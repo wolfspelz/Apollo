@@ -1,0 +1,6 @@
+LocalVpiFileName=_vpi.xml
+GlobalRoot=http://lms.virtual-presence.org/v7/root.xml
+DefaultTimeToLive=3600
+MinTimeToLive=20
+MaxVpiFileSize=30000
+ErrorTimeToLive=20

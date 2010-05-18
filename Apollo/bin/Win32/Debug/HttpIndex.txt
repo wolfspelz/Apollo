@@ -1,0 +1,25 @@
+http://www.virtual-presence.org/
+http://www.heise.de/
+http://www.heise.de/_vpi.xml
+http://www.bluehands.de/_vpi.xml
+http://exile.bluehands.de/
+http://www.virtual-presence.org/
+http://lms.virtual-presence.org/test/test-no-vpi/test1/_vpi.xml
+http://lms.virtual-presence.org/test/test-no-vpi/test2/_vpi.xml
+http://lms.virtual-presence.org/test/test-has-vpi/test-no-vpi/_vpi.xml
+http://lms.virtual-presence.org/test/test-has-vpi/test-fixed-name/_vpi.xml
+http://lms.virtual-presence.org/test/test-has-vpi/test-file-name/_vpi.xml
+http://lms.virtual-presence.org/test/test-no-vpi/test1/_vpi.xml
+http://lms.virtual-presence.org/test/test-no-vpi/_vpi.xml
+http://lms.virtual-presence.org/test/test-has-vpi/_vpi.xml
+http://lms.virtual-presence.org/test/_vpi.xml
+http://lms.virtual-presence.org/_vpi.xml
+http://lms.virtual-presence.org/root/root.xml
+http://lms.virtual-presence.org/root/org.xml
+http://lms.virtual-presence.org/root/default.xml
+http://scs.virtual-presence.org/char.php?name=char1 http/Test_Phoenix_ParseCharacter/char1.xml
+http://scs.virtual-presence.org/item.php?name=item1 http/Test_Phoenix_ParseCharacter/item1.xml
+http://scs.virtual-presence.org/item.php?name=item2 http/Test_Phoenix_ParseCharacter/item2.xml
+http://scs.virtual-presence.org/item.php?name=item3 http/Test_Phoenix_ParseCharacter/item3.xml
+http://scs.virtual-presence.org/item.php?name=item4 http/Test_Phoenix_ParseCharacter/item4.xml
+http://scs.virtual-presence.org/item.php?name=item5 http/Test_Phoenix_ParseCharacter/item5.xml

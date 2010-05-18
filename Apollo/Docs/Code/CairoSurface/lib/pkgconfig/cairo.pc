@@ -1,0 +1,13 @@
+prefix=c:/devel/target/a99af9c83971eecdc12777a56dbe2644
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: cairo
+Description: Multi-platform 2D graphics library
+Version: 1.8.10
+
+Requires.private:     freetype2 >= 9.7.3 fontconfig libpng   
+Libs: -L${libdir} -lcairo
+Libs.private:    -lz -lz      -lm
+Cflags: -I${includedir}/cairo

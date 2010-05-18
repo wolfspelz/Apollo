@@ -1,0 +1,3 @@
+content   avatarnav   chrome/chromeFiles/content/
+locale    avatarnav   en-US   chrome/chromeFiles/locale/en-US/avatarnav/
+overlay   chrome://browser/content/browser.xul   chrome://avatarnav/content/browser.xul

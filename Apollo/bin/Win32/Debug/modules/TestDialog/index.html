@@ -1,0 +1,128 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<script type="text/javascript" src="apollo.js"></script>
+<style>
+* { padding:0; margin:0; font-family:Verdana; font-size:11px; }
+input[type="button"] { padding-top:1px; padding-bottom:1px; padding-left:5px; padding-right:5px; }
+</style>
+<script type="text/javascript">
+function log(s) { document.getElementById('iOut').value = document.getElementById('iOut').value + s + '\n'; }
+
+function onMessage(msg)
+{
+  var sMethod = msg.getString('Method');
+  switch (sMethod) {
+    case 'OpenDisplayResponse':
+      var sDisplay = msg.getString('hDisplay');
+      document.getElementById('iHandle').value = sDisplay;
+      document.getElementById('iDisplayCallHandle').value = sDisplay;
+      break;
+
+    default:
+  }
+
+  var sMsg = '';
+  for (var i in msg.getList()) {
+    sMsg += i + '=' + msg.getList()[i] + '\n';
+  }
+  log(sMsg);
+}
+
+function onConfigResponse(sValue, sRef)
+{
+  log('onConfigResponse() ' + sRef + '=' + sValue);
+}
+
+function requestConfig(sModule, sKey)
+{
+  window.apollo.requestConfig(sModule, sKey);
+}
+
+function clearSrpc()
+{
+  document.getElementById('iSrpc').value = '';
+}
+
+function sendSrpc(sMsg)
+{
+  if (sMsg != '') {
+    if (sMsg.substr(sMsg.length-1) != '\n') { sMsg += '\n'; }
+    var msg = new SrpcMessage();
+    msg.fromString(sMsg);
+    msg.send(msg);
+  }
+}
+
+function clearDisplayCall()
+{
+  document.getElementById('iDisplayCallSrpc').value = '';
+}
+
+function sendDisplayCall(sHandle, sMsg)
+{
+  if (sMsg != '') {
+    if (sMsg.substr(sMsg.length-1) != '\n') { sMsg+= '\n'; }
+    var msg = new ApMessage('TestDialog_Command');
+    msg.setString('Method', 'DisplayCall');
+    msg.setString('hDisplay', sHandle);
+    msg.setString('sMsg', sMsg);
+    msg.send(msg);
+  }
+}
+</script>
+</head>
+<body style="background-color:#ffffcc;">
+<textarea id="iOut" style="position:absolute; width:50%; height:100%; left:50%; top:0; border:0px; border-left:1px solid #cccccc; "></textarea>
+<div style="position:absolute; left:0; top:0; width:50%; "><div style="margin:10px; ">
+
+<input type="button" value="Reload" onclick="window.location.reload();" />
+<input type="button" value="Quit"
+  onclick="var msg = new ApMessage('SrpcGate'); msg.setString('Method', 'MainLoop_EndLoop'); msg.send(msg);"
+  />
+<hr />
+
+<h1>Get config</h1>
+Module: <input id="iModule" type="text" value="TestDialog" /><br />
+Key: <input id="iKey" type="text" value="ContentURL" />
+<input type="button" value="Get" onclick="requestConfig(document.getElementById('iModule').value, document.getElementById('iKey').value, document.getElementById('iKey').value);" />
+<hr />
+
+<h1>Open display</h1>
+Path: <input id="iPath" type="text" value="C:\Wolf\Projekte\Apollo\Co &de\Apollo\fl\ApolloLib\ApolloDisplayTest\ApolloDisplayTest.exe" /><br />
+Args: <input id="iArgs" type="text" value="" />
+<input type="button" value="Open"
+  onclick="var msg = new ApMessage('TestDialog_Command'); msg.setString('Method', 'OpenDisplay'); msg.setString('sPath', document.getElementById('iPath').value); msg.setString('sArgs', document.getElementById('iArgs').value); msg.send(msg);"
+  />
+<hr />
+
+<h1>Close display</h1>
+hDisplay: <input id="iHandle" type="text" value="" />
+<input type="button" value="Close"
+  onclick="var msg = new ApMessage('SrpcGate'); msg.setString('Method', 'Fluid_Destroy'); msg.setString('hDisplay', document.getElementById('iHandle').value); msg.send(msg);"
+  />
+<hr />
+
+<h1>SRPC</h1>
+<table border="0" width="100%">
+<tr>
+  <td><textarea style="width:100%" id="iSrpc" rows="7" /></textarea></td>
+  <td valign="top" width="1"><input type="button" value="Clear" onclick="clearSrpc();" /><input type="button" value="Send" onclick="sendSrpc(document.getElementById('iSrpc').value);" /></td>
+</tr>
+</table>
+<hr />
+
+<h1>DisplayCall</h1>
+<table border="0" width="100%">
+<tr>
+  hDisplay: <input id="iDisplayCallHandle" type="text" value="" />
+  <td><textarea style="width:100%" id="iDisplayCallSrpc" rows="7" /></textarea></td>
+  <td valign="top" width="1"><input type="button" value="Clear" onclick="clearDisplayCall();" /><input type="button" value="Send" onclick="sendDisplayCall(document.getElementById('iDisplayCallHandle').value, document.getElementById('iDisplayCallSrpc').value);" /></td>
+</tr>
+</table>
+<hr />
+
+</div></div>
+</body>
+
+</html>

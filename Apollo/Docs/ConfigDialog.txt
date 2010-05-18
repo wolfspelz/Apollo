@@ -1,0 +1,38 @@
+
+ConfigDialog_Open <-
+
+ConfigDialog_RequestRegisterPanel ->
+
+ConfigDialog_RegisterPanel <-
+  hPanel
+  sLabel
+  sIconPath
+
+ConfigDialog_UnregisterPanel <-
+  hPanel
+
+ConfigDialog_SortPanels <->
+  KVList(sLabel, hModule)
+  
+Config Panel machen wenn noch nicht vorhanden (hDisplay)
+
+ConfigDialog_Load ->
+  hPanel
+  hDisplay
+
+ConfigDialog_SetMode ->
+  nMode { Small, Normal, Extended }
+
+ConfigDialog_GetMode <->
+  nMode { Small, Normal, Extended }
+
+ConfigDialog_BeforeUnload ->
+  hDisplay
+  hPanel
+
+ConfigDialog_Apply ->
+
+ConfigDialog_Cancel ->
+
+ConfigDialog_Close <-
+
