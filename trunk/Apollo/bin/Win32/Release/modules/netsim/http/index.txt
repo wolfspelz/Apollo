@@ -1,0 +1,5 @@
+http://www.virtual-presence.org/ dummy.html
+http://www.heise.de/ dummy.html
+http://www.heise.de/_vpi.xml dummy.xml
+http://www.bluehands.de/_vpi.xml dummy.xml
+https://ssl.google-analytics.com/urchin.js dummy.txt

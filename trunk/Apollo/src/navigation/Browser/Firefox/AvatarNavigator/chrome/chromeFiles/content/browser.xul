@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+
+<!-- Localization Information -->
+<!DOCTYPE overlay SYSTEM "chrome://avatarnav/locale/avatarnav.dtd">
+
+<overlay id="avatarnav_browser_overlay" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+  <!-- Include the javascript code -->
+  <script type="application/x-javascript" src="chrome://avatarnav/content/Log.js" />
+  <script type="application/x-javascript" src="chrome://avatarnav/content/Socket.js" />
+  <script type="application/x-javascript" src="chrome://avatarnav/content/SrpcMessage.js" />
+  <script type="application/x-javascript" src="chrome://avatarnav/content/SrpcProtocol.js" />
+  <script type="application/x-javascript" src="chrome://avatarnav/content/AvatarNavigator.js" />
+  <script type="application/x-javascript" src="chrome://avatarnav/content/browser.js" />
+  <script type="application/x-javascript" src="chrome://browser/content/utilityOverlay.js" />
+
+  <!-- Init only if this is an actual browser window (not prefs or something) -->
+  <window id="main-window">
+    <script type="application/x-javascript">
+      window.addEventListener("load", anLoad, false);
+			window.addEventListener("pagehide", anPageHide, false);
+    </script>
+  </window>
+
+  <!-- Add the avatarnav icon to the bottom right of screen -->
+  <statusbar id="status-bar">
+    <statusbarpanel class="statusbarpanel-iconic" id="avatarnav_sbi"
+      tooltiptext="&statusbar.tooltip.default;"
+      onclick="anToggle();"
+      src="chrome://avatarnav/content/images/logo18.png" />
+  </statusbar>
+
+  <!-- Create an avatarnav menu item -->
+  <menupopup id="menu_ToolsPopup">
+    <menuitem label="&menuitem.label;"
+      insertafter="devToolsSeparator" 
+      oncommand="anToggle();" />
+  </menupopup>
+
+</overlay>

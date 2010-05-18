@@ -1,0 +1,17 @@
+BEGIN TRANSACTION;
+CREATE TABLE Data (sKey TEXT UNIQUE, oValue BLOB, tCreated INT UNSIGNED, tLifetime INT UNSIGNED);
+INSERT INTO Data VALUES('Test_Config_DB/String','def',0,0);
+INSERT INTO Data VALUES('Test_Config_DB/EmptyString','',0,0);
+INSERT INTO Data VALUES('Test_Config_DB/Int',5,0,0);
+INSERT INTO Data VALUES('Test_Config_DB/Int0',0,0,0);
+INSERT INTO Data VALUES('Test_Config_DB/List/D/d',1,0,0);
+INSERT INTO Data VALUES('Test_Config_DB/List/E/e',2,0,0);
+INSERT INTO Data VALUES('Test_Config_DB/List/F',3,0,0);
+INSERT INTO Data VALUES('Test_Config_DBOverride/String','ghi',NULL,NULL);
+INSERT INTO Data VALUES('Test_Config_DBOverride/List/G/g',1,NULL,NULL);
+INSERT INTO Data VALUES('Test_Config_DBOverride/List/H/h',2,NULL,NULL);
+INSERT INTO Data VALUES('Test_Config_DBOverride/List/I',3,NULL,NULL);
+CREATE TABLE Version (nVersion INTEGER);
+INSERT INTO Version VALUES(6);
+CREATE UNIQUE INDEX iKey ON Data(sKey ASC);
+COMMIT;

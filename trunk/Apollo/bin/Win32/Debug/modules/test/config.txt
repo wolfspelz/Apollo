@@ -1,0 +1,16 @@
+LoadDLL/1=[[MODULE_LIBRARY_PATH]]/../netapi/netapi
+Language/en=[[MODULE_RESOURCE_PATH]]/testTranslation.en.txt
+Language/de=[[MODULE_RESOURCE_PATH]]/testTranslation.de.txt
+Language/de_DE=[[MODULE_RESOURCE_PATH]]/testTranslation.de.txt
+Language/zh=[[MODULE_RESOURCE_PATH]]/testTranslation.zh.txt
+
+Fluid/ExePath=[[MODULE_RESOURCE_PATH]]/../../SimpleHTML/SimpleHTML.exe
+Fluid/ContentURL=file:[[MODULE_RESOURCE_PATH]]/fluid/test.html
+#Fluid/ContentURL=http://blog.wolfspelz.de
+
+# Show window
+Fluid/InitiallyVisible=1
+# Do not close after test finished
+Fluid/SkipClose=0
+
+Fluid/ConfigTest=abc

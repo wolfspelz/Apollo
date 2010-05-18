@@ -1,0 +1,36 @@
+// AvatarNavigator.idl : IDL source for AvatarNavigator
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (AvatarNavigator.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	object,
+	uuid(C7DE94C3-5524-4EBF-8843-9BA20D2292C4),
+	dual,
+	nonextensible,
+	helpstring("IAvatarNavigatorBHO Interface"),
+	pointer_default(unique)
+]
+interface IAvatarNavigatorBHO : IDispatch{
+};
+[
+	uuid(3C93F8D4-C230-436D-839D-653B411BB417),
+	version(1.0),
+	helpstring("AvatarNavigator 1.0 Type Library")
+]
+library AvatarNavigatorLib
+{
+	importlib("stdole2.tlb");
+	[
+		uuid(4B2C4F08-7B67-4A7D-8DF6-EC64F046C6EC),
+		helpstring("AvatarNavigatorBHO Class")
+	]
+	coclass AvatarNavigatorBHO
+	{
+		[default] interface IAvatarNavigatorBHO;
+	};
+};

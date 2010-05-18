@@ -1,0 +1,62 @@
+<vpi xmlns='http://schema.bluehands.de/virtual-presence-info'>
+
+  <!-- globally ignore some -->
+  <location match='location-match-ignore'>
+    <ignore/>
+  </location>
+
+  <!-- handle .com(s) by another file --> 
+  <location match='location-match-delegate'>
+    <delegate>location-match-delegate-url</delegate> <!-- may be relative -->
+  </location>
+
+  <!-- all others go here -->
+  <location match='location-match-all'>
+
+      <!-- begin general instructions -->
+          <hidden/>
+          <destination>general-destination-replace</destination>
+          <protocol type='specific-protocol-type'><strict/></protocol>
+          <service>general-service</service>
+          <content xmlns='http://schema.bluehands.de/virtual-presence-content-interface'>
+            <handle>general-content-handle</handle>
+            <arg1>general-content-arg1</arg1>
+          </content>
+          <roles xmlns='http://schema.bluehands.de/virtual-presence-roles'>
+            <role type='owner'>general-roles-owner</role>
+            <role type='admin'>general-roles-admin</role>
+            <role type='moderator'>general-roles-moderator</role>
+            <role type='vip'>general-roles-vip</role>
+            <cert>general-roles-cert1</cert>
+            <cert>general-roles-cert2</cert>
+          </roles>
+      <!-- end general instructions -->
+
+    <mapping>
+      <rule match='location-mapping-rule-match'>
+        <search>location-mapping-rule-search</search>
+        <replace>location-mapping-rule-replace</replace>
+        <digest><prefix>location-mapping-rule-prefix</prefix></digest>
+      </rule>
+
+      <rule match='location-mapping-rule2-match'>
+        <room>location-mapping-rule2-replace</room>
+        <digest><prefix>location-mapping-rule2-prefix</prefix></digest>
+
+      <!-- begin rule specific instructions -->
+          <hidden/>
+          <destination>specific-destination-replace</destination>
+          <protocol type='specific-protocol-type'><strict/></protocol>
+          <service>specific-service</service>
+          <content xmlns='http://schema.bluehands.de/virtual-presence-content-interface'>
+            <handle>specific-content-handle</handle>
+            <arg1>specific-content-arg1</arg1>
+          </content>
+      <!-- end rule specific instructions -->
+
+      </rule>
+
+    </mapping>
+  </location>
+
+</vpi>

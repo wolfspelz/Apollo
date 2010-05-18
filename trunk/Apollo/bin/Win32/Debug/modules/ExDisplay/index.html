@@ -1,0 +1,964 @@
+﻿<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<script type="text/javascript" src="apollo.js"></script>
+<style>
+* { padding:0; margin:0; font-family:Verdana; font-size:11px; }
+input[type="button"] { padding-top:1px; padding-bottom:1px; padding-left:5px; padding-right:5px; }
+input[type="text"] { border:1px solid #808080; }
+.Location { border:2px solid #000000; padding:2px; margin-bottom:4px; }
+.Context { border:1px solid #808080; margin:3px; }
+.Invisible { color:#a0a0a0; border:1px solid #c0c0c0; }
+.Participant { padding:2px; border:1px solid #808080; margin:3px; overflow:hidden; }
+.Chat { margin:3px; }
+.Detail { float:left; border:1px solid #cccccc; margin:2px; }
+.Detail .Head { background-color:#ffffcc; }
+.Detail .Content { background-color:#ffffff; }
+.Image { float:right; }
+</style>
+<script type="text/javascript">
+function log(s) { var eGate = document.getElementById('iLogging'); if (eGate.checked) { var eOut = document.getElementById('iOut'); if (eOut) { eOut.value = eOut.value + s + '\n'; eOut.scrollTop = eOut.scrollHeight; }}}
+Function.prototype.bind = function(fn) { var m = this; return function() { return m.apply(fn, arguments); } }
+function setDomElementHtml(sDomId, sHtml) { var e = document.getElementById(sDomId); if (e) { e.innerHTML = sHtml; } }
+
+//----------------------------------------------------------------------
+
+var gContent = null;
+function Content()
+{
+  this.aLocations_ = new Object();
+  this.tStart_ = 0;
+  this.nHandleCnt_ = 0;
+  this.hProfile_ = '';
+  this.hParticipantProfile_ = '';
+}
+
+Content.prototype.getLocation = function(hLocation)
+{
+  return this.aLocations_[hLocation];
+}
+
+Content.prototype.newHandle = function()
+{
+  if (this.hProfile == '') {
+    this.nHandleCnt_++;
+    var sHandleCnt = '' + this.nHandleCnt_;
+    while (sHandleCnt.length() < 9) {
+      sHandleCnt = '0' + sHandleCnt;
+    }
+    this.hProfile_ = '[2' + sHandleCnt + ']';
+  }
+  return this.hProfile_;
+}
+
+Content.prototype.getContext = function(hContext)
+{
+  for (var i in this.aLocations_) {
+    if (this.aLocations_[i].hasContext(hContext)) {
+      return this.aLocations_[i].getContext(hContext);
+    }
+  }
+}
+
+Content.prototype.On_VpView_GetLocations = function(msg)
+{
+  var aOldLocations = new Object();
+  for (var i in this.aLocations_) {
+    aOldLocations[i] = false;
+  }
+
+  var vlLocations = msg.getString('vlLocations');
+  var aLocations = vlLocations.split(' ');
+  for (var i = 0; i < aLocations.length; i++) {
+    if (aLocations[i] != 0) {
+      if (this.aLocations_[aLocations[i]]) {
+        // already there
+        aOldLocations[aLocations[i]] = true;
+      } else {
+        // new
+        var pLocation = new Location(aLocations[i]);
+        pLocation.show();
+        this.aLocations_[aLocations[i]] = pLocation;
+      }
+    }
+  }
+
+  for (var i in aOldLocations) {
+    if (!aOldLocations[i]) {
+      this.aLocations_[i].hide();
+      delete this.aLocations_[i];
+    }
+  }
+}
+
+Content.prototype.onLocationsChanged = function()
+{
+  var msg = new ApMessage('SrpcGate');
+  msg.setString('Method', 'VpView_GetLocations');
+  msg.request(this.On_VpView_GetLocations.bind(this));
+}
+
+Content.prototype.On_System_GetTime = function(msg)
+{
+  this.tStart_ = msg.getInt('nSec');
+}
+
+Content.prototype.requestTime = function()
+{
+  var msg = new ApMessage('SrpcGate');
+  msg.setString('Method', 'System_GetTime');
+  msg.request(this.On_System_GetTime.bind(this));
+}
+
+Content.prototype.On_VpView_Profile_SetParticipantDetail = function(msg)
+{
+  this.nCntParticipantProfileResponses_++;
+  if (this.nCntParticipantProfileResponses_ >= this.nCntParticipantProfileRequests_) {
+    this.onLocationsChanged();
+  }
+}
+
+Content.prototype.addParticipantProfileKey = function(sKey, bByRef)
+{
+  this.nCntParticipantProfileRequests_++;
+  var msg = new ApMessage('SrpcGate');
+  msg.setString('Method', 'VpView_Profile_SetParticipantDetail');
+  msg.setString('hProfile', this.hParticipantProfile_);
+  msg.setString('sKey', sKey);
+  msg.setString('bByRef', bByRef);
+  msg.request(this.On_VpView_Profile_SetParticipantDetail.bind(this));
+}
+
+Content.prototype.On_VpView_Profile_Create = function(msg)
+{
+  this.nCntParticipantProfileResponses_++;
+}
+
+Content.prototype.createDisplayProfile = function()
+{
+  this.hParticipantProfile_ = this.newHandle();
+  this.nCntParticipantProfileRequests_++;
+  var msg = new ApMessage('SrpcGate');
+  msg.setString('Method', 'VpView_Profile_Create');
+  msg.setString('hProfile', this.hParticipantProfile_);
+  msg.request(this.On_VpView_Profile_Create.bind(this));
+
+  this.addParticipantProfileKey('Nickname', 0);
+  this.addParticipantProfileKey('avatar', 1);
+  this.addParticipantProfileKey('Status', 0);
+  this.addParticipantProfileKey('Message', 0);
+  this.addParticipantProfileKey('Position', 0);
+  this.addParticipantProfileKey('Condition', 0);
+  this.addParticipantProfileKey('PublicChat', 0);
+  this.addParticipantProfileKey('ProfilePage', 0);
+}
+
+Content.prototype.start = function()
+{
+  document.getElementById('iContent').innerHTML = '';
+  this.requestTime();
+    this.onLocationsChanged();
+  //this.createDisplayProfile();
+}
+
+//----------------------------------------------------------------------
+
+function ApHandleObject(hAp)
+{
+  this.hAp_ = hAp;
+  this.sDomId_ = this.getClass() + hAp.replace(/\[/, '_').replace(/\]/, '');
+}
+
+ApHandleObject.prototype.apHandle = function()
+{
+  return this.hAp_;
+}
+
+ApHandleObject.prototype.domId = function()
+{
+  return this.sDomId_;
+}
+
+//----------------------------------------------------------------------
+
+Location.prototype = {}; for (_ in ApHandleObject.prototype) { Location.prototype[_] = ApHandleObject.prototype[_]; }
+Location.prototype.baseClass = ApHandleObject;
+Location.prototype.getClass = function() { return 'Location'; }
+
+function Location(hAp)
+{
+  this.baseClass(hAp);
+  this.aContexts_ = new Object();
+  this.aParticipants_ = new Object();
+  this.sLocationUrl_ = '';
+  this.sState_ = '';
+}
+
+//-----------------------------------
+
+Location.prototype.show = function()
+{
+  var sHtml = '<'+'div id="' + this.domId() + '" class="Location"></div>';
+  document.getElementById('iContent').innerHTML += sHtml;
+  this.paint();
+
+  this.onContextsChanged();
+  this.onParticipantsChanged();
+  this.requestChats();
+  this.subscribeDetail('LocationUrl');
+  this.subscribeDetail('State');
+  this.requestDetail('LocationUrl');
+  this.requestDetail('State');
+}
+
+Location.prototype.paint = function()
+{
+  var e = document.getElementById(this.domId());
+  if (e) {
+    var s = ''
+    + '<div>' + this.domId() + '</div>'
+    + '<div id="' + this.domId() + 'LocationUrl">' + this.sLocationUrl_ + '</div>'
+    + '<div id="' + this.domId() + 'Contexts" class="Contexts"></div>'
+    + '<div id="' + this.domId() + 'Participants" class="Participants"></div>'
+    + '<div class="Chat">'
+    + '  <div id="' + this.domId() + 'Chatout" class="Chatout"></div>'
+    + '  <textarea id="' + this.domId() + 'Chatin" class="Chatin" rows="2"></textarea>'
+    + '  <input type="button" value="Send" onclick="var e = document.getElementById(\'' + this.domId() +  'Chatin\'); if (e) { gContent.getLocation(\'' + this.apHandle() + '\').sendChat(e.value); e.value = \'\'; }" />'
+    + '  <input type="button" value="Clear" onclick="var e = document.getElementById(\'' + this.domId() +  'Chatout\'); if (e) { e.innerHTML = \'\'; }"/>'
+    + '</div>'
+    + 'X=<input type="text" size="4" value="200" id="' + this.domId() + 'Position" />'
+    + '<input type="button" value="Set" onclick="var e = document.getElementById(\'' + this.domId() +  'Position\'); if (e) { gContent.getLocation(\'' + this.apHandle() + '\').sendPositionX(e.value); }" />'
+    + '<br/>'
+    + 'Condition:<input type="text" size="20" value="status=sleep" id="' + this.domId() + 'Condition" />'
+    + '<input type="button" value="Set" onclick="var e = document.getElementById(\'' + this.domId() +  'Condition\'); if (e) { gContent.getLocation(\'' + this.apHandle() + '\').sendCondition(e.value); }" />'
+    ;
+
+    e.innerHTML = s;
+  }
+}
+
+Location.prototype.hide = function()
+{
+  var e = document.getElementById(this.domId());
+  e.parentNode.removeChild(e);
+}
+
+//-----------------------------------
+
+Location.prototype.hasContext = function(hContext)
+{
+  return typeof(this.aContexts_[hContext]) != "undefined";
+}
+
+Location.prototype.getContext = function(hContext)
+{
+  return this.aContexts_[hContext];
+}
+
+Location.prototype.On_VpView_GetLocationContexts = function(msg)
+{
+  var aOldContexts = new Object();
+  for (var i in this.aContexts_) {
+    aOldContexts[i] = false;
+  }
+
+  var vlContexts = msg.getString('vlContexts');
+  var aContexts = vlContexts.split(' ');
+  for (var i = 0; i < aContexts.length; i++) {
+    if (aContexts[i] != 0) {
+      if (this.aContexts_[aContexts[i]]) {
+        // already there
+        aOldContexts[aContexts[i]] = true;
+      } else {
+        // new
+        var pContext = new Context(aContexts[i], this.domId());
+        pContext.show();
+        this.aContexts_[aContexts[i]] = pContext;
+      }
+    }
+  }
+
+  for (var i in aOldContexts) {
+    if (!aOldContexts[i]) {
+      this.aContexts_[i].hide();
+      delete this.aContexts_[i];
+    }
+  }
+}
+
+Location.prototype.On_VpView_GetParticipants = function(msg)
+{
+  var aOldParticipants = new Object();
+  for (var i in this.aParticipants_) {
+    aOldParticipants[i] = false;
+  }
+
+  var vlParticipants = msg.getString('vlParticipants');
+  var aParticipants = vlParticipants.split(' ');
+  for (var i = 0; i < aParticipants.length; i++) {
+    if (aParticipants[i] != 0) {
+      if (this.aParticipants_[aParticipants[i]]) {
+        // already there
+        aOldParticipants[aParticipants[i]] = true;
+      } else {
+        // new
+        var pParticipant = new Participant(aParticipants[i], this.domId());
+        pParticipant.show()
+        this.aParticipants_[aParticipants[i]] = pParticipant;
+      }
+    }
+  }
+
+  for (var i in aOldParticipants) {
+    if (!aOldParticipants[i]) {
+      this.aParticipants_[i].hide();
+      delete this.aParticipants_[i];
+    }
+  }
+}
+
+Location.prototype.onContextsChanged = function()
+{
+  var msg = new ApMessage('SrpcGate');
+  msg.setString('Method', 'VpView_GetLocationContexts');
+  msg.setString('hLocation', this.apHandle());
+  msg.request(this.On_VpView_GetLocationContexts.bind(this));
+}
+
+Location.prototype.onContextLocationAssigned = function(hDisplay)
+{
+}
+
+Location.prototype.onContextLocationUnassigned = function(hDisplay)
+{
+}
+
+Location.prototype.onParticipantsChanged = function()
+{
+  var msg = new ApMessage('SrpcGate');
+  msg.setString('Method', 'VpView_GetParticipants');
+  msg.setString('hLocation', this.apHandle());
+  msg.request(this.On_VpView_GetParticipants.bind(this));
+}
+
+Location.prototype.On_VpView_ReplayLocationPublicChat = function(msg)
+{
+}
+
+Location.prototype.requestChats = function()
+{
+  var msg = new ApMessage('SrpcGate');
+  msg.setString('Method', 'VpView_ReplayLocationPublicChat');
+  msg.setString('hLocation', this.apHandle());
+  msg.setInt('nMaxAge', 100);
+  msg.setInt('nMaxLines', 40);
+  msg.setInt('nMaxData', 2000);
+  msg.request(this.On_VpView_ReplayLocationPublicChat.bind(this));
+}
+
+Location.prototype.On_VpView_GetLocationDetail = function(msg)
+{
+  switch (msg.getString('sKey')) {
+    case 'LocationUrl':
+      this.sLocationUrl_ = msg.getString('sValue');
+      setDomElementHtml(this.domId() + 'LocationUrl', this.sLocationUrl_);
+      break;
+    case 'State':
+      this.sState_ = msg.getString('sValue');
+      break;
+  }
+}
+
+Location.prototype.onDetailsChanged = function(vlKeys)
+{
+  var aKeys = vlKeys.split(' ');
+  for (var i = 0; i < aKeys.length; i++) {
+    switch (aKeys[i]) {
+      case 'State':
+      case 'LocationUrl':
+        this.requestDetail(aKeys[i]);
+        break;
+    }
+  }
+}
+
+Location.prototype.subscribeDetail = function(sKey)
+{
+  var msg = new ApMessage('SrpcGate');
+  msg.setString('Method', 'VpView_SubscribeLocationDetail');
+  msg.setString('hLocation', this.hAp_);
+  msg.setString('sKey', sKey);
+  msg.request(null);
+}
+
+Location.prototype.requestDetail = function(sKey)
+{
+  var msg = new ApMessage('SrpcGate');
+  msg.setString('Method', 'VpView_GetLocationDetail');
+  msg.setString('sKey', sKey);
+  msg.setString('hLocation', this.apHandle());
+  msg.request(this.On_VpView_GetLocationDetail.bind(this));
+}
+
+//-----------------------------------
+
+Location.prototype.sendChat = function(sText)
+{
+  var msg = new ApMessage('SrpcGate');
+  msg.setString('Method', 'Vp_SendPublicChat');
+  msg.setString('hLocation', this.apHandle());
+  msg.setString('sText', sText);
+  msg.request(null);
+}
+
+Location.prototype.appendChat = function(sLine)
+{
+  var eChatout = document.getElementById(this.domId() + 'Chatout');
+  if (eChatout) {
+    eChatout.innerHTML += '<div class="Chatline">' + sLine + '</div>';
+  }
+}
+
+Location.prototype.sendPositionX = function(sX)
+{
+  var msg = new ApMessage('SrpcGate');
+  msg.setString('Method', 'Vp_SendPosition');
+  msg.setString('hLocation', this.apHandle());
+  msg.setKeyValueList('kvParams', { 'x': sX });
+  msg.request(null);
+}
+
+Location.prototype.sendCondition = function(sCondition)
+{
+  var msg = new ApMessage('SrpcGate');
+  msg.setString('Method', 'Vp_SendCondition');
+  msg.setString('hLocation', this.apHandle());
+  var aCondition = sCondition.split(' ');
+  var oCondition = {};
+  for (var i = 0; i < aCondition.length; i++) {
+    var nIndex = aCondition[i].indexOf('=');
+    if (nIndex > 0) {
+      var sKey = aCondition[i].substr(0, nIndex);
+      var sValue = aCondition[i].substr(nIndex + 1);
+      oCondition[sKey] = sValue;
+    }
+  }
+  msg.setKeyValueList('kvParams', oCondition);
+  msg.request(null);
+}
+
+//-----------------------------------
+
+Location.prototype.onEnterRequested = function()
+{
+}
+
+Location.prototype.onEnterBegin = function()
+{
+}
+
+Location.prototype.onEnterComplete = function()
+{
+  //this.requestChats();
+}
+
+Location.prototype.onLeaveRequested = function()
+{
+}
+
+Location.prototype.onLeaveBegin = function()
+{
+}
+
+Location.prototype.onLeaveComplete = function()
+{
+}
+
+Location.prototype.onContextDetailsChanged = function(hContext, vlKeys)
+{
+  this.aContexts_[hContext].onDetailsChanged(vlKeys);
+}
+
+Location.prototype.onParticipantDetailsChanged = function(hParticipant, vlKeys)
+{
+  this.aParticipants_[hParticipant].onDetailsChanged(vlKeys);
+}
+
+Location.prototype.onReceivePublicChat = function(hParticipant, hChat, sNickname, sText, nSec, nMicroSec)
+{
+  var sLine = nSec + ' ' + hChat + ' ' + sNickname + ': ' + sText;
+  this.appendChat(sLine);
+  
+  this.aParticipants_[hParticipant].onReceivePublicChat(hChat, sText, nSec, nMicroSec);
+}
+
+//----------------------------------------------------------------------
+
+Context.prototype = {}; for (_ in ApHandleObject.prototype) { Context.prototype[_] = ApHandleObject.prototype[_]; }
+Context.prototype.baseClass = ApHandleObject;
+Context.prototype.getClass = function() { return 'Context'; }
+
+function Context(hAp, sParentDomId)
+{
+  this.baseClass(hAp);
+  this.sParentDomId_ = sParentDomId;
+  this.sDocumentUrl_ = '';
+  this.sLocationUrl_ = '';
+  this.bVisible_ = true;
+  this.nX_ = null;
+  this.nY_ = null;
+  this.nWidth_ = null;
+  this.nHeight_ = null;
+}
+
+//-----------------------------------
+
+Context.prototype.show = function()
+{
+  var sHtml = '<div id="' + this.domId() + '" class="Context"></div>';
+  document.getElementById(this.sParentDomId_ + 'Contexts').innerHTML += sHtml;
+  this.paint();
+  
+  this.subscribeDetail('DocumentUrl');
+  this.subscribeDetail('LocationUrl');
+  this.subscribeDetail('Visibility');
+  this.subscribeDetail('Position');
+  this.subscribeDetail('Size');
+  this.requestDetail('DocumentUrl');
+  this.requestDetail('LocationUrl');
+  this.requestDetail('Visibility');
+  this.requestDetail('Position');
+  this.requestDetail('Size');
+}
+
+Context.prototype.paint = function()
+{
+  var e = document.getElementById(this.domId());
+  if (e) {
+    var s = ''
+    s += this.domId();
+    s += '<div id="' + this.domId() + 'DocumentUrl">' + this.sDocumentUrl_ + '</div>';
+    s += '<div id="' + this.domId() + 'LocationUrl">' + this.sLocationUrl_ + '</div>';
+
+    s += '<span id="' + this.domId() + 'Visible">' + this.bVisible_ + '</span>';
+    s += ' (<span id="' + this.domId() + 'X">' + this.nX_ + '</span>';
+    s += ',<span id="' + this.domId() + 'Y">' + this.nY_ + '</span>)';
+    s += ' (<span id="' + this.domId() + 'Width">' + this.nWidth_ + '</span>';
+    s += ',<span id="' + this.domId() + 'Height">' + this.nHeight_ + '</span>)';
+
+    e.innerHTML = s;
+    
+    e.className = this.bVisible_ ? 'Context Visible' : 'Context Invisible';
+  }
+}
+
+Context.prototype.hide = function()
+{
+  var e = document.getElementById(this.domId());
+  if (e) {
+    e.parentNode.removeChild(e);
+  }
+}
+
+//-----------------------------------
+
+Context.prototype.On_VpView_GetContextDetail = function(msg)
+{
+  switch (msg.getString('sKey')) {
+    case 'DocumentUrl':
+      this.sDocumentUrl_ = msg.getString('sValue');
+      setDomElementHtml(this.domId() + 'DocumentUrl', this.sDocumentUrl_);
+      break;
+
+    case 'LocationUrl':
+      this.sLocationUrl_ = msg.getString('sValue');
+      setDomElementHtml(this.domId() + 'LocationUrl', this.sLocationUrl_);
+      break;
+
+    case 'Visibility':
+      this.bVisible_ = (msg.getInt('sValue') == 1);
+      setDomElementHtml(this.domId() + 'Visible', this.bVisible_);
+      break;
+
+    case 'Position':
+      var kvValue = new SrpcMessage();
+      kvValue.fromString(msg.getString('sValue'));
+      this.nX_ = kvValue.getInt('nX');
+      this.nY_ = kvValue.getInt('nY');
+      setDomElementHtml(this.domId() + 'X', this.nX_);
+      setDomElementHtml(this.domId() + 'Y', this.nY_);
+      break;
+
+    case 'Size':
+      var kvValue = new SrpcMessage();
+      kvValue.fromString(msg.getString('sValue'));
+      this.nWidth_ = kvValue.getInt('nWidth');
+      this.nHeight_ = kvValue.getInt('nHeight');
+      setDomElementHtml(this.domId() + 'Width', this.nWidth_);
+      setDomElementHtml(this.domId() + 'Height', this.nHeight_);
+      break;
+  }
+  this.paint();
+}
+
+Context.prototype.onDetailsChanged = function(vlKeys)
+{
+  var aKeys = vlKeys.split(' ');
+  for (var i = 0; i < aKeys.length; i++) {
+    switch (aKeys[i]) {
+      case 'DocumentUrl':
+      case 'LocationUrl':
+      case 'Visibility':
+      case 'Position':
+      case 'Size':
+        this.requestDetail(aKeys[i]);
+        break;
+    }
+  }
+}
+
+Context.prototype.requestDetail = function(sKey)
+{
+  var msg = new ApMessage('SrpcGate');
+  msg.setString('Method', 'VpView_GetContextDetail');
+  msg.setString('hContext', this.hAp_);
+  msg.setString('sKey', sKey);
+  msg.request(this.On_VpView_GetContextDetail.bind(this));
+}
+
+Context.prototype.subscribeDetail = function(sKey)
+{
+  var msg = new ApMessage('SrpcGate');
+  msg.setString('Method', 'VpView_SubscribeContextDetail');
+  msg.setString('hContext', this.hAp_);
+  msg.setString('sKey', sKey);
+  msg.request(null);
+}
+
+Context.prototype.onVisibility = function(bVisible)
+{
+  this.bVisible_ = bVisible;
+  this.paint();
+}
+
+Context.prototype.onPosition = function(nX, nY)
+{
+  this.nX_ = nX;
+  this.nY_ = nY;
+  this.paint();
+}
+
+Context.prototype.onSize = function(nWidth, nHeight)
+{
+  this.nWidth_ = nWidth;
+  this.nHeight_ = nHeight;
+  this.paint();
+}
+
+//----------------------------------------------------------------------
+
+Participant.prototype = {}; for (_ in ApHandleObject.prototype) { Participant.prototype[_] = ApHandleObject.prototype[_]; }
+Participant.prototype.baseClass = ApHandleObject;
+Participant.prototype.getClass = function() { return 'Participant'; }
+
+function Participant(hAp, sParentDomId)
+{
+  this.baseClass(hAp);
+  this.sParentDomId_ = sParentDomId;
+
+  this.sNickname_ = '';
+  this.sImageUrl_ = '';
+  this.sStatus_ = '';
+  this.sMessage_ = '';
+  this.sPosition_ = '';
+  this.sCondition_ = '';
+  this.sProfilePage_ = '';
+}
+
+//-----------------------------------
+
+Participant.prototype.On_VpView_GetParticipantDetailString = function(msg)
+{
+  switch (msg.getString('sKey')) {
+    case 'Nickname':
+      this.sNickname_ = msg.getString('sValue');
+      break;
+
+    case 'Status':
+      this.sStatus_ = msg.getString('sValue');
+      break;
+
+    case 'Message':
+      this.sMessage_ = msg.getString('sValue');
+      break;
+
+    case 'Position':
+      this.sPosition_ = msg.getString('sValue');
+      break;
+
+    case 'Condition':
+      this.sCondition_ = msg.getString('sValue');
+      break;
+
+    case 'ProfilePage':
+      this.sProfilePage_ = msg.getString('sValue');
+      break;
+  }
+  this.paint();
+}
+
+Participant.prototype.requestDetail = function(sKey)
+{
+
+  var msg = new ApMessage('SrpcGate');
+  msg.setString('Method', 'VpView_GetParticipantDetailString');
+  msg.setString('sKey', sKey);
+  msg.setString('hParticipant', this.hAp_);
+  msg.request(this.On_VpView_GetParticipantDetailString.bind(this));
+}
+
+Participant.prototype.On_VpView_GetParticipantDetailRef = function(msg)
+{
+  switch (msg.getString('sKey')) {
+    case 'avatar':
+      this.sImageUrl_ = msg.getString('sUrl');
+      break;
+  }
+  this.paint();
+}
+
+Participant.prototype.requestDetailRef = function(sKey)
+{
+
+  var msg = new ApMessage('SrpcGate');
+  msg.setString('Method', 'VpView_GetParticipantDetailRef');
+  msg.setString('sKey', sKey);
+  msg.setString('hParticipant', this.hAp_);
+  msg.request(this.On_VpView_GetParticipantDetailRef.bind(this));
+}
+
+Participant.prototype.onDetailsChanged = function(vlKeys)
+{
+  var aKeys = vlKeys.split(' ');
+  for (var i = 0; i < aKeys.length; i++) {
+    switch (aKeys[i]) {
+      case 'Nickname':
+      case 'Status':
+      case 'Message':
+      case 'Position':
+      case 'Condition':
+      case 'ProfilePage':
+        this.requestDetail(aKeys[i]);
+        break;
+      case 'avatar':
+        this.requestDetailRef(aKeys[i]);
+        break;
+    }
+  }
+}
+
+Participant.prototype.On_VpView_SubscribeParticipantDetail = function(msg)
+{
+}
+
+Participant.prototype.subscribeDetail = function(sKey)
+{
+  var msg = new ApMessage('SrpcGate');
+  msg.setString('Method', 'VpView_SubscribeParticipantDetail');
+  msg.setString('hParticipant', this.hAp_);
+  msg.setString('sKey', sKey);
+  msg.request(this.On_VpView_SubscribeParticipantDetail.bind(this));
+}
+
+Participant.prototype.onReceivePublicChat = function(hChat, sText, nSec, nMicroSec)
+{
+}
+
+//-----------------------------------
+
+Participant.prototype.show = function()
+{
+  var sHtml = '<div id="' + this.domId() + '"  class="Participant"></div>';
+  document.getElementById(this.sParentDomId_ + 'Participants').innerHTML += sHtml;
+  this.paint();
+
+  var aAvatarMimeTypes = new Array();
+  aAvatarMimeTypes.push('avatar/gif');
+  aAvatarMimeTypes.push('image/gif');
+
+  this.subscribeDetail('Nickname');
+  this.subscribeDetail('avatar', aAvatarMimeTypes);
+  this.subscribeDetail('Status');
+  this.subscribeDetail('Message');
+  this.subscribeDetail('Position');
+  this.subscribeDetail('Condition');
+  this.subscribeDetail('PublicChat');
+  this.subscribeDetail('ProfilePage');
+
+  this.requestDetail('Nickname');
+  this.requestDetailRef('avatar', aAvatarMimeTypes);
+  this.requestDetail('Status');
+  this.requestDetail('Message');
+  this.requestDetail('Position');
+  this.requestDetail('Condition');
+  //this.requestDetail('PublicChat');
+  this.requestDetail('ProfilePage');
+}
+
+Participant.prototype.hide = function()
+{
+  var e = document.getElementById(this.domId());
+  if (e) {
+    e.parentNode.removeChild(e);
+  }
+}
+
+Participant.prototype.getDetailHtml = function(sHead, sContent)
+{
+  var s = '<div class="Detail"><div class="Head">' + sHead + '</div><div class="Content">' + sContent + '</div></div>';
+  return s;
+}
+
+Participant.prototype.paint = function()
+{
+  var e = document.getElementById(this.domId());
+  if (e) {
+    var s = '';
+    s += '<div>' + this.domId() + '</div>';
+
+    if (this.sNickname_ != '') { s += this.getDetailHtml('Nickname', this.sNickname_); }
+    if (this.sStatus_ != '') { s += this.getDetailHtml('Status', this.sStatus_); }
+    if (this.sMessage_ != '') { s += this.getDetailHtml('Message', this.sMessage_); }
+    if (this.sPosition_ != '') { s += this.getDetailHtml('Position', this.sPosition_); }
+    if (this.sCondition_ != '') { s += this.getDetailHtml('Condition', this.sCondition_); }
+    if (this.sProfilePage_ != '') { s += this.getDetailHtml('ProfilePage', this.sProfilePage_); }
+
+    if (this.sImageUrl_ != '') {
+      s += '<div class="Image"><img src="' + this.sImageUrl_ + '" />' + '</div>';
+    }
+
+    e.innerHTML = s;
+  }
+}
+
+//----------------------------------------------------------------------
+
+function onLog(s)
+{
+  log(s);
+}
+
+var gSrpcId = 1;
+
+function onMessage(msg)
+{
+  var sMethod = msg.getString('Method');
+  switch (sMethod) {
+    case 'VpView_EnterLocationRequested': if (gContent) { gContent.getLocation(msg.getString('hLocation')).onEnterRequested(); } break;
+    case 'VpView_EnterLocationBegin': if (gContent) { gContent.getLocation(msg.getString('hLocation')).onEnterBegin(); } break;
+    case 'VpView_EnterLocationComplete': if (gContent) { gContent.getLocation(msg.getString('hLocation')).onEnterComplete(); } break;
+    case 'VpView_LeaveLocationRequested': if (gContent) { gContent.getLocation(msg.getString('hLocation')).onLeaveRequested(); } break;
+    case 'VpView_LeaveLocationBegin': if (gContent) { gContent.getLocation(msg.getString('hLocation')).onLeaveBegin(); } break;
+    case 'VpView_LeaveLocationComplete': if (gContent) { gContent.getLocation(msg.getString('hLocation')).onLeaveComplete(); } break;
+    case 'VpView_LocationsChanged': if (gContent) { gContent.onLocationsChanged(); } break;
+    case 'VpView_LocationContextsChanged': if (gContent) { gContent.getLocation(msg.getString('hLocation')).onContextsChanged(); } break;
+    case 'VpView_ContextLocationAssigned': if (gContent) { gContent.getLocation(msg.getString('hLocation')).onContextLocationAssigned(msg.getString('hContext')); } break;
+    case 'VpView_ContextLocationUnassigned': if (gContent) { gContent.getLocation(msg.getString('hLocation')).onContextLocationUnassigned(msg.getString('hContext')); } break;
+    case 'VpView_ParticipantsChanged': if (gContent) { gContent.getLocation(msg.getString('hLocation')).onParticipantsChanged(); } break;
+    case 'VpView_LocationPublicChat': if (gContent) { gContent.getLocation(msg.getString('hLocation')).onReceivePublicChat(msg.getString('hParticipant'), msg.getString('hChat'), msg.getString('sNickname'), msg.getString('sText'), msg.getInt('nSec'), msg.getInt('nMicroSec')); } break;
+    case 'VpView_LocationDetailsChanged': if (gContent) { gContent.getLocation(msg.getString('hLocation')).onDetailsChanged(msg.getString('vlKeys')); } break;
+    case 'VpView_ContextDetailsChanged': if (gContent) { gContent.getContext(msg.getString('hContext')).onDetailsChanged(msg.getString('vlKeys')); } break;
+    case 'VpView_ParticipantDetailsChanged': if (gContent) { gContent.getLocation(msg.getString('hLocation')).onParticipantDetailsChanged(msg.getString('hParticipant'), msg.getString('vlKeys')); } break;
+    case 'VpView_ContextVisibility': if (gContent) { gContent.getContext(msg.getString('hContext')).onVisibility(msg.getInt('bVisible') == 1); } break;
+    case 'VpView_ContextPosition': if (gContent) { gContent.getContext(msg.getString('hContext')).onPosition(msg.getInt('nX'), msg.getInt('nY')); } break;
+    case 'VpView_ContextSize': if (gContent) { gContent.getContext(msg.getString('hContext')).onSize(msg.getInt('nWidth'), msg.getInt('nHeight')); } break;
+
+    default:
+  }
+}
+
+function sendSrpc(sMsg)
+{
+  if (sMsg != '') {
+    if (sMsg.substr(sMsg.length-1) != '\n') { sMsg += '\n'; }
+    var msg = new ApMessage('SrpcGate');
+    msg.fromString(sMsg);
+    msg.send();
+  }
+}
+
+function srpcResponse(msg)
+{
+}
+
+function requestSrpc(sMsg)
+{
+  if (sMsg != '') {
+    if (sMsg.substr(sMsg.length-1) != '\n') { sMsg += '\n'; }
+    var msg = new ApMessage('SrpcGate');
+    msg.fromString(sMsg);
+    msg.request(srpcResponse);
+  }
+}
+
+function getCurrentState()
+{
+  gContent = new Content();
+  gContent.start();
+}
+
+</script>
+</head>
+
+<body onload="getCurrentState();">
+<div style="position:absolute; left:0; top:0; width:25%; height:100%; background-color:#ffffcc;"><div style="margin:10px;">
+
+  <input type="button" value="Reload" onclick="window.location.reload();" />
+  <input type="button" value="Quit" onclick="var msg = new ApMessage('SrpcGate'); msg.setString('Method', 'MainLoop_EndLoop'); msg.send(msg);" />
+  <input type="button" value="Clear" onclick="document.getElementById('iOut').value = '';" />
+  <input type="checkbox" id="iLogging" checked="checked"/><label for="iLogging">Logging</label>
+  <hr />
+
+  <input type="button" value="Connect" onclick="var msg = new ApMessage('SrpcGate'); msg.setString('Method', 'Xmpp_Connect'); msg.send(msg);" />
+  <input type="button" value="Disconnect" onclick="var msg = new ApMessage('SrpcGate'); msg.setString('Method', 'Xmpp_Disconnect'); msg.send(msg);" />
+  <hr />
+
+  <h1>via SrpcGate</h1>
+  <table border="0" width="100%">
+  <tr>
+    <td>
+      <textarea style="width:100%;" id="iSrpc" rows="7"></textarea>
+      <input type="button" value="Clear" onclick="document.getElementById('iSrpc').value = '';" />
+      <input type="button" value="Send" onclick="sendSrpc(document.getElementById('iSrpc').value);" />
+      <input type="button" value="Request" onclick="requestSrpc(document.getElementById('iSrpc').value);" />
+    </td>
+  </tr>
+  </table>
+  <hr />
+
+  <input id="iURL" type="text" style="width:100%" value="http://forum.openvirtualworld.com/" /><br/>
+  <input id="iContext" type="text" size="15" value="[10000000001]" />
+  <input type="button" value="Navigate"
+    onclick="var msg = new ApMessage('SrpcGate'); msg.setString('Method', 'Vp_NavigateContext'); msg.setString('hContext', document.getElementById('iContext').value); msg.setString('sUrl', document.getElementById('iURL').value); msg.send(msg);"
+    />
+  <input type="button" value="Close"
+    onclick="var msg = new ApMessage('SrpcGate'); msg.setString('Method', 'Vp_CloseContext'); msg.setString('hContext', document.getElementById('iContext').value); msg.send(msg);"
+    />
+  <input onclick="var msg = new ApMessage('SrpcGate'); msg.setString('Method', 'Vp_CloseContext'); msg.setString('hContext', document.getElementById('iContext').value); msg.send(msg); var msg = new ApMessage('SrpcGate'); msg.setString('Method', 'Vp_NavigateContext'); msg.setString('hContext', document.getElementById('iContext').value); msg.setString('sUrl', document.getElementById('iURL').value); msg.send(msg); "
+    type="button" value="#" />
+  <hr />
+
+  <input type="button" value="getCurrentState"
+    onclick="getCurrentState();"
+    />
+  <hr />
+
+</div></div>
+
+<div id="iContent" style="position:absolute; left:0; top:0; width:50%; height:100%; left:25%; top:0; border:0px; background-color:#ffffee; overflow:auto"><div style="margin:10px; ">
+  xx
+</div></div>
+
+<textarea id="iOut" style="font-size:9px; font-family:Lucida Console; position:absolute; width:25%; height:100%; left:75%; top:0; border:0px; "></textarea>
+</body>
+</html>

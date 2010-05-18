@@ -1,0 +1,15 @@
+Active=1
+#StartOnRunLevelNormal=1
+
+Srpc/Url=http://web.avatar.io/srpc
+Srpc/ApiToken=8uzxXXZTAmHcni6tK3t
+#Srpc/MaxDataSize=30000
+
+#Register/MaxRetries=3
+#Register/RetryDelay=10
+#Register/RetryRandomDelay=10
+#Register/UseLoginAsNickname=1
+
+#Login/MaxRetries=1000000000
+#Login/RetryDelay=30
+#Login/RetryRandomDelay=30

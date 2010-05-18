@@ -1,0 +1,42 @@
+# Module independent config
+# Each module has its own config and optional local config
+
+#Test/Builtin=1
+#Test/Core=1
+#Test/Config=1
+#Test/Translation=1
+#Test/Threads=1
+#Test/Timer=1
+#Test/Db=1
+#Test/Xmpp=1
+#Test/Server=1
+#Test/Net=1
+#Test/Vpi=1
+#Test/Vp=1
+#Test/Identity=1
+#Test/Fluid=1
+#Test/Gm=1
+
+Update/Url=http://web.avatar.io/update/
+Update/Version=3.0.4
+
+# Put these lines uncommented into config.local.txt and enter your data
+#Xmpp/Connection/JabberId=Your@JabberId.Here
+#Xmpp/Connection/Password=YourJabberPasswordHere
+#Xmpp/Room/Nickname=YourNicknameHere
+#Vp/Identity/Url=http://Your.Identity.Url
+#Vp/Identity/Digest=YourIdentityDigest
+
+# For example:
+#Xmpp/Connection/JabberId=jabberDun@jabber.org
+#Xmpp/Connection/Password=qWaUVoeLQ88yGaJ4INFK
+#Xmpp/Room/Nickname=jabberDun
+#Vp/Identity/Url=http://storage.zweitgeist.com/index.php/18137194 
+#Vp/Identity/Digest=a69e77843cb5e49283bc9f27eb766264563cc2ab
+
+#ExDisplay/ExePath=C:/Wolf/Projekte/Apollo/Co &de/Apollo/fl/ApolloLib/ApolloDisplayTest/ApolloDisplayTest.exe
+#ExDisplay/InitiallyVisible=0
+#ExDisplay/Left=100
+#ExDisplay/Top=100
+#ExDisplay/Width=500
+#ExDisplay/Height=400

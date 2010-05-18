@@ -1,0 +1,82 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<script type="text/javascript" src="apollo.js"></script>
+</head>
+<body style="background-color:rgba(255,255,225,0.8)">
+<script type="text/javascript">
+function writeTestdata()
+{
+  try {
+    document.write(window.apollo.testProperty + ' ');
+    document.write(window.apollo.testFunction() + ' ');
+  } catch (ex) {
+    document.write(ex);
+  }
+}
+
+function fillMemory()
+{
+  try {
+    document.getElementById('iTotalMemory').innerHTML = window.apollo ? window.apollo.totalMemory : '-';
+  } catch (ex) {
+    alert(ex);
+  }
+}
+</script>
+<script type="text/javascript">writeTestdata();</script>
+TotalMemory: <span id="iTotalMemory"></span><script type="text/javascript">fillMemory();</script>
+
+<script type="text/javascript">
+function onUnittestClick()
+{
+  var msg = new SrpcMessage()
+  var s = msg.unitTest();
+  if (s) { alert(s); }
+}
+
+function onButtonClick()
+{
+  var msg = new ApMessage('fluidTest_Type')
+  msg.setString('Method', 'Test');
+  msg.setString('a', 'b\nc');
+  msg.setString('d', 'ü');
+  msg.setString('e', '首頁äöa');
+  msg.send();
+}
+
+function onMessage(msg)
+{
+  var s = '';
+  var aList = msg.getList();
+  for (var i in aList) {
+    s += i + '=' + aList[i] + '\n';
+  }
+  s += '\n';
+  for (var i in aList) {
+    s += i + ':[' + msg.getString(i) + ']\n';
+  }
+  document.getElementById('iText').value = s;
+}
+</script>
+
+<br/><br/>
+<img src="Fitzliputz-22b.png" align="right" />
+Mähen Äbte Klee? Nie mähen Äbte Klee. Äbte beten.
+Mäte Klee. Äbte beten.
+Mäte Klee. Äbte beten.
+Mähen Äbten Äbte Klee. Äbte beten.
+Mähen Äbten Äbte Klee. Äb Klee? Nie mähete beten.
+Mähen Äbten hen Äbten ÄbÄbte Klee. Äb Klee? Nie mähete beten.
+MÄbÄbte KleeNie mäheähen Äbten hen Äbten . Äb Klee? Nie mähete beten.
+Mähen Äbten Äbte Klee. Äb Klee? Nie mähete beten.
+Mähen Äbte Klee? Nie mähe Klee? Nie mähen Äbte Klee. Äbte beten.
+<br clear="all"/>
+
+<br/>
+<input id="iUnittest" type="button" value="Unittest" onClick="onUnittestClick();" />
+<input id="iButton" type="button" value="Hello World" onClick="onButtonClick();" />
+<textarea id="iText" cols="60" rows="14" /></textarea>
+
+</body>
+</html>

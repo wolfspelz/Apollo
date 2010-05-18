@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<VisualStudioPropertySheet
+	ProjectType="Visual C++"
+	Version="8.00"
+	Name="global"
+	OutputDirectory="$(ProjectDir)/$(ConfigurationName)"
+	IntermediateDirectory="$(ProjectDir)/$(ConfigurationName)"
+	>
+	<Tool
+		Name="VCBscMakeTool"
+		OutputFile="$(IntDir)/$(ProjectName).bsc"
+	/>
+	<Tool
+		Name="VCCLCompilerTool"
+		FavorSizeOrSpeed="2"
+		AdditionalIncludeDirectories="../;&quot;$(ProjectDir)/&quot;;&quot;$(IncludeDir)/&quot;"
+		PreprocessorDefinitions="WIN32;_WINDOWS,_MBCS"
+		StringPooling="true"
+		StructMemberAlignment="4"
+		EnableEnhancedInstructionSet="1"
+		BrowseInformation="1"
+		DisableSpecificWarnings="4244;4267;4311;4312;4996"
+	/>
+	<Tool
+		Name="VCLibrarianTool"
+		OutputFile="$(LibDir)\$(ProjectName).lib"
+		AdditionalLibraryDirectories="$(LibDir)"
+	/>
+	<Tool
+		Name="VCLinkerTool"
+		OutputFile=""
+		AdditionalLibraryDirectories="&quot;$(LibDir)&quot;"
+		SubSystem="2"
+		LargeAddressAware="0"
+		OptimizeForWindows98="1"
+		ProfileGuidedDatabase=""
+		TargetMachine="1"
+	/>
+	<UserMacro
+		Name="IncludeDir"
+		Value="..\..\include"
+		PerformEnvironmentSet="true"
+	/>
+	<UserMacro
+		Name="LibDir"
+		Value="..\..\lib\Win32\$(ConfigurationName)"
+		PerformEnvironmentSet="true"
+	/>
+	<UserMacro
+		Name="BinDir"
+		Value="..\..\bin\Win32\$(ConfigurationName)"
+		PerformEnvironmentSet="true"
+	/>
+</VisualStudioPropertySheet>

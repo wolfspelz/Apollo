@@ -1,0 +1,3 @@
+#version=1
+#ässert UTF-8
+Window.Title=頁首
