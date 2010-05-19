@@ -401,7 +401,6 @@ int Test_Config_DBOverride()
     msg.Request();
   }
 
-
   // Check values from DB
   { int n = Apollo::getConfig("Test_Config_DB/not-available", 42); if (n != 42) ok = 0; }
   { int n = Apollo::getConfig("Test_Config_DB/String", 43); if (n != 0) ok = 0; }
