@@ -1,0 +1,48 @@
+WinUnitTest/Test=1
+
+Test/Builtin=1
+Test/Core=1
+Test/Config=1
+Test/Translation=1
+Test/Threads=1
+Test/Timer=1
+Test/Db=1
+Test/Xmpp=1
+Test/Server=1
+Test/Net=1
+Test/Vpi=1
+Test/Vp=1
+Test/Identity=1
+Test/Fluid=1
+Test/Gm=1
+Test/Navigation=1
+  Test/BrowserInfo=1
+Test/Arena=1
+Test/Nimator=1
+
+ExDisplay/AutoStartExe=0
+
+  Gm/Active=0
+  Gm/StartOnRunLevelNormal=1
+  Gm/Srpc/Url=http://localhost:3277/srpc
+  Gm/User=wolfspelz
+  Gm/Password=gaga123
+
+Net/IgnoreLocalIp/192.168.128.1=1
+Net/IgnoreLocalIp/192.168.17.1=1
+
+TestDialog/Html/ContentURL=file:[[MODULE_RESOURCE_PATH]]/hw.html
+TestDialog/Left=1100
+TestDialog/Top=100
+TestDialog/Width=500
+TestDialog/Height=400
+
+Vp/Identity/Url=http://ydentiti.org/test/Planta/identity2.xml
+Vp/Identity/Digest=1
+
+WinMainLoop/ShowWindow=1
+
+  Xmpp/Connection/JabberId=test@wolfspelz.de
+  Xmpp/Connection/Password=dmgowtxykkbTckSqV8B
+  Xmpp/Room/Nickname=Fitzliputz
+Xmpp/StartOnRunLevelNormal=0
