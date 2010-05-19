@@ -177,7 +177,7 @@ String SQLiteFile::getErrorMessage()
 
 String SQLiteFile::pathFromName(const String& sName)
 {
-  String sBase = Apollo::getModuleConfig(MODULE_NAME, "BaseFolder", "./");
+  String sBase = Apollo::getModuleConfig(MODULE_NAME, "BaseFolder", Apollo::getAppResourcePath());
   sBase = Apollo::applyPathVars(sBase);
   if (!sBase.empty()) { sBase.makeTrailingSlash(); }
 

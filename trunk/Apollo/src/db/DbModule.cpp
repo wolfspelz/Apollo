@@ -318,9 +318,9 @@ static String Test_Db_Basic()
 
   // Bulk data
   Buffer sbFile;
-  Apollo::loadFile("ApCore.dll", sbFile);
+  Apollo::loadFile(Apollo::getAppResourcePath() + "ApCore.dll", sbFile);
   Buffer sbFile2;
-  Apollo::loadFile("test1.png", sbFile2);
+  Apollo::loadFile(Apollo::getAppResourcePath() + "test1.png", sbFile2);
 
   if (!s) {
     Msg_DB_SetBinary msg;

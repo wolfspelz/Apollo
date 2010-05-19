@@ -404,7 +404,7 @@ String IdentityModuleTester::test_GetItem()
   }
 
   Buffer sbImage;
-  if (!Apollo::loadFile("test1.png", sbImage)) {
+  if (!Apollo::loadFile(Apollo::getAppResourcePath() + "test1.png", sbImage)) {
     s = "Apollo::loadFile(test1.png) failed";
   }
 
@@ -744,7 +744,7 @@ String IdentityModuleTester::test_Change()
   }
 
   Buffer sbImage;
-  if (!Apollo::loadFile("test1.png", sbImage)) {
+  if (!Apollo::loadFile(Apollo::getAppResourcePath() + "test1.png", sbImage)) {
     s = "Apollo::loadFile(test1.png) failed";
   }
 
