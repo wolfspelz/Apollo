@@ -21,6 +21,9 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
+#include "_vld.h"
+#if defined(_VLD)
+
 #include <cassert>
 #include <cstdio>
 #include <windows.h>
@@ -778,3 +781,5 @@ BOOL strtobool (LPCWSTR s) {
         return FALSE;
     }
 }
+
+#endif

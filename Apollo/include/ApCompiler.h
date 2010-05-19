@@ -9,7 +9,7 @@
 
 // ------------------------------------
 
-#define AP_MEMORY_CHECK_USE_VLD 0
+#define AP_MEMORY_CHECK_USE_VLD 0 // 1 is broken
 
 // ------------------------------------
 
@@ -17,8 +17,8 @@
 #undef NAMESPACE_BEGIN
 #endif
 
-#define NAMESPACE_BEGIN( _ns_ )             namespace _ns_ {
-#define NAMESPACE_END( _ns_ )               };
+#define NAMESPACE_BEGIN( _ns_ )  namespace _ns_ {
+#define NAMESPACE_END( _ns_ )    };
 
 #if defined(_MSC_VER) && defined(_DEBUG)
   #define AP_DEBUG_BREAK() __asm { int 3 }
@@ -93,4 +93,3 @@
 #endif
 
 #endif // ApCompiler_H_INCLUDED
-

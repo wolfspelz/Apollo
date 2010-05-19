@@ -21,6 +21,9 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
+#include "_vld.h"
+#if defined(_VLD)
+
 #include <cassert>
 #define VLDBUILD     // Declares that we are building Visual Leak Detector.
 #include "ntapi.h"   // Provides access to NT APIs.
@@ -210,3 +213,5 @@ void* vldnew (unsigned int size, const char *file, int line)
     // Return a pointer to the beginning of the data section of the block.
     return (void*)VLDBLOCKDATA(header);
 }
+
+#endif

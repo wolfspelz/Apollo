@@ -21,6 +21,9 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
+#include "_vld.h"
+#if defined(_VLD)
+
 #pragma comment(lib, "dbghelp.lib")
 
 #include <cassert>
@@ -3337,3 +3340,7 @@ VOID VisualLeakDetector::unmapheap (HANDLE heap)
     m_heapmap->erase(heapit);
     LeaveCriticalSection(&m_maplock);
 }
+
+#else
+__declspec(dllexport) int vld_dummy() { return 42; }
+#endif

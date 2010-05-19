@@ -21,6 +21,9 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
+#include "_vld.h"
+#if defined(_VLD)
+
 #include <cassert>
 #include <windows.h>
 #define __out_xcount(x) // Workaround for the specstrings.h bug in the Platform SDK.
@@ -438,3 +441,5 @@ VOID SafeCallStack::getstacktrace (UINT32 maxdepth, SIZE_T *framepointer)
     }
     LeaveCriticalSection(&stackwalklock);
 }
+
+#endif

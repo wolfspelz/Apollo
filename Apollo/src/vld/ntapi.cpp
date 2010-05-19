@@ -21,6 +21,9 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
+#include "_vld.h"
+#if defined(_VLD)
+
 #define VLDBUILD
 #include "ntapi.h"
 
@@ -30,3 +33,5 @@ LdrLoadDll_t        LdrLoadDll;
 RtlAllocateHeap_t   RtlAllocateHeap;
 RtlFreeHeap_t       RtlFreeHeap;
 RtlReAllocateHeap_t RtlReAllocateHeap;
+
+#endif
