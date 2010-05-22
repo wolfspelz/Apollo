@@ -1,6 +1,7 @@
 General
 -------
 
+Set Win32App as startup project
 It should just compile.
 If you run it, then it will register a new account, start the xmpp client and log in. 
 Check the console window for XMPP I/O.
