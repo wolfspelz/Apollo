@@ -269,7 +269,7 @@ void Context::DrawSurface()
 
   int w, h;
   cairo_surface_t *image;
-  image = cairo_image_surface_create_from_png("tassadar.png");
+  image = cairo_image_surface_create_from_png(Apollo::getAppResourcePath() + "tassadar.png");
   w = cairo_image_surface_get_width(image);
   h = cairo_image_surface_get_height(image);
   cairo_scale(cr, 100.0/w, 100.0/h);
