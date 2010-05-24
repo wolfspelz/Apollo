@@ -60,10 +60,17 @@ AP_MSG_HANDLER_METHOD(NimatorModule, Animation_Event)
 
 #if defined(AP_TEST)
 
+String NimatorModule::Test1()
+{
+  String s;
+  return s;
+}
+
 AP_MSG_HANDLER_METHOD(NimatorModule, UnitTest_Begin)
 {
   AP_UNUSED_ARG(pMsg);
   if (Apollo::getConfig("Test/Nimator", 0)) {
+    AP_UNITTEST_REGISTER(NimatorModule::Test1);
   }
 }
 
@@ -71,6 +78,7 @@ AP_MSG_HANDLER_METHOD(NimatorModule, UnitTest_Execute)
 {
   AP_UNUSED_ARG(pMsg);
   if (Apollo::getConfig("Test/Nimator", 0)) {
+    AP_UNITTEST_EXECUTE(NimatorModule::Test1);
   }
 }
 

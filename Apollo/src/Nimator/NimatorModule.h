@@ -28,6 +28,8 @@ public:
   void On_Animation_Event(Msg_Animation_Event* pMsg);
 
 #if defined(AP_TEST)
+  static String Test1();
+
   void On_UnitTest_Begin(Msg_UnitTest_Begin* pMsg);
   void On_UnitTest_Execute(Msg_UnitTest_Execute* pMsg);
   void On_UnitTest_End(Msg_UnitTest_End* pMsg);
