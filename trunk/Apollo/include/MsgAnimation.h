@@ -16,6 +16,7 @@ class Msg_Animation_Create: public ApRequestMessage
 public:
   Msg_Animation_Create() : ApRequestMessage("Animation_Create") {}
   ApIN ApHandle hItem;
+  ApIN String sMimeType;
 };
 
 // -> Animator
@@ -23,6 +24,22 @@ class Msg_Animation_Destroy: public ApRequestMessage
 {
 public:
   Msg_Animation_Destroy() : ApRequestMessage("Animation_Destroy") {}
+  ApIN ApHandle hItem;
+};
+
+// -> Animator
+class Msg_Animation_Start: public ApRequestMessage
+{
+public:
+  Msg_Animation_Start() : ApRequestMessage("Animation_Start") {}
+  ApIN ApHandle hItem;
+};
+
+// -> Animator
+class Msg_Animation_Stop: public ApRequestMessage
+{
+public:
+  Msg_Animation_Stop() : ApRequestMessage("Animation_Stop") {}
   ApIN ApHandle hItem;
 };
 
@@ -43,7 +60,6 @@ public:
   ApIN ApHandle hItem;
   ApIN Buffer sbData;
   ApIN String sOriginalUrl;
-  ApIN String sMimeType;
 };
 
 // -> Animator

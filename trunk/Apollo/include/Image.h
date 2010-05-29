@@ -28,12 +28,14 @@ public:
   Pixel* Allocate(int nWidth, int nHeight);
   Pixel* Pixels() { return pPixels_; }
   size_t Size() { return nSize_; }
+  int Width() { return nWidth_; }
+  int Height() { return nHeight_; }
 
 protected:
-  int nWidth_;
-  int nHeight_;
   Pixel* pPixels_;
   size_t nSize_;
+  int nWidth_;
+  int nHeight_;
 };
 
 AP_NAMESPACE_END
