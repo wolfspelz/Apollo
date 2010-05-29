@@ -95,6 +95,7 @@ void Participant::GetDetailData(const String& sKey, Apollo::ValueList& vlMimeTyp
       if (!ApIsHandle(hAnimatedItem_)) {
         Msg_Animation_Create msgAC;
         msgAC.hItem = Apollo::newHandle();
+        msgAC.sMimeType = msg.sMimeType;
         if (!msgAC.Request()) {
           apLog_Error((LOG_CHANNEL, "Participant::GetDetailData", "Msg_Animation_Create failed: participant=" ApHandleFormat "", ApHandleType(hAp_)));
         } else {
@@ -115,7 +116,6 @@ void Participant::GetDetailData(const String& sKey, Apollo::ValueList& vlMimeTyp
         Msg_Animation_SetData msgASD;
         msgASD.hItem = hAnimatedItem_;
         msgASD.sbData = msg.sbData;
-        msgASD.sMimeType = msg.sMimeType;
 
         String sSource = msg.sSource;
         String sSourceType;
@@ -127,6 +127,14 @@ void Participant::GetDetailData(const String& sKey, Apollo::ValueList& vlMimeTyp
 
         if (!msgASD.Request()) {
           apLog_Error((LOG_CHANNEL, "Participant::GetDetailData", "Msg_Animation_SetData failed: participant=" ApHandleFormat " key=%s data:%d bytes, source=%s", ApHandleType(hAp_), StringType(sKey), msg.sbData.Length(), StringType(sSource)));
+        }
+      }
+
+      if (ApIsHandle(hAnimatedItem_)) {
+        Msg_Animation_Start msgAS;
+        msgAS.hItem = hAnimatedItem_;
+        if (!msgAS.Request()) {
+          apLog_Error((LOG_CHANNEL, "Participant::GetDetailData", "Msg_Animation_Start failed: participant=" ApHandleFormat "", ApHandleType(hAp_)));
         }
       }
 

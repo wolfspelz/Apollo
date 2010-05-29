@@ -157,6 +157,10 @@
 			UniqueIdentifier="{33D700F3-DD25-4939-8CBF-61D150EBCDA9}"
 			>
 			<File
+				RelativePath=".\Item.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\nimator.cpp"
 				>
 			</File>
@@ -170,6 +174,10 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{5877E7ED-165E-4d83-B836-ACF3AD181885}"
 			>
+			<File
+				RelativePath=".\Item.h"
+				>
+			</File>
 			<File
 				RelativePath=".\Local.h"
 				>
