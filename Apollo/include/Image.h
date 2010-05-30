@@ -24,8 +24,10 @@ class APOLLO_API Image
 {
 public:
   Image();
+  virtual ~Image();
 
   Pixel* Allocate(int nWidth, int nHeight);
+  void Free();
   Pixel* Pixels() { return pPixels_; }
   size_t Size() { return nSize_; }
   int Width() { return nWidth_; }

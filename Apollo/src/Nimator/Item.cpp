@@ -21,28 +21,22 @@ void Animation::AppendFrame(Frame* pFrame)
 
 void Animation::Load()
 {
-  //CxImage* cxImg = oImg.GetFrame(nIndex);
-  //if (cxImg != 0) {
-  //  msDuration_ = (int) cxImg->GetFrameDelay() * 10; // in 1/100 s
-
-  //  hBM_ = cxImg->MakeBitmap(NULL);
-
-  CxImageGIF img;
+  CxImage img(sbData_.Data(), sbData_.Length(), CXIMAGE_FORMAT_GIF);
   img.SetRetreiveAllFrames(true);
+  int nFrames = img.GetNumFrames();
+	img.SetFrame(nFrames - 1);
 
-  CxMemFile mfSource(sbData_.Data(), sbData_.Length());
-  if (!img.Decode(&mfSource)) {
-    apLog_Warning((LOG_CHANNEL, "Animation::Load", ""));
+  if (!img.Decode(sbData_.Data(), sbData_.Length(), CXIMAGE_FORMAT_GIF)) {
+    apLog_Warning((LOG_CHANNEL, "Animation::Load", "Decode failed"));
   } else {
     sbData_.Empty();
 
-    int nFrames = img.GetNumFrames();
     for (int i = 0; i < nFrames; i++) {
 
       // Not allocated here. Just points into an internal sub-image list
-      CxImage* pImgFrame = img.GetFrame(i); 
-
+      CxImage* pImgFrame = img.GetFrame(i);
       if (pImgFrame) {
+
         Frame* pFrame = new Frame();
         if (pFrame) {
           pFrame->img_.Allocate(pImgFrame->GetWidth(), pImgFrame->GetHeight());
@@ -51,11 +45,12 @@ void Animation::Load()
           pFrame->nDurationMSec_ = (int) pImgFrame->GetFrameDelay() * 10; // in 1/100 s
           
           AppendFrame(pFrame);
+          bLoaded_ = 1;
         }
-      }
-    }
 
-  }
+      } // if (pImgFrame)
+    } // for nFrames
+  } // img.Decode
 }
 
 void Sequence::AppendAnimation(Animation* pAnimation)
