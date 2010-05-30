@@ -14,11 +14,22 @@ Apollo::Image::Image()
 {
 }
 
+Apollo::Image::~Image()
+{
+  Free();
+}
+
+void Apollo::Image::Free()
+{
+  if (pPixels_) {
+    Apollo::free(pPixels_);;
+    pPixels_ = 0;
+  }
+}
+
 Apollo::Pixel* Apollo::Image::Allocate(int nWidth, int nHeight)
 {
-  if (pPixels_ != 0) {
-    Apollo::free(pPixels_);
-  }
+  Free();
 
   size_t nSize = nWidth * nHeight * sizeof(Apollo::Pixel);
   pPixels_ = (Apollo::Pixel*) Apollo::malloc(nSize);
