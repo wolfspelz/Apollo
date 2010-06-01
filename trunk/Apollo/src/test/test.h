@@ -49,6 +49,7 @@ extern "C" {
   #define AP_TEST_Vp
   #define AP_TEST_Fluid
   #define AP_TEST_Arena
+  #define AP_TEST_Nimator
   #if defined (AP_TEST_Net)
     #define AP_TEST_Net_TCP
     #define AP_TEST_Net_TCP_Advanced
@@ -91,4 +92,8 @@ void Test_Vp_End();
 void Test_Arena_Register();
 void Test_Arena_Begin();
 void Test_Arena_End();
+
+void Test_Nimator_Register();
+void Test_Nimator_Begin();
+void Test_Nimator_End();
 

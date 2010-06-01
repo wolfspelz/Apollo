@@ -60,15 +60,19 @@ public:
   TimerListElem(ApHandle hTimer_, Apollo::TimeValue& tvTime)
     :hTimer_(hTimer_)
     ,tv_(tvTime)
+    ,nCount_(1)
+    ,nIntervalSec_(0)
+    ,nIntervalMicroSec_(0)
   {}
 
-  Apollo::TimeValue& Time() { return tv_; };
-  ApHandle Handle() { return hTimer_; };
-
-protected:
   ApHandle hTimer_;
   Apollo::TimeValue tv_;
+  int nCount_; // 0 = infinite
+  int nIntervalSec_;
+  int nIntervalMicroSec_;
 };
+
+//----------------------------
 
 class MainLoopModule
 {
@@ -114,8 +118,10 @@ public:
   void On_UnitTest_End(Msg_UnitTest_End* pMsg);
   String Test_Timer_Queue();
   String Test_Timer_Basic();
+  String Test_Timer_Interval();
 #endif
 
+  int InsertTimer(TimerListElem* eTimer);
   void ProcessNextTimer();
   void ScheduleNextTimer();
 
@@ -482,6 +488,45 @@ void MainLoopModule::On_MainLoop_ModuleFinished(Msg_MainLoop_ModuleFinished* pMs
   pMsg->apStatus = ApMessage::Ok;
 }
 
+int MainLoopModule::InsertTimer(TimerListElem* eTimer)
+{
+  int ok = 0;
+  int bReSchedule = 0;
+
+  if (lTimer_.length() == 0) {
+    // no timer active
+    lTimer_.Add(eTimer);
+    bReSchedule = 1;
+    ok= 1;
+  } else {
+    TimerListElem* ePrev = 0;
+    TimerListElem* eNext = 0;
+    while ((eNext = (TimerListElem*) lTimer_.Next(ePrev))) {
+      if (eTimer->tv_ < eNext->tv_) {
+        if (ePrev == 0) {
+          lTimer_.AddFirst(eTimer);
+          bReSchedule = 1;
+        } else {
+          lTimer_.Insert(ePrev, eTimer);
+        }
+        break;
+      } else {
+        ePrev = eNext;
+      }
+    }
+    if (eNext == 0) {
+      lTimer_.AddLast(eTimer);
+    }
+    ok = 1;
+  }
+
+  if (bReSchedule) {
+    ScheduleNextTimer();
+  }
+
+  return ok;
+}
+
 void MainLoopModule::ScheduleNextTimer()
 {
   ::KillTimer(hWnd_, TIMERQUEUE_TIMER);
@@ -489,7 +534,7 @@ void MainLoopModule::ScheduleNextTimer()
   TimerListElem* eFirst = (TimerListElem*) lTimer_.First();
   if (eFirst != 0) {
     Apollo::TimeValue tvBase = Apollo::TimeValue::getTime();
-    Apollo::TimeValue tvNext = eFirst->Time();
+    Apollo::TimeValue tvNext = eFirst->tv_;
     Apollo::TimeValue tvDiff = tvNext - tvBase;
     int nDelayMS_ = tvDiff.Sec() * 1000 + tvDiff.MicroSec() / 1000;
     if (nDelayMS_ <= 0) {
@@ -501,21 +546,37 @@ void MainLoopModule::ScheduleNextTimer()
 
 void MainLoopModule::ProcessNextTimer()
 {
+  Apollo::TimeValue tvNow = Apollo::TimeValue::getTime();
+
   int bDone = 0;
   while (!bDone) {
     bDone = 1;
     TimerListElem* eNext = (TimerListElem*) lTimer_.First();
-    if (eNext != 0) {
-      Apollo::TimeValue tvExpires = eNext->Time();
-      Apollo::TimeValue tvNow = Apollo::TimeValue::getTime();
+    if (eNext) {
+      Apollo::TimeValue tvExpires = eNext->tv_;
       if (tvNow >= tvExpires) {
         bDone = 0;
         lTimer_.Remove(eNext);
-        Msg_Timer_Event msg;
-        msg.hTimer = eNext->Handle();
-        msg.Send();
-        delete eNext;
-        eNext = 0;
+        
+        {
+          Msg_Timer_Event msg;
+          msg.hTimer = eNext->hTimer_;
+          msg.Send();
+        }
+
+        if (eNext->nCount_ > 0) {
+          eNext->nCount_--;
+          if (eNext->nCount_ == 0) {
+            delete eNext;
+            eNext = 0;
+          }
+        }
+
+        if (eNext) {
+          eNext->tv_ = tvNow + Apollo::TimeValue(eNext->nIntervalSec_, eNext->nIntervalMicroSec_);
+          InsertTimer(eNext);
+        }
+
       }
     }
   }
@@ -547,40 +608,18 @@ void MainLoopModule::On_Timer_Start(Msg_Timer_Start* pMsg)
     int bReSchedule = 0;
 
     Apollo::TimeValue tvNow = Apollo::TimeValue::getTime();
-    Apollo::TimeValue tvDelta(pMsg->nSec, pMsg->nMicroSec);
-    Apollo::TimeValue tvExpires = tvNow + tvDelta;
+    Apollo::TimeValue tvExpires = tvNow + Apollo::TimeValue(pMsg->nSec, pMsg->nMicroSec);
+
     TimerListElem* eNew = new TimerListElem(pMsg->hTimer, tvExpires);
     if (eNew != 0) {
-      if (lTimer_.length() == 0) {
-        // no timer active
-        lTimer_.Add(eNew);
-        bReSchedule = 1;
-        ok= 1;
-      } else {
-        TimerListElem* ePrev = 0;
-        TimerListElem* eNext = 0;
-        while ((eNext = (TimerListElem*) lTimer_.Next(ePrev))) {
-          if (tvExpires < eNext->Time()) {
-            if (ePrev == 0) {
-              lTimer_.AddFirst(eNew);
-              bReSchedule = 1;
-            } else {
-              lTimer_.Insert(ePrev, eNew);
-            }
-            break;
-          } else {
-            ePrev = eNext;
-          }
-        }
-        if (eNext == 0) {
-          lTimer_.AddLast(eNew);
-        }
-        ok = 1;
-      }
-    }
 
-    if (bReSchedule) {
-      ScheduleNextTimer();
+      if (pMsg->nCount != 1 && (pMsg->nSec != 0 || pMsg->nMicroSec != 0)) {
+        eNew->nCount_ = pMsg->nCount;
+        eNew->nIntervalSec_ = pMsg->nSec;
+        eNew->nIntervalMicroSec_ = pMsg->nMicroSec;
+      }
+
+      ok = InsertTimer(eNew);
     }
   }
 
@@ -645,7 +684,7 @@ String MainLoopModule::Test_Timer_Queue()
     nCnt++;
     Test_Timer_Elem& e = lExpectedOrder[nCnt];
     ApHandle hApExpected = e.hExpected_;
-    ApHandle hAp = tle->Handle();
+    ApHandle hAp = tle->hTimer_;
     if (hAp != hApExpected) {
       err.appendf("Position %d has " ApHandleFormat " expected " ApHandleFormat, nCnt, ApHandleType(hAp), ApHandleType(hApExpected));
       break;
@@ -659,16 +698,17 @@ String MainLoopModule::Test_Timer_Queue()
 
 //---------------
 
-static ApHandle hTest_Timer_On_Timer_Event = ApNoHandle;
-static void Test_Timer_On_Timer_Event(Msg_Timer_Event* pMsg)
+static ApHandle hTest_Timer_Basic_On_Timer_Event = ApNoHandle;
+
+static void Test_Timer_Basic_On_Timer_Event(Msg_Timer_Event* pMsg)
 {
-  if (pMsg->hTimer == hTest_Timer_On_Timer_Event) {
+  if (pMsg->hTimer == hTest_Timer_Basic_On_Timer_Event) {
     String err;
-    if (!Apollo::cancelInterval(hTest_Timer_On_Timer_Event)) {
+    if (!Apollo::cancelInterval(hTest_Timer_Basic_On_Timer_Event)) {
       err = "Apollo::cancelTimeout() failed";
     }
-    AP_UNITTEST_RESULT(Test_Timer_Basic, err.empty(), err);
-    { Msg_Timer_Event msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_Timer_On_Timer_Event, 0); }  
+    AP_UNITTEST_RESULT(Test_Timer_Basic_Complete, err.empty(), err);
+    { Msg_Timer_Event msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_Timer_Basic_On_Timer_Event, 0); }  
   }
 }
 
@@ -676,12 +716,52 @@ String MainLoopModule::Test_Timer_Basic()
 {
   String err;
 
-  { Msg_Timer_Event msg; msg.Hook(MODULE_NAME, (ApCallback) Test_Timer_On_Timer_Event, 0, ApCallbackPosNormal); }
+  { Msg_Timer_Event msg; msg.Hook(MODULE_NAME, (ApCallback) Test_Timer_Basic_On_Timer_Event, 0, ApCallbackPosNormal); }
 
   if (err.empty()) {
-    hTest_Timer_On_Timer_Event = Apollo::startInterval(0, 10000);
-    if (!ApIsHandle(hTest_Timer_On_Timer_Event)) {
+    hTest_Timer_Basic_On_Timer_Event = Apollo::startInterval(0, 10000);
+    if (!ApIsHandle(hTest_Timer_Basic_On_Timer_Event)) {
       err = "Apollo::startTimeout() failed";
+    }
+  }
+  
+  return err;
+}
+
+//---------------
+
+static ApHandle hTest_Timer_Interval_On_Timer_Event = ApNoHandle;
+static int nTest_Timer_Interval_On_Timer_Event = 0;
+
+static void Test_Timer_Interval_On_Timer_Event(Msg_Timer_Event* pMsg)
+{
+  if (pMsg->hTimer == hTest_Timer_Interval_On_Timer_Event) {
+    nTest_Timer_Interval_On_Timer_Event++;
+    Apollo::TimeValue tv = Apollo::TimeValue::getTime();
+    if (nTest_Timer_Interval_On_Timer_Event == 1 || nTest_Timer_Interval_On_Timer_Event == 100) {
+      apLog_Info((LOG_CHANNEL, "Test_Timer_Interval_On_Timer_Event", "%d %s", nTest_Timer_Interval_On_Timer_Event, StringType(tv.toString())));
+    }
+    if (nTest_Timer_Interval_On_Timer_Event == 100) {
+      String err;
+      if (!Apollo::cancelInterval(hTest_Timer_Interval_On_Timer_Event)) {
+        err = "Apollo::cancelInterval() failed";
+      }
+      AP_UNITTEST_RESULT(Test_Timer_Interval_Complete, err.empty(), err);
+      { Msg_Timer_Event msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_Timer_Interval_On_Timer_Event, 0); }  
+    }
+  }
+}
+
+String MainLoopModule::Test_Timer_Interval()
+{
+  String err;
+
+  { Msg_Timer_Event msg; msg.Hook(MODULE_NAME, (ApCallback) Test_Timer_Interval_On_Timer_Event, 0, ApCallbackPosNormal); }
+
+  if (err.empty()) {
+    hTest_Timer_Interval_On_Timer_Event = Apollo::startInterval(0, 100000);
+    if (!ApIsHandle(hTest_Timer_Interval_On_Timer_Event)) {
+      err = "Apollo::startInterval() failed";
     }
   }
   
@@ -696,6 +776,9 @@ void MainLoopModule::On_UnitTest_Begin(Msg_UnitTest_Begin* pMsg)
   if (Apollo::getConfig("Test/Timer", 0)) {
     AP_UNITTEST_REGISTER(Test_Timer_Queue);
     AP_UNITTEST_REGISTER(Test_Timer_Basic);
+    AP_UNITTEST_REGISTER(Test_Timer_Basic_Complete);
+    AP_UNITTEST_REGISTER(Test_Timer_Interval);
+    AP_UNITTEST_REGISTER(Test_Timer_Interval_Complete);
   }
 }
 
@@ -705,6 +788,7 @@ void MainLoopModule::On_UnitTest_Execute(Msg_UnitTest_Execute* pMsg)
   if (Apollo::getConfig("Test/Timer", 0)) {
     AP_UNITTEST_EXECUTE(Test_Timer_Queue);
     AP_UNITTEST_EXECUTE(Test_Timer_Basic);
+    AP_UNITTEST_EXECUTE(Test_Timer_Interval);
   }
 }
 

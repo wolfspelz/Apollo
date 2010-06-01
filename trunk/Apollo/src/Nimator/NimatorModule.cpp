@@ -109,6 +109,17 @@ AP_MSG_HANDLER_METHOD(NimatorModule, Animation_SetStatus)
   pMsg->apStatus = ApMessage::Ok;
 }
 
+AP_MSG_HANDLER_METHOD(NimatorModule, Animation_SetCondition)
+{
+  ItemListNode* pNode = items_.Find(pMsg->hItem);
+  if (pNode == 0) { return; }
+  Item* pItem = pNode->Value();
+
+  pItem->SetCondition(pMsg->sCondition);
+
+  pMsg->apStatus = ApMessage::Ok;
+}
+
 AP_MSG_HANDLER_METHOD(NimatorModule, Animation_Event)
 {
   ItemListNode* pNode = items_.Find(pMsg->hItem);
@@ -118,6 +129,54 @@ AP_MSG_HANDLER_METHOD(NimatorModule, Animation_Event)
   pItem->PlayEvent(pMsg->sEvent);
 
   pMsg->apStatus = ApMessage::Ok;
+}
+
+AP_MSG_HANDLER_METHOD(NimatorModule, Animation_SetPosition)
+{
+  ItemListNode* pNode = items_.Find(pMsg->hItem);
+  if (pNode == 0) { return; }
+  Item* pItem = pNode->Value();
+
+  pItem->SetPosition(pMsg->nX);
+
+  pMsg->apStatus = ApMessage::Ok;
+}
+
+AP_MSG_HANDLER_METHOD(NimatorModule, Animation_MoveTo)
+{
+  ItemListNode* pNode = items_.Find(pMsg->hItem);
+  if (pNode == 0) { return; }
+  Item* pItem = pNode->Value();
+
+  pItem->MoveTo(pMsg->nX);
+
+  pMsg->apStatus = ApMessage::Ok;
+}
+
+Item* NimatorModule::GetItemByTimer(ApHandle hTimer)
+{
+  Item* pResult = 0;
+
+  ItemListIterator iter(items_);
+  for (ItemListNode* pNode = 0; pNode = iter.Next(); ) {
+    Item* pItem = pNode->Value();
+    if (pItem != 0) {
+      if (pItem->HasTimer(hTimer)) {
+        pResult = pItem;
+        break;
+      }
+    }
+  }
+  
+  return pResult;
+}
+
+AP_MSG_HANDLER_METHOD(NimatorModule, Timer_Event)
+{
+  Item* pItem = GetItemByTimer(pMsg->hTimer);
+  if (pItem == 0) { return; }
+
+  pItem->OnTimer();
 }
 
 //----------------------------------------------------------
@@ -284,7 +343,11 @@ int NimatorModule::Init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, NimatorModule, Animation_SetRate, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, NimatorModule, Animation_SetData, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, NimatorModule, Animation_SetStatus, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, NimatorModule, Animation_SetCondition, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, NimatorModule, Animation_Event, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, NimatorModule, Animation_SetPosition, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, NimatorModule, Animation_MoveTo, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, NimatorModule, Timer_Event, this, ApCallbackPosNormal);
   AP_UNITTEST_HOOK(NimatorModule, this);
 
   return ok;

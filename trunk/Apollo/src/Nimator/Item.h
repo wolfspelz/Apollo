@@ -78,30 +78,52 @@ public:
 class Item
 {
 public:
-  Item(ApHandle hItem);
+  Item(ApHandle hItem)
+    :hAp_(hItem)
+    ,bStarted_(0)
+    ,nDelayMSec_(100)
+    ,nX_(0)
+    ,nDestX_(0)
+  {}
+
   virtual ~Item();
 
-  void Start();
+  int Start();
   void Stop();
   void SetDelay(int nDelayMSec);
   void SetData(Buffer& sbData);
   void SetStatus(const String& sStatus);
+  void SetCondition(const String& sCondition);
   void PlayEvent(const String& sEvent);
+  void SetPosition(int nX);
+  void MoveTo(int nX);
+
+  int HasTimer(ApHandle hTimer) { return ApIsHandle(hTimer) && hTimer == hTimer_; }
+  void OnTimer();
 
 protected:
   void ResetAnimations();
   void ParseParamNode(Apollo::XMLNode* pNode);
   Group* GetOrCreateGroup(const String& sGroup);
   void ParseSequenceNode(Apollo::XMLNode* pNode);
+  void SelectSequence();
+  int StartTimer();
+  void StopTimer();
 
 protected:
   friend class NimatorModule;
   ApHandle hAp_;
   int bStarted_;
   int nDelayMSec_; // msec
+  ApHandle hTimer_;
   String sData_;
   String sDefaultGroup_;
   ListT<Group, Elem> lGroups_;
+  String sStatus_;
+  String sCondition_;
+  String sNextEvent_;
+  int nX_;
+  int nDestX_;
 };
 
 #endif // Item_H_INCLUDED

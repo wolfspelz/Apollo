@@ -72,6 +72,15 @@ public:
 };
 
 // -> Animator
+class Msg_Animation_SetCondition: public ApRequestMessage
+{
+public:
+  Msg_Animation_SetCondition() : ApRequestMessage("Animation_SetCondition") {}
+  ApIN ApHandle hItem;
+  ApIN String sCondition;
+};
+
+// -> Animator
 class Msg_Animation_Event: public ApRequestMessage
 {
 public:
@@ -80,7 +89,38 @@ public:
   ApIN String sEvent;
 };
 
+// -> Animator
+class Msg_Animation_SetPosition: public ApRequestMessage
+{
+public:
+  Msg_Animation_SetPosition() : ApRequestMessage("Animation_SetPosition") {}
+  ApIN ApHandle hItem;
+  ApIN int nX;
+  ApIN int nY;
+  ApIN int nZ;
+};
+
+// -> Animator
+class Msg_Animation_MoveTo: public ApRequestMessage
+{
+public:
+  Msg_Animation_MoveTo() : ApRequestMessage("Animation_MoveTo") {}
+  ApIN ApHandle hItem;
+  ApIN int nX;
+  ApIN int nY;
+  ApIN int nZ;
+};
+
 // -------------------------------------------------------------------
+
+// Animator ->
+class Msg_Animation_SequenceBegin: public ApNotificationMessage
+{
+public:
+  Msg_Animation_SequenceBegin() : ApNotificationMessage("SequenceBegin") {}
+  ApIN ApHandle hItem;
+  ApIN String sName;
+};
 
 // Animator ->
 class Msg_Animation_Frame: public ApNotificationMessage
@@ -89,6 +129,15 @@ public:
   Msg_Animation_Frame() : ApNotificationMessage("Animation_Frame") {}
   ApIN ApHandle hItem;
   ApIN Apollo::Image iFrame;
+};
+
+// Animator ->
+class Msg_Animation_SequenceEnd: public ApNotificationMessage
+{
+public:
+  Msg_Animation_SequenceEnd() : ApNotificationMessage("SequenceEnd") {}
+  ApIN ApHandle hItem;
+  ApIN String sName;
 };
 
 #endif // !defined(MsgSample_h_INCLUDED)

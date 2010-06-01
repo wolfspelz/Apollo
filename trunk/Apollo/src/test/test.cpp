@@ -59,6 +59,7 @@ int On_UnitTest_Begin(Msg_UnitTest_Begin* pMsg)
   if (Apollo::getConfig("Test/Threads", 0)) { Test_Threads_Register(); }
   if (Apollo::getConfig("Test/Fluid", 0)) { Test_Fluid_Register(); }
   if (Apollo::getConfig("Test/Arena", 0)) { Test_Arena_Register(); }
+  if (Apollo::getConfig("Test/Nimator", 0)) { Test_Nimator_Register(); }
 
   return 1;
 }
@@ -78,6 +79,7 @@ int On_UnitTest_Execute(Msg_UnitTest_Begin* pMsg)
   if (Apollo::getConfig("Test/Threads", 0)) { Test_Threads_Begin(); }
   if (Apollo::getConfig("Test/Fluid", 0)) { Test_Fluid_Begin(); }
   if (Apollo::getConfig("Test/Arena", 0)) { Test_Arena_Begin(); }
+  if (Apollo::getConfig("Test/Nimator", 0)) { Test_Nimator_Begin(); }
 
   apLog_SetMask(nMask);
 
@@ -96,6 +98,7 @@ int On_UnitTest_End(Msg_UnitTest_End* pMsg)
   if (Apollo::getConfig("Test/Threads", 0)) { Test_Threads_End(); }
   if (Apollo::getConfig("Test/Fluid", 0)) { Test_Fluid_End(); }
   if (Apollo::getConfig("Test/Arena", 0)) { Test_Arena_End(); }
+  if (Apollo::getConfig("Test/Nimator", 0)) { Test_Nimator_End(); }
 
   return 1;
 }
