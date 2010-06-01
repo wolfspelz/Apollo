@@ -10,6 +10,7 @@
 #include "ApModule.h"
 #include "ApContainer.h"
 #include "MsgUnitTest.h"
+#include "MsgTimer.h"
 #include "MsgAnimation.h"
 #include "Item.h"
 
@@ -33,7 +34,11 @@ public:
   void On_Animation_SetRate(Msg_Animation_SetRate* pMsg);
   void On_Animation_SetData(Msg_Animation_SetData* pMsg);
   void On_Animation_SetStatus(Msg_Animation_SetStatus* pMsg);
+  void On_Animation_SetCondition(Msg_Animation_SetCondition* pMsg);
   void On_Animation_Event(Msg_Animation_Event* pMsg);
+  void On_Animation_SetPosition(Msg_Animation_SetPosition* pMsg);
+  void On_Animation_MoveTo(Msg_Animation_MoveTo* pMsg);
+  void On_Timer_Event(Msg_Timer_Event* pMsg);
 
 #if defined(AP_TEST)
   static String Test_Parse();
@@ -43,6 +48,9 @@ public:
   void On_UnitTest_Execute(Msg_UnitTest_Execute* pMsg);
   void On_UnitTest_End(Msg_UnitTest_End* pMsg);
 #endif
+
+protected:
+  Item* GetItemByTimer(ApHandle hTimer);
 
 public:
   ItemList items_;

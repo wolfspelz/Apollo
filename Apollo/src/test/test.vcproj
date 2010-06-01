@@ -185,6 +185,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\testNimator.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\testThreads.cpp"
 				>
 			</File>

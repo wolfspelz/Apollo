@@ -53,10 +53,14 @@ void Animation::Load()
   } // img.Decode
 }
 
+// ------------------------------------------------------------
+
 void Sequence::AppendAnimation(Animation* pAnimation)
 {
   AddLast(pAnimation);
 }
+
+// ------------------------------------------------------------
 
 void Group::AddSequence(Sequence* pSequence)
 {
@@ -64,12 +68,7 @@ void Group::AddSequence(Sequence* pSequence)
   AddLast(pSequence);
 }
 
-Item::Item(ApHandle hItem)
-:hAp_(hItem)
-,bStarted_(0)
-,nDelayMSec_(100)
-{
-}
+// ------------------------------------------------------------
 
 Item::~Item()
 {
@@ -78,13 +77,22 @@ Item::~Item()
   }
 }
 
-void Item::Start()
+int Item::Start()
 {
-  bStarted_ = 1;
+  int ok = 1;
+  
+  ok = StartTimer();
+  if (ok) {
+    bStarted_ = 1;
+  }
+
+  return ok;
 }
 
 void Item::Stop()
 {
+  StopTimer();
+
   bStarted_ = 0;
 }
 
@@ -92,6 +100,57 @@ void Item::SetDelay(int nDelayMSec)
 {
   nDelayMSec_ = nDelayMSec;
 }
+
+void Item::SetData(Buffer& sbData)
+{
+  Apollo::XMLProcessor xml;
+  if (!xml.XmlText((const char*) sbData.Data(), sbData.Length(), 1)) { throw ApException("xml.Parse() failed, hItem=" ApHandleFormat " %d bytes: %s", ApHandleType(hAp_), sbData.Length(), StringType(xml.GetErrorString())); }
+
+  Apollo::XMLNode* pRoot = xml.Root();
+  if (pRoot == 0) { throw ApException("xml.Root() == 0, hItem=" ApHandleFormat " %d bytes", ApHandleType(hAp_), sbData.Length()); }
+
+  String sNs = pRoot->getAttribute("xmlns").getValue();
+  String sVersion = pRoot->getAttribute("version").getValue();
+  if (sNs != "http://schema.bluehands.de/character-config" || sVersion != "1.0") { throw ApException("Wrong xmlns=%s or version=%s, hItem=" ApHandleFormat "", StringType(sNs), StringType(sVersion), ApHandleType(hAp_)); }
+
+  ResetAnimations();
+
+  for (Apollo::XMLNode* pChild = 0; (pChild = pRoot->nextChild(pChild)) != 0; ) {
+    if (0) {
+    } else if (pChild->getName() == "param") {
+      ParseParamNode(pChild);
+    } else if (pChild->getName() == "sequence") {
+      ParseSequenceNode(pChild);
+    }
+  }
+}
+
+void Item::SetStatus(const String& sStatus)
+{
+  sStatus_ = sStatus;
+}
+
+void Item::SetCondition(const String& sCondition)
+{
+  sCondition_ = sCondition;
+}
+
+void Item::PlayEvent(const String& sEvent)
+{
+  sNextEvent_ = sEvent;
+}
+
+void Item::SetPosition(int nX)
+{
+  nX_ = nX;
+}
+
+void Item::MoveTo(int nX)
+{
+  nDestX_ = nX;
+}
+
+// ------------------------------------------------------------
 
 void Item::ResetAnimations()
 {
@@ -169,34 +228,39 @@ void Item::ParseSequenceNode(Apollo::XMLNode* pNode)
   }
 }
 
-void Item::SetData(Buffer& sbData)
+int Item::StartTimer()
 {
-  Apollo::XMLProcessor xml;
-  if (!xml.XmlText((const char*) sbData.Data(), sbData.Length(), 1)) { throw ApException("xml.Parse() failed, hItem=" ApHandleFormat " %d bytes: %s", ApHandleType(hAp_), sbData.Length(), StringType(xml.GetErrorString())); }
+  int ok = 0;
 
-  Apollo::XMLNode* pRoot = xml.Root();
-  if (pRoot == 0) { throw ApException("xml.Root() == 0, hItem=" ApHandleFormat " %d bytes", ApHandleType(hAp_), sbData.Length()); }
-
-  String sNs = pRoot->getAttribute("xmlns").getValue();
-  String sVersion = pRoot->getAttribute("version").getValue();
-  if (sNs != "http://schema.bluehands.de/character-config" || sVersion != "1.0") { throw ApException("Wrong xmlns=%s or version=%s, hItem=" ApHandleFormat "", StringType(sNs), StringType(sVersion), ApHandleType(hAp_)); }
-
-  ResetAnimations();
-
-  for (Apollo::XMLNode* pChild = 0; (pChild = pRoot->nextChild(pChild)) != 0; ) {
-    if (0) {
-    } else if (pChild->getName() == "param") {
-      ParseParamNode(pChild);
-    } else if (pChild->getName() == "sequence") {
-      ParseSequenceNode(pChild);
-    }
+  if (ApIsHandle(hTimer_)) {
+    StopTimer();
   }
+
+  int nDelayMSec = nDelayMSec_;
+  if (nDelayMSec <= 0) {
+    nDelayMSec = 100;
+  }
+  hTimer_ = Apollo::startInterval(0, nDelayMSec * 1000);
+  if (ApIsHandle(hTimer_)) {
+    ok = 1;
+  }
+
+  return ok;
 }
 
-void Item::SetStatus(const String& sStatus)
+void Item::StopTimer()
+{
+  Apollo::cancelInterval(hTimer_);
+  hTimer_ = ApNoHandle;
+}
+
+// ------------------------------------------------------------
+
+void Item::OnTimer()
 {
 }
 
-void Item::PlayEvent(const String& sEvent)
+void Item::SelectSequence()
 {
 }
+
