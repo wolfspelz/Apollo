@@ -38,11 +38,14 @@ public:
   void On_Animation_Event(Msg_Animation_Event* pMsg);
   void On_Animation_SetPosition(Msg_Animation_SetPosition* pMsg);
   void On_Animation_MoveTo(Msg_Animation_MoveTo* pMsg);
+  void On_Animation_GetPosition(Msg_Animation_GetPosition* pMsg);
   void On_Timer_Event(Msg_Timer_Event* pMsg);
 
 #if defined(AP_TEST)
   static String Test_Parse();
   static String Test_LoadGIF();
+  static String Test_SelectByGroup();
+  static String Test_SelectByGroup1(Group& g, int nRnd, const String& sExpectedSequence);
 
   void On_UnitTest_Begin(Msg_UnitTest_Begin* pMsg);
   void On_UnitTest_Execute(Msg_UnitTest_Execute* pMsg);

@@ -260,6 +260,8 @@ String Test_Nimator_Display()
   return s;
 }
 
+//---------------
+
 static void Test_Nimator_UnitTest_Token(Msg_UnitTest_Token* pMsg)
 {
   AP_UNUSED_ARG(pMsg);

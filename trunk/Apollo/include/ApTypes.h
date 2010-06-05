@@ -239,6 +239,7 @@ public:
   bool operator<=(TimeValue& tv);
   unsigned int Sec() { return nSec_; }
   unsigned MicroSec() { return nMicroSec_; }
+  unsigned MilliSec() { return nSec_ * 1000 + nMicroSec_ / 1000; }
 
   String toString();
 
