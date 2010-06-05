@@ -117,8 +117,10 @@ public:
   void On_UnitTest_Execute(Msg_UnitTest_Execute* pMsg);
   void On_UnitTest_End(Msg_UnitTest_End* pMsg);
   String Test_Timer_Queue();
-  String Test_Timer_Basic();
-  String Test_Timer_Interval();
+  static String Test_Timer_Basic();
+  static String Test_Timer_Interval();
+  static void UnitTest_TokenEnd();
+  static void UnitTest_Token(Msg_UnitTest_Token* pMsg);
 #endif
 
   int InsertTimer(TimerListElem* eTimer);
@@ -707,8 +709,9 @@ static void Test_Timer_Basic_On_Timer_Event(Msg_Timer_Event* pMsg)
     if (!Apollo::cancelInterval(hTest_Timer_Basic_On_Timer_Event)) {
       err = "Apollo::cancelTimeout() failed";
     }
-    AP_UNITTEST_RESULT(Test_Timer_Basic_Complete, err.empty(), err);
+    AP_UNITTEST_RESULT(MainLoopModule::Test_Timer_Basic_Complete, err.empty(), err);
     { Msg_Timer_Event msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_Timer_Basic_On_Timer_Event, 0); }  
+    AP_UNITTEST_EXECUTE(MainLoopModule::Test_Timer_Interval);
   }
 }
 
@@ -738,16 +741,15 @@ static void Test_Timer_Interval_On_Timer_Event(Msg_Timer_Event* pMsg)
   if (pMsg->hTimer == hTest_Timer_Interval_On_Timer_Event) {
     nTest_Timer_Interval_On_Timer_Event++;
     Apollo::TimeValue tv = Apollo::TimeValue::getTime();
-    if (nTest_Timer_Interval_On_Timer_Event == 1 || nTest_Timer_Interval_On_Timer_Event == 100) {
-      apLog_Info((LOG_CHANNEL, "Test_Timer_Interval_On_Timer_Event", "%d %s", nTest_Timer_Interval_On_Timer_Event, StringType(tv.toString())));
-    }
-    if (nTest_Timer_Interval_On_Timer_Event == 100) {
+    apLog_Info((LOG_CHANNEL, "Test_Timer_Interval_On_Timer_Event", "%d %s", nTest_Timer_Interval_On_Timer_Event, StringType(tv.toString())));
+    if (nTest_Timer_Interval_On_Timer_Event == 10) {
       String err;
       if (!Apollo::cancelInterval(hTest_Timer_Interval_On_Timer_Event)) {
         err = "Apollo::cancelInterval() failed";
       }
-      AP_UNITTEST_RESULT(Test_Timer_Interval_Complete, err.empty(), err);
+      AP_UNITTEST_RESULT(MainLoopModule::Test_Timer_Interval_Complete, err.empty(), err);
       { Msg_Timer_Event msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_Timer_Interval_On_Timer_Event, 0); }  
+      MainLoopModule::UnitTest_TokenEnd();
     }
   }
 }
@@ -759,7 +761,7 @@ String MainLoopModule::Test_Timer_Interval()
   { Msg_Timer_Event msg; msg.Hook(MODULE_NAME, (ApCallback) Test_Timer_Interval_On_Timer_Event, 0, ApCallbackPosNormal); }
 
   if (err.empty()) {
-    hTest_Timer_Interval_On_Timer_Event = Apollo::startInterval(0, 100000);
+    hTest_Timer_Interval_On_Timer_Event = Apollo::startInterval(0, 10000);
     if (!ApIsHandle(hTest_Timer_Interval_On_Timer_Event)) {
       err = "Apollo::startInterval() failed";
     }
@@ -770,15 +772,35 @@ String MainLoopModule::Test_Timer_Interval()
 
 //---------------
 
+void MainLoopModule::UnitTest_TokenEnd()
+{
+  apLog_Info((LOG_CHANNEL, "MainLoopModule::UnitTest_TokenEnd", "Finished Test/Timer"));
+  { ApAsyncMessage<Msg_UnitTest_Token> msg; msg.Post(); }
+}
+
+void MainLoopModule::UnitTest_Token(Msg_UnitTest_Token* pMsg)
+{
+  AP_UNUSED_ARG(pMsg);
+  { Msg_UnitTest_Token msg; msg.UnHook(MODULE_NAME, (ApCallback) MainLoopModule::UnitTest_Token, 0); }
+  apLog_Info((LOG_CHANNEL, "MainLoopModule::UnitTest_Token", "Starting Test/Timer"));
+  int bTokenEndNow = 0;
+
+  AP_UNITTEST_EXECUTE(MainLoopModule::Test_Timer_Basic);
+
+  if (bTokenEndNow) { UnitTest_TokenEnd(); }
+}
+
+//---------------
+
 void MainLoopModule::On_UnitTest_Begin(Msg_UnitTest_Begin* pMsg)
 {
   AP_UNUSED_ARG(pMsg);
   if (Apollo::getConfig("Test/Timer", 0)) {
     AP_UNITTEST_REGISTER(Test_Timer_Queue);
-    AP_UNITTEST_REGISTER(Test_Timer_Basic);
-    AP_UNITTEST_REGISTER(Test_Timer_Basic_Complete);
-    AP_UNITTEST_REGISTER(Test_Timer_Interval);
-    AP_UNITTEST_REGISTER(Test_Timer_Interval_Complete);
+    AP_UNITTEST_REGISTER(MainLoopModule::Test_Timer_Basic);
+    AP_UNITTEST_REGISTER(MainLoopModule::Test_Timer_Basic_Complete);
+    AP_UNITTEST_REGISTER(MainLoopModule::Test_Timer_Interval);
+    AP_UNITTEST_REGISTER(MainLoopModule::Test_Timer_Interval_Complete);
   }
 }
 
@@ -787,8 +809,7 @@ void MainLoopModule::On_UnitTest_Execute(Msg_UnitTest_Execute* pMsg)
   AP_UNUSED_ARG(pMsg);
   if (Apollo::getConfig("Test/Timer", 0)) {
     AP_UNITTEST_EXECUTE(Test_Timer_Queue);
-    AP_UNITTEST_EXECUTE(Test_Timer_Basic);
-    AP_UNITTEST_EXECUTE(Test_Timer_Interval);
+    { Msg_UnitTest_Token msg; msg.Hook(MODULE_NAME, (ApCallback) MainLoopModule::UnitTest_Token, 0, ApCallbackPosNormal); }  
   }
 }
 

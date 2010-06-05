@@ -113,6 +113,19 @@ public:
 
 // -------------------------------------------------------------------
 
+// -> Animator
+class Msg_Animation_GetPosition: public ApRequestMessage
+{
+public:
+  Msg_Animation_GetPosition() : ApRequestMessage("Animation_GetPosition") {}
+  ApIN ApHandle hItem;
+  ApOUT int nX;
+  ApOUT int nY;
+  ApOUT int nZ;
+};
+
+// -------------------------------------------------------------------
+
 // Animator ->
 class Msg_Animation_SequenceBegin: public ApNotificationMessage
 {

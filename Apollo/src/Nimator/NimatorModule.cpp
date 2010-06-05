@@ -153,6 +153,17 @@ AP_MSG_HANDLER_METHOD(NimatorModule, Animation_MoveTo)
   pMsg->apStatus = ApMessage::Ok;
 }
 
+AP_MSG_HANDLER_METHOD(NimatorModule, Animation_GetPosition)
+{
+  ItemListNode* pNode = items_.Find(pMsg->hItem);
+  if (pNode == 0) { return; }
+  Item* pItem = pNode->Value();
+
+  //pItem->GetPosition();
+
+  pMsg->apStatus = ApMessage::Ok;
+}
+
 Item* NimatorModule::GetItemByTimer(ApHandle hTimer)
 {
   Item* pResult = 0;
@@ -271,7 +282,7 @@ String NimatorModule::Test_LoadGIF()
   Apollo::loadFile(Apollo::getAppResourcePath() + "tassadar-walk-l.gif", a.sbData_);
   a.Load();
   if (!s) { if (a.length() != 13) { s = "expected 13 frames"; } }
-  if (!s) { if (a.nTotalDurationMSec_ != 1300) { s = "expected 1300 ms duration"; } }
+  if (!s) { if (a.nDurationMSec_ != 1300) { s = "expected 1300 ms duration"; } }
   if (!s) { if (a.nFramesCount_ != 13) { s = "expected frame count 13"; } }
   int nCnt = 0;
   for (Frame* pFrame = 0; (pFrame = a.Next(pFrame)) != 0; ) {
@@ -285,6 +296,59 @@ String NimatorModule::Test_LoadGIF()
   return s;
 }
 
+String NimatorModule::Test_SelectByGroup1(Group& g, int nRnd, const String& sExpectedSequence)
+{
+  String s;
+
+  Sequence* pSequence = g.GetRandomSequence(nRnd);
+  if (pSequence) {
+    if (sExpectedSequence) {
+      if (pSequence->getName() != sExpectedSequence) {
+        s.appendf("Sequence got=%s expected=%s", StringType(pSequence->getName()), StringType(sExpectedSequence));
+      }
+    } else {
+      s = "Expected no sequence";
+    }
+  } else {
+    if (sExpectedSequence) {
+      s = "No sequence";
+    }
+  }
+
+  return s;
+}
+
+String NimatorModule::Test_SelectByGroup()
+{
+  String s;
+
+  Group g("g");
+  Sequence *s1 = new Sequence("s1");
+  Sequence *s2 = new Sequence("s2");
+  Sequence *s3 = new Sequence("s3");
+  s1->nProbability_ = 100;
+  s2->nProbability_ = 100;
+  s3->nProbability_ = 100;
+  g.AddSequence(s1);
+  g.AddSequence(s2);
+  g.AddSequence(s3);
+
+  for (int i = 0; i< 10; i++) {
+    int n = Apollo::getRandom(3);
+    int m = n;
+  }
+
+  if (!s) { s = Test_SelectByGroup1(g, 0, "s1"); }
+  if (!s) { s = Test_SelectByGroup1(g, 1, "s1"); }
+  if (!s) { s = Test_SelectByGroup1(g, 99, "s1"); }
+  if (!s) { s = Test_SelectByGroup1(g, 100, "s2"); }
+  if (!s) { s = Test_SelectByGroup1(g, 150, "s2"); }
+  if (!s) { s = Test_SelectByGroup1(g, 299, "s3"); }
+  if (!s) { s = Test_SelectByGroup1(g, 300, ""); }
+
+  return s;
+}
+
 //---------------------------
 
 AP_MSG_HANDLER_METHOD(NimatorModule, UnitTest_Begin)
@@ -293,6 +357,7 @@ AP_MSG_HANDLER_METHOD(NimatorModule, UnitTest_Begin)
   if (Apollo::getConfig("Test/Nimator", 0)) {
     AP_UNITTEST_REGISTER(NimatorModule::Test_Parse);
     AP_UNITTEST_REGISTER(NimatorModule::Test_LoadGIF);
+    AP_UNITTEST_REGISTER(NimatorModule::Test_SelectByGroup);
   }
 }
 
@@ -302,6 +367,7 @@ AP_MSG_HANDLER_METHOD(NimatorModule, UnitTest_Execute)
   if (Apollo::getConfig("Test/Nimator", 0)) {
     AP_UNITTEST_EXECUTE(NimatorModule::Test_Parse);
     AP_UNITTEST_EXECUTE(NimatorModule::Test_LoadGIF);
+    AP_UNITTEST_EXECUTE(NimatorModule::Test_SelectByGroup);
   }
 }
 
@@ -347,6 +413,7 @@ int NimatorModule::Init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, NimatorModule, Animation_Event, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, NimatorModule, Animation_SetPosition, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, NimatorModule, Animation_MoveTo, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, NimatorModule, Animation_GetPosition, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, NimatorModule, Timer_Event, this, ApCallbackPosNormal);
   AP_UNITTEST_HOOK(NimatorModule, this);
 

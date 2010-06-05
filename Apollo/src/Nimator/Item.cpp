@@ -6,6 +6,7 @@
 
 #include "Apollo.h"
 #include "ApLog.h"
+#include "MsgAnimation.h"
 #include "Local.h"
 #include "Item.h"
 #include "ximagif.h"
@@ -13,7 +14,7 @@
 
 void Animation::AppendFrame(Frame* pFrame)
 {
-  nTotalDurationMSec_ += pFrame->nDurationMSec_;
+  nDurationMSec_ += pFrame->nDurationMSec_;
   nFramesCount_++;
 
   AddLast(pFrame);
@@ -57,8 +58,41 @@ void Animation::Load()
 
 void Sequence::AppendAnimation(Animation* pAnimation)
 {
+  nDurationMSec_ += pAnimation->nDurationMSec_;
   AddLast(pAnimation);
 }
+
+Frame* Sequence::GetFrameByTime(int nTimeMSec)
+{
+  Frame* pFrame = 0;
+
+  int nAccumulatedTime = 0;
+  for (Animation* pAnimation = 0; (pAnimation = Next(pAnimation)) != 0 && pFrame == 0; ) {
+    for (Frame* p = 0; (p = pAnimation->Next(p)) != 0 && pFrame == 0; ) {
+      nAccumulatedTime += p->nDurationMSec_;
+      if (nTimeMSec < nAccumulatedTime) {
+        pFrame = p;
+      }
+    }
+  }
+
+  return pFrame;
+}
+
+//Animation* Sequence::GetAnimationByTime(int nTimeMSec)
+//{
+//  Animation* pAnimation = 0;
+//
+//  for (Animation* p = 0; (p = Next(p)) != 0; ) {
+//    nTime += p->nDurationMSec_;
+//    if (nTimeMSec < nTime) {
+//      pAnimation = p;
+//      break;
+//    }
+//  }
+//
+//  return pAnimation;
+//}
 
 // ------------------------------------------------------------
 
@@ -66,6 +100,22 @@ void Group::AddSequence(Sequence* pSequence)
 {
   nTotalProbability_ += pSequence->nProbability_;
   AddLast(pSequence);
+}
+
+Sequence* Group::GetRandomSequence(int nRnd)
+{
+  Sequence* pSequence = 0;
+
+  int nProbability = 0;
+  for (Sequence* p = 0; (p = Next(p)) != 0; ) {
+    nProbability += p->nProbability_;
+    if (nRnd < nProbability) {
+      pSequence = p;
+      break;
+    }
+  }
+
+  return pSequence;
 }
 
 // ------------------------------------------------------------
@@ -92,6 +142,13 @@ int Item::Start()
 void Item::Stop()
 {
   StopTimer();
+
+  if (pCurrentSequence_) {
+    Msg_Animation_SequenceEnd msg;
+    msg.hItem = hAp_;
+    msg.sName = pCurrentSequence_->getName();
+    msg.Send();
+  }
 
   bStarted_ = 0;
 }
@@ -154,7 +211,7 @@ void Item::MoveTo(int nX)
 
 void Item::ResetAnimations()
 {
-  sDefaultGroup_ = "";
+  sDefaultSequence_ = "";
   lGroups_.Empty();
 }
 
@@ -164,7 +221,7 @@ void Item::ParseParamNode(Apollo::XMLNode* pNode)
   String sValue = pNode->getAttribute("value").getValue();
   if (0) {
   } else if (sName == "defaultsequence") {
-    sDefaultGroup_ = sValue;
+    sDefaultSequence_ = sValue;
   }
 }
 
@@ -258,9 +315,168 @@ void Item::StopTimer()
 
 void Item::OnTimer()
 {
+  Apollo::TimeValue tvCurrent = Apollo::TimeValue::getTime();
+
+  Step(tvCurrent);
 }
 
-void Item::SelectSequence()
+void Item::Step(Apollo::TimeValue& tvCurrent)
 {
+  // Assumed there is a current sequence
+
+  Apollo::TimeValue tvDelay = tvCurrent - tvLastTimer_;
+  tvLastTimer_ = tvCurrent;
+
+  int nInSequenceMSec = nSpentInCurrentSequenceMSec_ + tvDelay.MilliSec();
+  if (nInSequenceMSec > 10000) {
+    nInSequenceMSec = 1000;
+  }
+
+  int bSequenceChanged = 0;
+  Sequence* pPreviousSequence = pCurrentSequence_;
+  while (nInSequenceMSec > pCurrentSequence_->nDurationMSec_) {
+    bSequenceChanged = 1;
+    Sequence* pNextSequence = SelectNextSequence();
+    int nRemainingInCurrentSequence = pCurrentSequence_->nDurationMSec_ - nSpentInCurrentSequenceMSec_;
+    nInSequenceMSec -= nRemainingInCurrentSequence;
+    pCurrentSequence_ = pNextSequence;
+  }
+
+  nSpentInCurrentSequenceMSec_ = nInSequenceMSec;
+
+  if (bSequenceChanged) {
+    if (pPreviousSequence) {
+      Msg_Animation_SequenceEnd msg;
+      msg.hItem = hAp_;
+      msg.sName = pPreviousSequence->getName();
+      msg.Send();
+    }
+
+    {
+      Msg_Animation_SequenceBegin msg;
+      msg.hItem = hAp_;
+      msg.sName = pCurrentSequence_->getName();
+      msg.Send();
+    }
+  }
+
+  Frame* pFrame = pCurrentSequence_->GetFrameByTime(nSpentInCurrentSequenceMSec_);
+  int bFrameChanged = 1;
+  if (pPreviousFrame_ == pFrame) {
+    bFrameChanged = 0;
+  }
+
+  if (bFrameChanged) {
+    Msg_Animation_Frame msg;
+    //
+  }
+
+  pPreviousFrame_ = pFrame;
 }
+
+Sequence* Item::SelectNextSequence()
+{
+  Sequence * pSequence = 0;
+
+  Task* pTask = lTasks_.First();
+  int bDispose = 0;
+  pTask->GetSequence(*this, bDispose);
+  if (bDispose) {
+    lTasks_.Remove(pTask);
+    delete pTask;
+    pTask = 0;
+  }
+
+  if (pSequence == 0) {
+    pSequence = GetSequenceByName(sDefaultSequence_);
+  }
+
+  return pSequence;
+}
+
+String Item::GetDefaultSequence()
+{
+  String s = sDefaultSequence_;
+
+  Sequence* pSequence = GetSequenceByName(s);
+  if (pSequence == 0) {
+    pSequence = GetSequenceByGroup("idle");
+  }
+  if (pSequence == 0) {
+    Group* pGroup = lGroups_.First();
+    if (pGroup) {
+      pSequence = pGroup->First();
+    }
+  }
+
+  return s;
+}
+
+Sequence* Item::GetSequenceByName(const String& sSequence)
+{
+  Sequence* pSequence = 0;
+
+  int bDone = 0;
+  Group* pGroup = 0;
+  while (!bDone) {
+    pGroup = lGroups_.Next(pGroup);
+    if (pGroup) {
+      pSequence = pGroup->FindByName(sSequence);
+      if (pSequence) {
+        bDone = 1;
+      }
+    } else {
+      bDone = 1;
+    }
+  }
+
+  return pSequence;
+}
+
+Sequence* Item::GetSequenceByGroup(const String& sGroup)
+{
+  Sequence* pSequence = 0;
+
+  Group* pGroup = lGroups_.FindByName(sGroup);
+  if (pGroup) {
+    int nRnd = Apollo::getRandom(pGroup->nTotalProbability_);
+    pSequence = pGroup->GetRandomSequence(nRnd);
+  }
+
+  return pSequence;
+}
+
+// ------------------------------------------------------------
+
+Sequence* StatusTask::GetSequence(Item& item, int& bDispose)
+{
+  Sequence* pSequence = 0;
+  bDispose = 0;
+  pSequence = item.GetSequenceByGroup(sStatus_);
+  return pSequence;
+}
+
+Sequence* EventTask::GetSequence(Item& item, int& bDispose)
+{
+  Sequence* pSequence = 0;
+  bDispose = 1;
+  pSequence = item.GetSequenceByGroup(sEvent_);
+  return pSequence;
+}
+
+//Sequence* MoveTask::GetSequence(Item& item, int& bDispose)
+//{
+//  Sequence* pSequence = 0;
+//  bDispose = 1;
+//  String sGroup;
+//  if (nDestX_ > item.nX_) {
+//    sGroup = "moveright";
+//  } else if (nDestX_ < item.nX_) {
+//    sGroup = "moveleft";
+//  } else {
+//    sGroup = "idle";
+//  }
+//  pSequence = item.GetSequenceByGroup(sGroup);
+//  return pSequence;
+//}
 
