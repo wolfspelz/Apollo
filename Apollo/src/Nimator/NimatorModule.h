@@ -13,6 +13,7 @@
 #include "MsgTimer.h"
 #include "MsgAnimation.h"
 #include "Item.h"
+#include "Repository.h"
 
 typedef ApHandlePointerTree<Item*> ItemList;
 typedef ApHandlePointerTreeNode<Item*> ItemListNode;
@@ -46,6 +47,7 @@ public:
   static String Test_LoadGIF();
   static String Test_SelectByGroup();
   static String Test_SelectByGroup1(Group& g, int nRnd, const String& sExpectedSequence);
+  static String Test_Step();
 
   void On_UnitTest_Begin(Msg_UnitTest_Begin* pMsg);
   void On_UnitTest_Execute(Msg_UnitTest_Execute* pMsg);
@@ -57,6 +59,7 @@ protected:
 
 public:
   ItemList items_;
+  Repository rep_;
 
   AP_MSG_REGISTRY_DECLARE;
 };
