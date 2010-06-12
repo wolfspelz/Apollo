@@ -23,10 +23,10 @@ public:
 
 // ------------------------------------------------------------
 
-class AnimationFile: public ListT<Frame, Elem>
+class AnimationData: public ListT<Frame, Elem>
 {
 public:
-  AnimationFile()
+  AnimationData()
     :bLoaded_(0)
     ,nDurationMSec_(0)
     ,nFramesCount_(0)
@@ -50,9 +50,9 @@ public:
 
 // ------------------------------------------------------------
 
-typedef StringPointerTree<AnimationFile*> AnimationFileList;
-typedef StringPointerTreeNode<AnimationFile*> AnimationFileNode;
-typedef StringPointerTreeIterator<AnimationFile*> AnimationFileIterator;
+typedef StringPointerTree<AnimationData*> AnimationDataList;
+typedef StringPointerTreeNode<AnimationData*> AnimationDataNode;
+typedef StringPointerTreeIterator<AnimationData*> AnimationDataIterator;
 
 class Repository
 {
@@ -60,11 +60,11 @@ public:
   Repository();
   virtual ~Repository();
 
-  AnimationFile* Find(const String& sUrl);
-  AnimationFile* Load(const String& sUrl);
+  AnimationData* Find(const String& sUrl);
+  AnimationData* Load(const String& sUrl);
 
 protected:
-  AnimationFileList files_;
+  AnimationDataList files_;
 };
 
 #endif // Repository_H_INCLUDED
