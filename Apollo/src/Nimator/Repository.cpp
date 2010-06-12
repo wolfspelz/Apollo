@@ -12,7 +12,7 @@
 #include "ximagif.h"
 #include "Image.h"
 
-void AnimationFile::AppendFrame(Frame* pFrame)
+void AnimationData::AppendFrame(Frame* pFrame)
 {
   nDurationMSec_ += pFrame->nDurationMSec_;
   nFramesCount_++;
@@ -20,7 +20,7 @@ void AnimationFile::AppendFrame(Frame* pFrame)
   AddLast(pFrame);
 }
 
-void AnimationFile::Load()
+void AnimationData::Load()
 {
   CxImage img(sbData_.Data(), sbData_.Length(), CXIMAGE_FORMAT_GIF);
   img.SetRetreiveAllFrames(true);
@@ -28,7 +28,7 @@ void AnimationFile::Load()
 	img.SetFrame(nFrames - 1);
 
   if (!img.Decode(sbData_.Data(), sbData_.Length(), CXIMAGE_FORMAT_GIF)) {
-    apLog_Warning((LOG_CHANNEL, "AnimationFile::Load", "Decode failed"));
+    apLog_Warning((LOG_CHANNEL, "AnimationData::Load", "Decode failed"));
   } else {
 
     for (int i = 0; i < nFrames; i++) {
@@ -53,16 +53,16 @@ void AnimationFile::Load()
   } // img.Decode
 }
 
-void AnimationFile::Unload()
+void AnimationData::Unload()
 {
 }
 
-void AnimationFile::AddRef()
+void AnimationData::AddRef()
 {
   nCountUser_++;
 }
 
-void AnimationFile::DeleteRef()
+void AnimationData::DeleteRef()
 {
   nCountUser_--;
   if (nCountUser_ == 0) {
@@ -80,14 +80,14 @@ Repository::~Repository()
 {
 }
 
-AnimationFile* Repository::Find(const String& sUrl)
+AnimationData* Repository::Find(const String& sUrl)
 {
-  AnimationFile* p = 0;
+  AnimationData* p = 0;
   return p;
 }
 
-AnimationFile* Repository::Load(const String& sUrl)
+AnimationData* Repository::Load(const String& sUrl)
 {
-  AnimationFile* p = 0;
+  AnimationData* p = 0;
   return p;
 }

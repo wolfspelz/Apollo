@@ -278,7 +278,7 @@ String NimatorModule::Test_LoadGIF()
 {
   String s;
 
-  AnimationFile a;
+  AnimationData a;
   Apollo::loadFile(Apollo::getAppResourcePath() + "tassadar-walk-l.gif", a.sbData_);
   a.Load();
   if (!s) { if (a.length() != 13) { s = "expected 13 frames"; } }
@@ -295,11 +295,18 @@ String NimatorModule::Test_LoadGIF()
 
   String sUrl = "http://ydentiti.org/test/Nimator/still.gif";
   Repository r;
-  AnimationFile* paf = r.Find(sUrl);
+  AnimationData* paf = r.Find(sUrl);
   if (paf) {
     paf->AddRef();
   } else {
     r.Load(sUrl);
+    AnimationData* paf = r.Find(sUrl);
+    if (paf) {
+      paf->AddRef();
+    }
+  }
+  if (paf) {
+    paf->DeleteRef();
   }
 
   return s;
