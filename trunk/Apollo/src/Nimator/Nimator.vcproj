@@ -168,10 +168,6 @@
 				RelativePath=".\NimatorModule.cpp"
 				>
 			</File>
-			<File
-				RelativePath=".\Repository.cpp"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -192,10 +188,6 @@
 			</File>
 			<File
 				RelativePath=".\NimatorModule.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Repository.h"
 				>
 			</File>
 		</Filter>

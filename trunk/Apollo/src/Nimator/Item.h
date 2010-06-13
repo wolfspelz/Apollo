@@ -7,10 +7,23 @@
 #if !defined(Item_H_INCLUDED)
 #define Item_H_INCLUDED
 
-#include "Repository.h"
+#include "Image.h"
 #include "XMLProcessor.h"
 
-class Animation: public Elem
+class Frame: public Elem
+{
+public:
+  Frame()
+    :nDurationMSec_(0)
+  {}
+
+  int nDurationMSec_;
+  Apollo::Image img_;
+};
+
+// ------------------------------------------------------------
+
+class Animation: public ListT<Frame, Elem>
 {
 public:
   Animation()
@@ -106,7 +119,7 @@ public:
   void OnTimer();
 
 protected:
-  void Reset();
+  void ResetAnimations();
   void ParseParamNode(Apollo::XMLNode* pNode);
   Group* GetOrCreateGroup(const String& sGroup);
   void ParseSequenceNode(Apollo::XMLNode* pNode);

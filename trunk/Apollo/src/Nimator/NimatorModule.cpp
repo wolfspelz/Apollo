@@ -194,7 +194,7 @@ AP_MSG_HANDLER_METHOD(NimatorModule, Timer_Event)
 
 #if defined(AP_TEST)
 
-#define NimatorModule_Test_Char1 \
+#define NimatorModule_Test_Parse \
 "<config xmlns='http://schema.bluehands.de/character-config' version='1.0'>\n" \
 "  <param name='defaultsequence' value='idle'/>\n" \
 "  <sequence group='idle' name='still' type='status' probability='1000' in='standard' out='standard'><animation src='idle.gif'/></sequence>\n" \
@@ -224,7 +224,7 @@ String NimatorModule::Test_Parse()
   if (!s) {
     Msg_Animation_SetData msg;
     msg.hItem = hItem;
-    msg.sbData.SetData(NimatorModule_Test_Char1);
+    msg.sbData.SetData(NimatorModule_Test_Parse);
     if (!msg.Request()) {
       s = "Msg_Animation_SetData failed";
     }
@@ -278,7 +278,7 @@ String NimatorModule::Test_LoadGIF()
 {
   String s;
 
-  AnimationData a;
+  Animation a;
   Apollo::loadFile(Apollo::getAppResourcePath() + "tassadar-walk-l.gif", a.sbData_);
   a.Load();
   if (!s) { if (a.length() != 13) { s = "expected 13 frames"; } }
@@ -291,22 +291,6 @@ String NimatorModule::Test_LoadGIF()
     if (!s) { if (pFrame->img_.Size() != 40000) { s.appendf("frame %d: expected byte count 40.000", nCnt); } }
     if (!s) { if (pFrame->img_.Width() != 100) { s.appendf("frame %d: expected width 100", nCnt); } }
     if (!s) { if (pFrame->img_.Height() != 100) { s.appendf("frame %d: expected height 100", nCnt); } }
-  }
-
-  String sUrl = "http://ydentiti.org/test/Nimator/still.gif";
-  Repository r;
-  AnimationData* paf = r.Find(sUrl);
-  if (paf) {
-    paf->AddRef();
-  } else {
-    r.Load(sUrl);
-    AnimationData* paf = r.Find(sUrl);
-    if (paf) {
-      paf->AddRef();
-    }
-  }
-  if (paf) {
-    paf->DeleteRef();
   }
 
   return s;
@@ -365,19 +349,6 @@ String NimatorModule::Test_SelectByGroup()
   return s;
 }
 
-String NimatorModule::Test_Step()
-{
-  String s;
-
-  //Item i(ApHandle(0,1));
-  //Buffer sbData;
-  //sbData.SetData(NimatorModule_Test_Char1);
-  //i.SetData(sbData);
-  //i.Step(Apollo::TimeValue(1, 0));
-
-  return s;
-}
-
 //---------------------------
 
 AP_MSG_HANDLER_METHOD(NimatorModule, UnitTest_Begin)
@@ -387,7 +358,6 @@ AP_MSG_HANDLER_METHOD(NimatorModule, UnitTest_Begin)
     AP_UNITTEST_REGISTER(NimatorModule::Test_Parse);
     AP_UNITTEST_REGISTER(NimatorModule::Test_LoadGIF);
     AP_UNITTEST_REGISTER(NimatorModule::Test_SelectByGroup);
-    AP_UNITTEST_REGISTER(NimatorModule::Test_Step);
   }
 }
 
@@ -398,7 +368,6 @@ AP_MSG_HANDLER_METHOD(NimatorModule, UnitTest_Execute)
     AP_UNITTEST_EXECUTE(NimatorModule::Test_Parse);
     AP_UNITTEST_EXECUTE(NimatorModule::Test_LoadGIF);
     AP_UNITTEST_EXECUTE(NimatorModule::Test_SelectByGroup);
-    AP_UNITTEST_EXECUTE(NimatorModule::Test_Step);
   }
 }
 

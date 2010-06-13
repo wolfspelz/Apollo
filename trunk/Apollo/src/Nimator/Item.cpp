@@ -9,6 +9,53 @@
 #include "MsgAnimation.h"
 #include "Local.h"
 #include "Item.h"
+#include "ximagif.h"
+#include "Image.h"
+
+void Animation::AppendFrame(Frame* pFrame)
+{
+  nDurationMSec_ += pFrame->nDurationMSec_;
+  nFramesCount_++;
+
+  AddLast(pFrame);
+}
+
+void Animation::Load()
+{
+  CxImage img(sbData_.Data(), sbData_.Length(), CXIMAGE_FORMAT_GIF);
+  img.SetRetreiveAllFrames(true);
+  int nFrames = img.GetNumFrames();
+	img.SetFrame(nFrames - 1);
+
+  if (!img.Decode(sbData_.Data(), sbData_.Length(), CXIMAGE_FORMAT_GIF)) {
+    apLog_Warning((LOG_CHANNEL, "Animation::Load", "Decode failed"));
+  } else {
+    sbData_.Empty();
+
+    for (int i = 0; i < nFrames; i++) {
+
+      // Not allocated here. Just points into an internal sub-image list
+      CxImage* pImgFrame = img.GetFrame(i);
+      if (pImgFrame) {
+
+        Frame* pFrame = new Frame();
+        if (pFrame) {
+          pFrame->img_.Allocate(pImgFrame->GetWidth(), pImgFrame->GetHeight());
+          CxMemFile mfDest((BYTE*) pFrame->img_.Pixels(), pFrame->img_.Size());
+          pImgFrame->Encode2RGBA(&mfDest);
+          pFrame->nDurationMSec_ = (int) pImgFrame->GetFrameDelay() * 10; // in 1/100 s
+          
+          AppendFrame(pFrame);
+          bLoaded_ = 1;
+        }
+
+      } // if (pImgFrame)
+    } // for nFrames
+  } // img.Decode
+}
+
+// ------------------------------------------------------------
+
 void Sequence::AppendAnimation(Animation* pAnimation)
 {
   nDurationMSec_ += pAnimation->nDurationMSec_;
@@ -19,18 +66,33 @@ Frame* Sequence::GetFrameByTime(int nTimeMSec)
 {
   Frame* pFrame = 0;
 
-  //int nAccumulatedTime = 0;
-  //for (Animation* pAnimation = 0; (pAnimation = Next(pAnimation)) != 0 && pFrame == 0; ) {
-  //  for (Frame* p = 0; (p = pAnimation->Next(p)) != 0 && pFrame == 0; ) {
-  //    nAccumulatedTime += p->nDurationMSec_;
-  //    if (nTimeMSec < nAccumulatedTime) {
-  //      pFrame = p;
-  //    }
-  //  }
-  //}
+  int nAccumulatedTime = 0;
+  for (Animation* pAnimation = 0; (pAnimation = Next(pAnimation)) != 0 && pFrame == 0; ) {
+    for (Frame* p = 0; (p = pAnimation->Next(p)) != 0 && pFrame == 0; ) {
+      nAccumulatedTime += p->nDurationMSec_;
+      if (nTimeMSec < nAccumulatedTime) {
+        pFrame = p;
+      }
+    }
+  }
 
   return pFrame;
 }
+
+//Animation* Sequence::GetAnimationByTime(int nTimeMSec)
+//{
+//  Animation* pAnimation = 0;
+//
+//  for (Animation* p = 0; (p = Next(p)) != 0; ) {
+//    nTime += p->nDurationMSec_;
+//    if (nTimeMSec < nTime) {
+//      pAnimation = p;
+//      break;
+//    }
+//  }
+//
+//  return pAnimation;
+//}
 
 // ------------------------------------------------------------
 
@@ -108,7 +170,7 @@ void Item::SetData(Buffer& sbData)
   String sVersion = pRoot->getAttribute("version").getValue();
   if (sNs != "http://schema.bluehands.de/character-config" || sVersion != "1.0") { throw ApException("Wrong xmlns=%s or version=%s, hItem=" ApHandleFormat "", StringType(sNs), StringType(sVersion), ApHandleType(hAp_)); }
 
-  Reset();
+  ResetAnimations();
 
   for (Apollo::XMLNode* pChild = 0; (pChild = pRoot->nextChild(pChild)) != 0; ) {
     if (0) {
@@ -147,7 +209,7 @@ void Item::MoveTo(int nX)
 
 // ------------------------------------------------------------
 
-void Item::Reset()
+void Item::ResetAnimations()
 {
   sDefaultSequence_ = "";
   lGroups_.Empty();
@@ -169,7 +231,7 @@ Group* Item::GetOrCreateGroup(const String& sGroup)
   if (pGroup == 0) {
     pGroup = new Group(sGroup);
     if (pGroup) {
-      lGroups_.AddLast(pGroup);
+      lGroups_.Add(pGroup);
     }
   }
   return pGroup;
@@ -260,50 +322,42 @@ void Item::OnTimer()
 
 void Item::Step(Apollo::TimeValue& tvCurrent)
 {
-  String sSequenceStarted;
-  String sSequenceStopped;
+  // Assumed there is a current sequence
 
-  if (pCurrentSequence_ == 0) {
+  Apollo::TimeValue tvDelay = tvCurrent - tvLastTimer_;
+  tvLastTimer_ = tvCurrent;
 
-    pCurrentSequence_ = SelectNextSequence();
-    sSequenceStarted = pCurrentSequence_->getName();
-
-  } else {
-
-    Apollo::TimeValue tvDelay = tvCurrent - tvLastTimer_;
-    tvLastTimer_ = tvCurrent;
-
-    int nInSequenceMSec = nSpentInCurrentSequenceMSec_ + tvDelay.MilliSec();
-    if (nInSequenceMSec > 10000) {
-      nInSequenceMSec = 1000;
-    }
-
-    sSequenceStopped = pCurrentSequence_->getName();
-    while (nInSequenceMSec > pCurrentSequence_->nDurationMSec_) {
-      Sequence* pNextSequence = SelectNextSequence();
-      sSequenceStarted = pNextSequence->getName();
-
-      int nRemainingInCurrentSequence = pCurrentSequence_->nDurationMSec_ - nSpentInCurrentSequenceMSec_;
-      nInSequenceMSec -= nRemainingInCurrentSequence;
-      pCurrentSequence_ = pNextSequence;
-    }
-
-    nSpentInCurrentSequenceMSec_ = nInSequenceMSec;
-  
+  int nInSequenceMSec = nSpentInCurrentSequenceMSec_ + tvDelay.MilliSec();
+  if (nInSequenceMSec > 10000) {
+    nInSequenceMSec = 1000;
   }
 
-  if (sSequenceStopped) {
-    Msg_Animation_SequenceEnd msg;
-    msg.hItem = hAp_;
-    msg.sName = sSequenceStopped;
-    msg.Send();
+  int bSequenceChanged = 0;
+  Sequence* pPreviousSequence = pCurrentSequence_;
+  while (nInSequenceMSec > pCurrentSequence_->nDurationMSec_) {
+    bSequenceChanged = 1;
+    Sequence* pNextSequence = SelectNextSequence();
+    int nRemainingInCurrentSequence = pCurrentSequence_->nDurationMSec_ - nSpentInCurrentSequenceMSec_;
+    nInSequenceMSec -= nRemainingInCurrentSequence;
+    pCurrentSequence_ = pNextSequence;
   }
 
-  if (sSequenceStarted) {
-    Msg_Animation_SequenceBegin msg;
-    msg.hItem = hAp_;
-    msg.sName = sSequenceStarted;
-    msg.Send();
+  nSpentInCurrentSequenceMSec_ = nInSequenceMSec;
+
+  if (bSequenceChanged) {
+    if (pPreviousSequence) {
+      Msg_Animation_SequenceEnd msg;
+      msg.hItem = hAp_;
+      msg.sName = pPreviousSequence->getName();
+      msg.Send();
+    }
+
+    {
+      Msg_Animation_SequenceBegin msg;
+      msg.hItem = hAp_;
+      msg.sName = pCurrentSequence_->getName();
+      msg.Send();
+    }
   }
 
   Frame* pFrame = pCurrentSequence_->GetFrameByTime(nSpentInCurrentSequenceMSec_);
@@ -325,27 +379,16 @@ Sequence* Item::SelectNextSequence()
   Sequence * pSequence = 0;
 
   Task* pTask = lTasks_.First();
-  if (pTask) {
-    int bDispose = 0;
-    pTask->GetSequence(*this, bDispose);
-    if (bDispose) {
-      lTasks_.Remove(pTask);
-      delete pTask;
-      pTask = 0;
-    }
+  int bDispose = 0;
+  pTask->GetSequence(*this, bDispose);
+  if (bDispose) {
+    lTasks_.Remove(pTask);
+    delete pTask;
+    pTask = 0;
   }
 
   if (pSequence == 0) {
     pSequence = GetSequenceByName(sDefaultSequence_);
-  }
-  if (pSequence == 0) {
-    pSequence = GetSequenceByGroup(sDefaultSequence_);
-  }
-  if (pSequence == 0) {
-    Group* pGroup = lGroups_.First();
-    if (pGroup) {
-      pSequence = pGroup->First();
-    }
   }
 
   return pSequence;
