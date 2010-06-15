@@ -108,7 +108,7 @@ public:
   int Start();
   void Stop();
   void SetDelay(int nDelayMSec);
-  void SetData(Buffer& sbData);
+  void SetData(Buffer& sbData, const String& sUrl);
   void SetStatus(const String& sStatus);
   void SetCondition(const String& sCondition);
   void PlayEvent(const String& sEvent);
@@ -126,6 +126,8 @@ protected:
 
   void Step(Apollo::TimeValue& tvCurrent);
   Sequence* SelectNextSequence();
+  void InsertDefaultTaskIfEmpty();
+  Sequence* GetSequenceFromNextTask();
   Sequence* GetSequenceByName(const String& sSequence);
   Sequence* GetSequenceByGroup(const String& sGroup);
   String GetDefaultSequence();
@@ -142,7 +144,7 @@ protected:
   int bStarted_;
   int nDelayMSec_; // msec
   ApHandle hTimer_;
-  String sData_;
+  String sBaseUrl_;
   String sDefaultSequence_;
   ListT<Group, Elem> lGroups_;
   String sStatus_;
@@ -163,7 +165,7 @@ class Task: public Elem
 {
 public:
   Task(const String& sName) : Elem(sName) {}
-  Sequence* GetSequence(Item& item, int& bDispose) { bDispose = 1; return 0; }
+  virtual Sequence* GetSequence(Item& item, int& bDispose) { bDispose = 1; return 0; }
 };
 
 class StatusTask: public Task

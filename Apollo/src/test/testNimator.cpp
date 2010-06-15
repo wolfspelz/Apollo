@@ -180,6 +180,7 @@ static void Test_Nimator_Display_Animation_SequenceEnd(Msg_Animation_SequenceEnd
   Test_Nimator_UnitTest_TokenEnd();
 }
 
+#define Test_Nimator_Display_Url "http://ydentiti.org/test/Nimator/avatar.xml"
 #define Test_Nimator_Display_Data \
 "<config xmlns='http://schema.bluehands.de/character-config' version='1.0'>\n" \
 "  <param name='defaultsequence' value='idle'/>\n" \
@@ -226,6 +227,7 @@ String Test_Nimator_Display()
     Msg_Animation_SetData msg;
     msg.hItem = pTest_Nimator_Display_Controller->hItem_;
     msg.sbData.SetData(Test_Nimator_Display_Data);
+    msg.sSourceUrl = Test_Nimator_Display_Url;
     if (!msg.Request()) {
       s = "Msg_Animation_SetData failed";
     }
