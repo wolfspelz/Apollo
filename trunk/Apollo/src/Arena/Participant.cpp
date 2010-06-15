@@ -122,7 +122,7 @@ void Participant::GetDetailData(const String& sKey, Apollo::ValueList& vlMimeTyp
         sSource.nextToken(Msg_VpView_ParticipantDetail_SourceSeparator, sSourceType);
         if (sSourceType == Msg_VpView_ParticipantDetail_SourcePrefix_IdentityItemUrl) {
           String sUrl = sSource;
-          msgASD.sOriginalUrl = sUrl;
+          msgASD.sSourceUrl = sUrl;
         }
 
         if (!msgASD.Request()) {

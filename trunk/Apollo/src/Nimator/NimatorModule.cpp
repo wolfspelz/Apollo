@@ -93,7 +93,7 @@ AP_MSG_HANDLER_METHOD(NimatorModule, Animation_SetData)
   if (pNode == 0) { return; }
   Item* pItem = pNode->Value();
 
-  pItem->SetData(pMsg->sbData);
+  pItem->SetData(pMsg->sbData, pMsg->sSourceUrl);
 
   pMsg->apStatus = ApMessage::Ok;
 }

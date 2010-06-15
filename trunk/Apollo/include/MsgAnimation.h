@@ -59,7 +59,7 @@ public:
   Msg_Animation_SetData() : ApRequestMessage("Animation_SetData") {}
   ApIN ApHandle hItem;
   ApIN Buffer sbData;
-  ApIN String sOriginalUrl;
+  ApIN String sSourceUrl; // to resolve relative paths
 };
 
 // -> Animator

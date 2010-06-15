@@ -158,7 +158,7 @@ void Item::SetDelay(int nDelayMSec)
   nDelayMSec_ = nDelayMSec;
 }
 
-void Item::SetData(Buffer& sbData)
+void Item::SetData(Buffer& sbData, const String& sUrl)
 {
   Apollo::XMLProcessor xml;
   if (!xml.XmlText((const char*) sbData.Data(), sbData.Length(), 1)) { throw ApException("xml.Parse() failed, hItem=" ApHandleFormat " %d bytes: %s", ApHandleType(hAp_), sbData.Length(), StringType(xml.GetErrorString())); }
@@ -171,6 +171,8 @@ void Item::SetData(Buffer& sbData)
   if (sNs != "http://schema.bluehands.de/character-config" || sVersion != "1.0") { throw ApException("Wrong xmlns=%s or version=%s, hItem=" ApHandleFormat "", StringType(sNs), StringType(sVersion), ApHandleType(hAp_)); }
 
   ResetAnimations();
+
+  sBaseUrl_ = String::filenameBasePath(sUrl);
 
   for (Apollo::XMLNode* pChild = 0; (pChild = pRoot->nextChild(pChild)) != 0; ) {
     if (0) {
@@ -268,6 +270,13 @@ void Item::ParseSequenceNode(Apollo::XMLNode* pNode)
         } else if (pChild->getName() == "animation") {
           String sSrc = pChild->getAttribute("src").getValue();
           if (sSrc) {
+
+            if (sSrc.startsWith("http:") || sSrc.startsWith("https:")) {
+              // Is absolute URL
+            } else {
+              sSrc = sBaseUrl_ + sSrc;
+            }
+
             Animation* pAnimation = new Animation();
             if (pAnimation) {
               pAnimation->sSrc_ = sSrc;
@@ -297,6 +306,9 @@ int Item::StartTimer()
   if (nDelayMSec <= 0) {
     nDelayMSec = 100;
   }
+
+  tvLastTimer_ = Apollo::TimeValue::getTime();
+
   hTimer_ = Apollo::startInterval(0, nDelayMSec * 1000);
   if (ApIsHandle(hTimer_)) {
     ok = 1;
@@ -324,68 +336,113 @@ void Item::Step(Apollo::TimeValue& tvCurrent)
 {
   // Assumed there is a current sequence
 
-  Apollo::TimeValue tvDelay = tvCurrent - tvLastTimer_;
   tvLastTimer_ = tvCurrent;
 
-  int nInSequenceMSec = nSpentInCurrentSequenceMSec_ + tvDelay.MilliSec();
-  if (nInSequenceMSec > 10000) {
-    nInSequenceMSec = 1000;
+  Sequence* pPreviousSequence = 0;
+  Sequence* pNextSequence = 0;
+
+  if (pCurrentSequence_ == 0) {
+
+      pNextSequence = SelectNextSequence();
+      nSpentInCurrentSequenceMSec_ = 0;
+
+  } else {
+
+    Apollo::TimeValue tvDelay = tvCurrent - tvLastTimer_;
+    int nInSequenceMSec = nSpentInCurrentSequenceMSec_ + tvDelay.MilliSec();
+
+    if (nInSequenceMSec > pCurrentSequence_->nDurationMSec_) {
+      pPreviousSequence = pCurrentSequence_;
+
+      pNextSequence = SelectNextSequence();
+      if (pNextSequence) {
+        int nRemainingInCurrentSequence = pCurrentSequence_->nDurationMSec_ - nSpentInCurrentSequenceMSec_;
+        nInSequenceMSec -= nRemainingInCurrentSequence;
+        if (nInSequenceMSec > pNextSequence->nDurationMSec_) {
+          pNextSequence = SelectNextSequence();
+          nInSequenceMSec = 0;
+        }
+      }
+    }
+
+    nSpentInCurrentSequenceMSec_ = nInSequenceMSec;
   }
 
-  int bSequenceChanged = 0;
-  Sequence* pPreviousSequence = pCurrentSequence_;
-  while (nInSequenceMSec > pCurrentSequence_->nDurationMSec_) {
-    bSequenceChanged = 1;
-    Sequence* pNextSequence = SelectNextSequence();
-    int nRemainingInCurrentSequence = pCurrentSequence_->nDurationMSec_ - nSpentInCurrentSequenceMSec_;
-    nInSequenceMSec -= nRemainingInCurrentSequence;
+  if (pPreviousSequence) {
+    Msg_Animation_SequenceEnd msg;
+    msg.hItem = hAp_;
+    msg.sName = pPreviousSequence->getName();
+    msg.Send();
+  }
+
+  if (pNextSequence) {
+    Msg_Animation_SequenceBegin msg;
+    msg.hItem = hAp_;
+    msg.sName = pNextSequence->getName();
+    msg.Send();
+
     pCurrentSequence_ = pNextSequence;
   }
 
-  nSpentInCurrentSequenceMSec_ = nInSequenceMSec;
+  if (pCurrentSequence_) {
+    Frame* pFrame = pNextSequence->GetFrameByTime(nSpentInCurrentSequenceMSec_);
+    if (pFrame) {
+      int bFrameChanged = 1;
+      if (pPreviousFrame_ == pFrame) {
+        bFrameChanged = 0;
+      }
 
-  if (bSequenceChanged) {
-    if (pPreviousSequence) {
-      Msg_Animation_SequenceEnd msg;
-      msg.hItem = hAp_;
-      msg.sName = pPreviousSequence->getName();
-      msg.Send();
+      if (bFrameChanged) {
+        Msg_Animation_Frame msg;
+        //
+      }
+
+      pPreviousFrame_ = pFrame;
     }
 
-    {
-      Msg_Animation_SequenceBegin msg;
-      msg.hItem = hAp_;
-      msg.sName = pCurrentSequence_->getName();
-      msg.Send();
+  } // if (pNextSequence)
+
+}
+
+void Item::InsertDefaultTaskIfEmpty()
+{
+  if (lTasks_.length() == 0 ){
+
+    String sStatus = sStatus_;
+    if (!sStatus) {
+      sStatus = Apollo::getModuleConfig(MODULE_NAME, "DefaultStatus", "idle");
     }
+
+    Task* pTask = new StatusTask("status", sStatus);
+    if (pTask) {
+      lTasks_.Add(pTask);
+    }
+
+  }
+}
+
+Sequence* Item::GetSequenceFromNextTask()
+{
+  Sequence* pSequence = 0;
+
+  Task* pTask = lTasks_.First();
+  int bDispose = 0;
+  pSequence = pTask->GetSequence(*this, bDispose);
+  if (bDispose) {
+    lTasks_.Remove(pTask);
+    delete pTask;
+    pTask = 0;
   }
 
-  Frame* pFrame = pCurrentSequence_->GetFrameByTime(nSpentInCurrentSequenceMSec_);
-  int bFrameChanged = 1;
-  if (pPreviousFrame_ == pFrame) {
-    bFrameChanged = 0;
-  }
-
-  if (bFrameChanged) {
-    Msg_Animation_Frame msg;
-    //
-  }
-
-  pPreviousFrame_ = pFrame;
+  return pSequence;
 }
 
 Sequence* Item::SelectNextSequence()
 {
   Sequence * pSequence = 0;
 
-  Task* pTask = lTasks_.First();
-  int bDispose = 0;
-  pTask->GetSequence(*this, bDispose);
-  if (bDispose) {
-    lTasks_.Remove(pTask);
-    delete pTask;
-    pTask = 0;
-  }
+  InsertDefaultTaskIfEmpty();
+  pSequence = GetSequenceFromNextTask();
 
   if (pSequence == 0) {
     pSequence = GetSequenceByName(sDefaultSequence_);
@@ -399,9 +456,15 @@ String Item::GetDefaultSequence()
   String s = sDefaultSequence_;
 
   Sequence* pSequence = GetSequenceByName(s);
+
+  if (pSequence == 0) {
+    pSequence = GetSequenceByGroup(s);
+  }
+
   if (pSequence == 0) {
     pSequence = GetSequenceByGroup("idle");
   }
+
   if (pSequence == 0) {
     Group* pGroup = lGroups_.First();
     if (pGroup) {
@@ -452,6 +515,11 @@ Sequence* StatusTask::GetSequence(Item& item, int& bDispose)
 {
   Sequence* pSequence = 0;
   bDispose = 0;
+  
+  if (!sStatus_) {
+    sStatus_ = Apollo::getModuleConfig(MODULE_NAME, "DefaultStatus", "idle");
+  }
+
   pSequence = item.GetSequenceByGroup(sStatus_);
   return pSequence;
 }
