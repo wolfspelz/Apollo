@@ -336,8 +336,6 @@ void Item::Step(Apollo::TimeValue& tvCurrent)
 {
   // Assumed there is a current sequence
 
-  tvLastTimer_ = tvCurrent;
-
   Sequence* pPreviousSequence = 0;
   Sequence* pNextSequence = 0;
 
@@ -368,6 +366,8 @@ void Item::Step(Apollo::TimeValue& tvCurrent)
     nSpentInCurrentSequenceMSec_ = nInSequenceMSec;
   }
 
+  tvLastTimer_ = tvCurrent;
+
   if (pPreviousSequence) {
     Msg_Animation_SequenceEnd msg;
     msg.hItem = hAp_;
@@ -385,7 +385,7 @@ void Item::Step(Apollo::TimeValue& tvCurrent)
   }
 
   if (pCurrentSequence_) {
-    Frame* pFrame = pNextSequence->GetFrameByTime(nSpentInCurrentSequenceMSec_);
+    Frame* pFrame = pCurrentSequence_->GetFrameByTime(nSpentInCurrentSequenceMSec_);
     if (pFrame) {
       int bFrameChanged = 1;
       if (pPreviousFrame_ == pFrame) {
