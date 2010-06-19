@@ -194,7 +194,8 @@ AP_MSG_HANDLER_METHOD(NimatorModule, Timer_Event)
 
 #if defined(AP_TEST)
 
-#define NimatorModule_Test_Parse \
+#define NimatorModule_Test_Parse_Url "http://ydentiti.org/test/Nimator/avatar.xml"
+#define NimatorModule_Test_Parse_Data \
 "<config xmlns='http://schema.bluehands.de/character-config' version='1.0'>\n" \
 "  <param name='defaultsequence' value='idle'/>\n" \
 "  <sequence group='idle' name='still' type='status' probability='1000' in='standard' out='standard'><animation src='idle.gif'/></sequence>\n" \
@@ -203,8 +204,8 @@ AP_MSG_HANDLER_METHOD(NimatorModule, Timer_Event)
 "  <sequence group='moveright' name='moveright' type='basic' probability='1' in='moveright' out='moveright'><animation dx='55' dy='0' src='walk-r.gif'/></sequence>\n" \
 "  <sequence group='chat' name='chat1' type='basic' probability='1000' in='standard' out='standard'><animation src='chat.gif'/></sequence>\n" \
 "  <sequence group='chat' name='chat2' type='basic' probability='100' in='standard' out='standard'><animation src='chat-2.gif'/></sequence>\n" \
-"  <sequence group='wave' name='wave' type='emote' probability='1000' in='standard' out='standard'><animation src='wave.gif'/></sequence>\n" \
-"  <sequence group='sleep' name='sleep' type='status' probability='1000' in='standard' out='standard'><animation src='idle.gif'/></sequence>\n" \
+"  <sequence group='wave' name='wave' type='emote' probability='1000' in='standard' out='standard'><animation src='http://ydentiti.org/test/Tassadar/wave.gif'/></sequence>\n" \
+"  <sequence group='sleep' name='sleep' type='status' probability='1000' in='standard' out='standard'><animation src='sleep.gif'/></sequence>\n" \
 "</config>"
 
 String NimatorModule::Test_Parse()
@@ -224,7 +225,8 @@ String NimatorModule::Test_Parse()
   if (!s) {
     Msg_Animation_SetData msg;
     msg.hItem = hItem;
-    msg.sbData.SetData(NimatorModule_Test_Parse);
+    msg.sbData.SetData(NimatorModule_Test_Parse_Data);
+    msg.sSourceUrl = NimatorModule_Test_Parse_Url;
     if (!msg.Request()) {
       s = "Msg_Animation_SetData failed";
     }
@@ -256,8 +258,8 @@ String NimatorModule::Test_Parse()
     Animation* pAnimation_moveright = pSequence_moveright->First(); if (!s) { if (!pAnimation_moveright->sSrc_) { s = "expected src for animation in sequence moveright"; } }
     Animation* pAnimation_chat1 = pSequence_chat1->First(); if (!s) { if (!pAnimation_chat1->sSrc_) { s = "expected src for animation in sequence chat1"; } }
     Animation* pAnimation_chat2 = pSequence_chat2->First(); if (!s) { if (!pAnimation_chat2->sSrc_) { s = "expected src for animation in sequence chat2"; } }
-    Animation* pAnimation_wave = pSequence_wave->First(); if (!s) { if (!pAnimation_wave->sSrc_) { s = "expected src for animation in sequence wave"; } }
-    Animation* pAnimation_sleep = pSequence_sleep->First(); if (!s) { if (!pAnimation_sleep->sSrc_) { s = "expected src for animation in sequence sleep"; } }
+    Animation* pAnimation_wave = pSequence_wave->First(); if (!s) { if (pAnimation_wave->sSrc_ != "http://ydentiti.org/test/Tassadar/wave.gif") { s = "expected different src for animation in sequence wave"; } }
+    Animation* pAnimation_sleep = pSequence_sleep->First(); if (!s) { if (pAnimation_sleep->sSrc_ != "http://ydentiti.org/test/Nimator/sleep.gif") { s = "expected different src for animation in sequence sleep"; } }
   }
 
   if (!s) {
