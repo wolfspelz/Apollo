@@ -34,6 +34,12 @@ public:
 
   void Load();
   void AppendFrame(Frame* pFrame);
+  int Duration() { return nDurationMSec_; }
+  void Src(const String& sSrc) { sSrc_ = sSrc;}
+  void AnimationData(Buffer& sbData, const String& sUrl);
+
+protected:
+  friend class NimatorModuleTester;
 
   String sSrc_;
   Buffer sbData_;
@@ -47,16 +53,29 @@ public:
 class Sequence: public ListT<Animation, Elem>
 {
 public:
-  Sequence(const String& sName)
+  Sequence(const String& sName, const String& sType, const String& sCondition, int nProbability, const String& sIn, const String& sOut, int nDx, int nDy)
     :ListT<Animation, Elem>(sName)
-    ,nProbability_(100)
-    ,nDx_(0)
-    ,nDy_(0)
-    ,nDurationMSec_(0)
+    ,sType_(sType)
+    ,sCondition_(sCondition)
+    ,nProbability_(nProbability)
+    ,sIn_(sIn)
+    ,sOut_(sOut)
+    ,nDx_(nDx)
+    ,nDy_(nDy)
+    ,nDurationMSec_(1000)
+    ,bLoaded_(0)
   {}
 
   void AppendAnimation(Animation* pAnimation);
   Frame* GetFrameByTime(int nTimeMSec);
+  void AnimationData(Buffer& sbData, const String& sUrl);
+
+  int Probability() { return nProbability_; }
+  int Duration() { return nDurationMSec_; }
+  int IsLoaded() { return bLoaded_; }
+
+protected:
+  friend class NimatorModuleTester;
 
   String sType_;
   String sCondition_;
@@ -66,6 +85,7 @@ public:
   int nDx_;
   int nDy_;
   int nDurationMSec_;
+  int bLoaded_;
 };
 
 // ------------------------------------------------------------
@@ -80,7 +100,10 @@ public:
 
   void AddSequence(Sequence* pSequence);
   Sequence* GetRandomSequence(int nRnd);
+  int GetProbabilitySum() { return nTotalProbability_; }
+  void AnimationData(Buffer& sbData, const String& sUrl);
 
+protected:
   int nTotalProbability_;
   String sType_;
 };
@@ -114,6 +137,7 @@ public:
   void PlayEvent(const String& sEvent);
   void SetPosition(int nX);
   void MoveTo(int nX);
+  void AnimationData(Buffer& sbData, const String& sUrl);
 
   int HasTimer(ApHandle hTimer) { return ApIsHandle(hTimer) && hTimer == hTimer_; }
   void OnTimer();
@@ -135,7 +159,7 @@ protected:
   void StopTimer();
 
 protected:
-  friend class NimatorModule;
+  friend class NimatorModuleTester;
   friend class StatusTask;
   friend class EventTask;
   friend class MoveTask;
