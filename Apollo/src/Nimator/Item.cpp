@@ -54,11 +54,18 @@ void Animation::Load()
   } // img.Decode
 }
 
+void Animation::AnimationData(Buffer& sbData, const String& sUrl)
+{
+  if (sUrl == sSrc_) {
+    sbData_ = sbData;
+  }
+}
+
 // ------------------------------------------------------------
 
 void Sequence::AppendAnimation(Animation* pAnimation)
 {
-  nDurationMSec_ += pAnimation->nDurationMSec_;
+  nDurationMSec_ += pAnimation->Duration();
   AddLast(pAnimation);
 }
 
@@ -94,11 +101,18 @@ Frame* Sequence::GetFrameByTime(int nTimeMSec)
 //  return pAnimation;
 //}
 
+void Sequence::AnimationData(Buffer& sbData, const String& sUrl)
+{
+  for (Animation* pAnimation = 0; (pAnimation = Next(pAnimation)) != 0; ) {
+    pAnimation->AnimationData(sbData, sUrl);
+  }
+}
+
 // ------------------------------------------------------------
 
 void Group::AddSequence(Sequence* pSequence)
 {
-  nTotalProbability_ += pSequence->nProbability_;
+  nTotalProbability_ += pSequence->Probability();
   AddLast(pSequence);
 }
 
@@ -108,7 +122,7 @@ Sequence* Group::GetRandomSequence(int nRnd)
 
   int nProbability = 0;
   for (Sequence* p = 0; (p = Next(p)) != 0; ) {
-    nProbability += p->nProbability_;
+    nProbability += p->Probability();
     if (nRnd < nProbability) {
       pSequence = p;
       break;
@@ -116,6 +130,13 @@ Sequence* Group::GetRandomSequence(int nRnd)
   }
 
   return pSequence;
+}
+
+void Group::AnimationData(Buffer& sbData, const String& sUrl)
+{
+  for (Sequence* pSequence = 0; (pSequence = Next(pSequence)) != 0; ) {
+    pSequence->AnimationData(sbData, sUrl);
+  }
 }
 
 // ------------------------------------------------------------
@@ -141,16 +162,21 @@ int Item::Start()
 
 void Item::Stop()
 {
-  StopTimer();
+  if (bStarted_) {
+    StopTimer();
 
-  if (pCurrentSequence_) {
-    Msg_Animation_SequenceEnd msg;
-    msg.hItem = hAp_;
-    msg.sName = pCurrentSequence_->getName();
-    msg.Send();
+    Sequence* pSequence_ = pCurrentSequence_;
+    pCurrentSequence_ = 0;
+
+    if (pSequence_) {
+      Msg_Animation_SequenceEnd msg;
+      msg.hItem = hAp_;
+      msg.sName = pSequence_->getName();
+      msg.Send();
+    }
+
+    bStarted_ = 0;
   }
-
-  bStarted_ = 0;
 }
 
 void Item::SetDelay(int nDelayMSec)
@@ -209,6 +235,13 @@ void Item::MoveTo(int nX)
   nDestX_ = nX;
 }
 
+void Item::AnimationData(Buffer& sbData, const String& sUrl)
+{
+  for (Group* pGroup = 0; (pGroup =lGroups_.Next(pGroup)) != 0; ) {
+    pGroup->AnimationData(sbData, sUrl);
+  }
+}
+
 // ------------------------------------------------------------
 
 void Item::ResetAnimations()
@@ -250,21 +283,12 @@ void Item::ParseSequenceNode(Apollo::XMLNode* pNode)
   String sOut = pNode->getAttribute("out").getValue();
   String sDx = pNode->getAttribute("dx").getValue();
   String sDy = pNode->getAttribute("dy").getValue();
+  int nProbability = String::atoi(sProbability);
+  if (nProbability <= 0) { nProbability = 100; }
 
   if (sName) {
-    Sequence* pSequence = new Sequence(sName);
+    Sequence* pSequence = new Sequence(sName, sType, sCondition, nProbability, sIn, sOut, String::atoi(sDx), String::atoi(sDy));
     if (pSequence) {
-      pSequence->sType_ = sType;
-      pSequence->sCondition_ = sCondition;
-      pSequence->nProbability_ = String::atoi(sProbability);
-      if (pSequence->nProbability_ <= 0) {
-        pSequence->nProbability_ = 100;
-      }
-      pSequence->sIn_ = sIn;
-      pSequence->sOut_ = sOut;
-      pSequence->nDx_ = String::atoi(sDx);
-      pSequence->nDy_ = String::atoi(sDy);
-
       for (Apollo::XMLNode* pChild = 0; (pChild = pNode->nextChild(pChild)) != 0; ) {
         if (0) {
         } else if (pChild->getName() == "animation") {
@@ -279,7 +303,7 @@ void Item::ParseSequenceNode(Apollo::XMLNode* pNode)
 
             Animation* pAnimation = new Animation();
             if (pAnimation) {
-              pAnimation->sSrc_ = sSrc;
+              pAnimation->Src(sSrc);
               pSequence->AppendAnimation(pAnimation);
             }
           }
@@ -319,8 +343,10 @@ int Item::StartTimer()
 
 void Item::StopTimer()
 {
-  Apollo::cancelInterval(hTimer_);
-  hTimer_ = ApNoHandle;
+  if (ApIsHandle(hTimer_)) {
+    Apollo::cancelInterval(hTimer_);
+    hTimer_ = ApNoHandle;
+  }
 }
 
 // ------------------------------------------------------------
@@ -349,14 +375,14 @@ void Item::Step(Apollo::TimeValue& tvCurrent)
     Apollo::TimeValue tvDelay = tvCurrent - tvLastTimer_;
     int nInSequenceMSec = nSpentInCurrentSequenceMSec_ + tvDelay.MilliSec();
 
-    if (nInSequenceMSec > pCurrentSequence_->nDurationMSec_) {
+    if (nInSequenceMSec > pCurrentSequence_->Duration()) {
       pPreviousSequence = pCurrentSequence_;
 
       pNextSequence = SelectNextSequence();
       if (pNextSequence) {
-        int nRemainingInCurrentSequence = pCurrentSequence_->nDurationMSec_ - nSpentInCurrentSequenceMSec_;
+        int nRemainingInCurrentSequence = pCurrentSequence_->Duration() - nSpentInCurrentSequenceMSec_;
         nInSequenceMSec -= nRemainingInCurrentSequence;
-        if (nInSequenceMSec > pNextSequence->nDurationMSec_) {
+        if (nInSequenceMSec > pNextSequence->Duration()) {
           pNextSequence = SelectNextSequence();
           nInSequenceMSec = 0;
         }
@@ -384,7 +410,7 @@ void Item::Step(Apollo::TimeValue& tvCurrent)
     pCurrentSequence_ = pNextSequence;
   }
 
-  if (pCurrentSequence_) {
+  if (pCurrentSequence_ && pCurrentSequence_->IsLoaded()) {
     Frame* pFrame = pCurrentSequence_->GetFrameByTime(nSpentInCurrentSequenceMSec_);
     if (pFrame) {
       int bFrameChanged = 1;
@@ -502,7 +528,7 @@ Sequence* Item::GetSequenceByGroup(const String& sGroup)
 
   Group* pGroup = lGroups_.FindByName(sGroup);
   if (pGroup) {
-    int nRnd = Apollo::getRandom(pGroup->nTotalProbability_);
+    int nRnd = Apollo::getRandom(pGroup->GetProbabilitySum());
     pSequence = pGroup->GetRandomSequence(nRnd);
   }
 
