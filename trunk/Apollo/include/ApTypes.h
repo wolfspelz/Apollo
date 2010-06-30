@@ -230,6 +230,7 @@ public:
 
   void operator=(time_t nSec);
   TimeValue operator+(TimeValue& tv);
+  TimeValue& operator+=(TimeValue& tv) { *this = *this + tv; return *this; }
   TimeValue operator-(TimeValue& tv);
   bool operator<(TimeValue& tv);
   bool operator>(TimeValue& tv);

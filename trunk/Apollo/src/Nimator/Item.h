@@ -150,7 +150,9 @@ protected:
 
   void Step(Apollo::TimeValue& tvCurrent);
   Sequence* SelectNextSequence();
-  void InsertDefaultTaskIfEmpty();
+  void ClearAllTasks();
+  void InsertDefaultTask();
+  void InsertEventTask(const String& sEvent);
   Sequence* GetSequenceFromNextTask();
   Sequence* GetSequenceByName(const String& sSequence);
   Sequence* GetSequenceByGroup(const String& sGroup);
@@ -170,10 +172,10 @@ protected:
   ApHandle hTimer_;
   String sBaseUrl_;
   String sDefaultSequence_;
+  String sDefaultStatus_;
   ListT<Group, Elem> lGroups_;
   String sStatus_;
   String sCondition_;
-  String sNextEvent_;
   int nX_;
   int nDestX_;
   Sequence* pCurrentSequence_;
