@@ -154,6 +154,8 @@ int Item::Start()
   
   ok = StartTimer();
   if (ok) {
+    InsertDefaultTask();
+
     bStarted_ = 1;
   }
 
@@ -174,6 +176,8 @@ void Item::Stop()
       msg.sName = pSequence_->getName();
       msg.Send();
     }
+
+    ClearAllTasks();
 
     bStarted_ = 0;
   }
@@ -208,6 +212,8 @@ void Item::SetData(Buffer& sbData, const String& sUrl)
       ParseSequenceNode(pChild);
     }
   }
+
+  InsertDefaultTask();
 }
 
 void Item::SetStatus(const String& sStatus)
@@ -222,7 +228,7 @@ void Item::SetCondition(const String& sCondition)
 
 void Item::PlayEvent(const String& sEvent)
 {
-  sNextEvent_ = sEvent;
+  InsertEventTask(sEvent);
 }
 
 void Item::SetPosition(int nX)
@@ -246,7 +252,8 @@ void Item::AnimationData(Buffer& sbData, const String& sUrl)
 
 void Item::ResetAnimations()
 {
-  sDefaultSequence_ = "";
+  sDefaultSequence_ = "still";
+  sDefaultStatus_ = "idle";
   lGroups_.Empty();
 }
 
@@ -257,6 +264,8 @@ void Item::ParseParamNode(Apollo::XMLNode* pNode)
   if (0) {
   } else if (sName == "defaultsequence") {
     sDefaultSequence_ = sValue;
+  } else if (sName == "defaultstatus") {
+    sDefaultStatus_ = sValue;
   }
 }
 
@@ -380,8 +389,7 @@ void Item::Step(Apollo::TimeValue& tvCurrent)
 
       pNextSequence = SelectNextSequence();
       if (pNextSequence) {
-        int nRemainingInCurrentSequence = pCurrentSequence_->Duration() - nSpentInCurrentSequenceMSec_;
-        nInSequenceMSec -= nRemainingInCurrentSequence;
+        nInSequenceMSec -= pCurrentSequence_->Duration();
         if (nInSequenceMSec > pNextSequence->Duration()) {
           pNextSequence = SelectNextSequence();
           nInSequenceMSec = 0;
@@ -430,11 +438,29 @@ void Item::Step(Apollo::TimeValue& tvCurrent)
 
 }
 
-void Item::InsertDefaultTaskIfEmpty()
+void Item::ClearAllTasks()
+{
+  while (lTasks_.length() > 0) {
+    Task* pTask = lTasks_.First();
+    if (pTask) {
+      lTasks_.Remove(pTask);
+      delete pTask;
+      pTask = 0;
+    }
+
+  }
+}
+
+void Item::InsertDefaultTask()
 {
   if (lTasks_.length() == 0 ){
 
     String sStatus = sStatus_;
+
+    if (!sStatus) {
+      sStatus = sDefaultStatus_;
+    }
+
     if (!sStatus) {
       sStatus = Apollo::getModuleConfig(MODULE_NAME, "DefaultStatus", "idle");
     }
@@ -444,6 +470,26 @@ void Item::InsertDefaultTaskIfEmpty()
       lTasks_.Add(pTask);
     }
 
+  }
+}
+
+void Item::InsertEventTask(const String& sEvent)
+{
+  Task* pTask = 0;
+  while (pTask = lTasks_.FindByName("event")) {
+    lTasks_.Remove(pTask);
+    delete pTask;
+    pTask = 0;
+  }
+
+  pTask = new EventTask("event", sEvent);
+  if (pTask) {
+    Task* pStatus = lTasks_.FindByName("status");
+    if (pStatus) {
+      lTasks_.Remove(pStatus);
+      lTasks_.AddLast(pTask);
+      lTasks_.AddLast(pStatus);
+    }
   }
 }
 
@@ -467,7 +513,6 @@ Sequence* Item::SelectNextSequence()
 {
   Sequence * pSequence = 0;
 
-  InsertDefaultTaskIfEmpty();
   pSequence = GetSequenceFromNextTask();
 
   if (pSequence == 0) {

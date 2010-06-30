@@ -28,15 +28,17 @@ static void Test_Nimator_UnitTest_Token(Msg_UnitTest_Token* pMsg)
   AP_UNITTEST_EXECUTE(NimatorModuleTester::Test_Parse);
   AP_UNITTEST_EXECUTE(NimatorModuleTester::Test_LoadGIF);
   AP_UNITTEST_EXECUTE(NimatorModuleTester::Test_SelectByGroup);
-  AP_UNITTEST_EXECUTE(NimatorModuleTester::Test_Play);
+  AP_UNITTEST_EXECUTE(NimatorModuleTester::Test_PlayStill);
+  AP_UNITTEST_EXECUTE(NimatorModuleTester::Test_PlayWave);
 
   if (bTokenEndNow) { Test_Nimator_UnitTest_TokenEnd(); }
 }
 
 //----------------------------------------------------------
 
-#define NimatorModule_Test_Parse_Url "http://ydentiti.org/test/Nimator/avatar.xml"
-#define NimatorModule_Test_Parse_Data \
+#define NimatorModuleTester_Parse_Url "http://ydentiti.org/test/Nimator/avatar.xml"
+
+#define NimatorModuleTester_Parse_Data \
 "<config xmlns='http://schema.bluehands.de/character-config' version='1.0'>\n" \
 "  <param name='defaultsequence' value='idle'/>\n" \
 "  <sequence group='idle' name='still' type='status' probability='1000' in='standard' out='standard'><animation src='idle.gif'/></sequence>\n" \
@@ -66,8 +68,8 @@ String NimatorModuleTester::Test_Parse()
   if (!s) {
     Msg_Animation_SetData msg;
     msg.hItem = hItem;
-    msg.sbData.SetData(NimatorModule_Test_Parse_Data);
-    msg.sSourceUrl = NimatorModule_Test_Parse_Url;
+    msg.sbData.SetData(NimatorModuleTester_Parse_Data);
+    msg.sSourceUrl = NimatorModuleTester_Parse_Url;
     if (!msg.Request()) {
       s = "Msg_Animation_SetData failed";
     }
@@ -191,30 +193,128 @@ String NimatorModuleTester::Test_SelectByGroup()
 
 //---------------------------
 
-String NimatorModuleTester::Test_Play()
+#define NimatorModuleTester_Play_Url "http://ydentiti.org/test/Nimator/avatar.xml"
+
+#define NimatorModuleTester_Play_Data \
+"<config xmlns='http://schema.bluehands.de/character-config' version='1.0'>\n" \
+"  <param name='defaultsequence' value='idle'/>\n" \
+"  <sequence group='idle' name='still' type='status' probability='1000' in='standard' out='standard'><animation src='idle.gif'/></sequence>\n" \
+"  <sequence group='moveleft' name='moveleft' type='basic' probability='1' in='moveleft' out='moveleft'><animation dx='-55' dy='0' src='walk-l.gif'/></sequence>\n" \
+"  <sequence group='moveright' name='moveright' type='basic' probability='1' in='moveright' out='moveright'><animation dx='55' dy='0' src='walk-r.gif'/></sequence>\n" \
+"  <sequence group='chat' name='chat1' type='basic' probability='1000' in='standard' out='standard'><animation src='chat.gif'/></sequence>\n" \
+"  <sequence group='wave' name='wave' type='emote' probability='1000' in='standard' out='standard'><animation src='http://ydentiti.org/test/Tassadar/wave.gif'/></sequence>\n" \
+"  <sequence group='sleep' name='sleep' type='status' probability='1000' in='standard' out='standard'><animation src='sleep.gif'/></sequence>\n" \
+"</config>"
+
+static void NimatorModuleTester_Test_Item_AnimationData_RelativeUrl(Item& i, const String& sName, const String& sBaseUrl)
+{
+  String sAnimationPath = Apollo::getAppResourcePath() + "tassadar" + String::filenamePathSeparator() + sName;
+  String sAnimationUrl = sBaseUrl + sName;
+  Buffer sbAnimationData;
+  Apollo::loadFile(sAnimationPath, sbAnimationData);
+  i.AnimationData(sbAnimationData, sAnimationUrl);
+}
+
+static void NimatorModuleTester_Test_Item_AnimationData_AbsoluteUrl(Item& i, const String& sName, const String& sUrl)
+{
+  String sAnimationPath = Apollo::getAppResourcePath() + "tassadar" + String::filenamePathSeparator() + sName;
+  Buffer sbAnimationData;
+  Apollo::loadFile(sAnimationPath, sbAnimationData);
+  i.AnimationData(sbAnimationData, sUrl);
+}
+
+String NimatorModuleTester::Test_PlayStep(Item& i, Apollo::TimeValue& t, const String& sExpectedSequence, int nExpectedTime)
+{
+  String s;
+
+  i.Step(t);
+  if (i.pCurrentSequence_->getName() != sExpectedSequence) {
+    s.appendf("sequence=%s expected=%s", StringType(i.pCurrentSequence_->getName()), StringType(sExpectedSequence));
+  } else if (i.nSpentInCurrentSequenceMSec_ != nExpectedTime) {
+    s.appendf("time=%d expected=%d", i.nSpentInCurrentSequenceMSec_, nExpectedTime);
+  }
+
+  return s;
+}
+
+String NimatorModuleTester::Test_PlayStill()
 {
   String s;
 
   Item i(Apollo::newHandle());
 
   Buffer sbConfig;
-  sbConfig.SetData(NimatorModule_Test_Parse_Data);
-  String sUrl = NimatorModule_Test_Parse_Url;
+  sbConfig.SetData(NimatorModuleTester_Play_Data);
+  String sUrl = NimatorModuleTester_Play_Url;
   i.SetData(sbConfig, sUrl);
 
-  String sBasePath = Apollo::getAppResourcePath() + "tassadar" + String::filenamePathSeparator();
-  String sBaseUrl = String::filenameBasePath(sUrl);
-
-  String sName = "idle.gif";
-
-  String sAnimationPath = sBasePath + sName;
-  String sAnimationUrl = sBaseUrl + sName;
-  Buffer sbAnimationData;
-  Apollo::loadFile(sAnimationPath, sbAnimationData);
-  i.AnimationData(sbAnimationData, sAnimationUrl);
+  NimatorModuleTester_Test_Item_AnimationData_RelativeUrl(i, "idle.gif", String::filenameBasePath(sUrl));
+  NimatorModuleTester_Test_Item_AnimationData_RelativeUrl(i, "walk-l.gif", String::filenameBasePath(sUrl));
+  NimatorModuleTester_Test_Item_AnimationData_RelativeUrl(i, "walk-r.gif", String::filenameBasePath(sUrl));
+  NimatorModuleTester_Test_Item_AnimationData_RelativeUrl(i, "chat.gif", String::filenameBasePath(sUrl));
+  NimatorModuleTester_Test_Item_AnimationData_AbsoluteUrl(i, "wave.gif", "http://ydentiti.org/test/Tassadar/wave.gif");
+  NimatorModuleTester_Test_Item_AnimationData_RelativeUrl(i, "sleep.gif", String::filenameBasePath(sUrl));
 
   Apollo::TimeValue t = Apollo::TimeValue::getTime();
-  i.Step(t);
+  Apollo::TimeValue d(0, 110000);
+  if (!s) {         s = Test_PlayStep(i, t, "still", 0); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "still", 110); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "still", 220); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "still", 330); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "still", 440); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "still", 550); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "still", 660); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "still", 770); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "still", 880); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "still", 990); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "still", 100); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "still", 210); }
+
+  return s;
+}
+
+String NimatorModuleTester::Test_PlayWave()
+{
+  String s;
+
+  Item i(Apollo::newHandle());
+
+  Buffer sbConfig;
+  sbConfig.SetData(NimatorModuleTester_Play_Data);
+  String sUrl = NimatorModuleTester_Play_Url;
+  i.SetData(sbConfig, sUrl);
+
+  NimatorModuleTester_Test_Item_AnimationData_RelativeUrl(i, "idle.gif", String::filenameBasePath(sUrl));
+  NimatorModuleTester_Test_Item_AnimationData_RelativeUrl(i, "walk-l.gif", String::filenameBasePath(sUrl));
+  NimatorModuleTester_Test_Item_AnimationData_RelativeUrl(i, "walk-r.gif", String::filenameBasePath(sUrl));
+  NimatorModuleTester_Test_Item_AnimationData_RelativeUrl(i, "chat.gif", String::filenameBasePath(sUrl));
+  NimatorModuleTester_Test_Item_AnimationData_AbsoluteUrl(i, "wave.gif", "http://ydentiti.org/test/Tassadar/wave.gif");
+  NimatorModuleTester_Test_Item_AnimationData_RelativeUrl(i, "sleep.gif", String::filenameBasePath(sUrl));
+
+  Apollo::TimeValue t = Apollo::TimeValue::getTime();
+  Apollo::TimeValue d(0, 110000);
+  if (!s) {         s = Test_PlayStep(i, t, "still", 0); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "still", 110); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "still", 220); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "still", 330); }
+  i.PlayEvent("wave");
+  if (!s) { t += d; s = Test_PlayStep(i, t, "still", 440); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "still", 550); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "still", 660); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "still", 770); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "still", 880); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "still", 990); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "wave", 100); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "wave", 210); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "wave", 320); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "wave", 430); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "wave", 540); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "wave", 650); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "wave", 760); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "wave", 870); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "wave", 980); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "still", 90); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "still", 200); }
 
   return s;
 }
@@ -227,7 +327,8 @@ void NimatorModuleTester::Begin()
     AP_UNITTEST_REGISTER(NimatorModuleTester::Test_Parse);
     AP_UNITTEST_REGISTER(NimatorModuleTester::Test_LoadGIF);
     AP_UNITTEST_REGISTER(NimatorModuleTester::Test_SelectByGroup);
-    AP_UNITTEST_REGISTER(NimatorModuleTester::Test_Play);
+    AP_UNITTEST_REGISTER(NimatorModuleTester::Test_PlayStill);
+    AP_UNITTEST_REGISTER(NimatorModuleTester::Test_PlayWave);
 
     { Msg_UnitTest_Token msg; msg.Hook(MODULE_NAME, (ApCallback) Test_Nimator_UnitTest_Token, 0, ApCallbackPosNormal); }  
   }
