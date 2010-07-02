@@ -14,6 +14,27 @@
 #include "MsgAnimation.h"
 #include "Item.h"
 
+class AnimationRequest
+{
+public:
+  AnimationRequest(const String& sUrl)
+    :sUrl_(sUrl)
+    ,tvCreated_(Apollo::TimeValue::getTime())
+  {}
+
+  Apollo::TimeValue CreationTime() { return tvCreated_; }
+
+protected:
+  String sUrl_;
+  Apollo::TimeValue tvCreated_;
+};
+
+typedef StringTree<AnimationRequest> AnimationRequestList;
+typedef StringTreeNode<AnimationRequest> AnimationRequestListNode;
+typedef StringTreeIterator<AnimationRequest> AnimationRequestListIterator;
+
+// ---------------------------------------------------
+
 typedef ApHandlePointerTree<Item*> ItemList;
 typedef ApHandlePointerTreeNode<Item*> ItemListNode;
 typedef ApHandlePointerTreeIterator<Item*> ItemListIterator;
@@ -51,8 +72,13 @@ public:
 protected:
   Item* GetItemByTimer(ApHandle hTimer);
 
+  int AnimationIsRequested(const String& sUrl);
+  void RequestAnimation(const String& sUrl);
+  void AnimationRequestComplete(const String& sUrl, Buffer& sbData);
+
 public:
   ItemList items_;
+  AnimationRequestList requestedAnimations_;
 
   AP_MSG_REGISTRY_DECLARE;
 };

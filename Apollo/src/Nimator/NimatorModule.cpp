@@ -19,6 +19,40 @@ NimatorModule::~NimatorModule()
 {
 }
 
+int NimatorModule::AnimationIsRequested(const String& sUrl)
+{
+  int bIsIt = 0;
+
+  if (requestedAnimations_.Find(sUrl) != 0) {
+    bIsIt = 1;
+  }
+
+  return bIsIt;
+}
+
+void NimatorModule::RequestAnimation(const String& sUrl)
+{
+  if (!AnimationIsRequested(sUrl)) {
+// http request
+
+    AnimationRequest ar(sUrl);
+    requestedAnimations_.Set(sUrl, ar);
+  }
+}
+
+void NimatorModule::AnimationRequestComplete(const String& sUrl, Buffer& sbData)
+{
+  requestedAnimations_.Unset(sUrl);
+
+  ItemListIterator iter(items_);
+  for (ItemListNode* pNode = 0; (pNode = iter.Next()) != 0; ) {
+    Item* pItem = pNode->Value();
+    if (pItem) {
+      pItem->SetAnimationData(sbData, sUrl);
+    }
+  }
+}
+
 //----------------------------------------------------------
 
 AP_MSG_HANDLER_METHOD(NimatorModule, Animation_Create)
@@ -31,7 +65,7 @@ AP_MSG_HANDLER_METHOD(NimatorModule, Animation_Create)
 
   if (items_.Find(pMsg->hItem) != 0) { throw ApException("hItem=" ApHandleFormat ", already exists", ApHandleType(pMsg->hItem)); }
 
-  Item* pItem = new Item(pMsg->hItem);
+  Item* pItem = new Item(pMsg->hItem, this);
   if (pItem == 0) { throw ApException("new Item() failed, hItem=" ApHandleFormat "", ApHandleType(pMsg->hItem)); }
 
   items_.Set(pMsg->hItem, pItem);

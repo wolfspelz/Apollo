@@ -123,7 +123,8 @@ String NimatorModuleTester::Test_LoadGIF()
 {
   String s;
 
-  Animation a;
+  NimatorModule m;
+  Animation a(&m);
   Apollo::loadFile(Apollo::getAppResourcePath() + "tassadar/walk-l.gif", a.sbData_);
   a.Load();
   if (!s) { if (a.length() != 13) { s = "expected 13 frames"; } }
@@ -167,10 +168,11 @@ String NimatorModuleTester::Test_SelectByGroup()
 {
   String s;
 
+  NimatorModule m;
   Group g("g");
-  Sequence *s1 = new Sequence("s1", "status", "normal", 100, "", "", 0, 0);
-  Sequence *s2 = new Sequence("s2", "status", "normal", 100, "", "", 0, 0);
-  Sequence *s3 = new Sequence("s3", "status", "normal", 100, "", "", 0, 0);
+  Sequence *s1 = new Sequence("s1", &m, "status", "normal", 100, "", "", 0, 0);
+  Sequence *s2 = new Sequence("s2", &m, "status", "normal", 100, "", "", 0, 0);
+  Sequence *s3 = new Sequence("s3", &m, "status", "normal", 100, "", "", 0, 0);
   g.AddSequence(s1);
   g.AddSequence(s2);
   g.AddSequence(s3);
@@ -212,7 +214,7 @@ static void NimatorModuleTester_Test_Item_AnimationData_RelativeUrl(Item& i, con
   String sAnimationUrl = sBaseUrl + sName;
   Buffer sbAnimationData;
   Apollo::loadFile(sAnimationPath, sbAnimationData);
-  i.AnimationData(sbAnimationData, sAnimationUrl);
+  i.SetAnimationData(sbAnimationData, sAnimationUrl);
 }
 
 static void NimatorModuleTester_Test_Item_AnimationData_AbsoluteUrl(Item& i, const String& sName, const String& sUrl)
@@ -220,7 +222,7 @@ static void NimatorModuleTester_Test_Item_AnimationData_AbsoluteUrl(Item& i, con
   String sAnimationPath = Apollo::getAppResourcePath() + "tassadar" + String::filenamePathSeparator() + sName;
   Buffer sbAnimationData;
   Apollo::loadFile(sAnimationPath, sbAnimationData);
-  i.AnimationData(sbAnimationData, sUrl);
+  i.SetAnimationData(sbAnimationData, sUrl);
 }
 
 String NimatorModuleTester::Test_PlayStep(Item& i, Apollo::TimeValue& t, const String& sExpectedSequence, int nExpectedTime)
@@ -241,7 +243,8 @@ String NimatorModuleTester::Test_PlayStill()
 {
   String s;
 
-  Item i(Apollo::newHandle());
+  NimatorModule m;
+  Item i(Apollo::newHandle(), &m);
 
   Buffer sbConfig;
   sbConfig.SetData(NimatorModuleTester_Play_Data);
@@ -277,7 +280,8 @@ String NimatorModuleTester::Test_PlayWave()
 {
   String s;
 
-  Item i(Apollo::newHandle());
+  NimatorModule m;
+  Item i(Apollo::newHandle(), &m);
 
   Buffer sbConfig;
   sbConfig.SetData(NimatorModuleTester_Play_Data);
