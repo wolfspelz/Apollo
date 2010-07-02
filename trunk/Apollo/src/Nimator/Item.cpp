@@ -11,16 +11,45 @@
 #include "Item.h"
 #include "ximagif.h"
 #include "Image.h"
+#include "NimatorModule.h"
 
-void Animation::AppendFrame(Frame* pFrame)
+void Animation::SetAnimationData(Buffer& sbData, const String& sUrl)
 {
-  nDurationMSec_ += pFrame->nDurationMSec_;
-  nFramesCount_++;
-
-  AddLast(pFrame);
+  if (sUrl == sSrc_) {
+    sbData_ = sbData;
+    bData
+  }
 }
 
 void Animation::Load()
+{
+  if (IsLoaded()) {
+    // do nothing
+  } else {
+    if (HasData()) {
+      LoadFromData();
+    } else {
+      GetDataFromCache();
+      if (HasData()) {
+        LoadFromData();
+      } else {
+        if (pModule_) {
+          pModule_->RequestAnimation(sSrc_);
+        }
+      }
+    }
+  }
+}
+
+void Animation::GetDataFromCache()
+{
+}
+
+void Animation::SaveDataToCache()
+{
+}
+
+void Animation::LoadFromData()
 {
   CxImage img(sbData_.Data(), sbData_.Length(), CXIMAGE_FORMAT_GIF);
   img.SetRetreiveAllFrames(true);
@@ -54,18 +83,19 @@ void Animation::Load()
   } // img.Decode
 }
 
-void Animation::AnimationData(Buffer& sbData, const String& sUrl)
+void Animation::AppendFrame(Frame* pFrame)
 {
-  if (sUrl == sSrc_) {
-    sbData_ = sbData;
-  }
+  nDurationMSec_ += pFrame->nDurationMSec_;
+  nFramesCount_++;
+
+  AddLast(pFrame);
 }
 
 // ------------------------------------------------------------
 
 void Sequence::AppendAnimation(Animation* pAnimation)
 {
-  nDurationMSec_ += pAnimation->Duration();
+  //nDurationMSec_ += pAnimation->Duration();
   AddLast(pAnimation);
 }
 
@@ -101,10 +131,17 @@ Frame* Sequence::GetFrameByTime(int nTimeMSec)
 //  return pAnimation;
 //}
 
-void Sequence::AnimationData(Buffer& sbData, const String& sUrl)
+void Sequence::SetAnimationData(Buffer& sbData, const String& sUrl)
 {
   for (Animation* pAnimation = 0; (pAnimation = Next(pAnimation)) != 0; ) {
-    pAnimation->AnimationData(sbData, sUrl);
+    pAnimation->SetAnimationData(sbData, sUrl);
+  }
+}
+
+void Sequence::Load()
+{
+  for (Animation* pAnimation = 0; (pAnimation = Next(pAnimation)) != 0; ) {
+    pAnimation->Load();
   }
 }
 
@@ -132,10 +169,10 @@ Sequence* Group::GetRandomSequence(int nRnd)
   return pSequence;
 }
 
-void Group::AnimationData(Buffer& sbData, const String& sUrl)
+void Group::SetAnimationData(Buffer& sbData, const String& sUrl)
 {
   for (Sequence* pSequence = 0; (pSequence = Next(pSequence)) != 0; ) {
-    pSequence->AnimationData(sbData, sUrl);
+    pSequence->SetAnimationData(sbData, sUrl);
   }
 }
 
@@ -241,10 +278,10 @@ void Item::MoveTo(int nX)
   nDestX_ = nX;
 }
 
-void Item::AnimationData(Buffer& sbData, const String& sUrl)
+void Item::SetAnimationData(Buffer& sbData, const String& sUrl)
 {
   for (Group* pGroup = 0; (pGroup =lGroups_.Next(pGroup)) != 0; ) {
-    pGroup->AnimationData(sbData, sUrl);
+    pGroup->SetAnimationData(sbData, sUrl);
   }
 }
 
@@ -296,7 +333,7 @@ void Item::ParseSequenceNode(Apollo::XMLNode* pNode)
   if (nProbability <= 0) { nProbability = 100; }
 
   if (sName) {
-    Sequence* pSequence = new Sequence(sName, sType, sCondition, nProbability, sIn, sOut, String::atoi(sDx), String::atoi(sDy));
+    Sequence* pSequence = new Sequence(sName, pModule_, sType, sCondition, nProbability, sIn, sOut, String::atoi(sDx), String::atoi(sDy));
     if (pSequence) {
       for (Apollo::XMLNode* pChild = 0; (pChild = pNode->nextChild(pChild)) != 0; ) {
         if (0) {
@@ -310,7 +347,7 @@ void Item::ParseSequenceNode(Apollo::XMLNode* pNode)
               sSrc = sBaseUrl_ + sSrc;
             }
 
-            Animation* pAnimation = new Animation();
+            Animation* pAnimation = new Animation(pModule_);
             if (pAnimation) {
               pAnimation->Src(sSrc);
               pSequence->AppendAnimation(pAnimation);
@@ -517,6 +554,12 @@ Sequence* Item::SelectNextSequence()
 
   if (pSequence == 0) {
     pSequence = GetSequenceByName(sDefaultSequence_);
+  }
+
+  if (pSequence) {
+    if (!pSequence->IsLoaded()) {
+      pSequence->Load();
+    }
   }
 
   return pSequence;

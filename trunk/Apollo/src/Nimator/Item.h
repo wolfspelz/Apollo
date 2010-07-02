@@ -23,24 +23,33 @@ public:
 
 // ------------------------------------------------------------
 
+class NimatorModule;
+
 class Animation: public ListT<Frame, Elem>
 {
 public:
-  Animation()
-    :bLoaded_(0)
+  Animation(NimatorModule* pModule)
+    :pModule_(pModule)
+    ,bLoaded_(0)
     ,nDurationMSec_(0)
     ,nFramesCount_(0)
   {}
 
   void Load();
+  int IsLoaded() { return bLoaded_; }
+  int HasData() { return sbData_.Length() > 0; }
   void AppendFrame(Frame* pFrame);
   int Duration() { return nDurationMSec_; }
   void Src(const String& sSrc) { sSrc_ = sSrc;}
-  void AnimationData(Buffer& sbData, const String& sUrl);
+  void SetAnimationData(Buffer& sbData, const String& sUrl);
+
+protected:
+  void LoadFromData();
 
 protected:
   friend class NimatorModuleTester;
 
+  NimatorModule* pModule_;
   String sSrc_;
   Buffer sbData_;
   int bLoaded_;
@@ -53,8 +62,9 @@ protected:
 class Sequence: public ListT<Animation, Elem>
 {
 public:
-  Sequence(const String& sName, const String& sType, const String& sCondition, int nProbability, const String& sIn, const String& sOut, int nDx, int nDy)
+  Sequence(const String& sName, NimatorModule* pModule, const String& sType, const String& sCondition, int nProbability, const String& sIn, const String& sOut, int nDx, int nDy)
     :ListT<Animation, Elem>(sName)
+    ,pModule_(pModule)
     ,sType_(sType)
     ,sCondition_(sCondition)
     ,nProbability_(nProbability)
@@ -68,15 +78,17 @@ public:
 
   void AppendAnimation(Animation* pAnimation);
   Frame* GetFrameByTime(int nTimeMSec);
-  void AnimationData(Buffer& sbData, const String& sUrl);
+  void SetAnimationData(Buffer& sbData, const String& sUrl);
 
   int Probability() { return nProbability_; }
   int Duration() { return nDurationMSec_; }
+  void Load();
   int IsLoaded() { return bLoaded_; }
 
 protected:
   friend class NimatorModuleTester;
 
+  NimatorModule* pModule_;
   String sType_;
   String sCondition_;
   int nProbability_;
@@ -101,7 +113,7 @@ public:
   void AddSequence(Sequence* pSequence);
   Sequence* GetRandomSequence(int nRnd);
   int GetProbabilitySum() { return nTotalProbability_; }
-  void AnimationData(Buffer& sbData, const String& sUrl);
+  void SetAnimationData(Buffer& sbData, const String& sUrl);
 
 protected:
   int nTotalProbability_;
@@ -115,8 +127,9 @@ class Task;
 class Item
 {
 public:
-  Item(ApHandle hItem)
+  Item(ApHandle hItem, NimatorModule* pModule)
     :hAp_(hItem)
+    ,pModule_(pModule)
     ,bStarted_(0)
     ,nDelayMSec_(100)
     ,nX_(0)
@@ -137,7 +150,7 @@ public:
   void PlayEvent(const String& sEvent);
   void SetPosition(int nX);
   void MoveTo(int nX);
-  void AnimationData(Buffer& sbData, const String& sUrl);
+  void SetAnimationData(Buffer& sbData, const String& sUrl);
 
   int HasTimer(ApHandle hTimer) { return ApIsHandle(hTimer) && hTimer == hTimer_; }
   void OnTimer();
@@ -166,6 +179,7 @@ protected:
   friend class EventTask;
   friend class MoveTask;
 
+  NimatorModule* pModule_;
   ApHandle hAp_;
   int bStarted_;
   int nDelayMSec_; // msec
