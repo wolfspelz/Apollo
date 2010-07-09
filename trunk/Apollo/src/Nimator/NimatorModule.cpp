@@ -10,6 +10,7 @@
 #include "Local.h"
 #include "NimatorModule.h"
 #include "NimatorModuleTester.h"
+#include "AnimationClient.h"
 
 NimatorModule::NimatorModule()
 {
@@ -28,29 +29,6 @@ int NimatorModule::AnimationIsRequested(const String& sUrl)
   }
 
   return bIsIt;
-}
-
-void NimatorModule::RequestAnimation(const String& sUrl)
-{
-  if (!AnimationIsRequested(sUrl)) {
-// http request
-
-    AnimationRequest ar(sUrl);
-    requestedAnimations_.Set(sUrl, ar);
-  }
-}
-
-void NimatorModule::AnimationRequestComplete(const String& sUrl, Buffer& sbData)
-{
-  requestedAnimations_.Unset(sUrl);
-
-  ItemListIterator iter(items_);
-  for (ItemListNode* pNode = 0; (pNode = iter.Next()) != 0; ) {
-    Item* pItem = pNode->Value();
-    if (pItem) {
-      pItem->SetAnimationData(sbData, sUrl);
-    }
-  }
 }
 
 //----------------------------------------------------------
@@ -225,6 +203,47 @@ AP_MSG_HANDLER_METHOD(NimatorModule, Timer_Event)
   pItem->OnTimer();
 }
 
+AP_MSG_HANDLER_METHOD(NimatorModule, Animator_RequestAnimation)
+{
+  int ok = 0;
+
+  if (!AnimationIsRequested(pMsg->sUrl)) {
+
+    AnimationClient* pClient = new AnimationClient(pMsg->hRequest);
+    if (pClient != 0) {
+      ok = pClient->Get(pMsg->sUrl);
+      if (!ok) {
+        apLog_Warning((LOG_CHANNEL, "NimatorModule::RequestAnimation", "pClient->Get() failed, src=%s", StringType(pMsg->sUrl)));
+        delete pClient;
+        pClient = 0;
+      } else {
+        AnimationRequest ar(pMsg->sUrl);
+        requestedAnimations_.Set(pMsg->sUrl, ar);
+      }
+    }
+
+  }
+
+  pMsg->apStatus = ok ? ApMessage::Ok : ApMessage::Error;
+}
+
+AP_MSG_HANDLER_METHOD(NimatorModule, Animator_RequestAnimationComplete)
+{
+  if (!AnimationIsRequested(pMsg->sUrl)) {
+    requestedAnimations_.Unset(pMsg->sUrl);
+
+    if (pMsg->bSuccess) {
+      ItemListIterator iter(items_);
+      for (ItemListNode* pNode = 0; (pNode = iter.Next()) != 0; ) {
+        Item* pItem = pNode->Value();
+        if (pItem) {
+          pItem->SetAnimationData(pMsg->sUrl, pMsg->sbData, pMsg->sMimeType);
+        }
+      }
+    }
+  }
+}
+
 //----------------------------------------------------------
 
 #if defined(AP_TEST)
@@ -287,6 +306,8 @@ int NimatorModule::Init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, NimatorModule, Animation_GetPosition, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, NimatorModule, Timer_Event, this, ApCallbackPosNormal);
   AP_UNITTEST_HOOK(NimatorModule, this);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, NimatorModule, Animator_RequestAnimation, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, NimatorModule, Animator_RequestAnimationComplete, this, ApCallbackPosNormal);
 
   return ok;
 }

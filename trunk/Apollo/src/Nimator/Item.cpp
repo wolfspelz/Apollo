@@ -13,31 +13,48 @@
 #include "Image.h"
 #include "NimatorModule.h"
 
-void Animation::SetAnimationData(Buffer& sbData, const String& sUrl)
+void Animation::SetAnimationData(const String& sUrl, Buffer& sbData, const String& sMimeType)
 {
-  if (sUrl == sSrc_) {
-    sbData_ = sbData;
-    bData
+  if (!IsLoaded()) {
+    if (sUrl == sSrc_) {
+      sbData_ = sbData;
+      bDataBroken_ = 0;
+    }
   }
 }
 
 void Animation::Load()
 {
+  int bRequestData = 0;
+
   if (IsLoaded()) {
     // do nothing
   } else {
     if (HasData()) {
-      LoadFromData();
-    } else {
-      GetDataFromCache();
-      if (HasData()) {
-        LoadFromData();
+      if (IsBroken()) {
+        // do nothing
       } else {
-        if (pModule_) {
-          pModule_->RequestAnimation(sSrc_);
+        LoadData();
+      }
+    } else {
+      if (HasDataInCache()) {
+        GetDataFromCache();
+        if (HasData()) {
+          LoadData();
+        } else {
+          bRequestData = 1;
         }
+      } else {
+        bRequestData = 1;
       }
     }
+  }
+
+  if (bRequestData) {
+    Msg_Animator_RequestAnimation msg;
+    msg.hRequest = Apollo::newHandle();
+    msg.sUrl = sSrc_;
+    msg.Request();
   }
 }
 
@@ -49,7 +66,7 @@ void Animation::SaveDataToCache()
 {
 }
 
-void Animation::LoadFromData()
+void Animation::LoadData()
 {
   CxImage img(sbData_.Data(), sbData_.Length(), CXIMAGE_FORMAT_GIF);
   img.SetRetreiveAllFrames(true);
@@ -57,9 +74,9 @@ void Animation::LoadFromData()
 	img.SetFrame(nFrames - 1);
 
   if (!img.Decode(sbData_.Data(), sbData_.Length(), CXIMAGE_FORMAT_GIF)) {
-    apLog_Warning((LOG_CHANNEL, "Animation::Load", "Decode failed"));
+    apLog_Warning((LOG_CHANNEL, "Animation::LoadData", "Decode failed"));
   } else {
-    sbData_.Empty();
+    bLoaded_ = 0;
 
     for (int i = 0; i < nFrames; i++) {
 
@@ -72,14 +89,34 @@ void Animation::LoadFromData()
           pFrame->img_.Allocate(pImgFrame->GetWidth(), pImgFrame->GetHeight());
           CxMemFile mfDest((BYTE*) pFrame->img_.Pixels(), pFrame->img_.Size());
           pImgFrame->Encode2RGBA(&mfDest);
-          pFrame->nDurationMSec_ = (int) pImgFrame->GetFrameDelay() * 10; // in 1/100 s
-          
+
+          int nDuration = (int) pImgFrame->GetFrameDelay() * 10; // in 1/100 s
+          if (nDuration == 0) {
+            nDuration = Apollo::getModuleConfig(MODULE_NAME, "DefaultFrameDuration", 1000);
+          }
+          pFrame->nDurationMSec_ = nDuration;
+
           AppendFrame(pFrame);
           bLoaded_ = 1;
         }
 
       } // if (pImgFrame)
     } // for nFrames
+
+    if (bLoaded_) {
+      if (!HasDataInCache()) {
+        SaveDataToCache();
+      }
+
+      sbData_.Empty();
+      bDataBroken_ = 0;
+      if (nDurationMSec_ == 0) {
+        nDurationMSec_ = Apollo::getModuleConfig(MODULE_NAME, "DefaultAnimationDuration", 1000);
+      }
+
+    } else {
+      bDataBroken_ = 1;
+    }
   } // img.Decode
 }
 
@@ -107,7 +144,7 @@ Frame* Sequence::GetFrameByTime(int nTimeMSec)
   for (Animation* pAnimation = 0; (pAnimation = Next(pAnimation)) != 0 && pFrame == 0; ) {
     for (Frame* p = 0; (p = pAnimation->Next(p)) != 0 && pFrame == 0; ) {
       nAccumulatedTime += p->nDurationMSec_;
-      if (nTimeMSec < nAccumulatedTime) {
+      if (nTimeMSec <= nAccumulatedTime) {
         pFrame = p;
       }
     }
@@ -131,17 +168,27 @@ Frame* Sequence::GetFrameByTime(int nTimeMSec)
 //  return pAnimation;
 //}
 
-void Sequence::SetAnimationData(Buffer& sbData, const String& sUrl)
+void Sequence::SetAnimationData(const String& sUrl, Buffer& sbData, const String& sMimeType)
 {
   for (Animation* pAnimation = 0; (pAnimation = Next(pAnimation)) != 0; ) {
-    pAnimation->SetAnimationData(sbData, sUrl);
+    pAnimation->SetAnimationData(sUrl, sbData, sMimeType);
   }
 }
 
 void Sequence::Load()
 {
-  for (Animation* pAnimation = 0; (pAnimation = Next(pAnimation)) != 0; ) {
-    pAnimation->Load();
+  if (!IsLoaded()) {
+    int bLoaded = 1;
+    int nDuration = 0;
+    for (Animation* pAnimation = 0; (pAnimation = Next(pAnimation)) != 0; ) {
+      pAnimation->Load();
+      bLoaded = bLoaded && pAnimation->IsLoaded();
+      nDuration += pAnimation->Duration();
+    }
+    if (this->length() > 0) {
+      bLoaded_ = bLoaded;
+      nDurationMSec_ = nDuration;
+    }
   }
 }
 
@@ -169,10 +216,10 @@ Sequence* Group::GetRandomSequence(int nRnd)
   return pSequence;
 }
 
-void Group::SetAnimationData(Buffer& sbData, const String& sUrl)
+void Group::SetAnimationData(const String& sUrl, Buffer& sbData, const String& sMimeType)
 {
   for (Sequence* pSequence = 0; (pSequence = Next(pSequence)) != 0; ) {
-    pSequence->SetAnimationData(sbData, sUrl);
+    pSequence->SetAnimationData(sUrl, sbData, sMimeType);
   }
 }
 
@@ -189,10 +236,10 @@ int Item::Start()
 {
   int ok = 1;
   
+  InsertDefaultTask();
+
   ok = StartTimer();
   if (ok) {
-    InsertDefaultTask();
-
     bStarted_ = 1;
   }
 
@@ -278,10 +325,10 @@ void Item::MoveTo(int nX)
   nDestX_ = nX;
 }
 
-void Item::SetAnimationData(Buffer& sbData, const String& sUrl)
+void Item::SetAnimationData(const String& sUrl, Buffer& sbData, const String& sMimeType)
 {
   for (Group* pGroup = 0; (pGroup =lGroups_.Next(pGroup)) != 0; ) {
-    pGroup->SetAnimationData(sbData, sUrl);
+    pGroup->SetAnimationData(sUrl, sbData, sMimeType);
   }
 }
 
@@ -478,7 +525,7 @@ void Item::Step(Apollo::TimeValue& tvCurrent)
 void Item::ClearAllTasks()
 {
   while (lTasks_.length() > 0) {
-    Task* pTask = lTasks_.First();
+    SequenceTask* pTask = lTasks_.First();
     if (pTask) {
       lTasks_.Remove(pTask);
       delete pTask;
@@ -502,7 +549,7 @@ void Item::InsertDefaultTask()
       sStatus = Apollo::getModuleConfig(MODULE_NAME, "DefaultStatus", "idle");
     }
 
-    Task* pTask = new StatusTask("status", sStatus);
+    SequenceTask* pTask = new StatusTask("status", sStatus);
     if (pTask) {
       lTasks_.Add(pTask);
     }
@@ -512,7 +559,7 @@ void Item::InsertDefaultTask()
 
 void Item::InsertEventTask(const String& sEvent)
 {
-  Task* pTask = 0;
+  SequenceTask* pTask = 0;
   while (pTask = lTasks_.FindByName("event")) {
     lTasks_.Remove(pTask);
     delete pTask;
@@ -521,7 +568,7 @@ void Item::InsertEventTask(const String& sEvent)
 
   pTask = new EventTask("event", sEvent);
   if (pTask) {
-    Task* pStatus = lTasks_.FindByName("status");
+    SequenceTask* pStatus = lTasks_.FindByName("status");
     if (pStatus) {
       lTasks_.Remove(pStatus);
       lTasks_.AddLast(pTask);
@@ -534,7 +581,7 @@ Sequence* Item::GetSequenceFromNextTask()
 {
   Sequence* pSequence = 0;
 
-  Task* pTask = lTasks_.First();
+  SequenceTask* pTask = lTasks_.First();
   int bDispose = 0;
   pSequence = pTask->GetSequence(*this, bDispose);
   if (bDispose) {

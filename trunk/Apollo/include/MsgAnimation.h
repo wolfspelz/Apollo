@@ -153,4 +153,33 @@ public:
   ApIN String sName;
 };
 
+// -------------------------------------------------------------------
+
+// Animator -> Animator
+class Msg_Animator_RequestAnimation: public ApRequestMessage
+{
+public:
+  Msg_Animator_RequestAnimation() : ApRequestMessage("Animator_RequestAnimation") {}
+  ApIN ApHandle hRequest;
+  ApIN String sUrl;
+};
+
+// Animator -> Animator
+// In response to Msg_Animator_RequestAnimation
+class Msg_Animator_RequestAnimationComplete: public ApNotificationMessage
+{
+public:
+  Msg_Animator_RequestAnimationComplete() : ApNotificationMessage("Animator_RequestAnimationComplete"), bSuccess(0) {}
+  ApIN ApHandle hRequest;
+  ApIN int bSuccess;
+  ApIN String sUrl;
+  ApIN Buffer sbData;
+  ApIN String sMimeType;
+};
+
+
+
+
+
+
 #endif // !defined(MsgSample_h_INCLUDED)

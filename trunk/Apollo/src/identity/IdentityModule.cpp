@@ -9,11 +9,7 @@
 #include "MsgSystem.h"
 #include "MsgDB.h"
 #include "URL.h"
-#include "Local.h"
-#include "ItemClient.h"
-#include "ItemAcquisitionTask.h"
 #include "IdentityModule.h"
-#include "IdentityModuleTester.h"
 
 ItemAcquisitionTask* IdentityModule::findItemAcquisitionTaskByRequest(ApHandle hRequest)
 {
