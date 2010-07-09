@@ -8,6 +8,7 @@
 #include "ApLog.h"
 #include "NimatorModule.h"
 #include "NimatorModuleTester.h"
+#include "MsgConfig.h"
 #include "Local.h"
 
 #if defined(AP_TEST)
@@ -214,7 +215,7 @@ static void NimatorModuleTester_Test_Item_AnimationData_RelativeUrl(Item& i, con
   String sAnimationUrl = sBaseUrl + sName;
   Buffer sbAnimationData;
   Apollo::loadFile(sAnimationPath, sbAnimationData);
-  i.SetAnimationData(sbAnimationData, sAnimationUrl);
+  i.SetAnimationData(sAnimationUrl, sbAnimationData, "image/gif");
 }
 
 static void NimatorModuleTester_Test_Item_AnimationData_AbsoluteUrl(Item& i, const String& sName, const String& sUrl)
@@ -222,7 +223,7 @@ static void NimatorModuleTester_Test_Item_AnimationData_AbsoluteUrl(Item& i, con
   String sAnimationPath = Apollo::getAppResourcePath() + "tassadar" + String::filenamePathSeparator() + sName;
   Buffer sbAnimationData;
   Apollo::loadFile(sAnimationPath, sbAnimationData);
-  i.SetAnimationData(sbAnimationData, sUrl);
+  i.SetAnimationData(sUrl, sbAnimationData, "image/gif");
 }
 
 String NimatorModuleTester::Test_PlayStep(Item& i, Apollo::TimeValue& t, const String& sExpectedSequence, int nExpectedTime)
@@ -242,6 +243,13 @@ String NimatorModuleTester::Test_PlayStep(Item& i, Apollo::TimeValue& t, const S
 String NimatorModuleTester::Test_PlayStill()
 {
   String s;
+
+  String sOriginalPlane = "default";
+  { Msg_Config_GetPlane msg; if (msg.Request()) { sOriginalPlane = msg.sPlane; } }
+  { Msg_Config_SetPlane msg; msg.sPlane = "test"; msg.Request(); }
+  { Msg_Config_Clear msg; msg.Request(); }
+  Apollo::setModuleConfig(MODULE_NAME, "DefaultFrameDuration", 1000);
+  Apollo::setModuleConfig(MODULE_NAME, "DefaultAnimationDuration", 1000);
 
   NimatorModule m;
   Item i(Apollo::newHandle(), &m);
@@ -273,12 +281,21 @@ String NimatorModuleTester::Test_PlayStill()
   if (!s) { t += d; s = Test_PlayStep(i, t, "still", 100); }
   if (!s) { t += d; s = Test_PlayStep(i, t, "still", 210); }
 
+  { Msg_Config_SetPlane msg; msg.sPlane = sOriginalPlane; msg.Request(); }
+
   return s;
 }
 
 String NimatorModuleTester::Test_PlayWave()
 {
   String s;
+
+  String sOriginalPlane = "default";
+  { Msg_Config_GetPlane msg; if (msg.Request()) { sOriginalPlane = msg.sPlane; } }
+  { Msg_Config_SetPlane msg; msg.sPlane = "test"; msg.Request(); }
+  { Msg_Config_Clear msg; msg.Request(); }
+  Apollo::setModuleConfig(MODULE_NAME, "DefaultFrameDuration", 1000);
+  Apollo::setModuleConfig(MODULE_NAME, "DefaultAnimationDuration", 1000);
 
   NimatorModule m;
   Item i(Apollo::newHandle(), &m);
@@ -317,8 +334,17 @@ String NimatorModuleTester::Test_PlayWave()
   if (!s) { t += d; s = Test_PlayStep(i, t, "wave", 760); }
   if (!s) { t += d; s = Test_PlayStep(i, t, "wave", 870); }
   if (!s) { t += d; s = Test_PlayStep(i, t, "wave", 980); }
-  if (!s) { t += d; s = Test_PlayStep(i, t, "still", 90); }
-  if (!s) { t += d; s = Test_PlayStep(i, t, "still", 200); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "wave", 1090); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "wave", 1200); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "wave", 1310); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "wave", 1420); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "wave", 1530); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "wave", 1640); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "wave", 1750); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "still", 60); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "still", 170); }
+
+  { Msg_Config_SetPlane msg; msg.sPlane = sOriginalPlane; msg.Request(); }
 
   return s;
 }

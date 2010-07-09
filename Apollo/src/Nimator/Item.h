@@ -30,6 +30,7 @@ class Animation: public ListT<Frame, Elem>
 public:
   Animation(NimatorModule* pModule)
     :pModule_(pModule)
+    ,bDataBroken_(0)
     ,bLoaded_(0)
     ,nDurationMSec_(0)
     ,nFramesCount_(0)
@@ -37,14 +38,17 @@ public:
 
   void Load();
   int IsLoaded() { return bLoaded_; }
+  int IsBroken() { return bDataBroken_; }
   int HasData() { return sbData_.Length() > 0; }
   void AppendFrame(Frame* pFrame);
   int Duration() { return nDurationMSec_; }
   void Src(const String& sSrc) { sSrc_ = sSrc;}
-  void SetAnimationData(Buffer& sbData, const String& sUrl);
+  void SetAnimationData(const String& sUrl, Buffer& sbData, const String& sMimeType);
 
 protected:
-  void LoadFromData();
+  void LoadData();
+  void GetDataFromCache();
+  void SaveDataToCache();
 
 protected:
   friend class NimatorModuleTester;
@@ -52,6 +56,7 @@ protected:
   NimatorModule* pModule_;
   String sSrc_;
   Buffer sbData_;
+  int bDataBroken_;
   int bLoaded_;
   int nDurationMSec_;
   int nFramesCount_;
@@ -78,7 +83,7 @@ public:
 
   void AppendAnimation(Animation* pAnimation);
   Frame* GetFrameByTime(int nTimeMSec);
-  void SetAnimationData(Buffer& sbData, const String& sUrl);
+  void SetAnimationData(const String& sUrl, Buffer& sbData, const String& sMimeType);
 
   int Probability() { return nProbability_; }
   int Duration() { return nDurationMSec_; }
@@ -113,7 +118,7 @@ public:
   void AddSequence(Sequence* pSequence);
   Sequence* GetRandomSequence(int nRnd);
   int GetProbabilitySum() { return nTotalProbability_; }
-  void SetAnimationData(Buffer& sbData, const String& sUrl);
+  void SetAnimationData(const String& sUrl, Buffer& sbData, const String& sMimeType);
 
 protected:
   int nTotalProbability_;
@@ -122,7 +127,7 @@ protected:
 
 // ------------------------------------------------------------
 
-class Task;
+class SequenceTask;
 
 class Item
 {
@@ -150,7 +155,7 @@ public:
   void PlayEvent(const String& sEvent);
   void SetPosition(int nX);
   void MoveTo(int nX);
-  void SetAnimationData(Buffer& sbData, const String& sUrl);
+  void SetAnimationData(const String& sUrl, Buffer& sbData, const String& sMimeType);
 
   int HasTimer(ApHandle hTimer) { return ApIsHandle(hTimer) && hTimer == hTimer_; }
   void OnTimer();
@@ -196,30 +201,30 @@ protected:
   int nSpentInCurrentSequenceMSec_;
   Apollo::TimeValue tvLastTimer_;
   Frame* pPreviousFrame_;
-  ListT<Task, Elem> lTasks_;
+  ListT<SequenceTask, Elem> lTasks_;
 };
 
 // ------------------------------------------------------------
 
-class Task: public Elem
+class SequenceTask: public Elem
 {
 public:
-  Task(const String& sName) : Elem(sName) {}
+  SequenceTask(const String& sName) : Elem(sName) {}
   virtual Sequence* GetSequence(Item& item, int& bDispose) { bDispose = 1; return 0; }
 };
 
-class StatusTask: public Task
+class StatusTask: public SequenceTask
 {
 public:
-  StatusTask(const String& sName, const String& sStatus) : Task(sName), sStatus_(sStatus) {}
+  StatusTask(const String& sName, const String& sStatus) : SequenceTask(sName), sStatus_(sStatus) {}
   Sequence* GetSequence(Item& item, int& bDispose);
   String sStatus_;
 };
 
-class EventTask: public Task
+class EventTask: public SequenceTask
 {
 public:
-  EventTask(const String& sName, const String& sEvent) : Task(sName), sEvent_(sEvent) {}
+  EventTask(const String& sName, const String& sEvent) : SequenceTask(sName), sEvent_(sEvent) {}
   Sequence* GetSequence(Item& item, int& bDispose);
   String sEvent_;
 };

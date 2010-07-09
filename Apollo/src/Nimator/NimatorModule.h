@@ -61,6 +61,8 @@ public:
   void On_Animation_MoveTo(Msg_Animation_MoveTo* pMsg);
   void On_Animation_GetPosition(Msg_Animation_GetPosition* pMsg);
   void On_Timer_Event(Msg_Timer_Event* pMsg);
+  void On_Animator_RequestAnimation(Msg_Animator_RequestAnimation* pMsg);
+  void On_Animator_RequestAnimationComplete(Msg_Animator_RequestAnimationComplete* pMsg);
 
 #if defined(AP_TEST)
   void On_UnitTest_Begin(Msg_UnitTest_Begin* pMsg);
@@ -69,12 +71,10 @@ public:
   friend class NimatorModuleTester;
 #endif
 
+  int AnimationIsRequested(const String& sUrl);
+
 protected:
   Item* GetItemByTimer(ApHandle hTimer);
-
-  int AnimationIsRequested(const String& sUrl);
-  void RequestAnimation(const String& sUrl);
-  void AnimationRequestComplete(const String& sUrl, Buffer& sbData);
 
 public:
   ItemList items_;
