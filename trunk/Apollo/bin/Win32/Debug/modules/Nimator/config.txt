@@ -1,4 +1,0 @@
-DefaultStatus=idle
-DefaultFrameDuration=500
-DefaultAnimationDuration=500
-MaxAnimationFileSize=200000
