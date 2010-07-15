@@ -21,7 +21,7 @@ Core/Modules/018/TestDialog/Path=TestDialog
 Core/Modules/020/BrowserInfo/Path=browserinfo
 Core/Modules/021/Navigation/Path=navigation
 Core/Modules/022/Gm/Path=gm
-Core/Modules/023/Nimator/Path=Nimator
+Core/Modules/023/Galileo/Path=Galileo
 Core/Modules/023/Arena/Path=Arena
 
 Core/ModulesDirectory=modules

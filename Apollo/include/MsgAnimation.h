@@ -10,7 +10,7 @@
 #include "ApMessage.h"
 #include "Image.h"
 
-// -> Animator
+// -> Animation
 class Msg_Animation_Create: public ApRequestMessage
 {
 public:
@@ -19,7 +19,7 @@ public:
   ApIN String sMimeType;
 };
 
-// -> Animator
+// -> Animation
 class Msg_Animation_Destroy: public ApRequestMessage
 {
 public:
@@ -27,7 +27,7 @@ public:
   ApIN ApHandle hItem;
 };
 
-// -> Animator
+// -> Animation
 class Msg_Animation_Start: public ApRequestMessage
 {
 public:
@@ -35,7 +35,7 @@ public:
   ApIN ApHandle hItem;
 };
 
-// -> Animator
+// -> Animation
 class Msg_Animation_Stop: public ApRequestMessage
 {
 public:
@@ -43,7 +43,7 @@ public:
   ApIN ApHandle hItem;
 };
 
-// -> Animator
+// -> Animation
 class Msg_Animation_SetRate: public ApRequestMessage
 {
 public:
@@ -52,7 +52,7 @@ public:
   ApIN int nMaxRate;
 };
 
-// -> Animator
+// -> Animation
 class Msg_Animation_SetData: public ApRequestMessage
 {
 public:
@@ -62,7 +62,7 @@ public:
   ApIN String sSourceUrl; // to resolve relative paths
 };
 
-// -> Animator
+// -> Animation
 class Msg_Animation_SetStatus: public ApRequestMessage
 {
 public:
@@ -71,7 +71,7 @@ public:
   ApIN String sStatus;
 };
 
-// -> Animator
+// -> Animation
 class Msg_Animation_SetCondition: public ApRequestMessage
 {
 public:
@@ -80,7 +80,7 @@ public:
   ApIN String sCondition;
 };
 
-// -> Animator
+// -> Animation
 class Msg_Animation_Event: public ApRequestMessage
 {
 public:
@@ -89,7 +89,7 @@ public:
   ApIN String sEvent;
 };
 
-// -> Animator
+// -> Animation
 class Msg_Animation_SetPosition: public ApRequestMessage
 {
 public:
@@ -100,7 +100,7 @@ public:
   ApIN int nZ;
 };
 
-// -> Animator
+// -> Animation
 class Msg_Animation_MoveTo: public ApRequestMessage
 {
 public:
@@ -113,7 +113,7 @@ public:
 
 // -------------------------------------------------------------------
 
-// -> Animator
+// -> Animation
 class Msg_Animation_GetPosition: public ApRequestMessage
 {
 public:
@@ -126,7 +126,7 @@ public:
 
 // -------------------------------------------------------------------
 
-// Animator ->
+// Animation ->
 class Msg_Animation_SequenceBegin: public ApNotificationMessage
 {
 public:
@@ -135,7 +135,7 @@ public:
   ApIN String sName;
 };
 
-// Animator ->
+// Animation ->
 class Msg_Animation_Frame: public ApNotificationMessage
 {
 public:
@@ -144,7 +144,7 @@ public:
   ApIN Apollo::Image iFrame;
 };
 
-// Animator ->
+// Animation ->
 class Msg_Animation_SequenceEnd: public ApNotificationMessage
 {
 public:
@@ -152,34 +152,5 @@ public:
   ApIN ApHandle hItem;
   ApIN String sName;
 };
-
-// -------------------------------------------------------------------
-
-// Animator -> Animator
-class Msg_Animator_RequestAnimation: public ApRequestMessage
-{
-public:
-  Msg_Animator_RequestAnimation() : ApRequestMessage("Animator_RequestAnimation") {}
-  ApIN ApHandle hRequest;
-  ApIN String sUrl;
-};
-
-// Animator -> Animator
-// In response to Msg_Animator_RequestAnimation
-class Msg_Animator_RequestAnimationComplete: public ApNotificationMessage
-{
-public:
-  Msg_Animator_RequestAnimationComplete() : ApNotificationMessage("Animator_RequestAnimationComplete"), bSuccess(0) {}
-  ApIN ApHandle hRequest;
-  ApIN int bSuccess;
-  ApIN String sUrl;
-  ApIN Buffer sbData;
-  ApIN String sMimeType;
-};
-
-
-
-
-
 
 #endif // !defined(MsgSample_h_INCLUDED)

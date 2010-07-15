@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8,00"
-	Name="test"
-	ProjectGUID="{BA949D72-45D3-470E-8B89-A08CA5159E1B}"
-	RootNamespace="test"
+	Name="Galileo"
+	ProjectGUID="{F4710121-86D9-42FB-B48D-E7FD8070B2F8}"
+	RootNamespace="Galileo"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -38,8 +38,8 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories=""
-				PreprocessorDefinitions="TEST_EXPORTS"
+				AdditionalIncludeDirectories="../../src/CxImage/CxImage"
+				PreprocessorDefinitions="GALILEO_EXPORTS"
 				DebugInformationFormat="4"
 			/>
 			<Tool
@@ -53,7 +53,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="Apollo.lib netapi.lib"
+				AdditionalDependencies="Apollo.lib cximagecrtdu.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -104,8 +104,8 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories=""
-				PreprocessorDefinitions="TEST_EXPORTS"
+				AdditionalIncludeDirectories="../../src/CxImage/CxImage"
+				PreprocessorDefinitions="GALILEO_EXPORTS"
 				DebugInformationFormat="3"
 			/>
 			<Tool
@@ -119,7 +119,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="Apollo.lib netapi.lib"
+				AdditionalDependencies="Apollo.lib cximagecrtu.lib"
 				GenerateDebugInformation="true"
 			/>
 			<Tool
@@ -154,77 +154,65 @@
 		<Filter
 			Name="Source Files"
 			Filter="cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx"
-			UniqueIdentifier="{0548A7A2-BB45-45b8-B764-7454A702B79A}"
+			UniqueIdentifier="{33D700F3-DD25-4939-8CBF-61D150EBCDA9}"
 			>
 			<File
-				RelativePath=".\test.cpp"
+				RelativePath=".\AnimationClient.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\testArena.cpp"
+				RelativePath=".\Item.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\testBuiltin.cpp"
+				RelativePath=".\galileo.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\testConfig.cpp"
+				RelativePath=".\GalileoModule.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\testCore.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\testFluid.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\testNet.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\testGalileo.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\testThreads.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\testTranslation.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\testVp.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\testVpi.cpp"
+				RelativePath=".\GalileoModuleTester.cpp"
 				>
 			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
-			UniqueIdentifier="{EB081EE1-91BF-438f-A374-B7191195C301}"
+			UniqueIdentifier="{5877E7ED-165E-4d83-B836-ACF3AD181885}"
 			>
 			<File
-				RelativePath=".\test.h"
+				RelativePath=".\AnimationClient.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Item.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Local.h"
+				>
+			</File>
+			<File
+				RelativePath=".\galileo.h"
+				>
+			</File>
+			<File
+				RelativePath=".\GalileoModule.h"
+				>
+			</File>
+			<File
+				RelativePath=".\GalileoModuleTester.h"
 				>
 			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"
 			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
-			UniqueIdentifier="{F720E025-A814-4385-9D72-B14B884C8F81}"
+			UniqueIdentifier="{D0E550D2-8108-4ada-A7E0-D67F3AD19970}"
 			>
 		</Filter>
-		<File
-			RelativePath="..\..\bin\Win32\Debug\modules\test\config.txt"
-			>
-		</File>
 	</Files>
 	<Globals>
 	</Globals>

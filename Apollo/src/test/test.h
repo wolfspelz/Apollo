@@ -49,7 +49,7 @@ extern "C" {
   #define AP_TEST_Vp
   #define AP_TEST_Fluid
   #define AP_TEST_Arena
-  #define AP_TEST_Nimator
+  #define AP_TEST_Galileo
   #if defined (AP_TEST_Net)
     #define AP_TEST_Net_TCP
     #define AP_TEST_Net_TCP_Advanced
@@ -93,7 +93,7 @@ void Test_Arena_Register();
 void Test_Arena_Begin();
 void Test_Arena_End();
 
-void Test_Nimator_Register();
-void Test_Nimator_Begin();
-void Test_Nimator_End();
+void Test_Galileo_Register();
+void Test_Galileo_Begin();
+void Test_Galileo_End();
 

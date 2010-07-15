@@ -18,7 +18,7 @@ Test/Gm=1
 Test/Navigation=1
   Test/BrowserInfo=1
 Test/Arena=1
-Test/Nimator=1
+Test/Galileo=1
 
 ExDisplay/AutoStartExe=0
 
