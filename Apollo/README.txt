@@ -2,7 +2,7 @@ General
 -------
 
 This is a MSVC 8 (2005) project.
-Why 2005? Because MSVC 9/10 runtime libraries, are not available on al systems and would have to be deployed additionally. Maybe later.
+Why 2005? Because MSVC 9/10 runtime libraries, are not available on all systems and would have to be deployed additionally. Maybe later.
 
 Set Win32App as startup project
 It should just compile.
