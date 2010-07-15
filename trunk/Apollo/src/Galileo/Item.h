@@ -169,15 +169,20 @@ protected:
   Group* GetOrCreateGroup(const String& sGroup);
   void ParseSequenceNode(Apollo::XMLNode* pNode);
 
-  void Step(Apollo::TimeValue& tvCurrent);
-  Sequence* SelectNextSequence();
   void ClearAllTasks();
+  void RemoveAllTasksByType(const String& sType);
   void InsertDefaultTask();
+  void InsertStatusTask(const String& sStatus);
   void InsertEventTask(const String& sEvent);
+
+  void Step(Apollo::TimeValue& tvCurrent);
+
+  Sequence* SelectNextSequence();
   Sequence* GetSequenceFromNextTask();
   Sequence* GetSequenceByName(const String& sSequence);
   Sequence* GetSequenceByGroup(const String& sGroup);
   String GetDefaultSequence();
+
   int StartTimer();
   void StopTimer();
 
@@ -196,7 +201,6 @@ protected:
   String sDefaultSequence_;
   String sDefaultStatus_;
   ListT<Group, Elem> lGroups_;
-  String sStatus_;
   String sCondition_;
   int nX_;
   int nDestX_;
@@ -209,6 +213,10 @@ protected:
 
 // ------------------------------------------------------------
 
+#define SequenceTask_Type_Status "status"
+#define SequenceTask_Type_Event "event"
+#define SequenceTask_Type_Move "move"
+
 class SequenceTask: public Elem
 {
 public:
@@ -219,7 +227,7 @@ public:
 class StatusTask: public SequenceTask
 {
 public:
-  StatusTask(const String& sName, const String& sStatus) : SequenceTask(sName), sStatus_(sStatus) {}
+  StatusTask(const String& sName, const String& sStatus) : SequenceTask(SequenceTask_Type_Status), sStatus_(sStatus) {}
   Sequence* GetSequence(Item& item, int& bDispose);
   String sStatus_;
 };
@@ -227,7 +235,7 @@ public:
 class EventTask: public SequenceTask
 {
 public:
-  EventTask(const String& sName, const String& sEvent) : SequenceTask(sName), sEvent_(sEvent) {}
+  EventTask(const String& sName, const String& sEvent) : SequenceTask(SequenceTask_Type_Event), sEvent_(sEvent) {}
   Sequence* GetSequence(Item& item, int& bDispose);
   String sEvent_;
 };
