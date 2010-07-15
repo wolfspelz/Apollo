@@ -845,7 +845,7 @@ AP_MSG_HANDLER_METHOD(IdentityModule, Identity_SaveItemDataToStorage)
   msgDSB.sName = sDb_;
   msgDSB.sKey.appendf("%s data", StringType(prepareDbKey(sSrc)));
   pContainer->getItemData(pMsg->sId, sMimeType, msgDSB.sbValue);
-  if (!msgDSB.Request()) { throw ApException("Msg_DB_Set failed: db=%s key=%s", StringType(msgDSB.sName), StringType(msgDSB.sKey)); }
+  if (!msgDSB.Request()) { throw ApException("Msg_DB_SetBinary failed: db=%s key=%s", StringType(msgDSB.sName), StringType(msgDSB.sKey)); }
 
   Msg_DB_Set msgDS;
   msgDS.sName = sDb_;

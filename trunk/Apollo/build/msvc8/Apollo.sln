@@ -1,4 +1,4 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 9.00
 # Visual Studio 2005
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Apollo", "..\..\src\Apollo\Apollo.vcproj", "{9B3FBA6A-ED3F-479A-8919-A463882F19B1}"
@@ -352,7 +352,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Arena", "..\..\src\Arena\Ar
 		Release.AspNetCompiler.Debug = "False"
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Nimator", "..\..\src\Nimator\Nimator.vcproj", "{F4710121-86D9-42FB-B48D-E7FD8070B2F8}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Galileo", "..\..\src\Galileo\Galileo.vcproj", "{F4710121-86D9-42FB-B48D-E7FD8070B2F8}"
 	ProjectSection(ProjectDependencies) = postProject
 		{3E874A06-8AE1-460D-A6B6-AD2C0D66318F} = {3E874A06-8AE1-460D-A6B6-AD2C0D66318F}
 		{BACA660B-0FE7-4E52-8CD8-BA992CAEBBC6} = {BACA660B-0FE7-4E52-8CD8-BA992CAEBBC6}

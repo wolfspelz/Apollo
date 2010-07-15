@@ -370,6 +370,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\include\MsgGalileo.h"
+					>
+				</File>
+				<File
 					RelativePath="..\..\include\MsgOs.h"
 					>
 				</File>
