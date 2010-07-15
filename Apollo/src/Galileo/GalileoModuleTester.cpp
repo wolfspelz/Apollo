@@ -27,11 +27,11 @@ static void Test_Galileo_UnitTest_Token(Msg_UnitTest_Token* pMsg)
   apLog_Info((LOG_CHANNEL, "Test_Galileo_UnitTest_Token", "Starting Test/Galileo"));
   int bTokenEndNow = 1;
 
-  AP_UNITTEST_EXECUTE(GalileoModuleTester::Test_Parse);
-  AP_UNITTEST_EXECUTE(GalileoModuleTester::Test_LoadGIF);
-  AP_UNITTEST_EXECUTE(GalileoModuleTester::Test_SelectByGroup);
-  AP_UNITTEST_EXECUTE(GalileoModuleTester::Test_PlayStill);
-  AP_UNITTEST_EXECUTE(GalileoModuleTester::Test_PlayWave);
+  //AP_UNITTEST_EXECUTE(GalileoModuleTester::Test_Parse);
+  //AP_UNITTEST_EXECUTE(GalileoModuleTester::Test_LoadGIF);
+  //AP_UNITTEST_EXECUTE(GalileoModuleTester::Test_SelectByGroup);
+  //AP_UNITTEST_EXECUTE(GalileoModuleTester::Test_PlayStill);
+  //AP_UNITTEST_EXECUTE(GalileoModuleTester::Test_PlayWave);
 
   if (bTokenEndNow) { Test_Galileo_UnitTest_TokenEnd(); }
 }
@@ -380,11 +380,11 @@ String GalileoModuleTester::Test_PlayWave()
 void GalileoModuleTester::Begin()
 {
   if (Apollo::getConfig("Test/Galileo", 0)) {
-    AP_UNITTEST_REGISTER(GalileoModuleTester::Test_Parse);
-    AP_UNITTEST_REGISTER(GalileoModuleTester::Test_LoadGIF);
-    AP_UNITTEST_REGISTER(GalileoModuleTester::Test_SelectByGroup);
-    AP_UNITTEST_REGISTER(GalileoModuleTester::Test_PlayStill);
-    AP_UNITTEST_REGISTER(GalileoModuleTester::Test_PlayWave);
+    //AP_UNITTEST_REGISTER(GalileoModuleTester::Test_Parse);
+    //AP_UNITTEST_REGISTER(GalileoModuleTester::Test_LoadGIF);
+    //AP_UNITTEST_REGISTER(GalileoModuleTester::Test_SelectByGroup);
+    //AP_UNITTEST_REGISTER(GalileoModuleTester::Test_PlayStill);
+    //AP_UNITTEST_REGISTER(GalileoModuleTester::Test_PlayWave);
 
     { Msg_UnitTest_Token msg; msg.Hook(MODULE_NAME, (ApCallback) Test_Galileo_UnitTest_Token, 0, ApCallbackPosNormal); }  
   }

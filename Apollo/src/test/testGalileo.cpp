@@ -191,6 +191,8 @@ static void Test_Galileo_Display_Galileo_LoadAnimationDataFromStorage(Msg_Galile
 
 static void Test_Galileo_Display_Animation_SequenceEnd(Msg_Animation_SequenceEnd* pMsg)
 {
+  String s;
+
   Test_Galileo_Display_Controller* pTest_Galileo_Display_Controller = (Test_Galileo_Display_Controller*) pMsg->Ref();
   if (pTest_Galileo_Display_Controller->hItem_ != pMsg->hItem) { return; }
 
@@ -213,6 +215,8 @@ static void Test_Galileo_Display_Animation_SequenceEnd(Msg_Animation_SequenceEnd
     msg.hItem = pTest_Galileo_Display_Controller->hItem_;
     msg.Request();
   }
+
+  AP_UNITTEST_RESULT(Test_Galileo_Display_End, s.empty(), s);
 
   pTest_Galileo_Display_Controller->DestroyDisplay();
   pTest_Galileo_Display_Controller->End();
@@ -318,10 +322,9 @@ static void Test_Galileo_UnitTest_Token(Msg_UnitTest_Token* pMsg)
   AP_UNUSED_ARG(pMsg);
   { Msg_UnitTest_Token msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_Galileo_UnitTest_Token, 0); }
   apLog_Info((LOG_CHANNEL, "Test_Galileo_UnitTest_Token", "Starting Test/Galileo"));
-  int bTokenEndNow = 0;
-
-  //AP_UNITTEST_EXECUTE(Test_Galileo_Display_Begin);
-  bTokenEndNow = 1;
+  int bTokenEndNow = 1;
+  
+  AP_UNITTEST_EXECUTE(Test_Galileo_Display_Begin); bTokenEndNow = 0;
 
   if (bTokenEndNow) { Test_Galileo_UnitTest_TokenEnd(); }
 }

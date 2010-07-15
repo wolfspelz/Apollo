@@ -339,7 +339,7 @@ void Item::SetData(Buffer& sbData, const String& sUrl)
 
 void Item::SetStatus(const String& sStatus)
 {
-  sStatus_ = sStatus;
+  InsertEventTask(sStatus);
 }
 
 void Item::SetCondition(const String& sCondition)
@@ -586,32 +586,70 @@ void Item::InsertDefaultTask()
       sStatus = Apollo::getModuleConfig(MODULE_NAME, "DefaultStatus", "idle");
     }
 
-    SequenceTask* pTask = new StatusTask("status", sStatus);
+    SequenceTask* pTask = new StatusTask(sStatus);
     if (pTask) {
       lTasks_.Add(pTask);
     }
-
   }
 }
 
-void Item::InsertEventTask(const String& sEvent)
+void Item::InsertStatusTask(const String& sStatus)
 {
-  SequenceTask* pTask = 0;
-  while (pTask = lTasks_.FindByName("event")) {
+/*
+SequenceTask* pTask = 0;
+  while (pTask = lTasks_.FindByName(SequenceTask_Type_Status) {
     lTasks_.Remove(pTask);
     delete pTask;
     pTask = 0;
   }
 
-  pTask = new EventTask("event", sEvent);
+  pTask = new EventTask(sEvent);
   if (pTask) {
-    SequenceTask* pStatus = lTasks_.FindByName("status");
+    SequenceTask* pStatus = lTasks_.FindByName(SequenceTask_Type_Status);
     if (pStatus) {
       lTasks_.Remove(pStatus);
       lTasks_.AddLast(pTask);
       lTasks_.AddLast(pStatus);
     }
   }
+*/
+  RemoveAllTasksByType(SequenceTask_Type_Status);
+
+  SequenceTask* pTask = new StatusTask(sStatus);
+  if (pTask) {
+    lTasks_.AddLast(pTask);
+  }
+}
+
+void Item::RemoveAllTasksByType(const String& sType)
+{
+  SequenceTask* pTask = 0;
+  while (pTask = lTasks_.FindByName(sType)) {
+    lTasks_.Remove(pTask);
+    delete pTask;
+  }
+}
+
+void Item::InsertEventTask(const String& sEvent)
+{
+/*
+  SequenceTask* pTask = 0;
+  while (pTask = lTasks_.FindByName(SequenceTask_Type_Event)) {
+    lTasks_.Remove(pTask);
+    delete pTask;
+    pTask = 0;
+  }
+
+  pTask = new EventTask(SequenceTask_Type_Event, sEvent);
+  if (pTask) {
+    SequenceTask* pStatus = lTasks_.FindByName(SequenceTask_Type_Status);
+    if (pStatus) {
+      lTasks_.Remove(pStatus);
+      lTasks_.AddLast(pTask);
+      lTasks_.AddLast(pStatus);
+    }
+  }
+*/
 }
 
 Sequence* Item::GetSequenceFromNextTask()
