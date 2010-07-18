@@ -574,45 +574,21 @@ void Item::ClearAllTasks()
 
 void Item::InsertDefaultTask()
 {
-  if (lTasks_.length() == 0 ){
+  String sStatus;
 
-    String sStatus = sStatus_;
-
-    if (!sStatus) {
-      sStatus = sDefaultStatus_;
-    }
-
-    if (!sStatus) {
-      sStatus = Apollo::getModuleConfig(MODULE_NAME, "DefaultStatus", "idle");
-    }
-
-    SequenceTask* pTask = new StatusTask(sStatus);
-    if (pTask) {
-      lTasks_.Add(pTask);
-    }
+  if (!sStatus) {
+    sStatus = sDefaultStatus_;
   }
+
+  if (!sStatus) {
+    sStatus = Apollo::getModuleConfig(MODULE_NAME, "DefaultStatus", "idle");
+  }
+
+  InsertStatusTask(sStatus);
 }
 
 void Item::InsertStatusTask(const String& sStatus)
 {
-/*
-SequenceTask* pTask = 0;
-  while (pTask = lTasks_.FindByName(SequenceTask_Type_Status) {
-    lTasks_.Remove(pTask);
-    delete pTask;
-    pTask = 0;
-  }
-
-  pTask = new EventTask(sEvent);
-  if (pTask) {
-    SequenceTask* pStatus = lTasks_.FindByName(SequenceTask_Type_Status);
-    if (pStatus) {
-      lTasks_.Remove(pStatus);
-      lTasks_.AddLast(pTask);
-      lTasks_.AddLast(pStatus);
-    }
-  }
-*/
   RemoveAllTasksByType(SequenceTask_Type_Status);
 
   SequenceTask* pTask = new StatusTask(sStatus);
@@ -632,24 +608,32 @@ void Item::RemoveAllTasksByType(const String& sType)
 
 void Item::InsertEventTask(const String& sEvent)
 {
-/*
-  SequenceTask* pTask = 0;
-  while (pTask = lTasks_.FindByName(SequenceTask_Type_Event)) {
-    lTasks_.Remove(pTask);
-    delete pTask;
-    pTask = 0;
-  }
+  ListT<SequenceTask, Elem> lTmp;
 
-  pTask = new EventTask(SequenceTask_Type_Event, sEvent);
-  if (pTask) {
-    SequenceTask* pStatus = lTasks_.FindByName(SequenceTask_Type_Status);
-    if (pStatus) {
-      lTasks_.Remove(pStatus);
-      lTasks_.AddLast(pTask);
-      lTasks_.AddLast(pStatus);
+  SequenceTask* pTask = 0;
+  while (pTask = lTasks_.First()) {
+    lTasks_.Remove(pTask);
+    if (0) {
+    } else if (pTask->getName() == SequenceTask_Type_Status) {
+      break;
+    } else if (pTask->getName() == SequenceTask_Type_Event) {
+      delete pTask;
+      pTask = 0;
+      break;
+    } else {
+      lTmp.AddFirst(pTask);
     }
   }
-*/
+
+  pTask = new EventTask(sEvent);
+  if (pTask) {
+    lTasks_.AddFirst(pTask);
+  }
+
+  while (pTask = lTmp.First()) {
+    lTmp.Remove(pTask);
+    lTasks_.AddFirst(pTask);
+  }
 }
 
 Sequence* Item::GetSequenceFromNextTask()

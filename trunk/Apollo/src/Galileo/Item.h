@@ -227,7 +227,7 @@ public:
 class StatusTask: public SequenceTask
 {
 public:
-  StatusTask(const String& sName, const String& sStatus) : SequenceTask(SequenceTask_Type_Status), sStatus_(sStatus) {}
+  StatusTask(const String& sStatus) : SequenceTask(SequenceTask_Type_Status), sStatus_(sStatus) {}
   Sequence* GetSequence(Item& item, int& bDispose);
   String sStatus_;
 };
@@ -235,7 +235,7 @@ public:
 class EventTask: public SequenceTask
 {
 public:
-  EventTask(const String& sName, const String& sEvent) : SequenceTask(SequenceTask_Type_Event), sEvent_(sEvent) {}
+  EventTask(const String& sEvent) : SequenceTask(SequenceTask_Type_Event), sEvent_(sEvent) {}
   Sequence* GetSequence(Item& item, int& bDispose);
   String sEvent_;
 };
