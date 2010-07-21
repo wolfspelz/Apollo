@@ -577,6 +577,7 @@ void Item::Step(Apollo::TimeValue& tvCurrent)
 
       if (bFrameChanged) {
         Msg_Animation_Frame msg;
+        msg.hItem = hAp_;
         msg.iFrame.CopyReference(pFrame->img_);
         msg.Send();
       }
