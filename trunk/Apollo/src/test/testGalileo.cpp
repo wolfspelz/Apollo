@@ -168,6 +168,8 @@ static void Test_Galileo_Display_Animation_Frame(Msg_Animation_Frame* pMsg)
   Test_Galileo_Display_Controller* pTest_Galileo_Display_Controller = (Test_Galileo_Display_Controller*) pMsg->Ref();
   if (pTest_Galileo_Display_Controller->hItem_ != pMsg->hItem) { return; }
   apLog_Verbose((LOG_CHANNEL, "Test_Galileo_Display_Animation_Frame", "" ApHandleFormat "", ApHandleType(pMsg->hItem)));
+
+
 }
 
 static void Test_Galileo_Display_Galileo_RequestAnimation(Msg_Galileo_RequestAnimation* pMsg)
