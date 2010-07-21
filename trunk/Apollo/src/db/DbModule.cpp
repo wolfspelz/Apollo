@@ -112,10 +112,18 @@ AP_MSG_HANDLER_METHOD(DbModule, DB_SetBinary)
   pMsg->apStatus = ok ? ApMessage::Ok : ApMessage::Error;
 }
 
+AP_MSG_HANDLER_METHOD(DbModule, DB_HasKey)
+{
+  SQLiteFile* pFile = lFiles_.FindByName(pMsg->sName);
+  if (pFile == 0) { throw ApException("DB file not found: %s", StringType(pMsg->sName)); }
+  if (!pFile->hasValue(pMsg->sKey, pMsg->bAvailable)) { throw ApException("pFile->hasValue() failed"); }
+  pMsg->apStatus = ApMessage::Ok;
+}
+
 AP_MSG_HANDLER_METHOD(DbModule, DB_Get)
 {
   SQLiteFile* pFile = lFiles_.FindByName(pMsg->sName);
-  if (!pFile) { throw ApException("DB file not found: %s", StringType(pMsg->sName)); }
+  if (pFile == 0) { throw ApException("DB file not found: %s", StringType(pMsg->sName)); }
   if (!pFile->getValue(pMsg->sKey, pMsg->sValue)) { throw ApException("pFile->getValue() failed"); }
   pMsg->apStatus = ApMessage::Ok;
 }
@@ -252,7 +260,7 @@ AP_MSG_HANDLER_METHOD(DbModule, System_60SecTimer)
 
 #if defined(AP_TEST)
 
-static String Test_Db_Basic()
+static String Test_Db_String()
 {
   String s;
 
@@ -262,10 +270,7 @@ static String Test_Db_Basic()
   { Msg_DB_Open msg; msg.sName = "test"; msg.Request(); }
 
   String sString = "Hallo Welt string";
-  String sString2 = "Hallo Welt string 2";
-  String sBinary = "Hallo Welt binary";
 
-  // String
   if (!s) {
     Msg_DB_Set msg;
     msg.sName = "test";
@@ -282,6 +287,23 @@ static String Test_Db_Basic()
     String sValue = msg.sValue;
     if (!s) { if (sValue != sString) { s.appendf("%s %s %s wrong value", StringType(msg.getName()), StringType(msg.sName), StringType(msg.sKey)); } }
   }
+
+  { Msg_DB_Close msg; msg.sName = "test"; msg.Request(); }
+//  { Msg_DB_DeleteFile msg; msg.sName = "test"; msg.Request(); }
+
+  return s;
+}
+
+static String Test_Db_Binary()
+{
+  String s;
+
+  int bSyncToDisk = 1;
+
+  //{ Msg_DB_DeleteFile msg; msg.sName = "test"; msg.Request(); }
+  { Msg_DB_Open msg; msg.sName = "test"; msg.Request(); }
+
+  String sBinary = "Hallo Welt binary";
 
   // Binary
   if (!s) {
@@ -316,6 +338,21 @@ static String Test_Db_Basic()
     if (!s) { if (msg.sValue != "") { s.appendf("%s %s %s wrong value", StringType(msg.getName()), StringType(msg.sName), StringType(msg.sKey)); } }
   }
 
+  { Msg_DB_Close msg; msg.sName = "test"; msg.Request(); }
+//  { Msg_DB_DeleteFile msg; msg.sName = "test"; msg.Request(); }
+
+  return s;
+}
+
+static String Test_Db_Bulk()
+{
+  String s;
+
+  int bSyncToDisk = 1;
+
+  //{ Msg_DB_DeleteFile msg; msg.sName = "test"; msg.Request(); }
+  { Msg_DB_Open msg; msg.sName = "test"; msg.Request(); }
+
   // Bulk data
   Buffer sbFile;
   Apollo::loadFile(Apollo::getAppResourcePath() + "ApCore.dll", sbFile);
@@ -344,7 +381,32 @@ static String Test_Db_Basic()
     }
   }
 
-  // Update string
+  { Msg_DB_Close msg; msg.sName = "test"; msg.Request(); }
+//  { Msg_DB_DeleteFile msg; msg.sName = "test"; msg.Request(); }
+
+  return s;
+}
+
+static String Test_Db_UpdateString()
+{
+  String s;
+
+  int bSyncToDisk = 1;
+
+  //{ Msg_DB_DeleteFile msg; msg.sName = "test"; msg.Request(); }
+  { Msg_DB_Open msg; msg.sName = "test"; msg.Request(); }
+
+  String sString = "Hallo Welt string";
+  String sString2 = "Hallo Welt string 2";
+
+  if (!s) {
+    Msg_DB_Set msg;
+    msg.sName = "test";
+    msg.sKey = "test-string";
+    msg.sValue = sString;
+    if (!msg.Request()) { s.appendf("%s %s %s failed", StringType(msg.getName()), StringType(msg.sName), StringType(msg.sKey)); }
+    if (bSyncToDisk) { Msg_DB_Sync msg; msg.sName = "test"; msg.Request(); }
+  }
   if (!s) {
     Msg_DB_Get msg;
     msg.sName = "test";
@@ -353,6 +415,7 @@ static String Test_Db_Basic()
     String sValue = msg.sValue;
     if (!s) { if (sValue != sString) { s.appendf("%s %s %s wrong value", StringType(msg.getName()), StringType(msg.sName), StringType(msg.sKey)); } }
   }
+  // Update string
   if (!s) {
     Msg_DB_Set msg;
     msg.sName = "test";
@@ -384,7 +447,35 @@ static String Test_Db_Basic()
     if (!s) { if (msg.sValue != "") { s.appendf("%s %s %s wrong value", StringType(msg.getName()), StringType(msg.sName), StringType(msg.sKey)); } }
   }
 
-  // Update bulk binary
+  { Msg_DB_Close msg; msg.sName = "test"; msg.Request(); }
+//  { Msg_DB_DeleteFile msg; msg.sName = "test"; msg.Request(); }
+
+  return s;
+}
+
+static String Test_Db_UpdateBulk()
+{
+  String s;
+
+  int bSyncToDisk = 1;
+
+  //{ Msg_DB_DeleteFile msg; msg.sName = "test"; msg.Request(); }
+  { Msg_DB_Open msg; msg.sName = "test"; msg.Request(); }
+
+  // Bulk data
+  Buffer sbFile;
+  Apollo::loadFile(Apollo::getAppResourcePath() + "ApCore.dll", sbFile);
+  Buffer sbFile2;
+  Apollo::loadFile(Apollo::getAppResourcePath() + "test1.png", sbFile2);
+
+  if (!s) {
+    Msg_DB_SetBinary msg;
+    msg.sName = "test";
+    msg.sKey = "test-bulk";
+    msg.sbValue.SetData(sbFile.Data(), sbFile.Length());
+    if (!msg.Request()) { s.appendf("%s %s %s failed", StringType(msg.getName()), StringType(msg.sName), StringType(msg.sKey)); }
+    if (bSyncToDisk) { Msg_DB_Sync msg; msg.sName = "test"; msg.Request(); }
+  }
   if (!s) {
     Msg_DB_GetBinary msg;
     msg.sName = "test";
@@ -398,6 +489,7 @@ static String Test_Db_Basic()
       }
     }
   }
+  // Update bulk binary
   if (!s) {
     Msg_DB_SetBinary msg;
     msg.sName = "test";
@@ -434,6 +526,64 @@ static String Test_Db_Basic()
   return s;
 }
 
+static String Test_Db_HasKey()
+{
+  String s;
+
+  int bSyncToDisk = 1;
+
+  //{ Msg_DB_DeleteFile msg; msg.sName = "test"; msg.Request(); }
+  { Msg_DB_Open msg; msg.sName = "test"; msg.Request(); }
+
+  // String
+  if (!s) {
+    Msg_DB_Set msg;
+    msg.sName = "test";
+    msg.sKey = "test-string";
+    msg.sValue = "Hello World";
+    if (!msg.Request()) { s.appendf("%s %s %s failed", StringType(msg.getName()), StringType(msg.sName), StringType(msg.sKey)); }
+    if (bSyncToDisk) { Msg_DB_Sync msg; msg.sName = "test"; msg.Request(); }
+  }
+  // Check available
+  if (!s) {
+    Msg_DB_HasKey msg;
+    msg.sName = "test";
+    msg.sKey = "test-string";
+    if (!msg.Request()) { s.appendf("%s %s %s failed", StringType(msg.getName()), StringType(msg.sName), StringType(msg.sKey)); }
+    if (!s) { if (msg.bAvailable != 1) { s.appendf("%s %s %s expected available", StringType(msg.getName()), StringType(msg.sName), StringType(msg.sKey)); } }
+  }
+  // Delete string
+  if (!s) {
+    Msg_DB_Delete msg;
+    msg.sName = "test";
+    msg.sKey = "test-string";
+    if (!msg.Request()) { s.appendf("%s %s %s failed", StringType(msg.getName()), StringType(msg.sName), StringType(msg.sKey)); }
+    if (bSyncToDisk) { Msg_DB_Sync msg; msg.sName = "test"; msg.Request(); }
+  }
+  // Check available
+  if (!s) {
+    Msg_DB_HasKey msg;
+    msg.sName = "test";
+    msg.sKey = "test-string";
+    if (!msg.Request()) { s.appendf("%s %s %s failed", StringType(msg.getName()), StringType(msg.sName), StringType(msg.sKey)); }
+    if (!s) { if (msg.bAvailable != 0) { s.appendf("%s %s %s expected unavailable", StringType(msg.getName()), StringType(msg.sName), StringType(msg.sKey)); } }
+  }
+
+  // Check availablity of not existing key
+  if (!s) {
+    Msg_DB_HasKey msg;
+    msg.sName = "test";
+    msg.sKey = "test-string-unavailable";
+    if (!msg.Request()) { s.appendf("%s %s %s failed", StringType(msg.getName()), StringType(msg.sName), StringType(msg.sKey)); }
+    if (!s) { if (msg.bAvailable != 0) { s.appendf("%s %s %s expected unavailable", StringType(msg.getName()), StringType(msg.sName), StringType(msg.sKey)); } }
+  }
+
+  { Msg_DB_Close msg; msg.sName = "test"; msg.Request(); }
+//  { Msg_DB_DeleteFile msg; msg.sName = "test"; msg.Request(); }
+
+  return s;
+}
+
 //--------------------------
 
 void Test_Db_UnitTest_TokenEnd()
@@ -450,7 +600,12 @@ AP_MSG_HANDLER_METHOD(DbModule, UnitTest_Token)
   int bTokenEndNow = 1;
 
   if (Apollo::getConfig("Test/Db", 0)) {
-    AP_UNITTEST_EXECUTE(Test_Db_Basic);
+    AP_UNITTEST_EXECUTE(Test_Db_String);
+    AP_UNITTEST_EXECUTE(Test_Db_Binary);
+    AP_UNITTEST_EXECUTE(Test_Db_Bulk);
+    AP_UNITTEST_EXECUTE(Test_Db_UpdateString);
+    AP_UNITTEST_EXECUTE(Test_Db_UpdateBulk);
+    AP_UNITTEST_EXECUTE(Test_Db_HasKey);
   }
 
   if (bTokenEndNow) { Test_Db_UnitTest_TokenEnd(); }
@@ -460,7 +615,12 @@ AP_MSG_HANDLER_METHOD(DbModule, UnitTest_Begin)
 {
   AP_UNUSED_ARG(pMsg);
   if (Apollo::getConfig("Test/Db", 0)) {
-    AP_UNITTEST_REGISTER(Test_Db_Basic);
+    AP_UNITTEST_REGISTER(Test_Db_String);
+    AP_UNITTEST_REGISTER(Test_Db_Binary);
+    AP_UNITTEST_REGISTER(Test_Db_Bulk);
+    AP_UNITTEST_REGISTER(Test_Db_UpdateString);
+    AP_UNITTEST_REGISTER(Test_Db_UpdateBulk);
+    AP_UNITTEST_REGISTER(Test_Db_HasKey);
 
     { Msg_UnitTest_Token msg; msg.Hook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(DbModule, UnitTest_Token), this, Apollo::modulePos(ApCallbackPosNormal, MODULE_NAME)); }
   }
@@ -490,6 +650,7 @@ int DbModule::init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, DbModule, DB_Close, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, DbModule, DB_Set, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, DbModule, DB_SetBinary, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, DbModule, DB_HasKey, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, DbModule, DB_Get, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, DbModule, DB_GetBinary, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, DbModule, DB_GetKeys, this, ApCallbackPosNormal);

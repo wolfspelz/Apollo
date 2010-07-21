@@ -582,6 +582,33 @@ int SQLiteFile::deleteValue(const String& sKey)
   return ok;
 }
 
+int SQLiteFile::hasValue(const String& sKey, int& bAvailable)
+{
+  int ok = 0;
+
+  if (isOpen()) {
+    ok = 1;
+
+    try {
+      AutoPtr<SQLiteStatement> pStmt(prepareStatement("SELECT COUNT(*) FROM Data WHERE sKey=?;"));
+      pStmt->bindText(1, sKey.c_str(), sKey.bytes());
+      AutoPtr<SQLiteRow> pRow(pStmt->fetch());
+      if (pRow != 0) {
+        int nCount = (*pRow)["0"].getInt();
+        if (nCount > 0) {
+          bAvailable = 1;
+        }
+      }
+
+    } catch (SQLiteException& ex) {
+      apLog_Error((LOG_CHANNEL, "SQLiteFile::hasValue", "%s failed: %s (%s)", StringType(ex.getMethod()), StringType(ex.getMessage()), StringType(sFilePath_)));
+      ok = 0;
+    }
+  }
+
+  return ok;
+}
+
 int SQLiteFile::getValue(const String& sKey, String& sValue)
 {
   int ok = 0;

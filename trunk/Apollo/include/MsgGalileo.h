@@ -60,6 +60,16 @@ public:
 
 // Galileo -> Galileo
 // Load animation file from persistent storage
+class Msg_Galileo_IsAnimationDataInStorage: public ApRequestMessage
+{
+public:
+  Msg_Galileo_IsAnimationDataInStorage() : ApRequestMessage("Galileo_IsAnimationDataInStorage"), bAvailable(0) {}
+  ApIN String sUrl;
+  ApOUT int bAvailable;
+};
+
+// Galileo -> Galileo
+// Load animation file from persistent storage
 class Msg_Galileo_LoadAnimationDataFromStorage: public ApRequestMessage
 {
 public:

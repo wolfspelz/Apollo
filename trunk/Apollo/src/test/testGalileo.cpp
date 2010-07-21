@@ -159,7 +159,7 @@ static void Test_Galileo_Display_Animation_SequenceBegin(Msg_Animation_SequenceB
 {
   Test_Galileo_Display_Controller* pTest_Galileo_Display_Controller = (Test_Galileo_Display_Controller*) pMsg->Ref();
   if (pTest_Galileo_Display_Controller->hItem_ != pMsg->hItem) { return; }
-
+  apLog_Verbose((LOG_CHANNEL, "Test_Galileo_Display_Animation_SequenceBegin", "" ApHandleFormat "", ApHandleType(pMsg->hItem)));
   pTest_Galileo_Display_Controller->CreateDisplay();
 }
 
@@ -167,26 +167,59 @@ static void Test_Galileo_Display_Animation_Frame(Msg_Animation_Frame* pMsg)
 {
   Test_Galileo_Display_Controller* pTest_Galileo_Display_Controller = (Test_Galileo_Display_Controller*) pMsg->Ref();
   if (pTest_Galileo_Display_Controller->hItem_ != pMsg->hItem) { return; }
+  apLog_Verbose((LOG_CHANNEL, "Test_Galileo_Display_Animation_Frame", "" ApHandleFormat "", ApHandleType(pMsg->hItem)));
 }
 
 static void Test_Galileo_Display_Galileo_RequestAnimation(Msg_Galileo_RequestAnimation* pMsg)
 {
   Test_Galileo_Display_Controller* pTest_Galileo_Display_Controller = (Test_Galileo_Display_Controller*) pMsg->Ref();
+  apLog_Verbose((LOG_CHANNEL, "Test_Galileo_Display_Galileo_RequestAnimation", "%s", StringType(pMsg->sUrl)));
+
+  //String sFile = String::filenameFile(pMsg->sUrl);
+
+  //ApAsyncMessage<Msg_Galileo_RequestAnimationComplete> msg;
+  //msg->hRequest = pMsg->hRequest;
+  //msg->bSuccess = 1;
+  //msg->sUrl = pMsg->sUrl;
+  //Apollo::loadFile(Apollo::getAppResourcePath() + "tassadar" + String::filenamePathSeparator() + sFile, msg->sbData);
+  //msg->sMimeType = "image/gif";
+  //msg.Post();
+
+  pMsg->apStatus = ApMessage::Ok;
 }
 
-static void Test_Galileo_Display_Galileo_RequestAnimationComplete(Msg_Galileo_RequestAnimationComplete* pMsg)
-{
-  Test_Galileo_Display_Controller* pTest_Galileo_Display_Controller = (Test_Galileo_Display_Controller*) pMsg->Ref();
-}
+//static void Test_Galileo_Display_Galileo_RequestAnimationComplete(Msg_Galileo_RequestAnimationComplete* pMsg)
+//{
+//  Test_Galileo_Display_Controller* pTest_Galileo_Display_Controller = (Test_Galileo_Display_Controller*) pMsg->Ref();
+//  apLog_Verbose((LOG_CHANNEL, "Test_Galileo_Display_Galileo_RequestAnimationComplete", "%s", StringType(pMsg->sUrl)));
+//  pMsg->apStatus = ApMessage::Ok;
+//}
 
 static void Test_Galileo_Display_Galileo_SaveAnimationDataToStorage(Msg_Galileo_SaveAnimationDataToStorage* pMsg)
 {
   Test_Galileo_Display_Controller* pTest_Galileo_Display_Controller = (Test_Galileo_Display_Controller*) pMsg->Ref();
+  apLog_Verbose((LOG_CHANNEL, "Test_Galileo_Display_Galileo_SaveAnimationDataToStorage", "%s", StringType(pMsg->sUrl)));
+  pMsg->apStatus = ApMessage::Ok;
+}
+
+static void Test_Galileo_Display_Galileo_IsAnimationDataInStorage(Msg_Galileo_IsAnimationDataInStorage* pMsg)
+{
+  Test_Galileo_Display_Controller* pTest_Galileo_Display_Controller = (Test_Galileo_Display_Controller*) pMsg->Ref();
+  apLog_Verbose((LOG_CHANNEL, "Test_Galileo_Display_Galileo_IsAnimationDataInStorage", "%s", StringType(pMsg->sUrl)));
+  pMsg->bAvailable = 1;
+  pMsg->apStatus = ApMessage::Ok;
 }
 
 static void Test_Galileo_Display_Galileo_LoadAnimationDataFromStorage(Msg_Galileo_LoadAnimationDataFromStorage* pMsg)
 {
   Test_Galileo_Display_Controller* pTest_Galileo_Display_Controller = (Test_Galileo_Display_Controller*) pMsg->Ref();
+  apLog_Verbose((LOG_CHANNEL, "Test_Galileo_Display_Galileo_LoadAnimationDataFromStorage", "%s", StringType(pMsg->sUrl)));
+
+  String sFile = String::filenameFile(pMsg->sUrl);
+  Apollo::loadFile(Apollo::getAppResourcePath() + "tassadar" + String::filenamePathSeparator() + sFile, pMsg->sbData);
+  pMsg->sMimeType = "image/gif";
+
+  pMsg->apStatus = ApMessage::Ok;
 }
 
 static void Test_Galileo_Display_Animation_SequenceEnd(Msg_Animation_SequenceEnd* pMsg)
@@ -195,13 +228,15 @@ static void Test_Galileo_Display_Animation_SequenceEnd(Msg_Animation_SequenceEnd
 
   Test_Galileo_Display_Controller* pTest_Galileo_Display_Controller = (Test_Galileo_Display_Controller*) pMsg->Ref();
   if (pTest_Galileo_Display_Controller->hItem_ != pMsg->hItem) { return; }
+  apLog_Verbose((LOG_CHANNEL, "Test_Galileo_Display_Animation_SequenceEnd", "" ApHandleFormat "", ApHandleType(pMsg->hItem)));
 
   { Msg_Animation_SequenceBegin msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_Galileo_Display_Animation_SequenceBegin, pTest_Galileo_Display_Controller); }
   { Msg_Animation_Frame msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_Galileo_Display_Animation_Frame, pTest_Galileo_Display_Controller); }
   { Msg_Animation_SequenceEnd msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_Galileo_Display_Animation_SequenceEnd, pTest_Galileo_Display_Controller); }
   { Msg_Galileo_RequestAnimation msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_Galileo_Display_Galileo_RequestAnimation, pTest_Galileo_Display_Controller); }
-  { Msg_Galileo_RequestAnimationComplete msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_Galileo_Display_Galileo_RequestAnimationComplete, pTest_Galileo_Display_Controller); }
+  //{ Msg_Galileo_RequestAnimationComplete msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_Galileo_Display_Galileo_RequestAnimationComplete, pTest_Galileo_Display_Controller); }
   { Msg_Galileo_SaveAnimationDataToStorage msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_Galileo_Display_Galileo_SaveAnimationDataToStorage, pTest_Galileo_Display_Controller); }
+  { Msg_Galileo_IsAnimationDataInStorage msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_Galileo_Display_Galileo_IsAnimationDataInStorage, pTest_Galileo_Display_Controller); }
   { Msg_Galileo_LoadAnimationDataFromStorage msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_Galileo_Display_Galileo_LoadAnimationDataFromStorage, pTest_Galileo_Display_Controller); }
 
   {
@@ -252,8 +287,9 @@ String Test_Galileo_Display_Begin()
   { Msg_Animation_Frame msg; msg.Hook(MODULE_NAME, (ApCallback) Test_Galileo_Display_Animation_Frame, pTest_Galileo_Display_Controller, ApCallbackPosNormal); }
   { Msg_Animation_SequenceEnd msg; msg.Hook(MODULE_NAME, (ApCallback) Test_Galileo_Display_Animation_SequenceEnd, pTest_Galileo_Display_Controller, ApCallbackPosNormal); }
   { Msg_Galileo_RequestAnimation msg; msg.Hook(MODULE_NAME, (ApCallback) Test_Galileo_Display_Galileo_RequestAnimation, pTest_Galileo_Display_Controller, ApCallbackPosEarly); }
-  { Msg_Galileo_RequestAnimationComplete msg; msg.Hook(MODULE_NAME, (ApCallback) Test_Galileo_Display_Galileo_RequestAnimationComplete, pTest_Galileo_Display_Controller, ApCallbackPosEarly); }
+  //{ Msg_Galileo_RequestAnimationComplete msg; msg.Hook(MODULE_NAME, (ApCallback) Test_Galileo_Display_Galileo_RequestAnimationComplete, pTest_Galileo_Display_Controller, ApCallbackPosEarly); }
   { Msg_Galileo_SaveAnimationDataToStorage msg; msg.Hook(MODULE_NAME, (ApCallback) Test_Galileo_Display_Galileo_SaveAnimationDataToStorage, pTest_Galileo_Display_Controller, ApCallbackPosEarly); }
+  { Msg_Galileo_IsAnimationDataInStorage msg; msg.Hook(MODULE_NAME, (ApCallback) Test_Galileo_Display_Galileo_IsAnimationDataInStorage, pTest_Galileo_Display_Controller, ApCallbackPosEarly); }
   { Msg_Galileo_LoadAnimationDataFromStorage msg; msg.Hook(MODULE_NAME, (ApCallback) Test_Galileo_Display_Galileo_LoadAnimationDataFromStorage, pTest_Galileo_Display_Controller, ApCallbackPosEarly); }
 
   pTest_Galileo_Display_Controller->Begin();
@@ -298,7 +334,7 @@ String Test_Galileo_Display_Begin()
   if (!s) {
     Msg_Animation_Event msg;
     msg.hItem = pTest_Galileo_Display_Controller->hItem_;
-    msg.sEvent = "moveleft";
+    msg.sEvent = "wave";
     if (!msg.Request()) {
       s = "Msg_Animation_Event failed";
     }

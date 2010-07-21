@@ -26,6 +26,7 @@ public:
   void On_DB_Close(Msg_DB_Close* pMsg);
   void On_DB_Set(Msg_DB_Set* pMsg);
   void On_DB_SetBinary(Msg_DB_SetBinary* pMsg);
+  void On_DB_HasKey(Msg_DB_HasKey* pMsg);
   void On_DB_Get(Msg_DB_Get* pMsg);
   void On_DB_GetBinary(Msg_DB_GetBinary* pMsg);
   void On_DB_GetKeys(Msg_DB_GetKeys* pMsg);

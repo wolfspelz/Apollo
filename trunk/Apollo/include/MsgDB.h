@@ -49,6 +49,16 @@ public:
   ApIN int nLifeTime;
 };
 
+class Msg_DB_HasKey: public ApRequestMessage
+{
+public:
+  Msg_DB_HasKey() : ApRequestMessage("DB_HasKey"), bAvailable(0) {}
+public:
+  ApIN String sName;
+  ApIN String sKey;
+  ApOUT int bAvailable;
+};
+
 class Msg_DB_Get: public ApRequestMessage
 {
 public:

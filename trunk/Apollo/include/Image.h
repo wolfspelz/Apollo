@@ -26,6 +26,9 @@ public:
   Image();
   virtual ~Image();
 
+  void CopyReference(const Image& iSource);
+  void CopyData(const Image& iSource);
+  
   Pixel* Allocate(int nWidth, int nHeight);
   void Free();
   Pixel* Pixels() { return pPixels_; }
@@ -34,8 +37,14 @@ public:
   int Height() { return nHeight_; }
 
 protected:
+  // Do not use copy contructor or assignment
+  // Use CopyReference or CopyData explicitely
+  Image(const Image& iSource);
+  Image& operator=(const Image& iSource);
+
   Pixel* pPixels_;
   size_t nSize_;
+  int bFree_;
   int nWidth_;
   int nHeight_;
 };

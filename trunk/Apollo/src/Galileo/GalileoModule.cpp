@@ -210,6 +210,8 @@ AP_MSG_HANDLER_METHOD(GalileoModule, Galileo_RequestAnimation)
 {
   int ok = 0;
 
+  apLog_Verbose((LOG_CHANNEL, "GalileoModule::Galileo_RequestAnimation", "%s", StringType(pMsg->sUrl)));
+
   if (!AnimationIsRequested(pMsg->sUrl)) {
 
     AnimationClient* pClient = new AnimationClient(pMsg->hRequest);
@@ -232,6 +234,8 @@ AP_MSG_HANDLER_METHOD(GalileoModule, Galileo_RequestAnimation)
 
 AP_MSG_HANDLER_METHOD(GalileoModule, Galileo_RequestAnimationComplete)
 {
+  apLog_Verbose((LOG_CHANNEL, "GalileoModule::Galileo_RequestAnimationComplete", "%s success=%d len=%d mimetype=%s", StringType(pMsg->sUrl), pMsg->bSuccess, pMsg->sbData.Length(), StringType(pMsg->sMimeType)));
+
   if (!AnimationIsRequested(pMsg->sUrl)) {
     requestedAnimations_.Unset(pMsg->sUrl);
 
@@ -317,6 +321,21 @@ AP_MSG_HANDLER_METHOD(GalileoModule, Galileo_SaveAnimationDataToStorage)
   msgDS.sKey.appendf("%s mimetype", StringType(PrepareDbKey(pMsg->sUrl)));
   msgDS.sValue = pMsg->sMimeType;
   if (!msgDS.Request()) { throw ApException("Msg_DB_Set failed: db=%s key=%s", StringType(msgDS.sName), StringType(msgDS.sKey)); }
+
+  pMsg->apStatus = ApMessage::Ok;
+}
+
+AP_MSG_HANDLER_METHOD(GalileoModule, Galileo_IsAnimationDataInStorage)
+{
+  String sMimeType;
+
+  // Fetch mimetype from DB
+  Msg_DB_HasKey msg;
+  msg.sName = sDb_;
+  msg.sKey.appendf("%s data", StringType(PrepareDbKey(pMsg->sUrl)));
+  if (!msg.Request()) { throw ApException("Msg_DB_HasKey failed: db=%s key=%s", StringType(msg.sName), StringType(msg.sKey)); }
+
+  pMsg->bAvailable = msg.bAvailable;
 
   pMsg->apStatus = ApMessage::Ok;
 }
@@ -429,6 +448,7 @@ int GalileoModule::Init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, GalileoModule, System_BeforeUnloadModules, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, GalileoModule, Galileo_SetStorageName, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, GalileoModule, Galileo_SaveAnimationDataToStorage, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, GalileoModule, Galileo_IsAnimationDataInStorage, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, GalileoModule, Galileo_LoadAnimationDataFromStorage, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, GalileoModule, Galileo_ClearAllStorage, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, GalileoModule, Galileo_ExpireAllStorage, this, ApCallbackPosNormal);
