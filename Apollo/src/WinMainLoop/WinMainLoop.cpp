@@ -561,9 +561,9 @@ void MainLoopModule::ProcessNextTimer()
         lTimer_.Remove(eNext);
         
         {
-          Msg_Timer_Event msg;
-          msg.hTimer = eNext->hTimer_;
-          msg.Send();
+          ApAsyncMessage<Msg_Timer_Event> msg;
+          msg->hTimer = eNext->hTimer_;
+          msg.Post();
         }
 
         if (eNext->nCount_ > 0) {
@@ -630,9 +630,16 @@ void MainLoopModule::On_Timer_Start(Msg_Timer_Start* pMsg)
 
 void MainLoopModule::On_Timer_Cancel(Msg_Timer_Cancel* pMsg)
 {
-  int ok = 1;
+  for (TimerListElem* eTimer = 0; (eTimer = (TimerListElem*) lTimer_.Next(eTimer)) != 0; ) {
+    if (eTimer->hTimer_ == pMsg->hTimer) {
+      lTimer_.Remove(eTimer);
+      delete eTimer;
+      eTimer = 0;
+      break;
+    }
+  }
 
-  pMsg->apStatus = ok ? ApMessage::Ok : ApMessage::Error;
+  pMsg->apStatus = ApMessage::Ok;
 }
 
 #if defined(AP_TEST)

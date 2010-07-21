@@ -70,6 +70,7 @@ public:
   void On_System_BeforeUnloadModules(Msg_System_BeforeUnloadModules* pMsg);
   void On_Galileo_SetStorageName(Msg_Galileo_SetStorageName* pMsg);
   void On_Galileo_SaveAnimationDataToStorage(Msg_Galileo_SaveAnimationDataToStorage* pMsg);
+  void On_Galileo_IsAnimationDataInStorage(Msg_Galileo_IsAnimationDataInStorage* pMsg);
   void On_Galileo_LoadAnimationDataFromStorage(Msg_Galileo_LoadAnimationDataFromStorage* pMsg);
   void On_Galileo_ClearAllStorage(Msg_Galileo_ClearAllStorage* pMsg);
   void On_Galileo_ExpireAllStorage(Msg_Galileo_ExpireAllStorage* pMsg);

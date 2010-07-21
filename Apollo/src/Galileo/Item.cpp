@@ -70,12 +70,36 @@ int Animation::HasDataInCache()
 {
   int bAvailable = 0;
 
+  if (sSrc_) {
+    Msg_Galileo_IsAnimationDataInStorage msg;
+    msg.sUrl = sSrc_;
+    int ok = msg.Request();
+    if (!ok) {
+      apLog_Error((LOG_CHANNEL, "Animation::HasDataInCache", "Msg_Galileo_IsAnimationDataInStorage failed: url=%s", StringType(sSrc_)));
+    } else {
+      bAvailable = msg.bAvailable;
+    }
+  }
+
   return bAvailable;
 }
 
 int Animation::GetDataFromCache()
 {
   int ok = 0;
+
+  if (sSrc_) {
+    Msg_Galileo_LoadAnimationDataFromStorage msg;
+    msg.sUrl = sSrc_;
+    ok = msg.Request();
+    if (!ok) {
+      apLog_Error((LOG_CHANNEL, "Animation::GetDataFromCache", "Msg_Galileo_LoadAnimationDataFromStorage failed: url=%s", StringType(sSrc_)));
+    } else {
+      sbData_ = msg.sbData;
+      sMimeType_ = msg.sMimeType;
+    }
+  }
+
   return ok;
 }
 
@@ -109,6 +133,7 @@ int Animation::LoadData()
   if (!img.Decode(sbData_.Data(), sbData_.Length(), CXIMAGE_FORMAT_GIF)) {
     apLog_Warning((LOG_CHANNEL, "Animation::LoadData", "Decode failed"));
   } else {
+    apLog_Verbose((LOG_CHANNEL, "Animation::LoadData", "Decode successful src=%s #frames=%d", StringType(sSrc_), nFrames));
     bLoaded_ = 0;
 
     for (int i = 0; i < nFrames; i++) {
@@ -524,17 +549,20 @@ void Item::Step(Apollo::TimeValue& tvCurrent)
   tvLastTimer_ = tvCurrent;
 
   if (pPreviousSequence) {
-    Msg_Animation_SequenceEnd msg;
-    msg.hItem = hAp_;
-    msg.sName = pPreviousSequence->getName();
-    msg.Send();
+    // Async, because Msg_Animation_SequenceEnd may delete this
+    ApAsyncMessage<Msg_Animation_SequenceEnd> msg;
+    msg->hItem = hAp_;
+    msg->sName = pPreviousSequence->getName();
+    msg.Post();
   }
 
   if (pNextSequence) {
-    Msg_Animation_SequenceBegin msg;
-    msg.hItem = hAp_;
-    msg.sName = pNextSequence->getName();
-    msg.Send();
+    // Async, because Msg_Animation_SequenceBegin may delete this
+    // and Msg_Animation_SequenceBegin should be after Msg_Animation_SequenceEnd
+    ApAsyncMessage<Msg_Animation_SequenceBegin> msg;
+    msg->hItem = hAp_;
+    msg->sName = pNextSequence->getName();
+    msg.Post();
 
     pCurrentSequence_ = pNextSequence;
   }
@@ -549,7 +577,8 @@ void Item::Step(Apollo::TimeValue& tvCurrent)
 
       if (bFrameChanged) {
         Msg_Animation_Frame msg;
-        //
+        msg.iFrame.CopyReference(pFrame->img_);
+        msg.Send();
       }
 
       pPreviousFrame_ = pFrame;

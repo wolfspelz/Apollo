@@ -38,6 +38,7 @@ public:
   int beginTransaction();
   int commitTransaction();
 
+  int hasValue(const String& sKey, int& bAvailable);
   int setValue(const String& sKey, String& sValue, int nLifetime);
   int setValue(const String& sKey, const unsigned char* pData, size_t nLength, int nLifetime);
   int deleteValue(const String& sKey);
