@@ -130,8 +130,6 @@ protected:
 
 // ------------------------------------------------------------
 
-class SequenceTask;
-
 class Item
 {
 public:
@@ -169,18 +167,12 @@ protected:
   Group* GetOrCreateGroup(const String& sGroup);
   void ParseSequenceNode(Apollo::XMLNode* pNode);
 
-  void ClearAllTasks();
-  void RemoveAllTasksByType(const String& sType);
-  void InsertDefaultTask();
-  void InsertStatusTask(const String& sStatus);
-  void InsertEventTask(const String& sEvent);
-
   void Step(Apollo::TimeValue& tvCurrent);
 
   Sequence* SelectNextSequence();
-  Sequence* GetSequenceFromNextTask();
   Sequence* GetSequenceByName(const String& sSequence);
   Sequence* GetSequenceByGroup(const String& sGroup);
+  Sequence* GetSequenceByGroupOrName(const String& sDesignation);
   String GetDefaultSequence();
 
   int StartTimer();
@@ -188,9 +180,6 @@ protected:
 
 protected:
   friend class GalileoModuleTester;
-  friend class StatusTask;
-  friend class EventTask;
-  friend class MoveTask;
 
   GalileoModule* pModule_;
   ApHandle hAp_;
@@ -201,51 +190,17 @@ protected:
   String sDefaultSequence_;
   String sDefaultStatus_;
   ListT<Group, Elem> lGroups_;
+  String sStatus_;
+  String sEvent_;
+  String sAction_;
   String sCondition_;
+  String sNextSequence_; // enforce, e.g. after transition
   int nX_;
   int nDestX_;
   Sequence* pCurrentSequence_;
   int nSpentInCurrentSequenceMSec_;
   Apollo::TimeValue tvLastTimer_;
   Frame* pPreviousFrame_;
-  ListT<SequenceTask, Elem> lTasks_;
 };
-
-// ------------------------------------------------------------
-
-#define SequenceTask_Type_Status "status"
-#define SequenceTask_Type_Event "event"
-#define SequenceTask_Type_Move "move"
-
-class SequenceTask: public Elem
-{
-public:
-  SequenceTask(const String& sName) : Elem(sName) {}
-  virtual Sequence* GetSequence(Item& item, int& bDispose) { bDispose = 1; return 0; }
-};
-
-class StatusTask: public SequenceTask
-{
-public:
-  StatusTask(const String& sStatus) : SequenceTask(SequenceTask_Type_Status), sStatus_(sStatus) {}
-  Sequence* GetSequence(Item& item, int& bDispose);
-  String sStatus_;
-};
-
-class EventTask: public SequenceTask
-{
-public:
-  EventTask(const String& sEvent) : SequenceTask(SequenceTask_Type_Event), sEvent_(sEvent) {}
-  Sequence* GetSequence(Item& item, int& bDispose);
-  String sEvent_;
-};
-
-//class MoveTask: public Task
-//{
-//public:
-//  MoveTask(const String& sName, int nDestX) : Task(sName), nDestX_(nDestX) {}
-//  Sequence* GetSequence(Item& item, int& bDispose);
-//  int nDestX_;
-//};
 
 #endif // Item_H_INCLUDED

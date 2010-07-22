@@ -298,8 +298,6 @@ int Item::Start()
 {
   int ok = 1;
   
-  InsertDefaultTask();
-
   ok = StartTimer();
   if (ok) {
     bStarted_ = 1;
@@ -322,8 +320,6 @@ void Item::Stop()
       msg.sName = pSequence_->getName();
       msg.Send();
     }
-
-    ClearAllTasks();
 
     bStarted_ = 0;
   }
@@ -358,13 +354,11 @@ void Item::SetData(Buffer& sbData, const String& sUrl)
       ParseSequenceNode(pChild);
     }
   }
-
-  InsertDefaultTask();
 }
 
 void Item::SetStatus(const String& sStatus)
 {
-  InsertEventTask(sStatus);
+  sStatus_ = sStatus;
 }
 
 void Item::SetCondition(const String& sCondition)
@@ -374,7 +368,7 @@ void Item::SetCondition(const String& sCondition)
 
 void Item::PlayEvent(const String& sEvent)
 {
-  InsertEventTask(sEvent);
+  sEvent_ = sEvent;
 }
 
 void Item::SetPosition(int nX)
@@ -589,105 +583,57 @@ void Item::Step(Apollo::TimeValue& tvCurrent)
 
 }
 
-void Item::ClearAllTasks()
-{
-  while (lTasks_.length() > 0) {
-    SequenceTask* pTask = lTasks_.First();
-    if (pTask) {
-      lTasks_.Remove(pTask);
-      delete pTask;
-      pTask = 0;
-    }
-
-  }
-}
-
-void Item::InsertDefaultTask()
-{
-  String sStatus;
-
-  if (!sStatus) {
-    sStatus = sDefaultStatus_;
-  }
-
-  if (!sStatus) {
-    sStatus = Apollo::getModuleConfig(MODULE_NAME, "DefaultStatus", "idle");
-  }
-
-  InsertStatusTask(sStatus);
-}
-
-void Item::InsertStatusTask(const String& sStatus)
-{
-  RemoveAllTasksByType(SequenceTask_Type_Status);
-
-  SequenceTask* pTask = new StatusTask(sStatus);
-  if (pTask) {
-    lTasks_.AddLast(pTask);
-  }
-}
-
-void Item::RemoveAllTasksByType(const String& sType)
-{
-  SequenceTask* pTask = 0;
-  while (pTask = lTasks_.FindByName(sType)) {
-    lTasks_.Remove(pTask);
-    delete pTask;
-  }
-}
-
-void Item::InsertEventTask(const String& sEvent)
-{
-  ListT<SequenceTask, Elem> lTmp;
-
-  SequenceTask* pTask = 0;
-  while (pTask = lTasks_.First()) {
-    lTasks_.Remove(pTask);
-    if (0) {
-    } else if (pTask->getName() == SequenceTask_Type_Status) {
-      break;
-    } else if (pTask->getName() == SequenceTask_Type_Event) {
-      delete pTask;
-      pTask = 0;
-      break;
-    } else {
-      lTmp.AddFirst(pTask);
-    }
-  }
-
-  pTask = new EventTask(sEvent);
-  if (pTask) {
-    lTasks_.AddFirst(pTask);
-  }
-
-  while (pTask = lTmp.First()) {
-    lTmp.Remove(pTask);
-    lTasks_.AddFirst(pTask);
-  }
-}
-
-Sequence* Item::GetSequenceFromNextTask()
-{
-  Sequence* pSequence = 0;
-
-  SequenceTask* pTask = lTasks_.First();
-  int bDispose = 0;
-  pSequence = pTask->GetSequence(*this, bDispose);
-  if (bDispose) {
-    lTasks_.Remove(pTask);
-    delete pTask;
-    pTask = 0;
-  }
-
-  return pSequence;
-}
-
 Sequence* Item::SelectNextSequence()
 {
   Sequence * pSequence = 0;
+  String sSequence;
 
-  pSequence = GetSequenceFromNextTask();
+  if (!sSequence) {
+    if (sNextSequence_) {
+      sSequence = sNextSequence_;
+      sNextSequence_ = "";
+    }
+  }
 
+  if (!sSequence) {
+    if (sEvent_) {
+      sSequence = sEvent_;
+      sEvent_ = "";
+    }
+  }
+
+  if (!sSequence) {
+    if (sStatus_) {
+      sSequence = sStatus_;
+    }
+  }
+
+  if (pCurrentSequence_) {
+    String sTransitionSequence = pCurrentSequence_->getName() + "2" + sSequence;
+    Sequence* pTransitionSequence = GetSequenceByGroupOrName(sTransitionSequence);
+    if (pTransitionSequence) {
+      sNextSequence_ = sSequence;
+      sSequence = sTransitionSequence;
+    }
+  }
+
+  if (sStatus_) {
+    String sStatussedSequence = sSequence + "@" + sStatus_;
+    Sequence* pStatussedSequence = GetSequenceByGroupOrName(sStatussedSequence);
+    if (pStatussedSequence) {
+      sSequence = sStatussedSequence;
+    }
+  }
+
+  if (sCondition_) {
+    String sConditionedSequence = sSequence + "#" + sCondition_;
+    Sequence* pConditionedSequence = GetSequenceByGroupOrName(sConditionedSequence);
+    if (pConditionedSequence) {
+      sSequence = sConditionedSequence;
+    }
+  }
+
+  pSequence = GetSequenceByGroupOrName(sSequence);
   if (pSequence == 0) {
     pSequence = GetSequenceByName(sDefaultSequence_);
   }
@@ -759,42 +705,12 @@ Sequence* Item::GetSequenceByGroup(const String& sGroup)
   return pSequence;
 }
 
-// ------------------------------------------------------------
-
-Sequence* StatusTask::GetSequence(Item& item, int& bDispose)
+Sequence* Item::GetSequenceByGroupOrName(const String& sDesignation)
 {
-  Sequence* pSequence = 0;
-  bDispose = 0;
-  
-  if (!sStatus_) {
-    sStatus_ = Apollo::getModuleConfig(MODULE_NAME, "DefaultStatus", "idle");
+  Sequence* pSequence = GetSequenceByGroup(sDesignation);
+  if (pSequence == 0) {
+    pSequence = GetSequenceByName(sDesignation);
   }
 
-  pSequence = item.GetSequenceByGroup(sStatus_);
   return pSequence;
 }
-
-Sequence* EventTask::GetSequence(Item& item, int& bDispose)
-{
-  Sequence* pSequence = 0;
-  bDispose = 1;
-  pSequence = item.GetSequenceByGroup(sEvent_);
-  return pSequence;
-}
-
-//Sequence* MoveTask::GetSequence(Item& item, int& bDispose)
-//{
-//  Sequence* pSequence = 0;
-//  bDispose = 1;
-//  String sGroup;
-//  if (nDestX_ > item.nX_) {
-//    sGroup = "moveright";
-//  } else if (nDestX_ < item.nX_) {
-//    sGroup = "moveleft";
-//  } else {
-//    sGroup = "idle";
-//  }
-//  pSequence = item.GetSequenceByGroup(sGroup);
-//  return pSequence;
-//}
-
