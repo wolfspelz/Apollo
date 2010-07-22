@@ -436,7 +436,7 @@ void Item::ParseSequenceNode(Apollo::XMLNode* pNode)
   if (nProbability <= 0) { nProbability = 100; }
 
   if (sName) {
-    Sequence* pSequence = new Sequence(sName, pModule_, sType, sCondition, nProbability, sIn, sOut, String::atoi(sDx), String::atoi(sDy));
+    Sequence* pSequence = new Sequence(sName, pModule_, sGroup, sType, sCondition, nProbability, sIn, sOut, String::atoi(sDx), String::atoi(sDy));
     if (pSequence) {
       for (Apollo::XMLNode* pChild = 0; (pChild = pNode->nextChild(pChild)) != 0; ) {
         if (0) {
@@ -587,11 +587,13 @@ Sequence* Item::SelectNextSequence()
 {
   Sequence * pSequence = 0;
   String sSequence;
+  int bFinal = 0;
 
   if (!sSequence) {
     if (sNextSequence_) {
       sSequence = sNextSequence_;
       sNextSequence_ = "";
+      bFinal = 1;
     }
   }
 
@@ -608,29 +610,56 @@ Sequence* Item::SelectNextSequence()
     }
   }
 
-  if (pCurrentSequence_) {
-    String sTransitionSequence = pCurrentSequence_->getName() + "2" + sSequence;
-    Sequence* pTransitionSequence = GetSequenceByGroupOrName(sTransitionSequence);
-    if (pTransitionSequence) {
-      sNextSequence_ = sSequence;
-      sSequence = sTransitionSequence;
+  if (!bFinal) {
+    if (pCurrentSequence_) {
+      if (pCurrentSequence_->Group() != sSequence) {
+        String sTransitionSequence = pCurrentSequence_->Group() + "2" + sSequence;
+        Sequence* pTransitionSequence = GetSequenceByGroupOrName(sTransitionSequence);
+        if (pTransitionSequence) {
+          sNextSequence_ = sSequence;
+          sSequence = sTransitionSequence;
+        }
+      }
     }
   }
 
-  if (sStatus_) {
-    String sStatussedSequence = sSequence + "@" + sStatus_;
-    Sequence* pStatussedSequence = GetSequenceByGroupOrName(sStatussedSequence);
-    if (pStatussedSequence) {
-      sSequence = sStatussedSequence;
+  if (!bFinal) {
+    String sModified;
+
+    if (!sModified) {
+      if (sCondition_ && sStatus_) {
+        sModified = sSequence + "@" + sStatus_ + "#" + sCondition_;
+        if (GetSequenceByGroupOrName(sModified) == 0) {
+          sModified = "";
+        }
+      }
+    }
+
+    if (!sModified) {
+      if (sStatus_) {
+        sModified = sSequence + "@" + sStatus_;
+        if (GetSequenceByGroupOrName(sModified) == 0) {
+          sModified = "";
+        }
+      }
+    }
+
+    if (!sModified) {
+      if (sCondition_) {
+        sModified = sSequence + "#" + sCondition_;
+        if (GetSequenceByGroupOrName(sModified) == 0) {
+          sModified = "";
+        }
+      }
+    }
+
+    if (sModified) {
+      sSequence = sModified;
     }
   }
 
-  if (sCondition_) {
-    String sConditionedSequence = sSequence + "#" + sCondition_;
-    Sequence* pConditionedSequence = GetSequenceByGroupOrName(sConditionedSequence);
-    if (pConditionedSequence) {
-      sSequence = sConditionedSequence;
-    }
+  if (!sSequence) {
+    sSequence = GetDefaultSequence();
   }
 
   pSequence = GetSequenceByGroupOrName(sSequence);

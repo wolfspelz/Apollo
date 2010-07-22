@@ -32,6 +32,14 @@ static void Test_Galileo_UnitTest_Token(Msg_UnitTest_Token* pMsg)
   //AP_UNITTEST_EXECUTE(GalileoModuleTester::Test_SelectByGroup);
   //AP_UNITTEST_EXECUTE(GalileoModuleTester::Test_PlayStill);
   //AP_UNITTEST_EXECUTE(GalileoModuleTester::Test_PlayWave);
+  AP_UNITTEST_EXECUTE(GalileoModuleTester::Test_SelectNextSequence_KeepStatus);
+  AP_UNITTEST_EXECUTE(GalileoModuleTester::Test_SelectNextSequence_Event);
+  AP_UNITTEST_EXECUTE(GalileoModuleTester::Test_SelectNextSequence_StatussedEvent);
+  AP_UNITTEST_EXECUTE(GalileoModuleTester::Test_SelectNextSequence_StatusTransition);
+  AP_UNITTEST_EXECUTE(GalileoModuleTester::Test_SelectNextSequence_StatusTransitionNextSequence);
+  AP_UNITTEST_EXECUTE(GalileoModuleTester::Test_SelectNextSequence_ConditionedEvent);
+  AP_UNITTEST_EXECUTE(GalileoModuleTester::Test_SelectNextSequence_StatussedConditionedEvent);
+  AP_UNITTEST_EXECUTE(GalileoModuleTester::Test_SelectNextSequence_ConditionedStatusTransition);
 
   if (bTokenEndNow) { Test_Galileo_UnitTest_TokenEnd(); }
 }
@@ -181,9 +189,9 @@ String GalileoModuleTester::Test_SelectByGroup()
 
   GalileoModule m;
   Group g("g");
-  Sequence *s1 = new Sequence("s1", &m, "status", "normal", 100, "", "", 0, 0);
-  Sequence *s2 = new Sequence("s2", &m, "status", "normal", 100, "", "", 0, 0);
-  Sequence *s3 = new Sequence("s3", &m, "status", "normal", 100, "", "", 0, 0);
+  Sequence *s1 = new Sequence("s1", &m, "g", "status", "normal", 100, "", "", 0, 0);
+  Sequence *s2 = new Sequence("s2", &m, "g", "status", "normal", 100, "", "", 0, 0);
+  Sequence *s3 = new Sequence("s3", &m, "g", "status", "normal", 100, "", "", 0, 0);
   g.AddSequence(s1);
   g.AddSequence(s2);
   g.AddSequence(s3);
@@ -375,6 +383,243 @@ String GalileoModuleTester::Test_PlayWave()
   return s;
 }
 
+//---------------------------
+
+#define GalileoModuleTester_SelectNextSequence_Url "http://ydentiti.org/test/Galileo/avatar.xml"
+
+#define GalileoModuleTester_SelectNextSequence_Data \
+"<config xmlns='http://schema.bluehands.de/character-config' version='1.0'>\n" \
+"  <param name='defaultsequence' value='idle'/>\n" \
+"  <sequence group='idle' name='idle1' type='status' probability='1000' in='standard' out='standard'><animation src='idle.gif'/></sequence>\n" \
+"  <sequence group='moveleft' name='moveleft1' type='basic' probability='1' in='moveleft' out='moveleft'><animation dx='-55' dy='0' src='walk-l.gif'/></sequence>\n" \
+"  <sequence group='moveright' name='moveright1' type='basic' probability='1' in='moveright' out='moveright'><animation dx='55' dy='0' src='walk-r.gif'/></sequence>\n" \
+"  <sequence group='chat' name='chat1' type='basic' probability='1000' in='standard' out='standard'><animation src='chat.gif'/></sequence>\n" \
+"  <sequence group='wave' name='wave1' type='emote' probability='1000' in='standard' out='standard'><animation src='http://ydentiti.org/test/Tassadar/wave.gif'/></sequence>\n" \
+"  <sequence group='sleep' name='sleep1' type='status' probability='1000' in='standard' out='standard'><animation src='sleep.gif'/></sequence>\n" \
+"  <sequence group='wave@sleep' name='wave2' type='emote' probability='1000' in='standard' out='standard'><animation src='http://ydentiti.org/test/Tassadar/wave.gif'/></sequence>\n" \
+"  <sequence group='idle2sleep' name='idle2sleep1' type='emote' probability='1000' in='standard' out='standard'><animation src='http://ydentiti.org/test/Tassadar/wave.gif'/></sequence>\n" \
+"  <sequence group='wave#damaged' name='wave3' type='emote' probability='1000' in='standard' out='standard'><animation src='http://ydentiti.org/test/Tassadar/wave.gif'/></sequence>\n" \
+"  <sequence group='wave@sleep#damaged' name='wave3' type='emote' probability='1000' in='standard' out='standard'><animation src='http://ydentiti.org/test/Tassadar/wave.gif'/></sequence>\n" \
+"  <sequence group='idle2sleep#damaged' name='idle2sleep2' type='emote' probability='1000' in='standard' out='standard'><animation src='http://ydentiti.org/test/Tassadar/wave.gif'/></sequence>\n" \
+"</config>"
+
+String GalileoModuleTester::Test_SelectNextSequence_KeepStatus()
+{
+  String s;
+
+  GalileoModule m;
+  Item i(Apollo::newHandle(), &m);
+
+  Buffer sbConfig;
+  sbConfig.SetData(GalileoModuleTester_SelectNextSequence_Data);
+  i.SetData(sbConfig, GalileoModuleTester_SelectNextSequence_Url);
+  i.sStatus_ = "idle";
+  i.pCurrentSequence_ = i.GetSequenceByGroup("idle");
+
+  Sequence* p = i.SelectNextSequence();
+
+  String sExpected = "idle";
+  if (p->Group() != sExpected) {
+    s = "Sequence group=" + p->Group() + " expected=" + sExpected;
+  }
+
+  return s;
+}
+
+String GalileoModuleTester::Test_SelectNextSequence_Event()
+{
+  String s;
+
+  GalileoModule m;
+  Item i(Apollo::newHandle(), &m);
+
+  Buffer sbConfig;
+  sbConfig.SetData(GalileoModuleTester_SelectNextSequence_Data);
+  i.SetData(sbConfig, GalileoModuleTester_SelectNextSequence_Url);
+  i.sStatus_ = "idle";
+  i.pCurrentSequence_ = i.GetSequenceByGroup("idle");
+
+  i.PlayEvent("wave");
+  Sequence* p = i.SelectNextSequence();
+
+  String sExpected = "wave";
+  if (p->Group() != sExpected) {
+    s = "Sequence group=" + p->Group() + " expected=" + sExpected;
+  }
+
+  return s;
+}
+
+String GalileoModuleTester::Test_SelectNextSequence_StatussedEvent()
+{
+  String s;
+
+  GalileoModule m;
+  Item i(Apollo::newHandle(), &m);
+
+  Buffer sbConfig;
+  sbConfig.SetData(GalileoModuleTester_SelectNextSequence_Data);
+  i.SetData(sbConfig, GalileoModuleTester_SelectNextSequence_Url);
+  i.sStatus_ = "sleep";
+  i.pCurrentSequence_ = i.GetSequenceByGroup("sleep");
+
+  i.PlayEvent("wave");
+  Sequence* p = i.SelectNextSequence();
+
+  String sExpected = "wave@sleep";
+  if (p->Group() != sExpected) {
+    s = "Sequence group=" + p->Group() + " expected=" + sExpected;
+  }
+
+  return s;
+}
+
+String GalileoModuleTester::Test_SelectNextSequence_StatusTransition()
+{
+  String s;
+
+  GalileoModule m;
+  Item i(Apollo::newHandle(), &m);
+
+  Buffer sbConfig;
+  sbConfig.SetData(GalileoModuleTester_SelectNextSequence_Data);
+  i.SetData(sbConfig, GalileoModuleTester_SelectNextSequence_Url);
+  i.sStatus_ = "idle";
+  i.pCurrentSequence_ = i.GetSequenceByGroup("idle");
+
+  i.SetStatus("sleep");
+  Sequence* p = i.SelectNextSequence();
+
+  String sExpected = "idle2sleep";
+  if (p->Group() != sExpected) {
+    s = "Sequence group=" + p->Group() + " expected=" + sExpected;
+  }
+
+  return s;
+}
+
+String GalileoModuleTester::Test_SelectNextSequence_StatusTransitionNextSequence()
+{
+  String s;
+
+  GalileoModule m;
+  Item i(Apollo::newHandle(), &m);
+
+  Buffer sbConfig;
+  sbConfig.SetData(GalileoModuleTester_SelectNextSequence_Data);
+  i.SetData(sbConfig, GalileoModuleTester_SelectNextSequence_Url);
+  i.sStatus_ = "idle";
+  i.pCurrentSequence_ = i.GetSequenceByGroup("idle");
+
+  i.SetStatus("sleep");
+
+  if (!s) {
+    Sequence* p = i.SelectNextSequence();
+    String sExpected = "idle2sleep";
+    if (p->Group() != sExpected) {
+      s = "Sequence 1 group=" + p->Group() + " expected=" + sExpected;
+    } else {
+      i.pCurrentSequence_ = p;
+    }
+  }
+
+  if (!s) {
+    Sequence* p = i.SelectNextSequence();
+    String sExpected = "sleep";
+    if (p->Group() != sExpected) {
+      s = "Sequence 2 group=" + p->Group() + " expected=" + sExpected;
+    } else {
+      i.pCurrentSequence_ = p;
+    }
+  }
+
+  if (!s) {
+    Sequence* p = i.SelectNextSequence();
+    String sExpected = "sleep";
+    if (p->Group() != sExpected) {
+      s = "Sequence 3 group=" + p->Group() + " expected=" + sExpected;
+    } else {
+      i.pCurrentSequence_ = p;
+    }
+  }
+
+  return s;
+}
+
+String GalileoModuleTester::Test_SelectNextSequence_ConditionedEvent()
+{
+  String s;
+
+  GalileoModule m;
+  Item i(Apollo::newHandle(), &m);
+
+  Buffer sbConfig;
+  sbConfig.SetData(GalileoModuleTester_SelectNextSequence_Data);
+  i.SetData(sbConfig, GalileoModuleTester_SelectNextSequence_Url);
+  i.pCurrentSequence_ = i.GetSequenceByGroup("sleep");
+
+  i.SetCondition("damaged");
+  i.PlayEvent("wave");
+  Sequence* p = i.SelectNextSequence();
+
+  String sExpected = "wave#damaged";
+  if (p->Group() != sExpected) {
+    s = "Sequence group=" + p->Group() + " expected=" + sExpected;
+  }
+
+  return s;
+}
+
+String GalileoModuleTester::Test_SelectNextSequence_StatussedConditionedEvent()
+{
+  String s;
+
+  GalileoModule m;
+  Item i(Apollo::newHandle(), &m);
+
+  Buffer sbConfig;
+  sbConfig.SetData(GalileoModuleTester_SelectNextSequence_Data);
+  i.SetData(sbConfig, GalileoModuleTester_SelectNextSequence_Url);
+  i.pCurrentSequence_ = i.GetSequenceByGroup("sleep");
+
+  i.SetStatus("sleep");
+  i.SetCondition("damaged");
+  i.PlayEvent("wave");
+  Sequence* p = i.SelectNextSequence();
+
+  String sExpected = "wave@sleep#damaged";
+  if (p->Group() != sExpected) {
+    s = "Sequence group=" + p->Group() + " expected=" + sExpected;
+  }
+
+  return s;
+}
+
+String GalileoModuleTester::Test_SelectNextSequence_ConditionedStatusTransition()
+{
+  String s;
+
+  GalileoModule m;
+  Item i(Apollo::newHandle(), &m);
+
+  Buffer sbConfig;
+  sbConfig.SetData(GalileoModuleTester_SelectNextSequence_Data);
+  i.SetData(sbConfig, GalileoModuleTester_SelectNextSequence_Url);
+  i.sStatus_ = "idle";
+  i.pCurrentSequence_ = i.GetSequenceByGroup("idle");
+
+  i.SetStatus("sleep");
+  i.SetCondition("damaged");
+  Sequence* p = i.SelectNextSequence();
+
+  String sExpected = "idle2sleep#damaged";
+  if (p->Group() != sExpected) {
+    s = "Sequence group=" + p->Group() + " expected=" + sExpected;
+  }
+
+  return s;
+}
+
 //----------------------------------------------------------
 
 void GalileoModuleTester::Begin()
@@ -385,6 +630,14 @@ void GalileoModuleTester::Begin()
     //AP_UNITTEST_REGISTER(GalileoModuleTester::Test_SelectByGroup);
     //AP_UNITTEST_REGISTER(GalileoModuleTester::Test_PlayStill);
     //AP_UNITTEST_REGISTER(GalileoModuleTester::Test_PlayWave);
+    AP_UNITTEST_REGISTER(GalileoModuleTester::Test_SelectNextSequence_KeepStatus);
+    AP_UNITTEST_REGISTER(GalileoModuleTester::Test_SelectNextSequence_Event);
+    AP_UNITTEST_REGISTER(GalileoModuleTester::Test_SelectNextSequence_StatussedEvent);
+    AP_UNITTEST_REGISTER(GalileoModuleTester::Test_SelectNextSequence_StatusTransition);
+    AP_UNITTEST_REGISTER(GalileoModuleTester::Test_SelectNextSequence_StatusTransitionNextSequence);
+    AP_UNITTEST_REGISTER(GalileoModuleTester::Test_SelectNextSequence_ConditionedEvent);
+    AP_UNITTEST_REGISTER(GalileoModuleTester::Test_SelectNextSequence_StatussedConditionedEvent);
+    AP_UNITTEST_REGISTER(GalileoModuleTester::Test_SelectNextSequence_ConditionedStatusTransition);
 
     { Msg_UnitTest_Token msg; msg.Hook(MODULE_NAME, (ApCallback) Test_Galileo_UnitTest_Token, 0, ApCallbackPosNormal); }  
   }
