@@ -70,9 +70,10 @@ protected:
 class Sequence: public ListT<Animation, Elem>
 {
 public:
-  Sequence(const String& sName, GalileoModule* pModule, const String& sType, const String& sCondition, int nProbability, const String& sIn, const String& sOut, int nDx, int nDy)
+  Sequence(const String& sName, GalileoModule* pModule, const String& sGroup, const String& sType, const String& sCondition, int nProbability, const String& sIn, const String& sOut, int nDx, int nDy)
     :ListT<Animation, Elem>(sName)
     ,pModule_(pModule)
+    ,sGroup_(sGroup)
     ,sType_(sType)
     ,sCondition_(sCondition)
     ,nProbability_(nProbability)
@@ -90,6 +91,7 @@ public:
 
   int Probability() { return nProbability_; }
   int Duration() { return nDurationMSec_; }
+  String& Group() { return sGroup_; }
   void Load();
   int IsLoaded() { return bLoaded_; }
 
@@ -97,6 +99,7 @@ protected:
   friend class GalileoModuleTester;
 
   GalileoModule* pModule_;
+  String sGroup_;
   String sType_;
   String sCondition_;
   int nProbability_;
