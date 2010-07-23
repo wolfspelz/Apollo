@@ -287,6 +287,11 @@ void Group::SetAnimationData(const String& sUrl, Buffer& sbData, const String& s
 
 // ------------------------------------------------------------
 
+#define Item_Activity_Move "move"
+#define Item_Group_Standard "idle"
+#define Item_Group_MoveRight "moveright"
+#define Item_Group_MoveLeft "moveleft"
+
 Item::~Item()
 {
   if (bStarted_) {
@@ -379,6 +384,7 @@ void Item::SetPosition(int nX)
 void Item::MoveTo(int nX)
 {
   nDestX_ = nX;
+  sActivity_ = Item_Activity_Move;
 }
 
 void Item::SetAnimationData(const String& sUrl, Buffer& sbData, const String& sMimeType)
@@ -393,7 +399,7 @@ void Item::SetAnimationData(const String& sUrl, Buffer& sbData, const String& sM
 void Item::ResetAnimations()
 {
   sDefaultSequence_ = "still";
-  sDefaultStatus_ = "idle";
+  sDefaultStatus_ = Item_Group_Standard;
   lGroups_.Empty();
 }
 
@@ -598,6 +604,20 @@ Sequence* Item::SelectNextSequence()
   }
 
   if (!sSequence) {
+    if (sActivity_) {
+      if (sActivity_ == Item_Activity_Move) {
+        if (nX_ == nDestX_) {
+          // back to status or event
+        } else if (nX_ > nDestX_) {
+          sSequence = Item_Group_MoveLeft;
+        } else if (nX_ < nDestX_) {
+          sSequence = Item_Group_MoveRight;
+        }
+      }
+    }
+  }
+
+  if (!sSequence) {
     if (sEvent_) {
       sSequence = sEvent_;
       sEvent_ = "";
@@ -687,7 +707,7 @@ String Item::GetDefaultSequence()
   }
 
   if (pSequence == 0) {
-    pSequence = GetSequenceByGroup("idle");
+    pSequence = GetSequenceByGroup(Item_Group_Standard);
   }
 
   if (pSequence == 0) {

@@ -22,9 +22,10 @@ public:
   static String Test_SelectByGroup1(Group& g, int nRnd, const String& sExpectedSequence);
   static String Test_SelectByGroup();
 
-  static String Test_PlayStep(Item& i, Apollo::TimeValue& t, const String& sExpectedSequence, int nExpectedTime);
+  static String Test_PlayStep(Item& i, Apollo::TimeValue& t, const String& sExpectedSequence, int nExpectedTime, int nExpectedX);
   static String Test_PlayStill();
   static String Test_PlayWave();
+  static String Test_PlayMoveRight();
   static String Test_SelectNextSequence_KeepStatus();
   static String Test_SelectNextSequence_Event();
   static String Test_SelectNextSequence_StatussedEvent();

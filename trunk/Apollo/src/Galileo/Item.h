@@ -195,7 +195,7 @@ protected:
   ListT<Group, Elem> lGroups_;
   String sStatus_;
   String sEvent_;
-  String sAction_;
+  String sActivity_;
   String sCondition_;
   String sNextSequence_; // enforce, e.g. after transition
   int nX_;
