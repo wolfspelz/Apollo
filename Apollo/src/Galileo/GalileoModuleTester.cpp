@@ -27,11 +27,12 @@ static void Test_Galileo_UnitTest_Token(Msg_UnitTest_Token* pMsg)
   apLog_Info((LOG_CHANNEL, "Test_Galileo_UnitTest_Token", "Starting Test/Galileo"));
   int bTokenEndNow = 1;
 
-  //AP_UNITTEST_EXECUTE(GalileoModuleTester::Test_Parse);
-  //AP_UNITTEST_EXECUTE(GalileoModuleTester::Test_LoadGIF);
-  //AP_UNITTEST_EXECUTE(GalileoModuleTester::Test_SelectByGroup);
-  //AP_UNITTEST_EXECUTE(GalileoModuleTester::Test_PlayStill);
-  //AP_UNITTEST_EXECUTE(GalileoModuleTester::Test_PlayWave);
+  AP_UNITTEST_EXECUTE(GalileoModuleTester::Test_Parse);
+  AP_UNITTEST_EXECUTE(GalileoModuleTester::Test_LoadGIF);
+  AP_UNITTEST_EXECUTE(GalileoModuleTester::Test_SelectByGroup);
+  AP_UNITTEST_EXECUTE(GalileoModuleTester::Test_PlayStill);
+  AP_UNITTEST_EXECUTE(GalileoModuleTester::Test_PlayWave);
+  AP_UNITTEST_EXECUTE(GalileoModuleTester::Test_PlayMoveRight);
   AP_UNITTEST_EXECUTE(GalileoModuleTester::Test_SelectNextSequence_KeepStatus);
   AP_UNITTEST_EXECUTE(GalileoModuleTester::Test_SelectNextSequence_Event);
   AP_UNITTEST_EXECUTE(GalileoModuleTester::Test_SelectNextSequence_StatussedEvent);
@@ -244,7 +245,7 @@ static void GalileoModuleTester_Test_Item_AnimationData_AbsoluteUrl(Item& i, con
   i.SetAnimationData(sUrl, sbAnimationData, "image/gif");
 }
 
-String GalileoModuleTester::Test_PlayStep(Item& i, Apollo::TimeValue& t, const String& sExpectedSequence, int nExpectedTime)
+String GalileoModuleTester::Test_PlayStep(Item& i, Apollo::TimeValue& t, const String& sExpectedSequence, int nExpectedTime, int nExpectedX)
 {
   String s;
 
@@ -253,6 +254,8 @@ String GalileoModuleTester::Test_PlayStep(Item& i, Apollo::TimeValue& t, const S
     s.appendf("sequence=%s expected=%s", StringType(i.pCurrentSequence_->getName()), StringType(sExpectedSequence));
   } else if (i.nSpentInCurrentSequenceMSec_ != nExpectedTime) {
     s.appendf("time=%d expected=%d", i.nSpentInCurrentSequenceMSec_, nExpectedTime);
+  } else if (i.nX_ != nExpectedX) {
+    s.appendf("x=%d expected=%d", i.nX_, nExpectedX);
   }
 
   return s;
@@ -290,18 +293,18 @@ String GalileoModuleTester::Test_PlayStill()
 
   Apollo::TimeValue t = Apollo::TimeValue::getTime();
   Apollo::TimeValue d(0, 110000);
-  if (!s) {         s = Test_PlayStep(i, t, "still", 0); }
-  if (!s) { t += d; s = Test_PlayStep(i, t, "still", 110); }
-  if (!s) { t += d; s = Test_PlayStep(i, t, "still", 220); }
-  if (!s) { t += d; s = Test_PlayStep(i, t, "still", 330); }
-  if (!s) { t += d; s = Test_PlayStep(i, t, "still", 440); }
-  if (!s) { t += d; s = Test_PlayStep(i, t, "still", 550); }
-  if (!s) { t += d; s = Test_PlayStep(i, t, "still", 660); }
-  if (!s) { t += d; s = Test_PlayStep(i, t, "still", 770); }
-  if (!s) { t += d; s = Test_PlayStep(i, t, "still", 880); }
-  if (!s) { t += d; s = Test_PlayStep(i, t, "still", 990); }
-  if (!s) { t += d; s = Test_PlayStep(i, t, "still", 100); }
-  if (!s) { t += d; s = Test_PlayStep(i, t, "still", 210); }
+  if (!s) {         s = Test_PlayStep(i, t, "still", 0, 0); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "still", 110, 0); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "still", 220, 0); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "still", 330, 0); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "still", 440, 0); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "still", 550, 0); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "still", 660, 0); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "still", 770, 0); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "still", 880, 0); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "still", 990, 0); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "still", 100, 0); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "still", 210, 0); }
 
   { Msg_Galileo_ClearAllStorage msg; (void) msg.Request(); }
   { Msg_Galileo_SetStorageName msg; msg.sName = sOrigDb; (void) msg.Request(); }
@@ -344,35 +347,115 @@ String GalileoModuleTester::Test_PlayWave()
 
   Apollo::TimeValue t = Apollo::TimeValue::getTime();
   Apollo::TimeValue d(0, 110000);
-  if (!s) {         s = Test_PlayStep(i, t, "still", 0); }
-  if (!s) { t += d; s = Test_PlayStep(i, t, "still", 110); }
-  if (!s) { t += d; s = Test_PlayStep(i, t, "still", 220); }
-  if (!s) { t += d; s = Test_PlayStep(i, t, "still", 330); }
+  if (!s) {         s = Test_PlayStep(i, t, "still", 0, 0); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "still", 110, 0); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "still", 220, 0); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "still", 330, 0); }
   i.PlayEvent("wave");
-  if (!s) { t += d; s = Test_PlayStep(i, t, "still", 440); }
-  if (!s) { t += d; s = Test_PlayStep(i, t, "still", 550); }
-  if (!s) { t += d; s = Test_PlayStep(i, t, "still", 660); }
-  if (!s) { t += d; s = Test_PlayStep(i, t, "still", 770); }
-  if (!s) { t += d; s = Test_PlayStep(i, t, "still", 880); }
-  if (!s) { t += d; s = Test_PlayStep(i, t, "still", 990); }
-  if (!s) { t += d; s = Test_PlayStep(i, t, "wave", 100); }
-  if (!s) { t += d; s = Test_PlayStep(i, t, "wave", 210); }
-  if (!s) { t += d; s = Test_PlayStep(i, t, "wave", 320); }
-  if (!s) { t += d; s = Test_PlayStep(i, t, "wave", 430); }
-  if (!s) { t += d; s = Test_PlayStep(i, t, "wave", 540); }
-  if (!s) { t += d; s = Test_PlayStep(i, t, "wave", 650); }
-  if (!s) { t += d; s = Test_PlayStep(i, t, "wave", 760); }
-  if (!s) { t += d; s = Test_PlayStep(i, t, "wave", 870); }
-  if (!s) { t += d; s = Test_PlayStep(i, t, "wave", 980); }
-  if (!s) { t += d; s = Test_PlayStep(i, t, "wave", 1090); }
-  if (!s) { t += d; s = Test_PlayStep(i, t, "wave", 1200); }
-  if (!s) { t += d; s = Test_PlayStep(i, t, "wave", 1310); }
-  if (!s) { t += d; s = Test_PlayStep(i, t, "wave", 1420); }
-  if (!s) { t += d; s = Test_PlayStep(i, t, "wave", 1530); }
-  if (!s) { t += d; s = Test_PlayStep(i, t, "wave", 1640); }
-  if (!s) { t += d; s = Test_PlayStep(i, t, "wave", 1750); }
-  if (!s) { t += d; s = Test_PlayStep(i, t, "still", 60); }
-  if (!s) { t += d; s = Test_PlayStep(i, t, "still", 170); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "still", 440, 0); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "still", 550, 0); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "still", 660, 0); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "still", 770, 0); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "still", 880, 0); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "still", 990, 0); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "wave", 100, 0); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "wave", 210, 0); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "wave", 320, 0); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "wave", 430, 0); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "wave", 540, 0); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "wave", 650, 0); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "wave", 760, 0); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "wave", 870, 0); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "wave", 980, 0); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "wave", 1090, 0); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "wave", 1200, 0); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "wave", 1310, 0); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "wave", 1420, 0); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "wave", 1530, 0); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "wave", 1640, 0); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "wave", 1750, 0); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "still", 60, 0); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "still", 170, 0); }
+
+  { Msg_Galileo_ClearAllStorage msg; (void) msg.Request(); }
+  { Msg_Galileo_SetStorageName msg; msg.sName = sOrigDb; (void) msg.Request(); }
+  { Msg_DB_DeleteFile msg; msg.sName = Test_Galileo_DB; (void) msg.Request(); }
+
+  { Msg_Config_SetPlane msg; msg.sPlane = sOriginalPlane; msg.Request(); }
+
+  return s;
+}
+
+String GalileoModuleTester::Test_PlayMoveRight()
+{
+  String s;
+
+  String sOriginalPlane = "default";
+  { Msg_Config_GetPlane msg; if (msg.Request()) { sOriginalPlane = msg.sPlane; } }
+  { Msg_Config_SetPlane msg; msg.sPlane = "test"; msg.Request(); }
+  { Msg_Config_Clear msg; msg.Request(); }
+  Apollo::setModuleConfig(MODULE_NAME, "DefaultFrameDuration", 1000);
+  Apollo::setModuleConfig(MODULE_NAME, "DefaultAnimationDuration", 1000);
+
+  String sOrigDb;
+  { Msg_Galileo_SetStorageName msg; msg.sName = Test_Galileo_DB; if (msg.Request()) { sOrigDb = msg.sPreviousName; } }
+  { Msg_Galileo_ClearAllStorage msg; (void) msg.Request(); }
+
+  GalileoModule m;
+  Item i(Apollo::newHandle(), &m);
+
+  Buffer sbConfig;
+  sbConfig.SetData(GalileoModuleTester_Play_Data);
+  String sUrl = GalileoModuleTester_Play_Url;
+  i.SetData(sbConfig, sUrl);
+  i.SetPosition(100);
+
+  GalileoModuleTester_Test_Item_AnimationData_RelativeUrl(i, "idle.gif", String::filenameBasePath(sUrl));
+  GalileoModuleTester_Test_Item_AnimationData_RelativeUrl(i, "walk-l.gif", String::filenameBasePath(sUrl));
+  GalileoModuleTester_Test_Item_AnimationData_RelativeUrl(i, "walk-r.gif", String::filenameBasePath(sUrl));
+  GalileoModuleTester_Test_Item_AnimationData_RelativeUrl(i, "chat.gif", String::filenameBasePath(sUrl));
+  GalileoModuleTester_Test_Item_AnimationData_AbsoluteUrl(i, "wave.gif", "http://ydentiti.org/test/Tassadar/wave.gif");
+  GalileoModuleTester_Test_Item_AnimationData_RelativeUrl(i, "sleep.gif", String::filenameBasePath(sUrl));
+
+  Apollo::TimeValue t = Apollo::TimeValue::getTime();
+  Apollo::TimeValue d(0, 110000);
+  if (!s) {         s = Test_PlayStep(i, t, "still", 0, 100); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "still", 110, 100); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "still", 220, 100); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "still", 330, 100); }
+  i.MoveTo(250);
+  if (!s) { t += d; s = Test_PlayStep(i, t, "still", 440, 100); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "still", 550, 100); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "still", 660, 100); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "still", 770, 100); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "still", 880, 100); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "still", 990, 100); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "walk-r", 100, 105); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "walk-r", 210, 110); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "walk-r", 320, 115); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "walk-r", 430, 100); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "walk-r", 540, 100); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "walk-r", 650, 100); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "walk-r", 760, 100); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "walk-r", 870, 100); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "walk-r", 980, 100); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "walk-r", 1090, 100); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "walk-r", 1200, 100); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "walk-r", 10, 100); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "walk-r", 120, 100); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "walk-r", 230, 100); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "walk-r", 340, 100); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "walk-r", 450, 100); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "walk-r", 560, 100); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "walk-r", 670, 100); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "walk-r", 780, 100); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "walk-r", 890, 100); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "walk-r", 1000, 100); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "walk-r", 1110, 100); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "walk-r", 1220, 100); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "still", 30, 100); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "still", 140, 100); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "still", 250, 100); }
 
   { Msg_Galileo_ClearAllStorage msg; (void) msg.Request(); }
   { Msg_Galileo_SetStorageName msg; msg.sName = sOrigDb; (void) msg.Request(); }
@@ -625,11 +708,12 @@ String GalileoModuleTester::Test_SelectNextSequence_ConditionedStatusTransition(
 void GalileoModuleTester::Begin()
 {
   if (Apollo::getConfig("Test/Galileo", 0)) {
-    //AP_UNITTEST_REGISTER(GalileoModuleTester::Test_Parse);
-    //AP_UNITTEST_REGISTER(GalileoModuleTester::Test_LoadGIF);
-    //AP_UNITTEST_REGISTER(GalileoModuleTester::Test_SelectByGroup);
-    //AP_UNITTEST_REGISTER(GalileoModuleTester::Test_PlayStill);
-    //AP_UNITTEST_REGISTER(GalileoModuleTester::Test_PlayWave);
+    AP_UNITTEST_REGISTER(GalileoModuleTester::Test_Parse);
+    AP_UNITTEST_REGISTER(GalileoModuleTester::Test_LoadGIF);
+    AP_UNITTEST_REGISTER(GalileoModuleTester::Test_SelectByGroup);
+    AP_UNITTEST_REGISTER(GalileoModuleTester::Test_PlayStill);
+    AP_UNITTEST_REGISTER(GalileoModuleTester::Test_PlayWave);
+    AP_UNITTEST_REGISTER(GalileoModuleTester::Test_PlayMoveRight);
     AP_UNITTEST_REGISTER(GalileoModuleTester::Test_SelectNextSequence_KeepStatus);
     AP_UNITTEST_REGISTER(GalileoModuleTester::Test_SelectNextSequence_Event);
     AP_UNITTEST_REGISTER(GalileoModuleTester::Test_SelectNextSequence_StatussedEvent);
