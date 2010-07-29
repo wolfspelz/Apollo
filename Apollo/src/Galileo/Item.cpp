@@ -376,16 +376,16 @@ void Item::PlayEvent(const String& sEvent)
   sEvent_ = sEvent;
 }
 
-void Item::SetPosition(int nX)
-{
-  nX_ = nX;
-}
-
-void Item::MoveTo(int nX)
-{
-  nDestX_ = nX;
-  sActivity_ = Item_Activity_Move;
-}
+//void Item::SetPosition(int nX)
+//{
+//  nX_ = nX;
+//}
+//
+//void Item::MoveTo(int nX)
+//{
+//  nDestX_ = nX;
+//  sActivity_ = Item_Activity_Move;
+//}
 
 void Item::SetAnimationData(const String& sUrl, Buffer& sbData, const String& sMimeType)
 {
@@ -553,6 +553,7 @@ void Item::Step(Apollo::TimeValue& tvCurrent)
     ApAsyncMessage<Msg_Animation_SequenceEnd> msg;
     msg->hItem = hAp_;
     msg->sName = pPreviousSequence->getName();
+    msg->sGroup = pPreviousSequence->Group();
     msg.Post();
   }
 
@@ -562,6 +563,7 @@ void Item::Step(Apollo::TimeValue& tvCurrent)
     ApAsyncMessage<Msg_Animation_SequenceBegin> msg;
     msg->hItem = hAp_;
     msg->sName = pNextSequence->getName();
+    msg->sGroup = pNextSequence->Group();
     msg.Post();
 
     pCurrentSequence_ = pNextSequence;
@@ -603,19 +605,19 @@ Sequence* Item::SelectNextSequence()
     }
   }
 
-  if (!sSequence) {
-    if (sActivity_) {
-      if (sActivity_ == Item_Activity_Move) {
-        if (nX_ == nDestX_) {
-          // back to status or event
-        } else if (nX_ > nDestX_) {
-          sSequence = Item_Group_MoveLeft;
-        } else if (nX_ < nDestX_) {
-          sSequence = Item_Group_MoveRight;
-        }
-      }
-    }
-  }
+  //if (!sSequence) {
+  //  if (sActivity_) {
+  //    if (sActivity_ == Item_Activity_Move) {
+  //      if (nX_ == nDestX_) {
+  //        // back to status or event
+  //      } else if (nX_ > nDestX_) {
+  //        sSequence = Item_Group_MoveLeft;
+  //      } else if (nX_ < nDestX_) {
+  //        sSequence = Item_Group_MoveRight;
+  //      }
+  //    }
+  //  }
+  //}
 
   if (!sSequence) {
     if (sEvent_) {

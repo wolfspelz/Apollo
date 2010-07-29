@@ -89,40 +89,38 @@ public:
   ApIN String sEvent;
 };
 
-// -> Animation
-class Msg_Animation_SetPosition: public ApRequestMessage
-{
-public:
-  Msg_Animation_SetPosition() : ApRequestMessage("Animation_SetPosition") {}
-  ApIN ApHandle hItem;
-  ApIN int nX;
-  ApIN int nY;
-  ApIN int nZ;
-};
-
-// -> Animation
-class Msg_Animation_MoveTo: public ApRequestMessage
-{
-public:
-  Msg_Animation_MoveTo() : ApRequestMessage("Animation_MoveTo") {}
-  ApIN ApHandle hItem;
-  ApIN int nX;
-  ApIN int nY;
-  ApIN int nZ;
-};
-
-// -------------------------------------------------------------------
-
-// -> Animation
-class Msg_Animation_GetPosition: public ApRequestMessage
-{
-public:
-  Msg_Animation_GetPosition() : ApRequestMessage("Animation_GetPosition") {}
-  ApIN ApHandle hItem;
-  ApOUT int nX;
-  ApOUT int nY;
-  ApOUT int nZ;
-};
+//// -> Animation
+//class Msg_Animation_SetPosition: public ApRequestMessage
+//{
+//public:
+//  Msg_Animation_SetPosition() : ApRequestMessage("Animation_SetPosition") {}
+//  ApIN ApHandle hItem;
+//  ApIN int nX;
+//  ApIN int nY;
+//  ApIN int nZ;
+//};
+//
+//// -> Animation
+//class Msg_Animation_MoveTo: public ApRequestMessage
+//{
+//public:
+//  Msg_Animation_MoveTo() : ApRequestMessage("Animation_MoveTo") {}
+//  ApIN ApHandle hItem;
+//  ApIN int nX;
+//  ApIN int nY;
+//  ApIN int nZ;
+//};
+//
+//// -> Animation
+//class Msg_Animation_GetPosition: public ApRequestMessage
+//{
+//public:
+//  Msg_Animation_GetPosition() : ApRequestMessage("Animation_GetPosition") {}
+//  ApIN ApHandle hItem;
+//  ApOUT int nX;
+//  ApOUT int nY;
+//  ApOUT int nZ;
+//};
 
 // -------------------------------------------------------------------
 
@@ -133,6 +131,7 @@ public:
   Msg_Animation_SequenceBegin() : ApNotificationMessage("SequenceBegin") {}
   ApIN ApHandle hItem;
   ApIN String sName;
+  ApIN String sGroup;
 };
 
 // Animation ->
@@ -151,6 +150,7 @@ public:
   Msg_Animation_SequenceEnd() : ApNotificationMessage("SequenceEnd") {}
   ApIN ApHandle hItem;
   ApIN String sName;
+  ApIN String sGroup;
 };
 
 #endif // !defined(MsgSample_h_INCLUDED)
