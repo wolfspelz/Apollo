@@ -60,9 +60,9 @@ public:
   void On_Animation_SetStatus(Msg_Animation_SetStatus* pMsg);
   void On_Animation_SetCondition(Msg_Animation_SetCondition* pMsg);
   void On_Animation_Event(Msg_Animation_Event* pMsg);
-  void On_Animation_SetPosition(Msg_Animation_SetPosition* pMsg);
-  void On_Animation_MoveTo(Msg_Animation_MoveTo* pMsg);
-  void On_Animation_GetPosition(Msg_Animation_GetPosition* pMsg);
+  //void On_Animation_SetPosition(Msg_Animation_SetPosition* pMsg);
+  //void On_Animation_MoveTo(Msg_Animation_MoveTo* pMsg);
+  //void On_Animation_GetPosition(Msg_Animation_GetPosition* pMsg);
   void On_Timer_Event(Msg_Timer_Event* pMsg);
   void On_Galileo_RequestAnimation(Msg_Galileo_RequestAnimation* pMsg);
   void On_Galileo_RequestAnimationComplete(Msg_Galileo_RequestAnimationComplete* pMsg);

@@ -141,8 +141,8 @@ public:
     ,pModule_(pModule)
     ,bStarted_(0)
     ,nDelayMSec_(100)
-    ,nX_(0)
-    ,nDestX_(0)
+    //,nX_(0)
+    //,nDestX_(0)
     ,pCurrentSequence_(0)
     ,nSpentInCurrentSequenceMSec_(0)
     ,pPreviousFrame_(0)
@@ -157,8 +157,8 @@ public:
   void SetStatus(const String& sStatus);
   void SetCondition(const String& sCondition);
   void PlayEvent(const String& sEvent);
-  void SetPosition(int nX);
-  void MoveTo(int nX);
+  //void SetPosition(int nX);
+  //void MoveTo(int nX);
   void SetAnimationData(const String& sUrl, Buffer& sbData, const String& sMimeType);
 
   int HasTimer(ApHandle hTimer) { return ApIsHandle(hTimer) && hTimer == hTimer_; }
@@ -198,8 +198,8 @@ protected:
   String sActivity_;
   String sCondition_;
   String sNextSequence_; // enforce, e.g. after transition
-  int nX_;
-  int nDestX_;
+  //int nX_;
+  //int nDestX_;
   Sequence* pCurrentSequence_;
   int nSpentInCurrentSequenceMSec_;
   Apollo::TimeValue tvLastTimer_;

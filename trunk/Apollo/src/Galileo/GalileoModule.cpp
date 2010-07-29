@@ -147,38 +147,38 @@ AP_MSG_HANDLER_METHOD(GalileoModule, Animation_Event)
   pMsg->apStatus = ApMessage::Ok;
 }
 
-AP_MSG_HANDLER_METHOD(GalileoModule, Animation_SetPosition)
-{
-  ItemListNode* pNode = items_.Find(pMsg->hItem);
-  if (pNode == 0) { return; }
-  Item* pItem = pNode->Value();
-
-  pItem->SetPosition(pMsg->nX);
-
-  pMsg->apStatus = ApMessage::Ok;
-}
-
-AP_MSG_HANDLER_METHOD(GalileoModule, Animation_MoveTo)
-{
-  ItemListNode* pNode = items_.Find(pMsg->hItem);
-  if (pNode == 0) { return; }
-  Item* pItem = pNode->Value();
-
-  pItem->MoveTo(pMsg->nX);
-
-  pMsg->apStatus = ApMessage::Ok;
-}
-
-AP_MSG_HANDLER_METHOD(GalileoModule, Animation_GetPosition)
-{
-  ItemListNode* pNode = items_.Find(pMsg->hItem);
-  if (pNode == 0) { return; }
-  Item* pItem = pNode->Value();
-
-  //pItem->GetPosition();
-
-  pMsg->apStatus = ApMessage::Ok;
-}
+//AP_MSG_HANDLER_METHOD(GalileoModule, Animation_SetPosition)
+//{
+//  ItemListNode* pNode = items_.Find(pMsg->hItem);
+//  if (pNode == 0) { return; }
+//  Item* pItem = pNode->Value();
+//
+//  pItem->SetPosition(pMsg->nX);
+//
+//  pMsg->apStatus = ApMessage::Ok;
+//}
+//
+//AP_MSG_HANDLER_METHOD(GalileoModule, Animation_MoveTo)
+//{
+//  ItemListNode* pNode = items_.Find(pMsg->hItem);
+//  if (pNode == 0) { return; }
+//  Item* pItem = pNode->Value();
+//
+//  pItem->MoveTo(pMsg->nX);
+//
+//  pMsg->apStatus = ApMessage::Ok;
+//}
+//
+//AP_MSG_HANDLER_METHOD(GalileoModule, Animation_GetPosition)
+//{
+//  ItemListNode* pNode = items_.Find(pMsg->hItem);
+//  if (pNode == 0) { return; }
+//  Item* pItem = pNode->Value();
+//
+//  //pItem->GetPosition();
+//
+//  pMsg->apStatus = ApMessage::Ok;
+//}
 
 Item* GalileoModule::GetItemByTimer(ApHandle hTimer)
 {
@@ -438,9 +438,9 @@ int GalileoModule::Init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, GalileoModule, Animation_SetStatus, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, GalileoModule, Animation_SetCondition, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, GalileoModule, Animation_Event, this, ApCallbackPosNormal);
-  AP_MSG_REGISTRY_ADD(MODULE_NAME, GalileoModule, Animation_SetPosition, this, ApCallbackPosNormal);
-  AP_MSG_REGISTRY_ADD(MODULE_NAME, GalileoModule, Animation_MoveTo, this, ApCallbackPosNormal);
-  AP_MSG_REGISTRY_ADD(MODULE_NAME, GalileoModule, Animation_GetPosition, this, ApCallbackPosNormal);
+  //AP_MSG_REGISTRY_ADD(MODULE_NAME, GalileoModule, Animation_SetPosition, this, ApCallbackPosNormal);
+  //AP_MSG_REGISTRY_ADD(MODULE_NAME, GalileoModule, Animation_MoveTo, this, ApCallbackPosNormal);
+  //AP_MSG_REGISTRY_ADD(MODULE_NAME, GalileoModule, Animation_GetPosition, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, GalileoModule, Timer_Event, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, GalileoModule, Galileo_RequestAnimation, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, GalileoModule, Galileo_RequestAnimationComplete, this, ApCallbackPosNormal);
