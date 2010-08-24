@@ -246,6 +246,15 @@ void Test_Galileo_Display_Controller::DisplayFrame(Apollo::Image& image)
   //  }
   //}
 
+  unsigned char pPreMultiply[256][256];
+  {
+    for (int alpha = 0; alpha < 256; alpha++) {
+      for (int col = 0; col < 256; col++) {
+        pPreMultiply[alpha][col] = col * (alpha / 256.0);
+      }
+    }
+  }
+
   { // almost transp background
     BYTE* pPixel = pBits_;
     int w = image.Width();
@@ -253,11 +262,12 @@ void Test_Galileo_Display_Controller::DisplayFrame(Apollo::Image& image)
     for (int y = 0; y < nH; ++y) {
       for (int x = 0; x < nW ; ++x) {
         int i = y * w + x;
-        *pPixel++ = p[i].blue;
-        *pPixel++ = p[i].green;
-        *pPixel++ = p[i].red;
-        //*pPixel++ = p[i].alpha;
-        *pPixel++ = 250;
+        Apollo::Pixel* p2 = &p[i];       
+        *pPixel++ = pPreMultiply[p2->alpha][p2->blue];
+        *pPixel++ = pPreMultiply[p2->alpha][p2->green];
+        *pPixel++ = pPreMultiply[p2->alpha][p2->red];
+        *pPixel++ = p2->alpha;
+        //*pPixel++ = 250;
       }
     }
   }
@@ -390,7 +400,11 @@ static void Test_Galileo_Display_Animation_SequenceEnd(Msg_Animation_SequenceEnd
 "  <sequence group='chat' name='chat2' type='basic' probability='100' in='standard' out='standard'><animation src='chat-2.gif'/></sequence>\n" \
 "  <sequence group='wave' name='wave' type='emote' probability='1000' in='standard' out='standard'><animation src='wave.gif'/></sequence>\n" \
 "  <sequence group='sleep' name='sleep' type='status' probability='1000' in='standard' out='standard'><animation src='idle.gif'/></sequence>\n" \
-"</config>"
+"</config>" \
+//"<config xmlns='http://schema.bluehands.de/character-config' version='1.0'>\n" \
+//"  <param name='defaultsequence' value='wave'/>\n" \
+//"  <sequence group='wave' name='wave' type='status' probability='1000' in='standard' out='standard'><animation src='giftest.gif'/></sequence>\n" \
+//"</config>" \
 
 String Test_Galileo_Display_Begin()
 {
