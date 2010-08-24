@@ -146,7 +146,8 @@ int Animation::LoadData()
         if (pFrame) {
           pFrame->img_.Allocate(pImgFrame->GetWidth(), pImgFrame->GetHeight());
           CxMemFile mfDest((BYTE*) pFrame->img_.Pixels(), pFrame->img_.Size());
-          pImgFrame->Encode2RGBA(&mfDest);
+          pImgFrame->AlphaFromTransparency();
+          pImgFrame->Encode2RGBA(&mfDest, false);
 
           int nDuration = (int) pImgFrame->GetFrameDelay() * 10; // in 1/100 s
           if (nDuration == 0) {
