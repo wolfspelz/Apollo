@@ -34,8 +34,9 @@ public:
     ,nY_(200)
     ,nW_(100)
     ,nH_(100)
-    ,nCntWindows_(0)
+    ,nCntSeqenceBegin_(0)
     ,nCntSeqenceEnd_(0)
+    ,nTerminateAtSequenceNumber_(1)
   {}
 
   void CreateDisplay();
@@ -48,6 +49,14 @@ public:
   String Begin();
   String End();
 
+  virtual String Initialize() = 0;
+
+  static int nCntWindows_;
+
+  String sDescription_;
+  int nTerminateAtSequenceNumber_;
+  List lExpectedSequences_;
+
   HINSTANCE hInstance_;
   HWND hWnd_;
   HBITMAP hBitmap_;
@@ -56,14 +65,16 @@ public:
   int nY_;
   int nW_;
   int nH_;
-  int nCntWindows_;
   ApHandle hItem_;
   String sOrigDb_;
+  int nCntSeqenceBegin_;
   int nCntSeqenceEnd_;
+  List lSequences_;
 };
 
-#define Test_Galileo_Display_DB "GalileoDisplayTest"
+int Test_Galileo_Display_Controller::nCntWindows_ = 0;
 
+#define Test_Galileo_Display_DB "GalileoDisplayTest"
 #define Test_Galileo_Display_WindowClass _T("Test_Galileo_DisplayClass")
 #define Test_Galileo_Display_WindowCaption _T("Test_Galileo_DisplayCaption")
 
@@ -310,6 +321,16 @@ static void Test_Galileo_Display_Animation_SequenceBegin(Msg_Animation_SequenceB
   Test_Galileo_Display_Controller* pTest_Galileo_Display_Controller = (Test_Galileo_Display_Controller*) pMsg->Ref();
   if (pTest_Galileo_Display_Controller->hItem_ != pMsg->hItem) { return; }
   apLog_Verbose((LOG_CHANNEL, "Test_Galileo_Display_Animation_SequenceBegin", "" ApHandleFormat "", ApHandleType(pMsg->hItem)));
+
+  pTest_Galileo_Display_Controller->nCntSeqenceBegin_++;
+
+  if (pTest_Galileo_Display_Controller->nCntSeqenceBegin_ == 1) {
+    Msg_Animation_Event msg;
+    msg.hItem = pTest_Galileo_Display_Controller->hItem_;
+    msg.sEvent = "cheer";
+    msg.Request();
+  }
+
 }
 
 static void Test_Galileo_Display_Animation_Frame(Msg_Animation_Frame* pMsg)
@@ -380,7 +401,9 @@ static void Test_Galileo_Display_Animation_SequenceEnd(Msg_Animation_SequenceEnd
   apLog_Verbose((LOG_CHANNEL, "Test_Galileo_Display_Animation_SequenceEnd", "" ApHandleFormat "", ApHandleType(pMsg->hItem)));
 
   pTest_Galileo_Display_Controller->nCntSeqenceEnd_++;
-  if (pTest_Galileo_Display_Controller->nCntSeqenceEnd_ >= 2) {
+  pTest_Galileo_Display_Controller->lSequences_.AddLast(pMsg->sGroup, pTest_Galileo_Display_Controller->nCntSeqenceEnd_);
+
+  if (pTest_Galileo_Display_Controller->nCntSeqenceEnd_ == pTest_Galileo_Display_Controller->nTerminateAtSequenceNumber_) {
     String s = pTest_Galileo_Display_Controller->End();
     delete pTest_Galileo_Display_Controller;
     pTest_Galileo_Display_Controller = 0;
@@ -399,6 +422,7 @@ static void Test_Galileo_Display_Animation_SequenceEnd(Msg_Animation_SequenceEnd
 "  <sequence group='chat' name='chat1' type='basic' probability='1000' in='standard' out='standard'><animation src='chat.gif'/></sequence>\n" \
 "  <sequence group='chat' name='chat2' type='basic' probability='100' in='standard' out='standard'><animation src='chat-2.gif'/></sequence>\n" \
 "  <sequence group='wave' name='wave' type='emote' probability='1000' in='standard' out='standard'><animation src='wave.gif'/></sequence>\n" \
+"  <sequence group='cheer' name='cheer' type='emote' probability='1000' in='standard' out='standard'><animation src='cheer.gif'/></sequence>\n" \
 "  <sequence group='sleep' name='sleep' type='status' probability='1000' in='standard' out='standard'><animation src='idle.gif'/></sequence>\n" \
 "</config>" \
 //"<config xmlns='http://schema.bluehands.de/character-config' version='1.0'>\n" \
@@ -406,11 +430,39 @@ static void Test_Galileo_Display_Animation_SequenceEnd(Msg_Animation_SequenceEnd
 //"  <sequence group='wave' name='wave' type='status' probability='1000' in='standard' out='standard'><animation src='giftest.gif'/></sequence>\n" \
 //"</config>" \
 
+class Test_Galileo_Display_Controller_WaveCheerWave : public Test_Galileo_Display_Controller
+{
+public:
+  Test_Galileo_Display_Controller_WaveCheerWave()
+  {
+    sDescription_ = "WaveCheerWave";
+    int nCnt = 0;
+    lExpectedSequences_.AddLast("wave", ++nCnt);
+    lExpectedSequences_.AddLast("cheer", ++nCnt);
+    lExpectedSequences_.AddLast("wave", ++nCnt);
+    nTerminateAtSequenceNumber_ = nCnt;
+  }
+
+  String Initialize()
+  {
+    String s;
+
+    Msg_Animation_SetStatus msg;
+    msg.hItem = hItem_;
+    msg.sStatus = "wave";
+    if (!msg.Request()) {
+      s = "Msg_Animation_SetStatus failed";
+    }
+
+    return s;
+  }
+};
+
 String Test_Galileo_Display_Begin()
 {
   String s;
 
-  Test_Galileo_Display_Controller* pTest_Galileo_Display_Controller = new Test_Galileo_Display_Controller();
+  Test_Galileo_Display_Controller* pTest_Galileo_Display_Controller = new Test_Galileo_Display_Controller_WaveCheerWave();
   s = pTest_Galileo_Display_Controller->Begin();
 
   return s;
@@ -465,22 +517,8 @@ String Test_Galileo_Display_Controller::Begin()
   }
 
   if (!s) {
-    Msg_Animation_SetStatus msg;
-    msg.hItem = hItem_;
-    msg.sStatus = "wave";
-    if (!msg.Request()) {
-      s = "Msg_Animation_SetStatus failed";
-    }
+    Initialize();
   }
-
-  //if (!s) {
-  //  Msg_Animation_Event msg;
-  //  msg.hItem = hItem_;
-  //  msg.sEvent = "wave";
-  //  if (!msg.Request()) {
-  //    s = "Msg_Animation_Event failed";
-  //  }
-  //}
 
   if (!s) {
     Msg_Animation_Start msg;
@@ -519,6 +557,8 @@ String Test_Galileo_Display_Controller::End()
   }
 
   DestroyDisplay();
+
+  s = Apollo::Test_CompareLists(sDescription_, lSequences_, lExpectedSequences_);
 
   { Msg_Galileo_ClearAllStorage msg; (void) msg.Request(); }
   { Msg_Galileo_SetStorageName msg; msg.sName = sOrigDb_; (void) msg.Request(); }
