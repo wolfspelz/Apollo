@@ -91,53 +91,56 @@ void Participant::GetDetailData(const String& sKey, Apollo::ValueList& vlMimeTyp
 
     if (0) {
     } else if (sKey == Msg_VpView_ParticipantDetail_avatar) {
+      HandleAvatarData(msg.sMimeType, msg.sSource, msg.sbData);
+    }
+  }
+}
 
-      if (!ApIsHandle(hAnimatedItem_)) {
-        Msg_Animation_Create msgAC;
-        msgAC.hItem = Apollo::newHandle();
-        msgAC.sMimeType = msg.sMimeType;
-        if (!msgAC.Request()) {
-          apLog_Error((LOG_CHANNEL, "Participant::GetDetailData", "Msg_Animation_Create failed: participant=" ApHandleFormat "", ApHandleType(hAp_)));
-        } else {
-          hAnimatedItem_ = msgAC.hItem;
-        }
-      }
+void Participant::HandleAvatarData(const String& sMimeType, const String& sSource, Buffer& sbData)
+{
+  if (!ApIsHandle(hAnimatedItem_)) {
+    Msg_Animation_Create msgAC;
+    msgAC.hItem = Apollo::newHandle();
+    msgAC.sMimeType = sMimeType;
+    if (!msgAC.Request()) {
+      apLog_Error((LOG_CHANNEL, "Participant::HandleAvatarData", "Msg_Animation_Create failed: participant=" ApHandleFormat "", ApHandleType(hAp_)));
+    } else {
+      hAnimatedItem_ = msgAC.hItem;
+    }
+  }
 
-      if (ApIsHandle(hAnimatedItem_)) {
-        Msg_Animation_SetRate msgASR;
-        msgASR.hItem = hAnimatedItem_;
-        msgASR.nMaxRate = 10;
-        if (!msgASR.Request()) {
-          apLog_Error((LOG_CHANNEL, "Participant::GetDetailData", "Msg_Animation_SetRate failed: participant=" ApHandleFormat "", ApHandleType(hAp_)));
-        }
-      }
+  if (ApIsHandle(hAnimatedItem_)) {
+    Msg_Animation_SetRate msgASR;
+    msgASR.hItem = hAnimatedItem_;
+    msgASR.nMaxRate = 10;
+    if (!msgASR.Request()) {
+      apLog_Error((LOG_CHANNEL, "Participant::HandleAvatarData", "Msg_Animation_SetRate failed: participant=" ApHandleFormat "", ApHandleType(hAp_)));
+    }
+  }
 
-      if (ApIsHandle(hAnimatedItem_)) {
-        Msg_Animation_SetData msgASD;
-        msgASD.hItem = hAnimatedItem_;
-        msgASD.sbData = msg.sbData;
+  if (ApIsHandle(hAnimatedItem_)) {
+    Msg_Animation_SetData msgASD;
+    msgASD.hItem = hAnimatedItem_;
+    msgASD.sbData = sbData;
 
-        String sSource = msg.sSource;
-        String sSourceType;
-        sSource.nextToken(Msg_VpView_ParticipantDetail_SourceSeparator, sSourceType);
-        if (sSourceType == Msg_VpView_ParticipantDetail_SourcePrefix_IdentityItemUrl) {
-          String sUrl = sSource;
-          msgASD.sSourceUrl = sUrl;
-        }
+    String sSourceTokenizer = sSource;
+    String sSourceType;
+    sSourceTokenizer.nextToken(Msg_VpView_ParticipantDetail_SourceSeparator, sSourceType);
+    if (sSourceType == Msg_VpView_ParticipantDetail_SourcePrefix_IdentityItemUrl) {
+      String sUrl = sSourceTokenizer;
+      msgASD.sSourceUrl = sUrl;
+    }
 
-        if (!msgASD.Request()) {
-          apLog_Error((LOG_CHANNEL, "Participant::GetDetailData", "Msg_Animation_SetData failed: participant=" ApHandleFormat " key=%s data:%d bytes, source=%s", ApHandleType(hAp_), StringType(sKey), msg.sbData.Length(), StringType(sSource)));
-        }
-      }
+    if (!msgASD.Request()) {
+      apLog_Error((LOG_CHANNEL, "Participant::HandleAvatarData", "Msg_Animation_SetData failed: participant=" ApHandleFormat " data:%d bytes, source=%s", ApHandleType(hAp_), sbData.Length(), StringType(sSource)));
+    }
+  }
 
-      if (ApIsHandle(hAnimatedItem_)) {
-        Msg_Animation_Start msgAS;
-        msgAS.hItem = hAnimatedItem_;
-        if (!msgAS.Request()) {
-          apLog_Error((LOG_CHANNEL, "Participant::GetDetailData", "Msg_Animation_Start failed: participant=" ApHandleFormat "", ApHandleType(hAp_)));
-        }
-      }
-
+  if (ApIsHandle(hAnimatedItem_)) {
+    Msg_Animation_Start msgAS;
+    msgAS.hItem = hAnimatedItem_;
+    if (!msgAS.Request()) {
+      apLog_Error((LOG_CHANNEL, "Participant::HandleAvatarData", "Msg_Animation_Start failed: participant=" ApHandleFormat "", ApHandleType(hAp_)));
     }
   }
 }

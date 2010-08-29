@@ -22,6 +22,7 @@ protected:
   void GetDetailString(const String& sKey, Apollo::ValueList& vlMimeTypes);
   void GetDetailData(const String& sKey, Apollo::ValueList& vlMimeTypes);
   void UnSubscribeDetail(const String& sKey);
+  void HandleAvatarData(const String& sMimeType, const String& sSource, Buffer& sbData);
 
 protected:
   ApHandle hAp_;
