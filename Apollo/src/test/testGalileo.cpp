@@ -49,7 +49,8 @@ public:
   String Begin();
   String End();
 
-  virtual String Initialize() = 0;
+  virtual String OnInitialize() = 0;
+  virtual void OnSequenceBegin() = 0;
 
   static int nCntWindows_;
 
@@ -324,13 +325,7 @@ static void Test_Galileo_Display_Animation_SequenceBegin(Msg_Animation_SequenceB
 
   pTest_Galileo_Display_Controller->nCntSeqenceBegin_++;
 
-  if (pTest_Galileo_Display_Controller->nCntSeqenceBegin_ == 1) {
-    Msg_Animation_Event msg;
-    msg.hItem = pTest_Galileo_Display_Controller->hItem_;
-    msg.sEvent = "cheer";
-    msg.Request();
-  }
-
+  pTest_Galileo_Display_Controller->OnSequenceBegin();
 }
 
 static void Test_Galileo_Display_Animation_Frame(Msg_Animation_Frame* pMsg)
@@ -443,7 +438,7 @@ public:
     nTerminateAtSequenceNumber_ = nCnt;
   }
 
-  String Initialize()
+  String OnInitialize()
   {
     String s;
 
@@ -455,6 +450,15 @@ public:
     }
 
     return s;
+  }
+
+  void OnSequenceBegin() {
+    if (nCntSeqenceBegin_ == 1) {
+      Msg_Animation_Event msg;
+      msg.hItem = hItem_;
+      msg.sEvent = "cheer";
+      msg.Request();
+    }
   }
 };
 
@@ -517,7 +521,7 @@ String Test_Galileo_Display_Controller::Begin()
   }
 
   if (!s) {
-    Initialize();
+    OnInitialize();
   }
 
   if (!s) {
