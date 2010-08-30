@@ -18,6 +18,7 @@ public:
   String sNickname;
   Buffer sbAvatar;
   String sAvatarMimetype;
+  String sAvatarSource;
   String sOnlineStatus;
   String sMessage;
   String sPosition;
@@ -47,13 +48,19 @@ static void Test_VpView_SubscribeParticipantDetail(Msg_VpView_SubscribeParticipa
   String sKey = pMsg->sKey;
   if (0) {
   } else if (sKey == Msg_VpView_ParticipantDetail_Nickname) {
-    pMsg->bAvailable = !p.sNickname.empty();
+    pMsg->bAvailable = 1;
   } else if (sKey == Msg_VpView_ParticipantDetail_avatar) {
+    pMsg->bAvailable = 1;
   } else if (sKey == Msg_VpView_ParticipantDetail_OnlineStatus) {
+    pMsg->bAvailable = 1;
   } else if (sKey == Msg_VpView_ParticipantDetail_Message) {
+    pMsg->bAvailable = 1;
   } else if (sKey == Msg_VpView_ParticipantDetail_Position) {
+    pMsg->bAvailable = 1;
   } else if (sKey == Msg_VpView_ParticipantDetail_Condition) {
+    pMsg->bAvailable = 1;
   } else if (sKey == Msg_VpView_ParticipantDetail_ProfileUrl) {
+    pMsg->bAvailable = 1;
   }
 }
 
@@ -68,10 +75,15 @@ static void Test_VpView_GetParticipantDetailString(Msg_VpView_GetParticipantDeta
   } else if (sKey == Msg_VpView_ParticipantDetail_Nickname) {
     pMsg->sValue = p.sNickname;
   } else if (sKey == Msg_VpView_ParticipantDetail_OnlineStatus) {
+    pMsg->sValue = p.sOnlineStatus;
   } else if (sKey == Msg_VpView_ParticipantDetail_Message) {
+    pMsg->sValue = p.sMessage;
   } else if (sKey == Msg_VpView_ParticipantDetail_Position) {
+    pMsg->sValue = p.sPosition;
   } else if (sKey == Msg_VpView_ParticipantDetail_Condition) {
+    pMsg->sValue = p.sCondition;
   } else if (sKey == Msg_VpView_ParticipantDetail_ProfileUrl) {
+    pMsg->sValue = p.sProfileUrl;
   }
 }
 
@@ -84,7 +96,16 @@ static void Test_VpView_GetParticipantDetailData(Msg_VpView_GetParticipantDetail
   String sKey = pMsg->sKey;
   if (0) {
   } else if (sKey == Msg_VpView_ParticipantDetail_avatar) {
+    pMsg->sbData = p.sbAvatar;
+    pMsg->sMimeType = p.sAvatarMimetype;
+    pMsg->sSource = p.sAvatarSource;
   }
+}
+
+static void Test_VpView_ReplayLocationPublicChat(Msg_VpView_ReplayLocationPublicChat* pMsg)
+{
+  Test_ParticipantList* pl = (Test_ParticipantList*) pMsg->Ref();
+  { Msg_VpView_ReplayLocationPublicChat msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_VpView_ReplayLocationPublicChat, pl); }
 }
 
 static String Test_Arena_InChangeOut()
@@ -170,8 +191,9 @@ static String Test_Arena_InChangeOut()
   {
     Test_Participant p;
     p.sNickname = "Tassadar";
-    Apollo::loadFile("tassadar.png", p.sbAvatar);
-    p.sAvatarMimetype = "image/png";
+    Apollo::loadFile(Apollo::getAppResourcePath() + "tassadar" + String::filenamePathSeparator() + "config.xml", p.sbAvatar);
+    p.sAvatarMimetype = "avatar/gif";
+    p.sAvatarSource = "IdentityItemUrl=http://ydentiti.org/Tassadar/avatar-xml";
     p.sOnlineStatus = "";
     p.sMessage = "Hallo";
     p.sPosition;
@@ -191,15 +213,17 @@ static String Test_Arena_InChangeOut()
     msg.Send();
   }
 
+  // VpView_GetParticipants
+  // VpView_SubscribeParticipantDetail
+  // VpView_GetParticipantDetailString
+  // VpView_GetParticipantDetailData
+
   { Msg_VpView_GetParticipants msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_VpView_GetParticipants, &pl1); }
   { Msg_VpView_SubscribeParticipantDetail msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_VpView_SubscribeParticipantDetail, &pl1); }
   { Msg_VpView_GetParticipantDetailString msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_VpView_GetParticipantDetailString, &pl1); }
   { Msg_VpView_GetParticipantDetailData msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_VpView_GetParticipantDetailData, &pl1); }
 
-  // VpView_GetParticipants
-  // VpView_SubscribeParticipantDetail
-  // VpView_GetParticipantDetailString
-  // VpView_GetParticipantDetailData
+  { Msg_VpView_ReplayLocationPublicChat msg; msg.Hook(MODULE_NAME, (ApCallback) Test_VpView_ReplayLocationPublicChat, &pl1, ApCallbackPosEarly); }
 
   {
     Msg_VpView_EnterLocationComplete msg;
@@ -208,7 +232,6 @@ static String Test_Arena_InChangeOut()
   }
 
   // VpView_ReplayLocationPublicChat
-
 
   /*
   // CHANGE

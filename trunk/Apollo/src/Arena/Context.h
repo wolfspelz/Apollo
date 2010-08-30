@@ -37,7 +37,7 @@ protected:
   int nW_;
   int nH_;
 
-  int nCntWindows_;
+  static int nCntWindows_;
   HINSTANCE hInstance_;
   HWND hWnd_;
   HBITMAP hBitmap_;

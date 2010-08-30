@@ -9,6 +9,8 @@
 #include "Local.h"
 #include "Context.h"
 
+int Context::nCntWindows_ = 0;
+
 Context::Context(ApHandle hContext)
 :hAp_(hContext)
 ,bVisible_(0)
@@ -16,7 +18,6 @@ Context::Context(ApHandle hContext)
 ,nY_(0)
 ,nW_(0)
 ,nH_(0)
-,nCntWindows_(0)
 ,hInstance_(NULL)
 ,hWnd_(NULL)
 ,hBitmap_(NULL)
@@ -66,16 +67,16 @@ LRESULT CALLBACK Context::StaticWndProc(HWND hWnd, UINT message, WPARAM wParam, 
 
   if (message == WM_CREATE) {
     LPCREATESTRUCT lpcs = (LPCREATESTRUCT) lParam; 
-#pragma warning(push)
-#pragma warning(disable : 4311)
+    #pragma warning(push)
+    #pragma warning(disable : 4311)
     ::SetWindowLong(hWnd, GWL_USERDATA, (LONG) lpcs->lpCreateParams);
-#pragma warning(pop)
+    #pragma warning(pop)
     nResult = 0;
   } else {
-#pragma warning(push)
-#pragma warning(disable : 4312)
+    #pragma warning(push)
+    #pragma warning(disable : 4312)
     Context* pContext = (Context*) ::GetWindowLong(hWnd, GWL_USERDATA);
-#pragma warning(pop)
+    #pragma warning(pop)
     if (pContext != 0) {
       nResult = pContext->WndProc(hWnd, message, wParam, lParam);
     } else {

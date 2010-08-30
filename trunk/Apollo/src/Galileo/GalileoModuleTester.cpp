@@ -141,7 +141,7 @@ String GalileoModuleTester::Test_LoadGIF()
 
   GalileoModule m;
   Animation a(&m);
-  Apollo::loadFile(Apollo::getAppResourcePath() + "tassadar/walk-l.gif", a.sbData_);
+  Apollo::loadFile(Apollo::getAppResourcePath() + "tassadar" + String::filenamePathSeparator() + "walk-l.gif", a.sbData_);
   a.Load();
   if (!s) { if (a.length() != 13) { s = "expected 13 frames"; } }
   if (!s) { if (a.nDurationMSec_ != 1300) { s = "expected 1300 ms duration"; } }
