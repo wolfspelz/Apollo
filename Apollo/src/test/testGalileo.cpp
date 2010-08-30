@@ -51,6 +51,7 @@ public:
 
   virtual String OnInitialize() = 0;
   virtual void OnSequenceBegin() = 0;
+  virtual void OnSequenceEnd() = 0;
 
   static int nCntWindows_;
 
@@ -398,6 +399,8 @@ static void Test_Galileo_Display_Animation_SequenceEnd(Msg_Animation_SequenceEnd
   pTest_Galileo_Display_Controller->nCntSeqenceEnd_++;
   pTest_Galileo_Display_Controller->lSequences_.AddLast(pMsg->sGroup, pTest_Galileo_Display_Controller->nCntSeqenceEnd_);
 
+  pTest_Galileo_Display_Controller->OnSequenceEnd();
+
   if (pTest_Galileo_Display_Controller->nCntSeqenceEnd_ == pTest_Galileo_Display_Controller->nTerminateAtSequenceNumber_) {
     String s = pTest_Galileo_Display_Controller->End();
     delete pTest_Galileo_Display_Controller;
@@ -460,6 +463,8 @@ public:
       msg.Request();
     }
   }
+
+  void OnSequenceEnd() {}
 };
 
 String Test_Galileo_Display_Begin()

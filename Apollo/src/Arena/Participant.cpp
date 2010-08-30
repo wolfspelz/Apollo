@@ -147,6 +147,18 @@ void Participant::HandleAvatarData(const String& sMimeType, const String& sSourc
 
 void Participant::UnSubscribeDetail(const String& sKey)
 {
+  Msg_VpView_UnsubscribeParticipantDetail msg;
+  msg.hParticipant = hAp_;
+  msg.sKey = sKey;
+
+  if (0) {
+  } else if (sKey == Msg_VpView_ParticipantDetail_avatar) {
+    msg.vlMimeTypes = avatarMimeTypes_;
+  } else {
+    msg.vlMimeTypes = noMimeTypes_;
+  }
+
+  (void) msg.Request();
 }
 
 void Participant::Show()

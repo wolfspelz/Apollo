@@ -15,6 +15,15 @@ Location::Location(ApHandle hLocation)
 {
 }
 
+void Location::ProcessParticipantList(Apollo::ValueList& vlParticipants)
+{
+  InitRemovedParticipants();
+  InitAddedParticipants();
+  EvaluateNewParticipantList(vlParticipants);
+  ProcessRemovedParticipants();
+  ProcessAddedParticipants();
+}
+
 void Location::InitRemovedParticipants()
 {
   while (removedParticipants_.Count() >0) {
@@ -41,16 +50,6 @@ void Location::InitAddedParticipants()
   }
 }
 
-void Location::RemoveFromRemovedParticipants(ApHandle h)
-{
-  removedParticipants_.Unset(h);
-}
-
-void Location::AddToAddedParticipants(ApHandle h)
-{
-  addedParticipants_.Set(h, 1);
-}
-
 void Location::EvaluateNewParticipantList(Apollo::ValueList& vlParticipants)
 {
   for (Apollo::ValueElem* e = 0; e = vlParticipants.nextElem(e); ) {
@@ -61,6 +60,16 @@ void Location::EvaluateNewParticipantList(Apollo::ValueList& vlParticipants)
       AddToAddedParticipants(e->getHandle());
     }
   }
+}
+
+void Location::RemoveFromRemovedParticipants(ApHandle h)
+{
+  removedParticipants_.Unset(h);
+}
+
+void Location::AddToAddedParticipants(ApHandle h)
+{
+  addedParticipants_.Set(h, 1);
 }
 
 void Location::ProcessAddedParticipants()
@@ -92,14 +101,7 @@ void Location::ProcessRemovedParticipants()
   }
 }
 
-void Location::ProcessParticipantList(Apollo::ValueList& vlParticipants)
-{
-  InitRemovedParticipants();
-  InitAddedParticipants();
-  EvaluateNewParticipantList(vlParticipants);
-  ProcessRemovedParticipants();
-  ProcessAddedParticipants();
-}
+// -------------------------
 
 void Location::ParticipantDetailsChanged(ApHandle hParticipant, Apollo::ValueList& vlKeys)
 {
