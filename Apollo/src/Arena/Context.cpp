@@ -184,6 +184,8 @@ void Context::SizeSurface()
 
   HDC dcScreen = ::GetDC(NULL);
 
+  ::SetWindowPos(hWnd_, NULL, 0, 0, nW_, nH_, SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE);
+
   BITMAPINFO bi;
   bi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
   bi.bmiHeader.biWidth = nW_;
