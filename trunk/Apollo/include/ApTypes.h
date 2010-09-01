@@ -228,6 +228,7 @@ public:
 #endif
   static TimeValue getTime();
 
+  bool isNull() { return nSec_ == 0 && nMicroSec_ == 0; }
   void operator=(time_t nSec);
   TimeValue operator+(TimeValue& tv);
   TimeValue& operator+=(TimeValue& tv) { *this = *this + tv; return *this; }
