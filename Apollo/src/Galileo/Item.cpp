@@ -51,16 +51,49 @@ void Animation::Load()
   }
 }
 
+int Animation::RequestSuspended()
+{
+  if (tRequestSuspendedTime_.isNull()) { return 0; }
+
+  Apollo::TimeValue tSuspended = Apollo::getNow() - tRequestSuspendedTime_;
+  if (tSuspended.Sec() > nRequestSuspendDelaySec_) {
+    tRequestSuspendedTime_ = 0;
+    return 0;
+  }
+
+  return 1;
+}
+
+void Animation::SuspendRequest()
+{
+  tRequestSuspendedTime_ = Apollo::getNow();
+  if (nRequestSuspendDelaySec_ == 0) {
+    nRequestSuspendDelaySec_ = Apollo::getModuleConfig(MODULE_NAME, "MinSuspendRequestSec", 20);
+  } else {
+    nRequestSuspendDelaySec_ *= 2;
+    int nMaxSuspendRequestSec = Apollo::getModuleConfig(MODULE_NAME, "MaxSuspendRequestSec", 1800);
+    if (nRequestSuspendDelaySec_ > nMaxSuspendRequestSec) {
+      nRequestSuspendDelaySec_ = nMaxSuspendRequestSec;
+    }
+  }
+
+  apLog_Verbose((LOG_CHANNEL, "Animation::SuspendRequest", "for %d sec (%s)", nRequestSuspendDelaySec_, StringType(sSrc_)));
+}
+
 int Animation::RequestData()
 {
   int ok = 0;
 
-  Msg_Galileo_RequestAnimation msg;
-  msg.hRequest = Apollo::newHandle();
-  msg.sUrl = sSrc_;
-  ok = msg.Request();
-  if (!ok) {
-    apLog_Error((LOG_CHANNEL, "Animation::RequestData", "Msg_Galileo_RequestAnimation failed: url=%s", StringType(sSrc_)));
+  if (!RequestSuspended()) {
+    SuspendRequest();
+
+    Msg_Galileo_RequestAnimation msg;
+    msg.hRequest = Apollo::newHandle();
+    msg.sUrl = sSrc_;
+    ok = msg.Request();
+    if (!ok) {
+      apLog_Error((LOG_CHANNEL, "Animation::RequestData", "Msg_Galileo_RequestAnimation failed: url=%s", StringType(sSrc_)));
+    }
   }
 
   return ok;

@@ -31,6 +31,7 @@ public:
   Animation(GalileoModule* pModule)
     :pModule_(pModule)
     ,bDataBroken_(0)
+    ,nRequestSuspendDelaySec_(0)
     ,bLoaded_(0)
     ,nDurationMSec_(0)
     ,nFramesCount_(0)
@@ -52,6 +53,9 @@ protected:
   int GetDataFromCache();
   int SaveDataToCache();
 
+  int RequestSuspended();
+  void SuspendRequest();
+
 protected:
   friend class GalileoModuleTester;
 
@@ -60,6 +64,8 @@ protected:
   Buffer sbData_;
   String sMimeType_;
   int bDataBroken_;
+  Apollo::TimeValue tRequestSuspendedTime_;
+  int nRequestSuspendDelaySec_;
   int bLoaded_;
   int nDurationMSec_;
   int nFramesCount_;
