@@ -90,7 +90,8 @@ void ChildClassPathFinder::OnWindow(HWND hWnd)
 FirefoxFinder::FirefoxFinder()
 :WindowFinder(NULL)
 ,sToplevelClass_("MozillaUIWindowClass")
-,sChildClassPath_("MozillaWindowClass/MozillaWindowClass/MozillaWindowClass/MozillaContentWindowClass")
+,sChildClassPath_("MozillaWindowClass/MozillaContentWindowClass") // FF 3.6 ??
+//,sChildClassPath_("MozillaWindowClass/MozillaWindowClass/MozillaWindowClass/MozillaContentWindowClass") // FF 3.5
 {
 }
 
