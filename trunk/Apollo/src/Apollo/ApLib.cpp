@@ -251,6 +251,12 @@ int ApLib::checksumSigned8(const String& sString)
   return nSum - 128;
 }
 
+String ApLib::shortHash(const String& sData, unsigned int nLength)
+{
+  Apollo::MessageDigest md((unsigned char*) sData.c_str(), sData.bytes());
+  return md.getSHA1Hex().subString(0, nLength);
+}
+
 // --------------------------------
 
 String ApLib::getCwd()
