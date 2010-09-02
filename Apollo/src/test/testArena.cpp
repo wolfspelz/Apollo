@@ -193,7 +193,7 @@ static String Test_Arena_InChangeOut()
     p.sNickname = "Tassadar";
     Apollo::loadFile(Apollo::getAppResourcePath() + "tassadar" + String::filenamePathSeparator() + "config.xml", p.sbAvatar);
     p.sAvatarMimetype = "avatar/gif";
-    p.sAvatarSource = "IdentityItemUrl=http://ydentiti.org/Tassadar/avatar-xml";
+    p.sAvatarSource = "IdentityItemUrl=http://ydentiti.org/test/Tassadar/config.xml";
     p.sOnlineStatus = "";
     p.sMessage = "Hallo";
     p.sPosition;

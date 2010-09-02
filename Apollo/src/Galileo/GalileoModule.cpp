@@ -236,7 +236,7 @@ AP_MSG_HANDLER_METHOD(GalileoModule, Galileo_RequestAnimationComplete)
 {
   apLog_Verbose((LOG_CHANNEL, "GalileoModule::Galileo_RequestAnimationComplete", "%s success=%d len=%d mimetype=%s", StringType(pMsg->sUrl), pMsg->bSuccess, pMsg->sbData.Length(), StringType(pMsg->sMimeType)));
 
-  if (!AnimationIsRequested(pMsg->sUrl)) {
+  if (AnimationIsRequested(pMsg->sUrl)) {
     requestedAnimations_.Unset(pMsg->sUrl);
 
     if (pMsg->bSuccess) {
