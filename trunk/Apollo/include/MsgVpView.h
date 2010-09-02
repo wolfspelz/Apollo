@@ -379,7 +379,7 @@ public:
   ApIN Apollo::ValueList vlMimeTypes;
   ApOUT Buffer sbData;
   ApOUT String sMimeType;
-  ApOUT String sSource; // e.g. "IdentityItemUrl=http://ydentiti.org/Tassadar/avatar-xml"
+  ApOUT String sSource; // e.g. "IdentityItemUrl=http://ydentiti.org/test/Tassadar/config.xml"
 };
 
 class Msg_VpView_GetParticipantDetailRef: public ApRequestMessage
