@@ -117,7 +117,8 @@ public:
 
 protected:
   //String prepareDbKey(const String& sText) { return String::reverse(sText); }
-  String prepareDbKey(const String& sText) { return sText; }
+  //String prepareDbKey(const String& sText) { return sText; }
+  String prepareDbKey(const String& sText) { String sResult = Apollo::getShortHash(sText, 4) + " " + sText; return sResult; }
 
   ItemAcquisitionTask* findItemAcquisitionTaskByRequest(ApHandle hRequest);
   String selectItemId(const String& sUrl, const String& sType, const String& sMimeType);

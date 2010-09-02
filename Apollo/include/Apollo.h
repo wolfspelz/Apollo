@@ -94,6 +94,7 @@ APOLLO_API ApHandle string2Handle(const String& sString);
 APOLLO_API int getRandom(int nMax);
 APOLLO_API String getRandomString(int nLength);
 APOLLO_API String getUniqueId();
+APOLLO_API String getShortHash(const String& sData, unsigned int nLength);
 
 APOLLO_API TimeValue getNow();
 APOLLO_API void setNow(TimeValue& tv);

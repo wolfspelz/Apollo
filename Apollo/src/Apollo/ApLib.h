@@ -51,6 +51,7 @@ public:
   void setNow(Apollo::TimeValue& tvNow);
 
   int checksumSigned8(const String& sString);
+  String shortHash(const String& sData, unsigned int nLength);
 
   String getCwd();
   String getMachineId();

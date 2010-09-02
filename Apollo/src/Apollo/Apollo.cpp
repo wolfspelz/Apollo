@@ -280,6 +280,11 @@ String Apollo::getUniqueId()
   return gApLib.getUniqueId();
 }
 
+String Apollo::getShortHash(const String& sData, unsigned int nLength)
+{
+  return gApLib.shortHash(sData, nLength);
+}
+
 // --------------------------------
 
 Apollo::TimeValue Apollo::getNow()
