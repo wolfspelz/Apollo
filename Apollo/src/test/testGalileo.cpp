@@ -367,6 +367,7 @@ static void Test_Galileo_Display_Galileo_SaveAnimationDataToStorage(Msg_Galileo_
 {
   Test_Galileo_Display_Controller* pTest_Galileo_Display_Controller = (Test_Galileo_Display_Controller*) pMsg->Ref();
   apLog_Verbose((LOG_CHANNEL, "Test_Galileo_Display_Galileo_SaveAnimationDataToStorage", "%s", StringType(pMsg->sUrl)));
+
   pMsg->apStatus = ApMessage::Ok;
 }
 
@@ -374,7 +375,9 @@ static void Test_Galileo_Display_Galileo_IsAnimationDataInStorage(Msg_Galileo_Is
 {
   Test_Galileo_Display_Controller* pTest_Galileo_Display_Controller = (Test_Galileo_Display_Controller*) pMsg->Ref();
   apLog_Verbose((LOG_CHANNEL, "Test_Galileo_Display_Galileo_IsAnimationDataInStorage", "%s", StringType(pMsg->sUrl)));
+
   pMsg->bAvailable = 1;
+
   pMsg->apStatus = ApMessage::Ok;
 }
 

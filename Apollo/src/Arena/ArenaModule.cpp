@@ -163,7 +163,15 @@ AP_MSG_HANDLER_METHOD(ArenaModule, VpView_EnterLocationRequested){}
 
 AP_MSG_HANDLER_METHOD(ArenaModule, VpView_EnterLocationBegin){}
 
-AP_MSG_HANDLER_METHOD(ArenaModule, VpView_EnterLocationComplete){}
+AP_MSG_HANDLER_METHOD(ArenaModule, VpView_EnterLocationComplete)
+{
+  Msg_VpView_ReplayLocationPublicChat msg;
+  msg.hLocation = pMsg->hLocation;
+  //msg.nMaxAge;
+  //msg.nMaxLines;
+  //msg.nMaxData;
+  if (!msg.Request()) { throw ApException("ArenaModule::VpView_EnterLocationComplete: Msg_VpView_ReplayLocationPublicChat(" ApHandleFormat ") failed", ApHandleType(pMsg->hLocation)); }
+}
 
 AP_MSG_HANDLER_METHOD(ArenaModule, VpView_LocationContextsChanged){}
 
