@@ -489,7 +489,6 @@ public:
   ApIN int nMaxAge;
   ApIN int nMaxLines;
   ApIN int nMaxData;
-  ApOUT Apollo::ValueList vlParticipants;
 };
 
 #endif // !defined(MsgVpView_h_INCLUDED)
