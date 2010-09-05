@@ -21,6 +21,7 @@ public:
 
   void ProcessParticipantList(Apollo::ValueList& vlParticipants);
   void ParticipantDetailsChanged(ApHandle hParticipant, Apollo::ValueList& vlKeys);
+  void ReceivePublicChat(ApHandle hParticipant, ApHandle hChat, const String& sNickname, const String& sText, const Apollo::TimeValue& tv);
 
 protected:
   void InitRemovedParticipants();
