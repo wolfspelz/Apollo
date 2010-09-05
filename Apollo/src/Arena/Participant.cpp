@@ -198,3 +198,8 @@ void Participant::DetailsChanged(Apollo::ValueList& vlKeys)
     GetDetail(sKey);
   }
 }
+
+void Participant::ReceivePublicChat(ApHandle hChat, const String& sNickname, const String& sText, const Apollo::TimeValue& tv)
+{
+}
+

@@ -110,3 +110,12 @@ void Location::ParticipantDetailsChanged(ApHandle hParticipant, Apollo::ValueLis
     pNode->Value()->DetailsChanged(vlKeys);
   }
 }
+
+void Location::ReceivePublicChat(ApHandle hParticipant, ApHandle hChat, const String& sNickname, const String& sText, const Apollo::TimeValue& tv)
+{
+  ParticipantListNode* pNode = participants_.Find(hParticipant);
+  if (pNode) {
+    pNode->Value()->ReceivePublicChat(hChat, sNickname, sText, tv);
+  }
+}
+

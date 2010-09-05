@@ -17,6 +17,7 @@ class Test_Participant
 {
 public:
   String sNickname;
+
   Buffer sbAvatar;
   String sAvatarMimetype;
   String sAvatarSource;
@@ -158,6 +159,23 @@ static void Test_VpView_GetParticipantDetailData(Msg_VpView_GetParticipantDetail
 static void Test_VpView_ReplayLocationPublicChat(Msg_VpView_ReplayLocationPublicChat* pMsg)
 {
   Test_Setup* t = (Test_Setup*) pMsg->Ref();
+
+  Apollo::TimeValue tNow = Apollo::getNow();
+  Apollo::TimeValue tAge(2, 0);
+  Apollo::TimeValue tThen = tNow - tAge;
+
+  Test_ParticipantListIterator iter(t->pl1_);
+  for (Test_ParticipantListNode* pNode = 0; (pNode = iter.Next()) != 0; ) {
+    Msg_VpView_LocationPublicChat msg;
+    msg.hLocation = pMsg->hLocation;
+    msg.hParticipant = pNode->Key();
+    msg.hChat = Apollo::newHandle();
+    msg.sNickname = pNode->Value().sNickname;
+    msg.sText = "Hello World";
+    msg.nSec = tThen.Sec();
+    msg.nMicroSec = tThen.MicroSec();
+    msg.Send();
+  }
 
   Test_Arena_InChangeOut_End();
 }

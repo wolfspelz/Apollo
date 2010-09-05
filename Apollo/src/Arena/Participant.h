@@ -15,6 +15,7 @@ public:
   void Show();
   void Hide();
   void DetailsChanged(Apollo::ValueList& vlKeys);
+  void ReceivePublicChat(ApHandle hChat, const String& sNickname, const String& sText, const Apollo::TimeValue& tv);
 
 protected:
   void SubscribeAndGetDetail(const String& sKey);
