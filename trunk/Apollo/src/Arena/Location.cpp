@@ -6,12 +6,14 @@
 
 #include "Apollo.h"
 #include "ApLog.h"
+#include "ApContainer.h"
 #include "Local.h"
 #include "Location.h"
-#include "ApContainer.h"
+#include "ArenaModule.h"
 
-Location::Location(ApHandle hLocation)
+Location::Location(ApHandle hLocation, ArenaModule* pModule)
 :hAp_(hLocation)
+,pModule_(pModule)
 {
 }
 
@@ -77,7 +79,7 @@ void Location::ProcessAddedParticipants()
   ApHandleTreeIterator<int> iter(addedParticipants_);
   for (ApHandleTreeNode<int>* pNode = 0; (pNode = iter.Next()) != 0; ) {
     ApHandle hParticipant = pNode->Key();
-    Participant* pParticipant = new Participant(hParticipant);
+    Participant* pParticipant = new Participant(hParticipant, pModule_, this);
     if (pParticipant) {
       participants_.Set(hParticipant, pParticipant);
       pParticipant->Show();
@@ -119,3 +121,10 @@ void Location::ReceivePublicChat(ApHandle hParticipant, ApHandle hChat, const St
   }
 }
 
+void Location::ParticipantAnimationFrame(ApHandle hParticipant, const Apollo::Image& image)
+{
+  ParticipantListNode* pNode = participants_.Find(hParticipant);
+  if (pNode) {
+    pNode->Value()->AnimationFrame(image);
+  }
+}

@@ -42,7 +42,7 @@ Context* ArenaModule::FindContext(ApHandle hContext)
 
 Location* ArenaModule::CreateLocation(ApHandle hLocation)
 {
-  Location* pLocation = new Location(hLocation);
+  Location* pLocation = new Location(hLocation, this);
   if (pLocation) {
     locations_.Set(hLocation, pLocation);
   }
@@ -89,6 +89,33 @@ ApHandle ArenaModule::GetLocationOfContext(ApHandle hContext)
     return locationOfContext_.Find(hContext)->Value();
   }
   return ApNoHandle;
+}
+
+//---------------------------
+
+void ArenaModule::RegisterLocationParticipantOfAnimatedItem(ApHandle hItem, ApHandle hLocation, ApHandle hParticipant)
+{
+  LocationParticipant lp(hLocation, hParticipant);
+  locationParticipantOfAnimatedItem_.Set(hItem, lp);
+}
+
+void ArenaModule::UnregisterLocationParticipantOfAnimatedItem(ApHandle hItem)
+{
+  locationParticipantOfAnimatedItem_.Unset(hItem);
+}
+
+int ArenaModule::GetLocationParticipantOfAnimatedItem(ApHandle hItem, ApHandle& hLocation, ApHandle& hParticipant)
+{
+  int ok = 0;
+
+  ApHandleTreeNode<LocationParticipant>* pNode = locationParticipantOfAnimatedItem_.Find(hItem);
+  if (pNode) {
+    ok = 1;
+    hLocation = pNode->Value().hLocation_;
+    hParticipant = pNode->Value().hPartcipant_;
+  }
+
+  return ok;
 }
 
 //----------------------------------------------------------
@@ -218,6 +245,24 @@ AP_MSG_HANDLER_METHOD(ArenaModule, VpView_ParticipantAdded){}
 
 AP_MSG_HANDLER_METHOD(ArenaModule, VpView_ParticipantRemoved){}
 
+//----------------------------
+
+AP_MSG_HANDLER_METHOD(ArenaModule, Animation_SequenceBegin){}
+
+AP_MSG_HANDLER_METHOD(ArenaModule, Animation_Frame)
+{
+  ApHandle hLocation;
+  ApHandle hParticipant;
+  if (!GetLocationParticipantOfAnimatedItem(pMsg->hItem, hLocation, hParticipant)) { throw ApException("ArenaModule::Animation_Frame: GetLocationParticipantOfAnimatedItem(" ApHandleFormat ") failed", ApHandleType(pMsg->hItem)); }
+
+  Location* pLocation = FindLocation(hLocation);
+  if (pLocation == 0) { throw ApException("ArenaModule::Animation_Frame: FindLocation(" ApHandleFormat ") failed", ApHandleType(hLocation)); }
+
+  pLocation->ParticipantAnimationFrame(hParticipant, pMsg->iFrame);
+}
+
+AP_MSG_HANDLER_METHOD(ArenaModule, Animation_SequenceEnd){}
+
 //----------------------------------------------------------
 
 #if defined(AP_TEST)
@@ -280,6 +325,9 @@ int ArenaModule::Init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ArenaModule, VpView_LeaveLocationComplete, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ArenaModule, VpView_ParticipantAdded, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ArenaModule, VpView_ParticipantRemoved, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, ArenaModule, Animation_SequenceBegin, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, ArenaModule, Animation_Frame, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, ArenaModule, Animation_SequenceEnd, this, ApCallbackPosNormal);
 
   AP_UNITTEST_HOOK(ArenaModule, this);
 
