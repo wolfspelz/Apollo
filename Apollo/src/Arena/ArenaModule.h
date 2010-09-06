@@ -12,6 +12,7 @@
 #include "MsgUnitTest.h"
 #include "MsgVp.h"
 #include "MsgVpView.h"
+#include "MsgAnimation.h"
 #include "Context.h"
 #include "Location.h"
 
@@ -22,6 +23,18 @@ typedef ApHandlePointerTreeIterator<Context*> ContextListIterator;
 typedef ApHandlePointerTree<Location*> LocationList;
 typedef ApHandlePointerTreeNode<Location*> LocationListNode;
 typedef ApHandlePointerTreeIterator<Location*> LocationListIterator;
+
+class LocationParticipant
+{
+public:
+  LocationParticipant(ApHandle hLocation, ApHandle hPartcipant)
+    :hLocation_(hLocation)
+    ,hPartcipant_(hPartcipant)
+  {}
+
+  ApHandle hLocation_;
+  ApHandle hPartcipant_;
+};
 
 class ArenaModule
 {
@@ -54,12 +67,19 @@ public:
   void On_VpView_LeaveLocationComplete(Msg_VpView_LeaveLocationComplete* pMsg);
   void On_VpView_ParticipantAdded(Msg_VpView_ParticipantAdded* pMsg);
   void On_VpView_ParticipantRemoved(Msg_VpView_ParticipantRemoved* pMsg);
+  void On_Animation_SequenceBegin(Msg_Animation_SequenceBegin* pMsg);
+  void On_Animation_Frame(Msg_Animation_Frame* pMsg);
+  void On_Animation_SequenceEnd(Msg_Animation_SequenceEnd* pMsg);
 
 #if defined(AP_TEST)
   void On_UnitTest_Begin(Msg_UnitTest_Begin* pMsg);
   void On_UnitTest_Execute(Msg_UnitTest_Execute* pMsg);
   void On_UnitTest_End(Msg_UnitTest_End* pMsg);
 #endif
+
+  void RegisterLocationParticipantOfAnimatedItem(ApHandle hItem, ApHandle hLocation, ApHandle hParticipant);
+  void UnregisterLocationParticipantOfAnimatedItem(ApHandle hItem);
+  int GetLocationParticipantOfAnimatedItem(ApHandle hItem, ApHandle& hLocation, ApHandle& hParticipant);
 
 protected:
   Context* CreateContext(ApHandle hContext);
@@ -78,6 +98,7 @@ protected:
   ContextList contexts_;
   LocationList locations_;
   ApHandleTree<ApHandle> locationOfContext_;
+  ApHandleTree<LocationParticipant> locationParticipantOfAnimatedItem_;
 
 public:
 

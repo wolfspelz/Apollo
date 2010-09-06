@@ -10,9 +10,12 @@
 #include "MsgAnimation.h"
 #include "Local.h"
 #include "Participant.h"
+#include "ArenaModule.h"
 
-Participant::Participant(ApHandle hParticipant)
+Participant::Participant(ApHandle hParticipant, ArenaModule* pModule, Location* pLocation)
 :hAp_(hParticipant)
+,pModule_(pModule)
+,pLocation_(pLocation)
 ,hAnimatedItem_(ApNoHandle)
 {
   avatarMimeTypes_.add("avatar/gif");
@@ -137,6 +140,8 @@ void Participant::HandleAvatarData(const String& sMimeType, const String& sSourc
   }
 
   if (ApIsHandle(hAnimatedItem_)) {
+    pModule_->RegisterLocationParticipantOfAnimatedItem(hAnimatedItem_, pLocation_->apHandle(), apHandle());
+
     Msg_Animation_Start msgAS;
     msgAS.hItem = hAnimatedItem_;
     if (!msgAS.Request()) {
@@ -183,6 +188,16 @@ void Participant::Hide()
   UnSubscribeDetail(Msg_VpView_ParticipantDetail_ProfileUrl);
 
   if (ApIsHandle(hAnimatedItem_)) {
+    pModule_->UnregisterLocationParticipantOfAnimatedItem(hAnimatedItem_);
+
+    Msg_Animation_Stop msgAS;
+    msgAS.hItem = hAnimatedItem_;
+    if (!msgAS.Request()) {
+      apLog_Error((LOG_CHANNEL, "Participant::Hide", "Msg_Animation_Stop failed: participant=" ApHandleFormat "", ApHandleType(hAp_)));
+    }
+  }
+
+  if (ApIsHandle(hAnimatedItem_)) {
     Msg_Animation_Destroy msg;
     msg.hItem = hAnimatedItem_;
     if (!msg.Request()) {
@@ -200,6 +215,16 @@ void Participant::DetailsChanged(Apollo::ValueList& vlKeys)
 }
 
 void Participant::ReceivePublicChat(ApHandle hChat, const String& sNickname, const String& sText, const Apollo::TimeValue& tv)
+{
+  if (chats_.Find(hChat) != 0) {
+    chats_.Unset(hChat);
+  }
+
+  Chatline chat(sText, tv);
+  chats_.Set(hChat, chat);
+}
+
+void Participant::AnimationFrame(const Apollo::Image& image)
 {
 }
 
