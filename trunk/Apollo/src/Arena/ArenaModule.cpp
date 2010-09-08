@@ -253,7 +253,8 @@ AP_MSG_HANDLER_METHOD(ArenaModule, Animation_Frame)
 {
   ApHandle hLocation;
   ApHandle hParticipant;
-  if (!GetLocationParticipantOfAnimatedItem(pMsg->hItem, hLocation, hParticipant)) { throw ApException("ArenaModule::Animation_Frame: GetLocationParticipantOfAnimatedItem(" ApHandleFormat ") failed", ApHandleType(pMsg->hItem)); }
+//  if (!GetLocationParticipantOfAnimatedItem(pMsg->hItem, hLocation, hParticipant)) { throw ApException("ArenaModule::Animation_Frame: GetLocationParticipantOfAnimatedItem(" ApHandleFormat ") failed", ApHandleType(pMsg->hItem)); }
+  if (!GetLocationParticipantOfAnimatedItem(pMsg->hItem, hLocation, hParticipant)) { return; }
 
   Location* pLocation = FindLocation(hLocation);
   if (pLocation == 0) { throw ApException("ArenaModule::Animation_Frame: FindLocation(" ApHandleFormat ") failed", ApHandleType(hLocation)); }
