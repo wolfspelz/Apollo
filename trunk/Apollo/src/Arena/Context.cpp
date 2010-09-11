@@ -220,8 +220,29 @@ void Context::SizeSurface()
   ::ReleaseDC(NULL, dcScreen);
 }
 
+#if defined(_DEBUG)
 #include <cairo.h>
 #include <cairo-win32.h>
+#include "ximagif.h"
+#include "Image.h"
+
+void _PreMultiplyAlpha(unsigned char* _pPixel, int _nW, int _nH)
+{
+  unsigned char* pPixel = _pPixel;
+  int nW = _nW;
+  int nH = _nH;
+  for (int y = 0; y < nH; ++y) {
+    for (int x = 0; x < nW ; ++x) {
+      int nAlpha = pPixel[3]; // peek alpha
+      // *pPixel++ = *pPixel * nAlpha /255.0; //would be correct but slower
+      *pPixel++ = *pPixel * nAlpha >> 8;
+      *pPixel++ = *pPixel * nAlpha >> 8;
+      *pPixel++ = *pPixel * nAlpha >> 8;
+      pPixel++; // skip alpha
+    }
+  }
+}
+#endif
 
 void Context::DrawSurface()
 {
@@ -235,19 +256,7 @@ void Context::DrawSurface()
 
   HBITMAP hOldBitmap = (HBITMAP) ::SelectObject(dcMemory, hBitmap_);
 
-  //{ // almost transp background
-  //  for (int y = 0; y < nH; ++y) {
-  //    BYTE *pPixel= pBits_ + nW * 4 * y;
-  //    for (int x = 0; x < nW ; ++x) {
-  //      pPixel[3] = 0x80;
-  //      pPixel[0] = 0x80;
-  //      pPixel[1] = 0;
-  //      pPixel[2] = 0;
-  //      pPixel+= 4;
-  //    }
-  //  }
-  //}
-
+#if defined(_DEBUG)
   #define M_PI 3.14159265358979323
   cairo_surface_t *surface = cairo_win32_surface_create(dcMemory);
   cairo_t *cr = cairo_create(surface);
@@ -270,11 +279,48 @@ void Context::DrawSurface()
   cairo_line_to(cr, xc, yc);
   cairo_stroke(cr);
 
-  int w, h;
-  cairo_surface_t *image;
-  image = cairo_image_surface_create_from_png(Apollo::getAppResourcePath() + "tassadar.png");
-  w = cairo_image_surface_get_width(image);
-  h = cairo_image_surface_get_height(image);
+#define FROM_DATA
+#define TEST_PNG
+
+#ifdef FROM_FILE
+#ifdef TASSADAR_PNG
+  cairo_surface_t *image = cairo_image_surface_create_from_png(Apollo::getAppResourcePath() + "tassadar.png");
+#endif
+#ifdef TEST_PNG
+  cairo_surface_t *image = cairo_image_surface_create_from_png(Apollo::getAppResourcePath() + "tassadar" + String::filenamePathSeparator() + "test.png");
+#endif
+#endif // FROM_FILE
+
+#ifdef FROM_DATA
+  Buffer sbData;
+#ifdef TASSADAR_GIF
+  Apollo::loadFile(Apollo::getAppResourcePath() + "tassadar" + String::filenamePathSeparator() + "idle.gif", sbData);
+#endif
+#ifdef TEST_PNG
+  Apollo::loadFile(Apollo::getAppResourcePath() + "tassadar" + String::filenamePathSeparator() + "test.png", sbData);
+#endif
+  CxImage img(sbData.Data(), sbData.Length(), CXIMAGE_FORMAT_UNKNOWN);
+#ifdef TASSADAR_GIF
+  img.SetRetreiveAllFrames(true);
+  int nFrames = img.GetNumFrames();
+  img.SetFrame(nFrames - 1);
+  img.Decode(sbData.Data(), sbData.Length(), CXIMAGE_FORMAT_GIF);
+  CxImage* pImgFrame = img.GetFrame(0);
+#endif
+#ifdef TEST_PNG
+  CxImage* pImgFrame = &img;
+#endif
+  Apollo::Image apImg;
+  apImg.Allocate(pImgFrame->GetWidth(), pImgFrame->GetHeight());
+  CxMemFile mfDest((BYTE*) apImg.Pixels(), apImg.Size());
+  pImgFrame->AlphaFromTransparency();
+  pImgFrame->Encode2RGBA(&mfDest, true);
+  _PreMultiplyAlpha(mfDest.GetBuffer(false), pImgFrame->GetWidth(), pImgFrame->GetHeight());
+  cairo_surface_t *image = cairo_image_surface_create_for_data(mfDest.GetBuffer(false), CAIRO_FORMAT_ARGB32, pImgFrame->GetWidth(), pImgFrame->GetHeight(), pImgFrame->GetWidth() * 4);
+#endif // FROM_DATA
+
+  int w = cairo_image_surface_get_width(image);
+  int h = cairo_image_surface_get_height(image);
   cairo_scale(cr, 100.0/w, 100.0/h);
   cairo_set_source_surface(cr, image, 0, 0);
   cairo_paint(cr);
@@ -310,6 +356,7 @@ void Context::DrawSurface()
 
   cairo_destroy(cr); 
   cairo_surface_destroy(surface);
+#endif
 
   // setup the blend function
 	BLENDFUNCTION blendPixelFunction = { AC_SRC_OVER, 0, 255, AC_SRC_ALPHA };
