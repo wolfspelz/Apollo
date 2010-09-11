@@ -226,19 +226,23 @@ void Context::SizeSurface()
 #include "ximagif.h"
 #include "Image.h"
 
-void _PreMultiplyAlpha(unsigned char* _pPixel, int _nW, int _nH)
+// (component * alpha) / 255.0; //would be correct but slower
+void _PreMultiplyAlpha_mem_RGBA_to_cairo_ARGB_which_actually_is_BGRA_in_mem_on_little_endian(unsigned char* _pPixel, int _nW, int _nH)
 {
-  unsigned char* pPixel = _pPixel;
+  unsigned int* pPixel = (unsigned int*) _pPixel;
   int nW = _nW;
   int nH = _nH;
   for (int y = 0; y < nH; ++y) {
     for (int x = 0; x < nW ; ++x) {
-      int nAlpha = pPixel[3]; // peek alpha
-      // *pPixel++ = *pPixel * nAlpha /255.0; //would be correct but slower
-      *pPixel++ = *pPixel * nAlpha >> 8;
-      *pPixel++ = *pPixel * nAlpha >> 8;
-      *pPixel++ = *pPixel * nAlpha >> 8;
-      pPixel++; // skip alpha
+      unsigned int color = *pPixel; // AABBGGRR
+      int a = (color & 0xff000000) >> 24;
+      unsigned int cairo_color = 
+             (color & 0xff000000) // a
+        | (( (color & 0x000000ff)        * a) & 0x0000ff00) << 8 // r
+        | ((((color & 0x0000ff00) >> 8)  * a) & 0x0000ff00) // g
+        | ((((color & 0x00ff0000) >> 16) * a) >> 8) // b
+        ;
+      *pPixel++ = cairo_color; // AARRGGBB
     }
   }
 }
@@ -280,7 +284,7 @@ void Context::DrawSurface()
   cairo_stroke(cr);
 
 #define FROM_DATA
-#define TEST_PNG
+#define TASSADAR_GIF
 
 #ifdef FROM_FILE
 #ifdef TASSADAR_PNG
@@ -315,7 +319,18 @@ void Context::DrawSurface()
   CxMemFile mfDest((BYTE*) apImg.Pixels(), apImg.Size());
   pImgFrame->AlphaFromTransparency();
   pImgFrame->Encode2RGBA(&mfDest, true);
-  _PreMultiplyAlpha(mfDest.GetBuffer(false), pImgFrame->GetWidth(), pImgFrame->GetHeight());
+/*
+  {
+    Apollo::TimeValue tvBegin = Apollo::TimeValue::getTime();
+    for (int i = 0; i < 10000; ++i) {
+      _PreMultiplyAlpha_mem_RGBA_to_cairo_ARGB_which_actually_is_BGRA_in_mem_on_little_endian(mfDest.GetBuffer(false), pImgFrame->GetWidth(), pImgFrame->GetHeight());
+    }
+    Apollo::TimeValue tvEnd = Apollo::TimeValue::getTime();
+    Apollo::TimeValue tvDelay = tvEnd - tvBegin;
+    apLog_Debug((LOG_CHANNEL, "############# 1", "usec=%d.%06d", tvDelay.Sec(), tvDelay.MicroSec()));
+  }
+*/
+  _PreMultiplyAlpha_mem_RGBA_to_cairo_ARGB_which_actually_is_BGRA_in_mem_on_little_endian(mfDest.GetBuffer(false), pImgFrame->GetWidth(), pImgFrame->GetHeight());
   cairo_surface_t *image = cairo_image_surface_create_for_data(mfDest.GetBuffer(false), CAIRO_FORMAT_ARGB32, pImgFrame->GetWidth(), pImgFrame->GetHeight(), pImgFrame->GetWidth() * 4);
 #endif // FROM_DATA
 
@@ -331,7 +346,7 @@ void Context::DrawSurface()
   cairo_text_extents(cr, text, &extents);
   cairo_set_line_width(cr, 1.0);
   int b = 3;
-  int text_x = 64, text_y = 90;
+  int text_x = 110, text_y = 100;
   cairo_move_to(cr, text_x, text_y);
   cairo_rel_move_to(cr, -b, +b);
   cairo_rel_line_to(cr, 0, -extents.height - 2*b);
