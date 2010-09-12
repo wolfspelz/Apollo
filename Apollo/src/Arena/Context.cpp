@@ -221,6 +221,7 @@ void Context::SizeSurface()
 }
 
 #if defined(_DEBUG)
+
 #include <cairo.h>
 #include <cairo-win32.h>
 #include "ximagif.h"
@@ -234,8 +235,9 @@ void _PreMultiplyAlpha_mem_RGBA_to_cairo_ARGB_which_actually_is_BGRA_in_mem_on_l
   int nH = _nH;
   for (int y = 0; y < nH; ++y) {
     for (int x = 0; x < nW ; ++x) {
+
       unsigned int color = *pPixel; // AABBGGRR
-      int a = (color & 0xff000000) >> 24;
+      unsigned int a = (color & 0xff000000) >> 24;
       unsigned int cairo_color = 
              (color & 0xff000000) // a
         | (( (color & 0x000000ff)        * a) & 0x0000ff00) << 8 // r
@@ -243,9 +245,11 @@ void _PreMultiplyAlpha_mem_RGBA_to_cairo_ARGB_which_actually_is_BGRA_in_mem_on_l
         | ((((color & 0x00ff0000) >> 16) * a) >> 8) // b
         ;
       *pPixel++ = cairo_color; // AARRGGBB
+
     }
   }
 }
+
 #endif
 
 void Context::DrawSurface()
