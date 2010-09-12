@@ -15,13 +15,14 @@ class SceneModule
 {
 public:
   SceneModule()
-    :nTheAnswer_(42)
     {}
 
   int Init();
   void Exit();
 
-  void On_Scene_Get(Msg_Scene_Get* pMsg);
+  void On_Scene_Create(Msg_Scene_Create* pMsg);
+  void On_Scene_Destroy(Msg_Scene_Destroy* pMsg);
+  void On_Scene_Position(Msg_Scene_Position* pMsg);
 
 #if defined(AP_TEST)
   void On_UnitTest_Begin(Msg_UnitTest_Begin* pMsg);
@@ -30,7 +31,6 @@ public:
 #endif
 
 public:
-  int nTheAnswer_;
 
   AP_MSG_REGISTRY_DECLARE;
 };
