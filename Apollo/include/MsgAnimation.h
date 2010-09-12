@@ -4,8 +4,8 @@
 //
 // ============================================================================
 
-#if !defined(MsgSample_h_INCLUDED)
-#define MsgSample_h_INCLUDED
+#if !defined(MsgAnimation_h_INCLUDED)
+#define MsgAnimation_h_INCLUDED
 
 #include "ApMessage.h"
 #include "Image.h"
@@ -153,4 +153,4 @@ public:
   ApIN String sGroup;
 };
 
-#endif // !defined(MsgSample_h_INCLUDED)
+#endif // !defined(MsgAnimation_h_INCLUDED)

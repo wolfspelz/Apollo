@@ -20,6 +20,7 @@
 #Test/BrowserInfo=1
 #Test/Arena=1
 #Test/Galileo=1
+#Test/Scene=1
 
 Update/Url=http://web.avatar.io/update/
 Update/Version=3.0.4
