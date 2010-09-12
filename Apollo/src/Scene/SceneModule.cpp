@@ -10,17 +10,18 @@
 #include "Local.h"
 #include "SceneModule.h"
 
-AP_MSG_HANDLER_METHOD(SceneModule, Scene_Get)
+AP_MSG_HANDLER_METHOD(SceneModule, Scene_Create)
 {
-  String sSomeConfigValue;
-  Msg_Config_GetValue msg;
-  msg.sPath = "path";
-  msg.Request();
-  sSomeConfigValue = msg.sValue;
+  pMsg->apStatus = ApMessage::Ok;
+}
 
-  sSomeConfigValue = Apollo::getConfig("path", "default");
+AP_MSG_HANDLER_METHOD(SceneModule, Scene_Destroy)
+{
+  pMsg->apStatus = ApMessage::Ok;
+}
 
-  pMsg->nValue = nTheAnswer_;
+AP_MSG_HANDLER_METHOD(SceneModule, Scene_Position)
+{
   pMsg->apStatus = ApMessage::Ok;
 }
 
@@ -55,7 +56,10 @@ int SceneModule::Init()
 {
   int ok = 1;
 
-  AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_Get, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_Create, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_Destroy, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_Position, this, ApCallbackPosNormal);
+
   AP_UNITTEST_HOOK(SceneModule, this);
 
   return ok;
