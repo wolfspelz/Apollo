@@ -96,4 +96,4 @@ public:
   ApIN int nAge;
 };
 
-#endif // !defined(MsgSample_h_INCLUDED)
+#endif // !defined(MsgGalileo_h_INCLUDED)
