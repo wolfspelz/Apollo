@@ -26,21 +26,22 @@ public:
 class Msg_Scene_Position: public ApRequestMessage
 {
 public:
-  enum { NoFlags = 0
-    ,Move = 1<<0
-    ,Size = 1<<1
-    ,Visibility = 1<<2
-  };
-
 public:
-  Msg_Scene_Position() : ApRequestMessage("Scene_Position"), nX(0), nY(0), nW(0), nH(0), bVisible(0), nFlags(0) {}
+  Msg_Scene_Position() : ApRequestMessage("Scene_Position"), nX(0), nY(0), nW(0), nH(0) {}
   ApIN ApHandle hScene;
   ApIN int nX;
   ApIN int nY;
   ApIN int nW;
   ApIN int nH;
+};
+
+class Msg_Scene_Visibility: public ApRequestMessage
+{
+public:
+public:
+  Msg_Scene_Visibility() : ApRequestMessage("Scene_Visibility"), bVisible(0) {}
+  ApIN ApHandle hScene;
   ApIN int bVisible;
-  ApIN int nFlags;
 };
 
 #endif // !defined(MsgScene_h_INCLUDED)

@@ -14,9 +14,13 @@ Context* ArenaModule::CreateContext(ApHandle hContext)
 {
   Context* pContext = new Context(hContext);
   if (pContext) {
-    pContext->CreateSurface();
-
-    contexts_.Set(hContext, pContext);
+    int ok = pContext->Create();
+    if (ok ) {
+      contexts_.Set(hContext, pContext);
+    } else {
+      delete pContext;
+      pContext = 0;
+    }
   }
   return pContext;
 }
@@ -25,6 +29,7 @@ void ArenaModule::DeleteContext(ApHandle hContext)
 {
   Context* pContext = FindContext(hContext);
   if (pContext) {
+    pContext->Destroy();
     contexts_.Unset(hContext);
     delete pContext;
     pContext = 0;

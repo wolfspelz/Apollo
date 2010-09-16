@@ -38,7 +38,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\..\include\cairo;../../src/CxImage/CxImage"
+				AdditionalIncludeDirectories=""
 				PreprocessorDefinitions="ARENA_EXPORTS"
 				DebugInformationFormat="4"
 			/>
@@ -53,8 +53,8 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="Apollo.lib cairo.lib cximagecrtdu.lib"
-				AdditionalLibraryDirectories="..\..\lib\cairo"
+				AdditionalDependencies="Apollo.lib"
+				AdditionalLibraryDirectories=""
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -105,7 +105,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\..\include\cairo"
+				AdditionalIncludeDirectories=""
 				PreprocessorDefinitions="ARENA_EXPORTS"
 				DebugInformationFormat="3"
 			/>
@@ -120,8 +120,8 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="Apollo.lib cairo.lib"
-				AdditionalLibraryDirectories="..\..\lib\cairo"
+				AdditionalDependencies="Apollo.lib"
+				AdditionalLibraryDirectories=""
 				GenerateDebugInformation="true"
 			/>
 			<Tool
