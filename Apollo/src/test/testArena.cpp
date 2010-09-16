@@ -177,7 +177,8 @@ static void Test_VpView_ReplayLocationPublicChat(Msg_VpView_ReplayLocationPublic
     msg.Send();
   }
 
-  //Test_Arena_InChangeOut_End();
+  // todo: remove me
+  Test_Arena_InChangeOut_End();
 }
 
 static void Test_Galileo_IsAnimationDataInStorage(Msg_Galileo_IsAnimationDataInStorage* pMsg)

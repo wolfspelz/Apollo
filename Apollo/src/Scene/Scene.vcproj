@@ -38,7 +38,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories=""
+				AdditionalIncludeDirectories="..\..\include\cairo;..\..\src\CxImage\CxImage"
 				PreprocessorDefinitions="SCENE_EXPORTS"
 				DebugInformationFormat="4"
 			/>
@@ -53,7 +53,8 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="Apollo.lib"
+				AdditionalDependencies="Apollo.lib cairo.lib cximagecrtdu.lib"
+				AdditionalLibraryDirectories="..\..\lib\cairo"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -164,6 +165,10 @@
 				RelativePath=".\SceneModule.cpp"
 				>
 			</File>
+			<File
+				RelativePath=".\Surface.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -180,6 +185,10 @@
 			</File>
 			<File
 				RelativePath=".\SceneModule.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Surface.h"
 				>
 			</File>
 		</Filter>
