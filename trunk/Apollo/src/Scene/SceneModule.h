@@ -30,11 +30,15 @@ public:
   void On_Scene_Destroy(Msg_Scene_Destroy* pMsg);
   void On_Scene_Position(Msg_Scene_Position* pMsg);
   void On_Scene_Visibility(Msg_Scene_Visibility* pMsg);
+  void On_Scene_Rectangle(Msg_Scene_Rectangle* pMsg);
+  void On_Scene_Draw(Msg_Scene_Draw* pMsg);
 
 #if defined(AP_TEST)
   void On_UnitTest_Begin(Msg_UnitTest_Begin* pMsg);
   void On_UnitTest_Execute(Msg_UnitTest_Execute* pMsg);
   void On_UnitTest_End(Msg_UnitTest_End* pMsg);
+
+  String TestRectangle();
 #endif
 
 protected:

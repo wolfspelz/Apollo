@@ -7,6 +7,12 @@
 #if !defined(Surface_H_INCLUDED)
 #define Surface_H_INCLUDED
 
+#include "Element.h"
+
+typedef StringPointerTree<Element*> ElementList;
+typedef StringPointerTreeNode<Element*> ElementNode;
+typedef StringPointerTreeIterator<Element*> ElementIterator;
+
 class Surface
 {
 public:
@@ -17,6 +23,12 @@ public:
   void Destroy();
   void SetPosition(int nX, int nY, int nW, int nH);
   void SetVisibility(int bVisible);
+  void SetRectangle(
+    const String& sPath,
+    int bFill, double fFillRed, double fFillGreen, double fFillBlue, double fFillAlpha,
+    int bStroke, double fStrokeWidth, double fStrokeRed, double fStrokeGreen, double fStrokeBlue, double fStrokeAlpha,
+    double fX, double fY, double fW, double fH
+  );
   void Draw();
 
 #if defined(WIN32)
@@ -31,6 +43,8 @@ protected:
   int nY_;
   int nW_;
   int nH_;
+
+  ElementList graph_;
 
 #if defined(WIN32)
   static int nCntWindows_;

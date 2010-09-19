@@ -234,14 +234,30 @@ void Surface::SetVisibility(int bVisible)
 
 //------------------------------------
 
+void Surface::SetRectangle(
+    const String& sPath,
+    int bFill, double fFillRed, double fFillGreen, double fFillBlue, double fFillAlpha,
+    int bStroke, double fStrokeWidth, double fStrokeRed, double fStrokeGreen, double fStrokeBlue, double fStrokeAlpha,
+    double fX, double fY, double fW, double fH
+  )
+{
+  RectangleX* pShape = new RectangleX(
+    bFill, fFillRed, fFillGreen, fFillBlue, fFillAlpha,
+    bStroke, fStrokeWidth,  fStrokeRed, fStrokeGreen, fStrokeBlue, fStrokeAlpha,
+    fX, fY, fW, fH
+  );
+
+  graph_.Set(sPath, pShape);
+}
+
+//------------------------------------
+
 #if defined(_DEBUG)
 
-#include <cairo.h>
-#include <cairo-win32.h>
 #include "ximagif.h"
 #include "Image.h"
 
-// (component * alpha) / 255.0; //would be correct but slower
+// (component * alpha) / 255.0 would be correct but slower
 void _PreMultiplyAlpha_mem_RGBA_to_cairo_ARGB_which_actually_is_BGRA_in_mem_on_little_endian(unsigned char* _pPixel, int _nW, int _nH)
 {
   unsigned int* pPixel = (unsigned int*) _pPixel;
@@ -269,6 +285,7 @@ void _PreMultiplyAlpha_mem_RGBA_to_cairo_ARGB_which_actually_is_BGRA_in_mem_on_l
 void Surface::Draw()
 {
   if (hBitmap_ == NULL) { return; }
+//  if (!bVisible_) { return; }
 
   int nW = nW_;
   int nH = nH_;
@@ -278,10 +295,19 @@ void Surface::Draw()
 
   HBITMAP hOldBitmap = (HBITMAP) ::SelectObject(dcMemory, hBitmap_);
 
-#if defined(_DEBUG)
-  #define M_PI 3.14159265358979323
   cairo_surface_t *surface = cairo_win32_surface_create(dcMemory);
   cairo_t *cr = cairo_create(surface);
+
+  ElementIterator iter(graph_);
+  for (ElementNode* pNode = 0; pNode = iter.Next(); ) {
+    Element* pElement = pNode->Value();
+    if (pElement != 0) {
+      pElement->Draw(cr);
+    }
+  }
+
+#if defined(_DEBUG) && 1
+  #define M_PI 3.14159265358979323
 
   double xc = 128.0;
   double yc = 128.0;
@@ -354,14 +380,16 @@ void Surface::Draw()
 
   int w = cairo_image_surface_get_width(image);
   int h = cairo_image_surface_get_height(image);
-  cairo_scale(cr, 100.0/w, 100.0/h);
+  //cairo_scale(cr, 100.0/w, 100.0/h);
   cairo_set_source_surface(cr, image, 0, 0);
   cairo_paint(cr);
+
   cairo_select_font_face(cr, "Verdana", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
   cairo_set_font_size(cr, 32.0);
   const char* text = "Tassadar";
   cairo_text_extents_t extents;
   cairo_text_extents(cr, text, &extents);
+
   cairo_set_line_width(cr, 1.0);
   int b = 3;
   int text_x = 110, text_y = 100;
@@ -373,6 +401,7 @@ void Surface::Draw()
   cairo_rel_line_to(cr, -extents.width - 2*b, 0);
   cairo_set_source_rgba(cr, 1.0, 1.0, 1.0, 0.3);
   cairo_fill(cr);
+
   cairo_move_to(cr, text_x + 0.5, text_y + 0.5);
   cairo_rel_move_to(cr, -b, +b);
   cairo_rel_line_to(cr, 0, -extents.height - 2*b);
@@ -381,14 +410,17 @@ void Surface::Draw()
   cairo_rel_line_to(cr, -extents.width - 2*b, 0);
   cairo_set_source_rgba(cr, 0.6, 0.8, 0.2, 1.0);
   cairo_stroke(cr);
+
   cairo_move_to(cr, text_x, text_y);
   //cairo_show_text(cr, text);
   cairo_text_path(cr, text);
   cairo_set_source_rgba(cr, 0.0, 0.0, 0.0, 0.5);
   cairo_fill(cr);
 
-  cairo_destroy(cr); 
-  cairo_surface_destroy(surface);
+  cairo_rectangle(cr, 0, 0, 100, 100);
+  cairo_set_source_rgba(cr, 1.0, 0.0, 0.0, 0.5);
+  cairo_fill(cr);
+
 #endif
 
   // setup the blend function
@@ -417,7 +449,10 @@ void Surface::Draw()
       ULW_ALPHA
       );
 
-	// clean up
+  cairo_destroy(cr); 
+  cairo_surface_destroy(surface);
+
+  // clean up
   ::SelectObject(dcMemory, hOldBitmap);
 
   ::DeleteDC(dcMemory);
