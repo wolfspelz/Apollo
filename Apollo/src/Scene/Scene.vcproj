@@ -158,6 +158,10 @@
 			UniqueIdentifier="{4AAB929A-F4AC-42a9-931D-4FC71881CEF3}"
 			>
 			<File
+				RelativePath=".\Element.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Scene.cpp"
 				>
 			</File>
@@ -175,6 +179,10 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{CB8D0B81-4C4B-442d-9EEC-B18302AB3F2E}"
 			>
+			<File
+				RelativePath=".\Element.h"
+				>
+			</File>
 			<File
 				RelativePath=".\Local.h"
 				>
