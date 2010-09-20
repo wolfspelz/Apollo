@@ -152,7 +152,7 @@ String SceneModule::TestRectangle()
     Msg_Scene_Position msg;
     msg.hScene = hScene;
     msg.nX = 100;
-    msg.nY = 100;
+    msg.nY = 400;
     msg.nW = 300;
     msg.nH = 300;
     msg.Request();
@@ -169,8 +169,8 @@ String SceneModule::TestRectangle()
     Msg_Scene_Rectangle msg;
     msg.hScene = hScene;
     msg.sPath = "/rect1";
-    msg.fX = 0;
-    msg.fY = 0;
+    msg.fX = 10;
+    msg.fY = 10;
     msg.fW = 100;
     msg.fH = 100;
     msg.bFill = 1;
@@ -178,12 +178,12 @@ String SceneModule::TestRectangle()
     msg.fFillGreen = 0;
     msg.fFillBlue = 0;
     msg.fFillAlpha = 0.5;
-    //msg.bStroke = 0;
-    //msg.fStrokeWidth = 3;
-    //msg.fStrokeRed = 0;
-    //msg.fStrokeGreen = 0;
-    //msg.fStrokeBlue = 1;
-    //msg.fStrokeAlpha = 0.5;
+    msg.bStroke = 1;
+    msg.fStrokeWidth = 10;
+    msg.fStrokeRed = 0;
+    msg.fStrokeGreen = 0;
+    msg.fStrokeBlue = 1;
+    msg.fStrokeAlpha = 0.5;
     msg.Request();
   }
 
@@ -195,6 +195,7 @@ String SceneModule::TestRectangle()
 
   if (0) {
     Msg_Scene_Destroy msg;
+    msg.hScene = hScene;
     msg.Request();
   }
 
