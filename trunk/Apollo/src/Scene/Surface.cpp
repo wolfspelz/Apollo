@@ -210,7 +210,9 @@ void Surface::SetPosition(int nX, int nY, int nW, int nH)
 
     ::ReleaseDC(NULL, dcScreen);
 
-    Draw();
+    if (bVisible_) {
+      Draw();
+    }
 
   } else {
     if (bMove) {
@@ -226,6 +228,11 @@ void Surface::SetVisibility(int bVisible)
   bVisible_ = bVisible;
 
   if (bChanged) {
+
+    if (bVisible_) {
+      Draw();
+    }
+
 #if defined(WIN32)
     ::ShowWindow(hWnd_, bVisible_ ? SW_SHOW : SW_HIDE);
 #endif // WIN32
@@ -305,8 +312,11 @@ void Surface::Draw()
       pElement->Draw(cr);
     }
   }
+  //cairo_rectangle(cr, 0, 0, 100, 100);
+  //cairo_set_source_rgba(cr, 1.0, 0.0, 0.0, 0.5);
+  //cairo_fill(cr);
 
-#if defined(_DEBUG) && 1
+#if defined(_DEBUG) && 0
   #define M_PI 3.14159265358979323
 
   double xc = 128.0;
@@ -415,10 +425,6 @@ void Surface::Draw()
   //cairo_show_text(cr, text);
   cairo_text_path(cr, text);
   cairo_set_source_rgba(cr, 0.0, 0.0, 0.0, 0.5);
-  cairo_fill(cr);
-
-  cairo_rectangle(cr, 0, 0, 100, 100);
-  cairo_set_source_rgba(cr, 1.0, 0.0, 0.0, 0.5);
   cairo_fill(cr);
 
 #endif
