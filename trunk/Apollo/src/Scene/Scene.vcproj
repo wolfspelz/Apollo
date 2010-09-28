@@ -170,6 +170,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\SceneModuleTester.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Surface.cpp"
 				>
 			</File>
@@ -193,6 +197,10 @@
 			</File>
 			<File
 				RelativePath=".\SceneModule.h"
+				>
+			</File>
+			<File
+				RelativePath=".\SceneModuleTester.h"
 				>
 			</File>
 			<File

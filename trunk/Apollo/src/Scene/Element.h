@@ -7,24 +7,29 @@
 #if !defined(Element_H_INCLUDED)
 #define Element_H_INCLUDED
 
+#include "Apollo.h"
+
+#if defined(AP_TEST)
+#include "SceneModuleTester.h"
+#endif // #if defined(AP_TEST)
+
+
 #include <cairo.h>
 #include <cairo-win32.h>
 
-class Color
+typedef struct _Color
 {
-public:
-  Color(double r, double g, double b, double a)
-    :r_(r)
-    ,g_(g)
-    ,b_(b)
-    ,a_(a)
-  {}
+  double r;
+  double g;
+  double b;
+  double a;
+} Color;
 
-  double r_;
-  double g_;
-  double b_;
-  double a_;
-};
+class Element;
+
+typedef StringPointerTree<Element*> ElementList;
+typedef StringPointerTreeNode<Element*> ElementNode;
+typedef StringPointerTreeIterator<Element*> ElementIterator;
 
 class Element
 {
@@ -32,59 +37,75 @@ public:
   Element() {}
   virtual ~Element() {}
 
+  virtual void DrawAll(cairo_t* cr);
   virtual void Draw(cairo_t* cr) = 0;
 
+  Element* FindElement(const String& sPath);
+  void AddElement(const String& sPath, Element* pElement);
+
 protected:
+  ElementList list_;
+
+#if defined(AP_TEST)
+  friend class SceneModuleTester;
+#endif
+};
+
+class Node: public Element
+{
+public:
+  Node() {}
+  virtual ~Node() {}
+
+  void Draw(cairo_t* cr) {}
+
+#if defined(AP_TEST)
+  friend class SceneModuleTester;
+#endif
 };
 
 class Shape: public Element
 {
 public:
-  Shape(
-    bool bFill, float fFillColorRed, float fFillColorGreen, float fFillColorBlue, float fFillColorAlpha, 
-    bool bStroke, float fStrokeWidth, float fStrokeColorRed, float fStrokeColorGreen, float fStrokeColorBlue, float fStrokeColorAlpha
-    )
-    :fill(bFill) ,fill_color(fFillColorRed, fFillColorGreen, fFillColorBlue, fFillColorAlpha)
-    ,stroke(bStroke) ,stroke_width(fStrokeWidth) ,stroke_color(fStrokeColorRed, fStrokeColorGreen, fStrokeColorBlue, fStrokeColorAlpha)
+  Shape()
+    :bFillColor_(false)
+    ,bStrokeColor_(false)
   {}
   virtual ~Shape() {}
+
+  void SetFillColor(float fRed, float fGreen, float fBlue, float fAlpha);
+  void SetStrokeColor(float fWidth, float fRed, float fGreen, float fBlue, float fAlpha);
 
   void Draw(cairo_t* cr) = 0;
 
 protected:
-  bool fill;
-  Color fill_color;
-  bool stroke;
-  Color stroke_color;
-  double stroke_width;
+  bool bFillColor_;
+  Color cFill_;
+  bool bStrokeColor_;
+  Color cStroke_;
+  double fStrokeWidth_;
 };
 
 class RectangleX: public Shape
 {
 public:
-  RectangleX(
-    bool bFill, float fFillColorRed, float fFillColorGreen, float fFillColorBlue, float fFillColorAlpha, 
-    bool bStroke, float fStrokeWidth, float fStrokeColorRed, float fStrokeColorGreen, float fStrokeColorBlue, float fStrokeColorAlpha,
-    float fX, float fY, float fW, float fH
-    )
-    :Shape(
-      bFill, fFillColorRed, fFillColorGreen, fFillColorBlue, fFillColorAlpha, 
-      bStroke, fStrokeWidth, fStrokeColorRed, fStrokeColorGreen, fStrokeColorBlue, fStrokeColorAlpha
-    )
-    ,x_(fX)
-    ,y_(fY)
-    ,width_(fW)
-    ,height_(fH)
+  RectangleX(float fX, float fY, float fW, float fH)
+    :fX_(fX)
+    ,fY_(fY)
+    ,fW_(fW)
+    ,fH_(fH)
   {}
   virtual ~RectangleX() {}
+
+  void SetCoordinates(float fX, float fY, float fW, float fH) { fX_ = fX; fY_ = fY; fW_ = fW; fH_ = fH; }
 
   void Draw(cairo_t* cr);
 
 protected:
-  double x_;
-  double y_;
-  double width_;
-  double height_;
+  double fX_;
+  double fY_;
+  double fW_;
+  double fH_;
 };
 
 #endif // Element_H_INCLUDED
