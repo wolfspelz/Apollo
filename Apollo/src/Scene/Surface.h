@@ -9,10 +9,6 @@
 
 #include "Element.h"
 
-typedef StringPointerTree<Element*> ElementList;
-typedef StringPointerTreeNode<Element*> ElementNode;
-typedef StringPointerTreeIterator<Element*> ElementIterator;
-
 class Surface
 {
 public:
@@ -23,12 +19,14 @@ public:
   void Destroy();
   void SetPosition(int nX, int nY, int nW, int nH);
   void SetVisibility(int bVisible);
-  void SetRectangle(
-    const String& sPath,
-    int bFill, double fFillRed, double fFillGreen, double fFillBlue, double fFillAlpha,
-    int bStroke, double fStrokeWidth, double fStrokeRed, double fStrokeGreen, double fStrokeBlue, double fStrokeAlpha,
-    double fX, double fY, double fW, double fH
-  );
+  
+  Element* FindElement(const String& sPath, bool bExceptionOnFail = true);
+  void DeleteElement(const String& sPath);
+
+  void Rectangle(const String& sPath, double fX, double fY, double fW, double fH);
+  void SetFillColor(const String& sPath, double fRed, double fGreen, double fBlue, double fAlpha);
+  void SetStrokeColor(const String& sPath, double fWidth, double fRed, double fGreen, double fBlue, double fAlpha);
+  
   void Draw();
 
 #if defined(WIN32)
@@ -44,7 +42,7 @@ protected:
   int nW_;
   int nH_;
 
-  ElementList graph_;
+  Node root_;
 
 #if defined(WIN32)
   static int nCntWindows_;

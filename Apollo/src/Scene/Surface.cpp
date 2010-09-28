@@ -241,20 +241,75 @@ void Surface::SetVisibility(int bVisible)
 
 //------------------------------------
 
-void Surface::SetRectangle(
-    const String& sPath,
-    int bFill, double fFillRed, double fFillGreen, double fFillBlue, double fFillAlpha,
-    int bStroke, double fStrokeWidth, double fStrokeRed, double fStrokeGreen, double fStrokeBlue, double fStrokeAlpha,
-    double fX, double fY, double fW, double fH
-  )
+Element* Surface::FindElement(const String& sPath, bool bExceptionOnFail)
 {
-  RectangleX* pShape = new RectangleX(
-    bFill, fFillRed, fFillGreen, fFillBlue, fFillAlpha,
-    bStroke, fStrokeWidth,  fStrokeRed, fStrokeGreen, fStrokeBlue, fStrokeAlpha,
-    fX, fY, fW, fH
-  );
+  String sElement = sPath;
+  while (sElement.startsWith("/")) { sElement = sElement.subString(1); }
+  while (sElement.endsWith("/")) { sElement = sElement.subString(0, sElement.chars() - 1); }
 
-  graph_.Set(sPath, pShape);
+  Element* pElement = root_.FindElement(sElement);
+
+  if (bExceptionOnFail) {
+    if (pElement == 0) { throw ApException("Surface::FindElement scene=" ApHandleFormat " no element=%s", ApHandleType(hAp_), StringType(sPath)); }
+  }
+  return pElement;
+}
+
+//void Surface::AddElement(const String& sPath, Element* pElement)
+//{
+//  String sElement = sPath;
+//  while (sElement.startsWith("/")) { sElement = sElement.subString(1); }
+//  while (sElement.endsWith("/")) { sElement = sElement.subString(0, sElement.chars() - 1); }
+//
+//  String sPart;
+//  if (sElement.nextToken("/", sPart)) {
+//    if (sElement.empty()) {
+//      list_.Set(sPart, pElement);
+//    } else {
+//      
+//    }
+//  }
+//
+//}
+//
+//------------------------------------
+
+void Surface::Rectangle(const String& sPath, double fX, double fY, double fW, double fH)
+{
+  String sElement = sPath;
+  while (sElement.startsWith("/")) { sElement = sElement.subString(1); }
+
+  RectangleX* pElement = (RectangleX*) FindElement(sElement, false);
+  if (pElement != 0) {
+    pElement->SetCoordinates(fX, fY, fW, fH);
+  } else {
+
+    //pElement = new RectangleX(fX, fY, fW, fH);
+    //if (pElement) {
+    //  graph_.Add(sElement, pElement);
+    //}
+
+  }
+}
+
+void Surface::SetFillColor(const String& sPath, double fRed, double fGreen, double fBlue, double fAlpha)
+{
+  Shape* pShape = (Shape*) FindElement(sPath);
+  pShape->SetFillColor(fRed, fGreen, fBlue, fAlpha);
+}
+
+void Surface::SetStrokeColor(const String& sPath, double fWidth, double fRed, double fGreen, double fBlue, double fAlpha)
+{
+  Shape* pShape = (Shape*) FindElement(sPath);
+  pShape->SetStrokeColor(fWidth, fRed, fGreen, fBlue, fAlpha);
+}
+
+void Surface::DeleteElement(const String& sPath)
+{
+  //Shape* pShape = (Shape*) FindElement(sPath);
+  //graph_.Unset(sPath);
+  //delete pShape;
+  //pShape = 0;
 }
 
 //------------------------------------
@@ -305,13 +360,11 @@ void Surface::Draw()
   cairo_surface_t *surface = cairo_win32_surface_create(dcMemory);
   cairo_t *cr = cairo_create(surface);
 
-  ElementIterator iter(graph_);
-  for (ElementNode* pNode = 0; pNode = iter.Next(); ) {
-    Element* pElement = pNode->Value();
-    if (pElement != 0) {
-      pElement->Draw(cr);
-    }
-  }
+  //cairo_translate(cr, 0, 200);
+  //cairo_scale(cr, 1.0, -1.0);
+  
+  root_.DrawAll(cr);
+
   //cairo_rectangle(cr, 0, 0, 100, 100);
   //cairo_set_source_rgba(cr, 1.0, 0.0, 0.0, 0.5);
   //cairo_fill(cr);
