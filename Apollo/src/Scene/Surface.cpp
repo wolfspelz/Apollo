@@ -317,8 +317,6 @@ void _PreMultiplyAlpha_mem_RGBA_to_cairo_ARGB_which_actually_is_BGRA_in_mem_on_l
 
 #endif
 
-int nCnt = 0;
-
 void Surface::Draw()
 {
   if (hBitmap_ == NULL) { return; }
@@ -335,15 +333,28 @@ void Surface::Draw()
   cairo_surface_t *surface = cairo_win32_surface_create(dcMemory);
   cairo_t *cr = cairo_create(surface);
 
+  unsigned char* pPixel = pBits_;
+  for (int y = 0; y < nH; ++y) {
+    for (int x = 0; x < nW ; ++x) {
+      *pPixel++ = 0;
+      *pPixel++ = 0;
+      *pPixel++ = 0;
+      *pPixel++ = 0;
+    }
+  }
+
+  //cairo_rectangle(cr, 0, 0, nW, nH);
+  //cairo_set_source_rgba(cr, 0.0, 0.0, 0.0, 0.0);
+  //cairo_fill(cr);
+
   //cairo_translate(cr, 0, 200);
   //cairo_scale(cr, 1.0, -1.0);
-  
+
   root_.Draw(cr);
 
-  if (nCnt == 0) {
-    nCnt++;
-    cairo_rectangle(cr, 100, 100, 100, 100);
-    cairo_set_source_rgba(cr, 1.0, 0.0, 0.0, 0.99);
+  if (0) {
+    cairo_rectangle(cr, 50, 50, 100, 100);
+    cairo_set_source_rgba(cr, 1.0, 0.0, 0.0, 0.5);
     cairo_fill(cr);
   }
 

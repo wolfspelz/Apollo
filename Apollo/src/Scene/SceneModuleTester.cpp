@@ -126,19 +126,6 @@ String SceneModuleTester::Rectangle()
     if (!msg.Request()) { s = "Msg_Scene_Draw failed"; }
   }
 
-  if (!s) {
-    Msg_Scene_DeleteElement msg;
-    msg.hScene = hScene;
-    msg.sPath = "/rect1";
-    if (!msg.Request()) { s = "Msg_Scene_DeleteElement failed"; }
-  }
-
-  if (!s) {
-    Msg_Scene_Draw msg;
-    msg.hScene = hScene;
-    if (!msg.Request()) { s = "Msg_Scene_Draw failed"; }
-  }
-
   if (0) {
     Msg_Scene_Destroy msg;
     msg.hScene = hScene;
