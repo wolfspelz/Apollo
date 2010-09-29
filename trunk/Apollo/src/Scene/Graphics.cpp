@@ -38,6 +38,7 @@ void Shape::SetStrokeWidth(float fWidth)
 void RectangleX::Draw(cairo_t* cr)
 {
   cairo_rectangle(cr, fX_, fY_, fW_, fH_);
+
   if (bFillColor_) {
     cairo_set_source_rgba(cr, cFill_.r, cFill_.g, cFill_.b, cFill_.a > 0.99 ? 0.99 : cFill_.a);
     if (bStrokeColor_) {
@@ -46,6 +47,7 @@ void RectangleX::Draw(cairo_t* cr)
       cairo_fill(cr);
     }
   }
+
   if (bStrokeColor_) {
     cairo_set_line_width(cr, fStrokeWidth_);
     cairo_set_source_rgba(cr, cStroke_.r, cStroke_.g, cStroke_.b, cStroke_.a > 0.99 ? 0.99 : cStroke_.a);
