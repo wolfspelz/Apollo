@@ -42,10 +42,26 @@ public:
   ApIN int bVisible;
 };
 
-class Msg_Scene_Rectangle: public ApRequestMessage
+class Msg_Scene_CreateElement: public ApRequestMessage
 {
 public:
-  Msg_Scene_Rectangle() : ApRequestMessage("Scene_Rectangle"), fX(0), fY(0), fW(0), fH(0) {}
+  Msg_Scene_CreateElement() : ApRequestMessage("Scene_CreateElement") {}
+  ApIN ApHandle hScene;
+  ApIN String sPath;
+};
+
+class Msg_Scene_DeleteElement: public ApRequestMessage
+{
+public:
+  Msg_Scene_DeleteElement() : ApRequestMessage("Scene_DeleteElement") {}
+  ApIN ApHandle hScene;
+  ApIN String sPath;
+};
+
+class Msg_Scene_SetRectangle: public ApRequestMessage
+{
+public:
+  Msg_Scene_SetRectangle() : ApRequestMessage("Scene_SetRectangle"), fX(0), fY(0), fW(0), fH(0) {}
   ApIN ApHandle hScene;
   ApIN String sPath;
   ApIN double fX;
@@ -69,22 +85,22 @@ public:
 class Msg_Scene_SetStrokeColor: public ApRequestMessage
 {
 public:
-  Msg_Scene_SetStrokeColor() : ApRequestMessage("Scene_SetStrokeColor"), fWidth(1.0), fRed(0.0), fGreen(0.0), fBlue(0.0), fAlpha(1.0) {}
+  Msg_Scene_SetStrokeColor() : ApRequestMessage("Scene_SetStrokeColor"), fRed(0.0), fGreen(0.0), fBlue(0.0), fAlpha(1.0) {}
   ApIN ApHandle hScene;
   ApIN String sPath;
-  ApIN double fWidth;
   ApIN double fRed;
   ApIN double fGreen;
   ApIN double fBlue;
   ApIN double fAlpha;
 };
 
-class Msg_Scene_DeleteElement: public ApRequestMessage
+class Msg_Scene_SetStrokeWidth: public ApRequestMessage
 {
 public:
-  Msg_Scene_DeleteElement() : ApRequestMessage("Scene_DeleteElement") {}
+  Msg_Scene_SetStrokeWidth() : ApRequestMessage("Scene_SetStrokeWidth"), fWidth(1.0) {}
   ApIN ApHandle hScene;
   ApIN String sPath;
+  ApIN double fWidth;
 };
 
 class Msg_Scene_Draw: public ApRequestMessage

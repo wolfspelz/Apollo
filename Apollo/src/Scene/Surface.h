@@ -20,13 +20,15 @@ public:
   void SetPosition(int nX, int nY, int nW, int nH);
   void SetVisibility(int bVisible);
   
-  Element* FindElement(const String& sPath, bool bExceptionOnFail = true);
+  Element* FindElement(const String& sPath);
+  void CreateElement(const String& sPath);
   void DeleteElement(const String& sPath);
 
-  void Rectangle(const String& sPath, double fX, double fY, double fW, double fH);
+  void SetRectangle(const String& sPath, double fX, double fY, double fW, double fH);
   void SetFillColor(const String& sPath, double fRed, double fGreen, double fBlue, double fAlpha);
-  void SetStrokeColor(const String& sPath, double fWidth, double fRed, double fGreen, double fBlue, double fAlpha);
-  
+  void SetStrokeColor(const String& sPath, double fRed, double fGreen, double fBlue, double fAlpha);
+  void SetStrokeWidth(const String& sPath, double fWidth);
+
   void Draw();
 
 #if defined(WIN32)
@@ -42,7 +44,7 @@ protected:
   int nW_;
   int nH_;
 
-  Node root_;
+  Element root_;
 
 #if defined(WIN32)
   static int nCntWindows_;

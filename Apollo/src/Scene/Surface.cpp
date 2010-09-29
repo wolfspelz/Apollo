@@ -8,6 +8,7 @@
 #include "ApLog.h"
 #include "Local.h"
 #include "Surface.h"
+#include "Graphics.h"
 #if defined(WIN32)
 #include "MsgMainLoop.h"
 #endif // WIN32
@@ -241,75 +242,47 @@ void Surface::SetVisibility(int bVisible)
 
 //------------------------------------
 
-Element* Surface::FindElement(const String& sPath, bool bExceptionOnFail)
+Element* Surface::FindElement(const String& sPath)
 {
-  String sElement = sPath;
-  while (sElement.startsWith("/")) { sElement = sElement.subString(1); }
-  while (sElement.endsWith("/")) { sElement = sElement.subString(0, sElement.chars() - 1); }
+  String sFixedPath = sPath; sFixedPath.trim("/");
+  Element* pElement = root_.FindElement(sFixedPath);
+  if (pElement == 0) { throw ApException("Surface::FindElement scene=" ApHandleFormat " no element=%s", ApHandleType(hAp_), StringType(sPath)); }
 
-  Element* pElement = root_.FindElement(sElement);
-
-  if (bExceptionOnFail) {
-    if (pElement == 0) { throw ApException("Surface::FindElement scene=" ApHandleFormat " no element=%s", ApHandleType(hAp_), StringType(sPath)); }
-  }
   return pElement;
 }
 
-//void Surface::AddElement(const String& sPath, Element* pElement)
-//{
-//  String sElement = sPath;
-//  while (sElement.startsWith("/")) { sElement = sElement.subString(1); }
-//  while (sElement.endsWith("/")) { sElement = sElement.subString(0, sElement.chars() - 1); }
-//
-//  String sPart;
-//  if (sElement.nextToken("/", sPart)) {
-//    if (sElement.empty()) {
-//      list_.Set(sPart, pElement);
-//    } else {
-//      
-//    }
-//  }
-//
-//}
-//
-//------------------------------------
-
-void Surface::Rectangle(const String& sPath, double fX, double fY, double fW, double fH)
+void Surface::CreateElement(const String& sPath)
 {
-  String sElement = sPath;
-  while (sElement.startsWith("/")) { sElement = sElement.subString(1); }
-
-  RectangleX* pElement = (RectangleX*) FindElement(sElement, false);
-  if (pElement != 0) {
-    pElement->SetCoordinates(fX, fY, fW, fH);
-  } else {
-
-    //pElement = new RectangleX(fX, fY, fW, fH);
-    //if (pElement) {
-    //  graph_.Add(sElement, pElement);
-    //}
-
-  }
-}
-
-void Surface::SetFillColor(const String& sPath, double fRed, double fGreen, double fBlue, double fAlpha)
-{
-  Shape* pShape = (Shape*) FindElement(sPath);
-  pShape->SetFillColor(fRed, fGreen, fBlue, fAlpha);
-}
-
-void Surface::SetStrokeColor(const String& sPath, double fWidth, double fRed, double fGreen, double fBlue, double fAlpha)
-{
-  Shape* pShape = (Shape*) FindElement(sPath);
-  pShape->SetStrokeColor(fWidth, fRed, fGreen, fBlue, fAlpha);
+  String sFixedPath = sPath; sFixedPath.trim("/");
+  if (!root_.CreateElement(sFixedPath)) { throw ApException("Surface::CreateElement scene=" ApHandleFormat " root_.CreateElement(%s) failed", ApHandleType(hAp_), StringType(sPath)); }
 }
 
 void Surface::DeleteElement(const String& sPath)
 {
-  //Shape* pShape = (Shape*) FindElement(sPath);
-  //graph_.Unset(sPath);
-  //delete pShape;
-  //pShape = 0;
+  String sFixedPath = sPath; sFixedPath.trim("/");
+  if (!root_.DeleteElement(sFixedPath)) { throw ApException("Surface::DeleteElement scene=" ApHandleFormat " root_.DeleteElement(%s) failed", ApHandleType(hAp_), StringType(sPath)); }
+}
+
+//------------------------------------
+
+void Surface::SetRectangle(const String& sPath, double fX, double fY, double fW, double fH)
+{
+  FindElement(sPath)->SetRectangle(fX, fY, fW, fH);
+}
+
+void Surface::SetFillColor(const String& sPath, double fRed, double fGreen, double fBlue, double fAlpha)
+{
+  FindElement(sPath)->SetFillColor(fRed, fGreen, fBlue, fAlpha);
+}
+
+void Surface::SetStrokeColor(const String& sPath, double fRed, double fGreen, double fBlue, double fAlpha)
+{
+  FindElement(sPath)->SetStrokeColor(fRed, fGreen, fBlue, fAlpha);
+}
+
+void Surface::SetStrokeWidth(const String& sPath, double fWidth)
+{
+  FindElement(sPath)->SetStrokeWidth(fWidth);
 }
 
 //------------------------------------
@@ -344,6 +317,8 @@ void _PreMultiplyAlpha_mem_RGBA_to_cairo_ARGB_which_actually_is_BGRA_in_mem_on_l
 
 #endif
 
+int nCnt = 0;
+
 void Surface::Draw()
 {
   if (hBitmap_ == NULL) { return; }
@@ -363,11 +338,14 @@ void Surface::Draw()
   //cairo_translate(cr, 0, 200);
   //cairo_scale(cr, 1.0, -1.0);
   
-  root_.DrawAll(cr);
+  root_.Draw(cr);
 
-  //cairo_rectangle(cr, 0, 0, 100, 100);
-  //cairo_set_source_rgba(cr, 1.0, 0.0, 0.0, 0.5);
-  //cairo_fill(cr);
+  if (nCnt == 0) {
+    nCnt++;
+    cairo_rectangle(cr, 100, 100, 100, 100);
+    cairo_set_source_rgba(cr, 1.0, 0.0, 0.0, 0.99);
+    cairo_fill(cr);
+  }
 
 #if defined(_DEBUG) && 0
   #define M_PI 3.14159265358979323

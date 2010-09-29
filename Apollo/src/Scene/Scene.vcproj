@@ -162,6 +162,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Graphics.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Scene.cpp"
 				>
 			</File>
@@ -185,6 +189,10 @@
 			>
 			<File
 				RelativePath=".\Element.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Graphics.h"
 				>
 			</File>
 			<File
