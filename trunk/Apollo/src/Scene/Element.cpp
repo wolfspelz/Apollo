@@ -9,99 +9,168 @@
 #include "Local.h"
 #include "Element.h"
 
+Element::~Element()
+{
+  if (pGraphics_) {
+    delete pGraphics_;
+    pGraphics_ = 0;
+  }
+  if (pChildren_) {
+    delete pChildren_;
+    pChildren_ = 0;
+  }
+}
+
 Element* Element::FindElement(const String& sPath)
 {
   Element* pResult = 0;
 
-  String sElement = sPath;
-  String sPart;
-  if (sElement.nextToken("/", sPart)) {
-    Element* pElement = 0;
-    list_.Get(sElement, pElement);
-    if (sElement.empty()) {
-      pResult = pElement;
-    } else {
-      pResult = pElement->FindElement(sElement);
+  if (pChildren_) {
+    String sElement = sPath;
+    String sPart;
+    if (sElement.nextToken("/", sPart)) {
+      ElementNode* pNode = pChildren_->Find(sPart);
+      if (pNode) {
+        Element* pElement = pNode->Value();
+        if (sElement.empty()) {
+          pResult = pElement;
+        } else {
+          pResult = pElement->FindElement(sElement);
+        }
+      }
     }
   }
 
   return pResult;
 }
 
-void Element::AddElement(const String& sPath, Element* pElement)
+int Element::CreateElement(const String& sPath)
 {
+  int ok = 0;
+
   String sElement = sPath;
   String sPart;
   if (sElement.nextToken("/", sPart)) {
     if (sElement.empty()) {
-      list_.Set(sPart, pElement);
+      Element* pElement = new Element();
+      if (pElement) {
+        if (pChildren_ == 0) {
+          pChildren_ = new ElementList();
+        }
+        if (pChildren_) {
+          ok = pChildren_->Set(sPart, pElement);
+        }
+      }
     } else {
-      Element* pNext = 0;
-      if (list_.Get(sPart, pNext)) {
-        pNext->AddElement(sElement, pElement);
-      } else {
-        pNext = new Node();
-        if (pNext) {
-          list_.Set(sPart, pNext);
-          pNext->AddElement(sElement, pElement);
+      if (pChildren_) {
+        Element* pNext = 0;
+        if (pChildren_->Get(sPart, pNext)) {
+          ok = pNext->CreateElement(sElement);
+        } else {
+          pNext = new Element();
+          if (pNext) {
+            pChildren_->Set(sPart, pNext);
+            ok = pNext->CreateElement(sElement);
+          }
         }
       }
     }
   }
-  
+
+  return ok;
 }
 
-void Element::DrawAll(cairo_t* cr)
+int Element::DeleteElement(const String& sPath)
 {
-  Draw(cr);
+  int ok = 0;
 
-  ElementIterator iter(list_);
-  for (ElementNode* pNode = 0; pNode = iter.Next(); ) {
-    Element* pElement = pNode->Value();
-    if (pElement != 0) {
-      pElement->DrawAll(cr);
+  if (pChildren_) {
+    String sElement = sPath;
+    String sPart;
+    if (sElement.nextToken("/", sPart)) {
+      ElementNode* pNode = pChildren_->Find(sPart);
+      if (pNode) {
+        Element* pElement = pNode->Value();
+        if (sElement.empty()) {
+          pChildren_->Unset(sPart);
+          delete pElement;
+          pElement = 0;
+          ok = 1;
+        } else {
+          ok = pElement->DeleteElement(sElement);
+        }
+      }
     }
   }
+
+  return ok;
 }
 
 // ----------------------------------------------------------
 
-void Shape::SetFillColor(float fRed, float fGreen, float fBlue, float fAlpha)
+void Element::SetRectangle(double fX, double fY, double fW, double fH)
 {
-  bFillColor_ = true;
-  cFill_.r = fRed;
-  cFill_.g = fGreen;
-  cFill_.b = fBlue;
-  cFill_.a = fAlpha;
-}
-
-void Shape::SetStrokeColor(float fWidth, float fRed, float fGreen, float fBlue, float fAlpha)
-{
-  bStrokeColor_ = true;
-  fStrokeWidth_ = fWidth;
-  cStroke_.r = fRed;
-  cStroke_.g = fGreen;
-  cStroke_.b = fBlue;
-  cStroke_.a = fAlpha;
-}
-
-// ----------------------------------------------------------
-
-void RectangleX::Draw(cairo_t* cr)
-{
-  cairo_rectangle(cr, fX_, fY_, fW_, fH_);
-  if (bFillColor_) {
-    cairo_set_source_rgba(cr, cFill_.r, cFill_.g, cFill_.b, cFill_.a > 0.99 ? 0.99 : cFill_.a);
-    if (bStrokeColor_) {
-      cairo_fill_preserve(cr);
+  if (pGraphics_) {
+    if (pGraphics_->IsRectangle()) {
+      ((RectangleX*) pGraphics_)->SetCoordinates(fX, fY, fW, fH);
     } else {
-      cairo_fill(cr);
+      delete pGraphics_;
+      pGraphics_ = 0;
     }
   }
-  if (bStrokeColor_) {
-    cairo_set_line_width(cr, fStrokeWidth_);
-    cairo_set_source_rgba(cr, cStroke_.r, cStroke_.g, cStroke_.b, cStroke_.a > 0.99 ? 0.99 : cStroke_.a);
-    cairo_stroke(cr);
+
+  if (pGraphics_ == 0) {
+    pGraphics_ = new RectangleX(fX, fY, fW, fH);
+  }
+
+  if (pGraphics_ == 0 || !pGraphics_->IsRectangle()) {
+    throw ApException("Element::SetRectangle failed");
+  }
+}
+
+void Element::SetFillColor(double fRed, double fGreen, double fBlue, double fAlpha)
+{
+  if (pGraphics_ && pGraphics_->IsShape()) {
+    ((Shape*) pGraphics_)->SetFillColor(fRed, fGreen, fBlue, fAlpha);
+  } else {
+    throw ApException("Element::SetFillColor: not a Shape");
+  }
+}
+
+void Element::SetStrokeColor(double fRed, double fGreen, double fBlue, double fAlpha)
+{
+  if (pGraphics_ && pGraphics_->IsShape()) {
+    ((Shape*) pGraphics_)->SetStrokeColor(fRed, fGreen, fBlue, fAlpha);
+  } else {
+    throw ApException("Element::SetFillColor: not a Shape");
+  }
+}
+
+void Element::SetStrokeWidth(double fWidth)
+{
+  if (pGraphics_ && pGraphics_->IsShape()) {
+    ((Shape*) pGraphics_)->SetStrokeWidth(fWidth);
+  } else {
+    throw ApException("Element::SetFillColor: not a Shape");
+  }
+}
+
+// ----------------------------------------------------------
+
+void Element::Draw(cairo_t* cr)
+{
+  if (pGraphics_) {
+    pGraphics_->Draw(cr);
+  }
+
+  if (pChildren_) {
+    ElementIterator iter(*pChildren_);
+    for (ElementNode* pNode = 0; pNode = iter.Next(); ) {
+      Element* pElement = pNode->Value();
+      if (pElement != 0) {
+        pElement->Draw(cr);
+      }
+    }
   }
 }
 

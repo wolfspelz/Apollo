@@ -78,10 +78,24 @@ AP_MSG_HANDLER_METHOD(SceneModule, Scene_Visibility)
   pMsg->apStatus = ApMessage::Ok;
 }
 
-AP_MSG_HANDLER_METHOD(SceneModule, Scene_Rectangle)
+AP_MSG_HANDLER_METHOD(SceneModule, Scene_CreateElement)
 {
   Surface* pSurface = FindSurface(pMsg->hScene);
-  pSurface->Rectangle(pMsg->sPath, pMsg->fX, pMsg->fY, pMsg->fW, pMsg->fH);
+  pSurface->CreateElement(pMsg->sPath);
+  pMsg->apStatus = ApMessage::Ok;
+}
+
+AP_MSG_HANDLER_METHOD(SceneModule, Scene_DeleteElement)
+{
+  Surface* pSurface = FindSurface(pMsg->hScene);
+  pSurface->DeleteElement(pMsg->sPath);
+  pMsg->apStatus = ApMessage::Ok;
+}
+
+AP_MSG_HANDLER_METHOD(SceneModule, Scene_SetRectangle)
+{
+  Surface* pSurface = FindSurface(pMsg->hScene);
+  pSurface->SetRectangle(pMsg->sPath, pMsg->fX, pMsg->fY, pMsg->fW, pMsg->fH);
   pMsg->apStatus = ApMessage::Ok;
 }
 
@@ -95,14 +109,14 @@ AP_MSG_HANDLER_METHOD(SceneModule, Scene_SetFillColor)
 AP_MSG_HANDLER_METHOD(SceneModule, Scene_SetStrokeColor)
 {
   Surface* pSurface = FindSurface(pMsg->hScene);
-  pSurface->SetStrokeColor(pMsg->sPath, pMsg->fWidth, pMsg->fRed, pMsg->fGreen, pMsg->fBlue, pMsg->fAlpha);
+  pSurface->SetStrokeColor(pMsg->sPath, pMsg->fRed, pMsg->fGreen, pMsg->fBlue, pMsg->fAlpha);
   pMsg->apStatus = ApMessage::Ok;
 }
 
-AP_MSG_HANDLER_METHOD(SceneModule, Scene_DeleteElement)
+AP_MSG_HANDLER_METHOD(SceneModule, Scene_SetStrokeWidth)
 {
   Surface* pSurface = FindSurface(pMsg->hScene);
-  pSurface->DeleteElement(pMsg->sPath);
+  pSurface->SetStrokeWidth(pMsg->sPath, pMsg->fWidth);
   pMsg->apStatus = ApMessage::Ok;
 }
 
@@ -123,8 +137,8 @@ AP_MSG_HANDLER_METHOD(SceneModule, UnitTest_Begin)
 {
   AP_UNUSED_ARG(pMsg);
   if (Apollo::getConfig("Test/Scene", 0)) {
-//    AP_UNITTEST_REGISTER(SceneModuleTester::Rectangle);
-    AP_UNITTEST_REGISTER(SceneModuleTester::ElementTree);
+    AP_UNITTEST_REGISTER(SceneModuleTester::Rectangle);
+    //AP_UNITTEST_REGISTER(SceneModuleTester::ElementTree);
   }
 }
 
@@ -132,8 +146,8 @@ AP_MSG_HANDLER_METHOD(SceneModule, UnitTest_Execute)
 {
   AP_UNUSED_ARG(pMsg);
   if (Apollo::getConfig("Test/Scene", 0)) {
-//    AP_UNITTEST_EXECUTE(SceneModuleTester::Rectangle);
-    AP_UNITTEST_EXECUTE(SceneModuleTester::ElementTree);
+    AP_UNITTEST_EXECUTE(SceneModuleTester::Rectangle);
+    //AP_UNITTEST_EXECUTE(SceneModuleTester::ElementTree);
   }
 }
 
@@ -154,10 +168,12 @@ int SceneModule::Init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_Destroy, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_Position, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_Visibility, this, ApCallbackPosNormal);
-  AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_Rectangle, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_CreateElement, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_DeleteElement, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_SetRectangle, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_SetFillColor, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_SetStrokeColor, this, ApCallbackPosNormal);
-  AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_DeleteElement, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_SetStrokeWidth, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_Draw, this, ApCallbackPosNormal);
   AP_UNITTEST_HOOK(SceneModule, this);
 
