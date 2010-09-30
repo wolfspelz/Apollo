@@ -166,6 +166,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\GraphicsContext.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Scene.cpp"
 				>
 			</File>
@@ -193,6 +197,10 @@
 			</File>
 			<File
 				RelativePath=".\Graphics.h"
+				>
+			</File>
+			<File
+				RelativePath=".\GraphicsContext.h"
 				>
 			</File>
 			<File

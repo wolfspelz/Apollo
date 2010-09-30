@@ -43,17 +43,19 @@ String SceneModuleTester::Rectangle()
     if (!msg.Request()) { s = "Msg_Scene_Visibility failed"; }
   }
 
+// ------------------------
+
   if (!s) {
     Msg_Scene_CreateElement msg;
     msg.hScene = hScene;
-    msg.sPath = "/frame";
+    msg.sPath = "frame";
     if (!msg.Request()) { s = "Msg_Scene_CreateElement failed"; }
   }
 
   if (!s) {
     Msg_Scene_SetRectangle msg;
     msg.hScene = hScene;
-    msg.sPath = "/frame";
+    msg.sPath = "frame";
     msg.fX = 0;
     msg.fY = 0;
     msg.fW = nWidth;
@@ -64,7 +66,7 @@ String SceneModuleTester::Rectangle()
   if (!s) {
     Msg_Scene_SetFillColor msg;
     msg.hScene = hScene;
-    msg.sPath = "/frame";
+    msg.sPath = "frame";
     msg.fRed = 1;
     msg.fGreen = 1;
     msg.fBlue = 1;
@@ -75,7 +77,7 @@ String SceneModuleTester::Rectangle()
   if (!s) {
     Msg_Scene_SetStrokeColor msg;
     msg.hScene = hScene;
-    msg.sPath = "/frame";
+    msg.sPath = "frame";
     msg.fRed = 0;
     msg.fGreen = 0;
     msg.fBlue = 0;
@@ -86,22 +88,24 @@ String SceneModuleTester::Rectangle()
   if (!s) {
     Msg_Scene_SetStrokeWidth msg;
     msg.hScene = hScene;
-    msg.sPath = "/frame";
+    msg.sPath = "frame";
     msg.fWidth = 1.5;
     if (!msg.Request()) { s = "Msg_Scene_SetStrokeWidth failed"; }
   }
 
+// ------------------------
+
   if (!s) {
     Msg_Scene_CreateElement msg;
     msg.hScene = hScene;
-    msg.sPath = "/rect1";
+    msg.sPath = "rect1";
     if (!msg.Request()) { s = "Msg_Scene_CreateElement failed"; }
   }
 
   if (!s) {
     Msg_Scene_SetRectangle msg;
     msg.hScene = hScene;
-    msg.sPath = "/rect1";
+    msg.sPath = "rect1";
     msg.fX = 10;
     msg.fY = 10;
     msg.fW = 100;
@@ -121,6 +125,60 @@ String SceneModuleTester::Rectangle()
   }
 
   if (!s) {
+    Msg_Scene_SetStrokeColor msg;
+    msg.hScene = hScene;
+    msg.sPath = "rect1";
+    msg.fRed = 1;
+    msg.fGreen = 0;
+    msg.fBlue = 0;
+    msg.fAlpha = 1;
+    if (!msg.Request()) { s = "Msg_Scene_SetStrokeColor failed"; }
+  }
+
+  if (!s) {
+    Msg_Scene_SetStrokeWidth msg;
+    msg.hScene = hScene;
+    msg.sPath = "rect1";
+    msg.fWidth = 10;
+    if (!msg.Request()) { s = "Msg_Scene_SetStrokeWidth failed"; }
+  }
+
+// ------------------------
+
+  if (!s) {
+    Msg_Scene_CreateElement msg;
+    msg.hScene = hScene;
+    msg.sPath = "text1";
+    if (!msg.Request()) { s = "Msg_Scene_CreateElement failed"; }
+  }
+
+  if (!s) {
+    Msg_Scene_SetText msg;
+    msg.hScene = hScene;
+    msg.sPath = "text1";
+    msg.fX = 110;
+    msg.fY = 110;
+    msg.sText = "Hello W" "\xC3\xB6" "rld";
+    msg.fSize = 30;
+    msg.sFont = "Courier";
+    msg.nFlags = Msg_Scene_FontFlags::Italic | Msg_Scene_FontFlags::Bold;
+    if (!msg.Request()) { s = "Msg_Scene_SetText failed"; }
+  }
+
+  if (!s) {
+    Msg_Scene_SetFillColor msg;
+    msg.hScene = hScene;
+    msg.sPath = "text1";
+    msg.fRed = 0.7;
+    msg.fGreen = 0.7;
+    msg.fBlue = 0;
+    msg.fAlpha = 1;
+    if (!msg.Request()) { s = "Msg_Scene_SetFillColor failed"; }
+  }
+
+// ------------------------
+
+  if (!s) {
     Msg_Scene_Draw msg;
     msg.hScene = hScene;
     if (!msg.Request()) { s = "Msg_Scene_Draw failed"; }
@@ -132,6 +190,17 @@ String SceneModuleTester::Rectangle()
     if (!msg.Request()) { s = "Msg_Scene_Destroy failed"; }
   }
 
+  return s;
+}
+
+String SceneModuleTester::FontFlags()
+{
+  String s;
+
+  if (!s) { if (Msg_Scene_FontFlags::Italic != TextX::Italic) { s = "Msg_Scene_FontFlags::Italic != TextX::Italic"; }}
+  if (!s) { if (Msg_Scene_FontFlags::Bold != TextX::Bold) { s = "Msg_Scene_FontFlags::Bold != TextX::Bold"; }}
+  if (!s) { if (Msg_Scene_FontFlags::LastFlag != TextX::LastFlag) { s = "Msg_Scene_FontFlags::LastFlag != TextX::LastFlag"; }}
+ 
   return s;
 }
 

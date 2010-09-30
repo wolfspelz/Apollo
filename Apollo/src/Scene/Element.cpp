@@ -128,6 +128,37 @@ void Element::SetRectangle(double fX, double fY, double fW, double fH)
   }
 }
 
+void Element::SetText(double fX, double fY, const String& sText, const String& sFont, double fSize, int nFlags)
+{
+  if (pGraphics_) {
+    if (pGraphics_->IsText()) {
+      ((TextX*) pGraphics_)->SetCoordinates(fX, fY);
+      ((TextX*) pGraphics_)->SetString(sText);
+      ((TextX*) pGraphics_)->SetFont(sFont, fSize, nFlags);
+    } else {
+      delete pGraphics_;
+      pGraphics_ = 0;
+    }
+  }
+
+  if (pGraphics_ == 0) {
+    pGraphics_ = new TextX(fX, fY, sText, sFont, fSize, nFlags);
+  }
+
+  if (pGraphics_ == 0 || !pGraphics_->IsText()) {
+    throw ApException("Element::SetText failed");
+  }
+}
+
+void Element::MeasureText(const String& sText, const String& sFont, double fSize, int nFlags, TextExtents& te)
+{
+  if (pGraphics_ && pGraphics_->IsText()) {
+//    ((TextX*) pGraphics_)->Measure(sText, sFont, fSize, nFlags, te);
+  } else {
+    throw ApException("Element::MeasureText: not a Text");
+  }
+}
+
 void Element::SetFillColor(double fRed, double fGreen, double fBlue, double fAlpha)
 {
   if (pGraphics_ && pGraphics_->IsShape()) {
@@ -157,10 +188,10 @@ void Element::SetStrokeWidth(double fWidth)
 
 // ----------------------------------------------------------
 
-void Element::Draw(cairo_t* cr)
+void Element::Draw(GraphicsContext& gc)
 {
   if (pGraphics_) {
-    pGraphics_->Draw(cr);
+    pGraphics_->Draw(gc);
   }
 
   if (pChildren_) {
@@ -168,7 +199,7 @@ void Element::Draw(cairo_t* cr)
     for (ElementNode* pNode = 0; pNode = iter.Next(); ) {
       Element* pElement = pNode->Value();
       if (pElement != 0) {
-        pElement->Draw(cr);
+        pElement->Draw(gc);
       }
     }
   }

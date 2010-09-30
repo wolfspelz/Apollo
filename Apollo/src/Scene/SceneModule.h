@@ -34,6 +34,8 @@ public:
   void On_Scene_CreateElement(Msg_Scene_CreateElement* pMsg);
   void On_Scene_DeleteElement(Msg_Scene_DeleteElement* pMsg);
   void On_Scene_SetRectangle(Msg_Scene_SetRectangle* pMsg);
+  void On_Scene_SetText(Msg_Scene_SetText* pMsg);
+  void On_Scene_MeasureText(Msg_Scene_MeasureText* pMsg);
   void On_Scene_SetFillColor(Msg_Scene_SetFillColor* pMsg);
   void On_Scene_SetStrokeColor(Msg_Scene_SetStrokeColor* pMsg);
   void On_Scene_SetStrokeWidth(Msg_Scene_SetStrokeWidth* pMsg);

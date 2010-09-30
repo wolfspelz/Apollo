@@ -25,6 +25,9 @@ public:
   void DeleteElement(const String& sPath);
 
   void SetRectangle(const String& sPath, double fX, double fY, double fW, double fH);
+  void SetText(const String& sPath, double fX, double fY, const String& sText, const String& sFont, double fSize, int nFlags);
+  void MeasureText(const String& sPath, const String& sText, const String& sFont, double fSize, int nFlags, TextExtents& te);
+
   void SetFillColor(const String& sPath, double fRed, double fGreen, double fBlue, double fAlpha);
   void SetStrokeColor(const String& sPath, double fRed, double fGreen, double fBlue, double fAlpha);
   void SetStrokeWidth(const String& sPath, double fWidth);

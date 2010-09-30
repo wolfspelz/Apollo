@@ -342,6 +342,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\include\MsgGalileo.h"
+					>
+				</File>
+				<File
 					RelativePath="..\..\include\MsgIdentity.h"
 					>
 				</File>
@@ -370,10 +374,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\include\MsgGalileo.h"
-					>
-				</File>
-				<File
 					RelativePath="..\..\include\MsgOs.h"
 					>
 				</File>
@@ -383,6 +383,10 @@
 				</File>
 				<File
 					RelativePath="..\..\include\MsgSample.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\MsgScene.h"
 					>
 				</File>
 				<File

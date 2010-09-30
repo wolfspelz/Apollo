@@ -6,12 +6,13 @@
 
 #include "Apollo.h"
 #include "ApLog.h"
+#if defined(WIN32)
+  #include "MsgMainLoop.h"
+#endif // WIN32
 #include "Local.h"
 #include "Surface.h"
 #include "Graphics.h"
-#if defined(WIN32)
-#include "MsgMainLoop.h"
-#endif // WIN32
+#include "GraphicsContext.h"
 
 int Surface::nCntWindows_ = 0;
 
@@ -270,6 +271,16 @@ void Surface::SetRectangle(const String& sPath, double fX, double fY, double fW,
   FindElement(sPath)->SetRectangle(fX, fY, fW, fH);
 }
 
+void Surface::SetText(const String& sPath, double fX, double fY, const String& sText, const String& sFont, double fSize, int nFlags)
+{
+  FindElement(sPath)->SetText(fX, fY, sText, sFont, fSize, nFlags);
+}
+
+void Surface::MeasureText(const String& sPath, const String& sText, const String& sFont, double fSize, int nFlags, TextExtents& te)
+{
+  FindElement(sPath)->MeasureText(sText, sFont, fSize, nFlags, te);
+}
+
 void Surface::SetFillColor(const String& sPath, double fRed, double fGreen, double fBlue, double fAlpha)
 {
   FindElement(sPath)->SetFillColor(fRed, fGreen, fBlue, fAlpha);
@@ -343,14 +354,17 @@ void Surface::Draw()
     }
   }
 
-  //cairo_rectangle(cr, 0, 0, nW, nH);
-  //cairo_set_source_rgba(cr, 0.0, 0.0, 0.0, 0.0);
+  //cairo_rectangle(cr, 50, 50, 100, 100);
+  //cairo_set_source_rgba(cr, 0.0, 1.0, 0.0, 0.5);
   //cairo_fill(cr);
 
-  //cairo_translate(cr, 0, 200);
-  //cairo_scale(cr, 1.0, -1.0);
+  GraphicsContext gc;
+  gc.pCairo_ = cr;
 
-  root_.Draw(cr);
+  cairo_translate(gc.pCairo_, 0.0, nH);
+  cairo_scale(gc.pCairo_, 1.0, -1.0);
+
+  root_.Draw(gc);
 
   if (0) {
     cairo_rectangle(cr, 50, 50, 100, 100);

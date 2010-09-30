@@ -9,7 +9,7 @@
 #include "Local.h"
 #include "Graphics.h"
 
-void Shape::SetFillColor(float fRed, float fGreen, float fBlue, float fAlpha)
+void Shape::SetFillColor(double fRed, double fGreen, double fBlue, double fAlpha)
 {
   bFillColor_ = true;
   cFill_.r = fRed;
@@ -18,7 +18,7 @@ void Shape::SetFillColor(float fRed, float fGreen, float fBlue, float fAlpha)
   cFill_.a = fAlpha;
 }
 
-void Shape::SetStrokeColor(float fRed, float fGreen, float fBlue, float fAlpha)
+void Shape::SetStrokeColor(double fRed, double fGreen, double fBlue, double fAlpha)
 {
   bStrokeColor_ = true;
   cStroke_.r = fRed;
@@ -27,31 +27,76 @@ void Shape::SetStrokeColor(float fRed, float fGreen, float fBlue, float fAlpha)
   cStroke_.a = fAlpha;
 }
 
-void Shape::SetStrokeWidth(float fWidth)
+void Shape::SetStrokeWidth(double fWidth)
 {
   bStrokeColor_ = true;
   fStrokeWidth_ = fWidth;
 }
 
-// ----------------------------------------------------------
-
-void RectangleX::Draw(cairo_t* cr)
+void Shape::FillAndStroke(GraphicsContext& gc)
 {
-  cairo_rectangle(cr, fX_, fY_, fW_, fH_);
-
   if (bFillColor_) {
-    cairo_set_source_rgba(cr, cFill_.r, cFill_.g, cFill_.b, cFill_.a > 0.99 ? 0.99 : cFill_.a);
+    cairo_set_source_rgba(gc.Cairo(), cFill_.r, cFill_.g, cFill_.b, cFill_.a > 0.99 ? 0.99 : cFill_.a);
     if (bStrokeColor_) {
-      cairo_fill_preserve(cr);
+      cairo_fill_preserve(gc.Cairo());
     } else {
-      cairo_fill(cr);
+      cairo_fill(gc.Cairo());
     }
   }
 
   if (bStrokeColor_) {
-    cairo_set_line_width(cr, fStrokeWidth_);
-    cairo_set_source_rgba(cr, cStroke_.r, cStroke_.g, cStroke_.b, cStroke_.a > 0.99 ? 0.99 : cStroke_.a);
-    cairo_stroke(cr);
+    cairo_set_line_width(gc.Cairo(), fStrokeWidth_);
+    cairo_set_source_rgba(gc.Cairo(), cStroke_.r, cStroke_.g, cStroke_.b, cStroke_.a > 0.99 ? 0.99 : cStroke_.a);
+    cairo_stroke(gc.Cairo());
   }
 }
 
+// ----------------------------------------------------------
+
+void RectangleX::Draw(GraphicsContext& gc)
+{
+  cairo_rectangle(gc.Cairo(), fX_, fY_, fW_, fH_);
+
+  FillAndStroke(gc);
+}
+
+// ----------------------------------------------------------
+
+void TextX::Draw(GraphicsContext& gc)
+{
+  cairo_move_to(gc.Cairo(), fX_, fY_);
+
+  cairo_scale(gc.Cairo(), 1.0, -1.0);
+
+  cairo_select_font_face(gc.Cairo(), sFont_, nFlags_ & Italic ? CAIRO_FONT_SLANT_ITALIC : CAIRO_FONT_SLANT_NORMAL, nFlags_ & Bold ? CAIRO_FONT_WEIGHT_BOLD : CAIRO_FONT_WEIGHT_NORMAL);
+  cairo_set_font_size(gc.Cairo(), fSize_);
+
+  //cairo_text_extents_t extents;
+  //cairo_text_extents(gc.Cairo(), sText_, &extents);
+
+  cairo_text_path(gc.Cairo(), sText_);
+
+  cairo_scale(gc.Cairo(), 1.0, -1.0);
+
+  FillAndStroke(gc);
+}
+
+void TextX::Measure(GraphicsContext& gc, TextExtents& te)
+{
+  cairo_move_to(gc.Cairo(), fX_, fY_);
+
+  cairo_scale(gc.Cairo(), 1.0, -1.0);
+
+  cairo_select_font_face(gc.Cairo(), sFont_, nFlags_ & Italic ? CAIRO_FONT_SLANT_ITALIC : CAIRO_FONT_SLANT_NORMAL, nFlags_ & Bold ? CAIRO_FONT_WEIGHT_BOLD : CAIRO_FONT_WEIGHT_NORMAL);
+  cairo_set_font_size(gc.Cairo(), fSize_);
+
+  cairo_text_extents_t extents;
+  cairo_text_extents(gc.Cairo(), sText_, &extents);
+
+  te.fBearingX_ = extents.x_bearing;
+  te.fBearingY_ = extents.y_bearing;
+  te.fWidth_ = extents.width;
+  te.fHeight_ = extents.height;
+  te.fAdvanceX_ = extents.x_advance;
+  te.fAdvanceY_ = extents.y_advance;
+}
