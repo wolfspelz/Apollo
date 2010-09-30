@@ -70,6 +70,48 @@ public:
   ApIN double fH;
 };
 
+class Msg_Scene_FontFlags: public ApRequestMessage
+{
+public:
+  typedef enum _FontFlags { Normal = 0
+    ,Italic = 1 << 0
+    ,Bold = 1 << 1
+    ,LastFlag = 1 << 2
+  } FontFlags;
+};
+
+class Msg_Scene_SetText: public ApRequestMessage
+{
+public:
+  Msg_Scene_SetText() : ApRequestMessage("Scene_SetText"), fX(0), fY(0), fSize(12), nFlags(Msg_Scene_FontFlags::Normal) {}
+  ApIN ApHandle hScene;
+  ApIN String sPath;
+  ApIN double fX;
+  ApIN double fY;
+  ApIN String sText;
+  ApIN double fSize;
+  ApIN String sFont;
+  ApIN int nFlags;
+};
+
+class Msg_Scene_MeasureText: public ApRequestMessage
+{
+public:
+  Msg_Scene_MeasureText() : ApRequestMessage("Scene_MeasureText"), fSize(12), nFlags(Msg_Scene_FontFlags::Normal) {}
+  ApIN ApHandle hScene;
+  ApIN String sPath;
+  ApIN String sText;
+  ApIN double fSize;
+  ApIN String sFont;
+  ApIN int nFlags;
+  ApOUT double fBearingX;
+  ApOUT double fBearingY;
+  ApOUT double fWidth;
+  ApOUT double fHeight;
+  ApOUT double fAdvanceX;
+  ApOUT double fAdvanceY;
+};
+
 class Msg_Scene_SetFillColor: public ApRequestMessage
 {
 public:

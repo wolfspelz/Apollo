@@ -18,6 +18,7 @@ class SceneModuleTester
 public:
   static String CheckChildren(Element* pNode, const String& sExpectedChildren);
   static String Rectangle();
+  static String FontFlags();
   static String ElementTree();
 };
 #endif

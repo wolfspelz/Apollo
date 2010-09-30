@@ -99,6 +99,29 @@ AP_MSG_HANDLER_METHOD(SceneModule, Scene_SetRectangle)
   pMsg->apStatus = ApMessage::Ok;
 }
 
+AP_MSG_HANDLER_METHOD(SceneModule, Scene_SetText)
+{
+  Surface* pSurface = FindSurface(pMsg->hScene);
+  pSurface->SetText(pMsg->sPath, pMsg->fX, pMsg->fY, pMsg->sText, pMsg->sFont, pMsg->fSize, pMsg->nFlags);
+  pMsg->apStatus = ApMessage::Ok;
+}
+
+AP_MSG_HANDLER_METHOD(SceneModule, Scene_MeasureText)
+{
+  Surface* pSurface = FindSurface(pMsg->hScene);
+
+  TextExtents te;
+  pSurface->MeasureText(pMsg->sPath, pMsg->sText, pMsg->sFont, pMsg->fSize, pMsg->nFlags, te);
+  pMsg->fBearingX = te.fBearingX_;
+  pMsg->fBearingY = te.fBearingY_;
+  pMsg->fWidth = te.fWidth_;
+  pMsg->fHeight = te.fHeight_;
+  pMsg->fAdvanceX = te.fAdvanceX_;
+  pMsg->fAdvanceY = te.fAdvanceY_;
+ 
+  pMsg->apStatus = ApMessage::Ok;
+}
+
 AP_MSG_HANDLER_METHOD(SceneModule, Scene_SetFillColor)
 {
   Surface* pSurface = FindSurface(pMsg->hScene);
@@ -138,6 +161,7 @@ AP_MSG_HANDLER_METHOD(SceneModule, UnitTest_Begin)
   AP_UNUSED_ARG(pMsg);
   if (Apollo::getConfig("Test/Scene", 0)) {
     AP_UNITTEST_REGISTER(SceneModuleTester::Rectangle);
+    AP_UNITTEST_REGISTER(SceneModuleTester::FontFlags);
     //AP_UNITTEST_REGISTER(SceneModuleTester::ElementTree);
   }
 }
@@ -147,6 +171,7 @@ AP_MSG_HANDLER_METHOD(SceneModule, UnitTest_Execute)
   AP_UNUSED_ARG(pMsg);
   if (Apollo::getConfig("Test/Scene", 0)) {
     AP_UNITTEST_EXECUTE(SceneModuleTester::Rectangle);
+    AP_UNITTEST_EXECUTE(SceneModuleTester::FontFlags);
     //AP_UNITTEST_EXECUTE(SceneModuleTester::ElementTree);
   }
 }
@@ -171,6 +196,7 @@ int SceneModule::Init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_CreateElement, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_DeleteElement, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_SetRectangle, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_SetText, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_SetFillColor, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_SetStrokeColor, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_SetStrokeWidth, this, ApCallbackPosNormal);
