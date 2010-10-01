@@ -55,7 +55,7 @@ void Shape::FillAndStroke(GraphicsContext& gc)
 
 void RectangleX::Draw(GraphicsContext& gc)
 {
-  cairo_rectangle(gc.Cairo(), fX_, fY_, fW_, fH_);
+  cairo_rectangle(gc.Cairo(), fX_, gc.nH_ - fY_, fW_, -fH_);
 
   FillAndStroke(gc);
 }
@@ -64,19 +64,10 @@ void RectangleX::Draw(GraphicsContext& gc)
 
 void TextX::Draw(GraphicsContext& gc)
 {
-  cairo_move_to(gc.Cairo(), fX_, fY_);
-
-  cairo_scale(gc.Cairo(), 1.0, -1.0);
-
+  cairo_move_to(gc.Cairo(), fX_, gc.nH_ - fY_);
   cairo_select_font_face(gc.Cairo(), sFont_, nFlags_ & Italic ? CAIRO_FONT_SLANT_ITALIC : CAIRO_FONT_SLANT_NORMAL, nFlags_ & Bold ? CAIRO_FONT_WEIGHT_BOLD : CAIRO_FONT_WEIGHT_NORMAL);
   cairo_set_font_size(gc.Cairo(), fSize_);
-
-  //cairo_text_extents_t extents;
-  //cairo_text_extents(gc.Cairo(), sText_, &extents);
-
   cairo_text_path(gc.Cairo(), sText_);
-
-  cairo_scale(gc.Cairo(), 1.0, -1.0);
 
   FillAndStroke(gc);
 }
@@ -84,9 +75,6 @@ void TextX::Draw(GraphicsContext& gc)
 void TextX::Measure(GraphicsContext& gc, TextExtents& te)
 {
   cairo_move_to(gc.Cairo(), fX_, fY_);
-
-  cairo_scale(gc.Cairo(), 1.0, -1.0);
-
   cairo_select_font_face(gc.Cairo(), sFont_, nFlags_ & Italic ? CAIRO_FONT_SLANT_ITALIC : CAIRO_FONT_SLANT_NORMAL, nFlags_ & Bold ? CAIRO_FONT_WEIGHT_BOLD : CAIRO_FONT_WEIGHT_NORMAL);
   cairo_set_font_size(gc.Cairo(), fSize_);
 

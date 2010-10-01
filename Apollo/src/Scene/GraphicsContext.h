@@ -22,6 +22,7 @@ public:
   inline cairo_t* Cairo() { return pCairo_; }
 
   cairo_t* pCairo_;
+  int nH_;
 };
 
 #endif // GraphicsContext_H_INCLUDED
