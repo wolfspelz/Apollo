@@ -160,8 +160,8 @@ String SceneModuleTester::Rectangle()
     msg.fY = 110;
     msg.sText = "Hello W" "\xC3\xB6" "rld";
     msg.fSize = 30;
-    msg.sFont = "Courier";
-    msg.nFlags = Msg_Scene_FontFlags::Italic | Msg_Scene_FontFlags::Bold;
+    msg.sFont = "Courier New";
+    //msg.nFlags = Msg_Scene_FontFlags::Italic | Msg_Scene_FontFlags::Bold;
     if (!msg.Request()) { s = "Msg_Scene_SetText failed"; }
   }
 
@@ -176,13 +176,38 @@ String SceneModuleTester::Rectangle()
     if (!msg.Request()) { s = "Msg_Scene_SetFillColor failed"; }
   }
 
-// ------------------------
+  // ------------------------
 
   if (!s) {
     Msg_Scene_Draw msg;
     msg.hScene = hScene;
     if (!msg.Request()) { s = "Msg_Scene_Draw failed"; }
   }
+
+  //if (!s) {
+  //  Msg_Scene_Position msg;
+  //  msg.hScene = hScene;
+  //  msg.nX = 100;
+  //  msg.nY = 400;
+  //  msg.nW = 250;
+  //  msg.nH = 250;
+  //  if (!msg.Request()) { s = "Msg_Scene_Position failed"; }
+  //}
+  //if (!s) {
+  //  Msg_Scene_Draw msg;
+  //  msg.hScene = hScene;
+  //  if (!msg.Request()) { s = "Msg_Scene_Draw failed"; }
+  //}
+  //if (!s) {
+  //  Msg_Scene_Draw msg;
+  //  msg.hScene = hScene;
+  //  if (!msg.Request()) { s = "Msg_Scene_Draw failed"; }
+  //}
+  //if (!s) {
+  //  Msg_Scene_Draw msg;
+  //  msg.hScene = hScene;
+  //  if (!msg.Request()) { s = "Msg_Scene_Draw failed"; }
+  //}
 
   if (0) {
     Msg_Scene_Destroy msg;

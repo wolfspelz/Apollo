@@ -12,7 +12,24 @@
 class Surface
 {
 public:
-  Surface(ApHandle hSurface);
+  Surface(ApHandle hSurface)
+    :hAp_(hSurface)
+    ,bVisible_(0)
+    ,nX_(0)
+    ,nY_(0)
+    ,nW_(0)
+    ,nH_(0)
+    ,pSurface_(0)
+    ,pCairo_(0)
+    #if defined(WIN32)
+    ,hInstance_(NULL)
+    ,hWnd_(NULL)
+    ,hBitmap_(NULL)
+    ,pBits_(0)
+    ,dcMemory_(NULL)
+    ,hOldBitmap_(NULL)
+    #endif // WIN32
+  {}
   virtual ~Surface();
 
   int Create();
@@ -24,20 +41,16 @@ public:
   void CreateElement(const String& sPath);
   void DeleteElement(const String& sPath);
 
-  void SetRectangle(const String& sPath, double fX, double fY, double fW, double fH);
-  void SetText(const String& sPath, double fX, double fY, const String& sText, const String& sFont, double fSize, int nFlags);
-  void MeasureText(const String& sPath, const String& sText, const String& sFont, double fSize, int nFlags, TextExtents& te);
-
-  void SetFillColor(const String& sPath, double fRed, double fGreen, double fBlue, double fAlpha);
-  void SetStrokeColor(const String& sPath, double fRed, double fGreen, double fBlue, double fAlpha);
-  void SetStrokeWidth(const String& sPath, double fWidth);
-
   void Draw();
 
 #if defined(WIN32)
   static LRESULT CALLBACK StaticWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
   LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 #endif // WIN32
+
+protected:
+  int CreateBitmap();
+  void DestroyBitmap();
 
 protected:
   ApHandle hAp_;
@@ -49,12 +62,16 @@ protected:
 
   Element root_;
 
+  cairo_surface_t *pSurface_;
+  cairo_t *pCairo_;
 #if defined(WIN32)
   static int nCntWindows_;
   HINSTANCE hInstance_;
   HWND hWnd_;
   HBITMAP hBitmap_;
   unsigned char* pBits_;
+  HDC dcMemory_;
+  HBITMAP hOldBitmap_;
 #endif // WIN32
 };
 

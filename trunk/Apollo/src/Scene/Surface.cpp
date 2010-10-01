@@ -16,24 +16,9 @@
 
 int Surface::nCntWindows_ = 0;
 
-Surface::Surface(ApHandle hSurface)
-:hAp_(hSurface)
-,bVisible_(0)
-,nX_(0)
-,nY_(0)
-,nW_(0)
-,nH_(0)
-#if defined(WIN32)
-,hInstance_(NULL)
-,hWnd_(NULL)
-,hBitmap_(NULL)
-,pBits_(0)
-#endif // WIN32
-{
-}
-
 Surface::~Surface()
 {
+  DestroyBitmap();
 }
 
 #if defined(WIN32)
@@ -151,30 +136,109 @@ void Surface::Destroy()
 
 //------------------------------------
 
+int Surface::CreateBitmap()
+{
+  int ok = 1;
+
+  HDC dcScreen = ::GetDC(NULL);
+
+  BITMAPINFO bi;
+  bi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+  bi.bmiHeader.biWidth = nW_;
+  bi.bmiHeader.biHeight = nH_;
+  bi.bmiHeader.biPlanes = 1;
+  bi.bmiHeader.biBitCount = 32;
+  bi.bmiHeader.biCompression = BI_RGB;
+  bi.bmiHeader.biSizeImage = (bi.bmiHeader.biWidth * bi.bmiHeader.biHeight) * 4;
+  bi.bmiHeader.biXPelsPerMeter = 0;
+  bi.bmiHeader.biYPelsPerMeter = 0;
+  bi.bmiHeader.biClrUsed = 0;
+  bi.bmiHeader.biClrImportant = 0;
+
+  hBitmap_ = CreateDIBSection(
+    dcScreen,
+    &bi,
+    DIB_RGB_COLORS,
+    (void**) &pBits_,
+    NULL,
+    0    
+  );
+  if (hBitmap_ == NULL) {
+    DWORD dw = ::GetLastError(); // returns ERROR_NOT_ENOUGH_MEMORY ?
+    apLog_Error((LOG_CHANNEL, "Surface::Size", "CreateDIBSection failed: GetLastError()=%d", dw));
+    ok = 0;
+  }
+
+  dcMemory_ = ::CreateCompatibleDC(dcScreen);
+  if (dcMemory_ == NULL) {
+    DWORD dw = ::GetLastError();
+    apLog_Error((LOG_CHANNEL, "Surface::Size", "::CreateCompatibleDC(dcScreen) failed: GetLastError()=%d", dw));
+    ok = 0;
+  }
+
+  ::ReleaseDC(NULL, dcScreen);
+
+  hOldBitmap_ = (HBITMAP) ::SelectObject(dcMemory_, hBitmap_);
+  pSurface_ = cairo_win32_surface_create(dcMemory_);
+  pCairo_ = cairo_create(pSurface_);
+
+  //cairo_translate(pCairo_, 0.0, nH_);
+  //cairo_scale(pCairo_, 1.0, -1.0);
+
+  return ok;
+}
+
+void Surface::DestroyBitmap()
+{
+  if (hBitmap_!= NULL) {
+    ::DeleteObject(hBitmap_);
+    hBitmap_ = NULL;
+  }
+
+  if (pCairo_ != 0) {
+    cairo_destroy(pCairo_);
+    pCairo_ = 0;
+  }
+
+  if (pSurface_ != 0) {
+    cairo_surface_destroy(pSurface_);
+    pSurface_ = 0;
+  }
+
+  if (hOldBitmap_ != NULL && dcMemory_ != NULL) {
+    ::SelectObject(dcMemory_, hOldBitmap_);
+  }
+
+  if (dcMemory_ != NULL) {
+    ::DeleteDC(dcMemory_);
+    dcMemory_ = NULL;
+  }
+}
+
 void Surface::SetPosition(int nX, int nY, int nW, int nH)
 {
   int bMove = 0;
   int bSize = 0;
-  if (nX_ != nX || nY_ != nY) {
+
+  int nOldWindowTop = nY_ - nH_;
+  int nNewWindowTop = nY - nH;
+
+  if (nOldWindowTop != nNewWindowTop || nX_ != nX) {
     bMove = 1;
-    nX_ = nX;
-    nY_ = nY;
   }
   if (nW_ != nW || nH_ != nH) {
     bSize = 1;
-    nW_ = nW;
-    nH_ = nH;
   }
+
+  nX_ = nX;
+  nY_ = nY;
+  nW_ = nW;
+  nH_ = nH;
 
 #if defined(WIN32)
   if (bSize) {
 
-    if (hBitmap_!= NULL) {
-      ::DeleteObject(hBitmap_);
-      hBitmap_ = NULL;
-    }
-
-    HDC dcScreen = ::GetDC(NULL);
+    DestroyBitmap();
 
     if (bMove) {
       ::SetWindowPos(hWnd_, NULL, nX_, nY_ - nH_, nW_, nH_, SWP_NOZORDER | SWP_NOACTIVATE);
@@ -182,35 +246,9 @@ void Surface::SetPosition(int nX, int nY, int nW, int nH)
       ::SetWindowPos(hWnd_, NULL, 0, 0, nW_, nH_, SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE);
     }
 
-    BITMAPINFO bi;
-    bi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
-    bi.bmiHeader.biWidth = nW_;
-    bi.bmiHeader.biHeight = nH_;
-    bi.bmiHeader.biPlanes = 1;
-    bi.bmiHeader.biBitCount = 32;
-    bi.bmiHeader.biCompression = BI_RGB;
-    bi.bmiHeader.biSizeImage = (bi.bmiHeader.biWidth * bi.bmiHeader.biHeight) * 4;
-    bi.bmiHeader.biXPelsPerMeter = 0;
-    bi.bmiHeader.biYPelsPerMeter = 0;
-    bi.bmiHeader.biClrUsed = 0;
-    bi.bmiHeader.biClrImportant = 0;
-
-    hBitmap_ = CreateDIBSection(
-      dcScreen,
-      &bi,
-      DIB_RGB_COLORS,
-      (void**) &pBits_,
-      NULL,
-      0    
-    );
-
-    if (hBitmap_ == NULL) {
-      DWORD dw = ::GetLastError(); // returns ERROR_NOT_ENOUGH_MEMORY ?
-      //apLog_Error((LOG_CHANNEL, "Surface::Size", "CreateDIBSection failed: %s", StringType(_FormatLastError()));
-      apLog_Error((LOG_CHANNEL, "Surface::Size", "CreateDIBSection failed: GetLastError()=%d", dw));
+    if (!CreateBitmap()) {
+      apLog_Error((LOG_CHANNEL, "Surface::SetPosition", "CreateBitmap failed"));
     }
-
-    ::ReleaseDC(NULL, dcScreen);
 
     if (bVisible_) {
       Draw();
@@ -266,38 +304,6 @@ void Surface::DeleteElement(const String& sPath)
 
 //------------------------------------
 
-void Surface::SetRectangle(const String& sPath, double fX, double fY, double fW, double fH)
-{
-  FindElement(sPath)->SetRectangle(fX, fY, fW, fH);
-}
-
-void Surface::SetText(const String& sPath, double fX, double fY, const String& sText, const String& sFont, double fSize, int nFlags)
-{
-  FindElement(sPath)->SetText(fX, fY, sText, sFont, fSize, nFlags);
-}
-
-void Surface::MeasureText(const String& sPath, const String& sText, const String& sFont, double fSize, int nFlags, TextExtents& te)
-{
-  FindElement(sPath)->MeasureText(sText, sFont, fSize, nFlags, te);
-}
-
-void Surface::SetFillColor(const String& sPath, double fRed, double fGreen, double fBlue, double fAlpha)
-{
-  FindElement(sPath)->SetFillColor(fRed, fGreen, fBlue, fAlpha);
-}
-
-void Surface::SetStrokeColor(const String& sPath, double fRed, double fGreen, double fBlue, double fAlpha)
-{
-  FindElement(sPath)->SetStrokeColor(fRed, fGreen, fBlue, fAlpha);
-}
-
-void Surface::SetStrokeWidth(const String& sPath, double fWidth)
-{
-  FindElement(sPath)->SetStrokeWidth(fWidth);
-}
-
-//------------------------------------
-
 #if defined(_DEBUG)
 
 #include "ximagif.h"
@@ -333,20 +339,9 @@ void Surface::Draw()
   if (hBitmap_ == NULL) { return; }
 //  if (!bVisible_) { return; }
 
-  int nW = nW_;
-  int nH = nH_;
-
-  HDC dcScreen = ::GetDC(NULL);
-	HDC dcMemory = ::CreateCompatibleDC(dcScreen);
-
-  HBITMAP hOldBitmap = (HBITMAP) ::SelectObject(dcMemory, hBitmap_);
-
-  cairo_surface_t *surface = cairo_win32_surface_create(dcMemory);
-  cairo_t *cr = cairo_create(surface);
-
   unsigned char* pPixel = pBits_;
-  for (int y = 0; y < nH; ++y) {
-    for (int x = 0; x < nW ; ++x) {
+  for (int y = 0; y < nH_; ++y) {
+    for (int x = 0; x < nW_ ; ++x) {
       *pPixel++ = 0;
       *pPixel++ = 0;
       *pPixel++ = 0;
@@ -359,17 +354,15 @@ void Surface::Draw()
   //cairo_fill(cr);
 
   GraphicsContext gc;
-  gc.pCairo_ = cr;
-
-  cairo_translate(gc.pCairo_, 0.0, nH);
-  cairo_scale(gc.pCairo_, 1.0, -1.0);
+  gc.pCairo_ = pCairo_;
+  gc.nH_ = nH_;
 
   root_.Draw(gc);
 
   if (0) {
-    cairo_rectangle(cr, 50, 50, 100, 100);
-    cairo_set_source_rgba(cr, 1.0, 0.0, 0.0, 0.5);
-    cairo_fill(cr);
+    cairo_rectangle(pCairo_, 50, 50, 100, 100);
+    cairo_set_source_rgba(pCairo_, 1.0, 0.0, 0.0, 0.5);
+    cairo_fill(pCairo_);
   }
 
 #if defined(_DEBUG) && 0
@@ -380,18 +373,18 @@ void Surface::Draw()
   double radius = 100.0;
   double angle1 = 45.0  *(M_PI/180.0);  // angles are specified
   double angle2 = 180.0 *(M_PI/180.0);  // in radians/
-  cairo_set_line_width(cr, 10.0);
-  cairo_arc(cr, xc, yc, radius, angle1, angle2);
-  cairo_stroke(cr);
-  cairo_set_source_rgba(cr, 1, 0.2, 0.2, 0.6);
-  cairo_set_line_width(cr, 20.0);
-  cairo_arc(cr, xc, yc, 10.0, 0, 2*M_PI);
-  cairo_fill(cr);
-  cairo_arc(cr, xc, yc, radius, angle1, angle1);
-  cairo_line_to(cr, xc, yc);
-  cairo_arc(cr, xc, yc, radius, angle2, angle2);
-  cairo_line_to(cr, xc, yc);
-  cairo_stroke(cr);
+  cairo_set_line_width(pCairo_, 10.0);
+  cairo_arc(pCairo_, xc, yc, radius, angle1, angle2);
+  cairo_stroke(pCairo_);
+  cairo_set_source_rgba(pCairo_, 1, 0.2, 0.2, 0.6);
+  cairo_set_line_width(pCairo_, 20.0);
+  cairo_arc(pCairo_, xc, yc, 10.0, 0, 2*M_PI);
+  cairo_fill(pCairo_);
+  cairo_arc(pCairo_, xc, yc, radius, angle1, angle1);
+  cairo_line_to(pCairo_, xc, yc);
+  cairo_arc(pCairo_, xc, yc, radius, angle2, angle2);
+  cairo_line_to(pCairo_, xc, yc);
+  cairo_stroke(pCairo_);
 
 #define FROM_DATA
 #define TASSADAR_GIF
@@ -446,42 +439,42 @@ void Surface::Draw()
 
   int w = cairo_image_surface_get_width(image);
   int h = cairo_image_surface_get_height(image);
-  //cairo_scale(cr, 100.0/w, 100.0/h);
-  cairo_set_source_surface(cr, image, 0, 0);
-  cairo_paint(cr);
 
-  cairo_select_font_face(cr, "Verdana", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
-  cairo_set_font_size(cr, 32.0);
+  cairo_set_source_surface(pCairo_, image, 0, 0);
+  cairo_paint(pCairo_);
+
+  cairo_select_font_face(pCairo_, "Verdana", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
+  cairo_set_font_size(pCairo_, 32.0);
   const char* text = "Tassadar";
   cairo_text_extents_t extents;
-  cairo_text_extents(cr, text, &extents);
+  cairo_text_extents(pCairo_, text, &extents);
 
-  cairo_set_line_width(cr, 1.0);
+  cairo_set_line_width(pCairo_, 1.0);
   int b = 3;
   int text_x = 110, text_y = 100;
-  cairo_move_to(cr, text_x, text_y);
-  cairo_rel_move_to(cr, -b, +b);
-  cairo_rel_line_to(cr, 0, -extents.height - 2*b);
-  cairo_rel_line_to(cr, extents.width + 2*b, 0);
-  cairo_rel_line_to(cr, 0, extents.height + 2*b);
-  cairo_rel_line_to(cr, -extents.width - 2*b, 0);
-  cairo_set_source_rgba(cr, 1.0, 1.0, 1.0, 0.3);
-  cairo_fill(cr);
+  cairo_move_to(pCairo_, text_x, text_y);
+  cairo_rel_move_to(pCairo_, -b, +b);
+  cairo_rel_line_to(pCairo_, 0, -extents.height - 2*b);
+  cairo_rel_line_to(pCairo_, extents.width + 2*b, 0);
+  cairo_rel_line_to(pCairo_, 0, extents.height + 2*b);
+  cairo_rel_line_to(pCairo_, -extents.width - 2*b, 0);
+  cairo_set_source_rgba(pCairo_, 1.0, 1.0, 1.0, 0.3);
+  cairo_fill(pCairo_);
 
-  cairo_move_to(cr, text_x + 0.5, text_y + 0.5);
-  cairo_rel_move_to(cr, -b, +b);
-  cairo_rel_line_to(cr, 0, -extents.height - 2*b);
-  cairo_rel_line_to(cr, extents.width + 2*b, 0);
-  cairo_rel_line_to(cr, 0, extents.height + 2*b);
-  cairo_rel_line_to(cr, -extents.width - 2*b, 0);
-  cairo_set_source_rgba(cr, 0.6, 0.8, 0.2, 1.0);
-  cairo_stroke(cr);
+  cairo_move_to(pCairo_, text_x + 0.5, text_y + 0.5);
+  cairo_rel_move_to(pCairo_, -b, +b);
+  cairo_rel_line_to(pCairo_, 0, -extents.height - 2*b);
+  cairo_rel_line_to(pCairo_, extents.width + 2*b, 0);
+  cairo_rel_line_to(pCairo_, 0, extents.height + 2*b);
+  cairo_rel_line_to(pCairo_, -extents.width - 2*b, 0);
+  cairo_set_source_rgba(pCairo_, 0.6, 0.8, 0.2, 1.0);
+  cairo_stroke(pCairo_);
 
-  cairo_move_to(cr, text_x, text_y);
-  //cairo_show_text(cr, text);
-  cairo_text_path(cr, text);
-  cairo_set_source_rgba(cr, 0.0, 0.0, 0.0, 0.5);
-  cairo_fill(cr);
+  cairo_move_to(pCairo_, text_x, text_y);
+  //cairo_show_text(pCairo_, text);
+  cairo_text_path(pCairo_, text);
+  cairo_set_source_rgba(pCairo_, 0.0, 0.0, 0.0, 0.5);
+  cairo_fill(pCairo_);
 
 #endif
 
@@ -495,29 +488,24 @@ void Surface::Draw()
   ptWindowPosition.y = nY_ - nH_;
 
 	SIZE szWindowSize;
-  szWindowSize.cx = nW;
-  szWindowSize.cy = nH;
+  szWindowSize.cx = nW_;
+  szWindowSize.cy = nH_;
 
+  HDC dcScreen = ::GetDC(NULL);
+  
   // perform the alpha blend
 	BOOL bRet= ::UpdateLayeredWindow(
       hWnd_, 
       dcScreen, 
       0, //&ptWindowPosition, 
       &szWindowSize, 
-      dcMemory,
+      dcMemory_,
 		  &ptSrc, 
       0, 
       &blendPixelFunction, 
       ULW_ALPHA
       );
 
-  cairo_destroy(cr); 
-  cairo_surface_destroy(surface);
-
-  // clean up
-  ::SelectObject(dcMemory, hOldBitmap);
-
-  ::DeleteDC(dcMemory);
   ::ReleaseDC(NULL, dcScreen);
 }
 

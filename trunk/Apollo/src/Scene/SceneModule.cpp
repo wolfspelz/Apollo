@@ -95,14 +95,14 @@ AP_MSG_HANDLER_METHOD(SceneModule, Scene_DeleteElement)
 AP_MSG_HANDLER_METHOD(SceneModule, Scene_SetRectangle)
 {
   Surface* pSurface = FindSurface(pMsg->hScene);
-  pSurface->SetRectangle(pMsg->sPath, pMsg->fX, pMsg->fY, pMsg->fW, pMsg->fH);
+  pSurface->FindElement(pMsg->sPath)->SetRectangle(pMsg->fX, pMsg->fY, pMsg->fW, pMsg->fH);
   pMsg->apStatus = ApMessage::Ok;
 }
 
 AP_MSG_HANDLER_METHOD(SceneModule, Scene_SetText)
 {
   Surface* pSurface = FindSurface(pMsg->hScene);
-  pSurface->SetText(pMsg->sPath, pMsg->fX, pMsg->fY, pMsg->sText, pMsg->sFont, pMsg->fSize, pMsg->nFlags);
+  pSurface->FindElement(pMsg->sPath)->SetText(pMsg->fX, pMsg->fY, pMsg->sText, pMsg->sFont, pMsg->fSize, pMsg->nFlags);
   pMsg->apStatus = ApMessage::Ok;
 }
 
@@ -111,7 +111,7 @@ AP_MSG_HANDLER_METHOD(SceneModule, Scene_MeasureText)
   Surface* pSurface = FindSurface(pMsg->hScene);
 
   TextExtents te;
-  pSurface->MeasureText(pMsg->sPath, pMsg->sText, pMsg->sFont, pMsg->fSize, pMsg->nFlags, te);
+  pSurface->FindElement(pMsg->sPath)->MeasureText(pMsg->sText, pMsg->sFont, pMsg->fSize, pMsg->nFlags, te);
   pMsg->fBearingX = te.fBearingX_;
   pMsg->fBearingY = te.fBearingY_;
   pMsg->fWidth = te.fWidth_;
@@ -125,21 +125,21 @@ AP_MSG_HANDLER_METHOD(SceneModule, Scene_MeasureText)
 AP_MSG_HANDLER_METHOD(SceneModule, Scene_SetFillColor)
 {
   Surface* pSurface = FindSurface(pMsg->hScene);
-  pSurface->SetFillColor(pMsg->sPath, pMsg->fRed, pMsg->fGreen, pMsg->fBlue, pMsg->fAlpha);
+  pSurface->FindElement(pMsg->sPath)->SetFillColor(pMsg->fRed, pMsg->fGreen, pMsg->fBlue, pMsg->fAlpha);
   pMsg->apStatus = ApMessage::Ok;
 }
 
 AP_MSG_HANDLER_METHOD(SceneModule, Scene_SetStrokeColor)
 {
   Surface* pSurface = FindSurface(pMsg->hScene);
-  pSurface->SetStrokeColor(pMsg->sPath, pMsg->fRed, pMsg->fGreen, pMsg->fBlue, pMsg->fAlpha);
+  pSurface->FindElement(pMsg->sPath)->SetStrokeColor(pMsg->fRed, pMsg->fGreen, pMsg->fBlue, pMsg->fAlpha);
   pMsg->apStatus = ApMessage::Ok;
 }
 
 AP_MSG_HANDLER_METHOD(SceneModule, Scene_SetStrokeWidth)
 {
   Surface* pSurface = FindSurface(pMsg->hScene);
-  pSurface->SetStrokeWidth(pMsg->sPath, pMsg->fWidth);
+  pSurface->FindElement(pMsg->sPath)->SetStrokeWidth(pMsg->fWidth);
   pMsg->apStatus = ApMessage::Ok;
 }
 
