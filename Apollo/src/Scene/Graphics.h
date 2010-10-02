@@ -118,7 +118,7 @@ public:
     :fX_(fX)
     ,fY_(fY)
     ,sText_(sText)
-    ,sFont_(sFont_)
+    ,sFont_(sFont)
     ,fSize_(fSize)
     ,nFlags_(nFlags)
   {}

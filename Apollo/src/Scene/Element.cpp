@@ -150,15 +150,6 @@ void Element::SetText(double fX, double fY, const String& sText, const String& s
   }
 }
 
-void Element::MeasureText(const String& sText, const String& sFont, double fSize, int nFlags, TextExtents& te)
-{
-  if (pGraphics_ && pGraphics_->IsText()) {
-//    ((TextX*) pGraphics_)->Measure(sText, sFont, fSize, nFlags, te);
-  } else {
-    throw ApException("Element::MeasureText: not a Text");
-  }
-}
-
 void Element::SetFillColor(double fRed, double fGreen, double fBlue, double fAlpha)
 {
   if (pGraphics_ && pGraphics_->IsShape()) {

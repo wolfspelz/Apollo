@@ -41,6 +41,8 @@ public:
   void CreateElement(const String& sPath);
   void DeleteElement(const String& sPath);
 
+  void MeasureText(const String& sText, const String& sFont, double fSize, int nFlags, TextExtents& te);
+
   void Draw();
 
 #if defined(WIN32)

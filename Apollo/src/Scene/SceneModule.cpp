@@ -111,7 +111,7 @@ AP_MSG_HANDLER_METHOD(SceneModule, Scene_MeasureText)
   Surface* pSurface = FindSurface(pMsg->hScene);
 
   TextExtents te;
-  pSurface->FindElement(pMsg->sPath)->MeasureText(pMsg->sText, pMsg->sFont, pMsg->fSize, pMsg->nFlags, te);
+  pSurface->MeasureText(pMsg->sText, pMsg->sFont, pMsg->fSize, pMsg->nFlags, te);
   pMsg->fBearingX = te.fBearingX_;
   pMsg->fBearingY = te.fBearingY_;
   pMsg->fWidth = te.fWidth_;
@@ -197,6 +197,7 @@ int SceneModule::Init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_DeleteElement, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_SetRectangle, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_SetText, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_MeasureText, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_SetFillColor, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_SetStrokeColor, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_SetStrokeWidth, this, ApCallbackPosNormal);
