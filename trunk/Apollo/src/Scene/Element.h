@@ -37,7 +37,6 @@ public:
 
   void SetRectangle(double fX, double fY, double fW, double fH);
   void SetText(double fX, double fY, const String& sText, const String& sFont, double fSize, int nFlags);
-  void MeasureText(const String& sText, const String& sFont, double fSize, int nFlags, TextExtents& te);
 
   void SetFillColor(double fRed, double fGreen, double fBlue, double fAlpha);
   void SetStrokeColor(double fRed, double fGreen, double fBlue, double fAlpha);

@@ -302,6 +302,16 @@ void Surface::DeleteElement(const String& sPath)
   if (!root_.DeleteElement(sFixedPath)) { throw ApException("Surface::DeleteElement scene=" ApHandleFormat " root_.DeleteElement(%s) failed", ApHandleType(hAp_), StringType(sPath)); }
 }
 
+void Surface::MeasureText(const String& sText, const String& sFont, double fSize, int nFlags, TextExtents& te)
+{
+  GraphicsContext gc;
+  gc.pCairo_ = pCairo_;
+  gc.nH_ = nH_;
+
+  TextX t(0.0, 0.0, sText, sFont, fSize, nFlags);
+  t.Measure(gc, te);
+}
+
 //------------------------------------
 
 #if defined(_DEBUG)

@@ -46,6 +46,13 @@ class Msg_Scene_CreateElement: public ApRequestMessage
 {
 public:
   Msg_Scene_CreateElement() : ApRequestMessage("Scene_CreateElement") {}
+  static int Invoke(const ApHandle& hScene, const String& sPath)
+  {
+    Msg_Scene_CreateElement msg; 
+    msg.hScene = hScene; 
+    msg.sPath = sPath;
+    return msg.Request();
+  }
   ApIN ApHandle hScene;
   ApIN String sPath;
 };
@@ -54,6 +61,13 @@ class Msg_Scene_DeleteElement: public ApRequestMessage
 {
 public:
   Msg_Scene_DeleteElement() : ApRequestMessage("Scene_DeleteElement") {}
+  static int Invoke(const ApHandle& hScene, const String& sPath)
+  {
+    Msg_Scene_DeleteElement msg; 
+    msg.hScene = hScene; 
+    msg.sPath = sPath;
+    return msg.Request();
+  }
   ApIN ApHandle hScene;
   ApIN String sPath;
 };
@@ -62,6 +76,17 @@ class Msg_Scene_SetRectangle: public ApRequestMessage
 {
 public:
   Msg_Scene_SetRectangle() : ApRequestMessage("Scene_SetRectangle"), fX(0), fY(0), fW(0), fH(0) {}
+  static int Invoke(const ApHandle& hScene, const String& sPath, double fX, double fY, double fW, double fH)
+  {
+    Msg_Scene_SetRectangle msg; 
+    msg.hScene = hScene; 
+    msg.sPath = sPath; 
+    msg.fX = fX; 
+    msg.fY = fY; 
+    msg.fW = fW; 
+    msg.fH = fH; 
+    return msg.Request();
+  }
   ApIN ApHandle hScene;
   ApIN String sPath;
   ApIN double fX;
@@ -84,13 +109,26 @@ class Msg_Scene_SetText: public ApRequestMessage
 {
 public:
   Msg_Scene_SetText() : ApRequestMessage("Scene_SetText"), fX(0), fY(0), fSize(12), nFlags(Msg_Scene_FontFlags::Normal) {}
+  static int Invoke(const ApHandle& hScene, const String& sPath, double fX, double fY, String sText, String sFont, double fSize, int nFlags)
+  {
+    Msg_Scene_SetText msg; 
+    msg.hScene = hScene; 
+    msg.sPath = sPath; 
+    msg.fX = fX; 
+    msg.fY = fY; 
+    msg.sText = sText; 
+    msg.sFont = sFont; 
+    msg.fSize = fSize; 
+    msg.nFlags = nFlags; 
+    return msg.Request();
+  }
   ApIN ApHandle hScene;
   ApIN String sPath;
   ApIN double fX;
   ApIN double fY;
   ApIN String sText;
-  ApIN double fSize;
   ApIN String sFont;
+  ApIN double fSize;
   ApIN int nFlags;
 };
 
@@ -98,11 +136,29 @@ class Msg_Scene_MeasureText: public ApRequestMessage
 {
 public:
   Msg_Scene_MeasureText() : ApRequestMessage("Scene_MeasureText"), fSize(12), nFlags(Msg_Scene_FontFlags::Normal) {}
+  static int Invoke(const ApHandle& hScene, const String& sText, const String& sFont, double fSize, int nFlags, double& fBearingX, double& fBearingY, double& fWidth, double& fHeight, double& fAdvanceX, double& fAdvanceY)
+  { 
+    Msg_Scene_MeasureText msg; 
+    msg.hScene = hScene; 
+    msg.sText = sText;
+    msg.sFont = sFont;
+    msg.fSize = fSize;
+    msg.nFlags = nFlags;
+    int ok = msg.Request();
+    if (ok) {
+      fBearingX = msg.fBearingX;
+      fBearingY = msg.fBearingY;
+      fWidth = msg.fWidth;
+      fHeight = msg.fHeight;
+      fAdvanceX = msg.fAdvanceX;
+      fAdvanceY = msg.fAdvanceY;
+    } 
+    return ok;
+  }
   ApIN ApHandle hScene;
-  ApIN String sPath;
   ApIN String sText;
-  ApIN double fSize;
   ApIN String sFont;
+  ApIN double fSize;
   ApIN int nFlags;
   ApOUT double fBearingX;
   ApOUT double fBearingY;
@@ -116,6 +172,17 @@ class Msg_Scene_SetFillColor: public ApRequestMessage
 {
 public:
   Msg_Scene_SetFillColor() : ApRequestMessage("Scene_SetFillColor"), fRed(0.0), fGreen(0.0), fBlue(0.0), fAlpha(1.0) {}
+  static int Invoke(const ApHandle& hScene, const String& sPath, double fRed, double fGreen, double fBlue, double fAlpha)
+  { 
+    Msg_Scene_SetFillColor msg; 
+    msg.hScene = hScene; 
+    msg.sPath = sPath; 
+    msg.fRed = fRed; 
+    msg.fGreen = fGreen; 
+    msg.fBlue = fBlue; 
+    msg.fAlpha = fAlpha; 
+    return msg.Request();
+  }
   ApIN ApHandle hScene;
   ApIN String sPath;
   ApIN double fRed;
@@ -128,6 +195,17 @@ class Msg_Scene_SetStrokeColor: public ApRequestMessage
 {
 public:
   Msg_Scene_SetStrokeColor() : ApRequestMessage("Scene_SetStrokeColor"), fRed(0.0), fGreen(0.0), fBlue(0.0), fAlpha(1.0) {}
+  static int Invoke(const ApHandle& hScene, const String& sPath, double fRed, double fGreen, double fBlue, double fAlpha)
+  {
+    Msg_Scene_SetStrokeColor msg; 
+    msg.hScene = hScene; 
+    msg.sPath = sPath; 
+    msg.fRed = fRed; 
+    msg.fGreen = fGreen; 
+    msg.fBlue = fBlue; 
+    msg.fAlpha = fAlpha; 
+    return msg.Request();
+  }
   ApIN ApHandle hScene;
   ApIN String sPath;
   ApIN double fRed;
@@ -140,6 +218,14 @@ class Msg_Scene_SetStrokeWidth: public ApRequestMessage
 {
 public:
   Msg_Scene_SetStrokeWidth() : ApRequestMessage("Scene_SetStrokeWidth"), fWidth(1.0) {}
+  static int Invoke(const ApHandle& hScene, const String& sPath, double fWidth)
+  {
+    Msg_Scene_SetStrokeWidth msg;
+    msg.hScene = hScene;
+    msg.sPath = sPath;
+    msg.fWidth = fWidth;
+    return msg.Request();
+  }
   ApIN ApHandle hScene;
   ApIN String sPath;
   ApIN double fWidth;
