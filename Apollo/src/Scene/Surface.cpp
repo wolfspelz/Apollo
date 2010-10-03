@@ -319,49 +319,32 @@ void Surface::MeasureText(const String& sText, const String& sFont, double fSize
 #include "ximagif.h"
 #include "Image.h"
 
-// (component * alpha) / 255.0 would be correct but slower
-void _PreMultiplyAlpha_mem_RGBA_to_cairo_ARGB_which_actually_is_BGRA_in_mem_on_little_endian(unsigned char* _pPixel, int _nW, int _nH)
-{
-  unsigned int* pPixel = (unsigned int*) _pPixel;
-  int nW = _nW;
-  int nH = _nH;
-  for (int y = 0; y < nH; ++y) {
-    for (int x = 0; x < nW ; ++x) {
-
-      unsigned int color = *pPixel; // AABBGGRR
-      unsigned int a = (color & 0xff000000) >> 24;
-      unsigned int cairo_color = 
-             (color & 0xff000000) // a
-        | (( (color & 0x000000ff)        * a) & 0x0000ff00) << 8 // r
-        | ((((color & 0x0000ff00) >> 8)  * a) & 0x0000ff00) // g
-        | ((((color & 0x00ff0000) >> 16) * a) >> 8) // b
-        ;
-      *pPixel++ = cairo_color; // AARRGGBB
-
-    }
-  }
-}
-
 #endif
+
+void Surface::EraseBackground()
+{
+  //unsigned char* pPixel = pBits_;
+  //for (int y = 0; y < nH_; ++y) {
+  //  for (int x = 0; x < nW_ ; ++x) {
+  //    *pPixel++ = 0;
+  //    *pPixel++ = 0;
+  //    *pPixel++ = 0;
+  //    *pPixel++ = 0;
+  //  }
+  //}
+
+  cairo_save(pCairo_);
+  cairo_set_operator(pCairo_, CAIRO_OPERATOR_CLEAR);
+  cairo_paint(pCairo_);
+  cairo_restore(pCairo_);
+}
 
 void Surface::Draw()
 {
   if (hBitmap_ == NULL) { return; }
 //  if (!bVisible_) { return; }
 
-  unsigned char* pPixel = pBits_;
-  for (int y = 0; y < nH_; ++y) {
-    for (int x = 0; x < nW_ ; ++x) {
-      *pPixel++ = 0;
-      *pPixel++ = 0;
-      *pPixel++ = 0;
-      *pPixel++ = 0;
-    }
-  }
-
-  //cairo_rectangle(cr, 50, 50, 100, 100);
-  //cairo_set_source_rgba(cr, 0.0, 1.0, 0.0, 0.5);
-  //cairo_fill(cr);
+  EraseBackground();
 
   GraphicsContext gc;
   gc.pCairo_ = pCairo_;
@@ -398,6 +381,7 @@ void Surface::Draw()
 
 #define FROM_DATA
 #define TASSADAR_GIF
+//#define TEST_PNG
 
 #ifdef FROM_FILE
 #ifdef TASSADAR_PNG
@@ -416,41 +400,44 @@ void Surface::Draw()
 #ifdef TEST_PNG
   Apollo::loadFile(Apollo::getAppResourcePath() + "tassadar" + String::filenamePathSeparator() + "test.png", sbData);
 #endif
-  CxImage img(sbData.Data(), sbData.Length(), CXIMAGE_FORMAT_UNKNOWN);
+  CxImage cxImg(sbData.Data(), sbData.Length(), CXIMAGE_FORMAT_UNKNOWN);
 #ifdef TASSADAR_GIF
-  img.SetRetreiveAllFrames(true);
-  int nFrames = img.GetNumFrames();
-  img.SetFrame(nFrames - 1);
-  img.Decode(sbData.Data(), sbData.Length(), CXIMAGE_FORMAT_GIF);
-  CxImage* pImgFrame = img.GetFrame(0);
+  cxImg.SetRetreiveAllFrames(true);
+  int nFrames = cxImg.GetNumFrames();
+  cxImg.SetFrame(nFrames - 1);
+  cxImg.Decode(sbData.Data(), sbData.Length(), CXIMAGE_FORMAT_GIF);
+  CxImage* pCxImgFrame = cxImg.GetFrame(0);
 #endif
 #ifdef TEST_PNG
-  CxImage* pImgFrame = &img;
+  CxImage* pCxImgFrame = &cxImg;
 #endif
   Apollo::Image apImg;
-  apImg.Allocate(pImgFrame->GetWidth(), pImgFrame->GetHeight());
+  apImg.Allocate(pCxImgFrame->GetWidth(), pCxImgFrame->GetHeight());
   CxMemFile mfDest((BYTE*) apImg.Pixels(), apImg.Size());
-  pImgFrame->AlphaFromTransparency();
-  pImgFrame->Encode2RGBA(&mfDest, true);
+  pCxImgFrame->AlphaFromTransparency();
+  pCxImgFrame->Encode2RGBA(&mfDest, true);
+
+  Apollo::Image apImgPremultiplied;
+  apImgPremultiplied.Allocate(apImg.Width(), apImg.Height());
+  apImgPremultiplied.CopyData_PreMultiplyAlpha_mem_RGBA_to_cairo_ARGB_which_actually_is_BGRA_in_mem_on_little_endian(apImg);
 
   //{
   //  Apollo::TimeValue tvBegin = Apollo::TimeValue::getTime();
   //  for (int i = 0; i < 10000; ++i) {
-  //    _PreMultiplyAlpha_mem_RGBA_to_cairo_ARGB_which_actually_is_BGRA_in_mem_on_little_endian(mfDest.GetBuffer(false), pImgFrame->GetWidth(), pImgFrame->GetHeight());
+  //    _PreMultiplyAlpha_mem_RGBA_to_cairo_ARGB_which_actually_is_BGRA_in_mem_on_little_endian(mfDest.GetBuffer(false), pCxImgFrame->GetWidth(), pCxImgFrame->GetHeight());
   //  }
   //  Apollo::TimeValue tvEnd = Apollo::TimeValue::getTime();
   //  Apollo::TimeValue tvDelay = tvEnd - tvBegin;
   //  apLog_Debug((LOG_CHANNEL, "############# 1", "usec=%d.%06d", tvDelay.Sec(), tvDelay.MicroSec()));
   //}
 
-  _PreMultiplyAlpha_mem_RGBA_to_cairo_ARGB_which_actually_is_BGRA_in_mem_on_little_endian(mfDest.GetBuffer(false), pImgFrame->GetWidth(), pImgFrame->GetHeight());
-  cairo_surface_t *image = cairo_image_surface_create_for_data(mfDest.GetBuffer(false), CAIRO_FORMAT_ARGB32, pImgFrame->GetWidth(), pImgFrame->GetHeight(), pImgFrame->GetWidth() * 4);
+  cairo_surface_t *pCairoImage = cairo_image_surface_create_for_data((unsigned char*) apImgPremultiplied.Pixels(), CAIRO_FORMAT_ARGB32, apImgPremultiplied.Width(), apImgPremultiplied.Height(), apImgPremultiplied.Width() * 4);
 #endif // FROM_DATA
 
-  int w = cairo_image_surface_get_width(image);
-  int h = cairo_image_surface_get_height(image);
+  int w = cairo_image_surface_get_width(pCairoImage);
+  int h = cairo_image_surface_get_height(pCairoImage);
 
-  cairo_set_source_surface(pCairo_, image, 0, 0);
+  cairo_set_source_surface(pCairo_, pCairoImage, 0, 0);
   cairo_paint(pCairo_);
 
   cairo_select_font_face(pCairo_, "Verdana", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);

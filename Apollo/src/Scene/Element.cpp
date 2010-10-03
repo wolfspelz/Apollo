@@ -108,46 +108,37 @@ int Element::DeleteElement(const String& sPath)
 
 // ----------------------------------------------------------
 
-void Element::SetRectangle(double fX, double fY, double fW, double fH)
+void Element::CreateRectangle(double fX, double fY, double fW, double fH)
 {
   if (pGraphics_) {
-    if (pGraphics_->IsRectangle()) {
-      ((RectangleX*) pGraphics_)->SetCoordinates(fX, fY, fW, fH);
-    } else {
-      delete pGraphics_;
-      pGraphics_ = 0;
-    }
+    delete pGraphics_;
+    pGraphics_ = 0;
   }
 
-  if (pGraphics_ == 0) {
-    pGraphics_ = new RectangleX(fX, fY, fW, fH);
-  }
-
-  if (pGraphics_ == 0 || !pGraphics_->IsRectangle()) {
-    throw ApException("Element::SetRectangle failed");
-  }
+  pGraphics_ = new RectangleX(fX, fY, fW, fH);
+  if (pGraphics_ == 0) { throw ApException("Element::CreateRectangle failed"); }
 }
 
-void Element::SetText(double fX, double fY, const String& sText, const String& sFont, double fSize, int nFlags)
+void Element::CreateImage(double fX, double fY, Apollo::Image& image)
 {
   if (pGraphics_) {
-    if (pGraphics_->IsText()) {
-      ((TextX*) pGraphics_)->SetCoordinates(fX, fY);
-      ((TextX*) pGraphics_)->SetString(sText);
-      ((TextX*) pGraphics_)->SetFont(sFont, fSize, nFlags);
-    } else {
-      delete pGraphics_;
-      pGraphics_ = 0;
-    }
+    delete pGraphics_;
+    pGraphics_ = 0;
   }
 
-  if (pGraphics_ == 0) {
-    pGraphics_ = new TextX(fX, fY, sText, sFont, fSize, nFlags);
+  pGraphics_ = new ImageX(fX, fY, image);
+  if (pGraphics_ == 0) { throw ApException("Element::CreateImage failed"); }
+}
+
+void Element::CreateText(double fX, double fY, const String& sText, const String& sFont, double fSize, int nFlags)
+{
+  if (pGraphics_) {
+    delete pGraphics_;
+    pGraphics_ = 0;
   }
 
-  if (pGraphics_ == 0 || !pGraphics_->IsText()) {
-    throw ApException("Element::SetText failed");
-  }
+  pGraphics_ = new TextX(fX, fY, sText, sFont, fSize, nFlags);
+  if (pGraphics_ == 0) { throw ApException("Element::CreateText failed"); }
 }
 
 void Element::SetFillColor(double fRed, double fGreen, double fBlue, double fAlpha)
