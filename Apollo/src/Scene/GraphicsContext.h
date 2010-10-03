@@ -15,7 +15,12 @@
 class GraphicsContext
 {
 public:
-  GraphicsContext() {}
+  GraphicsContext()
+    :pCairo_(0)
+    ,nH_(0)
+    ,fTranslateX_(0.0)
+    ,fTranslateY_(0.0)
+  {}
   virtual ~GraphicsContext() {}
 
   void Implement();
@@ -23,6 +28,9 @@ public:
 
   cairo_t* pCairo_;
   int nH_;
+
+  double fTranslateX_;
+  double fTranslateY_;
 };
 
 #endif // GraphicsContext_H_INCLUDED

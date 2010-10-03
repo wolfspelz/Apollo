@@ -108,6 +108,24 @@ int Element::DeleteElement(const String& sPath)
 
 // ----------------------------------------------------------
 
+void Element::Translate(double fX, double fY)
+{
+  fTranslateX_ = fX;
+  fTranslateY_ = -fY;
+
+  bTransform_ = (fTranslateX_ != 0.0 || fTranslateY_ != 0.0 || fScaleX_ != 1.0 || fScaleY_ != 1.0);
+}
+
+void Element::Scale(double fX, double fY)
+{
+  fScaleX_ = fX;
+  fScaleY_ = fY;
+
+  bTransform_ = (fTranslateX_ != 0.0 || fTranslateY_ != 0.0 || fScaleX_ != 1.0 || fScaleY_ != 1.0);
+}
+
+// ----------------------------------------------------------
+
 void Element::CreateRectangle(double fX, double fY, double fW, double fH)
 {
   if (pGraphics_) {
@@ -168,10 +186,29 @@ void Element::SetStrokeWidth(double fWidth)
   }
 }
 
+void Element::SetImageData(const Apollo::Image& image)
+{
+  if (pGraphics_ && pGraphics_->IsImage()) {
+    ((ImageX*) pGraphics_)->SetImage(image);
+  } else {
+    throw ApException("Element::SetImageData: not an Image");
+  }
+}
+
 // ----------------------------------------------------------
 
 void Element::Draw(GraphicsContext& gc)
 {
+  //GraphicsContext gcNext = gc;
+  //gcNext.fTranslateX_ += fTranslateX_;
+  //gcNext.fTranslateY_ += fTranslateY_;
+
+  if (bTransform_) {
+    cairo_save(gc.Cairo());
+    cairo_translate(gc.Cairo(), fTranslateX_, fTranslateY_);
+    cairo_scale(gc.Cairo(), fScaleX_, fScaleY_);
+  }
+
   if (pGraphics_) {
     pGraphics_->Draw(gc);
   }
@@ -185,5 +222,8 @@ void Element::Draw(GraphicsContext& gc)
       }
     }
   }
-}
 
+  if (bTransform_) {
+    cairo_restore(gc.Cairo());
+  }
+}
