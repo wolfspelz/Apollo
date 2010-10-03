@@ -34,12 +34,15 @@ public:
   void On_Scene_CreateElement(Msg_Scene_CreateElement* pMsg);
   void On_Scene_DeleteElement(Msg_Scene_DeleteElement* pMsg);
   void On_Scene_CreateRectangle(Msg_Scene_CreateRectangle* pMsg);
+  void On_Scene_TranslateElement(Msg_Scene_TranslateElement* pMsg);
+  void On_Scene_ScaleElement(Msg_Scene_ScaleElement* pMsg);
   void On_Scene_CreateImage(Msg_Scene_CreateImage* pMsg);
   void On_Scene_CreateText(Msg_Scene_CreateText* pMsg);
   void On_Scene_MeasureText(Msg_Scene_MeasureText* pMsg);
   void On_Scene_SetFillColor(Msg_Scene_SetFillColor* pMsg);
   void On_Scene_SetStrokeColor(Msg_Scene_SetStrokeColor* pMsg);
   void On_Scene_SetStrokeWidth(Msg_Scene_SetStrokeWidth* pMsg);
+  void On_Scene_SetImageData(Msg_Scene_SetImageData* pMsg);
   void On_Scene_Draw(Msg_Scene_Draw* pMsg);
 
 #if defined(AP_TEST)

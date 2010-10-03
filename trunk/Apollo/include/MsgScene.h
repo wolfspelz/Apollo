@@ -58,6 +58,44 @@ public:
   ApIN String sPath;
 };
 
+class Msg_Scene_TranslateElement: public ApRequestMessage
+{
+public:
+  Msg_Scene_TranslateElement() : ApRequestMessage("Scene_TranslateElement"), fX(0), fY(0) {}
+  static int Invoke(const ApHandle& hScene, const String& sPath, double fX, double fY)
+  {
+    Msg_Scene_TranslateElement msg; 
+    msg.hScene = hScene; 
+    msg.sPath = sPath;
+    msg.fX = fX; 
+    msg.fY = fY; 
+    return msg.Request();
+  }
+  ApIN ApHandle hScene;
+  ApIN String sPath;
+  ApIN double fX;
+  ApIN double fY;
+};
+
+class Msg_Scene_ScaleElement: public ApRequestMessage
+{
+public:
+  Msg_Scene_ScaleElement() : ApRequestMessage("Scene_ScaleElement"), fX(0), fY(0) {}
+  static int Invoke(const ApHandle& hScene, const String& sPath, double fX, double fY)
+  {
+    Msg_Scene_ScaleElement msg; 
+    msg.hScene = hScene; 
+    msg.sPath = sPath;
+    msg.fX = fX; 
+    msg.fY = fY; 
+    return msg.Request();
+  }
+  ApIN ApHandle hScene;
+  ApIN String sPath;
+  ApIN double fX;
+  ApIN double fY;
+};
+
 class Msg_Scene_DeleteElement: public ApRequestMessage
 {
 public:
@@ -251,6 +289,23 @@ public:
   ApIN ApHandle hScene;
   ApIN String sPath;
   ApIN double fWidth;
+};
+
+class Msg_Scene_SetImageData: public ApRequestMessage
+{
+public:
+  Msg_Scene_SetImageData() : ApRequestMessage("Scene_SetImageData") {}
+  static int Invoke(const ApHandle& hScene, const String& sPath, const Apollo::Image& image)
+  {
+    Msg_Scene_SetImageData msg;
+    msg.hScene = hScene;
+    msg.sPath = sPath;
+    msg.image.CopyReference(image);
+    return msg.Request();
+  }
+  ApIN ApHandle hScene;
+  ApIN String sPath;
+  ApIN Apollo::Image image;
 };
 
 class Msg_Scene_Draw: public ApRequestMessage
