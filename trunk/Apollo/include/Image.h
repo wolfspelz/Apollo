@@ -28,17 +28,18 @@ public:
 
   void CopyReference(const Image& iSource);
   void CopyData(const Image& iSource);
-  
+  void CopyData_PreMultiplyAlpha_mem_RGBA_to_cairo_ARGB_which_actually_is_BGRA_in_mem_on_little_endian(const Apollo::Image& iSource);
+
   Pixel* Allocate(int nWidth, int nHeight);
   void Free();
-  Pixel* Pixels() { return pPixels_; }
-  size_t Size() { return nSize_; }
-  int Width() { return nWidth_; }
-  int Height() { return nHeight_; }
+  Pixel* Pixels() const { return pPixels_; }
+  size_t Size() const { return nSize_; }
+  int Width() const { return nWidth_; }
+  int Height() const { return nHeight_; }
 
 protected:
   // Do not use copy contructor or assignment
-  // Use CopyReference or CopyData explicitely
+  // Use CopyReference or CopyData explicitly
   Image(const Image& iSource);
   Image& operator=(const Image& iSource);
 

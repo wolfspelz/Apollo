@@ -35,8 +35,9 @@ public:
   int CreateElement(const String& sPath);
   int DeleteElement(const String& sPath);
 
-  void SetRectangle(double fX, double fY, double fW, double fH);
-  void SetText(double fX, double fY, const String& sText, const String& sFont, double fSize, int nFlags);
+  void CreateRectangle(double fX, double fY, double fW, double fH);
+  void CreateImage(double fX, double fY, Apollo::Image& image);
+  void CreateText(double fX, double fY, const String& sText, const String& sFont, double fSize, int nFlags);
 
   void SetFillColor(double fRed, double fGreen, double fBlue, double fAlpha);
   void SetStrokeColor(double fRed, double fGreen, double fBlue, double fAlpha);

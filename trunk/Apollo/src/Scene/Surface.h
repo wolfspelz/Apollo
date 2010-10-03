@@ -53,6 +53,7 @@ public:
 protected:
   int CreateBitmap();
   void DestroyBitmap();
+  void EraseBackground();
 
 protected:
   ApHandle hAp_;
@@ -75,6 +76,10 @@ protected:
   HDC dcMemory_;
   HBITMAP hOldBitmap_;
 #endif // WIN32
+
+#if defined(AP_TEST)
+  friend class SceneModuleTester;
+#endif
 };
 
 #endif // Surface_H_INCLUDED

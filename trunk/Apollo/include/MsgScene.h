@@ -8,6 +8,7 @@
 #define MsgScene_h_INCLUDED
 
 #include "ApMessage.h"
+#include "Image.h"
 
 class Msg_Scene_Create: public ApRequestMessage
 {
@@ -72,13 +73,13 @@ public:
   ApIN String sPath;
 };
 
-class Msg_Scene_SetRectangle: public ApRequestMessage
+class Msg_Scene_CreateRectangle: public ApRequestMessage
 {
 public:
-  Msg_Scene_SetRectangle() : ApRequestMessage("Scene_SetRectangle"), fX(0), fY(0), fW(0), fH(0) {}
+  Msg_Scene_CreateRectangle() : ApRequestMessage("Scene_CreateRectangle"), fX(0), fY(0), fW(0), fH(0) {}
   static int Invoke(const ApHandle& hScene, const String& sPath, double fX, double fY, double fW, double fH)
   {
-    Msg_Scene_SetRectangle msg; 
+    Msg_Scene_CreateRectangle msg; 
     msg.hScene = hScene; 
     msg.sPath = sPath; 
     msg.fX = fX; 
@@ -95,6 +96,27 @@ public:
   ApIN double fH;
 };
 
+class Msg_Scene_CreateImage: public ApRequestMessage
+{
+public:
+  Msg_Scene_CreateImage() : ApRequestMessage("Scene_CreateImage"), fX(0), fY(0) {}
+  static int Invoke(const ApHandle& hScene, const String& sPath, double fX, double fY, const Apollo::Image& image)
+  {
+    Msg_Scene_CreateImage msg; 
+    msg.hScene = hScene; 
+    msg.sPath = sPath; 
+    msg.fX = fX; 
+    msg.fY = fY; 
+    msg.image.CopyReference(image);
+    return msg.Request();
+  }
+  ApIN ApHandle hScene;
+  ApIN String sPath;
+  ApIN double fX;
+  ApIN double fY;
+  ApIN Apollo::Image image;
+};
+
 class Msg_Scene_FontFlags: public ApRequestMessage
 {
 public:
@@ -105,13 +127,13 @@ public:
   } FontFlags;
 };
 
-class Msg_Scene_SetText: public ApRequestMessage
+class Msg_Scene_CreateText: public ApRequestMessage
 {
 public:
-  Msg_Scene_SetText() : ApRequestMessage("Scene_SetText"), fX(0), fY(0), fSize(12), nFlags(Msg_Scene_FontFlags::Normal) {}
+  Msg_Scene_CreateText() : ApRequestMessage("Scene_CreateText"), fX(0), fY(0), fSize(12), nFlags(Msg_Scene_FontFlags::Normal) {}
   static int Invoke(const ApHandle& hScene, const String& sPath, double fX, double fY, String sText, String sFont, double fSize, int nFlags)
   {
-    Msg_Scene_SetText msg; 
+    Msg_Scene_CreateText msg; 
     msg.hScene = hScene; 
     msg.sPath = sPath; 
     msg.fX = fX; 

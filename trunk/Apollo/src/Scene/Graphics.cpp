@@ -53,6 +53,15 @@ void Shape::FillAndStroke(GraphicsContext& gc)
 
 // ----------------------------------------------------------
 
+RectangleX::RectangleX(double fX, double fY, double fW, double fH)
+{
+  SetCoordinates(fX, fY, fW, fH);
+}
+
+RectangleX::~RectangleX()
+{
+}
+
 void RectangleX::Draw(GraphicsContext& gc)
 {
   cairo_rectangle(gc.Cairo(), fX_, gc.nH_ - fY_ - fH_, fW_, fH_);
@@ -61,6 +70,50 @@ void RectangleX::Draw(GraphicsContext& gc)
 }
 
 // ----------------------------------------------------------
+
+ImageX::ImageX(double fX, double fY, const Apollo::Image& image)
+{
+  SetCoordinates(fX, fY);
+  SetImage(image);
+}
+
+ImageX::~ImageX()
+{
+}
+
+void ImageX::SetImage(const Apollo::Image& image)
+{
+  image_.CopyData_PreMultiplyAlpha_mem_RGBA_to_cairo_ARGB_which_actually_is_BGRA_in_mem_on_little_endian(image);
+}
+
+#include "ximagif.h"
+
+void ImageX::Draw(GraphicsContext& gc)
+{
+  cairo_surface_t* pImage = cairo_image_surface_create_for_data((unsigned char *) image_.Pixels(), CAIRO_FORMAT_ARGB32, image_.Width(), image_.Height(), image_.Width() * 4);
+  if (pImage) {
+
+    //int nImageW = cairo_image_surface_get_width(pImage);
+    int nImageH = cairo_image_surface_get_height(pImage);
+    cairo_set_source_surface(gc.Cairo(), pImage, fX_, gc.nH_ - fY_ - nImageH);
+    cairo_paint(gc.Cairo());
+
+    cairo_surface_destroy(pImage);
+  }
+}
+
+// ----------------------------------------------------------
+
+TextX::TextX(double fX, double fY, const String& sText, const String& sFont, double fSize, int nFlags)
+{
+  SetCoordinates(fX, fY);
+  SetString(sText);
+  SetFont(sFont, fSize, nFlags);
+}
+
+TextX::~TextX()
+{
+}
 
 void TextX::Draw(GraphicsContext& gc)
 {

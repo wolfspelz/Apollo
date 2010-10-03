@@ -33,8 +33,9 @@ public:
   void On_Scene_Visibility(Msg_Scene_Visibility* pMsg);
   void On_Scene_CreateElement(Msg_Scene_CreateElement* pMsg);
   void On_Scene_DeleteElement(Msg_Scene_DeleteElement* pMsg);
-  void On_Scene_SetRectangle(Msg_Scene_SetRectangle* pMsg);
-  void On_Scene_SetText(Msg_Scene_SetText* pMsg);
+  void On_Scene_CreateRectangle(Msg_Scene_CreateRectangle* pMsg);
+  void On_Scene_CreateImage(Msg_Scene_CreateImage* pMsg);
+  void On_Scene_CreateText(Msg_Scene_CreateText* pMsg);
   void On_Scene_MeasureText(Msg_Scene_MeasureText* pMsg);
   void On_Scene_SetFillColor(Msg_Scene_SetFillColor* pMsg);
   void On_Scene_SetStrokeColor(Msg_Scene_SetStrokeColor* pMsg);

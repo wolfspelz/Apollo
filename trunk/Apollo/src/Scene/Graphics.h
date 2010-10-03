@@ -8,6 +8,7 @@
 #define Graphics_H_INCLUDED
 
 #include "Apollo.h"
+#include "Image.h"
 
 #if defined(AP_TEST)
 #include "SceneModuleTester.h"
@@ -32,6 +33,7 @@ public:
   virtual void Draw(GraphicsContext& gc) = 0;
 
   virtual bool IsRectangle() { return false; }
+  virtual bool IsImage() { return false; }
   virtual bool IsShape() { return false; }
   virtual bool IsText() { return false; }
 
@@ -72,13 +74,8 @@ protected:
 class RectangleX: public Shape
 {
 public:
-  RectangleX(double fX, double fY, double fW, double fH)
-    :fX_(fX)
-    ,fY_(fY)
-    ,fW_(fW)
-    ,fH_(fH)
-  {}
-  virtual ~RectangleX() {}
+  RectangleX(double fX, double fY, double fW, double fH);
+  virtual ~RectangleX();
 
   virtual bool IsRectangle() { return true; }
 
@@ -91,6 +88,25 @@ protected:
   double fY_;
   double fW_;
   double fH_;
+};
+
+class ImageX: public Graphics
+{
+public:
+  ImageX(double fX, double fY, const Apollo::Image& image);
+  virtual ~ImageX();
+
+  virtual bool IsImage() { return true; }
+
+  virtual void SetCoordinates(double fX, double fY) { fX_ = fX; fY_ = fY; }
+  virtual void SetImage(const Apollo::Image& image);
+
+  void Draw(GraphicsContext& gc);
+
+protected:
+  double fX_;
+  double fY_;
+  Apollo::Image image_;
 };
 
 class TextExtents
@@ -114,15 +130,8 @@ public:
     ,LastFlag = 1 << 2
   } FontFlags;
 
-  TextX(double fX, double fY, const String& sText, const String& sFont, double fSize, int nFlags)
-    :fX_(fX)
-    ,fY_(fY)
-    ,sText_(sText)
-    ,sFont_(sFont)
-    ,fSize_(fSize)
-    ,nFlags_(nFlags)
-  {}
-  virtual ~TextX() {}
+  TextX(double fX, double fY, const String& sText, const String& sFont, double fSize, int nFlags);
+  virtual ~TextX();
 
   virtual bool IsText() { return true; }
 
