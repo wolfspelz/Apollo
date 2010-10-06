@@ -31,6 +31,7 @@ public:
     ,fTranslateY_(0.0)
     ,fScaleX_(1.0)
     ,fScaleY_(1.0)
+    ,fRotate_(0.0)
   {}
   virtual ~Element();
 
@@ -42,6 +43,7 @@ public:
 
   void Translate(double fX, double fY);
   void Scale(double fX, double fY);
+  void Rotate(double fAngle);
 
   void CreateRectangle(double fX, double fY, double fW, double fH);
   void CreateImage(double fX, double fY, Apollo::Image& image);
@@ -61,6 +63,7 @@ protected:
   double fTranslateY_;
   double fScaleX_;
   double fScaleY_;
+  double fRotate_;
 
 #if defined(AP_TEST)
   friend class SceneModuleTester;
