@@ -47,7 +47,7 @@ class Msg_Scene_CreateElement: public ApRequestMessage
 {
 public:
   Msg_Scene_CreateElement() : ApRequestMessage("Scene_CreateElement") {}
-  static int Invoke(const ApHandle& hScene, const String& sPath)
+  static int _(const ApHandle& hScene, const String& sPath)
   {
     Msg_Scene_CreateElement msg; 
     msg.hScene = hScene; 
@@ -62,7 +62,7 @@ class Msg_Scene_TranslateElement: public ApRequestMessage
 {
 public:
   Msg_Scene_TranslateElement() : ApRequestMessage("Scene_TranslateElement"), fX(0), fY(0) {}
-  static int Invoke(const ApHandle& hScene, const String& sPath, double fX, double fY)
+  static int _(const ApHandle& hScene, const String& sPath, double fX, double fY)
   {
     Msg_Scene_TranslateElement msg; 
     msg.hScene = hScene; 
@@ -81,7 +81,7 @@ class Msg_Scene_ScaleElement: public ApRequestMessage
 {
 public:
   Msg_Scene_ScaleElement() : ApRequestMessage("Scene_ScaleElement"), fX(0), fY(0) {}
-  static int Invoke(const ApHandle& hScene, const String& sPath, double fX, double fY)
+  static int _(const ApHandle& hScene, const String& sPath, double fX, double fY)
   {
     Msg_Scene_ScaleElement msg; 
     msg.hScene = hScene; 
@@ -96,11 +96,28 @@ public:
   ApIN double fY;
 };
 
+class Msg_Scene_RotateElement: public ApRequestMessage
+{
+public:
+  Msg_Scene_RotateElement() : ApRequestMessage("Scene_RotateElement"), fAngle(0) {}
+  static int _(const ApHandle& hScene, const String& sPath, double fAngle)
+  {
+    Msg_Scene_RotateElement msg; 
+    msg.hScene = hScene; 
+    msg.sPath = sPath;
+    msg.fAngle = fAngle; 
+    return msg.Request();
+  }
+  ApIN ApHandle hScene;
+  ApIN String sPath;
+  ApIN double fAngle;
+};
+
 class Msg_Scene_DeleteElement: public ApRequestMessage
 {
 public:
   Msg_Scene_DeleteElement() : ApRequestMessage("Scene_DeleteElement") {}
-  static int Invoke(const ApHandle& hScene, const String& sPath)
+  static int _(const ApHandle& hScene, const String& sPath)
   {
     Msg_Scene_DeleteElement msg; 
     msg.hScene = hScene; 
@@ -115,7 +132,7 @@ class Msg_Scene_CreateRectangle: public ApRequestMessage
 {
 public:
   Msg_Scene_CreateRectangle() : ApRequestMessage("Scene_CreateRectangle"), fX(0), fY(0), fW(0), fH(0) {}
-  static int Invoke(const ApHandle& hScene, const String& sPath, double fX, double fY, double fW, double fH)
+  static int _(const ApHandle& hScene, const String& sPath, double fX, double fY, double fW, double fH)
   {
     Msg_Scene_CreateRectangle msg; 
     msg.hScene = hScene; 
@@ -138,7 +155,7 @@ class Msg_Scene_CreateImage: public ApRequestMessage
 {
 public:
   Msg_Scene_CreateImage() : ApRequestMessage("Scene_CreateImage"), fX(0), fY(0) {}
-  static int Invoke(const ApHandle& hScene, const String& sPath, double fX, double fY, const Apollo::Image& image)
+  static int _(const ApHandle& hScene, const String& sPath, double fX, double fY, const Apollo::Image& image)
   {
     Msg_Scene_CreateImage msg; 
     msg.hScene = hScene; 
@@ -169,7 +186,7 @@ class Msg_Scene_CreateText: public ApRequestMessage
 {
 public:
   Msg_Scene_CreateText() : ApRequestMessage("Scene_CreateText"), fX(0), fY(0), fSize(12), nFlags(Msg_Scene_FontFlags::Normal) {}
-  static int Invoke(const ApHandle& hScene, const String& sPath, double fX, double fY, String sText, String sFont, double fSize, int nFlags)
+  static int _(const ApHandle& hScene, const String& sPath, double fX, double fY, String sText, String sFont, double fSize, int nFlags)
   {
     Msg_Scene_CreateText msg; 
     msg.hScene = hScene; 
@@ -196,7 +213,7 @@ class Msg_Scene_MeasureText: public ApRequestMessage
 {
 public:
   Msg_Scene_MeasureText() : ApRequestMessage("Scene_MeasureText"), fSize(12), nFlags(Msg_Scene_FontFlags::Normal) {}
-  static int Invoke(const ApHandle& hScene, const String& sText, const String& sFont, double fSize, int nFlags, double& fBearingX, double& fBearingY, double& fWidth, double& fHeight, double& fAdvanceX, double& fAdvanceY)
+  static int _(const ApHandle& hScene, const String& sText, const String& sFont, double fSize, int nFlags, double& fBearingX, double& fBearingY, double& fWidth, double& fHeight, double& fAdvanceX, double& fAdvanceY)
   { 
     Msg_Scene_MeasureText msg; 
     msg.hScene = hScene; 
@@ -232,7 +249,7 @@ class Msg_Scene_SetFillColor: public ApRequestMessage
 {
 public:
   Msg_Scene_SetFillColor() : ApRequestMessage("Scene_SetFillColor"), fRed(0.0), fGreen(0.0), fBlue(0.0), fAlpha(1.0) {}
-  static int Invoke(const ApHandle& hScene, const String& sPath, double fRed, double fGreen, double fBlue, double fAlpha)
+  static int _(const ApHandle& hScene, const String& sPath, double fRed, double fGreen, double fBlue, double fAlpha)
   { 
     Msg_Scene_SetFillColor msg; 
     msg.hScene = hScene; 
@@ -255,7 +272,7 @@ class Msg_Scene_SetStrokeColor: public ApRequestMessage
 {
 public:
   Msg_Scene_SetStrokeColor() : ApRequestMessage("Scene_SetStrokeColor"), fRed(0.0), fGreen(0.0), fBlue(0.0), fAlpha(1.0) {}
-  static int Invoke(const ApHandle& hScene, const String& sPath, double fRed, double fGreen, double fBlue, double fAlpha)
+  static int _(const ApHandle& hScene, const String& sPath, double fRed, double fGreen, double fBlue, double fAlpha)
   {
     Msg_Scene_SetStrokeColor msg; 
     msg.hScene = hScene; 
@@ -278,7 +295,7 @@ class Msg_Scene_SetStrokeWidth: public ApRequestMessage
 {
 public:
   Msg_Scene_SetStrokeWidth() : ApRequestMessage("Scene_SetStrokeWidth"), fWidth(1.0) {}
-  static int Invoke(const ApHandle& hScene, const String& sPath, double fWidth)
+  static int _(const ApHandle& hScene, const String& sPath, double fWidth)
   {
     Msg_Scene_SetStrokeWidth msg;
     msg.hScene = hScene;
@@ -295,7 +312,7 @@ class Msg_Scene_SetImageData: public ApRequestMessage
 {
 public:
   Msg_Scene_SetImageData() : ApRequestMessage("Scene_SetImageData") {}
-  static int Invoke(const ApHandle& hScene, const String& sPath, const Apollo::Image& image)
+  static int _(const ApHandle& hScene, const String& sPath, const Apollo::Image& image)
   {
     Msg_Scene_SetImageData msg;
     msg.hScene = hScene;

@@ -111,9 +111,10 @@ int Element::DeleteElement(const String& sPath)
 void Element::Translate(double fX, double fY)
 {
   fTranslateX_ = fX;
-  fTranslateY_ = -fY;
+  fTranslateY_ = fY;
+  //fTranslateY_ = -fY; // -V
 
-  bTransform_ = (fTranslateX_ != 0.0 || fTranslateY_ != 0.0 || fScaleX_ != 1.0 || fScaleY_ != 1.0);
+  bTransform_ = (fTranslateX_ != 0.0 || fTranslateY_ != 0.0 || fScaleX_ != 1.0 || fScaleY_ != 1.0 || fRotate_ != 0.0);
 }
 
 void Element::Scale(double fX, double fY)
@@ -121,7 +122,14 @@ void Element::Scale(double fX, double fY)
   fScaleX_ = fX;
   fScaleY_ = fY;
 
-  bTransform_ = (fTranslateX_ != 0.0 || fTranslateY_ != 0.0 || fScaleX_ != 1.0 || fScaleY_ != 1.0);
+  bTransform_ = (fTranslateX_ != 0.0 || fTranslateY_ != 0.0 || fScaleX_ != 1.0 || fScaleY_ != 1.0 || fRotate_ != 0.0);
+}
+
+void Element::Rotate(double fAngle)
+{
+  fRotate_ = fAngle;
+
+  bTransform_ = (fTranslateX_ != 0.0 || fTranslateY_ != 0.0 || fScaleX_ != 1.0 || fScaleY_ != 1.0 || fRotate_ != 0.0);
 }
 
 // ----------------------------------------------------------
@@ -205,8 +213,15 @@ void Element::Draw(GraphicsContext& gc)
 
   if (bTransform_) {
     cairo_save(gc.Cairo());
-    cairo_translate(gc.Cairo(), fTranslateX_, fTranslateY_);
-    cairo_scale(gc.Cairo(), fScaleX_, fScaleY_);
+    if (fTranslateX_ != 0.0 || fTranslateY_ != 0.0) {
+      cairo_translate(gc.Cairo(), fTranslateX_, fTranslateY_);
+    }
+    if (fScaleX_ != 0.0 || fScaleY_ != 0.0) {
+      cairo_scale(gc.Cairo(), fScaleX_, fScaleY_);
+    }
+    if (fRotate_ != 0.0) {
+      cairo_rotate(gc.Cairo(), fRotate_);
+    }
   }
 
   if (pGraphics_) {
