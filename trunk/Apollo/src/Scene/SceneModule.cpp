@@ -121,11 +121,19 @@ AP_MSG_HANDLER_METHOD(SceneModule, Scene_CreateRectangle)
   pMsg->apStatus = ApMessage::Ok;
 }
 
-AP_MSG_HANDLER_METHOD(SceneModule, Scene_CreateImage)
+AP_MSG_HANDLER_METHOD(SceneModule, Scene_CreateImageFromData)
 {
   Surface* pSurface = FindSurface(pMsg->hScene);
   pSurface->CreateElement(pMsg->sPath);
-  pSurface->FindElement(pMsg->sPath)->CreateImage(pMsg->fX, pMsg->fY, pMsg->image);
+  pSurface->FindElement(pMsg->sPath)->CreateImageFromData(pMsg->fX, pMsg->fY, pMsg->image);
+  pMsg->apStatus = ApMessage::Ok;
+}
+
+AP_MSG_HANDLER_METHOD(SceneModule, Scene_CreateImageFromFile)
+{
+  Surface* pSurface = FindSurface(pMsg->hScene);
+  pSurface->CreateElement(pMsg->sPath);
+  pSurface->FindElement(pMsg->sPath)->CreateImageFromFile(pMsg->fX, pMsg->fY, pMsg->sFile);
   pMsg->apStatus = ApMessage::Ok;
 }
 
@@ -181,10 +189,24 @@ AP_MSG_HANDLER_METHOD(SceneModule, Scene_SetImageData)
   pMsg->apStatus = ApMessage::Ok;
 }
 
+AP_MSG_HANDLER_METHOD(SceneModule, Scene_DeleteImageData)
+{
+  Surface* pSurface = FindSurface(pMsg->hScene);
+  pSurface->FindElement(pMsg->sPath)->DeleteImageData();
+  pMsg->apStatus = ApMessage::Ok;
+}
+
 AP_MSG_HANDLER_METHOD(SceneModule, Scene_SetImageFile)
 {
   Surface* pSurface = FindSurface(pMsg->hScene);
   pSurface->FindElement(pMsg->sPath)->SetImageFile(pMsg->sFile);
+  pMsg->apStatus = ApMessage::Ok;
+}
+
+AP_MSG_HANDLER_METHOD(SceneModule, Scene_DeleteImageFile)
+{
+  Surface* pSurface = FindSurface(pMsg->hScene);
+  pSurface->FindElement(pMsg->sPath)->DeleteImageFile();
   pMsg->apStatus = ApMessage::Ok;
 }
 
@@ -244,14 +266,17 @@ int SceneModule::Init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_ScaleElement, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_RotateElement, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_CreateRectangle, this, ApCallbackPosNormal);
-  AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_CreateImage, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_CreateImageFromData, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_CreateImageFromFile, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_CreateText, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_MeasureText, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_SetFillColor, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_SetStrokeColor, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_SetStrokeWidth, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_SetImageData, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_DeleteImageData, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_SetImageFile, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_DeleteImageFile, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_Draw, this, ApCallbackPosNormal);
   AP_UNITTEST_HOOK(SceneModule, this);
 

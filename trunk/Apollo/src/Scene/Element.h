@@ -45,15 +45,19 @@ public:
   void Scale(double fX, double fY);
   void Rotate(double fAngle);
 
+  void DeleteGraphics();
   void CreateRectangle(double fX, double fY, double fW, double fH);
-  void CreateImage(double fX, double fY, Apollo::Image& image);
+  void CreateImageFromData(double fX, double fY, const Apollo::Image& image);
+  void CreateImageFromFile(double fX, double fY, const String& sFile);
   void CreateText(double fX, double fY, const String& sText, const String& sFont, double fSize, int nFlags);
 
   void SetFillColor(double fRed, double fGreen, double fBlue, double fAlpha);
   void SetStrokeColor(double fRed, double fGreen, double fBlue, double fAlpha);
   void SetStrokeWidth(double fWidth);
   void SetImageData(const Apollo::Image& image);
+  void DeleteImageData();
   void SetImageFile(const String& sFile);
+  void DeleteImageFile();
 
 protected:
   ElementList* pChildren_;

@@ -106,11 +106,16 @@ String SceneModuleTester::Rectangle()
     pCxImgFrame->Encode2RGBA(&mfDest, true);
   }
 
-  if (!s) { if (!Msg_Scene_CreateImage::_(hScene, "image", -50, -50, apImg1)) { s = "Msg_Scene_CreateImage failed"; }}
+  if (!s) { if (!Msg_Scene_CreateImageFromData::_(hScene, "image", -50, -50, apImg1)) { s = "Msg_Scene_CreateImageFromData failed"; }}
   if (!s) { if (!Msg_Scene_SetImageData::_(hScene, "image", apImg2)) { s = "Msg_Scene_SetImageData failed"; }}
   if (!s) { if (!Msg_Scene_TranslateElement::_(hScene, "image", 50, 200)) { s = "Msg_Scene_RotateElement failed"; }}
   if (!s) { if (!Msg_Scene_RotateElement::_(hScene, "image", 45.0 / 180.0 * 3.1415)) { s = "Msg_Scene_RotateElement failed"; }}
   if (!s) { if (!Msg_Scene_ScaleElement::_(hScene, "image", 0.8, 0.8)) { s = "Msg_Scene_ScaleElement failed"; }}
+
+  // ------------------------
+
+  if (!s) { if (!Msg_Scene_CreateImageFromFile::_(hScene, "image", -50, -50, Apollo::getAppResourcePath() + "tassadar" + String::filenamePathSeparator() + "test.png")) { s = "Msg_Scene_CreateImageFromFile failed"; }}
+  if (!s) { if (!Msg_Scene_TranslateElement::_(hScene, "image", 50, 250)) { s = "Msg_Scene_RotateElement failed"; }}
 
   // ------------------------
 

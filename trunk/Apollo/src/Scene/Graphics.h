@@ -74,8 +74,13 @@ protected:
 class RectangleX: public Shape
 {
 public:
-  RectangleX(double fX, double fY, double fW, double fH);
-  virtual ~RectangleX();
+  RectangleX()
+    :fX_(0.0)
+    ,fY_(0.0)
+    ,fW_(0.0)
+    ,fH_(0.0)
+  {}
+  virtual ~RectangleX() {}
 
   virtual bool IsRectangle() { return true; }
 
@@ -93,21 +98,31 @@ protected:
 class ImageX: public Graphics
 {
 public:
-  ImageX(double fX, double fY, const Apollo::Image& image);
-  virtual ~ImageX();
+  ImageX()
+    :fX_(0.0)
+    ,fY_(0.0)
+    ,bData_(false)
+    ,bFile_(false)
+  {}
+  virtual ~ImageX() {}
 
   virtual bool IsImage() { return true; }
 
   virtual void SetCoordinates(double fX, double fY) { fX_ = fX; fY_ = fY; }
   virtual void SetImageData(const Apollo::Image& image);
+  virtual void DeleteImageData();
   virtual void SetImageFile(const String& sFile);
+  virtual void DeleteImageFile();
 
   void Draw(GraphicsContext& gc);
 
 protected:
   double fX_;
   double fY_;
+  bool bData_;
   Apollo::Image image_;
+  bool bFile_;
+  String sFile_;
 };
 
 class TextExtents
@@ -131,8 +146,13 @@ public:
     ,LastFlag = 1 << 2
   } FontFlags;
 
-  TextX(double fX, double fY, const String& sText, const String& sFont, double fSize, int nFlags);
-  virtual ~TextX();
+  TextX()
+    :fX_(0.0)
+    ,fY_(0.0)
+    ,fSize_(0.0)
+    ,nFlags_(0)
+  {}
+  virtual ~TextX() {}
 
   virtual bool IsText() { return true; }
 
