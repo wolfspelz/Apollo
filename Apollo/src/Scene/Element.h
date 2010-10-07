@@ -53,6 +53,7 @@ public:
   void SetStrokeColor(double fRed, double fGreen, double fBlue, double fAlpha);
   void SetStrokeWidth(double fWidth);
   void SetImageData(const Apollo::Image& image);
+  void SetImageFile(const String& sFile);
 
 protected:
   ElementList* pChildren_;

@@ -99,7 +99,8 @@ public:
   virtual bool IsImage() { return true; }
 
   virtual void SetCoordinates(double fX, double fY) { fX_ = fX; fY_ = fY; }
-  virtual void SetImage(const Apollo::Image& image);
+  virtual void SetImageData(const Apollo::Image& image);
+  virtual void SetImageFile(const String& sFile);
 
   void Draw(GraphicsContext& gc);
 

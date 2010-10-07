@@ -68,6 +68,9 @@ int Element::CreateElement(const String& sPath)
         }
       }
     } else {
+      if (pChildren_ == 0) {
+        pChildren_ = new ElementList();
+      } 
       if (pChildren_) {
         Element* pNext = 0;
         if (pChildren_->Get(sPart, pNext)) {
@@ -203,9 +206,18 @@ void Element::SetStrokeWidth(double fWidth)
 void Element::SetImageData(const Apollo::Image& image)
 {
   if (pGraphics_ && pGraphics_->IsImage()) {
-    ((ImageX*) pGraphics_)->SetImage(image);
+    ((ImageX*) pGraphics_)->SetImageData(image);
   } else {
     throw ApException("Element::SetImageData: not an Image");
+  }
+}
+
+void Element::SetImageFile(const String& sFile)
+{
+  if (pGraphics_ && pGraphics_->IsImage()) {
+    ((ImageX*) pGraphics_)->SetImageFile(sFile);
+  } else {
+    throw ApException("Element::SetImageFile: not an Image");
   }
 }
 

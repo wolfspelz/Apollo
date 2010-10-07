@@ -75,16 +75,20 @@ void RectangleX::Draw(GraphicsContext& gc)
 ImageX::ImageX(double fX, double fY, const Apollo::Image& image)
 {
   SetCoordinates(fX, fY);
-  SetImage(image);
+  SetImageData(image);
 }
 
 ImageX::~ImageX()
 {
 }
 
-void ImageX::SetImage(const Apollo::Image& image)
+void ImageX::SetImageData(const Apollo::Image& image)
 {
   image_.CopyData_PreMultiplyAlpha_mem_RGBA_to_cairo_ARGB_which_actually_is_BGRA_in_mem_on_little_endian(image);
+}
+
+void ImageX::SetImageFile(const String& sFile)
+{
 }
 
 #include "ximagif.h"

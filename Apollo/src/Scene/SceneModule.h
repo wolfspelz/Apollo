@@ -44,6 +44,7 @@ public:
   void On_Scene_SetStrokeColor(Msg_Scene_SetStrokeColor* pMsg);
   void On_Scene_SetStrokeWidth(Msg_Scene_SetStrokeWidth* pMsg);
   void On_Scene_SetImageData(Msg_Scene_SetImageData* pMsg);
+  void On_Scene_SetImageFile(Msg_Scene_SetImageFile* pMsg);
   void On_Scene_Draw(Msg_Scene_Draw* pMsg);
 
 #if defined(AP_TEST)
