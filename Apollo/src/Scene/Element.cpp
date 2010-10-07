@@ -58,6 +58,12 @@ int Element::CreateElement(const String& sPath)
           pChildren_ = new ElementList();
         }
         if (pChildren_) {
+          Element* pOld = 0;
+          if (pChildren_->Get(sPart, pOld)) {
+            pChildren_->Unset(sPart);
+            delete pOld;
+            pOld = 0;
+          }
           ok = pChildren_->Set(sPart, pElement);
         }
       }
@@ -216,11 +222,11 @@ void Element::Draw(GraphicsContext& gc)
     if (fTranslateX_ != 0.0 || fTranslateY_ != 0.0) {
       cairo_translate(gc.Cairo(), fTranslateX_, fTranslateY_);
     }
-    if (fScaleX_ != 0.0 || fScaleY_ != 0.0) {
-      cairo_scale(gc.Cairo(), fScaleX_, fScaleY_);
-    }
     if (fRotate_ != 0.0) {
       cairo_rotate(gc.Cairo(), fRotate_);
+    }
+    if (fScaleX_ != 0.0 || fScaleY_ != 0.0) {
+      cairo_scale(gc.Cairo(), fScaleX_, fScaleY_);
     }
   }
 
