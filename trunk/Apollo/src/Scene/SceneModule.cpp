@@ -181,6 +181,13 @@ AP_MSG_HANDLER_METHOD(SceneModule, Scene_SetImageData)
   pMsg->apStatus = ApMessage::Ok;
 }
 
+AP_MSG_HANDLER_METHOD(SceneModule, Scene_SetImageFile)
+{
+  Surface* pSurface = FindSurface(pMsg->hScene);
+  pSurface->FindElement(pMsg->sPath)->SetImageFile(pMsg->sFile);
+  pMsg->apStatus = ApMessage::Ok;
+}
+
 AP_MSG_HANDLER_METHOD(SceneModule, Scene_Draw)
 {
   Surface* pSurface = FindSurface(pMsg->hScene);
@@ -200,7 +207,7 @@ AP_MSG_HANDLER_METHOD(SceneModule, UnitTest_Begin)
   if (Apollo::getConfig("Test/Scene", 0)) {
     AP_UNITTEST_REGISTER(SceneModuleTester::Rectangle);
     AP_UNITTEST_REGISTER(SceneModuleTester::FontFlags);
-    //AP_UNITTEST_REGISTER(SceneModuleTester::ElementTree);
+    AP_UNITTEST_REGISTER(SceneModuleTester::ElementTree);
   }
 }
 
@@ -210,7 +217,7 @@ AP_MSG_HANDLER_METHOD(SceneModule, UnitTest_Execute)
   if (Apollo::getConfig("Test/Scene", 0)) {
     AP_UNITTEST_EXECUTE(SceneModuleTester::Rectangle);
     AP_UNITTEST_EXECUTE(SceneModuleTester::FontFlags);
-    //AP_UNITTEST_EXECUTE(SceneModuleTester::ElementTree);
+    AP_UNITTEST_EXECUTE(SceneModuleTester::ElementTree);
   }
 }
 
@@ -244,6 +251,7 @@ int SceneModule::Init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_SetStrokeColor, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_SetStrokeWidth, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_SetImageData, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_SetImageFile, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_Draw, this, ApCallbackPosNormal);
   AP_UNITTEST_HOOK(SceneModule, this);
 

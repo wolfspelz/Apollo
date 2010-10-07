@@ -325,6 +325,23 @@ public:
   ApIN Apollo::Image image;
 };
 
+class Msg_Scene_SetImageFile: public ApRequestMessage
+{
+public:
+  Msg_Scene_SetImageFile() : ApRequestMessage("Scene_SetImageFile") {}
+  static int _(const ApHandle& hScene, const String& sPath, const String& sFile)
+  {
+    Msg_Scene_SetImageFile msg;
+    msg.hScene = hScene;
+    msg.sPath = sPath;
+    msg.sFile = sFile;
+    return msg.Request();
+  }
+  ApIN ApHandle hScene;
+  ApIN String sPath;
+  ApIN String sFile;
+};
+
 class Msg_Scene_Draw: public ApRequestMessage
 {
 public:
