@@ -151,13 +151,13 @@ public:
   ApIN double fH;
 };
 
-class Msg_Scene_CreateImage: public ApRequestMessage
+class Msg_Scene_CreateImageFromData: public ApRequestMessage
 {
 public:
-  Msg_Scene_CreateImage() : ApRequestMessage("Scene_CreateImage"), fX(0), fY(0) {}
+  Msg_Scene_CreateImageFromData() : ApRequestMessage("Scene_CreateImageFromData"), fX(0), fY(0) {}
   static int _(const ApHandle& hScene, const String& sPath, double fX, double fY, const Apollo::Image& image)
   {
-    Msg_Scene_CreateImage msg; 
+    Msg_Scene_CreateImageFromData msg; 
     msg.hScene = hScene; 
     msg.sPath = sPath; 
     msg.fX = fX; 
@@ -170,6 +170,27 @@ public:
   ApIN double fX;
   ApIN double fY;
   ApIN Apollo::Image image;
+};
+
+class Msg_Scene_CreateImageFromFile: public ApRequestMessage
+{
+public:
+  Msg_Scene_CreateImageFromFile() : ApRequestMessage("Scene_CreateImageFromFile"), fX(0), fY(0) {}
+  static int _(const ApHandle& hScene, const String& sPath, double fX, double fY, const String& sFile)
+  {
+    Msg_Scene_CreateImageFromFile msg; 
+    msg.hScene = hScene; 
+    msg.sPath = sPath; 
+    msg.fX = fX; 
+    msg.fY = fY; 
+    msg.sFile = sFile;
+    return msg.Request();
+  }
+  ApIN ApHandle hScene;
+  ApIN String sPath;
+  ApIN double fX;
+  ApIN double fY;
+  ApIN String sFile;
 };
 
 class Msg_Scene_FontFlags: public ApRequestMessage
@@ -325,6 +346,21 @@ public:
   ApIN Apollo::Image image;
 };
 
+class Msg_Scene_DeleteImageData: public ApRequestMessage
+{
+public:
+  Msg_Scene_DeleteImageData() : ApRequestMessage("Scene_DeleteImageData") {}
+  static int _(const ApHandle& hScene, const String& sPath)
+  {
+    Msg_Scene_DeleteImageData msg;
+    msg.hScene = hScene;
+    msg.sPath = sPath;
+    return msg.Request();
+  }
+  ApIN ApHandle hScene;
+  ApIN String sPath;
+};
+
 class Msg_Scene_SetImageFile: public ApRequestMessage
 {
 public:
@@ -340,6 +376,21 @@ public:
   ApIN ApHandle hScene;
   ApIN String sPath;
   ApIN String sFile;
+};
+
+class Msg_Scene_DeleteImageFile: public ApRequestMessage
+{
+public:
+  Msg_Scene_DeleteImageFile() : ApRequestMessage("Scene_DeleteImageFile") {}
+  static int _(const ApHandle& hScene, const String& sPath)
+  {
+    Msg_Scene_DeleteImageFile msg;
+    msg.hScene = hScene;
+    msg.sPath = sPath;
+    return msg.Request();
+  }
+  ApIN ApHandle hScene;
+  ApIN String sPath;
 };
 
 class Msg_Scene_Draw: public ApRequestMessage

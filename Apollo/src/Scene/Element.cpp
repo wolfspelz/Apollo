@@ -143,37 +143,52 @@ void Element::Rotate(double fAngle)
 
 // ----------------------------------------------------------
 
-void Element::CreateRectangle(double fX, double fY, double fW, double fH)
+void Element::DeleteGraphics()
 {
   if (pGraphics_) {
     delete pGraphics_;
     pGraphics_ = 0;
   }
-
-  pGraphics_ = new RectangleX(fX, fY, fW, fH);
-  if (pGraphics_ == 0) { throw ApException("Element::CreateRectangle failed"); }
 }
 
-void Element::CreateImage(double fX, double fY, Apollo::Image& image)
+void Element::CreateRectangle(double fX, double fY, double fW, double fH)
 {
-  if (pGraphics_) {
-    delete pGraphics_;
-    pGraphics_ = 0;
-  }
+  DeleteGraphics();
+  RectangleX* p = new RectangleX();
+  if (p == 0) { throw ApException("Element::CreateRectangle failed"); }
+  p->SetCoordinates(fX, fY, fW, fH);
+  pGraphics_ = p;
+}
 
-  pGraphics_ = new ImageX(fX, fY, image);
-  if (pGraphics_ == 0) { throw ApException("Element::CreateImage failed"); }
+void Element::CreateImageFromData(double fX, double fY, const Apollo::Image& image)
+{
+  DeleteGraphics();
+  ImageX* p = new ImageX();
+  if (p == 0) { throw ApException("Element::CreateImageFromData failed"); }
+  p->SetCoordinates(fX, fY);
+  p->SetImageData(image);
+  pGraphics_ = p;
+}
+
+void Element::CreateImageFromFile(double fX, double fY, const String& sFile)
+{
+  DeleteGraphics();
+  ImageX* p = new ImageX();
+  if (p == 0) { throw ApException("Element::CreateImageFromFile failed"); }
+  p->SetCoordinates(fX, fY);
+  p->SetImageFile(sFile);
+  pGraphics_ = p;
 }
 
 void Element::CreateText(double fX, double fY, const String& sText, const String& sFont, double fSize, int nFlags)
 {
-  if (pGraphics_) {
-    delete pGraphics_;
-    pGraphics_ = 0;
-  }
-
-  pGraphics_ = new TextX(fX, fY, sText, sFont, fSize, nFlags);
-  if (pGraphics_ == 0) { throw ApException("Element::CreateText failed"); }
+  DeleteGraphics();
+  TextX* p = new TextX();
+  if (p == 0) { throw ApException("Element::CreateText failed"); }
+  p->SetCoordinates(fX, fY);
+  p->SetString(sText);
+  p->SetFont(sFont, fSize, nFlags);
+  pGraphics_ = p;
 }
 
 void Element::SetFillColor(double fRed, double fGreen, double fBlue, double fAlpha)
@@ -212,12 +227,30 @@ void Element::SetImageData(const Apollo::Image& image)
   }
 }
 
+void Element::DeleteImageData()
+{
+  if (pGraphics_ && pGraphics_->IsImage()) {
+    ((ImageX*) pGraphics_)->DeleteImageData();
+  } else {
+    throw ApException("Element::DeleteImageData: not an Image");
+  }
+}
+
 void Element::SetImageFile(const String& sFile)
 {
   if (pGraphics_ && pGraphics_->IsImage()) {
     ((ImageX*) pGraphics_)->SetImageFile(sFile);
   } else {
     throw ApException("Element::SetImageFile: not an Image");
+  }
+}
+
+void Element::DeleteImageFile()
+{
+  if (pGraphics_ && pGraphics_->IsImage()) {
+    ((ImageX*) pGraphics_)->DeleteImageFile();
+  } else {
+    throw ApException("Element::DeleteImageFile: not an Image");
   }
 }
 

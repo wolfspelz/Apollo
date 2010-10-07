@@ -308,7 +308,11 @@ void Surface::MeasureText(const String& sText, const String& sFont, double fSize
   gc.pCairo_ = pCairo_;
   gc.nH_ = nH_;
 
-  TextX t(0.0, 0.0, sText, sFont, fSize, nFlags);
+  TextX t;
+  t.SetCoordinates(0.0, 0.0);
+  t.SetString(sText);
+  t.SetFont(sFont, fSize, nFlags);
+
   t.Measure(gc, te);
 }
 

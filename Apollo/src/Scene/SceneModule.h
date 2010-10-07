@@ -37,14 +37,17 @@ public:
   void On_Scene_TranslateElement(Msg_Scene_TranslateElement* pMsg);
   void On_Scene_ScaleElement(Msg_Scene_ScaleElement* pMsg);
   void On_Scene_RotateElement(Msg_Scene_RotateElement* pMsg);
-  void On_Scene_CreateImage(Msg_Scene_CreateImage* pMsg);
+  void On_Scene_CreateImageFromData(Msg_Scene_CreateImageFromData* pMsg);
+  void On_Scene_CreateImageFromFile(Msg_Scene_CreateImageFromFile* pMsg);
   void On_Scene_CreateText(Msg_Scene_CreateText* pMsg);
   void On_Scene_MeasureText(Msg_Scene_MeasureText* pMsg);
   void On_Scene_SetFillColor(Msg_Scene_SetFillColor* pMsg);
   void On_Scene_SetStrokeColor(Msg_Scene_SetStrokeColor* pMsg);
   void On_Scene_SetStrokeWidth(Msg_Scene_SetStrokeWidth* pMsg);
   void On_Scene_SetImageData(Msg_Scene_SetImageData* pMsg);
+  void On_Scene_DeleteImageData(Msg_Scene_DeleteImageData* pMsg);
   void On_Scene_SetImageFile(Msg_Scene_SetImageFile* pMsg);
+  void On_Scene_DeleteImageFile(Msg_Scene_DeleteImageFile* pMsg);
   void On_Scene_Draw(Msg_Scene_Draw* pMsg);
 
 #if defined(AP_TEST)
