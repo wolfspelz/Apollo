@@ -116,6 +116,7 @@ AP_MSG_HANDLER_METHOD(SceneModule, Scene_RotateElement)
 AP_MSG_HANDLER_METHOD(SceneModule, Scene_CreateRectangle)
 {
   Surface* pSurface = FindSurface(pMsg->hScene);
+  pSurface->CreateElement(pMsg->sPath);
   pSurface->FindElement(pMsg->sPath)->CreateRectangle(pMsg->fX, pMsg->fY, pMsg->fW, pMsg->fH);
   pMsg->apStatus = ApMessage::Ok;
 }
@@ -123,6 +124,7 @@ AP_MSG_HANDLER_METHOD(SceneModule, Scene_CreateRectangle)
 AP_MSG_HANDLER_METHOD(SceneModule, Scene_CreateImage)
 {
   Surface* pSurface = FindSurface(pMsg->hScene);
+  pSurface->CreateElement(pMsg->sPath);
   pSurface->FindElement(pMsg->sPath)->CreateImage(pMsg->fX, pMsg->fY, pMsg->image);
   pMsg->apStatus = ApMessage::Ok;
 }
@@ -130,6 +132,7 @@ AP_MSG_HANDLER_METHOD(SceneModule, Scene_CreateImage)
 AP_MSG_HANDLER_METHOD(SceneModule, Scene_CreateText)
 {
   Surface* pSurface = FindSurface(pMsg->hScene);
+  pSurface->CreateElement(pMsg->sPath);
   pSurface->FindElement(pMsg->sPath)->CreateText(pMsg->fX, pMsg->fY, pMsg->sText, pMsg->sFont, pMsg->fSize, pMsg->nFlags);
   pMsg->apStatus = ApMessage::Ok;
 }
