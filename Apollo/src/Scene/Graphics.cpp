@@ -95,7 +95,20 @@ void ImageX::DeleteImageFile()
   sFile_ = "";
 }
 
-#include "ximagif.h"
+void ImageX::GetSize(GraphicsContext& gc, double& fW, double& fH)
+{  
+  if (bData_) {
+    fW = image_.Width();
+    fH = image_.Height();
+  } else if (bFile_) {
+    cairo_surface_t* pImage = cairo_image_surface_create_from_png(sFile_);
+    if (pImage) {
+      fW = cairo_image_surface_get_width(pImage);
+      fH = cairo_image_surface_get_height(pImage);
+      cairo_surface_destroy(pImage);
+    }
+  }
+}
 
 void ImageX::Draw(GraphicsContext& gc)
 {

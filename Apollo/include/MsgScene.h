@@ -10,6 +10,9 @@
 #include "ApMessage.h"
 #include "Image.h"
 
+//--------------------------
+// Manage scenes
+
 class Msg_Scene_Create: public ApRequestMessage
 {
 public:
@@ -42,6 +45,16 @@ public:
   ApIN ApHandle hScene;
   ApIN int bVisible;
 };
+
+class Msg_Scene_Draw: public ApRequestMessage
+{
+public:
+  Msg_Scene_Draw() : ApRequestMessage("Scene_Draw") {}
+  ApIN ApHandle hScene;
+};
+
+//--------------------------
+// Manage elements
 
 class Msg_Scene_CreateElement: public ApRequestMessage
 {
@@ -127,6 +140,9 @@ public:
   ApIN ApHandle hScene;
   ApIN String sPath;
 };
+
+//--------------------------
+// Create primitives
 
 class Msg_Scene_CreateRectangle: public ApRequestMessage
 {
@@ -230,41 +246,8 @@ public:
   ApIN int nFlags;
 };
 
-class Msg_Scene_MeasureText: public ApRequestMessage
-{
-public:
-  Msg_Scene_MeasureText() : ApRequestMessage("Scene_MeasureText"), fSize(12), nFlags(Msg_Scene_FontFlags::Normal) {}
-  static int _(const ApHandle& hScene, const String& sText, const String& sFont, double fSize, int nFlags, double& fBearingX, double& fBearingY, double& fWidth, double& fHeight, double& fAdvanceX, double& fAdvanceY)
-  { 
-    Msg_Scene_MeasureText msg; 
-    msg.hScene = hScene; 
-    msg.sText = sText;
-    msg.sFont = sFont;
-    msg.fSize = fSize;
-    msg.nFlags = nFlags;
-    int ok = msg.Request();
-    if (ok) {
-      fBearingX = msg.fBearingX;
-      fBearingY = msg.fBearingY;
-      fWidth = msg.fWidth;
-      fHeight = msg.fHeight;
-      fAdvanceX = msg.fAdvanceX;
-      fAdvanceY = msg.fAdvanceY;
-    } 
-    return ok;
-  }
-  ApIN ApHandle hScene;
-  ApIN String sText;
-  ApIN String sFont;
-  ApIN double fSize;
-  ApIN int nFlags;
-  ApOUT double fBearingX;
-  ApOUT double fBearingY;
-  ApOUT double fWidth;
-  ApOUT double fHeight;
-  ApOUT double fAdvanceX;
-  ApOUT double fAdvanceY;
-};
+//--------------------------
+// Change properties
 
 class Msg_Scene_SetFillColor: public ApRequestMessage
 {
@@ -393,11 +376,88 @@ public:
   ApIN String sPath;
 };
 
-class Msg_Scene_Draw: public ApRequestMessage
+//--------------------------
+// Info query without element
+
+class Msg_Scene_MeasureText: public ApRequestMessage
 {
 public:
-  Msg_Scene_Draw() : ApRequestMessage("Scene_Draw") {}
+  Msg_Scene_MeasureText() : ApRequestMessage("Scene_MeasureText"), fSize(12), nFlags(Msg_Scene_FontFlags::Normal) {}
+  static int _(const ApHandle& hScene, const String& sText, const String& sFont, double fSize, int nFlags, double& fBearingX, double& fBearingY, double& fWidth, double& fHeight, double& fAdvanceX, double& fAdvanceY)
+  { 
+    Msg_Scene_MeasureText msg; 
+    msg.hScene = hScene; 
+    msg.sText = sText;
+    msg.sFont = sFont;
+    msg.fSize = fSize;
+    msg.nFlags = nFlags;
+    int ok = msg.Request();
+    if (ok) {
+      fBearingX = msg.fBearingX;
+      fBearingY = msg.fBearingY;
+      fWidth = msg.fWidth;
+      fHeight = msg.fHeight;
+      fAdvanceX = msg.fAdvanceX;
+      fAdvanceY = msg.fAdvanceY;
+    } 
+    return ok;
+  }
   ApIN ApHandle hScene;
+  ApIN String sText;
+  ApIN String sFont;
+  ApIN double fSize;
+  ApIN int nFlags;
+  ApOUT double fBearingX;
+  ApOUT double fBearingY;
+  ApOUT double fWidth;
+  ApOUT double fHeight;
+  ApOUT double fAdvanceX;
+  ApOUT double fAdvanceY;
+};
+
+class Msg_Scene_GetImageSizeFromData: public ApRequestMessage
+{
+public:
+  Msg_Scene_GetImageSizeFromData() : ApRequestMessage("Scene_GetImageSizeFromData"), fW(0), fH(0) {}
+  static int _(const ApHandle& hScene, const Apollo::Image& image, double& fW, double& fH)
+  {
+    Msg_Scene_GetImageSizeFromData msg; 
+    msg.hScene = hScene; 
+    msg.image.CopyReference(image);
+    int ok = msg.Request();
+    if (ok) {
+      fW = msg.fW; 
+      fH = msg.fH; 
+    } 
+    return ok;
+  }
+  ApIN ApHandle hScene;
+  ApIN Apollo::Image image;
+  ApOUT double fW;
+  ApOUT double fH;
+  ApIN String sFile;
+};
+
+class Msg_Scene_GetImageSizeFromFile: public ApRequestMessage
+{
+public:
+  Msg_Scene_GetImageSizeFromFile() : ApRequestMessage("Scene_GetImageSizeFromFile"), fW(0), fH(0) {}
+  static int _(const ApHandle& hScene, const String& sFile, double& fW, double& fH)
+  {
+    Msg_Scene_GetImageSizeFromFile msg; 
+    msg.hScene = hScene; 
+    msg.sFile = sFile;
+    int ok = msg.Request();
+    if (ok) {
+      fW = msg.fW; 
+      fH = msg.fH; 
+    } 
+    return ok;
+  }
+  ApIN ApHandle hScene;
+  ApIN String sFile;
+  ApOUT double fW;
+  ApOUT double fH;
 };
 
 #endif // !defined(MsgScene_h_INCLUDED)

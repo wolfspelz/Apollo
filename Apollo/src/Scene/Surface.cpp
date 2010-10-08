@@ -309,11 +309,31 @@ void Surface::MeasureText(const String& sText, const String& sFont, double fSize
   gc.nH_ = nH_;
 
   TextX t;
-  t.SetCoordinates(0.0, 0.0);
   t.SetString(sText);
   t.SetFont(sFont, fSize, nFlags);
-
   t.Measure(gc, te);
+}
+
+void Surface::GetImageSizeFromData(const Apollo::Image& image, double& fW, double& fH)
+{
+  GraphicsContext gc;
+  gc.pCairo_ = pCairo_;
+  gc.nH_ = nH_;
+
+  ImageX i;
+  i.SetImageData(image);
+  i.GetSize(gc, fW, fH);
+}
+
+void Surface::GetImageSizeFromFile(const String& sFile, double& fW, double& fH)
+{
+  GraphicsContext gc;
+  gc.pCairo_ = pCairo_;
+  gc.nH_ = nH_;
+
+  ImageX i;
+  i.SetImageFile(sFile);
+  i.GetSize(gc, fW, fH);
 }
 
 //------------------------------------
