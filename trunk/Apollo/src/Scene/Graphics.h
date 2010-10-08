@@ -114,6 +114,8 @@ public:
   virtual void SetImageFile(const String& sFile);
   virtual void DeleteImageFile();
 
+  void GetSize(GraphicsContext& gc, double& fW, double& fH);
+
   void Draw(GraphicsContext& gc);
 
 protected:

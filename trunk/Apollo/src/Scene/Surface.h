@@ -42,6 +42,8 @@ public:
   void DeleteElement(const String& sPath);
 
   void MeasureText(const String& sText, const String& sFont, double fSize, int nFlags, TextExtents& te);
+  void GetImageSizeFromData(const Apollo::Image& image, double& fW, double& fH);
+  void GetImageSizeFromFile(const String& sFile, double& fW, double& fH);
 
   void Draw();
 

@@ -79,7 +79,7 @@ String SceneModuleTester::Rectangle()
 
   // ------------------------
 
-  Apollo::Image apImg1;
+  Apollo::Image apImg1; // from PNG
   {
     Buffer sbData;
     Apollo::loadFile(Apollo::getAppResourcePath() + "tassadar" + String::filenamePathSeparator() + "test.png", sbData);
@@ -90,7 +90,7 @@ String SceneModuleTester::Rectangle()
     cxImg.Encode2RGBA(&mfDest, true);
   }
 
-  Apollo::Image apImg2;
+  Apollo::Image apImg2; // from animated GIF
   {
     Buffer sbData;
     Apollo::loadFile(Apollo::getAppResourcePath() + "tassadar" + String::filenamePathSeparator() + "idle.gif", sbData);
@@ -106,16 +106,21 @@ String SceneModuleTester::Rectangle()
     pCxImgFrame->Encode2RGBA(&mfDest, true);
   }
 
-  if (!s) { if (!Msg_Scene_CreateImageFromData::_(hScene, "image", -50, -50, apImg1)) { s = "Msg_Scene_CreateImageFromData failed"; }}
-  if (!s) { if (!Msg_Scene_SetImageData::_(hScene, "image", apImg2)) { s = "Msg_Scene_SetImageData failed"; }}
-  if (!s) { if (!Msg_Scene_TranslateElement::_(hScene, "image", 50, 200)) { s = "Msg_Scene_RotateElement failed"; }}
-  if (!s) { if (!Msg_Scene_RotateElement::_(hScene, "image", 45.0 / 180.0 * 3.1415)) { s = "Msg_Scene_RotateElement failed"; }}
-  if (!s) { if (!Msg_Scene_ScaleElement::_(hScene, "image", 0.8, 0.8)) { s = "Msg_Scene_ScaleElement failed"; }}
+  double fImage1W, fImage1H;
+  if (!s) { if (!Msg_Scene_GetImageSizeFromData::_(hScene, apImg2, fImage1W, fImage1H)) { s = "Msg_Scene_GetImageSizeFromData failed"; }}
+  if (!s) { if (fImage1W != 100.0 || fImage1H != 100.0) { s = "Msg_Scene_GetImageSizeFromFile returned wrong size"; }}
+  if (!s) { if (!Msg_Scene_CreateImageFromData::_(hScene, "image1", - fImage1W / 2.0, - fImage1H / 2.0, apImg2)) { s = "Msg_Scene_CreateImageFromData failed"; }}
+  if (!s) { if (!Msg_Scene_TranslateElement::_(hScene, "image1", 50, 170)) { s = "Msg_Scene_RotateElement failed"; }}
+  if (!s) { if (!Msg_Scene_RotateElement::_(hScene, "image1", 45.0 / 180.0 * 3.1415)) { s = "Msg_Scene_RotateElement failed"; }}
+  if (!s) { if (!Msg_Scene_ScaleElement::_(hScene, "image1", 0.8, 0.8)) { s = "Msg_Scene_ScaleElement failed"; }}
 
   // ------------------------
 
-  if (!s) { if (!Msg_Scene_CreateImageFromFile::_(hScene, "image", -50, -50, Apollo::getAppResourcePath() + "tassadar" + String::filenamePathSeparator() + "test.png")) { s = "Msg_Scene_CreateImageFromFile failed"; }}
-  if (!s) { if (!Msg_Scene_TranslateElement::_(hScene, "image", 50, 250)) { s = "Msg_Scene_RotateElement failed"; }}
+  double fImage2W, fImage2H;
+  if (!s) { if (!Msg_Scene_GetImageSizeFromFile::_(hScene, Apollo::getAppResourcePath() + "tassadar" + String::filenamePathSeparator() + "test.png", fImage2W, fImage2H)) { s = "Msg_Scene_GetImageSizeFromFile failed"; }}
+  if (!s) { if (fImage2W != 100.0 || fImage2H != 100.0) { s = "Msg_Scene_GetImageSizeFromFile returned wrong size"; }}
+  if (!s) { if (!Msg_Scene_CreateImageFromFile::_(hScene, "image2", - fImage2W / 2.0, - fImage2H / 2.0, Apollo::getAppResourcePath() + "tassadar" + String::filenamePathSeparator() + "test.png")) { s = "Msg_Scene_CreateImageFromFile failed"; }}
+  if (!s) { if (!Msg_Scene_TranslateElement::_(hScene, "image2", 50, 270)) { s = "Msg_Scene_RotateElement failed"; }}
 
   // ------------------------
 

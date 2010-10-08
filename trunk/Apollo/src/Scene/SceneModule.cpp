@@ -78,6 +78,13 @@ AP_MSG_HANDLER_METHOD(SceneModule, Scene_Visibility)
   pMsg->apStatus = ApMessage::Ok;
 }
 
+AP_MSG_HANDLER_METHOD(SceneModule, Scene_Draw)
+{
+  Surface* pSurface = FindSurface(pMsg->hScene);
+  pSurface->Draw();
+  pMsg->apStatus = ApMessage::Ok;
+}
+
 AP_MSG_HANDLER_METHOD(SceneModule, Scene_CreateElement)
 {
   Surface* pSurface = FindSurface(pMsg->hScene);
@@ -145,22 +152,6 @@ AP_MSG_HANDLER_METHOD(SceneModule, Scene_CreateText)
   pMsg->apStatus = ApMessage::Ok;
 }
 
-AP_MSG_HANDLER_METHOD(SceneModule, Scene_MeasureText)
-{
-  Surface* pSurface = FindSurface(pMsg->hScene);
-
-  TextExtents te;
-  pSurface->MeasureText(pMsg->sText, pMsg->sFont, pMsg->fSize, pMsg->nFlags, te);
-  pMsg->fBearingX = te.fBearingX_;
-  pMsg->fBearingY = te.fBearingY_;
-  pMsg->fWidth = te.fWidth_;
-  pMsg->fHeight = te.fHeight_;
-  pMsg->fAdvanceX = te.fAdvanceX_;
-  pMsg->fAdvanceY = te.fAdvanceY_;
- 
-  pMsg->apStatus = ApMessage::Ok;
-}
-
 AP_MSG_HANDLER_METHOD(SceneModule, Scene_SetFillColor)
 {
   Surface* pSurface = FindSurface(pMsg->hScene);
@@ -210,10 +201,33 @@ AP_MSG_HANDLER_METHOD(SceneModule, Scene_DeleteImageFile)
   pMsg->apStatus = ApMessage::Ok;
 }
 
-AP_MSG_HANDLER_METHOD(SceneModule, Scene_Draw)
+AP_MSG_HANDLER_METHOD(SceneModule, Scene_MeasureText)
 {
   Surface* pSurface = FindSurface(pMsg->hScene);
-  pSurface->Draw();
+
+  TextExtents te;
+  pSurface->MeasureText(pMsg->sText, pMsg->sFont, pMsg->fSize, pMsg->nFlags, te);
+  pMsg->fBearingX = te.fBearingX_;
+  pMsg->fBearingY = te.fBearingY_;
+  pMsg->fWidth = te.fWidth_;
+  pMsg->fHeight = te.fHeight_;
+  pMsg->fAdvanceX = te.fAdvanceX_;
+  pMsg->fAdvanceY = te.fAdvanceY_;
+ 
+  pMsg->apStatus = ApMessage::Ok;
+}
+
+AP_MSG_HANDLER_METHOD(SceneModule, Scene_GetImageSizeFromData)
+{
+  Surface* pSurface = FindSurface(pMsg->hScene);
+  pSurface->GetImageSizeFromData(pMsg->image, pMsg->fW, pMsg->fH);
+  pMsg->apStatus = ApMessage::Ok;
+}
+
+AP_MSG_HANDLER_METHOD(SceneModule, Scene_GetImageSizeFromFile)
+{
+  Surface* pSurface = FindSurface(pMsg->hScene);
+  pSurface->GetImageSizeFromFile(pMsg->sFile, pMsg->fW, pMsg->fH);
   pMsg->apStatus = ApMessage::Ok;
 }
 
@@ -260,6 +274,7 @@ int SceneModule::Init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_Destroy, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_Position, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_Visibility, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_Draw, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_CreateElement, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_DeleteElement, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_TranslateElement, this, ApCallbackPosNormal);
@@ -269,7 +284,6 @@ int SceneModule::Init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_CreateImageFromData, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_CreateImageFromFile, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_CreateText, this, ApCallbackPosNormal);
-  AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_MeasureText, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_SetFillColor, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_SetStrokeColor, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_SetStrokeWidth, this, ApCallbackPosNormal);
@@ -277,7 +291,9 @@ int SceneModule::Init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_DeleteImageData, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_SetImageFile, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_DeleteImageFile, this, ApCallbackPosNormal);
-  AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_Draw, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_MeasureText, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_GetImageSizeFromData, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_GetImageSizeFromFile, this, ApCallbackPosNormal);
   AP_UNITTEST_HOOK(SceneModule, this);
 
   return ok;
