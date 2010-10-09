@@ -46,6 +46,24 @@ public:
   ApIN int bVisible;
 };
 
+class Msg_Scene_SetAutoDraw: public ApRequestMessage
+{
+public:
+  typedef enum _AutoDrawConst { Disabled = -1 } AutoDrawConst;
+
+  Msg_Scene_SetAutoDraw() : ApRequestMessage("Scene_SetAutoDraw"), nMilliSec(Disabled), bAsync(0) {}
+  ApIN ApHandle hScene;
+  ApIN int nMilliSec;
+  ApIN int bAsync;
+};
+
+class Msg_Scene_AutoDraw: public ApRequestMessage
+{
+public:
+  Msg_Scene_AutoDraw() : ApRequestMessage("Scene_AutoDraw") {}
+  ApIN ApHandle hScene;
+};
+
 class Msg_Scene_Draw: public ApRequestMessage
 {
 public:

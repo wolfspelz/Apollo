@@ -19,6 +19,9 @@ public:
     ,nY_(0)
     ,nW_(0)
     ,nH_(0)
+    ,bAutoDraw_(false)
+    ,bAutoDrawAsync_(false)
+    ,autoDrawInterval_(0, 100000)
     ,pSurface_(0)
     ,pCairo_(0)
     #if defined(WIN32)
@@ -36,7 +39,11 @@ public:
   void Destroy();
   void SetPosition(int nX, int nY, int nW, int nH);
   void SetVisibility(int bVisible);
-  
+
+  void DeleteAutoDraw();
+  void SetAutoDraw(int nMilliSec, int bAsync);
+  void AutoDraw();
+
   Element* FindElement(const String& sPath);
   void CreateElement(const String& sPath);
   void DeleteElement(const String& sPath);
@@ -64,6 +71,11 @@ protected:
   int nY_;
   int nW_;
   int nH_;
+
+  bool bAutoDraw_;
+  bool bAutoDrawAsync_;
+  Apollo::TimeValue autoDrawInterval_;
+  Apollo::TimeValue lastAutoDraw_;
 
   Element root_;
 
