@@ -122,7 +122,6 @@ void Element::Translate(double fX, double fY)
   fTranslateX_ = fX;
   fTranslateY_ = fY;
   //fTranslateY_ = -fY; // -V
-
   bTransform_ = (fTranslateX_ != 0.0 || fTranslateY_ != 0.0 || fScaleX_ != 1.0 || fScaleY_ != 1.0 || fRotate_ != 0.0);
 }
 
@@ -130,15 +129,18 @@ void Element::Scale(double fX, double fY)
 {
   fScaleX_ = fX;
   fScaleY_ = fY;
-
   bTransform_ = (fTranslateX_ != 0.0 || fTranslateY_ != 0.0 || fScaleX_ != 1.0 || fScaleY_ != 1.0 || fRotate_ != 0.0);
 }
 
 void Element::Rotate(double fAngle)
 {
   fRotate_ = fAngle;
-
   bTransform_ = (fTranslateX_ != 0.0 || fTranslateY_ != 0.0 || fScaleX_ != 1.0 || fScaleY_ != 1.0 || fRotate_ != 0.0);
+}
+
+void Element::Hide(int bHide)
+{
+  bHide_ = bHide;
 }
 
 // ----------------------------------------------------------
@@ -258,6 +260,8 @@ void Element::DeleteImageFile()
 
 void Element::Draw(GraphicsContext& gc)
 {
+  if (bHide_) { return; }
+
   //GraphicsContext gcNext = gc;
   //gcNext.fTranslateX_ += fTranslateX_;
   //gcNext.fTranslateY_ += fTranslateY_;

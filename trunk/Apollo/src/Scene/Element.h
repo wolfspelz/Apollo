@@ -32,6 +32,7 @@ public:
     ,fScaleX_(1.0)
     ,fScaleY_(1.0)
     ,fRotate_(0.0)
+    ,bHide_(0)
   {}
   virtual ~Element();
 
@@ -44,6 +45,7 @@ public:
   void Translate(double fX, double fY);
   void Scale(double fX, double fY);
   void Rotate(double fAngle);
+  void Hide(int bHide);
 
   void DeleteGraphics();
   void CreateRectangle(double fX, double fY, double fW, double fH);
@@ -69,6 +71,7 @@ protected:
   double fScaleX_;
   double fScaleY_;
   double fRotate_;
+  int bHide_;
 
 #if defined(AP_TEST)
   friend class SceneModuleTester;
