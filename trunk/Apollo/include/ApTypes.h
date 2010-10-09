@@ -250,6 +250,19 @@ protected:
   int nMicroSec_; // not unsigned, because operator- uses nMicroSec_ to compute carry
 };
 
+class APOLLO_API StopWatch
+{
+public:
+  StopWatch() { Reset(); }
+
+  void Reset() { tBegin_ = Apollo::TimeValue::getTime(); }
+  Apollo::TimeValue GetDuration() { return Apollo::TimeValue::getTime() - tBegin_; }
+  operator const char* () { Apollo::TimeValue tDuration = GetDuration(); s_ = ""; s_.appendf("%d.%06d", tDuration.Sec(), tDuration.MicroSec()); return s_; }
+
+  Apollo::TimeValue tBegin_;
+  String s_;
+};
+
 AP_NAMESPACE_END
 
 #endif // !defined(ApTypes_h_INCLUDED)

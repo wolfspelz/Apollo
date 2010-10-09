@@ -58,24 +58,8 @@ String SceneModuleTester::Rectangle()
   if (!s) { if (!Msg_Scene_SetFillColor::_(hScene, "rect1", 0, 0, 1, 0.5)) { s = "Msg_Scene_SetFillColor failed"; }}
   if (!s) { if (!Msg_Scene_SetStrokeColor::_(hScene, "rect1", 1, 0, 0, 0.5)) { s = "Msg_Scene_SetStrokeColor failed"; }}
   if (!s) { if (!Msg_Scene_SetStrokeWidth::_(hScene, "rect1", 10)) { s = "Msg_Scene_SetStrokeWidth failed"; }}
-  if (!s) { if (!Msg_Scene_TranslateElement::_(hScene, "rect1", 60, 60)) { s = "Msg_Scene_RotateElement failed"; }}
+  if (!s) { if (!Msg_Scene_TranslateElement::_(hScene, "rect1", 80, 80)) { s = "Msg_Scene_RotateElement failed"; }}
   if (!s) { if (!Msg_Scene_RotateElement::_(hScene, "rect1", 45.0 / 180.0 * 3.1415)) { s = "Msg_Scene_RotateElement failed"; }}
-
-  // ------------------------
-
-  String sText1 = "Hello W" "\xC3\xB6" "rld";
-  double fText1BearingX, fText1BearingY, fText1Width, fText1Height, fText1AdvanceX, fText1AdvanceY;
-  if (!s) { if (!Msg_Scene_MeasureText::_(hScene, sText1, "Courier New", 30, Msg_Scene_FontFlags::Bold, fText1BearingX, fText1BearingY, fText1Width, fText1Height, fText1AdvanceX, fText1AdvanceY)) { s = "Msg_Scene_MeasureText failed"; }}
-  double fText1Padding = 2.5;
-  double fText1X = 110;
-  double fText1Y = 110;
-  double fText1Size = 30;
-  if (!s) { if (!Msg_Scene_CreateText::_(hScene, "text1/text", fText1X, fText1Y, sText1, "Courier New", 30, Msg_Scene_FontFlags::Bold)) { s = "Msg_Scene_CreateText failed"; }}
-  if (!s) { if (!Msg_Scene_SetFillColor::_(hScene, "text1/text", 0.5, 0.5, 0, 1)) { s = "Msg_Scene_SetFillColor failed"; }}
-  if (!s) { if (!Msg_Scene_CreateRectangle::_(hScene, "text1/frame", fText1X - fText1Padding, fText1Y - fText1Height - fText1Padding, fText1Width + 2*fText1Padding, fText1Height + 2*fText1Padding)) { s = "Msg_Scene_CreateRectangle failed"; }}
-  if (!s) { if (!Msg_Scene_SetFillColor::_(hScene, "text1/frame", 1, 1, 0, 0.5)) { s = "Msg_Scene_SetFillColor failed"; }}
-  if (!s) { if (!Msg_Scene_SetStrokeColor::_(hScene, "text1/frame", 0, 0, 0, 1)) { s = "Msg_Scene_SetStrokeColor failed"; }}
-  if (!s) { if (!Msg_Scene_SetStrokeWidth::_(hScene, "text1/frame", 1)) { s = "Msg_Scene_SetStrokeWidth failed"; }}
 
   // ------------------------
 
@@ -110,7 +94,7 @@ String SceneModuleTester::Rectangle()
   if (!s) { if (!Msg_Scene_GetImageSizeFromData::_(hScene, apImg2, fImage1W, fImage1H)) { s = "Msg_Scene_GetImageSizeFromData failed"; }}
   if (!s) { if (fImage1W != 100.0 || fImage1H != 100.0) { s = "Msg_Scene_GetImageSizeFromFile returned wrong size"; }}
   if (!s) { if (!Msg_Scene_CreateImageFromData::_(hScene, "image1", - fImage1W / 2.0, - fImage1H / 2.0, apImg2)) { s = "Msg_Scene_CreateImageFromData failed"; }}
-  if (!s) { if (!Msg_Scene_TranslateElement::_(hScene, "image1", 50, 170)) { s = "Msg_Scene_RotateElement failed"; }}
+  if (!s) { if (!Msg_Scene_TranslateElement::_(hScene, "image1", 80, 190)) { s = "Msg_Scene_RotateElement failed"; }}
   if (!s) { if (!Msg_Scene_RotateElement::_(hScene, "image1", 45.0 / 180.0 * 3.1415)) { s = "Msg_Scene_RotateElement failed"; }}
   if (!s) { if (!Msg_Scene_ScaleElement::_(hScene, "image1", 0.8, 0.8)) { s = "Msg_Scene_ScaleElement failed"; }}
 
@@ -120,7 +104,24 @@ String SceneModuleTester::Rectangle()
   if (!s) { if (!Msg_Scene_GetImageSizeFromFile::_(hScene, Apollo::getAppResourcePath() + "tassadar" + String::filenamePathSeparator() + "test.png", fImage2W, fImage2H)) { s = "Msg_Scene_GetImageSizeFromFile failed"; }}
   if (!s) { if (fImage2W != 100.0 || fImage2H != 100.0) { s = "Msg_Scene_GetImageSizeFromFile returned wrong size"; }}
   if (!s) { if (!Msg_Scene_CreateImageFromFile::_(hScene, "image2", - fImage2W / 2.0, - fImage2H / 2.0, Apollo::getAppResourcePath() + "tassadar" + String::filenamePathSeparator() + "test.png")) { s = "Msg_Scene_CreateImageFromFile failed"; }}
-  if (!s) { if (!Msg_Scene_TranslateElement::_(hScene, "image2", 50, 270)) { s = "Msg_Scene_RotateElement failed"; }}
+  if (!s) { if (!Msg_Scene_TranslateElement::_(hScene, "image2", 80, 290)) { s = "Msg_Scene_RotateElement failed"; }}
+  if (!s) { if (!Msg_Scene_RotateElement::_(hScene, "image2", - 10.0 / 180.0 * 3.1415)) { s = "Msg_Scene_RotateElement failed"; }}
+
+  // ------------------------
+
+  String sText1 = "Hello W" "\xC3\xB6" "rld";
+  double fText1BearingX, fText1BearingY, fText1Width, fText1Height, fText1AdvanceX, fText1AdvanceY;
+  if (!s) { if (!Msg_Scene_MeasureText::_(hScene, sText1, "Courier New", 30, Msg_Scene_FontFlags::Bold, fText1BearingX, fText1BearingY, fText1Width, fText1Height, fText1AdvanceX, fText1AdvanceY)) { s = "Msg_Scene_MeasureText failed"; }}
+  double fText1Padding = 2.5;
+  double fText1X = 130;
+  double fText1Y = 150;
+  double fText1Size = 30;
+  if (!s) { if (!Msg_Scene_CreateText::_(hScene, "text1/text", fText1X, fText1Y, sText1, "Courier New", 30, Msg_Scene_FontFlags::Bold)) { s = "Msg_Scene_CreateText failed"; }}
+  if (!s) { if (!Msg_Scene_SetFillColor::_(hScene, "text1/text", 0.5, 0.5, 0, 1)) { s = "Msg_Scene_SetFillColor failed"; }}
+  if (!s) { if (!Msg_Scene_CreateRectangle::_(hScene, "text1/frame", fText1X - fText1Padding, fText1Y - fText1Height - fText1Padding, fText1Width + 2*fText1Padding, fText1Height + 2*fText1Padding)) { s = "Msg_Scene_CreateRectangle failed"; }}
+  if (!s) { if (!Msg_Scene_SetFillColor::_(hScene, "text1/frame", 1, 1, 0, 0.5)) { s = "Msg_Scene_SetFillColor failed"; }}
+  if (!s) { if (!Msg_Scene_SetStrokeColor::_(hScene, "text1/frame", 0, 0, 0, 1)) { s = "Msg_Scene_SetStrokeColor failed"; }}
+  if (!s) { if (!Msg_Scene_SetStrokeWidth::_(hScene, "text1/frame", 1)) { s = "Msg_Scene_SetStrokeWidth failed"; }}
 
   // ------------------------
 
@@ -128,8 +129,8 @@ String SceneModuleTester::Rectangle()
   double fText2BearingX, fText2BearingY, fText2Width, fText2Height, fText2AdvanceX, fText2AdvanceY;
   if (!s) { if (!Msg_Scene_MeasureText::_(hScene, sText2, "Courier New", 30, Msg_Scene_FontFlags::Bold, fText2BearingX, fText2BearingY, fText2Width, fText2Height, fText2AdvanceX, fText2AdvanceY)) { s = "Msg_Scene_MeasureText failed"; }}
   double fText2Padding = 2.5;
-  double fText2X = 110.0 + fText2Width / 2;
-  double fText2Y = 127.0 + fText2Height / 2;
+  double fText2X = 130.0 + fText2Width / 2;
+  double fText2Y = 167.0 + fText2Height / 2;
   double fText2Size = 30;
   if (!s) { if (!Msg_Scene_CreateText::_(hScene, "text2/text", - fText2Width / 2, - fText2Height / 2, sText2, "Courier New", 30, Msg_Scene_FontFlags::Bold)) { s = "Msg_Scene_CreateText failed"; }}
   if (!s) { if (!Msg_Scene_SetFillColor::_(hScene, "text2/text", 0, 0.5, 0.5, 1)) { s = "Msg_Scene_SetFillColor failed"; }}
@@ -147,8 +148,8 @@ String SceneModuleTester::Rectangle()
   double fText3BearingX, fText3BearingY, fText3Width, fText3Height, fText3AdvanceX, fText3AdvanceY;
   if (!s) { if (!Msg_Scene_MeasureText::_(hScene, sText3, "Courier New", 30, Msg_Scene_FontFlags::Bold, fText3BearingX, fText3BearingY, fText3Width, fText3Height, fText3AdvanceX, fText3AdvanceY)) { s = "Msg_Scene_MeasureText failed"; }}
   double fText3Padding = 2.5;
-  double fText3X = 110.0 + fText3Width / 2;
-  double fText3Y = 146.0 + fText3Height / 2;
+  double fText3X = 130.0 + fText3Width / 2;
+  double fText3Y = 186.0 + fText3Height / 2;
   double fText3Size = 30;
   if (!s) { if (!Msg_Scene_CreateElement::_(hScene, "text3")) { s = "Msg_Scene_CreateElement failed"; }}
   if (!s) { if (!Msg_Scene_TranslateElement::_(hScene, "text3", fText3X, fText3Y)) { s = "Msg_Scene_TranslateElement failed"; }}
@@ -160,14 +161,25 @@ String SceneModuleTester::Rectangle()
   if (!s) { if (!Msg_Scene_SetStrokeColor::_(hScene, "text3/frame", 0, 0, 0, 1)) { s = "Msg_Scene_SetStrokeColor failed"; }}
   if (!s) { if (!Msg_Scene_SetStrokeWidth::_(hScene, "text3/frame", 1)) { s = "Msg_Scene_SetStrokeWidth failed"; }}
 
-
   // ------------------------
 
   if (!s) {
-    Msg_Scene_Draw msg;
+    Msg_Scene_SetAutoDraw msg;
     msg.hScene = hScene;
-    if (!msg.Request()) { s = "Msg_Scene_Draw failed"; }
+    msg.nMilliSec = 100;
+    msg.bAsync = 1;
+    if (!msg.Request()) { s = "Msg_Scene_SetAutoDraw failed"; }
   }
+  if (!s) { if (!Msg_Scene_SetFillColor::_(hScene, "frame", 1, 1, 1, 0.5)) { s = "Msg_Scene_SetFillColor failed"; }}
+  if (!s) { if (!Msg_Scene_SetFillColor::_(hScene, "frame", 1, 1, 1, 0.5)) { s = "Msg_Scene_SetFillColor failed"; }}
+
+  // ------------------------
+
+  //if (!s) {
+  //  Msg_Scene_Draw msg;
+  //  msg.hScene = hScene;
+  //  if (!msg.Request()) { s = "Msg_Scene_Draw failed"; }
+  //}
 
   // ------------------------
 
@@ -182,20 +194,21 @@ String SceneModuleTester::Rectangle()
   //}
 
   if (!s) {
-    Msg_Scene_Draw msg;
+    Msg_Scene_AutoDraw msg;
     msg.hScene = hScene;
-    if (!msg.Request()) { s = "Msg_Scene_Draw failed"; }
+    if (!msg.Request()) { s = "Msg_Scene_AutoDraw failed"; }
   }
-  if (!s) {
-    Msg_Scene_Draw msg;
-    msg.hScene = hScene;
-    if (!msg.Request()) { s = "Msg_Scene_Draw failed"; }
-  }
-  if (!s) {
-    Msg_Scene_Draw msg;
-    msg.hScene = hScene;
-    if (!msg.Request()) { s = "Msg_Scene_Draw failed"; }
-  }
+
+    //if (!s) {
+  //  Msg_Scene_Draw msg;
+  //  msg.hScene = hScene;
+  //  if (!msg.Request()) { s = "Msg_Scene_Draw failed"; }
+  //}
+  //if (!s) {
+  //  Msg_Scene_Draw msg;
+  //  msg.hScene = hScene;
+  //  if (!msg.Request()) { s = "Msg_Scene_Draw failed"; }
+  //}
 
   if (0) {
     Msg_Scene_Destroy msg;

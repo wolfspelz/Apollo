@@ -9,6 +9,7 @@
 #if defined(WIN32)
   #include "MsgMainLoop.h"
 #endif // WIN32
+#include "MsgScene.h"
 #include "Local.h"
 #include "Surface.h"
 #include "Graphics.h"
@@ -279,6 +280,42 @@ void Surface::SetVisibility(int bVisible)
   }
 }
 
+void Surface::DeleteAutoDraw()
+{
+  bAutoDraw_ = false;
+}
+
+void Surface::SetAutoDraw(int nMilliSec, int bAsync)
+{
+  bAutoDraw_ = true;
+  bAutoDrawAsync_ = bAsync == 1;
+  autoDrawInterval_ = nMilliSec;
+  lastAutoDraw_ = 0;
+}
+
+void Surface::AutoDraw()
+{
+  if (bAutoDraw_) {
+    Apollo::TimeValue now = Apollo::TimeValue::getTime();
+    if (now > lastAutoDraw_ + autoDrawInterval_) {
+
+      if (bAutoDrawAsync_) {
+        ApAsyncMessage<Msg_Scene_Draw> msg;
+        msg->hScene = hAp_;
+        msg.Post();
+      } else {
+        Msg_Scene_Draw msg;
+        msg.hScene = hAp_;
+        if (!msg.Request()) {
+          apLog_Error((LOG_CHANNEL, "Surface::AutoDraw", "Msg_Scene_Draw failed"));
+        }
+      }
+
+      lastAutoDraw_ = now;
+    }
+  }
+}
+
 //------------------------------------
 
 Element* Surface::FindElement(const String& sPath)
@@ -366,7 +403,9 @@ void Surface::EraseBackground()
 void Surface::Draw()
 {
   if (hBitmap_ == NULL) { return; }
-//  if (!bVisible_) { return; }
+  //if (!bVisible_) { return; }
+
+  //apLog_Debug((LOG_CHANNEL, "Surface::Draw", "###########################"));
 
   EraseBackground();
 

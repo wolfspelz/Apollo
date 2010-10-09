@@ -24,6 +24,7 @@
   #define AP_TEST_Random
   #define AP_TEST_Url
   #define AP_TEST_AutoPtr
+  #define AP_TEST_TimeValue
 #endif
 
 #if defined(AP_TEST_String)
@@ -2501,6 +2502,33 @@ String Test_AutoPtr()
 #endif // AP_TEST_AutoPtr
 
 //----------------------------------------------------------
+// TimeValue
+
+#if defined(AP_TEST_TimeValue)
+
+String Test_TimeValue_Benchmark()
+{
+  String s;
+
+  Apollo::StopWatch stopWatch;
+
+  int nCnt = 1000000;
+  Apollo::TimeValue t;
+  for (int i = 0; i < nCnt; i++) {
+    t = Apollo::TimeValue::getTime();
+  }
+
+  Apollo::TimeValue oneSec(1, 0);
+  if (stopWatch.GetDuration() > oneSec) {
+    s.appendf("Apollo::TimeValue::getTime() x %d took %s sec", nCnt, StringType((String) stopWatch));
+  }
+
+  return s;
+}
+
+#endif // AP_TEST_TimeValue
+
+//----------------------------------------------------------
 
 void Test_Builtin_Register()
 {
@@ -2569,6 +2597,10 @@ void Test_Builtin_Register()
 
 #if defined(AP_TEST_AutoPtr)
   AP_UNITTEST_REGISTER(Test_AutoPtr);
+#endif
+
+#if defined(AP_TEST_TimeValue)
+  AP_UNITTEST_REGISTER(Test_TimeValue_Benchmark);
 #endif
 
 #if defined(AP_TEST_RegEx)
@@ -2673,6 +2705,10 @@ void Test_Builtin_Execute()
 
 #if defined(AP_TEST_AutoPtr)
   AP_UNITTEST_EXECUTE(Test_AutoPtr);
+#endif
+
+#if defined(AP_TEST_TimeValue)
+  AP_UNITTEST_EXECUTE(Test_TimeValue_Benchmark);
 #endif
 
 #if defined(AP_TEST_RegEx)

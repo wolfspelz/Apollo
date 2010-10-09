@@ -31,6 +31,8 @@ public:
   void On_Scene_Destroy(Msg_Scene_Destroy* pMsg);
   void On_Scene_Position(Msg_Scene_Position* pMsg);
   void On_Scene_Visibility(Msg_Scene_Visibility* pMsg);
+  void On_Scene_SetAutoDraw(Msg_Scene_SetAutoDraw* pMsg);
+  void On_Scene_AutoDraw(Msg_Scene_AutoDraw* pMsg);
   void On_Scene_Draw(Msg_Scene_Draw* pMsg);
   void On_Scene_CreateElement(Msg_Scene_CreateElement* pMsg);
   void On_Scene_DeleteElement(Msg_Scene_DeleteElement* pMsg);
