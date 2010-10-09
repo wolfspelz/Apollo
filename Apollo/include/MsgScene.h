@@ -144,6 +144,23 @@ public:
   ApIN double fAngle;
 };
 
+class Msg_Scene_HideElement: public ApRequestMessage
+{
+public:
+  Msg_Scene_HideElement() : ApRequestMessage("Scene_HideElement"), bHide(1) {}
+  static int _(const ApHandle& hScene, const String& sPath, int bHide)
+  {
+    Msg_Scene_HideElement msg; 
+    msg.hScene = hScene; 
+    msg.sPath = sPath;
+    msg.bHide = bHide; 
+    return msg.Request();
+  }
+  ApIN ApHandle hScene;
+  ApIN String sPath;
+  ApIN int bHide;
+};
+
 class Msg_Scene_DeleteElement: public ApRequestMessage
 {
 public:

@@ -39,6 +39,7 @@ public:
   void On_Scene_CreateRectangle(Msg_Scene_CreateRectangle* pMsg);
   void On_Scene_TranslateElement(Msg_Scene_TranslateElement* pMsg);
   void On_Scene_ScaleElement(Msg_Scene_ScaleElement* pMsg);
+  void On_Scene_HideElement(Msg_Scene_HideElement* pMsg);
   void On_Scene_RotateElement(Msg_Scene_RotateElement* pMsg);
   void On_Scene_CreateImageFromData(Msg_Scene_CreateImageFromData* pMsg);
   void On_Scene_CreateImageFromFile(Msg_Scene_CreateImageFromFile* pMsg);

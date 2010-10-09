@@ -58,8 +58,22 @@ String SceneModuleTester::Rectangle()
   if (!s) { if (!Msg_Scene_SetFillColor::_(hScene, "rect1", 0, 0, 1, 0.5)) { s = "Msg_Scene_SetFillColor failed"; }}
   if (!s) { if (!Msg_Scene_SetStrokeColor::_(hScene, "rect1", 1, 0, 0, 0.5)) { s = "Msg_Scene_SetStrokeColor failed"; }}
   if (!s) { if (!Msg_Scene_SetStrokeWidth::_(hScene, "rect1", 10)) { s = "Msg_Scene_SetStrokeWidth failed"; }}
-  if (!s) { if (!Msg_Scene_TranslateElement::_(hScene, "rect1", 80, 80)) { s = "Msg_Scene_RotateElement failed"; }}
+  if (!s) { if (!Msg_Scene_TranslateElement::_(hScene, "rect1", 80, 80)) { s = "Msg_Scene_TranslateElement failed"; }}
   if (!s) { if (!Msg_Scene_RotateElement::_(hScene, "rect1", 45.0 / 180.0 * 3.1415)) { s = "Msg_Scene_RotateElement failed"; }}
+
+  // ------------------------
+
+  for (int i = 0; i < 5; i++) {
+    String sPath; sPath.appendf("rect2-%d", i);
+    if (!s) { if (!Msg_Scene_CreateRectangle::_(hScene, sPath + "/1outer", -15, -15, 30, 30)) { s = "Msg_Scene_CreateRectangle failed"; }}
+    if (!s) { if (!Msg_Scene_SetFillColor::_(hScene, sPath + "/1outer", 0, 0, 1, 1)) { s = "Msg_Scene_SetFillColor failed"; }}
+    if (!s) { if (!Msg_Scene_CreateRectangle::_(hScene, sPath + "/2inner", -10, -10, 20, 20)) { s = "Msg_Scene_CreateRectangle failed"; }}
+    if (!s) { if (!Msg_Scene_SetFillColor::_(hScene, sPath + "/2inner", 1, 0, 0, 1)) { s = "Msg_Scene_SetFillColor failed"; }}
+    if (!s) { if (!Msg_Scene_TranslateElement::_(hScene, sPath, 180 + 35 * i, 80)) { s = "Msg_Scene_TranslateElement failed"; }}
+    if (i == 3) {
+      if (!s) { if (!Msg_Scene_HideElement::_(hScene, sPath, 1)) { s = "Msg_Scene_HideElement failed"; }}
+    }
+  }
 
   // ------------------------
 
