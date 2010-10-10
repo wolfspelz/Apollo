@@ -144,6 +144,41 @@ public:
   ApIN double fAngle;
 };
 
+class Msg_Scene_ElementCopyMode: public ApRequestMessage
+{
+public:
+  // Same as cairo_operator_t
+  typedef enum _CopyMode {
+      Clear,
+      Source,
+      Over,
+      In,
+      Out,
+      Atop,
+      Dest,
+      DestOver,
+      DestIn,
+      DestOut,
+      DestAtop,
+      Xor,
+      Add,
+      Saturate
+  } CopyMode;
+
+  Msg_Scene_ElementCopyMode() : ApRequestMessage("Scene_ElementCopyMode"), nMode(0) {}
+  static int _(const ApHandle& hScene, const String& sPath, int nMode)
+  {
+    Msg_Scene_ElementCopyMode msg; 
+    msg.hScene = hScene; 
+    msg.sPath = sPath;
+    msg.nMode = nMode; 
+    return msg.Request();
+  }
+  ApIN ApHandle hScene;
+  ApIN String sPath;
+  ApIN int nMode;
+};
+
 class Msg_Scene_HideElement: public ApRequestMessage
 {
 public:
@@ -328,6 +363,78 @@ public:
   ApIN double fGreen;
   ApIN double fBlue;
   ApIN double fAlpha;
+};
+
+class Msg_Scene_SetStrokeImageFile: public ApRequestMessage
+{
+public:
+  Msg_Scene_SetStrokeImageFile() : ApRequestMessage("Scene_SetStrokeImageFile") {}
+  static int _(const ApHandle& hScene, const String& sPath, const String& sFile)
+  {
+    Msg_Scene_SetStrokeImageFile msg; 
+    msg.hScene = hScene; 
+    msg.sPath = sPath; 
+    msg.sFile = sFile; 
+    return msg.Request();
+  }
+  ApIN ApHandle hScene;
+  ApIN String sPath;
+  ApIN String sFile;
+};
+
+class Msg_Scene_SetFillImageFile: public ApRequestMessage
+{
+public:
+  Msg_Scene_SetFillImageFile() : ApRequestMessage("Scene_SetFillImageFile") {}
+  static int _(const ApHandle& hScene, const String& sPath, const String& sFile)
+  {
+    Msg_Scene_SetFillImageFile msg; 
+    msg.hScene = hScene; 
+    msg.sPath = sPath; 
+    msg.sFile = sFile; 
+    return msg.Request();
+  }
+  ApIN ApHandle hScene;
+  ApIN String sPath;
+  ApIN String sFile;
+};
+
+class Msg_Scene_SetStrokeImageOffset: public ApRequestMessage
+{
+public:
+  Msg_Scene_SetStrokeImageOffset() : ApRequestMessage("Scene_SetStrokeImageOffset"), fX(0.0), fY(0.0) {}
+  static int _(const ApHandle& hScene, const String& sPath, double fX, double fY)
+  {
+    Msg_Scene_SetStrokeImageOffset msg; 
+    msg.hScene = hScene; 
+    msg.sPath = sPath; 
+    msg.fX = fX; 
+    msg.fY = fY; 
+    return msg.Request();
+  }
+  ApIN ApHandle hScene;
+  ApIN String sPath;
+  ApIN double fX;
+  ApIN double fY;
+};
+
+class Msg_Scene_SetFillImageOffset: public ApRequestMessage
+{
+public:
+  Msg_Scene_SetFillImageOffset() : ApRequestMessage("Scene_SetFillImageOffset"), fX(0.0), fY(0.0) {}
+  static int _(const ApHandle& hScene, const String& sPath, double fX, double fY)
+  {
+    Msg_Scene_SetFillImageOffset msg; 
+    msg.hScene = hScene; 
+    msg.sPath = sPath; 
+    msg.fX = fX; 
+    msg.fY = fY; 
+    return msg.Request();
+  }
+  ApIN ApHandle hScene;
+  ApIN String sPath;
+  ApIN double fX;
+  ApIN double fY;
 };
 
 class Msg_Scene_SetStrokeWidth: public ApRequestMessage

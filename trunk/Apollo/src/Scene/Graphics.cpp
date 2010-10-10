@@ -12,6 +12,7 @@
 void Shape::SetFillColor(double fRed, double fGreen, double fBlue, double fAlpha)
 {
   bFillColor_ = true;
+  bFillImageFile_ = false;
   cFill_.r = fRed;
   cFill_.g = fGreen;
   cFill_.b = fBlue;
@@ -21,33 +22,94 @@ void Shape::SetFillColor(double fRed, double fGreen, double fBlue, double fAlpha
 void Shape::SetStrokeColor(double fRed, double fGreen, double fBlue, double fAlpha)
 {
   bStrokeColor_ = true;
+  bStrokeImageFile_ = false;
   cStroke_.r = fRed;
   cStroke_.g = fGreen;
   cStroke_.b = fBlue;
   cStroke_.a = fAlpha;
 }
 
+void Shape::SetStrokeImageFile(const String& sFile)
+{
+  bStrokeColor_ = false;
+  bStrokeImageFile_ = true;
+  sStrokeImageFile_ = sFile;
+}
+
+void Shape::SetFillImageFile(const String& sFile)
+{
+  bFillColor_ = false;
+  bFillImageFile_ = true;
+  sFillImageFile_ = sFile;
+}
+
+void Shape::SetStrokeImageOffset(double fX, double fY)
+{
+  fStrokeImageX_ = fX;
+  fStrokeImageY_ = fY;
+}
+
+void Shape::SetFillImageOffset(double fX, double fY)
+{
+  fFillImageX_ = fX;
+  fFillImageY_ = fY;
+}
+
 void Shape::SetStrokeWidth(double fWidth)
 {
-  bStrokeColor_ = true;
   fStrokeWidth_ = fWidth;
 }
 
 void Shape::FillAndStroke(GraphicsContext& gc)
 {
+  // Fill
+
+  cairo_surface_t* pFillImage = 0;
+  if (bFillImageFile_) {
+    pFillImage = cairo_image_surface_create_from_png(sFillImageFile_);
+    if (pFillImage) {
+      cairo_set_source_surface(gc.Cairo(), pFillImage, fFillImageX_, fFillImageY_);
+    }
+  }
+
   if (bFillColor_) {
     cairo_set_source_rgba(gc.Cairo(), cFill_.r, cFill_.g, cFill_.b, cFill_.a > 0.99 ? 0.99 : cFill_.a);
-    if (bStrokeColor_) {
+  }
+
+  if (bFillColor_ || bFillImageFile_) {
+    if (bStrokeColor_ || bStrokeImageFile_) {
       cairo_fill_preserve(gc.Cairo());
     } else {
       cairo_fill(gc.Cairo());
     }
   }
 
+  if (pFillImage) {
+    cairo_surface_destroy(pFillImage);
+    pFillImage = 0;
+  }
+
+  // Stroke
+
+  cairo_surface_t* pStrokeImage = 0;
+  if (bStrokeImageFile_) {
+    pStrokeImage = cairo_image_surface_create_from_png(sStrokeImageFile_);
+    if (pStrokeImage) {
+      cairo_set_source_surface(gc.Cairo(), pStrokeImage, fStrokeImageX_, fStrokeImageY_);
+    }
+  }
+
   if (bStrokeColor_) {
-    cairo_set_line_width(gc.Cairo(), fStrokeWidth_);
     cairo_set_source_rgba(gc.Cairo(), cStroke_.r, cStroke_.g, cStroke_.b, cStroke_.a > 0.99 ? 0.99 : cStroke_.a);
+  }
+  if (bStrokeColor_ || bStrokeImageFile_) {
+    cairo_set_line_width(gc.Cairo(), fStrokeWidth_);
     cairo_stroke(gc.Cairo());
+  }
+
+  if (pStrokeImage) {
+    cairo_surface_destroy(pStrokeImage);
+    pStrokeImage = 0;
   }
 }
 
@@ -106,6 +168,7 @@ void ImageX::GetSize(GraphicsContext& gc, double& fW, double& fH)
       fW = cairo_image_surface_get_width(pImage);
       fH = cairo_image_surface_get_height(pImage);
       cairo_surface_destroy(pImage);
+      pImage = 0;
     }
   }
 }
