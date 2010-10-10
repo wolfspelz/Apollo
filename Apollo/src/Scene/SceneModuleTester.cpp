@@ -45,6 +45,14 @@ String SceneModuleTester::Rectangle()
     if (!msg.Request()) { s = "Msg_Scene_Visibility failed"; }
   }
 
+  if (!s) {
+    Msg_Scene_SetAutoDraw msg;
+    msg.hScene = hScene;
+    msg.nMilliSec = 100;
+    msg.bAsync = 1;
+    if (!msg.Request()) { s = "Msg_Scene_SetAutoDraw failed"; }
+  }
+
   // ------------------------
 
   if (!s) { if (!Msg_Scene_CreateRectangle::_(hScene, "frame", 0, 0, nWidth, nHeight)) { s = "Msg_Scene_CreateRectangle failed"; }}
@@ -63,14 +71,26 @@ String SceneModuleTester::Rectangle()
 
   // ------------------------
 
-  for (int i = 0; i < 5; i++) {
+  if (!s) { if (!Msg_Scene_CreateRectangle::_(hScene, "copymode1", -50, -25, 100, 50)) { s = "Msg_Scene_CreateRectangle failed"; }}
+  if (!s) { if (!Msg_Scene_SetFillColor::_(hScene, "copymode1", 1, 1, 1, 1)) { s = "Msg_Scene_SetFillColor failed"; }}
+  if (!s) { if (!Msg_Scene_SetStrokeColor::_(hScene, "copymode1", 0, 0, 0, 1)) { s = "Msg_Scene_SetStrokeColor failed"; }}
+  if (!s) { if (!Msg_Scene_SetStrokeWidth::_(hScene, "copymode1", 1)) { s = "Msg_Scene_SetStrokeWidth failed"; }}
+  if (!s) { if (!Msg_Scene_TranslateElement::_(hScene, "copymode1", 200.5, 30.5)) { s = "Msg_Scene_TranslateElement failed"; }}
+  if (!s) { if (!Msg_Scene_CreateRectangle::_(hScene, "copymode2", -50, -15, 100, 30)) { s = "Msg_Scene_CreateRectangle failed"; }}
+  if (!s) { if (!Msg_Scene_SetFillColor::_(hScene, "copymode2", 0, 1, 0, 0.5)) { s = "Msg_Scene_SetFillColor failed"; }}
+  if (!s) { if (!Msg_Scene_TranslateElement::_(hScene, "copymode2", 250.5, 30.5)) { s = "Msg_Scene_TranslateElement failed"; }}
+  if (!s) { if (!Msg_Scene_ElementCopyMode::_(hScene, "copymode2", Msg_Scene_ElementCopyMode::Source)) { s = "Msg_Scene_ElementCopyMode failed"; }}
+
+  // ------------------------
+
+  for (int i = 0; i < 3; i++) {
     String sPath; sPath.appendf("rect2-%d", i);
     if (!s) { if (!Msg_Scene_CreateRectangle::_(hScene, sPath + "/1outer", -15, -15, 30, 30)) { s = "Msg_Scene_CreateRectangle failed"; }}
     if (!s) { if (!Msg_Scene_SetFillColor::_(hScene, sPath + "/1outer", 0, 0, 1, 1)) { s = "Msg_Scene_SetFillColor failed"; }}
-    if (!s) { if (!Msg_Scene_CreateRectangle::_(hScene, sPath + "/2inner", -10, -10, 20, 20)) { s = "Msg_Scene_CreateRectangle failed"; }}
+    if (!s) { if (!Msg_Scene_CreateRectangle::_(hScene, sPath + "/2inner", -10, -20, 20, 20)) { s = "Msg_Scene_CreateRectangle failed"; }}
     if (!s) { if (!Msg_Scene_SetFillColor::_(hScene, sPath + "/2inner", 1, 0, 0, 1)) { s = "Msg_Scene_SetFillColor failed"; }}
-    if (!s) { if (!Msg_Scene_TranslateElement::_(hScene, sPath, 180 + 35 * i, 80)) { s = "Msg_Scene_TranslateElement failed"; }}
-    if (i == 3) {
+    if (!s) { if (!Msg_Scene_TranslateElement::_(hScene, sPath, 180 + 35 * i, 90)) { s = "Msg_Scene_TranslateElement failed"; }}
+    if (i == 1) {
       if (!s) { if (!Msg_Scene_HideElement::_(hScene, sPath, 1)) { s = "Msg_Scene_HideElement failed"; }}
     }
   }
@@ -118,7 +138,7 @@ String SceneModuleTester::Rectangle()
   if (!s) { if (!Msg_Scene_GetImageSizeFromFile::_(hScene, Apollo::getAppResourcePath() + "tassadar" + String::filenamePathSeparator() + "test.png", fImage2W, fImage2H)) { s = "Msg_Scene_GetImageSizeFromFile failed"; }}
   if (!s) { if (fImage2W != 100.0 || fImage2H != 100.0) { s = "Msg_Scene_GetImageSizeFromFile returned wrong size"; }}
   if (!s) { if (!Msg_Scene_CreateImageFromFile::_(hScene, "image2", - fImage2W / 2.0, - fImage2H / 2.0, Apollo::getAppResourcePath() + "tassadar" + String::filenamePathSeparator() + "test.png")) { s = "Msg_Scene_CreateImageFromFile failed"; }}
-  if (!s) { if (!Msg_Scene_TranslateElement::_(hScene, "image2", 80, 290)) { s = "Msg_Scene_RotateElement failed"; }}
+  if (!s) { if (!Msg_Scene_TranslateElement::_(hScene, "image2", 60, 290)) { s = "Msg_Scene_RotateElement failed"; }}
   if (!s) { if (!Msg_Scene_RotateElement::_(hScene, "image2", - 10.0 / 180.0 * 3.1415)) { s = "Msg_Scene_RotateElement failed"; }}
 
   // ------------------------
@@ -177,15 +197,23 @@ String SceneModuleTester::Rectangle()
 
   // ------------------------
 
-  if (!s) {
-    Msg_Scene_SetAutoDraw msg;
-    msg.hScene = hScene;
-    msg.nMilliSec = 100;
-    msg.bAsync = 1;
-    if (!msg.Request()) { s = "Msg_Scene_SetAutoDraw failed"; }
-  }
-  if (!s) { if (!Msg_Scene_SetFillColor::_(hScene, "frame", 1, 1, 1, 0.5)) { s = "Msg_Scene_SetFillColor failed"; }}
-  if (!s) { if (!Msg_Scene_SetFillColor::_(hScene, "frame", 1, 1, 1, 0.5)) { s = "Msg_Scene_SetFillColor failed"; }}
+  if (!s) { if (!Msg_Scene_CreateRectangle::_(hScene, "strokeimage", -40, -40, 80, 80)) { s = "Msg_Scene_CreateRectangle failed"; }}
+//  if (!s) { if (!Msg_Scene_SetStrokeColor::_(hScene, "strokeimage", 0, 0, 0, 1)) { s = "Msg_Scene_SetStrokeColor failed"; }}
+  if (!s) { if (!Msg_Scene_SetFillColor::_(hScene, "strokeimage", 0, 0, 0, 1)) { s = "Msg_Scene_SetFillColor failed"; }}
+  if (!s) { if (!Msg_Scene_SetStrokeImageFile::_(hScene, "strokeimage", Apollo::getAppResourcePath() + "tassadar" + String::filenamePathSeparator() + "test.png")) { s = "Msg_Scene_SetStrokeImageFile failed"; }}
+  if (!s) { if (!Msg_Scene_SetStrokeImageOffset::_(hScene, "strokeimage", -50, -50)) { s = "Msg_Scene_SetStrokeImageOffset failed"; }}
+  if (!s) { if (!Msg_Scene_SetStrokeWidth::_(hScene, "strokeimage", 40)) { s = "Msg_Scene_SetStrokeWidth failed"; }}
+  if (!s) { if (!Msg_Scene_TranslateElement::_(hScene, "strokeimage", 180, 253)) { s = "Msg_Scene_TranslateElement failed"; }}
+
+  // ------------------------
+
+  if (!s) { if (!Msg_Scene_CreateRectangle::_(hScene, "fillimage", -49.5, -49.5, 100, 100)) { s = "Msg_Scene_CreateRectangle failed"; }}
+//  if (!s) { if (!Msg_Scene_SetStrokeColor::_(hScene, "fillimage", 0, 0, 0, 1)) { s = "Msg_Scene_SetStrokeColor failed"; }}
+  if (!s) { if (!Msg_Scene_SetFillImageFile::_(hScene, "fillimage", Apollo::getAppResourcePath() + "tassadar" + String::filenamePathSeparator() + "test.png")) { s = "Msg_Scene_SetFillImageFile failed"; }}
+  if (!s) { if (!Msg_Scene_SetFillImageOffset::_(hScene, "fillimage", -50, -50)) { s = "Msg_Scene_SetFillImageOffset failed"; }}
+  if (!s) { if (!Msg_Scene_SetStrokeColor::_(hScene, "fillimage", 0, 0, 0, 1)) { s = "Msg_Scene_SetStrokeColor failed"; }}
+  if (!s) { if (!Msg_Scene_SetStrokeWidth::_(hScene, "fillimage", 1)) { s = "Msg_Scene_SetStrokeWidth failed"; }}
+  if (!s) { if (!Msg_Scene_TranslateElement::_(hScene, "fillimage", 285, 253)) { s = "Msg_Scene_TranslateElement failed"; }}
 
   // ------------------------
 
@@ -240,6 +268,28 @@ String SceneModuleTester::FontFlags()
   if (!s) { if (Msg_Scene_FontFlags::Italic != TextX::Italic) { s = "Msg_Scene_FontFlags::Italic != TextX::Italic"; }}
   if (!s) { if (Msg_Scene_FontFlags::Bold != TextX::Bold) { s = "Msg_Scene_FontFlags::Bold != TextX::Bold"; }}
   if (!s) { if (Msg_Scene_FontFlags::LastFlag != TextX::LastFlag) { s = "Msg_Scene_FontFlags::LastFlag != TextX::LastFlag"; }}
+ 
+  return s;
+}
+
+String SceneModuleTester::Operator()
+{
+  String s;
+
+  if (!s) { if (Msg_Scene_ElementCopyMode::Clear != CAIRO_OPERATOR_CLEAR) { s = "Msg_Scene_ElementCopyMode::Clear != CAIRO_OPERATOR_CLEAR"; }}
+  if (!s) { if (Msg_Scene_ElementCopyMode::Source != CAIRO_OPERATOR_SOURCE) { s = "Msg_Scene_ElementCopyMode::Source != CAIRO_OPERATOR_SOURCE"; }}
+  if (!s) { if (Msg_Scene_ElementCopyMode::Over != CAIRO_OPERATOR_OVER) { s = "Msg_Scene_ElementCopyMode::Over != CAIRO_OPERATOR_OVER"; }}
+  if (!s) { if (Msg_Scene_ElementCopyMode::In != CAIRO_OPERATOR_IN) { s = "Msg_Scene_ElementCopyMode::In != CAIRO_OPERATOR_IN"; }}
+  if (!s) { if (Msg_Scene_ElementCopyMode::Out != CAIRO_OPERATOR_OUT) { s = "Msg_Scene_ElementCopyMode::Out != CAIRO_OPERATOR_OUT"; }}
+  if (!s) { if (Msg_Scene_ElementCopyMode::Atop != CAIRO_OPERATOR_ATOP) { s = "Msg_Scene_ElementCopyMode::Atop != CAIRO_OPERATOR_ATOP"; }}
+  if (!s) { if (Msg_Scene_ElementCopyMode::Dest != CAIRO_OPERATOR_DEST) { s = "Msg_Scene_ElementCopyMode::Dest != CAIRO_OPERATOR_DEST"; }}
+  if (!s) { if (Msg_Scene_ElementCopyMode::DestOver != CAIRO_OPERATOR_DEST_OVER) { s = "Msg_Scene_ElementCopyMode::DestOver != CAIRO_OPERATOR_DEST_OVER"; }}
+  if (!s) { if (Msg_Scene_ElementCopyMode::DestIn != CAIRO_OPERATOR_DEST_IN) { s = "Msg_Scene_ElementCopyMode::DestIn != CAIRO_OPERATOR_DEST_IN"; }}
+  if (!s) { if (Msg_Scene_ElementCopyMode::DestOut != CAIRO_OPERATOR_DEST_OUT) { s = "Msg_Scene_ElementCopyMode::DestOut != CAIRO_OPERATOR_DEST_OUT"; }}
+  if (!s) { if (Msg_Scene_ElementCopyMode::DestAtop != CAIRO_OPERATOR_DEST_ATOP) { s = "Msg_Scene_ElementCopyMode::DestAtop != CAIRO_OPERATOR_DEST_ATOP"; }}
+  if (!s) { if (Msg_Scene_ElementCopyMode::Xor != CAIRO_OPERATOR_XOR) { s = "Msg_Scene_ElementCopyMode::Xor != CAIRO_OPERATOR_XOR"; }}
+  if (!s) { if (Msg_Scene_ElementCopyMode::Add != CAIRO_OPERATOR_ADD) { s = "Msg_Scene_ElementCopyMode::Add != CAIRO_OPERATOR_ADD"; }}
+  if (!s) { if (Msg_Scene_ElementCopyMode::Saturate != CAIRO_OPERATOR_SATURATE) { s = "Msg_Scene_ElementCopyMode::Saturate != CAIRO_OPERATOR_SATURATE"; }}
  
   return s;
 }

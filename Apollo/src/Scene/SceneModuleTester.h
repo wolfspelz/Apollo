@@ -19,6 +19,7 @@ public:
   static String CheckChildren(Element* pNode, const String& sExpectedChildren);
   static String Rectangle();
   static String FontFlags();
+  static String Operator();
   static String ElementTree();
 };
 #endif

@@ -26,12 +26,13 @@ public:
   Element()
     :pChildren_(0)
     ,pGraphics_(0)
-    ,bTransform_(false)
+    ,bSave_(false)
     ,fTranslateX_(0.0)
     ,fTranslateY_(0.0)
     ,fScaleX_(1.0)
     ,fScaleY_(1.0)
     ,fRotate_(0.0)
+    ,nCopyMode_(CAIRO_OPERATOR_OVER)
     ,bHide_(0)
   {}
   virtual ~Element();
@@ -45,6 +46,7 @@ public:
   void Translate(double fX, double fY);
   void Scale(double fX, double fY);
   void Rotate(double fAngle);
+  void CopyMode(int nMode);
   void Hide(int bHide);
 
   void DeleteGraphics();
@@ -55,6 +57,10 @@ public:
 
   void SetFillColor(double fRed, double fGreen, double fBlue, double fAlpha);
   void SetStrokeColor(double fRed, double fGreen, double fBlue, double fAlpha);
+  void SetStrokeImageFile(const String& sFile);
+  void SetFillImageFile(const String& sFile);
+  void SetStrokeImageOffset(double fX, double fY);
+  void SetFillImageOffset(double fX, double fY);
   void SetStrokeWidth(double fWidth);
   void SetImageData(const Apollo::Image& image);
   void DeleteImageData();
@@ -62,15 +68,21 @@ public:
   void DeleteImageFile();
 
 protected:
+  void CheckSaveRestore();
+
+protected:
   ElementList* pChildren_;
   Graphics* pGraphics_;
 
-  bool bTransform_;
+  bool bSave_;
   double fTranslateX_;
   double fTranslateY_;
   double fScaleX_;
   double fScaleY_;
   double fRotate_;
+
+  int nCopyMode_;
+
   int bHide_;
 
 #if defined(AP_TEST)

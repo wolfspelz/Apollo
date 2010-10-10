@@ -143,6 +143,14 @@ AP_MSG_HANDLER_METHOD(SceneModule, Scene_RotateElement)
   pMsg->apStatus = ApMessage::Ok;
 }
 
+AP_MSG_HANDLER_METHOD(SceneModule, Scene_ElementCopyMode)
+{
+  Surface* pSurface = FindSurface(pMsg->hScene);
+  pSurface->FindElement(pMsg->sPath)->CopyMode(pMsg->nMode);
+  pSurface->AutoDraw();
+  pMsg->apStatus = ApMessage::Ok;
+}
+
 AP_MSG_HANDLER_METHOD(SceneModule, Scene_HideElement)
 {
   Surface* pSurface = FindSurface(pMsg->hScene);
@@ -199,6 +207,38 @@ AP_MSG_HANDLER_METHOD(SceneModule, Scene_SetStrokeColor)
 {
   Surface* pSurface = FindSurface(pMsg->hScene);
   pSurface->FindElement(pMsg->sPath)->SetStrokeColor(pMsg->fRed, pMsg->fGreen, pMsg->fBlue, pMsg->fAlpha);
+  pSurface->AutoDraw();
+  pMsg->apStatus = ApMessage::Ok;
+}
+
+AP_MSG_HANDLER_METHOD(SceneModule, Scene_SetStrokeImageFile)
+{
+  Surface* pSurface = FindSurface(pMsg->hScene);
+  pSurface->FindElement(pMsg->sPath)->SetStrokeImageFile(pMsg->sFile);
+  pSurface->AutoDraw();
+  pMsg->apStatus = ApMessage::Ok;
+}
+
+AP_MSG_HANDLER_METHOD(SceneModule, Scene_SetFillImageFile)
+{
+  Surface* pSurface = FindSurface(pMsg->hScene);
+  pSurface->FindElement(pMsg->sPath)->SetFillImageFile(pMsg->sFile);
+  pSurface->AutoDraw();
+  pMsg->apStatus = ApMessage::Ok;
+}
+
+AP_MSG_HANDLER_METHOD(SceneModule, Scene_SetStrokeImageOffset)
+{
+  Surface* pSurface = FindSurface(pMsg->hScene);
+  pSurface->FindElement(pMsg->sPath)->SetStrokeImageOffset(pMsg->fX, pMsg->fY);
+  pSurface->AutoDraw();
+  pMsg->apStatus = ApMessage::Ok;
+}
+
+AP_MSG_HANDLER_METHOD(SceneModule, Scene_SetFillImageOffset)
+{
+  Surface* pSurface = FindSurface(pMsg->hScene);
+  pSurface->FindElement(pMsg->sPath)->SetFillImageOffset(pMsg->fX, pMsg->fY);
   pSurface->AutoDraw();
   pMsg->apStatus = ApMessage::Ok;
 }
@@ -285,6 +325,7 @@ AP_MSG_HANDLER_METHOD(SceneModule, UnitTest_Begin)
   if (Apollo::getConfig("Test/Scene", 0)) {
     AP_UNITTEST_REGISTER(SceneModuleTester::Rectangle);
     AP_UNITTEST_REGISTER(SceneModuleTester::FontFlags);
+    AP_UNITTEST_REGISTER(SceneModuleTester::Operator);
     AP_UNITTEST_REGISTER(SceneModuleTester::ElementTree);
   }
 }
@@ -295,6 +336,7 @@ AP_MSG_HANDLER_METHOD(SceneModule, UnitTest_Execute)
   if (Apollo::getConfig("Test/Scene", 0)) {
     AP_UNITTEST_EXECUTE(SceneModuleTester::Rectangle);
     AP_UNITTEST_EXECUTE(SceneModuleTester::FontFlags);
+    AP_UNITTEST_EXECUTE(SceneModuleTester::Operator);
     AP_UNITTEST_EXECUTE(SceneModuleTester::ElementTree);
   }
 }
@@ -324,6 +366,7 @@ int SceneModule::Init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_TranslateElement, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_ScaleElement, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_RotateElement, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_ElementCopyMode, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_HideElement, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_CreateRectangle, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_CreateImageFromData, this, ApCallbackPosNormal);
@@ -331,6 +374,10 @@ int SceneModule::Init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_CreateText, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_SetFillColor, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_SetStrokeColor, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_SetStrokeImageFile, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_SetFillImageFile, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_SetStrokeImageOffset, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_SetFillImageOffset, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_SetStrokeWidth, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_SetImageData, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_DeleteImageData, this, ApCallbackPosNormal);

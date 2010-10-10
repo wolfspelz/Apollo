@@ -41,11 +41,16 @@ public:
   void On_Scene_ScaleElement(Msg_Scene_ScaleElement* pMsg);
   void On_Scene_HideElement(Msg_Scene_HideElement* pMsg);
   void On_Scene_RotateElement(Msg_Scene_RotateElement* pMsg);
+  void On_Scene_ElementCopyMode(Msg_Scene_ElementCopyMode* pMsg);
   void On_Scene_CreateImageFromData(Msg_Scene_CreateImageFromData* pMsg);
   void On_Scene_CreateImageFromFile(Msg_Scene_CreateImageFromFile* pMsg);
   void On_Scene_CreateText(Msg_Scene_CreateText* pMsg);
   void On_Scene_SetFillColor(Msg_Scene_SetFillColor* pMsg);
   void On_Scene_SetStrokeColor(Msg_Scene_SetStrokeColor* pMsg);
+  void On_Scene_SetStrokeImageFile(Msg_Scene_SetStrokeImageFile* pMsg);
+  void On_Scene_SetFillImageFile(Msg_Scene_SetFillImageFile* pMsg);
+  void On_Scene_SetStrokeImageOffset(Msg_Scene_SetStrokeImageOffset* pMsg);
+  void On_Scene_SetFillImageOffset(Msg_Scene_SetFillImageOffset* pMsg);
   void On_Scene_SetStrokeWidth(Msg_Scene_SetStrokeWidth* pMsg);
   void On_Scene_SetImageData(Msg_Scene_SetImageData* pMsg);
   void On_Scene_DeleteImageData(Msg_Scene_DeleteImageData* pMsg);

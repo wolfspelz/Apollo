@@ -117,25 +117,43 @@ int Element::DeleteElement(const String& sPath)
 
 // ----------------------------------------------------------
 
+void Element::CheckSaveRestore()
+{
+  bSave_ = (0
+    || fTranslateX_ != 0.0
+    || fTranslateY_ != 0.0
+    || fScaleX_ != 1.0
+    || fScaleY_ != 1.0
+    || fRotate_ != 0.0
+    || nCopyMode_ != CAIRO_OPERATOR_OVER
+    );
+}
+
 void Element::Translate(double fX, double fY)
 {
   fTranslateX_ = fX;
   fTranslateY_ = fY;
   //fTranslateY_ = -fY; // -V
-  bTransform_ = (fTranslateX_ != 0.0 || fTranslateY_ != 0.0 || fScaleX_ != 1.0 || fScaleY_ != 1.0 || fRotate_ != 0.0);
+  CheckSaveRestore();
 }
 
 void Element::Scale(double fX, double fY)
 {
   fScaleX_ = fX;
   fScaleY_ = fY;
-  bTransform_ = (fTranslateX_ != 0.0 || fTranslateY_ != 0.0 || fScaleX_ != 1.0 || fScaleY_ != 1.0 || fRotate_ != 0.0);
+  CheckSaveRestore();
 }
 
 void Element::Rotate(double fAngle)
 {
   fRotate_ = fAngle;
-  bTransform_ = (fTranslateX_ != 0.0 || fTranslateY_ != 0.0 || fScaleX_ != 1.0 || fScaleY_ != 1.0 || fRotate_ != 0.0);
+  CheckSaveRestore();
+}
+
+void Element::CopyMode(int nMode)
+{
+  nCopyMode_ = nMode;
+  CheckSaveRestore();
 }
 
 void Element::Hide(int bHide)
@@ -211,6 +229,42 @@ void Element::SetStrokeColor(double fRed, double fGreen, double fBlue, double fA
   }
 }
 
+void Element::SetStrokeImageFile(const String& sFile)
+{
+  if (pGraphics_ && pGraphics_->IsShape()) {
+    ((Shape*) pGraphics_)->SetStrokeImageFile(sFile);
+  } else {
+    throw ApException("Element::SetStrokeImageFile: not a Shape");
+  }
+}
+
+void Element::SetFillImageFile(const String& sFile)
+{
+  if (pGraphics_ && pGraphics_->IsShape()) {
+    ((Shape*) pGraphics_)->SetFillImageFile(sFile);
+  } else {
+    throw ApException("Element::SetFillImageFile: not a Shape");
+  }
+}
+
+void Element::SetStrokeImageOffset(double fX, double fY)
+{
+  if (pGraphics_ && pGraphics_->IsShape()) {
+    ((Shape*) pGraphics_)->SetStrokeImageOffset(fX, fY);
+  } else {
+    throw ApException("Element::SetStrokeImageOffset: not a Shape");
+  }
+}
+
+void Element::SetFillImageOffset(double fX, double fY)
+{
+  if (pGraphics_ && pGraphics_->IsShape()) {
+    ((Shape*) pGraphics_)->SetFillImageOffset(fX, fY);
+  } else {
+    throw ApException("Element::SetFillImageOffset: not a Shape");
+  }
+}
+
 void Element::SetStrokeWidth(double fWidth)
 {
   if (pGraphics_ && pGraphics_->IsShape()) {
@@ -266,8 +320,9 @@ void Element::Draw(GraphicsContext& gc)
   //gcNext.fTranslateX_ += fTranslateX_;
   //gcNext.fTranslateY_ += fTranslateY_;
 
-  if (bTransform_) {
+  if (bSave_) {
     cairo_save(gc.Cairo());
+
     if (fTranslateX_ != 0.0 || fTranslateY_ != 0.0) {
       cairo_translate(gc.Cairo(), fTranslateX_, fTranslateY_);
     }
@@ -276,6 +331,9 @@ void Element::Draw(GraphicsContext& gc)
     }
     if (fScaleX_ != 0.0 || fScaleY_ != 0.0) {
       cairo_scale(gc.Cairo(), fScaleX_, fScaleY_);
+    }
+    if (nCopyMode_ != CAIRO_OPERATOR_OVER) {
+      cairo_set_operator(gc.Cairo(), (cairo_operator_t) nCopyMode_);
     }
   }
 
@@ -293,7 +351,7 @@ void Element::Draw(GraphicsContext& gc)
     }
   }
 
-  if (bTransform_) {
+  if (bSave_) {
     cairo_restore(gc.Cairo());
   }
 }

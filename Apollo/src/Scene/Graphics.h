@@ -16,13 +16,20 @@
 
 #include "GraphicsContext.h"
 
-typedef struct _Color
+class Color
 {
+public:
+  Color()
+    :r(0.0)
+    ,g(0.0)
+    ,b(0.0)
+    ,a(0.0)
+  {}
   double r;
   double g;
   double b;
   double a;
-} Color;
+};
 
 class Graphics
 {
@@ -37,6 +44,8 @@ public:
   virtual bool IsShape() { return false; }
   virtual bool IsText() { return false; }
 
+protected:
+
 #if defined(AP_TEST)
   friend class SceneModuleTester;
 #endif
@@ -47,8 +56,14 @@ class Shape: public Graphics
 public:
   Shape()
     :bFillColor_(false)
-    ,bStrokeColor_(false)
+    ,bFillImageFile_(false)
+    ,fFillImageX_(0.0)
+    ,fFillImageY_(0.0)
     ,fStrokeWidth_(1.0)
+    ,bStrokeColor_(false)
+    ,bStrokeImageFile_(false)
+    ,fStrokeImageX_(0.0)
+    ,fStrokeImageY_(0.0)
   {}
   virtual ~Shape() {}
 
@@ -56,6 +71,10 @@ public:
 
   virtual void SetFillColor(double fRed, double fGreen, double fBlue, double fAlpha);
   virtual void SetStrokeColor(double fRed, double fGreen, double fBlue, double fAlpha);
+  virtual void SetStrokeImageFile(const String& sFile);
+  virtual void SetFillImageFile(const String& sFile);
+  virtual void SetStrokeImageOffset(double fX, double fY);
+  virtual void SetFillImageOffset(double fX, double fY);
   virtual void SetStrokeWidth(double fWidth);
 
   void Draw(GraphicsContext& gc) = 0;
@@ -66,9 +85,18 @@ protected:
 protected:
   bool bFillColor_;
   Color cFill_;
+  bool bFillImageFile_;
+  String sFillImageFile_;
+  double fFillImageX_;
+  double fFillImageY_;
+
+  double fStrokeWidth_;
   bool bStrokeColor_;
   Color cStroke_;
-  double fStrokeWidth_;
+  bool bStrokeImageFile_;
+  String sStrokeImageFile_;
+  double fStrokeImageX_;
+  double fStrokeImageY_;
 };
 
 class RectangleX: public Shape
