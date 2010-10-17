@@ -11,7 +11,7 @@
 #include "Location.h"
 #include "ArenaModule.h"
 
-Location::Location(ApHandle hLocation, ArenaModule* pModule)
+Location::Location(const ApHandle& hLocation, ArenaModule* pModule)
 :hAp_(hLocation)
 ,pModule_(pModule)
 {
@@ -64,12 +64,12 @@ void Location::EvaluateNewParticipantList(Apollo::ValueList& vlParticipants)
   }
 }
 
-void Location::RemoveFromRemovedParticipants(ApHandle h)
+void Location::RemoveFromRemovedParticipants(const ApHandle& h)
 {
   removedParticipants_.Unset(h);
 }
 
-void Location::AddToAddedParticipants(ApHandle h)
+void Location::AddToAddedParticipants(const ApHandle& h)
 {
   addedParticipants_.Set(h, 1);
 }
@@ -105,7 +105,7 @@ void Location::ProcessRemovedParticipants()
 
 // -------------------------
 
-void Location::ParticipantDetailsChanged(ApHandle hParticipant, Apollo::ValueList& vlKeys)
+void Location::ParticipantDetailsChanged(const ApHandle& hParticipant, Apollo::ValueList& vlKeys)
 {
   ParticipantListNode* pNode = participants_.Find(hParticipant);
   if (pNode) {
@@ -113,7 +113,7 @@ void Location::ParticipantDetailsChanged(ApHandle hParticipant, Apollo::ValueLis
   }
 }
 
-void Location::ReceivePublicChat(ApHandle hParticipant, ApHandle hChat, const String& sNickname, const String& sText, const Apollo::TimeValue& tv)
+void Location::ReceivePublicChat(const ApHandle& hParticipant, const ApHandle& hChat, const String& sNickname, const String& sText, const Apollo::TimeValue& tv)
 {
   ParticipantListNode* pNode = participants_.Find(hParticipant);
   if (pNode) {
@@ -121,7 +121,7 @@ void Location::ReceivePublicChat(ApHandle hParticipant, ApHandle hChat, const St
   }
 }
 
-void Location::ParticipantAnimationFrame(ApHandle hParticipant, const Apollo::Image& image)
+void Location::ParticipantAnimationFrame(const ApHandle& hParticipant, const Apollo::Image& image)
 {
   ParticipantListNode* pNode = participants_.Find(hParticipant);
   if (pNode) {

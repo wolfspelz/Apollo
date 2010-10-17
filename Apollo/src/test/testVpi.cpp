@@ -361,14 +361,14 @@ static String Test_Vpi_DetailedMap_Start()
 class Test_Vpi_Map_Data : public Elem
 {
 public:
-  Test_Vpi_Map_Data(ApHandle hAp, const char* szDocumentURL, const char* szLocationUrl)
+  Test_Vpi_Map_Data(const ApHandle& hAp, const char* szDocumentURL, const char* szLocationUrl)
     :sDocumentUrl_(szDocumentURL)
     ,sLocationUrl_(szLocationUrl)
     ,bSuccess_(0)
     ,bMapped_(0)
     ,hAp_(hAp)
   {}
-  ApHandle apHandle() { return hAp_; }
+  inline ApHandle apHandle() { return hAp_; }
   String sDocumentUrl_;
   String sLocationUrl_;
   int bSuccess_;
@@ -380,7 +380,7 @@ List lTest_Vpi_Map_DataList;
 static unsigned int nTest_Vpi_Map_Mapped = 0;
 static unsigned int nTest_Vpi_Map_Success = 0;
 
-Test_Vpi_Map_Data* Test_Vpi_Map_Data_FindByHandle(ApHandle h)
+Test_Vpi_Map_Data* Test_Vpi_Map_Data_FindByHandle(const ApHandle& h)
 {
   Test_Vpi_Map_Data* pResult = 0;
   for (Test_Vpi_Map_Data* e = 0; (e = (Test_Vpi_Map_Data*) lTest_Vpi_Map_DataList.Next(e)) != 0; ) {

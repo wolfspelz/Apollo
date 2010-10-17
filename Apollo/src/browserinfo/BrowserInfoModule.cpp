@@ -28,7 +28,7 @@ LocalCallGuard::~LocalCallGuard()
 
 //----------------------------------------------------------
 
-Browser* BrowserInfoModule::FindBrowserByContext(ApHandle hContext)
+Browser* BrowserInfoModule::FindBrowserByContext(const ApHandle& hContext)
 {
   Browser* pResult = 0;
 

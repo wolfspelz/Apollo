@@ -17,7 +17,7 @@ public:
   virtual ~HttpServer() {}
 
 protected:
-  virtual Apollo::TCPConnection* OnConnectionAccepted(String& sName, ApHandle hHttpConnection, String& sClientAddress, int nClientPort);
+  virtual Apollo::TCPConnection* OnConnectionAccepted(String& sName, const ApHandle& hHttpConnection, String& sClientAddress, int nClientPort);
   virtual int OnStarted();
   virtual int OnStopped();
 };

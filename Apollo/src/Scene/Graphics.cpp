@@ -6,8 +6,16 @@
 
 #include "Apollo.h"
 #include "ApLog.h"
+#include "MsgScene.h"
 #include "Local.h"
 #include "Graphics.h"
+#include "Surface.h"
+
+void Shape::SetCoordinates(double fX, double fY)
+{
+  fX_ = fX;
+  fY_ = fY;
+}
 
 void Shape::SetFillColor(double fRed, double fGreen, double fBlue, double fAlpha)
 {
@@ -60,7 +68,7 @@ void Shape::SetStrokeWidth(double fWidth)
   fStrokeWidth_ = fWidth;
 }
 
-void Shape::FillAndStroke(GraphicsContext& gc)
+void Shape::FillAndStroke(DrawContext& gc)
 {
   // Fill
 
@@ -68,7 +76,9 @@ void Shape::FillAndStroke(GraphicsContext& gc)
   if (bFillImageFile_) {
     pFillImage = cairo_image_surface_create_from_png(sFillImageFile_);
     if (pFillImage) {
+      cairo_scale(gc.Cairo(), 1.0, -1.0);
       cairo_set_source_surface(gc.Cairo(), pFillImage, fFillImageX_, fFillImageY_);
+      cairo_scale(gc.Cairo(), 1.0, -1.0);
     }
   }
 
@@ -95,7 +105,9 @@ void Shape::FillAndStroke(GraphicsContext& gc)
   if (bStrokeImageFile_) {
     pStrokeImage = cairo_image_surface_create_from_png(sStrokeImageFile_);
     if (pStrokeImage) {
+      cairo_scale(gc.Cairo(), 1.0, -1.0);
       cairo_set_source_surface(gc.Cairo(), pStrokeImage, fStrokeImageX_, fStrokeImageY_);
+      cairo_scale(gc.Cairo(), 1.0, -1.0);
     }
   }
 
@@ -115,9 +127,8 @@ void Shape::FillAndStroke(GraphicsContext& gc)
 
 // ----------------------------------------------------------
 
-void RectangleX::Draw(GraphicsContext& gc)
+void RectangleX::Draw(DrawContext& gc)
 {
-//  cairo_rectangle(gc.Cairo(), fX_, gc.nH_ - fY_ - fH_, fW_, fH_); // -V
   cairo_rectangle(gc.Cairo(), fX_, fY_, fW_, fH_);
 
   FillAndStroke(gc);
@@ -157,7 +168,7 @@ void ImageX::DeleteImageFile()
   sFile_ = "";
 }
 
-void ImageX::GetSize(GraphicsContext& gc, double& fW, double& fH)
+void ImageX::GetSize(DrawContext& gc, double& fW, double& fH)
 {  
   if (bData_) {
     fW = image_.Width();
@@ -173,7 +184,7 @@ void ImageX::GetSize(GraphicsContext& gc, double& fW, double& fH)
   }
 }
 
-void ImageX::Draw(GraphicsContext& gc)
+void ImageX::Draw(DrawContext& gc)
 {
   cairo_surface_t* pImage = 0;
   
@@ -186,9 +197,14 @@ void ImageX::Draw(GraphicsContext& gc)
   if (pImage) {
     //int nImageW = cairo_image_surface_get_width(pImage);
     int nImageH = cairo_image_surface_get_height(pImage);
+    cairo_scale(gc.Cairo(), 1.0, -1.0);
     cairo_set_source_surface(gc.Cairo(), pImage, fX_, fY_);
-//    cairo_set_source_surface(gc.Cairo(), pImage, fX_, gc.nH_ - fY_ - nImageH); // -V
-    cairo_paint(gc.Cairo());
+    cairo_scale(gc.Cairo(), 1.0, -1.0);
+    if (fAlpha_ > 0.99) {
+      cairo_paint(gc.Cairo());
+    } else {
+      cairo_paint_with_alpha(gc.Cairo(), fAlpha_);
+    }
 
     cairo_surface_destroy(pImage);
   }
@@ -196,18 +212,19 @@ void ImageX::Draw(GraphicsContext& gc)
 
 // ----------------------------------------------------------
 
-void TextX::Draw(GraphicsContext& gc)
+void TextX::Draw(DrawContext& gc)
 {
-//  cairo_move_to(gc.Cairo(), fX_, gc.nH_ - fY_); // -V
   cairo_move_to(gc.Cairo(), fX_, fY_);
   cairo_select_font_face(gc.Cairo(), sFont_, nFlags_ & Italic ? CAIRO_FONT_SLANT_ITALIC : CAIRO_FONT_SLANT_NORMAL, nFlags_ & Bold ? CAIRO_FONT_WEIGHT_BOLD : CAIRO_FONT_WEIGHT_NORMAL);
   cairo_set_font_size(gc.Cairo(), fSize_);
+  cairo_scale(gc.Cairo(), 1.0, -1.0);
   cairo_text_path(gc.Cairo(), sText_);
+  cairo_scale(gc.Cairo(), 1.0, -1.0);
 
   FillAndStroke(gc);
 }
 
-void TextX::Measure(GraphicsContext& gc, TextExtents& te)
+void TextX::Measure(DrawContext& gc, TextExtents& te)
 {
   cairo_select_font_face(gc.Cairo(), sFont_, nFlags_ & Italic ? CAIRO_FONT_SLANT_ITALIC : CAIRO_FONT_SLANT_NORMAL, nFlags_ & Bold ? CAIRO_FONT_WEIGHT_BOLD : CAIRO_FONT_WEIGHT_NORMAL);
   cairo_set_font_size(gc.Cairo(), fSize_);
@@ -222,3 +239,42 @@ void TextX::Measure(GraphicsContext& gc, TextExtents& te)
   te.fAdvanceX_ = extents.x_advance;
   te.fAdvanceY_ = extents.y_advance;
 }
+
+// ----------------------------------------------------------
+
+Sensor::~Sensor()
+{
+  //if (pSurface_) {
+  //  pSurface_->RemoveSensor(hAp_);
+  //}
+}
+
+//void Sensor::Draw(DrawContext& gc)
+//{
+//  cairo_rectangle(gc.Cairo(), fX_, fY_, fW_, fH_);
+//
+//  FillAndStroke(gc);
+//}
+
+void Sensor::MouseEvent(EventContext& gc, double fX, double fY)
+{
+  bool bHit = false;
+
+  if (fX_ < fX && fX_ + fW_ > fX && fY_ < fY && fY_ + fH_ > fY) {
+    bHit = true;
+  }
+
+  if (bHit) {
+    Msg_Scene_MouseEvent msg;
+    msg.hScene = pSurface_->apHandle();
+    msg.sPath = sPath_;
+    msg.nEvent = gc.nEvent_;
+    msg.nButton = gc.nButton_;
+    msg.fX = fX;
+    msg.fY = fY;
+    msg.Send();
+
+    gc.bFired_ = true;
+  }
+}
+

@@ -94,7 +94,7 @@ public:
   void On_UnitTest_End(Msg_UnitTest_End* pMsg);
 #endif
 
-  Client* FindClient(ApHandle h);
+  Client* FindClient(const ApHandle& h);
 
 protected:
   String XmppModule::getNickname();

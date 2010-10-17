@@ -15,7 +15,7 @@ using namespace Apollo;
 class ContainerClient: public HTTPClient
 {
 public:
-  ContainerClient(ApHandle hRequest, const String& sDigest)
+  ContainerClient(const ApHandle& hRequest, const String& sDigest)
     :HTTPClient("ContainerClient") 
     ,hRequest_(hRequest)
     ,sDigest_(sDigest)

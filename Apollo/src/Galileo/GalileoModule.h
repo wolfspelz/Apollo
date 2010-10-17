@@ -85,7 +85,7 @@ public:
   int AnimationIsRequested(const String& sUrl);
 
 protected:
-  Item* GetItemByTimer(ApHandle hTimer);
+  Item* GetItemByTimer(const ApHandle& hTimer);
   //String PrepareDbKey(const String& sText) { return String::reverse(sText); }
   //String PrepareDbKey(const String& sText) { return sText; }
   String PrepareDbKey(const String& sText) { String sResult = Apollo::getShortHash(sText, 4) + " " + sText; return sResult; }

@@ -16,7 +16,7 @@
 #include "Protocol.h"
 #include "SAutoPtr.h"
 
-Participant::Participant(const char* szNickname, ApHandle hParticipant, Client* pClient, Room* pRoom)
+Participant::Participant(const char* szNickname, const ApHandle& hParticipant, Client* pClient, Room* pRoom)
 :Elem(szNickname)
 ,hAp_(hParticipant)
 ,pClient_(pClient)

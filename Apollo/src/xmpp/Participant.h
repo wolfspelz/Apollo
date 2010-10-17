@@ -16,10 +16,10 @@ class Stanza;
 class Participant: public Elem
 {
 public:
-  Participant(const char* szNickname, ApHandle hParticipant, Client* pClient, Room* pRoom);
+  Participant(const char* szNickname, const ApHandle& hParticipant, Client* pClient, Room* pRoom);
   virtual ~Participant();
 
-  ApHandle apHandle() { return hAp_; }
+  inline ApHandle apHandle() { return hAp_; }
   
   int presence(Stanza& stanza);
 

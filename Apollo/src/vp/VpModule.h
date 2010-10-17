@@ -44,7 +44,7 @@ protected:
 class DisplayProfile
 {
 public:
-  DisplayProfile(ApHandle hAp): hAp_(hAp) {}
+  DisplayProfile(const ApHandle& hAp): hAp_(hAp) {}
   void setParticipantDetail(const String& sKey, Apollo::ValueList& vlMimeTypes);
 
 protected:
@@ -175,27 +175,27 @@ public:
   AP_UNITTEST_DECLAREHOOK();
 
 protected:
-  Context* findContext(ApHandle hContext);
-  Context* findContextByMapping(ApHandle hMapping);
-  Location* findLocation(ApHandle hLocation);
+  Context* findContext(const ApHandle& hContext);
+  Context* findContextByMapping(const ApHandle& hMapping);
+  Location* findLocation(const ApHandle& hLocation);
   Location* findLocationByUrl(const String& sUrl);
-  Location* findLocationByContext(ApHandle hContext);
-  Location* findLocationByRoom(ApHandle hRoom);
-  Location* findLocationByParticipant(ApHandle hParticipant);
-  ApHandle findLocationHandleByParticipant(ApHandle hParticipant);
+  Location* findLocationByContext(const ApHandle& hContext);
+  Location* findLocationByRoom(const ApHandle& hRoom);
+  Location* findLocationByParticipant(const ApHandle& hParticipant);
+  ApHandle findLocationHandleByParticipant(const ApHandle& hParticipant);
 
-  Participant* findParticipant(ApHandle hParticipant);
-  Participant* findParticipantInRoom(ApHandle hRoom, ApHandle hParticipant);
+  Participant* findParticipant(const ApHandle& hParticipant);
+  Participant* findParticipantInRoom(const ApHandle& hRoom, const ApHandle& hParticipant);
   ParticipantPointerList findParticipantsByIdentityUrl(const String& sUrl);
 
-  DisplayProfile* findProfile(ApHandle hProfile);
+  DisplayProfile* findProfile(const ApHandle& hProfile);
 
-  void setParticipantLocationMapping(ApHandle hParticipant, ApHandle hLocation);
-  void unsetParticipantLocationMapping(ApHandle hParticipant, ApHandle hLocation);
+  void setParticipantLocationMapping(const ApHandle& hParticipant, const ApHandle& hLocation);
+  void unsetParticipantLocationMapping(const ApHandle& hParticipant, const ApHandle& hLocation);
 
-  void setIdentityParticipantMapping(const String& sUrl, ApHandle hParticipant);
-  void unsetIdentityParticipantMapping(const String& sUrl, ApHandle hParticipant);
-  void removeParticipantFromIdentityParticipantMapping(ApHandle hParticipant);
+  void setIdentityParticipantMapping(const String& sUrl, const ApHandle& hParticipant);
+  void unsetIdentityParticipantMapping(const String& sUrl, const ApHandle& hParticipant);
+  void removeParticipantFromIdentityParticipantMapping(const ApHandle& hParticipant);
   void getParticipantHandlesByIdentity(const String& sUrl, Apollo::ValueList& vlHandles);
 
 protected:

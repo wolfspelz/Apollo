@@ -21,7 +21,7 @@ XmppModule::~XmppModule()
   void Exit();
 }
 
-Client* XmppModule::FindClient(ApHandle h)
+Client* XmppModule::FindClient(const ApHandle& h)
 {
   Client* pResult = 0; 
 

@@ -34,17 +34,17 @@ public:
   int init();
   void exit();
 
-  Display* findDisplay(ApHandle h);
-  Display* findDestroyedDisplay(ApHandle h);
+  Display* findDisplay(const ApHandle& h);
+  Display* findDestroyedDisplay(const ApHandle& h);
   Display* findDisplayById(const String& sId);
-  Connection* findConnection(ApHandle h);
-  int addConnection(ApHandle hConnection, Connection* pConnection);
-  int removeConnection(ApHandle hConnection);
+  Connection* findConnection(const ApHandle& h);
+  int addConnection(const ApHandle& hConnection, Connection* pConnection);
+  int removeConnection(const ApHandle& hConnection);
 
-  void setConnectionDisplayMapping(ApHandle hConnection, ApHandle hDisplay);
-  void unsetConnectionDisplayMapping(ApHandle hConnection, ApHandle hDisplay);
-  ApHandle findDisplayHandleByConnectionHandle(ApHandle hConnection);
-  ApHandle findConnectionHandleByDisplayHandle(ApHandle hDisplay);
+  void setConnectionDisplayMapping(const ApHandle& hConnection, const ApHandle& hDisplay);
+  void unsetConnectionDisplayMapping(const ApHandle& hConnection, const ApHandle& hDisplay);
+  ApHandle findDisplayHandleByConnectionHandle(const ApHandle& hConnection);
+  ApHandle findConnectionHandleByDisplayHandle(const ApHandle& hDisplay);
 
   void On_Fluid_Create(Msg_Fluid_Create* pMsg);
   void On_Fluid_Destroy(Msg_Fluid_Destroy* pMsg);

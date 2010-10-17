@@ -14,7 +14,7 @@
 #include "Stanza.h"
 #include "Protocol.h"
 
-Room::Room(const char* szJid, ApHandle hRoom, Client* pClient)
+Room::Room(const char* szJid, const ApHandle& hRoom, Client* pClient)
 :Elem(szJid)
 ,hAp_(hRoom)
 ,pClient_(pClient)

@@ -18,7 +18,7 @@ class Resolver;
 class DNSResolveTask: public Apollo::Task
 {
 public:
-  DNSResolveTask(ApHandle hAp, String& sName)
+  DNSResolveTask(const ApHandle& hAp, String& sName)
     :hAp_(hAp)
     ,sName_(sName)
   {}

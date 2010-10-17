@@ -9,6 +9,7 @@
 
 #include "Apollo.h"
 #include "SString.h"
+#include "MsgScene.h"
 
 class Element;
 
@@ -16,11 +17,21 @@ class Element;
 class SceneModuleTester
 {
 public:
+  static void Begin();
+  static void Execute();
+  static void End();
+
+  static void On_Scene_MouseEvent(Msg_Scene_MouseEvent* pMsg);
+
   static String CheckChildren(Element* pNode, const String& sExpectedChildren);
   static String Rectangle();
-  static String FontFlags();
-  static String Operator();
+  static String SameConstants_FontFlags();
+  static String SameConstants_Operator();
+  static String SameConstants_EventContext();
   static String ElementTree();
+//  static String SensorListOps();
+
+  static int bHasCursor_;
 };
 #endif
 

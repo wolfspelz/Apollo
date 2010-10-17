@@ -82,7 +82,7 @@ void NetAPIModule::On_Net_TCP_ListenStopped(Msg_Net_TCP_ListenStopped* pMsg)
   }
 }
 
-Apollo::TCPServer* NetAPIModule::FindTCPServer(ApHandle hAp)
+Apollo::TCPServer* NetAPIModule::FindTCPServer(const ApHandle& hAp)
 {
   Apollo::TCPServer* pServer = NULL;
   ApHandleTreeNode<Apollo::TCPServer*>* pNode = tcpServers_.Find(hAp);
@@ -102,7 +102,7 @@ void NetAPIModule::RemoveTCPServer(Apollo::TCPServer* pServer)
   tcpServers_.Unset(pServer->apHandle());
 }
 
-Apollo::TCPConnection* NetAPIModule::FindTCPConnection(ApHandle h)
+Apollo::TCPConnection* NetAPIModule::FindTCPConnection(const ApHandle& h)
 {
   Apollo::TCPConnection* c = 0; 
   while ((c = NetAPIModuleInstance::Get()->lTCPConnections_.Next(c)) != 0) {
@@ -167,7 +167,7 @@ void NetAPIModule::On_Net_HTTP_Closed(Msg_Net_HTTP_Closed* pMsg)
   }
 }
 
-Apollo::HTTPClient* NetAPIModule::FindHTTPClient(ApHandle h)
+Apollo::HTTPClient* NetAPIModule::FindHTTPClient(const ApHandle& h)
 {
   Apollo::HTTPClient* c = 0; 
   while ((c = NetAPIModuleInstance::Get()->lHTTPClients_.Next(c)) != 0) {

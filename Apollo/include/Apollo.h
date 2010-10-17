@@ -88,7 +88,7 @@ APOLLO_API void* libraryGetProcAddress(HANDLE hDll, const String& sSymbol);
 APOLLO_API int libraryFree(HANDLE hDll);
 
 APOLLO_API ApHandle newHandle();
-APOLLO_API String handle2String(ApHandle h);
+APOLLO_API String handle2String(const ApHandle& h);
 APOLLO_API ApHandle string2Handle(const String& sString);
 
 APOLLO_API int getRandom(int nMax);
@@ -128,8 +128,8 @@ APOLLO_API String translate(const char* szModule, const char* szContext, const c
 
 APOLLO_API ApHandle startInterval(int nSec, int nMicroSec);
 APOLLO_API ApHandle startTimeout(int nSec, int nMicroSec);
-APOLLO_API int cancelInterval(ApHandle hTimer);
-APOLLO_API int cancelTimeout(ApHandle hTimer);
+APOLLO_API int cancelInterval(const ApHandle& hTimer);
+APOLLO_API int cancelTimeout(const ApHandle& hTimer);
 
 APOLLO_API int loadFile(const String& sFile, Buffer& sbData);
 APOLLO_API int loadFile(const String& sFile, String& sbData);

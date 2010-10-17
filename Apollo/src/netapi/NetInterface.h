@@ -47,11 +47,11 @@ public:
   virtual int Start(const String& sAddress, int nPort);
   virtual int Stop();
   int Running() { return bRunning_; }
-  ApHandle apHandle() { return hAp_; }
+  inline ApHandle apHandle() { return hAp_; }
 
 protected:
   // Overwrite this method by returnin a new connection object inheriting from TCPConnection
-  virtual TCPConnection* OnConnectionAccepted(String& sName, ApHandle hConnection, String& sClientAddress, int nClientPort) 
+  virtual TCPConnection* OnConnectionAccepted(String& sName, const ApHandle& hConnection, String& sClientAddress, int nClientPort) 
   { return NULL; }
 
 protected:
@@ -61,7 +61,7 @@ protected:
 public:
   int InternalListening();
   int InternalListenStopped();
-  int InternalConnectionAccepted(ApHandle hConnection, String& sClientAddress, int nClientPort);
+  int InternalConnectionAccepted(const ApHandle& hConnection, String& sClientAddress, int nClientPort);
 
 protected:
   int bRunning_;
@@ -77,10 +77,10 @@ class NETAPI_API TCPConnection : public Elem
 {
 public:
   TCPConnection(const char* szName);
-  TCPConnection(const char* szName, ApHandle hConnection);
+  TCPConnection(const char* szName, const ApHandle& hConnection);
   virtual ~TCPConnection();
 
-  static TCPConnection* Find(ApHandle h);
+  static TCPConnection* Find(const ApHandle& h);
 
   virtual int Connect(const char* szAddress, int nPort);
   virtual int DataOut(unsigned char* pData, size_t nLen);
@@ -93,7 +93,7 @@ public:
   int InternalDataIn(unsigned char* pData, size_t nLen);
   int InternalClosed();
 
-  ApHandle apHandle() { return hAp_; }
+  inline ApHandle apHandle() { return hAp_; }
 
 protected:
   virtual int OnConnected() { return 0; }
@@ -122,7 +122,7 @@ public:
 
   static void ClassInit();
   static void ClassExit();
-  static HTTPClient* Find(ApHandle h);
+  static HTTPClient* Find(const ApHandle& h);
 
   virtual int Get(const char* szUrl, KeyValueList& kvHeaders = kvEmptyHeaders_);
   virtual int Post(const char* szUrl, const unsigned char* pData, size_t nLen, KeyValueList& kvHeaders = kvEmptyHeaders_);
@@ -140,7 +140,7 @@ public:
   int InternalFailed(const char* szMessage);
   int InternalClosed();
 
-  ApHandle apHandle() { return hAp_; }
+  inline ApHandle apHandle() { return hAp_; }
 
 protected:
   virtual int OnConnected() { return 0; }

@@ -735,7 +735,7 @@ Room* Client::findRoom(const String& szJid)
   return pRoom;
 }
 
-Room* Client::findRoom(ApHandle hRoom)
+Room* Client::findRoom(const ApHandle& hRoom)
 {
   Room* pResult = 0;
 
@@ -763,7 +763,7 @@ ApHandle Client::getRoomHandle(String& sJid)
   return h;
 }
 
-int Client::enterRoom(String& sJid, String& sNickname, ApHandle hRoom)
+int Client::enterRoom(String& sJid, String& sNickname, const ApHandle& hRoom)
 {
   int ok = 0;
 
@@ -787,7 +787,7 @@ int Client::enterRoom(String& sJid, String& sNickname, ApHandle hRoom)
   return ok;
 }
 
-int Client::enterRoomComplete(ApHandle hRoom)
+int Client::enterRoomComplete(const ApHandle& hRoom)
 {
   int ok = 0;
 
@@ -796,7 +796,7 @@ int Client::enterRoomComplete(ApHandle hRoom)
   return ok;
 }
 
-int Client::leaveRoom(ApHandle hRoom)
+int Client::leaveRoom(const ApHandle& hRoom)
 {
   int ok = 1;
 
@@ -813,7 +813,7 @@ int Client::leaveRoom(ApHandle hRoom)
   return ok;
 }
 
-int Client::leaveRoomComplete(ApHandle hRoom)
+int Client::leaveRoomComplete(const ApHandle& hRoom)
 {
   int ok = 1;
 
@@ -829,7 +829,7 @@ int Client::leaveRoomComplete(ApHandle hRoom)
   return ok;
 }
 
-int Client::sendGroupchat(ApHandle hRoom, String& sText)
+int Client::sendGroupchat(const ApHandle& hRoom, String& sText)
 {
   int ok = 1;
 
@@ -846,7 +846,7 @@ int Client::sendGroupchat(ApHandle hRoom, String& sText)
   return ok;
 }
 
-int Client::sendRoomState(ApHandle hRoom)
+int Client::sendRoomState(const ApHandle& hRoom)
 {
   int ok = 1;
 

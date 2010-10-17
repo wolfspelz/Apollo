@@ -20,7 +20,7 @@ class Parser;
 class Client: public Elem
 {
 public:
-  Client(ApHandle hAp)
+  Client(const ApHandle& hAp)
     :hAp_(hAp)
     ,nPort_(0)
     ,bOnline_(0)
@@ -71,16 +71,16 @@ public:
   Buddy* findBuddy(const String& szJid);
 
   Room* findRoom(const String& szJid);
-  Room* findRoom(ApHandle hRoom);
+  Room* findRoom(const ApHandle& hRoom);
   ApHandle getRoomHandle(String& sJid);
 
-  int enterRoom(String& sJid, String& sNickname, ApHandle hRoom);
-  int enterRoomComplete(ApHandle hRoom);
-  int leaveRoom(ApHandle hRoom);
-  int leaveRoomComplete(ApHandle hRoom);
+  int enterRoom(String& sJid, String& sNickname, const ApHandle& hRoom);
+  int enterRoomComplete(const ApHandle& hRoom);
+  int leaveRoom(const ApHandle& hRoom);
+  int leaveRoomComplete(const ApHandle& hRoom);
 
-  int sendGroupchat(ApHandle hRoom, String& sText);
-  int sendRoomState(ApHandle hRoom);
+  int sendGroupchat(const ApHandle& hRoom, String& sText);
+  int sendRoomState(const ApHandle& hRoom);
 
   // --------------------------------
   // Iternal events:
@@ -109,7 +109,7 @@ public:
   void setPort(int nPort);
   int getPort();
 
-  ApHandle apHandle() { return hAp_; }
+  inline ApHandle apHandle() { return hAp_; }
   int getNextStanzaId();
 
   typedef enum _ClientState { ClientState_Unknown

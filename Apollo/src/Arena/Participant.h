@@ -33,14 +33,14 @@ class Location;
 class Participant
 {
 public:
-  Participant(ApHandle hParticipant, ArenaModule* pModule, Location* pLocation);
+  Participant(const ApHandle& hParticipant, ArenaModule* pModule, Location* pLocation);
 
-  ApHandle apHandle() { return hAp_; }
+  inline ApHandle apHandle() { return hAp_; }
 
   void Show();
   void Hide();
   void DetailsChanged(Apollo::ValueList& vlKeys);
-  void ReceivePublicChat(ApHandle hChat, const String& sNickname, const String& sText, const Apollo::TimeValue& tv);
+  void ReceivePublicChat(const ApHandle& hChat, const String& sNickname, const String& sText, const Apollo::TimeValue& tv);
   void AnimationFrame(const Apollo::Image& image);
 
 protected:

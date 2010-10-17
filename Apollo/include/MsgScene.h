@@ -80,8 +80,8 @@ public:
   Msg_Scene_CreateElement() : ApRequestMessage("Scene_CreateElement") {}
   static int _(const ApHandle& hScene, const String& sPath)
   {
-    Msg_Scene_CreateElement msg; 
-    msg.hScene = hScene; 
+    Msg_Scene_CreateElement msg;
+    msg.hScene = hScene;
     msg.sPath = sPath;
     return msg.Request();
   }
@@ -95,12 +95,34 @@ public:
   Msg_Scene_TranslateElement() : ApRequestMessage("Scene_TranslateElement"), fX(0), fY(0) {}
   static int _(const ApHandle& hScene, const String& sPath, double fX, double fY)
   {
-    Msg_Scene_TranslateElement msg; 
-    msg.hScene = hScene; 
+    Msg_Scene_TranslateElement msg;
+    msg.hScene = hScene;
     msg.sPath = sPath;
-    msg.fX = fX; 
-    msg.fY = fY; 
+    msg.fX = fX;
+    msg.fY = fY;
     return msg.Request();
+  }
+  ApIN ApHandle hScene;
+  ApIN String sPath;
+  ApIN double fX;
+  ApIN double fY;
+};
+
+class Msg_Scene_GetTranslateElement: public ApRequestMessage
+{
+public:
+  Msg_Scene_GetTranslateElement() : ApRequestMessage("Scene_GetTranslateElement"), fX(0), fY(0) {}
+  static int _(const ApHandle& hScene, const String& sPath, double& fX, double& fY)
+  {
+    Msg_Scene_GetTranslateElement msg;
+    msg.hScene = hScene;
+    msg.sPath = sPath;
+    int ok = msg.Request();
+    if (ok) {
+      fX = msg.fX;
+      fY = msg.fY;
+    } 
+    return ok;
   }
   ApIN ApHandle hScene;
   ApIN String sPath;
@@ -114,11 +136,11 @@ public:
   Msg_Scene_ScaleElement() : ApRequestMessage("Scene_ScaleElement"), fX(0), fY(0) {}
   static int _(const ApHandle& hScene, const String& sPath, double fX, double fY)
   {
-    Msg_Scene_ScaleElement msg; 
-    msg.hScene = hScene; 
+    Msg_Scene_ScaleElement msg;
+    msg.hScene = hScene;
     msg.sPath = sPath;
-    msg.fX = fX; 
-    msg.fY = fY; 
+    msg.fX = fX;
+    msg.fY = fY;
     return msg.Request();
   }
   ApIN ApHandle hScene;
@@ -133,10 +155,10 @@ public:
   Msg_Scene_RotateElement() : ApRequestMessage("Scene_RotateElement"), fAngle(0) {}
   static int _(const ApHandle& hScene, const String& sPath, double fAngle)
   {
-    Msg_Scene_RotateElement msg; 
-    msg.hScene = hScene; 
+    Msg_Scene_RotateElement msg;
+    msg.hScene = hScene;
     msg.sPath = sPath;
-    msg.fAngle = fAngle; 
+    msg.fAngle = fAngle;
     return msg.Request();
   }
   ApIN ApHandle hScene;
@@ -168,10 +190,10 @@ public:
   Msg_Scene_ElementCopyMode() : ApRequestMessage("Scene_ElementCopyMode"), nMode(0) {}
   static int _(const ApHandle& hScene, const String& sPath, int nMode)
   {
-    Msg_Scene_ElementCopyMode msg; 
-    msg.hScene = hScene; 
+    Msg_Scene_ElementCopyMode msg;
+    msg.hScene = hScene;
     msg.sPath = sPath;
-    msg.nMode = nMode; 
+    msg.nMode = nMode;
     return msg.Request();
   }
   ApIN ApHandle hScene;
@@ -185,10 +207,10 @@ public:
   Msg_Scene_HideElement() : ApRequestMessage("Scene_HideElement"), bHide(1) {}
   static int _(const ApHandle& hScene, const String& sPath, int bHide)
   {
-    Msg_Scene_HideElement msg; 
-    msg.hScene = hScene; 
+    Msg_Scene_HideElement msg;
+    msg.hScene = hScene;
     msg.sPath = sPath;
-    msg.bHide = bHide; 
+    msg.bHide = bHide;
     return msg.Request();
   }
   ApIN ApHandle hScene;
@@ -202,8 +224,8 @@ public:
   Msg_Scene_DeleteElement() : ApRequestMessage("Scene_DeleteElement") {}
   static int _(const ApHandle& hScene, const String& sPath)
   {
-    Msg_Scene_DeleteElement msg; 
-    msg.hScene = hScene; 
+    Msg_Scene_DeleteElement msg;
+    msg.hScene = hScene;
     msg.sPath = sPath;
     return msg.Request();
   }
@@ -220,13 +242,13 @@ public:
   Msg_Scene_CreateRectangle() : ApRequestMessage("Scene_CreateRectangle"), fX(0), fY(0), fW(0), fH(0) {}
   static int _(const ApHandle& hScene, const String& sPath, double fX, double fY, double fW, double fH)
   {
-    Msg_Scene_CreateRectangle msg; 
-    msg.hScene = hScene; 
-    msg.sPath = sPath; 
-    msg.fX = fX; 
-    msg.fY = fY; 
-    msg.fW = fW; 
-    msg.fH = fH; 
+    Msg_Scene_CreateRectangle msg;
+    msg.hScene = hScene;
+    msg.sPath = sPath;
+    msg.fX = fX;
+    msg.fY = fY;
+    msg.fW = fW;
+    msg.fH = fH;
     return msg.Request();
   }
   ApIN ApHandle hScene;
@@ -243,11 +265,11 @@ public:
   Msg_Scene_CreateImageFromData() : ApRequestMessage("Scene_CreateImageFromData"), fX(0), fY(0) {}
   static int _(const ApHandle& hScene, const String& sPath, double fX, double fY, const Apollo::Image& image)
   {
-    Msg_Scene_CreateImageFromData msg; 
-    msg.hScene = hScene; 
-    msg.sPath = sPath; 
-    msg.fX = fX; 
-    msg.fY = fY; 
+    Msg_Scene_CreateImageFromData msg;
+    msg.hScene = hScene;
+    msg.sPath = sPath;
+    msg.fX = fX;
+    msg.fY = fY;
     msg.image.CopyReference(image);
     return msg.Request();
   }
@@ -264,11 +286,11 @@ public:
   Msg_Scene_CreateImageFromFile() : ApRequestMessage("Scene_CreateImageFromFile"), fX(0), fY(0) {}
   static int _(const ApHandle& hScene, const String& sPath, double fX, double fY, const String& sFile)
   {
-    Msg_Scene_CreateImageFromFile msg; 
-    msg.hScene = hScene; 
-    msg.sPath = sPath; 
-    msg.fX = fX; 
-    msg.fY = fY; 
+    Msg_Scene_CreateImageFromFile msg;
+    msg.hScene = hScene;
+    msg.sPath = sPath;
+    msg.fX = fX;
+    msg.fY = fY;
     msg.sFile = sFile;
     return msg.Request();
   }
@@ -295,15 +317,15 @@ public:
   Msg_Scene_CreateText() : ApRequestMessage("Scene_CreateText"), fX(0), fY(0), fSize(12), nFlags(Msg_Scene_FontFlags::Normal) {}
   static int _(const ApHandle& hScene, const String& sPath, double fX, double fY, String sText, String sFont, double fSize, int nFlags)
   {
-    Msg_Scene_CreateText msg; 
-    msg.hScene = hScene; 
-    msg.sPath = sPath; 
-    msg.fX = fX; 
-    msg.fY = fY; 
-    msg.sText = sText; 
-    msg.sFont = sFont; 
-    msg.fSize = fSize; 
-    msg.nFlags = nFlags; 
+    Msg_Scene_CreateText msg;
+    msg.hScene = hScene;
+    msg.sPath = sPath;
+    msg.fX = fX;
+    msg.fY = fY;
+    msg.sText = sText;
+    msg.sFont = sFont;
+    msg.fSize = fSize;
+    msg.nFlags = nFlags;
     return msg.Request();
   }
   ApIN ApHandle hScene;
@@ -319,19 +341,61 @@ public:
 //--------------------------
 // Change properties
 
+class Msg_Scene_SetCoordinates: public ApRequestMessage
+{
+public:
+  Msg_Scene_SetCoordinates() : ApRequestMessage("Scene_SetCoordinates"), fX(0.0), fY(0.0) {}
+  static int _(const ApHandle& hScene, const String& sPath, double fX, double fY)
+  {
+    Msg_Scene_SetCoordinates msg;
+    msg.hScene = hScene;
+    msg.sPath = sPath;
+    msg.fX = fX;
+    msg.fY = fY;
+    return msg.Request();
+  }
+  ApIN ApHandle hScene;
+  ApIN String sPath;
+  ApIN double fX;
+  ApIN double fY;
+};
+
+class Msg_Scene_SetRectangle: public ApRequestMessage
+{
+public:
+  Msg_Scene_SetRectangle() : ApRequestMessage("Scene_SetRectangle"), fX(0.0), fY(0.0), fW(0), fH(0) {}
+  static int _(const ApHandle& hScene, const String& sPath, double fX, double fY, double fW, double fH)
+  {
+    Msg_Scene_SetRectangle msg;
+    msg.hScene = hScene;
+    msg.sPath = sPath;
+    msg.fX = fX;
+    msg.fY = fY;
+    msg.fW = fW;
+    msg.fH = fH;
+    return msg.Request();
+  }
+  ApIN ApHandle hScene;
+  ApIN String sPath;
+  ApIN double fX;
+  ApIN double fY;
+  ApIN double fW;
+  ApIN double fH;
+};
+
 class Msg_Scene_SetFillColor: public ApRequestMessage
 {
 public:
   Msg_Scene_SetFillColor() : ApRequestMessage("Scene_SetFillColor"), fRed(0.0), fGreen(0.0), fBlue(0.0), fAlpha(1.0) {}
   static int _(const ApHandle& hScene, const String& sPath, double fRed, double fGreen, double fBlue, double fAlpha)
-  { 
-    Msg_Scene_SetFillColor msg; 
-    msg.hScene = hScene; 
-    msg.sPath = sPath; 
-    msg.fRed = fRed; 
-    msg.fGreen = fGreen; 
-    msg.fBlue = fBlue; 
-    msg.fAlpha = fAlpha; 
+  {
+    Msg_Scene_SetFillColor msg;
+    msg.hScene = hScene;
+    msg.sPath = sPath;
+    msg.fRed = fRed;
+    msg.fGreen = fGreen;
+    msg.fBlue = fBlue;
+    msg.fAlpha = fAlpha;
     return msg.Request();
   }
   ApIN ApHandle hScene;
@@ -348,13 +412,13 @@ public:
   Msg_Scene_SetStrokeColor() : ApRequestMessage("Scene_SetStrokeColor"), fRed(0.0), fGreen(0.0), fBlue(0.0), fAlpha(1.0) {}
   static int _(const ApHandle& hScene, const String& sPath, double fRed, double fGreen, double fBlue, double fAlpha)
   {
-    Msg_Scene_SetStrokeColor msg; 
-    msg.hScene = hScene; 
-    msg.sPath = sPath; 
-    msg.fRed = fRed; 
-    msg.fGreen = fGreen; 
-    msg.fBlue = fBlue; 
-    msg.fAlpha = fAlpha; 
+    Msg_Scene_SetStrokeColor msg;
+    msg.hScene = hScene;
+    msg.sPath = sPath;
+    msg.fRed = fRed;
+    msg.fGreen = fGreen;
+    msg.fBlue = fBlue;
+    msg.fAlpha = fAlpha;
     return msg.Request();
   }
   ApIN ApHandle hScene;
@@ -371,10 +435,10 @@ public:
   Msg_Scene_SetStrokeImageFile() : ApRequestMessage("Scene_SetStrokeImageFile") {}
   static int _(const ApHandle& hScene, const String& sPath, const String& sFile)
   {
-    Msg_Scene_SetStrokeImageFile msg; 
-    msg.hScene = hScene; 
-    msg.sPath = sPath; 
-    msg.sFile = sFile; 
+    Msg_Scene_SetStrokeImageFile msg;
+    msg.hScene = hScene;
+    msg.sPath = sPath;
+    msg.sFile = sFile;
     return msg.Request();
   }
   ApIN ApHandle hScene;
@@ -388,10 +452,10 @@ public:
   Msg_Scene_SetFillImageFile() : ApRequestMessage("Scene_SetFillImageFile") {}
   static int _(const ApHandle& hScene, const String& sPath, const String& sFile)
   {
-    Msg_Scene_SetFillImageFile msg; 
-    msg.hScene = hScene; 
-    msg.sPath = sPath; 
-    msg.sFile = sFile; 
+    Msg_Scene_SetFillImageFile msg;
+    msg.hScene = hScene;
+    msg.sPath = sPath;
+    msg.sFile = sFile;
     return msg.Request();
   }
   ApIN ApHandle hScene;
@@ -405,11 +469,11 @@ public:
   Msg_Scene_SetStrokeImageOffset() : ApRequestMessage("Scene_SetStrokeImageOffset"), fX(0.0), fY(0.0) {}
   static int _(const ApHandle& hScene, const String& sPath, double fX, double fY)
   {
-    Msg_Scene_SetStrokeImageOffset msg; 
-    msg.hScene = hScene; 
-    msg.sPath = sPath; 
-    msg.fX = fX; 
-    msg.fY = fY; 
+    Msg_Scene_SetStrokeImageOffset msg;
+    msg.hScene = hScene;
+    msg.sPath = sPath;
+    msg.fX = fX;
+    msg.fY = fY;
     return msg.Request();
   }
   ApIN ApHandle hScene;
@@ -424,11 +488,11 @@ public:
   Msg_Scene_SetFillImageOffset() : ApRequestMessage("Scene_SetFillImageOffset"), fX(0.0), fY(0.0) {}
   static int _(const ApHandle& hScene, const String& sPath, double fX, double fY)
   {
-    Msg_Scene_SetFillImageOffset msg; 
-    msg.hScene = hScene; 
-    msg.sPath = sPath; 
-    msg.fX = fX; 
-    msg.fY = fY; 
+    Msg_Scene_SetFillImageOffset msg;
+    msg.hScene = hScene;
+    msg.sPath = sPath;
+    msg.fX = fX;
+    msg.fY = fY;
     return msg.Request();
   }
   ApIN ApHandle hScene;
@@ -518,6 +582,23 @@ public:
   ApIN String sPath;
 };
 
+class Msg_Scene_SetImageAlpha: public ApRequestMessage
+{
+public:
+  Msg_Scene_SetImageAlpha() : ApRequestMessage("Scene_SetImageAlpha"), fAlpha(1.0) {}
+  static int _(const ApHandle& hScene, const String& sPath, double fAlpha)
+  {
+    Msg_Scene_SetImageAlpha msg;
+    msg.hScene = hScene;
+    msg.sPath = sPath;
+    msg.fAlpha = fAlpha;
+    return msg.Request();
+  }
+  ApIN ApHandle hScene;
+  ApIN String sPath;
+  ApIN double fAlpha;
+};
+
 //--------------------------
 // Info query without element
 
@@ -526,9 +607,9 @@ class Msg_Scene_MeasureText: public ApRequestMessage
 public:
   Msg_Scene_MeasureText() : ApRequestMessage("Scene_MeasureText"), fSize(12), nFlags(Msg_Scene_FontFlags::Normal) {}
   static int _(const ApHandle& hScene, const String& sText, const String& sFont, double fSize, int nFlags, double& fBearingX, double& fBearingY, double& fWidth, double& fHeight, double& fAdvanceX, double& fAdvanceY)
-  { 
-    Msg_Scene_MeasureText msg; 
-    msg.hScene = hScene; 
+  {
+    Msg_Scene_MeasureText msg;
+    msg.hScene = hScene;
     msg.sText = sText;
     msg.sFont = sFont;
     msg.fSize = fSize;
@@ -563,13 +644,13 @@ public:
   Msg_Scene_GetImageSizeFromData() : ApRequestMessage("Scene_GetImageSizeFromData"), fW(0), fH(0) {}
   static int _(const ApHandle& hScene, const Apollo::Image& image, double& fW, double& fH)
   {
-    Msg_Scene_GetImageSizeFromData msg; 
-    msg.hScene = hScene; 
+    Msg_Scene_GetImageSizeFromData msg;
+    msg.hScene = hScene;
     msg.image.CopyReference(image);
     int ok = msg.Request();
     if (ok) {
-      fW = msg.fW; 
-      fH = msg.fH; 
+      fW = msg.fW;
+      fH = msg.fH;
     } 
     return ok;
   }
@@ -586,13 +667,13 @@ public:
   Msg_Scene_GetImageSizeFromFile() : ApRequestMessage("Scene_GetImageSizeFromFile"), fW(0), fH(0) {}
   static int _(const ApHandle& hScene, const String& sFile, double& fW, double& fH)
   {
-    Msg_Scene_GetImageSizeFromFile msg; 
-    msg.hScene = hScene; 
+    Msg_Scene_GetImageSizeFromFile msg;
+    msg.hScene = hScene;
     msg.sFile = sFile;
     int ok = msg.Request();
     if (ok) {
-      fW = msg.fW; 
-      fH = msg.fH; 
+      fW = msg.fW;
+      fH = msg.fH;
     } 
     return ok;
   }
@@ -600,6 +681,59 @@ public:
   ApIN String sFile;
   ApOUT double fW;
   ApOUT double fH;
+};
+
+//--------------------------
+// Sensors
+
+class Msg_Scene_CreateMouseSensor: public ApRequestMessage
+{
+public:
+  Msg_Scene_CreateMouseSensor() : ApRequestMessage("Scene_CreateMouseSensor"), fX(0), fY(0), fW(0), fH(0) {}
+  static int _(const ApHandle& hScene, const String& sPath, const ApHandle& hSensor, double fX, double fY, double fW, double fH)
+  {
+    Msg_Scene_CreateMouseSensor msg;
+    msg.hScene = hScene;
+    msg.sPath = sPath;
+    msg.fX = fX;
+    msg.fY = fY;
+    msg.fW = fW;
+    msg.fH = fH;
+    return msg.Request();
+  }
+  ApIN ApHandle hScene;
+  ApIN String sPath;
+  ApIN double fX;
+  ApIN double fY;
+  ApIN double fW;
+  ApIN double fH;
+};
+
+// Scene ->
+class Msg_Scene_MouseEvent: public ApNotificationMessage
+{
+public:
+  typedef enum _EventType { NoEventType
+    ,MouseMove
+    ,MouseDown
+    ,MouseUp
+    ,MouseClick
+    ,MouseDoubleClick
+  } EventType;
+
+  typedef enum _MouseButton { NoMouseButton
+    ,LeftButton
+    ,MiddleButton
+    ,RightButton
+  } MouseButton;
+
+  Msg_Scene_MouseEvent() : ApNotificationMessage("Scene_MouseEvent"), nEvent(NoEventType), nButton(NoMouseButton), fX(0), fY(0) {}
+  ApIN ApHandle hScene;
+  ApIN String sPath;
+  ApIN int nEvent;
+  ApIN int nButton;
+  ApIN double fX;
+  ApIN double fY;
 };
 
 #endif // !defined(MsgScene_h_INCLUDED)

@@ -39,7 +39,7 @@ protected:
 class SendDataTask: public Apollo::Task
 {
 public:
-  SendDataTask(ApHandle h, const unsigned char* pData, size_t nLen)
+  SendDataTask(const ApHandle& h, const unsigned char* pData, size_t nLen)
     :hAp_(h)
   {
     sbData_.SetData(pData, nLen);
@@ -54,7 +54,7 @@ public:
 class CloseSocketTask: public Apollo::Task
 {
 public:
-  CloseSocketTask(ApHandle h)
+  CloseSocketTask(const ApHandle& h)
     :hAp_(h)
   {}
   void Execute();
@@ -78,7 +78,7 @@ public:
 class TCPConnectTask: public Apollo::Task
 {
 public:
-  TCPConnectTask(ApHandle h, SocketAddress& saAddress)
+  TCPConnectTask(const ApHandle& h, SocketAddress& saAddress)
     :hAp_(h)
     ,saAddress_(saAddress)
   {}
@@ -92,7 +92,7 @@ public:
 class TCPListenTask: public Apollo::Task
 {
 public:
-  TCPListenTask(ApHandle h, SocketAddress& saAddress)
+  TCPListenTask(const ApHandle& h, SocketAddress& saAddress)
     :hAp_(h)
     ,saAddress_(saAddress)
   {}
@@ -136,7 +136,7 @@ public:
     lSockets_.Remove(s);
   }
 
-  Socket* FindSocket(ApHandle h)
+  Socket* FindSocket(const ApHandle& h)
   {
     if (!AssertThread()) { return 0; }
     Socket* s = 0;

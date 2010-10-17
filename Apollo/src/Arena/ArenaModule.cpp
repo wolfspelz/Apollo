@@ -10,7 +10,7 @@
 #include "Local.h"
 #include "ArenaModule.h"
 
-Context* ArenaModule::CreateContext(ApHandle hContext)
+Context* ArenaModule::CreateContext(const ApHandle& hContext)
 {
   Context* pContext = new Context(hContext);
   if (pContext) {
@@ -25,7 +25,7 @@ Context* ArenaModule::CreateContext(ApHandle hContext)
   return pContext;
 }
 
-void ArenaModule::DeleteContext(ApHandle hContext)
+void ArenaModule::DeleteContext(const ApHandle& hContext)
 {
   Context* pContext = FindContext(hContext);
   if (pContext) {
@@ -36,7 +36,7 @@ void ArenaModule::DeleteContext(ApHandle hContext)
   }
 }
 
-Context* ArenaModule::FindContext(ApHandle hContext)
+Context* ArenaModule::FindContext(const ApHandle& hContext)
 {
   Context* pContext = 0;  
   contexts_.Get(hContext, pContext);
@@ -45,7 +45,7 @@ Context* ArenaModule::FindContext(ApHandle hContext)
 
 //---------------------------
 
-Location* ArenaModule::CreateLocation(ApHandle hLocation)
+Location* ArenaModule::CreateLocation(const ApHandle& hLocation)
 {
   Location* pLocation = new Location(hLocation, this);
   if (pLocation) {
@@ -54,7 +54,7 @@ Location* ArenaModule::CreateLocation(ApHandle hLocation)
   return pLocation;
 }
 
-void ArenaModule::DeleteLocation(ApHandle hLocation)
+void ArenaModule::DeleteLocation(const ApHandle& hLocation)
 {
   Location* pLocation = FindLocation(hLocation);
   if (pLocation) {
@@ -64,7 +64,7 @@ void ArenaModule::DeleteLocation(ApHandle hLocation)
   }
 }
 
-Location* ArenaModule::FindLocation(ApHandle hLocation)
+Location* ArenaModule::FindLocation(const ApHandle& hLocation)
 {
   Location* pLocation = 0;  
   locations_.Get(hLocation, pLocation);
@@ -73,7 +73,7 @@ Location* ArenaModule::FindLocation(ApHandle hLocation)
 
 //---------------------------
 
-void ArenaModule::SetLocationOfContext(ApHandle hContext, ApHandle hLocation)
+void ArenaModule::SetLocationOfContext(const ApHandle& hContext, const ApHandle& hLocation)
 {
   if (locationOfContext_.IsSet(hContext)) {
     locationOfContext_.Unset(hContext);
@@ -81,14 +81,14 @@ void ArenaModule::SetLocationOfContext(ApHandle hContext, ApHandle hLocation)
   locationOfContext_.Set(hContext, hLocation);
 }
 
-void ArenaModule::DeleteLocationOfContext(ApHandle hContext, ApHandle hLocation)
+void ArenaModule::DeleteLocationOfContext(const ApHandle& hContext, const ApHandle& hLocation)
 {
   if (locationOfContext_.IsSet(hContext)) {
     locationOfContext_.Unset(hContext);
   }
 }
 
-ApHandle ArenaModule::GetLocationOfContext(ApHandle hContext)
+ApHandle ArenaModule::GetLocationOfContext(const ApHandle& hContext)
 {
   if (locationOfContext_.IsSet(hContext)) {
     return locationOfContext_.Find(hContext)->Value();
@@ -98,18 +98,18 @@ ApHandle ArenaModule::GetLocationOfContext(ApHandle hContext)
 
 //---------------------------
 
-void ArenaModule::RegisterLocationParticipantOfAnimatedItem(ApHandle hItem, ApHandle hLocation, ApHandle hParticipant)
+void ArenaModule::RegisterLocationParticipantOfAnimatedItem(const ApHandle& hItem, const ApHandle& hLocation, const ApHandle& hParticipant)
 {
   LocationParticipant lp(hLocation, hParticipant);
   locationParticipantOfAnimatedItem_.Set(hItem, lp);
 }
 
-void ArenaModule::UnregisterLocationParticipantOfAnimatedItem(ApHandle hItem)
+void ArenaModule::UnregisterLocationParticipantOfAnimatedItem(const ApHandle& hItem)
 {
   locationParticipantOfAnimatedItem_.Unset(hItem);
 }
 
-int ArenaModule::GetLocationParticipantOfAnimatedItem(ApHandle hItem, ApHandle& hLocation, ApHandle& hParticipant)
+int ArenaModule::GetLocationParticipantOfAnimatedItem(const ApHandle& hItem, ApHandle& hLocation, ApHandle& hParticipant)
 {
   int ok = 0;
 

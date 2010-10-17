@@ -30,12 +30,12 @@ public:
   inline ApHandle(unsigned long nHi, unsigned long nLo): nLo_(nLo) ,nHi_(nHi) {}
   //ApHandle(const String& s);  // replaced by fromString(), because of accidental conversions
 
-  inline bool operator==(ApHandle& h) { return h.nLo_ == nLo_ && h.nHi_ == nHi_; }
-  inline bool operator!=(ApHandle& h) { return h.nLo_ != nLo_ || h.nHi_ != nHi_; }
+  inline bool operator==(const ApHandle& h) { return h.nLo_ == nLo_ && h.nHi_ == nHi_; }
+  inline bool operator!=(const ApHandle& h) { return h.nLo_ != nLo_ || h.nHi_ != nHi_; }
 
   //operator String(); // replaced by toString(), because of accidental conversions
   void fromString(const String& s);
-  String toString();
+  String toString() const;
   ApHandle operator++();
   bool operator<(const ApHandle &h) const;
 
@@ -46,7 +46,7 @@ public:
 };
 
 #define ApNoHandle ApHandle::hNoHandle_
-#define ApIsHandle(__h__) (__h__ != ApNoHandle)
+#define ApIsHandle(__h__) (ApNoHandle != __h__)
 
 //#define ApHandleFormat "[0x%016llx]" // format for printf
 //typedef unsigned long long ApHandleType; // extractor for printf
@@ -114,7 +114,7 @@ public:
 
   inline void setInt(int n) { Elem::setInt(n); setType(TypeInt); }
   inline void setString(const String& s) { Elem::setString(s); setType(TypeString); }
-  inline void setHandle(ApHandle h) { hAp_ = h; setType(TypeHandle); }
+  inline void setHandle(const ApHandle& h) { hAp_ = h; setType(TypeHandle); }
 
 protected: 
   friend class KeyValueList;
@@ -148,20 +148,20 @@ public:
 
   void add(int n);
   void add(const String& s);
-  void add(ApHandle h);
+  void add(const ApHandle& h);
 
   ValueElem* findString(const String& s) { return (ValueElem*) List::FindByString(s); }
 
-  void addElem(ValueElem* e) { List::AddLast((Elem*) e); }
-  void removeElem(ValueElem* e) { List::Remove((Elem*) e); }
-  ValueElem* nextElem(ValueElem* e) { return (ValueElem*) List::Next((Elem*) e); }
+  inline void addElem(ValueElem* e) { List::AddLast((Elem*) e); }
+  inline void removeElem(ValueElem* e) { List::Remove((Elem*) e); }
+  inline ValueElem* nextElem(ValueElem* e) { return (ValueElem*) List::Next((Elem*) e); }
 
   Apollo::ValueElem* elemAtIndex(int nIndex);
   int atIndex(int nIndex, int nDefault);
   String atIndex(int nIndex, const String& sDefault);
-  ApHandle atIndex(int nIndex, ApHandle hDefault);
+  ApHandle atIndex(int nIndex, const ApHandle& hDefault);
 
-  int length() { return List::length(); }
+  inline int length() { return List::length(); }
 
   void operator=(ValueList& l);
   void removeAll() { List::Empty(); }
@@ -179,17 +179,17 @@ public:
 
   void add(const String& sKey, int n);
   void add(const String& sKey, const String& s);
-  void add(const String& sKey, ApHandle h);
+  void add(const String& sKey, const ApHandle& h);
 
   typedef enum _Flags { NoFlags = 0, IgnoreCase = 1 } Flags;
 
-  KeyValueElem* find(const String& sKey, Flags nFlags = NoFlags) { return nFlags == IgnoreCase ? (KeyValueElem*) List::FindByName(sKey) : (KeyValueElem*) List::FindByNameCase(sKey); }
+  inline KeyValueElem* find(const String& sKey, Flags nFlags = NoFlags) { return nFlags == IgnoreCase ? (KeyValueElem*) List::FindByName(sKey) : (KeyValueElem*) List::FindByNameCase(sKey); }
   KeyValueElem& operator[](const String& s);
-  KeyValueElem* findString(const String& s) { return (KeyValueElem*) List::FindByString(s); }
+  inline KeyValueElem* findString(const String& s) { return (KeyValueElem*) List::FindByString(s); }
 
   void addElem(KeyValueElem* e) { List::AddLast((Elem*) e); }
   void removeElem(KeyValueElem* e) { List::Remove((Elem*) e); }
-  KeyValueElem* nextElem(ValueElem* e) { return (KeyValueElem*) List::Next((Elem*) e); }
+  inline KeyValueElem* nextElem(ValueElem* e) { return (KeyValueElem*) List::Next((Elem*) e); }
 
   void operator=(KeyValueList& l);
   void removeAll() { List::Empty(); }
@@ -228,20 +228,20 @@ public:
 #endif
   static TimeValue getTime();
 
-  bool isNull() { return nSec_ == 0 && nMicroSec_ == 0; }
+  inline bool isNull() { return nSec_ == 0 && nMicroSec_ == 0; }
   void operator=(time_t nSec);
   TimeValue operator+(TimeValue& tv);
-  TimeValue& operator+=(TimeValue& tv) { *this = *this + tv; return *this; }
+  inline TimeValue& operator+=(TimeValue& tv) { *this = *this + tv; return *this; }
   TimeValue operator-(TimeValue& tv);
   bool operator<(TimeValue& tv);
   bool operator>(TimeValue& tv);
   bool operator==(TimeValue& tv);
-  bool operator!=(TimeValue& tv) { return !operator==(tv); }
+  inline bool operator!=(TimeValue& tv) { return !operator==(tv); }
   bool operator>=(TimeValue& tv);
   bool operator<=(TimeValue& tv);
-  unsigned int Sec() { return nSec_; }
-  unsigned MicroSec() { return nMicroSec_; }
-  unsigned MilliSec() { return nSec_ * 1000 + nMicroSec_ / 1000; }
+  inline unsigned int Sec() { return nSec_; }
+  inline unsigned MicroSec() { return nMicroSec_; }
+  inline unsigned MilliSec() { return nSec_ * 1000 + nMicroSec_ / 1000; }
 
   String toString();
 
@@ -255,8 +255,8 @@ class APOLLO_API StopWatch
 public:
   StopWatch() { Reset(); }
 
-  void Reset() { tBegin_ = Apollo::TimeValue::getTime(); }
-  Apollo::TimeValue GetDuration() { return Apollo::TimeValue::getTime() - tBegin_; }
+  inline void Reset() { tBegin_ = Apollo::TimeValue::getTime(); }
+  inline Apollo::TimeValue GetDuration() { return Apollo::TimeValue::getTime() - tBegin_; }
   operator const char* () { Apollo::TimeValue tDuration = GetDuration(); s_ = ""; s_.appendf("%d.%06d", tDuration.Sec(), tDuration.MicroSec()); return s_; }
 
   Apollo::TimeValue tBegin_;

@@ -40,7 +40,7 @@ public:
   int libraryFree(HANDLE hDll);
 
   ApHandle newHandle();
-  String handle2String(ApHandle h);
+  String handle2String(const ApHandle& h);
   ApHandle string2Handle(const String& sString);
 
   String getRandomString(); // Unknown length

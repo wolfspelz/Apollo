@@ -12,7 +12,7 @@
 #include "Participant.h"
 #include "ArenaModule.h"
 
-Participant::Participant(ApHandle hParticipant, ArenaModule* pModule, Location* pLocation)
+Participant::Participant(const ApHandle& hParticipant, ArenaModule* pModule, Location* pLocation)
 :hAp_(hParticipant)
 ,pModule_(pModule)
 ,pLocation_(pLocation)
@@ -214,7 +214,7 @@ void Participant::DetailsChanged(Apollo::ValueList& vlKeys)
   }
 }
 
-void Participant::ReceivePublicChat(ApHandle hChat, const String& sNickname, const String& sText, const Apollo::TimeValue& tv)
+void Participant::ReceivePublicChat(const ApHandle& hChat, const String& sNickname, const String& sText, const Apollo::TimeValue& tv)
 {
   if (chats_.Find(hChat) != 0) {
     chats_.Unset(hChat);

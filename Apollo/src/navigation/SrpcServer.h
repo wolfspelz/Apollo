@@ -17,7 +17,7 @@ public:
   virtual ~SrpcServer() {}
 
 protected:
-  virtual Apollo::TCPConnection* OnConnectionAccepted(String& sName, ApHandle hConnection, String& sClientAddress, int nClientPort);
+  virtual Apollo::TCPConnection* OnConnectionAccepted(String& sName, const ApHandle& hConnection, String& sClientAddress, int nClientPort);
   virtual int OnStarted();
   virtual int OnStopped();
 };

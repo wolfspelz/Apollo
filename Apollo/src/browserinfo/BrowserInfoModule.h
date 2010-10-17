@@ -58,7 +58,7 @@ public:
 #endif
 
 protected:
-  Browser* FindBrowserByContext(ApHandle hContext);
+  Browser* FindBrowserByContext(const ApHandle& hContext);
 
 protected:
   BrowserList browsers_;

@@ -27,7 +27,7 @@ typedef ApHandlePointerTreeIterator<Location*> LocationListIterator;
 class LocationParticipant
 {
 public:
-  LocationParticipant(ApHandle hLocation, ApHandle hPartcipant)
+  LocationParticipant(const ApHandle& hLocation, const ApHandle& hPartcipant)
     :hLocation_(hLocation)
     ,hPartcipant_(hPartcipant)
   {}
@@ -77,22 +77,22 @@ public:
   void On_UnitTest_End(Msg_UnitTest_End* pMsg);
 #endif
 
-  void RegisterLocationParticipantOfAnimatedItem(ApHandle hItem, ApHandle hLocation, ApHandle hParticipant);
-  void UnregisterLocationParticipantOfAnimatedItem(ApHandle hItem);
-  int GetLocationParticipantOfAnimatedItem(ApHandle hItem, ApHandle& hLocation, ApHandle& hParticipant);
+  void RegisterLocationParticipantOfAnimatedItem(const ApHandle& hItem, const ApHandle& hLocation, const ApHandle& hParticipant);
+  void UnregisterLocationParticipantOfAnimatedItem(const ApHandle& hItem);
+  int GetLocationParticipantOfAnimatedItem(const ApHandle& hItem, ApHandle& hLocation, ApHandle& hParticipant);
 
 protected:
-  Context* CreateContext(ApHandle hContext);
-  Context* FindContext(ApHandle hContext);
-  void DeleteContext(ApHandle hContext);
+  Context* CreateContext(const ApHandle& hContext);
+  Context* FindContext(const ApHandle& hContext);
+  void DeleteContext(const ApHandle& hContext);
 
-  Location* CreateLocation(ApHandle hLocation);
-  Location* FindLocation(ApHandle hLocation);
-  void DeleteLocation(ApHandle hLocation);
+  Location* CreateLocation(const ApHandle& hLocation);
+  Location* FindLocation(const ApHandle& hLocation);
+  void DeleteLocation(const ApHandle& hLocation);
 
-  void SetLocationOfContext(ApHandle hContext, ApHandle hLocation);
-  void DeleteLocationOfContext(ApHandle hContext, ApHandle hLocation);
-  ApHandle GetLocationOfContext(ApHandle hContext);
+  void SetLocationOfContext(const ApHandle& hContext, const ApHandle& hLocation);
+  void DeleteLocationOfContext(const ApHandle& hContext, const ApHandle& hLocation);
+  ApHandle GetLocationOfContext(const ApHandle& hContext);
 
 protected:
   ContextList contexts_;

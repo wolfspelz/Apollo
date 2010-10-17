@@ -56,7 +56,7 @@ VPI_API AP_MODULE_INFO* Info(AP_MODULE_CALL* pModuleData)
 class LocationTask: public Elem
 {
 public:
-  LocationTask(String& sDocumentUrl, ApHandle hRequest, TimeValue& tStarted)
+  LocationTask(String& sDocumentUrl, const ApHandle& hRequest, TimeValue& tStarted)
     :sDocumentUrl_(sDocumentUrl)
     ,hRequest_(hRequest)
     ,tStarted_(tStarted)

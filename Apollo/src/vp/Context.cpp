@@ -14,7 +14,7 @@
 #include "Local.h"
 #include "Context.h"
 
-Context::Context(ApHandle hContext)
+Context::Context(const ApHandle& hContext)
 :hAp_(hContext)
 ,tCreated_(Apollo::getNow().Sec())
 ,hMapping_(ApNoHandle)

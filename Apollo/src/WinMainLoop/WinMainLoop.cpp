@@ -57,7 +57,7 @@ WINMAINLOOP_API AP_MODULE_INFO* Info(AP_MODULE_CALL* pModuleData)
 class TimerListElem: public Elem
 {
 public:
-  TimerListElem(ApHandle hTimer_, Apollo::TimeValue& tvTime)
+  TimerListElem(const ApHandle& hTimer_, Apollo::TimeValue& tvTime)
     :hTimer_(hTimer_)
     ,tv_(tvTime)
     ,nCount_(1)

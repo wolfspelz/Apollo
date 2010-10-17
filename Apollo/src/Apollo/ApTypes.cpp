@@ -31,7 +31,7 @@ void ApHandle::fromString(const String& s)
   }
 }
 
-String ApHandle::toString()
+String ApHandle::toString() const
 { 
   String s;
   if (nHi_ > 0) {
@@ -143,7 +143,7 @@ void Apollo::ValueList::add(const String& s)
   }
 }
 
-void Apollo::ValueList::add(ApHandle h)
+void Apollo::ValueList::add(const ApHandle& h)
 {
   Apollo::ValueElem* e = new Apollo::ValueElem();
   if (e != 0) {
@@ -182,7 +182,7 @@ String Apollo::ValueList::atIndex(int nIndex, const String& sDefault)
   return sDefault;
 }
 
-ApHandle Apollo::ValueList::atIndex(int nIndex, ApHandle hDefault)
+ApHandle Apollo::ValueList::atIndex(int nIndex, const ApHandle& hDefault)
 {
   Apollo::ValueElem* e = elemAtIndex(nIndex);
   if (e != 0) {
@@ -261,7 +261,7 @@ void Apollo::KeyValueList::add(const String& sKey, const String& s)
   }
 }
 
-void Apollo::KeyValueList::add(const String& sKey, ApHandle h)
+void Apollo::KeyValueList::add(const String& sKey, const ApHandle& h)
 {
   Apollo::KeyValueElem* e = new Apollo::KeyValueElem(sKey);
   if (e != 0) {

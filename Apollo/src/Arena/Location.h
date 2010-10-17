@@ -19,20 +19,20 @@ class ArenaModule;
 class Location
 {
 public:
-  Location(ApHandle hLocation, ArenaModule* pModule);
+  Location(const ApHandle& hLocation, ArenaModule* pModule);
 
-  ApHandle apHandle() { return hAp_; }
+  inline ApHandle apHandle() { return hAp_; }
 
   void ProcessParticipantList(Apollo::ValueList& vlParticipants);
-  void ParticipantDetailsChanged(ApHandle hParticipant, Apollo::ValueList& vlKeys);
-  void ReceivePublicChat(ApHandle hParticipant, ApHandle hChat, const String& sNickname, const String& sText, const Apollo::TimeValue& tv);
-  void ParticipantAnimationFrame(ApHandle hParticipant, const Apollo::Image& image);
+  void ParticipantDetailsChanged(const ApHandle& hParticipant, Apollo::ValueList& vlKeys);
+  void ReceivePublicChat(const ApHandle& hParticipant, const ApHandle& hChat, const String& sNickname, const String& sText, const Apollo::TimeValue& tv);
+  void ParticipantAnimationFrame(const ApHandle& hParticipant, const Apollo::Image& image);
 
 protected:
   void InitRemovedParticipants();
   void InitAddedParticipants();
-  void RemoveFromRemovedParticipants(ApHandle h);
-  void AddToAddedParticipants(ApHandle h);
+  void RemoveFromRemovedParticipants(const ApHandle& h);
+  void AddToAddedParticipants(const ApHandle& h);
   void EvaluateNewParticipantList(Apollo::ValueList& vlParticipants);
   void ProcessRemovedParticipants();
   void ProcessAddedParticipants();

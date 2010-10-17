@@ -9,7 +9,7 @@
 #include "Browser.h"
 #include "BrowserInfoModule.h"
 
-void Browser::AddContext(ApHandle hContext)
+void Browser::AddContext(const ApHandle& hContext)
 {
   int bWasEmpty = !HasContexts();
 
@@ -23,7 +23,7 @@ void Browser::AddContext(ApHandle hContext)
   }
 }
 
-void Browser::RemoveContext(ApHandle hContext)
+void Browser::RemoveContext(const ApHandle& hContext)
 {
   int bWasEmpty = !HasContexts();
 
@@ -39,7 +39,7 @@ void Browser::RemoveContext(ApHandle hContext)
   }
 }
 
-Context* Browser::GetContext(ApHandle hContext)
+Context* Browser::GetContext(const ApHandle& hContext)
 {
   Context* pContext = 0;
   contexts_.Get(hContext, pContext);

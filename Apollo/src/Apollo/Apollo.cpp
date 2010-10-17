@@ -253,7 +253,7 @@ ApHandle Apollo::newHandle()
   return gApLib.newHandle();
 }
 
-String Apollo::handle2String(ApHandle h)
+String Apollo::handle2String(const ApHandle& h)
 {
   return gApLib.handle2String(h);
 }
@@ -532,7 +532,7 @@ ApHandle Apollo::startTimeout(int nSec, int nMicroSec)
   return hTimer;
 }
 
-int Apollo::cancelTimeout(ApHandle hTimer)
+int Apollo::cancelTimeout(const ApHandle& hTimer)
 {
   int ok = 0;
 
@@ -547,7 +547,7 @@ int Apollo::cancelTimeout(ApHandle hTimer)
   return ok;
 }
 
-int Apollo::cancelInterval(ApHandle hTimer) { return cancelTimeout(hTimer); }
+int Apollo::cancelInterval(const ApHandle& hTimer) { return cancelTimeout(hTimer); }
 
 // --------------------------------
 

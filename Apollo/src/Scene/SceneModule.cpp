@@ -5,12 +5,11 @@
 // ============================================================================
 
 #include "Apollo.h"
-#include "ApLog.h"
 #include "MsgConfig.h"
 #include "Local.h"
 #include "SceneModule.h"
 
-Surface* SceneModule::CreateSurface(ApHandle hSurface)
+Surface* SceneModule::CreateSurface(const ApHandle& hSurface)
 {
   Surface* pSurface = new Surface(hSurface);
   if (pSurface) {
@@ -27,7 +26,7 @@ Surface* SceneModule::CreateSurface(ApHandle hSurface)
   return pSurface;
 }
 
-void SceneModule::DeleteSurface(ApHandle hSurface)
+void SceneModule::DeleteSurface(const ApHandle& hSurface)
 {
   Surface* pSurface = FindSurface(hSurface);
   if (pSurface) {
@@ -38,7 +37,7 @@ void SceneModule::DeleteSurface(ApHandle hSurface)
   }
 }
 
-Surface* SceneModule::FindSurface(ApHandle hSurface)
+Surface* SceneModule::FindSurface(const ApHandle& hSurface)
 {
   Surface* pSurface = 0;  
 
@@ -127,6 +126,13 @@ AP_MSG_HANDLER_METHOD(SceneModule, Scene_TranslateElement)
   pMsg->apStatus = ApMessage::Ok;
 }
 
+AP_MSG_HANDLER_METHOD(SceneModule, Scene_GetTranslateElement)
+{
+  Surface* pSurface = FindSurface(pMsg->hScene);
+  pSurface->FindElement(pMsg->sPath)->GetTranslate(pMsg->fX, pMsg->fY);
+  pMsg->apStatus = ApMessage::Ok;
+}
+
 AP_MSG_HANDLER_METHOD(SceneModule, Scene_ScaleElement)
 {
   Surface* pSurface = FindSurface(pMsg->hScene);
@@ -191,6 +197,22 @@ AP_MSG_HANDLER_METHOD(SceneModule, Scene_CreateText)
   Surface* pSurface = FindSurface(pMsg->hScene);
   pSurface->CreateElement(pMsg->sPath);
   pSurface->FindElement(pMsg->sPath)->CreateText(pMsg->fX, pMsg->fY, pMsg->sText, pMsg->sFont, pMsg->fSize, pMsg->nFlags);
+  pSurface->AutoDraw();
+  pMsg->apStatus = ApMessage::Ok;
+}
+
+AP_MSG_HANDLER_METHOD(SceneModule, Scene_SetCoordinates)
+{
+  Surface* pSurface = FindSurface(pMsg->hScene);
+  pSurface->FindElement(pMsg->sPath)->SetCoordinates(pMsg->fX, pMsg->fY);
+  pSurface->AutoDraw();
+  pMsg->apStatus = ApMessage::Ok;
+}
+
+AP_MSG_HANDLER_METHOD(SceneModule, Scene_SetRectangle)
+{
+  Surface* pSurface = FindSurface(pMsg->hScene);
+  pSurface->FindElement(pMsg->sPath)->SetRectangle(pMsg->fX, pMsg->fY, pMsg->fW, pMsg->fH);
   pSurface->AutoDraw();
   pMsg->apStatus = ApMessage::Ok;
 }
@@ -283,6 +305,14 @@ AP_MSG_HANDLER_METHOD(SceneModule, Scene_DeleteImageFile)
   pMsg->apStatus = ApMessage::Ok;
 }
 
+AP_MSG_HANDLER_METHOD(SceneModule, Scene_SetImageAlpha)
+{
+  Surface* pSurface = FindSurface(pMsg->hScene);
+  pSurface->FindElement(pMsg->sPath)->SetImageAlpha(pMsg->fAlpha);
+  pSurface->AutoDraw();
+  pMsg->apStatus = ApMessage::Ok;
+}
+
 AP_MSG_HANDLER_METHOD(SceneModule, Scene_MeasureText)
 {
   Surface* pSurface = FindSurface(pMsg->hScene);
@@ -313,6 +343,14 @@ AP_MSG_HANDLER_METHOD(SceneModule, Scene_GetImageSizeFromFile)
   pMsg->apStatus = ApMessage::Ok;
 }
 
+AP_MSG_HANDLER_METHOD(SceneModule, Scene_CreateMouseSensor)
+{
+  Surface* pSurface = FindSurface(pMsg->hScene);
+  pSurface->CreateElement(pMsg->sPath);
+  pSurface->FindElement(pMsg->sPath)->CreateMouseSensor(pMsg->sPath, pMsg->fX, pMsg->fY, pMsg->fW, pMsg->fH);
+  pMsg->apStatus = ApMessage::Ok;
+}
+
 //----------------------------------------------------------
 
 #if defined(AP_TEST)
@@ -323,10 +361,7 @@ AP_MSG_HANDLER_METHOD(SceneModule, UnitTest_Begin)
 {
   AP_UNUSED_ARG(pMsg);
   if (Apollo::getConfig("Test/Scene", 0)) {
-    AP_UNITTEST_REGISTER(SceneModuleTester::Rectangle);
-    AP_UNITTEST_REGISTER(SceneModuleTester::FontFlags);
-    AP_UNITTEST_REGISTER(SceneModuleTester::Operator);
-    AP_UNITTEST_REGISTER(SceneModuleTester::ElementTree);
+    SceneModuleTester::Begin();
   }
 }
 
@@ -334,16 +369,16 @@ AP_MSG_HANDLER_METHOD(SceneModule, UnitTest_Execute)
 {
   AP_UNUSED_ARG(pMsg);
   if (Apollo::getConfig("Test/Scene", 0)) {
-    AP_UNITTEST_EXECUTE(SceneModuleTester::Rectangle);
-    AP_UNITTEST_EXECUTE(SceneModuleTester::FontFlags);
-    AP_UNITTEST_EXECUTE(SceneModuleTester::Operator);
-    AP_UNITTEST_EXECUTE(SceneModuleTester::ElementTree);
+    SceneModuleTester::Execute();
   }
 }
 
 AP_MSG_HANDLER_METHOD(SceneModule, UnitTest_End)
 {
   AP_UNUSED_ARG(pMsg);
+  if (Apollo::getConfig("Test/Scene", 0)) {
+    SceneModuleTester::End();
+  }
 }
 
 #endif // #if defined(AP_TEST)
@@ -364,14 +399,18 @@ int SceneModule::Init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_CreateElement, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_DeleteElement, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_TranslateElement, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_GetTranslateElement, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_ScaleElement, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_RotateElement, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_ElementCopyMode, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_HideElement, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_CreateRectangle, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_CreateMouseSensor, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_CreateImageFromData, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_CreateImageFromFile, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_CreateText, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_SetCoordinates, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_SetRectangle, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_SetFillColor, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_SetStrokeColor, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_SetStrokeImageFile, this, ApCallbackPosNormal);
@@ -383,6 +422,7 @@ int SceneModule::Init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_DeleteImageData, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_SetImageFile, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_DeleteImageFile, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_SetImageAlpha, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_MeasureText, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_GetImageSizeFromData, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_GetImageSizeFromFile, this, ApCallbackPosNormal);

@@ -14,7 +14,7 @@
 class Connection: public Apollo::TCPConnection
 {
 public:
-  Connection(const char* szName, ApHandle hConnection)
+  Connection(const char* szName, const ApHandle& hConnection)
     :Apollo::TCPConnection(szName, hConnection)
   {}
   virtual ~Connection() {}
