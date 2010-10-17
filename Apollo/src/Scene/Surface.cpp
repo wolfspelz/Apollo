@@ -12,7 +12,6 @@
 #include "MsgScene.h"
 #include "Local.h"
 #include "Surface.h"
-#include "Graphics.h"
 #include "GraphicsContext.h"
 
 int Surface::nCntWindows_ = 0;
@@ -74,14 +73,17 @@ LRESULT Surface::HandleMouseEvent(int nEvent, int nButton, LPARAM lParam)
     gc.nButton_ = nButton;
 
     if (sCaptureMouseElement_.empty()) {
-      root_.MouseEvent(gc, fX, fY);
+      root_.MouseEventRecursive(gc, fX, fY);
     } else {
-      Element* pElement = FindElement(sCaptureMouseElement_);
+      Element* pElement = GetElement(sCaptureMouseElement_);
       if (pElement) {
-        pElement->MouseEvent(gc, fX, fY);
+        if (pElement->IsSensor()) {
+          pElement->AsSensor()->MouseEvent(gc, fX, fY);
+        }
       }
     }
   }
+
   return 0;
 }
 
@@ -95,25 +97,6 @@ LRESULT CALLBACK Surface::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM
       }
       break;
 
-        //SensorListNode* pNode = 0;
-        //for (SensorListIterator iter(sensors_); pNode = iter.Next(); ) {
-        //  SensorBox& box = pNode->Key();
-        //  if (box.nLeft_ < nX && box.nRight_ > nX && box.nTop_ < nY && box.nBottom_ > nY) {
-        //    Graphics* pGraphics = pNode->Value()->GetGraphics();
-        //    if (pGraphics && pGraphics->IsSensor()) {
-        //      Sensor* pSensor = (Sensor*) pGraphics;
-        //      if (pSensor->Hit(fX, fY)) {
-        //        Msg_Scene_MouseMove msg;
-        //        msg.hScene = hAp_;
-        //        msg.hSensor = box.hAp_;
-        //        msg.fX = fX;
-        //        msg.fY = fY;
-        //        msg.Send();
-        //      }
-        //    }
-        //  }
-        //} // for
-
     case WM_MOUSEMOVE: { return HandleMouseEvent(EventContext::MouseMove, EventContext::NoMouseButton, lParam); } break;
     case WM_LBUTTONDOWN: { return HandleMouseEvent(EventContext::MouseDown, EventContext::LeftButton, lParam); } break;
     case WM_MBUTTONDOWN: { return HandleMouseEvent(EventContext::MouseDown, EventContext::MiddleButton, lParam); } break;
@@ -121,9 +104,6 @@ LRESULT CALLBACK Surface::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM
     case WM_LBUTTONUP: { return HandleMouseEvent(EventContext::MouseUp, EventContext::LeftButton, lParam); } break;
     case WM_MBUTTONUP: { return HandleMouseEvent(EventContext::MouseUp, EventContext::MiddleButton, lParam); } break;
     case WM_RBUTTONUP: { return HandleMouseEvent(EventContext::MouseUp, EventContext::RightButton, lParam); } break;
-    //case WM_LBUTTONCLICK: { return HandleMouseEvent(EventContext::MouseClick, EventContext::LeftButton, lParam); } break;
-    //case WM_MBUTTONCLICK: { return HandleMouseEvent(EventContext::MouseClick, EventContext::MiddleButton, lParam); } break;
-    //case WM_RBUTTONCLICK: { return HandleMouseEvent(EventContext::MouseClick, EventContext::RightButton, lParam); } break;
     case WM_LBUTTONDBLCLK: { return HandleMouseEvent(EventContext::MouseDoubleClick, EventContext::LeftButton, lParam); } break;
     case WM_MBUTTONDBLCLK: { return HandleMouseEvent(EventContext::MouseDoubleClick, EventContext::MiddleButton, lParam); } break;
     case WM_RBUTTONDBLCLK: { return HandleMouseEvent(EventContext::MouseDoubleClick, EventContext::RightButton, lParam); } break;
@@ -396,38 +376,97 @@ void Surface::AutoDraw()
 
 //------------------------------------
 
-Element* Surface::FindElement(const String& sPath)
+Element* Surface::GetElement(const String& sPath)
 {
-  String sFixedPath = sPath; sFixedPath.trim("/");
-  Element* pElement = root_.FindElement(sFixedPath);
-  if (pElement == 0) { throw ApException("Surface::FindElement scene=" ApHandleFormat " no element=%s", ApHandleType(hAp_), StringType(sPath)); }
+  Element* pElement = root_.FindElement(sPath);
+
+  if (pElement == 0) {
+    throw ApException("Surface::FindElement scene=" ApHandleFormat " no element=%s", ApHandleType(hAp_), StringType(sPath));
+  }
 
   return pElement;
 }
 
-void Surface::CreateElement(const String& sPath)
+int Surface::HasElement(const String& sPath)
 {
-  String sFixedPath = sPath; sFixedPath.trim("/");
-  if (!root_.CreateElement(sFixedPath)) { throw ApException("Surface::CreateElement scene=" ApHandleFormat " root_.CreateElement(%s) failed", ApHandleType(hAp_), StringType(sPath)); }
+  Element* pElement = root_.FindElement(sPath);
+  return (pElement != 0);
+}
+
+Element* Surface::CreateElement(const String& sPath)
+{
+  return root_.CreateElement(sPath);
 }
 
 void Surface::DeleteElement(const String& sPath)
 {
-  String sFixedPath = sPath; sFixedPath.trim("/");
-  if (!root_.DeleteElement(sFixedPath)) { throw ApException("Surface::DeleteElement scene=" ApHandleFormat " root_.DeleteElement(%s) failed", ApHandleType(hAp_), StringType(sPath)); }
+  if (!root_.DeleteElement(sPath)) {
+    throw ApException("Surface::DeleteElement scene=" ApHandleFormat " root_.DeleteElement(%s) failed", ApHandleType(hAp_), StringType(sPath));
+  }
 }
 
-void Surface::MeasureText(const String& sText, const String& sFont, double fSize, int nFlags, TextExtents& te)
+void Surface::CreateGraphicsElement(const String& sPath, Element* pElement)
+{
+  String sParent = String::filenameBasePath(sPath); sParent.trim("/");
+  String sName = String::filenameFile(sPath);
+
+  Element* pParent = 0;
+  if (HasElement(sParent)) {
+    pParent = GetElement(sParent);
+  } else {
+    pParent = CreateElement(sParent);
+  }
+
+  if (pParent) {
+    pParent->AddChild(sName, pElement);
+  } else {
+    throw ApException("Surface::CreateGraphicsElement(%s) failed: no parent",  StringType(sPath));
+  }
+}
+
+RectangleElement* Surface::CreateRectangle(const String& sPath)
+{
+  RectangleElement* pRectangle = new RectangleElement(this);
+  if (pRectangle == 0) { throw ApException("Surface::CreateRectangle(%s) failed",  StringType(sPath)); }
+  CreateGraphicsElement(sPath, pRectangle);
+  return pRectangle;
+}
+
+ImageElement* Surface::CreateImage(const String& sPath)
+{
+  ImageElement* pImage = new ImageElement(this);
+  if (pImage == 0) { throw ApException("Surface::CreateImage(%s) failed",  StringType(sPath)); }
+  CreateGraphicsElement(sPath, pImage);
+  return pImage;
+}
+
+TextElement* Surface::CreateText(const String& sPath)
+{
+  TextElement* pText = new TextElement(this);
+  if (pText == 0) { throw ApException("Surface::CreateText(%s) failed",  StringType(sPath)); }
+  CreateGraphicsElement(sPath, pText);
+  return pText;
+}
+
+SensorElement* Surface::CreateSensor(const String& sPath)
+{
+  SensorElement* pSensor = new SensorElement(this, sPath);
+  if (pSensor == 0) { throw ApException("Surface::CreateSensor(%s) failed",  StringType(sPath)); }
+  CreateGraphicsElement(sPath, pSensor);
+  return pSensor;
+}
+
+void Surface::GetTextExtents(const String& sText, const String& sFont, double fSize, int nFlags, TextExtents& te)
 {
   DrawContext gc;
   gc.pCairo_ = pCairo_;
   gc.nH_ = nH_;
   gc.nW_ = nW_;
 
-  TextX t(this);
+  TextElement t(this);
   t.SetString(sText);
   t.SetFont(sFont, fSize, nFlags);
-  t.Measure(gc, te);
+  t.GetExtents(gc, te);
 }
 
 void Surface::GetImageSizeFromData(const Apollo::Image& image, double& fW, double& fH)
@@ -437,8 +476,8 @@ void Surface::GetImageSizeFromData(const Apollo::Image& image, double& fW, doubl
   gc.nH_ = nH_;
   gc.nW_ = nW_;
 
-  ImageX i(this);
-  i.SetImageData(image);
+  ImageElement i(this);
+  i.SetData(image);
   i.GetSize(gc, fW, fH);
 }
 
@@ -449,16 +488,16 @@ void Surface::GetImageSizeFromFile(const String& sFile, double& fW, double& fH)
   gc.nH_ = nH_;
   gc.nW_ = nW_;
 
-  ImageX i(this);
-  i.SetImageFile(sFile);
+  ImageElement i(this);
+  i.SetFile(sFile);
   i.GetSize(gc, fW, fH);
 }
 
 void Surface::CaptureMouse(const String& sPath)
 {
-  Element* pElement = FindElement(sPath);
-  if (pElement) {
-    pElement->CaptureMouse(sPath);
+  SensorElement* pSensor = GetElement(sPath)->AsSensor();
+  if (pSensor) {
+    pSensor->CaptureMouse();
 #if defined(WIN32)
     if (hWnd_ != NULL) {
       ::SetCapture(hWnd_);
@@ -470,9 +509,9 @@ void Surface::CaptureMouse(const String& sPath)
 
 void Surface::ReleaseMouse()
 {
-  Element* pElement = FindElement(sCaptureMouseElement_);
-  if (pElement) {
-    pElement->ReleaseMouse();
+  SensorElement* pSensor = GetElement(sCaptureMouseElement_)->AsSensor();
+  if (pSensor) {
+    pSensor->ReleaseMouse();
 #if defined(WIN32)
     if (hWnd_ != NULL) {
       ::ReleaseCapture();
@@ -481,16 +520,6 @@ void Surface::ReleaseMouse()
   }
   sCaptureMouseElement_ = "";
 }
-
-//------------------------------------
-
-//void Surface::AddSensor(const ApHandle& hSensor)
-//{
-//}
-//
-//void Surface::RemoveSensor(const ApHandle& hSensor)
-//{
-//}
 
 //------------------------------------
 
@@ -522,9 +551,6 @@ void Surface::EraseBackground()
 void Surface::Draw()
 {
   if (hBitmap_ == NULL) { return; }
-  //if (!bVisible_) { return; }
-
-  //apLog_Debug((LOG_CHANNEL, "Surface::Draw", "###########################"));
 
   EraseBackground();
 
@@ -533,7 +559,7 @@ void Surface::Draw()
   gc.nH_ = nH_;
   gc.nW_ = nW_;
 
-  root_.Draw(gc);
+  root_.DrawRecursive(gc);
 
   if (0) {
     cairo_rectangle(pCairo_, 50, 50, 100, 100);

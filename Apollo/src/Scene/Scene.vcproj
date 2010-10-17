@@ -162,11 +162,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Graphics.cpp"
+				RelativePath=".\GraphicsContext.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\GraphicsContext.cpp"
+				RelativePath=".\GraphicsElements.cpp"
 				>
 			</File>
 			<File
@@ -196,11 +196,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Graphics.h"
+				RelativePath=".\GraphicsContext.h"
 				>
 			</File>
 			<File
-				RelativePath=".\GraphicsContext.h"
+				RelativePath=".\GraphicsElements.h"
 				>
 			</File>
 			<File
