@@ -363,6 +363,24 @@ void Element::SetImageAlpha(double fAlpha)
   }
 }
 
+void Element::CaptureMouse(const String& sPath)
+{
+  if (pGraphics_ && pGraphics_->IsSensor()) {
+    ((Sensor*) pGraphics_)->CaptureMouse();
+  } else {
+    throw ApException("Element::SetImageAlpha: not a Sensor");
+  }
+}
+
+void Element::ReleaseMouse()
+{
+  if (pGraphics_ && pGraphics_->IsSensor()) {
+    ((Sensor*) pGraphics_)->ReleaseMouse();
+  } else {
+    throw ApException("Element::ReleaseMouse: not a Sensor");
+  }
+}
+
 // ----------------------------------------------------------
 
 void Element::Draw(DrawContext& gc)

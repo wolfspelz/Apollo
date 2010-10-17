@@ -690,7 +690,7 @@ class Msg_Scene_CreateMouseSensor: public ApRequestMessage
 {
 public:
   Msg_Scene_CreateMouseSensor() : ApRequestMessage("Scene_CreateMouseSensor"), fX(0), fY(0), fW(0), fH(0) {}
-  static int _(const ApHandle& hScene, const String& sPath, const ApHandle& hSensor, double fX, double fY, double fW, double fH)
+  static int _(const ApHandle& hScene, const String& sPath, double fX, double fY, double fW, double fH)
   {
     Msg_Scene_CreateMouseSensor msg;
     msg.hScene = hScene;
@@ -707,6 +707,34 @@ public:
   ApIN double fY;
   ApIN double fW;
   ApIN double fH;
+};
+
+class Msg_Scene_CaptureMouse: public ApRequestMessage
+{
+public:
+  Msg_Scene_CaptureMouse() : ApRequestMessage("Scene_CaptureMouse") {}
+  static int _(const ApHandle& hScene, const String& sPath)
+  {
+    Msg_Scene_CaptureMouse msg;
+    msg.hScene = hScene;
+    msg.sPath = sPath;
+    return msg.Request();
+  }
+  ApIN ApHandle hScene;
+  ApIN String sPath;
+};
+
+class Msg_Scene_ReleaseMouse: public ApRequestMessage
+{
+public:
+  Msg_Scene_ReleaseMouse() : ApRequestMessage("Scene_ReleaseMouse") {}
+  static int _(const ApHandle& hScene)
+  {
+    Msg_Scene_ReleaseMouse msg;
+    msg.hScene = hScene;
+    return msg.Request();
+  }
+  ApIN ApHandle hScene;
 };
 
 // Scene ->

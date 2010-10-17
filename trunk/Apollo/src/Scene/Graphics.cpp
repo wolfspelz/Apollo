@@ -256,12 +256,24 @@ Sensor::~Sensor()
 //  FillAndStroke(gc);
 //}
 
+void Sensor::CaptureMouse()
+{
+  bHitAll_ = 1;
+}
+
+void Sensor::ReleaseMouse()
+{
+  bHitAll_ = 0;
+}
+
 void Sensor::MouseEvent(EventContext& gc, double fX, double fY)
 {
-  bool bHit = false;
+  int bHit = bHitAll_;
 
-  if (fX_ < fX && fX_ + fW_ > fX && fY_ < fY && fY_ + fH_ > fY) {
-    bHit = true;
+  if (!bHit) {
+    if (fX_ < fX && fX_ + fW_ > fX && fY_ < fY && fY_ + fH_ > fY) {
+      bHit = true;
+    }
   }
 
   if (bHit) {

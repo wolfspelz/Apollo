@@ -23,11 +23,16 @@ void SceneModuleTester::On_Scene_MouseEvent(Msg_Scene_MouseEvent* pMsg)
   if (!bHasCursor_) {
     double fW = 0;
     double fH = 0;
-    Msg_Scene_GetImageSizeFromFile::_(pMsg->hScene, Apollo::getAppResourcePath() + "cursor.png", fW, fH);
-    Msg_Scene_CreateImageFromFile::_(pMsg->hScene, "z_cursor", -fW/2.0, -fH/2.0, Apollo::getAppResourcePath() + "cursor.png");
-    Msg_Scene_SetStrokeColor::_(pMsg->hScene, "z_cursor", 1, 0, 0, 1);
-    Msg_Scene_SetStrokeWidth::_(pMsg->hScene, "z_cursor", 2);
+    Msg_Scene_GetImageSizeFromFile::_(pMsg->hScene, Apollo::getAppResourcePath() + "test/cursor.png", fW, fH);
+    Msg_Scene_CreateImageFromFile::_(pMsg->hScene, "z_cursor", -fW/2.0, -fH/2.0, Apollo::getAppResourcePath() + "test/cursor.png");
     bHasCursor_ = 1;
+  }
+
+  if (pMsg->nEvent == Msg_Scene_MouseEvent::MouseDown) {
+    Msg_Scene_CaptureMouse::_(pMsg->hScene, pMsg->sPath);
+  }
+  if (pMsg->nEvent == Msg_Scene_MouseEvent::MouseUp) {
+    Msg_Scene_ReleaseMouse::_(pMsg->hScene);
   }
 
   double fTranslateX = 0;
@@ -127,12 +132,10 @@ String SceneModuleTester::Rectangle()
   //ApHandle hSensor0 = Apollo::newHandle();
   //if (!s) { if (!Msg_Scene_CreateMouseSensor::_(hScene, "z_sensor0", hSensor0, 0, 0, 350, 350)) { s = "Msg_Scene_CreateMouseSensor failed"; }}
 
-  ApHandle hSensor1 = Apollo::newHandle();
-  if (!s) { if (!Msg_Scene_CreateMouseSensor::_(hScene, "z_sensor1", hSensor1, 0, 0, 200, 200)) { s = "Msg_Scene_CreateMouseSensor failed"; }}
+  if (!s) { if (!Msg_Scene_CreateMouseSensor::_(hScene, "z_sensor1", 0, 0, 200, 200)) { s = "Msg_Scene_CreateMouseSensor failed"; }}
   if (!s) { if (!Msg_Scene_TranslateElement::_(hScene, "z_sensor1", 50, 50)) { s = "Msg_Scene_TranslateElement failed"; }}
 
-  ApHandle hSensor2 = Apollo::newHandle();
-  if (!s) { if (!Msg_Scene_CreateMouseSensor::_(hScene, "z_sensor2", hSensor2, 0, 0, 100, 100)) { s = "Msg_Scene_CreateMouseSensor failed"; }}
+  if (!s) { if (!Msg_Scene_CreateMouseSensor::_(hScene, "z_sensor2", 0, 0, 100, 100)) { s = "Msg_Scene_CreateMouseSensor failed"; }}
   if (!s) { if (!Msg_Scene_TranslateElement::_(hScene, "z_sensor2", 200, 200)) { s = "Msg_Scene_TranslateElement failed"; }}
 
   // ------------------------
@@ -168,7 +171,7 @@ String SceneModuleTester::Rectangle()
   Apollo::Image apImg1; // from PNG
   {
     Buffer sbData;
-    Apollo::loadFile(Apollo::getAppResourcePath() + "tassadar" + String::filenamePathSeparator() + "test.png", sbData);
+    Apollo::loadFile(Apollo::getAppResourcePath() + "test/" + "test2.png", sbData);
     CxImage cxImg(sbData.Data(), sbData.Length(), CXIMAGE_FORMAT_UNKNOWN);
     apImg1.Allocate(cxImg.GetWidth(), cxImg.GetHeight());
     CxMemFile mfDest((BYTE*) apImg1.Pixels(), apImg1.Size());
@@ -179,7 +182,7 @@ String SceneModuleTester::Rectangle()
   Apollo::Image apImg2; // from animated GIF
   {
     Buffer sbData;
-    Apollo::loadFile(Apollo::getAppResourcePath() + "tassadar" + String::filenamePathSeparator() + "idle.gif", sbData);
+    Apollo::loadFile(Apollo::getAppResourcePath() + "test/tassadar/" + "idle.gif", sbData);
     CxImage cxImg(sbData.Data(), sbData.Length(), CXIMAGE_FORMAT_UNKNOWN);
     cxImg.SetRetreiveAllFrames(true);
     int nFrames = cxImg.GetNumFrames();
@@ -214,9 +217,9 @@ String SceneModuleTester::Rectangle()
   // ------------------------
 
   double fImage3W, fImage3H;
-  if (!s) { if (!Msg_Scene_GetImageSizeFromFile::_(hScene, Apollo::getAppResourcePath() + "tassadar" + String::filenamePathSeparator() + "test.png", fImage3W, fImage3H)) { s = "Msg_Scene_GetImageSizeFromFile failed"; }}
+  if (!s) { if (!Msg_Scene_GetImageSizeFromFile::_(hScene, Apollo::getAppResourcePath() + "test/" + "test2.png", fImage3W, fImage3H)) { s = "Msg_Scene_GetImageSizeFromFile failed"; }}
   if (!s) { if (fImage3W != 100.0 || fImage3H != 100.0) { s = "Msg_Scene_GetImageSizeFromFile returned wrong size"; }}
-  if (!s) { if (!Msg_Scene_CreateImageFromFile::_(hScene, "image3", - fImage3W / 2.0, - fImage3H / 2.0, Apollo::getAppResourcePath() + "tassadar" + String::filenamePathSeparator() + "test.png")) { s = "Msg_Scene_CreateImageFromFile failed"; }}
+  if (!s) { if (!Msg_Scene_CreateImageFromFile::_(hScene, "image3", - fImage3W / 2.0, - fImage3H / 2.0, Apollo::getAppResourcePath() + "test/" + "test2.png")) { s = "Msg_Scene_CreateImageFromFile failed"; }}
   if (!s) { if (!Msg_Scene_TranslateElement::_(hScene, "image3", 60, 290)) { s = "Msg_Scene_RotateElement failed"; }}
   if (!s) { if (!Msg_Scene_RotateElement::_(hScene, "image3", - 10.0 / 180.0 * 3.1415)) { s = "Msg_Scene_RotateElement failed"; }}
 
@@ -280,7 +283,7 @@ String SceneModuleTester::Rectangle()
 
   if (!s) { if (!Msg_Scene_CreateRectangle::_(hScene, "strokeimage", -40, -40, 80, 80)) { s = "Msg_Scene_CreateRectangle failed"; }}
   if (!s) { if (!Msg_Scene_SetFillColor::_(hScene, "strokeimage", 1, 1, 0, 1)) { s = "Msg_Scene_SetFillColor failed"; }}
-  if (!s) { if (!Msg_Scene_SetStrokeImageFile::_(hScene, "strokeimage", Apollo::getAppResourcePath() + "tassadar" + String::filenamePathSeparator() + "test.png")) { s = "Msg_Scene_SetStrokeImageFile failed"; }}
+  if (!s) { if (!Msg_Scene_SetStrokeImageFile::_(hScene, "strokeimage", Apollo::getAppResourcePath() + "test/" + "test2.png")) { s = "Msg_Scene_SetStrokeImageFile failed"; }}
   if (!s) { if (!Msg_Scene_SetStrokeImageOffset::_(hScene, "strokeimage", -50, -50)) { s = "Msg_Scene_SetStrokeImageOffset failed"; }}
   if (!s) { if (!Msg_Scene_SetStrokeWidth::_(hScene, "strokeimage", 40)) { s = "Msg_Scene_SetStrokeWidth failed"; }}
   if (!s) { if (!Msg_Scene_TranslateElement::_(hScene, "strokeimage", 180, 280)) { s = "Msg_Scene_TranslateElement failed"; }}
@@ -288,7 +291,7 @@ String SceneModuleTester::Rectangle()
   // ------------------------
 
   if (!s) { if (!Msg_Scene_CreateRectangle::_(hScene, "fillimage", -49.5, -49.5, 100, 100)) { s = "Msg_Scene_CreateRectangle failed"; }}
-  if (!s) { if (!Msg_Scene_SetFillImageFile::_(hScene, "fillimage", Apollo::getAppResourcePath() + "tassadar" + String::filenamePathSeparator() + "test.png")) { s = "Msg_Scene_SetFillImageFile failed"; }}
+  if (!s) { if (!Msg_Scene_SetFillImageFile::_(hScene, "fillimage", Apollo::getAppResourcePath() + "test/" + "test2.png")) { s = "Msg_Scene_SetFillImageFile failed"; }}
   if (!s) { if (!Msg_Scene_SetFillImageOffset::_(hScene, "fillimage", -50, -50)) { s = "Msg_Scene_SetFillImageOffset failed"; }}
   if (!s) { if (!Msg_Scene_SetStrokeColor::_(hScene, "fillimage", 1, 1, 0, 1)) { s = "Msg_Scene_SetStrokeColor failed"; }}
   if (!s) { if (!Msg_Scene_SetStrokeWidth::_(hScene, "fillimage", 1)) { s = "Msg_Scene_SetStrokeWidth failed"; }}

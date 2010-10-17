@@ -64,6 +64,8 @@ public:
   void On_Scene_GetImageSizeFromData(Msg_Scene_GetImageSizeFromData* pMsg);
   void On_Scene_GetImageSizeFromFile(Msg_Scene_GetImageSizeFromFile* pMsg);
   void On_Scene_CreateMouseSensor(Msg_Scene_CreateMouseSensor* pMsg);
+  void On_Scene_CaptureMouse(Msg_Scene_CaptureMouse* pMsg);
+  void On_Scene_ReleaseMouse(Msg_Scene_ReleaseMouse* pMsg);
 
 #if defined(AP_TEST)
   void On_UnitTest_Begin(Msg_UnitTest_Begin* pMsg);
