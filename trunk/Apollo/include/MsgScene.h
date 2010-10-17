@@ -166,7 +166,7 @@ public:
   ApIN double fAngle;
 };
 
-class Msg_Scene_ElementCopyMode: public ApRequestMessage
+class Msg_Scene_SetCopyMode: public ApRequestMessage
 {
 public:
   // Same as cairo_operator_t
@@ -187,10 +187,10 @@ public:
       Saturate
   } CopyMode;
 
-  Msg_Scene_ElementCopyMode() : ApRequestMessage("Scene_ElementCopyMode"), nMode(0) {}
+  Msg_Scene_SetCopyMode() : ApRequestMessage("Scene_SetCopyMode"), nMode(0) {}
   static int _(const ApHandle& hScene, const String& sPath, int nMode)
   {
-    Msg_Scene_ElementCopyMode msg;
+    Msg_Scene_SetCopyMode msg;
     msg.hScene = hScene;
     msg.sPath = sPath;
     msg.nMode = nMode;
@@ -341,13 +341,13 @@ public:
 //--------------------------
 // Change properties
 
-class Msg_Scene_SetCoordinates: public ApRequestMessage
+class Msg_Scene_SetPosition: public ApRequestMessage
 {
 public:
-  Msg_Scene_SetCoordinates() : ApRequestMessage("Scene_SetCoordinates"), fX(0.0), fY(0.0) {}
+  Msg_Scene_SetPosition() : ApRequestMessage("Scene_SetPosition"), fX(0.0), fY(0.0) {}
   static int _(const ApHandle& hScene, const String& sPath, double fX, double fY)
   {
-    Msg_Scene_SetCoordinates msg;
+    Msg_Scene_SetPosition msg;
     msg.hScene = hScene;
     msg.sPath = sPath;
     msg.fX = fX;
@@ -602,13 +602,13 @@ public:
 //--------------------------
 // Info query without element
 
-class Msg_Scene_MeasureText: public ApRequestMessage
+class Msg_Scene_GetTextExtents: public ApRequestMessage
 {
 public:
-  Msg_Scene_MeasureText() : ApRequestMessage("Scene_MeasureText"), fSize(12), nFlags(Msg_Scene_FontFlags::Normal) {}
+  Msg_Scene_GetTextExtents() : ApRequestMessage("Scene_GetTextExtents"), fSize(12), nFlags(Msg_Scene_FontFlags::Normal) {}
   static int _(const ApHandle& hScene, const String& sText, const String& sFont, double fSize, int nFlags, double& fBearingX, double& fBearingY, double& fWidth, double& fHeight, double& fAdvanceX, double& fAdvanceY)
   {
-    Msg_Scene_MeasureText msg;
+    Msg_Scene_GetTextExtents msg;
     msg.hScene = hScene;
     msg.sText = sText;
     msg.sFont = sFont;

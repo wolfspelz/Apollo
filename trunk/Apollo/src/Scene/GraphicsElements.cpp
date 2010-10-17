@@ -6,18 +6,17 @@
 
 #include "Apollo.h"
 #include "ApLog.h"
-#include "MsgScene.h"
 #include "Local.h"
-#include "Graphics.h"
+#include "GraphicsElements.h"
 #include "Surface.h"
 
-void Shape::SetCoordinates(double fX, double fY)
+void ShapeElement::SetPosition(double fX, double fY)
 {
   fX_ = fX;
   fY_ = fY;
 }
 
-void Shape::SetFillColor(double fRed, double fGreen, double fBlue, double fAlpha)
+void ShapeElement::SetFillColor(double fRed, double fGreen, double fBlue, double fAlpha)
 {
   bFillColor_ = true;
   bFillImageFile_ = false;
@@ -27,7 +26,7 @@ void Shape::SetFillColor(double fRed, double fGreen, double fBlue, double fAlpha
   cFill_.a = fAlpha;
 }
 
-void Shape::SetStrokeColor(double fRed, double fGreen, double fBlue, double fAlpha)
+void ShapeElement::SetStrokeColor(double fRed, double fGreen, double fBlue, double fAlpha)
 {
   bStrokeColor_ = true;
   bStrokeImageFile_ = false;
@@ -37,38 +36,38 @@ void Shape::SetStrokeColor(double fRed, double fGreen, double fBlue, double fAlp
   cStroke_.a = fAlpha;
 }
 
-void Shape::SetStrokeImageFile(const String& sFile)
+void ShapeElement::SetStrokeImageFile(const String& sFile)
 {
   bStrokeColor_ = false;
   bStrokeImageFile_ = true;
   sStrokeImageFile_ = sFile;
 }
 
-void Shape::SetFillImageFile(const String& sFile)
+void ShapeElement::SetFillImageFile(const String& sFile)
 {
   bFillColor_ = false;
   bFillImageFile_ = true;
   sFillImageFile_ = sFile;
 }
 
-void Shape::SetStrokeImageOffset(double fX, double fY)
+void ShapeElement::SetStrokeImageOffset(double fX, double fY)
 {
   fStrokeImageX_ = fX;
   fStrokeImageY_ = fY;
 }
 
-void Shape::SetFillImageOffset(double fX, double fY)
+void ShapeElement::SetFillImageOffset(double fX, double fY)
 {
   fFillImageX_ = fX;
   fFillImageY_ = fY;
 }
 
-void Shape::SetStrokeWidth(double fWidth)
+void ShapeElement::SetStrokeWidth(double fWidth)
 {
   fStrokeWidth_ = fWidth;
 }
 
-void Shape::FillAndStroke(DrawContext& gc)
+void ShapeElement::FillAndStroke(DrawContext& gc)
 {
   // Fill
 
@@ -127,7 +126,7 @@ void Shape::FillAndStroke(DrawContext& gc)
 
 // ----------------------------------------------------------
 
-void RectangleX::Draw(DrawContext& gc)
+void RectangleElement::Draw(DrawContext& gc)
 {
   cairo_rectangle(gc.Cairo(), fX_, fY_, fW_, fH_);
 
@@ -136,39 +135,39 @@ void RectangleX::Draw(DrawContext& gc)
 
 // ----------------------------------------------------------
 
-void ImageX::SetImageData(const Apollo::Image& image)
+void ImageElement::SetData(const Apollo::Image& image)
 {
-  DeleteImageFile();
+  DeleteFile();
 
   image_.CopyData_PreMultiplyAlpha_mem_RGBA_to_cairo_ARGB_which_actually_is_BGRA_in_mem_on_little_endian(image);
   bData_ = true;
 }
 
-void ImageX::DeleteImageData()
+void ImageElement::DeleteData()
 {
   bData_ = false;
   image_.Free();
 }
 
-void ImageX::SetImageFile(const String& sFile)
+void ImageElement::SetFile(const String& sFile)
 {
   if (sFile.empty()) {
-    DeleteImageFile();
+    DeleteFile();
   } else {
-    DeleteImageData();
+    DeleteData();
 
     bFile_ = true;
     sFile_ = sFile;
   }
 }
 
-void ImageX::DeleteImageFile()
+void ImageElement::DeleteFile()
 {
   bFile_ = false;
   sFile_ = "";
 }
 
-void ImageX::GetSize(DrawContext& gc, double& fW, double& fH)
+void ImageElement::GetSize(DrawContext& gc, double& fW, double& fH)
 {  
   if (bData_) {
     fW = image_.Width();
@@ -184,7 +183,7 @@ void ImageX::GetSize(DrawContext& gc, double& fW, double& fH)
   }
 }
 
-void ImageX::Draw(DrawContext& gc)
+void ImageElement::Draw(DrawContext& gc)
 {
   cairo_surface_t* pImage = 0;
   
@@ -212,7 +211,7 @@ void ImageX::Draw(DrawContext& gc)
 
 // ----------------------------------------------------------
 
-void TextX::Draw(DrawContext& gc)
+void TextElement::Draw(DrawContext& gc)
 {
   cairo_move_to(gc.Cairo(), fX_, fY_);
   cairo_select_font_face(gc.Cairo(), sFont_, nFlags_ & Italic ? CAIRO_FONT_SLANT_ITALIC : CAIRO_FONT_SLANT_NORMAL, nFlags_ & Bold ? CAIRO_FONT_WEIGHT_BOLD : CAIRO_FONT_WEIGHT_NORMAL);
@@ -224,7 +223,7 @@ void TextX::Draw(DrawContext& gc)
   FillAndStroke(gc);
 }
 
-void TextX::Measure(DrawContext& gc, TextExtents& te)
+void TextElement::GetExtents(DrawContext& gc, TextExtents& te)
 {
   cairo_select_font_face(gc.Cairo(), sFont_, nFlags_ & Italic ? CAIRO_FONT_SLANT_ITALIC : CAIRO_FONT_SLANT_NORMAL, nFlags_ & Bold ? CAIRO_FONT_WEIGHT_BOLD : CAIRO_FONT_WEIGHT_NORMAL);
   cairo_set_font_size(gc.Cairo(), fSize_);
@@ -242,33 +241,32 @@ void TextX::Measure(DrawContext& gc, TextExtents& te)
 
 // ----------------------------------------------------------
 
-Sensor::~Sensor()
+void SensorElement::Draw(DrawContext& gc)
 {
-  //if (pSurface_) {
-  //  pSurface_->RemoveSensor(hAp_);
-  //}
+  cairo_rectangle(gc.Cairo(), fX_, fY_, fW_, fH_);
+  FillAndStroke(gc);
 }
 
-//void Sensor::Draw(DrawContext& gc)
-//{
-//  cairo_rectangle(gc.Cairo(), fX_, fY_, fW_, fH_);
-//
-//  FillAndStroke(gc);
-//}
-
-void Sensor::CaptureMouse()
+void SensorElement::CaptureMouse()
 {
   bHitAll_ = 1;
 }
 
-void Sensor::ReleaseMouse()
+void SensorElement::ReleaseMouse()
 {
   bHitAll_ = 0;
 }
 
-void Sensor::MouseEvent(EventContext& gc, double fX, double fY)
+void SensorElement::MouseEvent(EventContext& gc, double fX, double fY)
 {
-  int bHit = bHitAll_;
+  int bHit = 0;
+
+  fX -= fTranslateX_;
+  fY -= fTranslateY_;
+
+  if (bHitAll_) {
+    bHit = 1;
+  }
 
   if (!bHit) {
     if (fX_ < fX && fX_ + fW_ > fX && fY_ < fY && fY_ + fH_ > fY) {

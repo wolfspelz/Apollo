@@ -8,17 +8,39 @@
 #define Element_H_INCLUDED
 
 #include "Apollo.h"
-#include "Graphics.h"
+#include "GraphicsContext.h"
 
 #if defined(AP_TEST)
 #include "SceneModuleTester.h"
 #endif // #if defined(AP_TEST)
 
 class Element;
+class Surface;
 
 typedef StringPointerTree<Element*> ElementList;
 typedef StringPointerTreeNode<Element*> ElementNode;
 typedef StringPointerTreeIterator<Element*> ElementIterator;
+
+class RectangleElement;
+class TextElement;
+class ShapeElement;
+class ImageElement;
+class SensorElement;
+
+class Color
+{
+public:
+  Color()
+    :r(0.0)
+    ,g(0.0)
+    ,b(0.0)
+    ,a(0.0)
+  {}
+  double r;
+  double g;
+  double b;
+  double a;
+};
 
 class Element
 {
@@ -26,7 +48,6 @@ public:
   Element(Surface* pSurface)
     :pSurface_(pSurface)
     ,pChildren_(0)
-    ,pGraphics_(0)
     ,bSave_(false)
     ,fTranslateX_(0.0)
     ,fTranslateY_(0.0)
@@ -38,44 +59,35 @@ public:
   {}
   virtual ~Element();
 
-  void Draw(DrawContext& gc);
-  void MouseEvent(EventContext& gc, double fX, double fY);
+  virtual void Draw(DrawContext& gc) {};
+  void MouseEvent(EventContext& gc, double fX, double fY) {}
+
+  void DrawRecursive(DrawContext& gc);  
+  void MouseEventRecursive(EventContext& gc, double fX, double fY);
 
   Element* FindElement(const String& sPath);
-  int CreateElement(const String& sPath);
+  void AddChild(const String& sName, Element* pElement);
+  Element* CreateElement(const String& sPath);
   int DeleteElement(const String& sPath);
 
   void Translate(double fX, double fY);
   void GetTranslate(double& fX, double& fY);
   void Scale(double fX, double fY);
   void Rotate(double fAngle);
-  void CopyMode(int nMode);
   void Hide(int bHide);
+  void CopyMode(int nMode);
 
-  Graphics* GetGraphics() { return pGraphics_; }
-  void DeleteGraphics();
-  void CreateRectangle(double fX, double fY, double fW, double fH);
-  void CreateImageFromData(double fX, double fY, const Apollo::Image& image);
-  void CreateImageFromFile(double fX, double fY, const String& sFile);
-  void CreateText(double fX, double fY, const String& sText, const String& sFont, double fSize, int nFlags);
-  void CreateMouseSensor(const String& sPath, double fX, double fY, double fW, double fH);
+  inline virtual bool IsShape() { return false; }
+  inline virtual bool IsRectangle() { return false; }
+  inline virtual bool IsImage() { return false; }
+  inline virtual bool IsText() { return false; }
+  inline virtual bool IsSensor() { return false; }
 
-  void SetRectangle(double fX, double fY, double fW, double fH);
-  void SetCoordinates(double fX, double fY);
-  void SetFillColor(double fRed, double fGreen, double fBlue, double fAlpha);
-  void SetStrokeColor(double fRed, double fGreen, double fBlue, double fAlpha);
-  void SetStrokeImageFile(const String& sFile);
-  void SetFillImageFile(const String& sFile);
-  void SetStrokeImageOffset(double fX, double fY);
-  void SetFillImageOffset(double fX, double fY);
-  void SetStrokeWidth(double fWidth);
-  void SetImageData(const Apollo::Image& image);
-  void DeleteImageData();
-  void SetImageFile(const String& sFile);
-  void DeleteImageFile();
-  void SetImageAlpha(double fAlpha);
-  void CaptureMouse(const String& sPath);
-  void ReleaseMouse();
+  ShapeElement* AsShape();
+  RectangleElement* AsRectangle();
+  TextElement* AsText();
+  ImageElement* AsImage();
+  SensorElement* AsSensor();
 
 protected:
   void CheckSaveRestore();
@@ -83,7 +95,6 @@ protected:
 protected:
   Surface* pSurface_;
   ElementList* pChildren_;
-  Graphics* pGraphics_;
 
   bool bSave_;
   double fTranslateX_;

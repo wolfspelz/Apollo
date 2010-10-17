@@ -42,33 +42,6 @@ void SceneModuleTester::On_Scene_MouseEvent(Msg_Scene_MouseEvent* pMsg)
   //Msg_Scene_Draw msg; msg.hScene = pMsg->hScene; msg.Request();
 }
 
-void SceneModuleTester::Begin()
-{
-  { Msg_Scene_MouseEvent msg; msg.Hook(MODULE_NAME, (ApCallback) SceneModuleTester::On_Scene_MouseEvent, 0, ApCallbackPosNormal); }
-
-  AP_UNITTEST_REGISTER(SceneModuleTester::Rectangle);
-  AP_UNITTEST_REGISTER(SceneModuleTester::SameConstants_FontFlags);
-  AP_UNITTEST_REGISTER(SceneModuleTester::SameConstants_Operator);
-  AP_UNITTEST_REGISTER(SceneModuleTester::SameConstants_EventContext);
-  AP_UNITTEST_REGISTER(SceneModuleTester::ElementTree);
-//  AP_UNITTEST_REGISTER(SceneModuleTester::SensorListOps);
-}
-
-void SceneModuleTester::Execute()
-{
-  AP_UNITTEST_EXECUTE(SceneModuleTester::Rectangle);
-  AP_UNITTEST_EXECUTE(SceneModuleTester::SameConstants_FontFlags);
-  AP_UNITTEST_EXECUTE(SceneModuleTester::SameConstants_Operator);
-  AP_UNITTEST_EXECUTE(SceneModuleTester::SameConstants_EventContext);
-  AP_UNITTEST_EXECUTE(SceneModuleTester::ElementTree);
-//  AP_UNITTEST_EXECUTE(SceneModuleTester::SensorListOps);
-}
-
-void SceneModuleTester::End()
-{
-  { Msg_Scene_MouseEvent msg; msg.UnHook(MODULE_NAME, (ApCallback) SceneModuleTester::On_Scene_MouseEvent, 0); }
-}
-
 #include "ximagif.h"
 
 String SceneModuleTester::Rectangle()
@@ -148,7 +121,7 @@ String SceneModuleTester::Rectangle()
   if (!s) { if (!Msg_Scene_CreateRectangle::_(hScene, "copymode2", -50, -15, 100, 30)) { s = "Msg_Scene_CreateRectangle failed"; }}
   if (!s) { if (!Msg_Scene_SetFillColor::_(hScene, "copymode2", 0, 1, 0, 0.5)) { s = "Msg_Scene_SetFillColor failed"; }}
   if (!s) { if (!Msg_Scene_TranslateElement::_(hScene, "copymode2", 260.5, 40.5)) { s = "Msg_Scene_TranslateElement failed"; }}
-  if (!s) { if (!Msg_Scene_ElementCopyMode::_(hScene, "copymode2", Msg_Scene_ElementCopyMode::Source)) { s = "Msg_Scene_ElementCopyMode failed"; }}
+  if (!s) { if (!Msg_Scene_SetCopyMode::_(hScene, "copymode2", Msg_Scene_SetCopyMode::Source)) { s = "Msg_Scene_SetCopyMode failed"; }}
 
   // ------------------------
 
@@ -224,11 +197,12 @@ String SceneModuleTester::Rectangle()
   if (!s) { if (!Msg_Scene_RotateElement::_(hScene, "image3", - 10.0 / 180.0 * 3.1415)) { s = "Msg_Scene_RotateElement failed"; }}
 
   // ------------------------
+
   String sTextA = "Hello W" "\xC3\xB6" "rld";
 
   String sText1 = sTextA;
   double fText1BearingX, fText1BearingY, fText1W, fText1H, fText1AdvanceX, fText1AdvanceY;
-  if (!s) { if (!Msg_Scene_MeasureText::_(hScene, sText1, "Courier New", 30, Msg_Scene_FontFlags::Bold, fText1BearingX, fText1BearingY, fText1W, fText1H, fText1AdvanceX, fText1AdvanceY)) { s = "Msg_Scene_MeasureText failed"; }}
+  if (!s) { if (!Msg_Scene_GetTextExtents::_(hScene, sText1, "Courier New", 30, Msg_Scene_FontFlags::Bold, fText1BearingX, fText1BearingY, fText1W, fText1H, fText1AdvanceX, fText1AdvanceY)) { s = "Msg_Scene_MeasureText failed"; }}
   double fText1Padding = 2.5;
   double fText1X = 130;
   double fText1Y = 140;
@@ -244,7 +218,7 @@ String SceneModuleTester::Rectangle()
 
   String sText2 = sTextA;
   double fText2BearingX, fText2BearingY, fText2W, fText2H, fText2AdvanceX, fText2AdvanceY;
-  if (!s) { if (!Msg_Scene_MeasureText::_(hScene, sText2, "Courier New", 30, Msg_Scene_FontFlags::Bold, fText2BearingX, fText2BearingY, fText2W, fText2H, fText2AdvanceX, fText2AdvanceY)) { s = "Msg_Scene_MeasureText failed"; }}
+  if (!s) { if (!Msg_Scene_GetTextExtents::_(hScene, sText2, "Courier New", 30, Msg_Scene_FontFlags::Bold, fText2BearingX, fText2BearingY, fText2W, fText2H, fText2AdvanceX, fText2AdvanceY)) { s = "Msg_Scene_MeasureText failed"; }}
   double fText2Padding = 2.5;
   double fText2X = fText1X;
   double fText2Y = fText1Y + fText1H + fText1Padding + 2;
@@ -264,7 +238,7 @@ String SceneModuleTester::Rectangle()
 
   String sText3 = sTextA;
   double fText3BearingX, fText3BearingY, fText3W, fText3H, fText3AdvanceX, fText3AdvanceY;
-  if (!s) { if (!Msg_Scene_MeasureText::_(hScene, sText3, "Courier New", 30, Msg_Scene_FontFlags::Bold, fText3BearingX, fText3BearingY, fText3W, fText3H, fText3AdvanceX, fText3AdvanceY)) { s = "Msg_Scene_MeasureText failed"; }}
+  if (!s) { if (!Msg_Scene_GetTextExtents::_(hScene, sText3, "Courier New", 30, Msg_Scene_FontFlags::Bold, fText3BearingX, fText3BearingY, fText3W, fText3H, fText3AdvanceX, fText3AdvanceY)) { s = "Msg_Scene_MeasureText failed"; }}
   double fText3Padding = 2.5;
   double fText3X = fText2X;
   double fText3Y = fText2Y + fText2H * fText2Scale + fText2Padding + 4;
@@ -299,11 +273,11 @@ String SceneModuleTester::Rectangle()
 
   // ------------------------
 
-  //if (!s) {
-  //  Msg_Scene_Draw msg;
-  //  msg.hScene = hScene;
-  //  if (!msg.Request()) { s = "Msg_Scene_Draw failed"; }
-  //}
+  if (!s) {
+    Msg_Scene_Draw msg;
+    msg.hScene = hScene;
+    if (!msg.Request()) { s = "Msg_Scene_Draw failed"; }
+  }
 
   // ------------------------
 
@@ -347,9 +321,9 @@ String SceneModuleTester::SameConstants_FontFlags()
 {
   String s;
 
-  if (!s) { if (Msg_Scene_FontFlags::Italic != TextX::Italic    ) { s = "Msg_Scene_FontFlags::Italic != TextX::Italic"; }}
-  if (!s) { if (Msg_Scene_FontFlags::Bold != TextX::Bold        ) { s = "Msg_Scene_FontFlags::Bold != TextX::Bold"; }}
-  if (!s) { if (Msg_Scene_FontFlags::LastFlag != TextX::LastFlag) { s = "Msg_Scene_FontFlags::LastFlag != TextX::LastFlag"; }}
+  if (!s) { if (Msg_Scene_FontFlags::Italic != TextElement::Italic    ) { s = "Msg_Scene_FontFlags::Italic != TextElement::Italic"; }}
+  if (!s) { if (Msg_Scene_FontFlags::Bold != TextElement::Bold        ) { s = "Msg_Scene_FontFlags::Bold != TextElement::Bold"; }}
+  if (!s) { if (Msg_Scene_FontFlags::LastFlag != TextElement::LastFlag) { s = "Msg_Scene_FontFlags::LastFlag != TextElement::LastFlag"; }}
  
   return s;
 }
@@ -358,20 +332,20 @@ String SceneModuleTester::SameConstants_Operator()
 {
   String s;
 
-  if (!s) { if (Msg_Scene_ElementCopyMode::Clear != CAIRO_OPERATOR_CLEAR       ) { s = "Msg_Scene_ElementCopyMode::Clear != CAIRO_OPERATOR_CLEAR"; }}
-  if (!s) { if (Msg_Scene_ElementCopyMode::Source != CAIRO_OPERATOR_SOURCE     ) { s = "Msg_Scene_ElementCopyMode::Source != CAIRO_OPERATOR_SOURCE"; }}
-  if (!s) { if (Msg_Scene_ElementCopyMode::Over != CAIRO_OPERATOR_OVER         ) { s = "Msg_Scene_ElementCopyMode::Over != CAIRO_OPERATOR_OVER"; }}
-  if (!s) { if (Msg_Scene_ElementCopyMode::In != CAIRO_OPERATOR_IN             ) { s = "Msg_Scene_ElementCopyMode::In != CAIRO_OPERATOR_IN"; }}
-  if (!s) { if (Msg_Scene_ElementCopyMode::Out != CAIRO_OPERATOR_OUT           ) { s = "Msg_Scene_ElementCopyMode::Out != CAIRO_OPERATOR_OUT"; }}
-  if (!s) { if (Msg_Scene_ElementCopyMode::Atop != CAIRO_OPERATOR_ATOP         ) { s = "Msg_Scene_ElementCopyMode::Atop != CAIRO_OPERATOR_ATOP"; }}
-  if (!s) { if (Msg_Scene_ElementCopyMode::Dest != CAIRO_OPERATOR_DEST         ) { s = "Msg_Scene_ElementCopyMode::Dest != CAIRO_OPERATOR_DEST"; }}
-  if (!s) { if (Msg_Scene_ElementCopyMode::DestOver != CAIRO_OPERATOR_DEST_OVER) { s = "Msg_Scene_ElementCopyMode::DestOver != CAIRO_OPERATOR_DEST_OVER"; }}
-  if (!s) { if (Msg_Scene_ElementCopyMode::DestIn != CAIRO_OPERATOR_DEST_IN    ) { s = "Msg_Scene_ElementCopyMode::DestIn != CAIRO_OPERATOR_DEST_IN"; }}
-  if (!s) { if (Msg_Scene_ElementCopyMode::DestOut != CAIRO_OPERATOR_DEST_OUT  ) { s = "Msg_Scene_ElementCopyMode::DestOut != CAIRO_OPERATOR_DEST_OUT"; }}
-  if (!s) { if (Msg_Scene_ElementCopyMode::DestAtop != CAIRO_OPERATOR_DEST_ATOP) { s = "Msg_Scene_ElementCopyMode::DestAtop != CAIRO_OPERATOR_DEST_ATOP"; }}
-  if (!s) { if (Msg_Scene_ElementCopyMode::Xor != CAIRO_OPERATOR_XOR           ) { s = "Msg_Scene_ElementCopyMode::Xor != CAIRO_OPERATOR_XOR"; }}
-  if (!s) { if (Msg_Scene_ElementCopyMode::Add != CAIRO_OPERATOR_ADD           ) { s = "Msg_Scene_ElementCopyMode::Add != CAIRO_OPERATOR_ADD"; }}
-  if (!s) { if (Msg_Scene_ElementCopyMode::Saturate != CAIRO_OPERATOR_SATURATE ) { s = "Msg_Scene_ElementCopyMode::Saturate != CAIRO_OPERATOR_SATURATE"; }}
+  if (!s) { if (Msg_Scene_SetCopyMode::Clear != CAIRO_OPERATOR_CLEAR       ) { s = "Msg_Scene_SetCopyMode::Clear != CAIRO_OPERATOR_CLEAR"; }}
+  if (!s) { if (Msg_Scene_SetCopyMode::Source != CAIRO_OPERATOR_SOURCE     ) { s = "Msg_Scene_SetCopyMode::Source != CAIRO_OPERATOR_SOURCE"; }}
+  if (!s) { if (Msg_Scene_SetCopyMode::Over != CAIRO_OPERATOR_OVER         ) { s = "Msg_Scene_SetCopyMode::Over != CAIRO_OPERATOR_OVER"; }}
+  if (!s) { if (Msg_Scene_SetCopyMode::In != CAIRO_OPERATOR_IN             ) { s = "Msg_Scene_SetCopyMode::In != CAIRO_OPERATOR_IN"; }}
+  if (!s) { if (Msg_Scene_SetCopyMode::Out != CAIRO_OPERATOR_OUT           ) { s = "Msg_Scene_SetCopyMode::Out != CAIRO_OPERATOR_OUT"; }}
+  if (!s) { if (Msg_Scene_SetCopyMode::Atop != CAIRO_OPERATOR_ATOP         ) { s = "Msg_Scene_SetCopyMode::Atop != CAIRO_OPERATOR_ATOP"; }}
+  if (!s) { if (Msg_Scene_SetCopyMode::Dest != CAIRO_OPERATOR_DEST         ) { s = "Msg_Scene_SetCopyMode::Dest != CAIRO_OPERATOR_DEST"; }}
+  if (!s) { if (Msg_Scene_SetCopyMode::DestOver != CAIRO_OPERATOR_DEST_OVER) { s = "Msg_Scene_SetCopyMode::DestOver != CAIRO_OPERATOR_DEST_OVER"; }}
+  if (!s) { if (Msg_Scene_SetCopyMode::DestIn != CAIRO_OPERATOR_DEST_IN    ) { s = "Msg_Scene_SetCopyMode::DestIn != CAIRO_OPERATOR_DEST_IN"; }}
+  if (!s) { if (Msg_Scene_SetCopyMode::DestOut != CAIRO_OPERATOR_DEST_OUT  ) { s = "Msg_Scene_SetCopyMode::DestOut != CAIRO_OPERATOR_DEST_OUT"; }}
+  if (!s) { if (Msg_Scene_SetCopyMode::DestAtop != CAIRO_OPERATOR_DEST_ATOP) { s = "Msg_Scene_SetCopyMode::DestAtop != CAIRO_OPERATOR_DEST_ATOP"; }}
+  if (!s) { if (Msg_Scene_SetCopyMode::Xor != CAIRO_OPERATOR_XOR           ) { s = "Msg_Scene_SetCopyMode::Xor != CAIRO_OPERATOR_XOR"; }}
+  if (!s) { if (Msg_Scene_SetCopyMode::Add != CAIRO_OPERATOR_ADD           ) { s = "Msg_Scene_SetCopyMode::Add != CAIRO_OPERATOR_ADD"; }}
+  if (!s) { if (Msg_Scene_SetCopyMode::Saturate != CAIRO_OPERATOR_SATURATE ) { s = "Msg_Scene_SetCopyMode::Saturate != CAIRO_OPERATOR_SATURATE"; }}
  
   return s;
 }
@@ -556,5 +530,34 @@ String SceneModuleTester::ElementTree()
 //
 //  return s;
 //}
+
+//----------------------------------------------------------
+
+void SceneModuleTester::Begin()
+{
+  { Msg_Scene_MouseEvent msg; msg.Hook(MODULE_NAME, (ApCallback) SceneModuleTester::On_Scene_MouseEvent, 0, ApCallbackPosNormal); }
+
+  AP_UNITTEST_REGISTER(SceneModuleTester::Rectangle);
+  AP_UNITTEST_REGISTER(SceneModuleTester::SameConstants_FontFlags);
+  AP_UNITTEST_REGISTER(SceneModuleTester::SameConstants_Operator);
+  AP_UNITTEST_REGISTER(SceneModuleTester::SameConstants_EventContext);
+  AP_UNITTEST_REGISTER(SceneModuleTester::ElementTree);
+//  AP_UNITTEST_REGISTER(SceneModuleTester::SensorListOps);
+}
+
+void SceneModuleTester::Execute()
+{
+  AP_UNITTEST_EXECUTE(SceneModuleTester::Rectangle);
+  AP_UNITTEST_EXECUTE(SceneModuleTester::SameConstants_FontFlags);
+  AP_UNITTEST_EXECUTE(SceneModuleTester::SameConstants_Operator);
+  AP_UNITTEST_EXECUTE(SceneModuleTester::SameConstants_EventContext);
+  AP_UNITTEST_EXECUTE(SceneModuleTester::ElementTree);
+//  AP_UNITTEST_EXECUTE(SceneModuleTester::SensorListOps);
+}
+
+void SceneModuleTester::End()
+{
+  { Msg_Scene_MouseEvent msg; msg.UnHook(MODULE_NAME, (ApCallback) SceneModuleTester::On_Scene_MouseEvent, 0); }
+}
 
 #endif // #if defined(AP_TEST)
