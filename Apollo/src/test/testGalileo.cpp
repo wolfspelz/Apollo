@@ -349,7 +349,7 @@ static void Test_Galileo_Display_Galileo_RequestAnimation(Msg_Galileo_RequestAni
   //msg->hRequest = pMsg->hRequest;
   //msg->bSuccess = 1;
   //msg->sUrl = pMsg->sUrl;
-  //Apollo::loadFile(Apollo::getAppResourcePath() + "tassadar" + String::filenamePathSeparator() + sFile, msg->sbData);
+  //Apollo::loadFile(Apollo::getAppResourcePath() + "test/tassadar/" + sFile, msg->sbData);
   //msg->sMimeType = "image/gif";
   //msg.Post();
 
@@ -387,7 +387,7 @@ static void Test_Galileo_Display_Galileo_LoadAnimationDataFromStorage(Msg_Galile
   apLog_Verbose((LOG_CHANNEL, "Test_Galileo_Display_Galileo_LoadAnimationDataFromStorage", "%s", StringType(pMsg->sUrl)));
 
   String sFile = String::filenameFile(pMsg->sUrl);
-  Apollo::loadFile(Apollo::getAppResourcePath() + "tassadar" + String::filenamePathSeparator() + sFile, pMsg->sbData);
+  Apollo::loadFile(Apollo::getAppResourcePath() + "test/tassadar/" + sFile, pMsg->sbData);
   pMsg->sMimeType = "image/gif";
 
   pMsg->apStatus = ApMessage::Ok;

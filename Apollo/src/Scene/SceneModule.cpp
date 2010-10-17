@@ -351,6 +351,20 @@ AP_MSG_HANDLER_METHOD(SceneModule, Scene_CreateMouseSensor)
   pMsg->apStatus = ApMessage::Ok;
 }
 
+AP_MSG_HANDLER_METHOD(SceneModule, Scene_CaptureMouse)
+{
+  Surface* pSurface = FindSurface(pMsg->hScene);
+  pSurface->CaptureMouse(pMsg->sPath);
+  pMsg->apStatus = ApMessage::Ok;
+}
+
+AP_MSG_HANDLER_METHOD(SceneModule, Scene_ReleaseMouse)
+{
+  Surface* pSurface = FindSurface(pMsg->hScene);
+  pSurface->ReleaseMouse();
+  pMsg->apStatus = ApMessage::Ok;
+}
+
 //----------------------------------------------------------
 
 #if defined(AP_TEST)
@@ -426,6 +440,8 @@ int SceneModule::Init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_MeasureText, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_GetImageSizeFromData, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_GetImageSizeFromFile, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_CaptureMouse, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_ReleaseMouse, this, ApCallbackPosNormal);
   AP_UNITTEST_HOOK(SceneModule, this);
 
   return ok;

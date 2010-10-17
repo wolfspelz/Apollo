@@ -416,12 +416,12 @@ int GalileoModule::Init()
 
   //CxImageGIF img;
   //Buffer sbSource;
-  //Apollo::loadFile("tassadar" + String::filenamePathSeparator() + "walk-l.gif", sbSource);
+  //Apollo::loadFile("test/tassadar/" + "walk-l.gif", sbSource);
   //CxMemFile mfSource(sbSource.Data(), sbSource.Length());
   //img.Decode(&mfSource);
 
   //CxImage img;
-  //String sFilename = "tassadar" + String::filenamePathSeparator() + "walk-l.gif";
+  //String sFilename = "test/tassadar/" + "walk-l.gif";
   //img.Load(sFilename);
 
   //Msg_Animation_Frame msg;

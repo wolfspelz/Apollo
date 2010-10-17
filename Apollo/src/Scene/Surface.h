@@ -146,6 +146,8 @@ public:
 
   //void AddSensor(const ApHandle& hSensor);
   //void RemoveSensor(const ApHandle& hSensor);
+  void CaptureMouse(const String& sPath);
+  void ReleaseMouse();
 
   void Draw();
 
@@ -178,6 +180,8 @@ protected:
 
   cairo_surface_t *pCairoSurface_;
   cairo_t *pCairo_;
+  String sCaptureMouseElement_;
+
 #if defined(WIN32)
   static int nCntWindows_;
   HINSTANCE hInstance_;

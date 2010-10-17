@@ -357,7 +357,7 @@ static String Test_Db_Bulk()
   Buffer sbFile;
   Apollo::loadFile(Apollo::getAppResourcePath() + "ApCore.dll", sbFile);
   Buffer sbFile2;
-  Apollo::loadFile(Apollo::getAppResourcePath() + "test1.png", sbFile2);
+  Apollo::loadFile(Apollo::getAppResourcePath() + "test/test1.png", sbFile2);
 
   if (!s) {
     Msg_DB_SetBinary msg;
@@ -466,7 +466,7 @@ static String Test_Db_UpdateBulk()
   Buffer sbFile;
   Apollo::loadFile(Apollo::getAppResourcePath() + "ApCore.dll", sbFile);
   Buffer sbFile2;
-  Apollo::loadFile(Apollo::getAppResourcePath() + "test1.png", sbFile2);
+  Apollo::loadFile(Apollo::getAppResourcePath() + "test/test1.png", sbFile2);
 
   if (!s) {
     Msg_DB_SetBinary msg;

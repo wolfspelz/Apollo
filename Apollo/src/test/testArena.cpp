@@ -195,7 +195,7 @@ static void Test_Galileo_LoadAnimationDataFromStorage(Msg_Galileo_LoadAnimationD
   Test_Setup* t = (Test_Setup*) pMsg->Ref();
 
   String sFile = String::filenameFile(pMsg->sUrl);
-  Apollo::loadFile(Apollo::getAppResourcePath() + "tassadar" + String::filenamePathSeparator() + sFile, pMsg->sbData);
+  Apollo::loadFile(Apollo::getAppResourcePath() + "test/tassadar/" + sFile, pMsg->sbData);
   pMsg->sMimeType = "image/gif";
 
   pMsg->apStatus = ApMessage::Ok;
@@ -218,7 +218,7 @@ String Test_Setup::Begin()
   {
     Test_Participant p;
     p.sNickname = "Tassadar";
-    Apollo::loadFile(Apollo::getAppResourcePath() + "tassadar" + String::filenamePathSeparator() + "config.xml", p.sbAvatar);
+    Apollo::loadFile(Apollo::getAppResourcePath() + "test/tassadar/" + "config.xml", p.sbAvatar);
     p.sAvatarMimetype = "avatar/gif";
     p.sAvatarSource = "IdentityItemUrl=http://ydentiti.org/test/Tassadar/config.xml";
     p.sOnlineStatus = "";

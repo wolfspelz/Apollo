@@ -74,6 +74,8 @@ public:
   void SetImageFile(const String& sFile);
   void DeleteImageFile();
   void SetImageAlpha(double fAlpha);
+  void CaptureMouse(const String& sPath);
+  void ReleaseMouse();
 
 protected:
   void CheckSaveRestore();

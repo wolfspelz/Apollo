@@ -19,6 +19,10 @@ int Surface::nCntWindows_ = 0;
 
 Surface::~Surface()
 {
+  if (!sCaptureMouseElement_.empty()) {
+    ReleaseMouse();
+  }
+
   DestroyBitmap();
 }
 
@@ -68,7 +72,15 @@ LRESULT Surface::HandleMouseEvent(int nEvent, int nButton, LPARAM lParam)
     gc.pCairo_ = pCairo_;
     gc.nEvent_ = nEvent;
     gc.nButton_ = nButton;
-    root_.MouseEvent(gc, fX, fY);
+
+    if (sCaptureMouseElement_.empty()) {
+      root_.MouseEvent(gc, fX, fY);
+    } else {
+      Element* pElement = FindElement(sCaptureMouseElement_);
+      if (pElement) {
+        pElement->MouseEvent(gc, fX, fY);
+      }
+    }
   }
   return 0;
 }
@@ -442,6 +454,34 @@ void Surface::GetImageSizeFromFile(const String& sFile, double& fW, double& fH)
   i.GetSize(gc, fW, fH);
 }
 
+void Surface::CaptureMouse(const String& sPath)
+{
+  Element* pElement = FindElement(sPath);
+  if (pElement) {
+    pElement->CaptureMouse(sPath);
+#if defined(WIN32)
+    if (hWnd_ != NULL) {
+      ::SetCapture(hWnd_);
+    }
+#endif // WIN32
+    sCaptureMouseElement_ = sPath;
+  }
+}
+
+void Surface::ReleaseMouse()
+{
+  Element* pElement = FindElement(sCaptureMouseElement_);
+  if (pElement) {
+    pElement->ReleaseMouse();
+#if defined(WIN32)
+    if (hWnd_ != NULL) {
+      ::ReleaseCapture();
+    }
+#endif // WIN32
+  }
+  sCaptureMouseElement_ = "";
+}
+
 //------------------------------------
 
 //void Surface::AddSensor(const ApHandle& hSensor)
@@ -528,20 +568,20 @@ void Surface::Draw()
 
 #ifdef FROM_FILE
 #ifdef TASSADAR_PNG
-  cairo_surface_t *image = cairo_image_surface_create_from_png(Apollo::getAppResourcePath() + "tassadar.png");
+  cairo_surface_t *image = cairo_image_surface_create_from_png(Apollo::getAppResourcePath() + "test/tassadar.png");
 #endif
 #ifdef TEST_PNG
-  cairo_surface_t *image = cairo_image_surface_create_from_png(Apollo::getAppResourcePath() + "tassadar" + String::filenamePathSeparator() + "test.png");
+  cairo_surface_t *image = cairo_image_surface_create_from_png(Apollo::getAppResourcePath() + "test/" + "test2.png");
 #endif
 #endif // FROM_FILE
 
 #ifdef FROM_DATA
   Buffer sbData;
 #ifdef TASSADAR_GIF
-  Apollo::loadFile(Apollo::getAppResourcePath() + "tassadar" + String::filenamePathSeparator() + "idle.gif", sbData);
+  Apollo::loadFile(Apollo::getAppResourcePath() + "test/tassadar/" + "idle.gif", sbData);
 #endif
 #ifdef TEST_PNG
-  Apollo::loadFile(Apollo::getAppResourcePath() + "tassadar" + String::filenamePathSeparator() + "test.png", sbData);
+  Apollo::loadFile(Apollo::getAppResourcePath() + "test/" + "test2.png", sbData);
 #endif
   CxImage cxImg(sbData.Data(), sbData.Length(), CXIMAGE_FORMAT_UNKNOWN);
 #ifdef TASSADAR_GIF

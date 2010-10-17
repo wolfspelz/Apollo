@@ -220,15 +220,19 @@ public:
   Sensor(Surface* pSurface, const String& sPath)
     :RectangleX(pSurface)
     ,sPath_(sPath)
+    ,bHitAll_(0)
   {}
   virtual ~Sensor();
 
   inline bool IsSensor() { return true; }
 
+  void CaptureMouse();
+  void ReleaseMouse();
   virtual void MouseEvent(EventContext& gc, double fX, double fY);
 
 protected:
   String sPath_;
+  int bHitAll_;
 
 #if defined(AP_TEST)
   friend class SceneModuleTester;
