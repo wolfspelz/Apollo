@@ -10,7 +10,7 @@
 class Http
 {
 public:
-  Http(ApHandle hClient, const String& sMethod, const String& sUrl, Apollo::KeyValueList& kvHeader, Buffer& sbBody)
+  Http(const ApHandle& hClient, const String& sMethod, const String& sUrl, Apollo::KeyValueList& kvHeader, Buffer& sbBody)
     :sMethod_(sMethod)
     ,hClient_(hClient)
     ,sUrl_(sUrl)

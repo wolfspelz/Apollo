@@ -183,10 +183,10 @@ class Location;
 class Participant
 {
 public:
-  Participant(ApHandle hParticipant, Location* pLocation);
+  Participant(const ApHandle& hParticipant, Location* pLocation);
 
-  ApHandle apHandle() { return hAp_; }
-  Location* getLocation() { return pLocation_; }
+  inline ApHandle apHandle() { return hAp_; }
+  inline Location* getLocation() { return pLocation_; }
 
   int isDetailAvailable(const String& sKey, Apollo::ValueList& vlMimeTypes);
   int getDetailString(const String& sKey, Apollo::ValueList& vlMimeTypes, String& sValue, String& sMimeType);

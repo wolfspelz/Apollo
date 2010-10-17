@@ -12,20 +12,20 @@
 class ItemAcquisitionTask
 {
 public:
-  ItemAcquisitionTask(ApHandle hAp, const String& sUrl, const String& sType, const String& sMimeType)
+  ItemAcquisitionTask(const ApHandle& hAp, const String& sUrl, const String& sType, const String& sMimeType)
     :hAp_(hAp)
     ,sUrl_(sUrl)
     ,sType_(sType)
   {}
   ~ItemAcquisitionTask() {}
 
-  ApHandle apHandle() { return hAp_; }
-  String& getUrl() { return sUrl_; }
-  String& getType() { return sType_; }
-  String& getMIMEType() { return sMimeType_; }
+  inline ApHandle apHandle() { return hAp_; }
+  inline String& getUrl() { return sUrl_; }
+  inline String& getType() { return sType_; }
+  inline String& getMIMEType() { return sMimeType_; }
 
-  void setRequest(ApHandle hRequest) { hRequest_ = hRequest; }
-  ApHandle getRequest() { return hRequest_; }
+  inline void setRequest(const ApHandle& hRequest) { hRequest_ = hRequest; }
+  inline ApHandle getRequest() { return hRequest_; }
 
 protected:
   ApHandle hAp_;

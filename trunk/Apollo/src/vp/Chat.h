@@ -10,7 +10,7 @@
 class Chat: public Elem
 {
 public:
-  Chat(ApHandle hLocation, ApHandle hParticipant, ApHandle hChat, const String& sNickname, const String& sText, Apollo::TimeValue& tvStamp);
+  Chat(const ApHandle& hLocation, const ApHandle& hParticipant, const ApHandle& hChat, const String& sNickname, const String& sText, Apollo::TimeValue& tvStamp);
   ~Chat();
 
   String& getText() { return getString(); }

@@ -71,7 +71,7 @@ int Display::stop()
   return ok;
 }
 
-void Display::onCreated(ApHandle hConnection)
+void Display::onCreated(const ApHandle& hConnection)
 {
   if (!bCreated_) {
     bCreated_ = 1;

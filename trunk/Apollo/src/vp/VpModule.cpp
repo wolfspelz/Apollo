@@ -32,7 +32,7 @@ void DisplayProfile::setParticipantDetail(const String& sKey, Apollo::ValueList&
 
 //----------------------------------------------------------
 
-DisplayProfile* VpModule::findProfile(ApHandle hProfile)
+DisplayProfile* VpModule::findProfile(const ApHandle& hProfile)
 {
   DisplayProfile* pResult = 0;
   
@@ -43,7 +43,7 @@ DisplayProfile* VpModule::findProfile(ApHandle hProfile)
 
 //----------------------
 
-Context* VpModule::findContext(ApHandle hContext)
+Context* VpModule::findContext(const ApHandle& hContext)
 {
   Context* pResult = 0;
   
@@ -52,7 +52,7 @@ Context* VpModule::findContext(ApHandle hContext)
   return pResult;
 }
 
-Context* VpModule::findContextByMapping(ApHandle hMapping)
+Context* VpModule::findContextByMapping(const ApHandle& hMapping)
 {
   Context* pResult = 0;
 
@@ -70,7 +70,7 @@ Context* VpModule::findContextByMapping(ApHandle hMapping)
   return pResult;
 }
 
-Location* VpModule::findLocation(ApHandle hLocation)
+Location* VpModule::findLocation(const ApHandle& hLocation)
 {
   Location* pResult = 0;
   
@@ -97,7 +97,7 @@ Location* VpModule::findLocationByUrl(const String& sUrl)
   return pResult;
 }
 
-Location* VpModule::findLocationByContext(ApHandle hContext)
+Location* VpModule::findLocationByContext(const ApHandle& hContext)
 {
   Location* pResult = 0;
   
@@ -115,7 +115,7 @@ Location* VpModule::findLocationByContext(ApHandle hContext)
   return pResult;
 }
 
-Location* VpModule::findLocationByRoom(ApHandle hRoom)
+Location* VpModule::findLocationByRoom(const ApHandle& hRoom)
 {
   Location* pResult = 0;
 
@@ -133,7 +133,7 @@ Location* VpModule::findLocationByRoom(ApHandle hRoom)
   return pResult;
 }
 
-Participant* VpModule::findParticipant(ApHandle hParticipant)
+Participant* VpModule::findParticipant(const ApHandle& hParticipant)
 {
   Participant* pResult = 0;
 
@@ -145,7 +145,7 @@ Participant* VpModule::findParticipant(ApHandle hParticipant)
   return pResult;
 }
 
-Participant* VpModule::findParticipantInRoom(ApHandle hRoom, ApHandle hParticipant)
+Participant* VpModule::findParticipantInRoom(const ApHandle& hRoom, const ApHandle& hParticipant)
 {
   Participant* pResult = 0;
 
@@ -183,17 +183,17 @@ ParticipantPointerList VpModule::findParticipantsByIdentityUrl(const String& sUr
 
 //----------------------
 
-void VpModule::setParticipantLocationMapping(ApHandle hParticipant, ApHandle hLocation)
+void VpModule::setParticipantLocationMapping(const ApHandle& hParticipant, const ApHandle& hLocation)
 {
   participant2Location_.Set(hParticipant, hLocation);
 }
 
-void VpModule::unsetParticipantLocationMapping(ApHandle hParticipant, ApHandle hLocation)
+void VpModule::unsetParticipantLocationMapping(const ApHandle& hParticipant, const ApHandle& hLocation)
 {
   participant2Location_.Unset(hParticipant);
 }
 
-ApHandle VpModule::findLocationHandleByParticipant(ApHandle hParticipant)
+ApHandle VpModule::findLocationHandleByParticipant(const ApHandle& hParticipant)
 {
   ApHandleTreeNode<ApHandle>* pNode = participant2Location_.Find(hParticipant);
   if (pNode != 0) {
@@ -203,7 +203,7 @@ ApHandle VpModule::findLocationHandleByParticipant(ApHandle hParticipant)
   }
 }
 
-Location* VpModule::findLocationByParticipant(ApHandle hParticipant)
+Location* VpModule::findLocationByParticipant(const ApHandle& hParticipant)
 {
   Location* pLocation = 0;
 
@@ -217,7 +217,7 @@ Location* VpModule::findLocationByParticipant(ApHandle hParticipant)
 
 //----------------------
 
-void VpModule::setIdentityParticipantMapping(const String& sUrl, ApHandle hParticipant)
+void VpModule::setIdentityParticipantMapping(const String& sUrl, const ApHandle& hParticipant)
 {
   {
     ApHandleTreeNode<String>* pNode = participant2Identity_.Find(hParticipant);
@@ -244,7 +244,7 @@ void VpModule::setIdentityParticipantMapping(const String& sUrl, ApHandle hParti
   }
 }
 
-void VpModule::unsetIdentityParticipantMapping(const String& sUrl, ApHandle hParticipant)
+void VpModule::unsetIdentityParticipantMapping(const String& sUrl, const ApHandle& hParticipant)
 {
   participant2Identity_.Unset(hParticipant);
 
@@ -258,7 +258,7 @@ void VpModule::unsetIdentityParticipantMapping(const String& sUrl, ApHandle hPar
   }
 }
 
-void VpModule::removeParticipantFromIdentityParticipantMapping(ApHandle hParticipant)
+void VpModule::removeParticipantFromIdentityParticipantMapping(const ApHandle& hParticipant)
 {
   {
     ApHandleTreeNode<String>* pNode = participant2Identity_.Find(hParticipant);

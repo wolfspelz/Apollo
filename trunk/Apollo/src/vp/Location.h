@@ -79,7 +79,7 @@ typedef ListT<Chat, Elem> ChatList;
 class Location
 {
 public:
-  Location(ApHandle hLocation, const String& sLocationUrl);
+  Location(const ApHandle& hLocation, const String& sLocationUrl);
 
   typedef enum _State { State_NotEntered
     ,State_EnterRequested
@@ -89,14 +89,14 @@ public:
     ,State_Leaving
   } State;
 
-  ApHandle apHandle() { return hAp_; }
-  String& getUrl() { return sLocationUrl_; }
-  ApHandle getRoom() { return hRoom_; }
-  State getState() { return nState_; };
+  inline ApHandle apHandle() { return hAp_; }
+  inline String& getUrl() { return sLocationUrl_; }
+  inline ApHandle getRoom() { return hRoom_; }
+  inline State getState() { return nState_; };
 
-  int addContext(ApHandle hContext);
-  int removeContext(ApHandle hContext);
-  int hasContext(ApHandle hContext);
+  int addContext(const ApHandle& hContext);
+  int removeContext(const ApHandle& hContext);
+  int hasContext(const ApHandle& hContext);
   void getContexts(Apollo::ValueList& vlContexts);
   int removeAllContexts();
 
@@ -110,17 +110,17 @@ public:
   int onProtocolOnline();
   int onProtocolOffline();
 
-  int addParticipant(ApHandle hParticipant);
-  int removeParticipant(ApHandle hParticipant);
+  int addParticipant(const ApHandle& hParticipant);
+  int removeParticipant(const ApHandle& hParticipant);
   int removeAllParticipants();
-  Participant* findParticipant(ApHandle hParticipant);
+  Participant* findParticipant(const ApHandle& hParticipant);
   void getParticipants(Apollo::ValueList& vlParticipants);
 
-  void setSelfParticipant(ApHandle hParticipant) { hSelf_ = hParticipant; }
-  ApHandle getSelfParticipant() { return hSelf_; }
+  void setSelfParticipant(const ApHandle& hParticipant) { hSelf_ = hParticipant; }
+  ApHandle getSelfParticipant() const { return hSelf_; }
 
   void sendPublicChat(const String& sText);
-  void onReceivePublicChat(ApHandle hParticipant, const String& sText, int nSec, int nMicroSec);
+  void onReceivePublicChat(const ApHandle& hParticipant, const String& sText, int nSec, int nMicroSec);
   void replayChats(int nMaxAge, int nMaxLines, int nMaxData);
   void cleanupChat();
 

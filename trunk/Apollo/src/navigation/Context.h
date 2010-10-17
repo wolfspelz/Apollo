@@ -12,12 +12,12 @@
 class Context
 {
 public:
-  Context(ApHandle hContext)
+  Context(const ApHandle& hContext)
     :hAp_(hContext)
   {}
   virtual ~Context() {}
 
-  ApHandle apHandle() { return hAp_; }
+  inline ApHandle apHandle() { return hAp_; }
 
   void create(); // throws ApException
   void destroy(); // throws ApException

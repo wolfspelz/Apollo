@@ -142,7 +142,7 @@ protected:
 class Item
 {
 public:
-  Item(ApHandle hItem, GalileoModule* pModule)
+  Item(const ApHandle& hItem, GalileoModule* pModule)
     :hAp_(hItem)
     ,pModule_(pModule)
     ,bStarted_(0)
@@ -167,7 +167,7 @@ public:
   //void MoveTo(int nX);
   void SetAnimationData(const String& sUrl, Buffer& sbData, const String& sMimeType);
 
-  int HasTimer(ApHandle hTimer) { return ApIsHandle(hTimer) && hTimer == hTimer_; }
+  int HasTimer(const ApHandle& hTimer) { return ApIsHandle(hTimer) && hTimer_ == hTimer; }
   void OnTimer();
 
 protected:

@@ -10,7 +10,7 @@
 #include "Connection.h"
 #include "NavigationModule.h"
 
-Apollo::TCPConnection* SrpcServer::OnConnectionAccepted(String& sName, ApHandle hConnection, String& sClientAddress, int nClientPort)
+Apollo::TCPConnection* SrpcServer::OnConnectionAccepted(String& sName, const ApHandle& hConnection, String& sClientAddress, int nClientPort)
 {
   Connection* pConnection = new Connection(sName, hConnection);
   if (pConnection != 0) {

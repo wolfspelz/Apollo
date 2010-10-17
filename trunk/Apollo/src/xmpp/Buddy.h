@@ -16,7 +16,7 @@ class Stanza;
 class Buddy: public Elem
 {
 public:
-  Buddy(Client* pClient, const char* szJid, ApHandle hBuddy);
+  Buddy(Client* pClient, const char* szJid, const ApHandle& hBuddy);
   virtual ~Buddy();
 
   int presenceAvailable(Stanza& stanza);

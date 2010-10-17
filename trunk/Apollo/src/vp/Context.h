@@ -107,15 +107,15 @@ protected:
 class Context
 {
 public:
-  Context(ApHandle hContext);
+  Context(const ApHandle& hContext);
 
   int navigate(const String& sUrl);
   int setLocationXml(const String& sLocationXml);
 
-  ApHandle apHandle() { return hAp_; }
-  String& getDocumentUrl() { return sDocumentUrl_; }
-  String& getLocationUrl() { return sLocationUrl_; }
-  ApHandle getMapping() { return hMapping_; }
+  inline ApHandle apHandle() { return hAp_; }
+  inline String& getDocumentUrl() { return sDocumentUrl_; }
+  inline String& getLocationUrl() { return sLocationUrl_; }
+  inline ApHandle getMapping() { return hMapping_; }
 
   void setVisibility(int bVisible);
   void setPosition(int nX, int nY);

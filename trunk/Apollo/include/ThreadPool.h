@@ -23,7 +23,7 @@ class APOLLO_API ThreadPool : public Apollo::Thread
   friend class IdleWorkerTask;
   friend class WorkerThread;
 public:
-  ThreadPool(ApHandle hAp, const char* szName, int nConcurrency);
+  ThreadPool(const ApHandle& hAp, const char* szName, int nConcurrency);
   virtual ~ThreadPool();
 public:
   virtual void Run();

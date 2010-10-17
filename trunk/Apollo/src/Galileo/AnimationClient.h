@@ -15,7 +15,7 @@ using namespace Apollo;
 class AnimationClient: public HTTPClient
 {
 public:
-  AnimationClient(ApHandle hRequest)
+  AnimationClient(const ApHandle& hRequest)
     :HTTPClient("AnimationClient")
     ,hRequest_(hRequest)
     ,nStatus_(0)

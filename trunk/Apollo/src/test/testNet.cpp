@@ -21,7 +21,7 @@
 class Test_Net_TCP_On_Data : public Elem
 {
 public:
-  Test_Net_TCP_On_Data(ApHandle hAp, const char* szAddress, int nPort)
+  Test_Net_TCP_On_Data(const ApHandle& hAp, const char* szAddress, int nPort)
     :sAddress_(szAddress)
     ,nPort_(nPort)
     ,bConnected_(0)
@@ -29,7 +29,7 @@ public:
     ,bClosed_(0)
     ,hAp_(hAp)
   {}
-  ApHandle apHandle() { return hAp_; }
+  inline ApHandle apHandle() { return hAp_; }
   String sAddress_;
   int nPort_;
   int bConnected_;
@@ -43,7 +43,7 @@ static int bTest_Net_TCP_Connected_Done = 0;
 static int bTest_Net_TCP_Closed_Done = 0;
 static int bTest_Net_TCP_DataIn_Done = 0;
 
-Test_Net_TCP_On_Data* Test_Net_TCP_On_Data_FindByHandle(ApHandle h)
+Test_Net_TCP_On_Data* Test_Net_TCP_On_Data_FindByHandle(const ApHandle& h)
 {
   Test_Net_TCP_On_Data* pResult = 0;
   for (Test_Net_TCP_On_Data* e = 0; (e = (Test_Net_TCP_On_Data*) lTest_Net_TCP_On_DataList.Next(e)) != 0; ) {
@@ -386,7 +386,7 @@ public:
   void OnClientDeleted() { bClientDeleted_ = 1; pClientConnection_ = NULL; }
   void OnClientConnectionDeleted() { bClientConnectionDeleted_ = 1; pServerConnection_ = 0; }
 protected:
-  virtual Apollo::TCPConnection* OnConnectionAccepted(String& sName, ApHandle hConnection, String& sClientAddress, int nClientPort);
+  virtual Apollo::TCPConnection* OnConnectionAccepted(String& sName, const ApHandle& hConnection, String& sClientAddress, int nClientPort);
   virtual int OnStarted();
   virtual int OnStopped();
 protected:
@@ -409,7 +409,7 @@ protected:
 class Test_Net_TCP_ClientServer_ServerConnection : public Apollo::TCPConnection
 {
 public:
-  Test_Net_TCP_ClientServer_ServerConnection(const char* szName, ApHandle hServerConnection);
+  Test_Net_TCP_ClientServer_ServerConnection(const char* szName, const ApHandle& hServerConnection);
   virtual ~Test_Net_TCP_ClientServer_ServerConnection();
 
 protected:
@@ -449,7 +449,7 @@ void Test_Net_TCP_ClientServer_TCPServer::Delete()
 }
 
 Apollo::TCPConnection* Test_Net_TCP_ClientServer_TCPServer::OnConnectionAccepted(String& sName
-                                                                      , ApHandle hConnection
+                                                                      , const ApHandle& hConnection
                                                                       , String& sClientAddress
                                                                       , int nClientPort)
 {
@@ -566,7 +566,7 @@ int Test_Net_TCP_ClientServer_ClientConnection::OnClosed()
 }
 
 Test_Net_TCP_ClientServer_ServerConnection::Test_Net_TCP_ClientServer_ServerConnection(const char* szName
-                                                                                     , ApHandle hServerConnection)
+                                                                                     , const ApHandle& hServerConnection)
 
 : Apollo::TCPConnection(szName, hServerConnection)
 {
@@ -968,7 +968,7 @@ int Test_Begin_Net_CompareTCPHTTPData()
 class Test_Net_HTTP_Data : public Elem
 {
 public:
-  Test_Net_HTTP_Data(ApHandle hAp, const char* szUrl)
+  Test_Net_HTTP_Data(const ApHandle& hAp, const char* szUrl)
     :sUrl_(szUrl)
     ,bConnected_(0)
     ,nHeader_(0)
@@ -977,7 +977,7 @@ public:
     ,bFailed_(0)
     ,hAp_(hAp)
   {}
-  ApHandle apHandle() { return hAp_; }
+  inline ApHandle apHandle() { return hAp_; }
   String sUrl_;
   int bConnected_;
   int nHeader_;
@@ -990,7 +990,7 @@ public:
 static List lTest_Net_HTTP_DataList;
 static int bTest_Net_HTTP_Failed_Done = 0;
 
-Test_Net_HTTP_Data* Test_Net_HTTP_Data_FindByHandle(ApHandle h)
+Test_Net_HTTP_Data* Test_Net_HTTP_Data_FindByHandle(const ApHandle& h)
 {
   Test_Net_HTTP_Data* pResult = 0;
   for (Test_Net_HTTP_Data* e = 0; (e = (Test_Net_HTTP_Data*) lTest_Net_HTTP_DataList.Next(e)) != 0; ) {

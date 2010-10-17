@@ -104,7 +104,7 @@ public:
   int Init(const char* szClientName);
   void Exit();
 
-  int CancelRequest(ApHandle h);
+  int CancelRequest(const ApHandle& h);
   int CancelAllRequests();
 
   void CloseAll();

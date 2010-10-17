@@ -12,7 +12,7 @@
 #include "HttpServer.h"
 #include "HttpConnection.h"
 
-int ServerModule::addHttpConnection(ApHandle hHttpConnection, HttpConnection* pHttpConnection)
+int ServerModule::addHttpConnection(const ApHandle& hHttpConnection, HttpConnection* pHttpConnection)
 {
   int ok = 1;
 
@@ -21,7 +21,7 @@ int ServerModule::addHttpConnection(ApHandle hHttpConnection, HttpConnection* pH
   return ok;
 }
 
-int ServerModule::removeHttpConnection(ApHandle hHttpConnection)
+int ServerModule::removeHttpConnection(const ApHandle& hHttpConnection)
 {
   int ok = 1;
 

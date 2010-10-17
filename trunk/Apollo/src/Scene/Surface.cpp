@@ -23,6 +23,8 @@ Surface::~Surface()
 }
 
 #if defined(WIN32)
+#include <windowsx.h>
+
 #define Surface_WindowClass _T("ApolloSurfaceClass_gthjbvi43765iftvb")
 #define Surface_WindowCaption _T("ApolloSurface")
 
@@ -52,9 +54,71 @@ LRESULT CALLBACK Surface::StaticWndProc(HWND hWnd, UINT message, WPARAM wParam, 
   return nResult;
 }
 
+LRESULT Surface::HandleMouseEvent(int nEvent, int nButton, LPARAM lParam)
+{
+  int nX = GET_X_LPARAM(lParam);
+  int nY = GET_Y_LPARAM(lParam);
+
+  if (pCairo_) {
+    double fX = nX;
+    double fY = nY;
+    cairo_user_to_device(pCairo_, &fX, &fY);
+
+    EventContext gc;
+    gc.pCairo_ = pCairo_;
+    gc.nEvent_ = nEvent;
+    gc.nButton_ = nButton;
+    root_.MouseEvent(gc, fX, fY);
+  }
+  return 0;
+}
+
 LRESULT CALLBACK Surface::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-  return DefWindowProc(hWnd, message, wParam, lParam);
+  switch (message) {
+    case WM_NCCALCSIZE:
+      {
+        // When wParam is TRUE, simply returning 0 without processing the NCCALCSIZE_PARAMS rectangles will cause the client area to resize to the size of the window, including the window frame. This will remove the window frame and caption items from your window, leaving only the client area displayed.
+        return 0;
+      }
+      break;
+
+        //SensorListNode* pNode = 0;
+        //for (SensorListIterator iter(sensors_); pNode = iter.Next(); ) {
+        //  SensorBox& box = pNode->Key();
+        //  if (box.nLeft_ < nX && box.nRight_ > nX && box.nTop_ < nY && box.nBottom_ > nY) {
+        //    Graphics* pGraphics = pNode->Value()->GetGraphics();
+        //    if (pGraphics && pGraphics->IsSensor()) {
+        //      Sensor* pSensor = (Sensor*) pGraphics;
+        //      if (pSensor->Hit(fX, fY)) {
+        //        Msg_Scene_MouseMove msg;
+        //        msg.hScene = hAp_;
+        //        msg.hSensor = box.hAp_;
+        //        msg.fX = fX;
+        //        msg.fY = fY;
+        //        msg.Send();
+        //      }
+        //    }
+        //  }
+        //} // for
+
+    case WM_MOUSEMOVE: { return HandleMouseEvent(EventContext::MouseMove, EventContext::NoMouseButton, lParam); } break;
+    case WM_LBUTTONDOWN: { return HandleMouseEvent(EventContext::MouseDown, EventContext::LeftButton, lParam); } break;
+    case WM_MBUTTONDOWN: { return HandleMouseEvent(EventContext::MouseDown, EventContext::MiddleButton, lParam); } break;
+    case WM_RBUTTONDOWN: { return HandleMouseEvent(EventContext::MouseDown, EventContext::RightButton, lParam); } break;
+    case WM_LBUTTONUP: { return HandleMouseEvent(EventContext::MouseUp, EventContext::LeftButton, lParam); } break;
+    case WM_MBUTTONUP: { return HandleMouseEvent(EventContext::MouseUp, EventContext::MiddleButton, lParam); } break;
+    case WM_RBUTTONUP: { return HandleMouseEvent(EventContext::MouseUp, EventContext::RightButton, lParam); } break;
+    //case WM_LBUTTONCLICK: { return HandleMouseEvent(EventContext::MouseClick, EventContext::LeftButton, lParam); } break;
+    //case WM_MBUTTONCLICK: { return HandleMouseEvent(EventContext::MouseClick, EventContext::MiddleButton, lParam); } break;
+    //case WM_RBUTTONCLICK: { return HandleMouseEvent(EventContext::MouseClick, EventContext::RightButton, lParam); } break;
+    case WM_LBUTTONDBLCLK: { return HandleMouseEvent(EventContext::MouseDoubleClick, EventContext::LeftButton, lParam); } break;
+    case WM_MBUTTONDBLCLK: { return HandleMouseEvent(EventContext::MouseDoubleClick, EventContext::MiddleButton, lParam); } break;
+    case WM_RBUTTONDBLCLK: { return HandleMouseEvent(EventContext::MouseDoubleClick, EventContext::RightButton, lParam); } break;
+
+    default:
+      return DefWindowProc(hWnd, message, wParam, lParam);
+  }
 }
 #endif // WIN32
 
@@ -95,7 +159,7 @@ int Surface::Create()
       Surface_WindowClass, 
       Surface_WindowCaption, 
       0, 
-      0, 200, 100, 100, 
+      0, CW_USEDEFAULT, 0, CW_USEDEFAULT, 
       NULL, 
       NULL, 
       hInstance_, 
@@ -180,11 +244,11 @@ int Surface::CreateBitmap()
   ::ReleaseDC(NULL, dcScreen);
 
   hOldBitmap_ = (HBITMAP) ::SelectObject(dcMemory_, hBitmap_);
-  pSurface_ = cairo_win32_surface_create(dcMemory_);
-  pCairo_ = cairo_create(pSurface_);
+  pCairoSurface_ = cairo_win32_surface_create(dcMemory_);
+  pCairo_ = cairo_create(pCairoSurface_);
 
-  //cairo_translate(pCairo_, 0.0, nH_);
-  //cairo_scale(pCairo_, 1.0, -1.0);
+  cairo_translate(pCairo_, 0.0, nH_);
+  cairo_scale(pCairo_, 1.0, -1.0);
 
   return ok;
 }
@@ -201,9 +265,9 @@ void Surface::DestroyBitmap()
     pCairo_ = 0;
   }
 
-  if (pSurface_ != 0) {
-    cairo_surface_destroy(pSurface_);
-    pSurface_ = 0;
+  if (pCairoSurface_ != 0) {
+    cairo_surface_destroy(pCairoSurface_);
+    pCairoSurface_ = 0;
   }
 
   if (hOldBitmap_ != NULL && dcMemory_ != NULL) {
@@ -289,15 +353,17 @@ void Surface::SetAutoDraw(int nMilliSec, int bAsync)
 {
   bAutoDraw_ = true;
   bAutoDrawAsync_ = bAsync == 1;
-  autoDrawInterval_ = nMilliSec;
-  lastAutoDraw_ = 0;
+  int nSec = nMilliSec / 1000;
+  nMilliSec = nMilliSec % 1000;
+  autoDrawInterval_ = Apollo::TimeValue(nSec, nMilliSec * 1000);
+  lastDraw_ = 0;
 }
 
 void Surface::AutoDraw()
 {
   if (bAutoDraw_) {
     Apollo::TimeValue now = Apollo::TimeValue::getTime();
-    if (now > lastAutoDraw_ + autoDrawInterval_) {
+    if (now > lastDraw_ + autoDrawInterval_) {
 
       if (bAutoDrawAsync_) {
         ApAsyncMessage<Msg_Scene_Draw> msg;
@@ -311,7 +377,7 @@ void Surface::AutoDraw()
         }
       }
 
-      lastAutoDraw_ = now;
+      lastDraw_ = now;
     }
   }
 }
@@ -341,11 +407,12 @@ void Surface::DeleteElement(const String& sPath)
 
 void Surface::MeasureText(const String& sText, const String& sFont, double fSize, int nFlags, TextExtents& te)
 {
-  GraphicsContext gc;
+  DrawContext gc;
   gc.pCairo_ = pCairo_;
   gc.nH_ = nH_;
+  gc.nW_ = nW_;
 
-  TextX t;
+  TextX t(this);
   t.SetString(sText);
   t.SetFont(sFont, fSize, nFlags);
   t.Measure(gc, te);
@@ -353,25 +420,37 @@ void Surface::MeasureText(const String& sText, const String& sFont, double fSize
 
 void Surface::GetImageSizeFromData(const Apollo::Image& image, double& fW, double& fH)
 {
-  GraphicsContext gc;
+  DrawContext gc;
   gc.pCairo_ = pCairo_;
   gc.nH_ = nH_;
+  gc.nW_ = nW_;
 
-  ImageX i;
+  ImageX i(this);
   i.SetImageData(image);
   i.GetSize(gc, fW, fH);
 }
 
 void Surface::GetImageSizeFromFile(const String& sFile, double& fW, double& fH)
 {
-  GraphicsContext gc;
+  DrawContext gc;
   gc.pCairo_ = pCairo_;
   gc.nH_ = nH_;
+  gc.nW_ = nW_;
 
-  ImageX i;
+  ImageX i(this);
   i.SetImageFile(sFile);
   i.GetSize(gc, fW, fH);
 }
+
+//------------------------------------
+
+//void Surface::AddSensor(const ApHandle& hSensor)
+//{
+//}
+//
+//void Surface::RemoveSensor(const ApHandle& hSensor)
+//{
+//}
 
 //------------------------------------
 
@@ -409,9 +488,10 @@ void Surface::Draw()
 
   EraseBackground();
 
-  GraphicsContext gc;
+  DrawContext gc;
   gc.pCairo_ = pCairo_;
   gc.nH_ = nH_;
+  gc.nW_ = nW_;
 
   root_.Draw(gc);
 
@@ -567,5 +647,7 @@ void Surface::Draw()
       );
 
   ::ReleaseDC(NULL, dcScreen);
+
+  lastDraw_ = Apollo::TimeValue::getTime();
 }
 

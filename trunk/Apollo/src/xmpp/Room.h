@@ -17,12 +17,12 @@ class Stanza;
 class Room: public Elem
 {
 public:
-  Room(const char* szJid, ApHandle hRoom, Client* pClient);
+  Room(const char* szJid, const ApHandle& hRoom, Client* pClient);
   virtual ~Room();
 
-  ApHandle apHandle() { return hAp_; }
-  String& getJid() { return getName(); }
-  String& getNickname() { return sNickname_; }
+  inline ApHandle apHandle() { return hAp_; }
+  inline String& getJid() { return getName(); }
+  inline String& getNickname() { return sNickname_; }
 
   int sendState();
   int enter(String& sNickname);

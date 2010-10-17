@@ -52,10 +52,10 @@ public:
   int init();
   void exit();
 
-  Context* findContext(ApHandle h);
+  Context* findContext(const ApHandle& h);
 
-  int addConnection(ApHandle hConnection, Connection* pConnection);
-  int removeConnection(ApHandle hConnection);
+  int addConnection(const ApHandle& hConnection, Connection* pConnection);
+  int removeConnection(const ApHandle& hConnection);
 
   void On_MainLoop_EventLoopBegin(Msg_MainLoop_EventLoopBegin* pMsg);
   void On_MainLoop_EventLoopBeforeEnd(Msg_MainLoop_EventLoopBeforeEnd* pMsg);
@@ -70,14 +70,14 @@ public:
   AP_UNITTEST_DECLAREHOOK();
 
 protected:
-  Context* createContext(ApHandle hContext);
-  int destroyContext(ApHandle hContext);
+  Context* createContext(const ApHandle& hContext);
+  int destroyContext(const ApHandle& hContext);
 
-  Connection* findConnection(ApHandle h);
-  ApHandle findConnectionHandleByContextHandle(ApHandle hContext);
-  void associateContextWithConnection(ApHandle hContext, ApHandle hConnection);
-  void addContextToConnection(ApHandle hContext, ApHandle hConnection);
-  void removeContextFromConnection(ApHandle hContext, ApHandle hConnection);
+  Connection* findConnection(const ApHandle& h);
+  ApHandle findConnectionHandleByContextHandle(const ApHandle& hContext);
+  void associateContextWithConnection(const ApHandle& hContext, const ApHandle& hConnection);
+  void addContextToConnection(const ApHandle& hContext, const ApHandle& hConnection);
+  void removeContextFromConnection(const ApHandle& hContext, const ApHandle& hConnection);
 
 public:
   SrpcServer* pServer_;

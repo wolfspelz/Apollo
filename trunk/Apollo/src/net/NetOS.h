@@ -91,9 +91,9 @@ namespace NetOS
   
   void SocketIOThreadProc(UINT nThreadId);
   
-  SOCKET TCPSocketCreate(ApHandle hAp);
-  int SocketSetNonblock(SOCKET nSock, ApHandle hAp);
-  int SocketClose(SOCKET nSock, ApHandle hAp);
+  SOCKET TCPSocketCreate(const ApHandle& hAp);
+  int SocketSetNonblock(SOCKET nSock, const ApHandle& hAp);
+  int SocketClose(SOCKET nSock, const ApHandle& hAp);
     
 // Platform HTTP Api:
   String HTTP_ErrorMessage(int nErr);

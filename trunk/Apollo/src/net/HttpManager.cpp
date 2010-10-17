@@ -218,7 +218,7 @@ void HttpManager::SetCurrentTask(HTTPRequestTask* t)
   pCurrentTask_ = t;
 }
 
-int HttpManager::CancelRequest(ApHandle h)
+int HttpManager::CancelRequest(const ApHandle& h)
 {
   int ok = 0;
 

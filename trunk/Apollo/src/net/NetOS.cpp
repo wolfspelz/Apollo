@@ -387,7 +387,7 @@ void NetOS::SocketIOThreadProc(UINT nThreadId)
 #endif
 }
 
-SOCKET NetOS::TCPSocketCreate(ApHandle hAp)
+SOCKET NetOS::TCPSocketCreate(const ApHandle& hAp)
 {
   SOCKET nSock = INVALID_SOCKET;
 #if defined(WIN32)
@@ -404,7 +404,7 @@ SOCKET NetOS::TCPSocketCreate(ApHandle hAp)
   return nSock;
 }
 
-int NetOS::SocketSetNonblock(SOCKET nSock, ApHandle hAp)
+int NetOS::SocketSetNonblock(SOCKET nSock, const ApHandle& hAp)
 {
   int nResult = SOCKET_ERROR;
 #if defined(WIN32)
@@ -422,7 +422,7 @@ int NetOS::SocketSetNonblock(SOCKET nSock, ApHandle hAp)
   return ((nResult == SOCKET_ERROR) ? 0 : 1);
 }
 
-int NetOS::SocketClose(SOCKET nSock, ApHandle hAp)
+int NetOS::SocketClose(SOCKET nSock, const ApHandle& hAp)
 {
   int nResult = SOCKET_ERROR;
 #if defined(WIN32)

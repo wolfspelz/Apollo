@@ -11,7 +11,7 @@
 #include "URL.h"
 #include "IdentityModule.h"
 
-ItemAcquisitionTask* IdentityModule::findItemAcquisitionTaskByRequest(ApHandle hRequest)
+ItemAcquisitionTask* IdentityModule::findItemAcquisitionTaskByRequest(const ApHandle& hRequest)
 {
   ItemAcquisitionTask* pResult = 0;
 

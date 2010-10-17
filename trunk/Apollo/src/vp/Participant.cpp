@@ -20,7 +20,7 @@
 
 //------------------------------------------------------------------
 
-Participant::Participant(ApHandle hParticipant, Location* pLocation)
+Participant::Participant(const ApHandle& hParticipant, Location* pLocation)
 :hAp_(hParticipant)
 ,pLocation_(pLocation)
 {

@@ -10,7 +10,7 @@
 #include "Buddy.h"
 #include "Stanza.h"
 
-Buddy::Buddy(Client* pClient, const char* szJid, ApHandle hBuddy)
+Buddy::Buddy(Client* pClient, const char* szJid, const ApHandle& hBuddy)
 :Elem(szJid)
 ,pClient_(pClient)
 ,hBuddy_(hBuddy)

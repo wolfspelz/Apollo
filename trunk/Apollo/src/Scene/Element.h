@@ -23,8 +23,9 @@ typedef StringPointerTreeIterator<Element*> ElementIterator;
 class Element
 {
 public:
-  Element()
-    :pChildren_(0)
+  Element(Surface* pSurface)
+    :pSurface_(pSurface)
+    ,pChildren_(0)
     ,pGraphics_(0)
     ,bSave_(false)
     ,fTranslateX_(0.0)
@@ -37,24 +38,30 @@ public:
   {}
   virtual ~Element();
 
-  virtual void Draw(GraphicsContext& gc);
+  void Draw(DrawContext& gc);
+  void MouseEvent(EventContext& gc, double fX, double fY);
 
   Element* FindElement(const String& sPath);
   int CreateElement(const String& sPath);
   int DeleteElement(const String& sPath);
 
   void Translate(double fX, double fY);
+  void GetTranslate(double& fX, double& fY);
   void Scale(double fX, double fY);
   void Rotate(double fAngle);
   void CopyMode(int nMode);
   void Hide(int bHide);
 
+  Graphics* GetGraphics() { return pGraphics_; }
   void DeleteGraphics();
   void CreateRectangle(double fX, double fY, double fW, double fH);
   void CreateImageFromData(double fX, double fY, const Apollo::Image& image);
   void CreateImageFromFile(double fX, double fY, const String& sFile);
   void CreateText(double fX, double fY, const String& sText, const String& sFont, double fSize, int nFlags);
+  void CreateMouseSensor(const String& sPath, double fX, double fY, double fW, double fH);
 
+  void SetRectangle(double fX, double fY, double fW, double fH);
+  void SetCoordinates(double fX, double fY);
   void SetFillColor(double fRed, double fGreen, double fBlue, double fAlpha);
   void SetStrokeColor(double fRed, double fGreen, double fBlue, double fAlpha);
   void SetStrokeImageFile(const String& sFile);
@@ -66,11 +73,13 @@ public:
   void DeleteImageData();
   void SetImageFile(const String& sFile);
   void DeleteImageFile();
+  void SetImageAlpha(double fAlpha);
 
 protected:
   void CheckSaveRestore();
 
 protected:
+  Surface* pSurface_;
   ElementList* pChildren_;
   Graphics* pGraphics_;
 

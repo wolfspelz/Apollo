@@ -11,7 +11,7 @@
 #include "HttpServer.h"
 #include "HttpConnection.h"
 
-Apollo::TCPConnection* HttpServer::OnConnectionAccepted(String& sName, ApHandle hHttpConnection, String& sClientAddress, int nClientPort)
+Apollo::TCPConnection* HttpServer::OnConnectionAccepted(String& sName, const ApHandle& hHttpConnection, String& sClientAddress, int nClientPort)
 {
   HttpConnection* pHttpConnection = new HttpConnection(sName, hHttpConnection);
   if (pHttpConnection != 0) {

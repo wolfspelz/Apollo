@@ -10,7 +10,7 @@
 #include "Local.h"
 #include "Chat.h"
 
-Chat::Chat(ApHandle hLocation, ApHandle hParticipant, ApHandle hChat, const String& sNickname, const String& sText,Apollo::TimeValue& tvStamp)
+Chat::Chat(const ApHandle& hLocation, const ApHandle& hParticipant, const ApHandle& hChat, const String& sNickname, const String& sText,Apollo::TimeValue& tvStamp)
 :Elem(sNickname, sText)
 ,hLocation_(hLocation)
 ,hParticipant_(hParticipant)

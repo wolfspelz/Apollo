@@ -14,7 +14,7 @@
 class HttpConnection: public Apollo::TCPConnection
 {
 public:
-  HttpConnection(const char* szName, ApHandle hHttpConnection)
+  HttpConnection(const char* szName, const ApHandle& hHttpConnection)
     :Apollo::TCPConnection(szName, hHttpConnection)
   {}
   virtual ~HttpConnection() {}

@@ -10,7 +10,7 @@
 class Context
 {
 public:
-  Context(ApHandle hContext);
+  Context(const ApHandle& hContext);
   virtual ~Context();
 
   int Create();

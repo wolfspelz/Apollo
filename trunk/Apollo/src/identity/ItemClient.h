@@ -15,7 +15,7 @@ using namespace Apollo;
 class ItemClient: public HTTPClient
 {
 public:
-  ItemClient(ApHandle hRequest, const String& sContainerUrl, const String& sId, const String& sDigest)
+  ItemClient(const ApHandle& hRequest, const String& sContainerUrl, const String& sId, const String& sDigest)
     :HTTPClient("ItemClient") 
     ,hRequest_(hRequest)
     ,sContainerUrl_(sContainerUrl)

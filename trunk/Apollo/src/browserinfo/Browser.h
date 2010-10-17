@@ -14,7 +14,7 @@
 class Context
 {
 public:
-  Context(ApHandle hContext)
+  Context(const ApHandle& hContext)
     :hAp_(hContext)
     ,bVisible_(0)
     ,nX_(0)
@@ -57,11 +57,11 @@ public:
   {}
   virtual ~Browser() {}
 
-  void AddContext(ApHandle hContext);
-  void RemoveContext(ApHandle hContext);
-  Context* GetContext(ApHandle hContext);
+  void AddContext(const ApHandle& hContext);
+  void RemoveContext(const ApHandle& hContext);
+  Context* GetContext(const ApHandle& hContext);
   bool HasContexts() { return contexts_.Count(); }
-  bool HasContext(ApHandle hContext) { return contexts_.Find(hContext) != 0; }
+  bool HasContext(const ApHandle& hContext) { return contexts_.Find(hContext) != 0; }
   Apollo::WindowHandle GetWindow() { return win_; }
 
   virtual void SecTimer() {}

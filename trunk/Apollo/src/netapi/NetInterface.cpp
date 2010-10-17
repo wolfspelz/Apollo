@@ -81,7 +81,7 @@ int TCPServer::InternalListenStopped()
   return OnStopped();
 }
 
-int TCPServer::InternalConnectionAccepted(ApHandle hConnection, String& sClientAddress, int nClientPort)
+int TCPServer::InternalConnectionAccepted(const ApHandle& hConnection, String& sClientAddress, int nClientPort)
 {
   int ok = 0;
 
@@ -115,7 +115,7 @@ TCPConnection::TCPConnection(const char* szName)
   NetAPIModuleInstance::Get()->AddTCPConnection(this);
 }
 
-TCPConnection::TCPConnection(const char* szName, ApHandle hConnection)
+TCPConnection::TCPConnection(const char* szName, const ApHandle& hConnection)
 :Elem(szName)
 ,hAp_(hConnection)
 ,nPort_(0)

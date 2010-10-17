@@ -17,20 +17,58 @@ class GraphicsContext
 public:
   GraphicsContext()
     :pCairo_(0)
-    ,nH_(0)
-    ,fTranslateX_(0.0)
-    ,fTranslateY_(0.0)
   {}
-  virtual ~GraphicsContext() {}
 
-  void Implement();
   inline cairo_t* Cairo() { return pCairo_; }
 
   cairo_t* pCairo_;
-  int nH_;
+};
 
-  double fTranslateX_;
-  double fTranslateY_;
+class DrawContext: public GraphicsContext
+{
+public:
+  DrawContext()
+    :nH_(0)
+    ,nW_(0)
+  {}
+
+  inline int Height() { return nH_; }
+  inline int Width() { return nW_; }
+
+  int nH_;
+  int nW_;
+};
+
+class EventContext: public GraphicsContext
+{
+public:
+  // Same as Msg_Scene_MouseEvent::EventType
+  typedef enum _EventType { NoEventType
+    ,MouseMove
+    ,MouseDown
+    ,MouseUp
+    ,MouseClick
+    ,MouseDoubleClick
+  } EventType;
+
+  // Same as Msg_Scene_MouseEvent::MouseButton
+  typedef enum _MouseButton { NoMouseButton
+    ,LeftButton
+    ,MiddleButton
+    ,RightButton
+  } MouseButton;
+
+  EventContext()
+    :bFired_(false)
+    ,nEvent_(NoEventType)
+    ,nButton_(NoMouseButton)
+  {}
+
+  inline bool Fired() { return bFired_; }
+
+  bool bFired_;
+  int nEvent_;
+  int nButton_;
 };
 
 #endif // GraphicsContext_H_INCLUDED

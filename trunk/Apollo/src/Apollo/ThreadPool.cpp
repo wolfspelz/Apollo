@@ -259,7 +259,7 @@ void Apollo::ThreadList::PushIdle(Apollo::WorkerThread* pWorker)
 
 // ----------------------------------------------------------------------------
 
-Apollo::ThreadPool::ThreadPool(ApHandle hAp, const char* szName, int nConcurrency)
+Apollo::ThreadPool::ThreadPool(const ApHandle& hAp, const char* szName, int nConcurrency)
 : Apollo::Thread(szName), hAp_(hAp), nConcurrency_(nConcurrency)
 {
 }

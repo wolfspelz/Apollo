@@ -186,7 +186,7 @@ ApHandle ApLib::newHandle()
   return nNextHandle_;
 }
 
-String ApLib::handle2String(ApHandle h)
+String ApLib::handle2String(const ApHandle& h)
 {
   return h.toString();
 }

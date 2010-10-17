@@ -52,7 +52,7 @@ int Element::CreateElement(const String& sPath)
   String sPart;
   if (sElement.nextToken("/", sPart)) {
     if (sElement.empty()) {
-      Element* pElement = new Element();
+      Element* pElement = new Element(pSurface_);
       if (pElement) {
         if (pChildren_ == 0) {
           pChildren_ = new ElementList();
@@ -76,7 +76,7 @@ int Element::CreateElement(const String& sPath)
         if (pChildren_->Get(sPart, pNext)) {
           ok = pNext->CreateElement(sElement);
         } else {
-          pNext = new Element();
+          pNext = new Element(pSurface_);
           if (pNext) {
             pChildren_->Set(sPart, pNext);
             ok = pNext->CreateElement(sElement);
@@ -133,7 +133,13 @@ void Element::Translate(double fX, double fY)
 {
   fTranslateX_ = fX;
   fTranslateY_ = fY;
-  //fTranslateY_ = -fY; // -V
+  CheckSaveRestore();
+}
+
+void Element::GetTranslate(double& fX, double& fY)
+{
+  fX = fTranslateX_;
+  fY = fTranslateY_;
   CheckSaveRestore();
 }
 
@@ -174,16 +180,17 @@ void Element::DeleteGraphics()
 void Element::CreateRectangle(double fX, double fY, double fW, double fH)
 {
   DeleteGraphics();
-  RectangleX* p = new RectangleX();
+  RectangleX* p = new RectangleX(pSurface_);
   if (p == 0) { throw ApException("Element::CreateRectangle failed"); }
-  p->SetCoordinates(fX, fY, fW, fH);
+  p->SetCoordinates(fX, fY);
+  p->SetSize(fW, fH);
   pGraphics_ = p;
 }
 
 void Element::CreateImageFromData(double fX, double fY, const Apollo::Image& image)
 {
   DeleteGraphics();
-  ImageX* p = new ImageX();
+  ImageX* p = new ImageX(pSurface_);
   if (p == 0) { throw ApException("Element::CreateImageFromData failed"); }
   p->SetCoordinates(fX, fY);
   p->SetImageData(image);
@@ -193,7 +200,7 @@ void Element::CreateImageFromData(double fX, double fY, const Apollo::Image& ima
 void Element::CreateImageFromFile(double fX, double fY, const String& sFile)
 {
   DeleteGraphics();
-  ImageX* p = new ImageX();
+  ImageX* p = new ImageX(pSurface_);
   if (p == 0) { throw ApException("Element::CreateImageFromFile failed"); }
   p->SetCoordinates(fX, fY);
   p->SetImageFile(sFile);
@@ -203,12 +210,49 @@ void Element::CreateImageFromFile(double fX, double fY, const String& sFile)
 void Element::CreateText(double fX, double fY, const String& sText, const String& sFont, double fSize, int nFlags)
 {
   DeleteGraphics();
-  TextX* p = new TextX();
+  TextX* p = new TextX(pSurface_);
   if (p == 0) { throw ApException("Element::CreateText failed"); }
   p->SetCoordinates(fX, fY);
   p->SetString(sText);
   p->SetFont(sFont, fSize, nFlags);
   pGraphics_ = p;
+}
+
+void Element::CreateMouseSensor(const String& sPath, double fX, double fY, double fW, double fH)
+{
+  DeleteGraphics();
+  Sensor* p = new Sensor(pSurface_, sPath);
+  if (p == 0) { throw ApException("Element::CreateMouseSensor failed"); }
+  p->SetCoordinates(fX, fY);
+  p->SetSize(fW, fH);
+  p->SetStrokeColor(0,0,0,1);
+  p->SetStrokeWidth(1.0);
+  pGraphics_ = p;
+}
+
+void Element::SetCoordinates(double fX, double fY)
+{
+  if (pGraphics_) {
+    if (pGraphics_->IsShape()) {
+      ((Shape*) pGraphics_)->SetCoordinates(fX, fY);
+    } else if (pGraphics_->IsImage()) {
+      ((ImageX*) pGraphics_)->SetCoordinates(fX, fY);
+    } else {
+      throw ApException("Element::SetFillColor: not Shape or Image");
+    }
+  } else {
+    throw ApException("Element::SetFillColor: not a Shape");
+  }
+}
+
+void Element::SetRectangle(double fX, double fY, double fW, double fH)
+{
+  if (pGraphics_ && pGraphics_->IsRectangle()) {
+    ((RectangleX*) pGraphics_)->SetCoordinates(fX, fY);
+    ((RectangleX*) pGraphics_)->SetSize(fW, fH);
+  } else {
+    throw ApException("Element::SetRectangle: not a IsRectangle");
+  }
 }
 
 void Element::SetFillColor(double fRed, double fGreen, double fBlue, double fAlpha)
@@ -270,7 +314,7 @@ void Element::SetStrokeWidth(double fWidth)
   if (pGraphics_ && pGraphics_->IsShape()) {
     ((Shape*) pGraphics_)->SetStrokeWidth(fWidth);
   } else {
-    throw ApException("Element::SetFillColor: not a Shape");
+    throw ApException("Element::SetStrokeWidth: not a Shape");
   }
 }
 
@@ -310,15 +354,20 @@ void Element::DeleteImageFile()
   }
 }
 
+void Element::SetImageAlpha(double fAlpha)
+{
+  if (pGraphics_ && pGraphics_->IsImage()) {
+    ((ImageX*) pGraphics_)->SetAlpha(fAlpha);
+  } else {
+    throw ApException("Element::SetImageAlpha: not an Image");
+  }
+}
+
 // ----------------------------------------------------------
 
-void Element::Draw(GraphicsContext& gc)
+void Element::Draw(DrawContext& gc)
 {
   if (bHide_) { return; }
-
-  //GraphicsContext gcNext = gc;
-  //gcNext.fTranslateX_ += fTranslateX_;
-  //gcNext.fTranslateY_ += fTranslateY_;
 
   if (bSave_) {
     cairo_save(gc.Cairo());
@@ -327,7 +376,7 @@ void Element::Draw(GraphicsContext& gc)
       cairo_translate(gc.Cairo(), fTranslateX_, fTranslateY_);
     }
     if (fRotate_ != 0.0) {
-      cairo_rotate(gc.Cairo(), fRotate_);
+      cairo_rotate(gc.Cairo(), -fRotate_);
     }
     if (fScaleX_ != 0.0 || fScaleY_ != 0.0) {
       cairo_scale(gc.Cairo(), fScaleX_, fScaleY_);
@@ -355,3 +404,23 @@ void Element::Draw(GraphicsContext& gc)
     cairo_restore(gc.Cairo());
   }
 }
+
+void Element::MouseEvent(EventContext& gc, double fX, double fY)
+{
+  if (bHide_) { return; }
+
+  if (pChildren_) {
+    ElementIterator iter(*pChildren_);
+    for (ElementNode* pNode = 0; (pNode = iter.Next()) && !gc.Fired(); ) {
+      Element* pElement = pNode->Value();
+      if (pElement != 0) {
+        pElement->MouseEvent(gc, fX, fY);
+      }
+    }
+  }
+
+  if (pGraphics_ && pGraphics_->IsSensor() && !gc.Fired()) {
+    ((Sensor*) pGraphics_)->MouseEvent(gc, fX - fTranslateX_, fY - fTranslateY_);
+  }
+}
+

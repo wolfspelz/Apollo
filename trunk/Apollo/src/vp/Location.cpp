@@ -12,7 +12,7 @@
 #include "Local.h"
 #include "Location.h"
 
-Location::Location(ApHandle hLocation, const String& sLocationUrl)
+Location::Location(const ApHandle& hLocation, const String& sLocationUrl)
 :hAp_(hLocation)
 ,sLocationUrl_(sLocationUrl)
 ,hRoom_(ApNoHandle)
@@ -60,7 +60,7 @@ String& Location::room()
 
 //----------------------------------------------------------
 
-int Location::addContext(ApHandle hContext)
+int Location::addContext(const ApHandle& hContext)
 {
   int ok = 1;
 
@@ -93,7 +93,7 @@ int Location::addContext(ApHandle hContext)
   return ok;
 }
 
-int Location::removeContext(ApHandle hContext)
+int Location::removeContext(const ApHandle& hContext)
 {
   int ok = 1;
 
@@ -126,7 +126,7 @@ int Location::removeContext(ApHandle hContext)
   return ok;
 }
 
-int Location::hasContext(ApHandle hContext)
+int Location::hasContext(const ApHandle& hContext)
 {
   return (contexts_.Find(hContext) != 0);
 }
@@ -328,7 +328,7 @@ int Location::onProtocolOffline()
 
 //----------------------------------------------------------
 
-int Location::addParticipant(ApHandle hParticipant)
+int Location::addParticipant(const ApHandle& hParticipant)
 {
   int ok = 0;
   apLog_Verbose((LOG_CHANNEL, "Location::addParticipant", "" ApHandleFormat " add " ApHandleFormat "", ApHandleType(apHandle()), ApHandleType(hParticipant)));
@@ -342,7 +342,7 @@ int Location::addParticipant(ApHandle hParticipant)
     Msg_VpView_ParticipantAdded msg;
     msg.hLocation = apHandle();
     msg.hParticipant = hParticipant;
-    if (hParticipant == getSelfParticipant()) {
+    if (getSelfParticipant() == hParticipant) {
       msg.bSelf = 1;
     }
     msg.Send();
@@ -358,7 +358,7 @@ int Location::addParticipant(ApHandle hParticipant)
   return ok;
 }
 
-int Location::removeParticipant(ApHandle hParticipant)
+int Location::removeParticipant(const ApHandle& hParticipant)
 {
   int ok = 0;
   apLog_Verbose((LOG_CHANNEL, "Location::removeParticipant", "" ApHandleFormat " remove " ApHandleFormat "", ApHandleType(apHandle()), ApHandleType(hParticipant)));
@@ -413,7 +413,7 @@ int Location::removeAllParticipants()
   return ok;
 }
 
-Participant* Location::findParticipant(ApHandle hParticipant)
+Participant* Location::findParticipant(const ApHandle& hParticipant)
 {
   Participant* pParticipant = 0;
   
@@ -443,7 +443,7 @@ void Location::sendPublicChat(const String& sText)
   if (!msg.Request()) { throw ApException("Location::sendPublicChat: Msg_Protocol_SendPublicChat failed, %s", StringType(sLocationUrl_)); }
 }
 
-void Location::onReceivePublicChat(ApHandle hParticipant, const String& sText, int nSec, int nMicroSec)
+void Location::onReceivePublicChat(const ApHandle& hParticipant, const String& sText, int nSec, int nMicroSec)
 {
   ApHandle hChat = Apollo::newHandle();
 

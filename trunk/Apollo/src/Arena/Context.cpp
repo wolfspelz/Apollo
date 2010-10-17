@@ -10,7 +10,7 @@
 #include "Local.h"
 #include "Context.h"
 
-Context::Context(ApHandle hContext)
+Context::Context(const ApHandle& hContext)
 :hAp_(hContext)
 ,bVisible_(0)
 ,nX_(0)

@@ -42,15 +42,15 @@ public:
   void On_Net_HTTP_Failed(Msg_Net_HTTP_Failed* pMsg);
   void On_Net_HTTP_Closed(Msg_Net_HTTP_Closed* pMsg);
 
-  Apollo::TCPServer* FindTCPServer(ApHandle hAp);
+  Apollo::TCPServer* FindTCPServer(const ApHandle& hAp);
   void AddTCPServer(Apollo::TCPServer* pServer);
   void RemoveTCPServer(Apollo::TCPServer* pServer);
 
-  Apollo::TCPConnection* FindTCPConnection(ApHandle hAp);
+  Apollo::TCPConnection* FindTCPConnection(const ApHandle& hAp);
   void AddTCPConnection(Apollo::TCPConnection* pConnection);
   void RemoveTCPConnection(Apollo::TCPConnection* pConnection);
 
-  Apollo::HTTPClient* FindHTTPClient(ApHandle hAp);
+  Apollo::HTTPClient* FindHTTPClient(const ApHandle& hAp);
   void AddHTTPClient(Apollo::HTTPClient* pClient);
   void RemoveHTTPClient(Apollo::HTTPClient* pClient);
 

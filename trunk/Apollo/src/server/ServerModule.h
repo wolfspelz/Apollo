@@ -30,8 +30,8 @@ public:
   int init();
   void exit();
 
-  int addHttpConnection(ApHandle hHttpConnection, HttpConnection* pHttpConnection);
-  int removeHttpConnection(ApHandle hHttpConnection);
+  int addHttpConnection(const ApHandle& hHttpConnection, HttpConnection* pHttpConnection);
+  int removeHttpConnection(const ApHandle& hHttpConnection);
 
   void On_Server_StartHTTP(Msg_Server_StartHTTP* pMsg);
   void On_Server_StopHTTP(Msg_Server_StopHTTP* pMsg);

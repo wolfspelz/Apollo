@@ -12,7 +12,7 @@
 class Display
 {
 public:
-  Display(ApHandle hDisplay, const String& sId, const String& sPathname, const String& sArgs)
+  Display(const ApHandle& hDisplay, const String& sId, const String& sPathname, const String& sArgs)
     :hAp_(hDisplay)
     ,sId_(sId)
     ,sPathname_(sPathname)
@@ -26,15 +26,15 @@ public:
   int start();
   int stop();
 
-  void onCreated(ApHandle hConnection);
+  void onCreated(const ApHandle& hConnection);
   void onLoaded();
   void onBeforeUnload();
   void onUnloaded();
   void onDestroyed();
 
-  ApHandle apHandle() { return hAp_; }
-  String getPathname() { return sPathname_; }
-  String getId() { return sId_; }
+  inline ApHandle apHandle() { return hAp_; }
+  inline String getPathname() { return sPathname_; }
+  inline String getId() { return sId_; }
 
 protected:
   ApHandle hAp_;

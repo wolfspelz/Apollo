@@ -26,7 +26,7 @@
 class PostResolveConnectTask
 {
 public:
-  PostResolveConnectTask(ApHandle hConnection, String& sName, int nPort)
+  PostResolveConnectTask(const ApHandle& hConnection, String& sName, int nPort)
     :hConnection_(hConnection)
     ,sName_(sName)
     ,nPort_(nPort)
@@ -47,7 +47,7 @@ protected:
 class PostResolveListenTask
 {
 public:
-  PostResolveListenTask(ApHandle hServer, String& sName, int nPort)
+  PostResolveListenTask(const ApHandle& hServer, String& sName, int nPort)
     :hServer_(hServer)
     ,sName_(sName)
     ,nPort_(nPort)

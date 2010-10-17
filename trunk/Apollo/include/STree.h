@@ -85,14 +85,14 @@ public:
   int open (void);
   int close (void);
 
-  int Set(const EXT_ID &item, const INT_ID &int_id);
-  TreeNode<EXT_ID, INT_ID>* Find(const EXT_ID &ext_id);
-  int Get(const EXT_ID &ext_id, INT_ID &int_id);
+  inline int Set(const EXT_ID &item, const INT_ID &int_id);
+  inline TreeNode<EXT_ID, INT_ID>* Find(const EXT_ID &ext_id);
+  inline int Get(const EXT_ID &ext_id, INT_ID &int_id);
   const TreeNode<EXT_ID, INT_ID>* Find(const EXT_ID &ext_id) const;
   int IsSet(const EXT_ID &ext_id) const;
-  int Unset(const EXT_ID &ext_id);
-  TreeNode<EXT_ID, INT_ID>* Next(TreeNode<EXT_ID, INT_ID>* entry);
-  const TreeNode<EXT_ID, INT_ID>* Next(const TreeNode<EXT_ID, INT_ID>* entry) const;
+  inline int Unset(const EXT_ID &ext_id);
+  inline TreeNode<EXT_ID, INT_ID>* Next(TreeNode<EXT_ID, INT_ID>* entry);
+  inline const TreeNode<EXT_ID, INT_ID>* Next(const TreeNode<EXT_ID, INT_ID>* entry) const;
 
   // Sets EXT_ID, if not already there
   //TreeNode<EXT_ID, INT_ID> &operator[](const EXT_ID &ext_id);
@@ -167,8 +167,8 @@ template <class INT_ID>
 class StringTree : public Tree<String, INT_ID, LessThan<String> >
 {
 public:
-  StringTreeNode<INT_ID>* Find(const String &ext_id) { return (StringTreeNode<INT_ID>*) Tree<String, INT_ID, LessThan<String> >::Find(ext_id); }
-  StringTreeNode<INT_ID>* Next(StringTreeNode<INT_ID>* entry) { return (StringTreeNode<INT_ID>*) Tree<String, INT_ID, LessThan<String> >::Next(entry); }
+  inline StringTreeNode<INT_ID>* Find(const String &ext_id) { return (StringTreeNode<INT_ID>*) Tree<String, INT_ID, LessThan<String> >::Find(ext_id); }
+  inline StringTreeNode<INT_ID>* Next(StringTreeNode<INT_ID>* entry) { return (StringTreeNode<INT_ID>*) Tree<String, INT_ID, LessThan<String> >::Next(entry); }
 };
 
 template <class INT_ID>
@@ -176,7 +176,7 @@ class StringTreeIterator : public TreeIterator<String, INT_ID, LessThan<String> 
 {
 public:
   StringTreeIterator(const StringTree<INT_ID> &tree, int set_first = 1):TreeIterator<String, INT_ID, LessThan<String> >(tree, set_first) {}
-  StringTreeNode<INT_ID>* Next(void) { return (StringTreeNode<INT_ID>* ) TreeIterator<String, INT_ID, LessThan<String> >::Next(); }
+  inline StringTreeNode<INT_ID>* Next(void) { return (StringTreeNode<INT_ID>* ) TreeIterator<String, INT_ID, LessThan<String> >::Next(); }
 };
 
 //----------------------------------------------------------
@@ -194,10 +194,9 @@ class PointerTree : public Tree<EXT_ID, INT_ID, COMPARE_KEYS>
 {
 public:
   virtual ~PointerTree();
-
-  PointerTreeNode<EXT_ID, INT_ID>* Find(const EXT_ID &ext_id) { return (PointerTreeNode<EXT_ID, INT_ID>*) Tree<EXT_ID, INT_ID, COMPARE_KEYS>::Find(ext_id); }
-  PointerTreeNode<EXT_ID, INT_ID>* Next(PointerTreeNode<EXT_ID, INT_ID>* entry) { return (PointerTreeNode<EXT_ID, INT_ID>*) Tree<EXT_ID, INT_ID, COMPARE_KEYS>::Next(entry); } 
-  int Get(const EXT_ID &ext_id, INT_ID &int_id) { return Tree<EXT_ID, INT_ID, COMPARE_KEYS>::Get(ext_id, int_id); }
+  inline PointerTreeNode<EXT_ID, INT_ID>* Find(const EXT_ID &ext_id) { return (PointerTreeNode<EXT_ID, INT_ID>*) Tree<EXT_ID, INT_ID, COMPARE_KEYS>::Find(ext_id); }
+  inline PointerTreeNode<EXT_ID, INT_ID>* Next(PointerTreeNode<EXT_ID, INT_ID>* entry) { return (PointerTreeNode<EXT_ID, INT_ID>*) Tree<EXT_ID, INT_ID, COMPARE_KEYS>::Next(entry); } 
+  inline int Get(const EXT_ID &ext_id, INT_ID &int_id) { return Tree<EXT_ID, INT_ID, COMPARE_KEYS>::Get(ext_id, int_id); }
 };
 
 template <class EXT_ID, class INT_ID, class COMPARE_KEYS>
@@ -205,7 +204,7 @@ class PointerTreeIterator : public TreeIterator<EXT_ID, INT_ID, COMPARE_KEYS>
 {
 public:
   PointerTreeIterator(const PointerTree<EXT_ID, INT_ID, COMPARE_KEYS> &tree, int set_first = 1):TreeIterator<EXT_ID, INT_ID, COMPARE_KEYS>(tree, set_first) {}
-  PointerTreeNode<EXT_ID, INT_ID>* Next(void) { return (PointerTreeNode<EXT_ID, INT_ID>* ) TreeIterator<EXT_ID, INT_ID, COMPARE_KEYS>::Next(); }
+  inline PointerTreeNode<EXT_ID, INT_ID>* Next(void) { return (PointerTreeNode<EXT_ID, INT_ID>* ) TreeIterator<EXT_ID, INT_ID, COMPARE_KEYS>::Next(); }
 };
 
 template <class EXT_ID, class INT_ID, class COMPARE_KEYS>
@@ -238,8 +237,8 @@ template <class INT_ID>
 class StringPointerTree : public PointerTree<String, INT_ID, LessThan<String> >
 {
 public:
-  StringPointerTreeNode<INT_ID>* Find(const String &ext_id) { return (StringPointerTreeNode<INT_ID>*) PointerTree<String, INT_ID, LessThan<String> >::Find(ext_id); }
-  StringPointerTreeNode<INT_ID>* Next(StringTreeNode<INT_ID>* entry) { return (StringPointerTreeNode<INT_ID>*) PointerTree<String, INT_ID, LessThan<String> >::Next(entry); }
+  inline StringPointerTreeNode<INT_ID>* Find(const String &ext_id) { return (StringPointerTreeNode<INT_ID>*) PointerTree<String, INT_ID, LessThan<String> >::Find(ext_id); }
+  inline StringPointerTreeNode<INT_ID>* Next(StringTreeNode<INT_ID>* entry) { return (StringPointerTreeNode<INT_ID>*) PointerTree<String, INT_ID, LessThan<String> >::Next(entry); }
 };
 
 template <class INT_ID>
@@ -247,7 +246,7 @@ class StringPointerTreeIterator : public PointerTreeIterator<String, INT_ID, Les
 {
 public:
   StringPointerTreeIterator(const StringPointerTree<INT_ID> &tree, int set_first = 1):PointerTreeIterator<String, INT_ID, LessThan<String> >(tree, set_first) {}
-  StringPointerTreeNode<INT_ID>* Next(void) { return (StringPointerTreeNode<INT_ID>* ) PointerTreeIterator<String, INT_ID, LessThan<String> >::Next(); }
+  inline StringPointerTreeNode<INT_ID>* Next(void) { return (StringPointerTreeNode<INT_ID>* ) PointerTreeIterator<String, INT_ID, LessThan<String> >::Next(); }
 };
 
 // -------------------------------------------------------

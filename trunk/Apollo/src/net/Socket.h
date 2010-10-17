@@ -28,7 +28,7 @@ public:
 class Socket: public Elem
 {
 public:
-  Socket(ApHandle h)
+  Socket(const ApHandle& h)
     :hAp_(h)
     ,nSock_(INVALID_SOCKET)
     ,nState_(SocketState_None)

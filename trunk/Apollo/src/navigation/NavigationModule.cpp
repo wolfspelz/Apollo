@@ -13,7 +13,7 @@
 #include "Context.h"
 #include "Connection.h"
 
-Context* NavigationModule::findContext(ApHandle h)
+Context* NavigationModule::findContext(const ApHandle& h)
 {
   Context* pContext = 0; 
 
@@ -25,7 +25,7 @@ Context* NavigationModule::findContext(ApHandle h)
   return pContext; 
 }
 
-Connection* NavigationModule::findConnection(ApHandle h)
+Connection* NavigationModule::findConnection(const ApHandle& h)
 {
   Connection* pConnection = 0; 
 
@@ -37,7 +37,7 @@ Connection* NavigationModule::findConnection(ApHandle h)
   return pConnection; 
 }
 
-int NavigationModule::addConnection(ApHandle hConnection, Connection* pConnection)
+int NavigationModule::addConnection(const ApHandle& hConnection, Connection* pConnection)
 {
   int ok = 1;
 
@@ -46,7 +46,7 @@ int NavigationModule::addConnection(ApHandle hConnection, Connection* pConnectio
   return ok;
 }
 
-int NavigationModule::removeConnection(ApHandle hConnection)
+int NavigationModule::removeConnection(const ApHandle& hConnection)
 {
   int ok = 1;
 
@@ -86,7 +86,7 @@ int NavigationModule::removeConnection(ApHandle hConnection)
   return ok;
 }
 
-void NavigationModule::associateContextWithConnection(ApHandle hContext, ApHandle hConnection)
+void NavigationModule::associateContextWithConnection(const ApHandle& hContext, const ApHandle& hConnection)
 {
   ApHandle hCurrentlyAssociatedConnection = findConnectionHandleByContextHandle(hContext);
   if (hCurrentlyAssociatedConnection != hConnection) {
@@ -97,7 +97,7 @@ void NavigationModule::associateContextWithConnection(ApHandle hContext, ApHandl
   }
 }
 
-ApHandle NavigationModule::findConnectionHandleByContextHandle(ApHandle hContext)
+ApHandle NavigationModule::findConnectionHandleByContextHandle(const ApHandle& hContext)
 {
   ApHandle hConnection = ApNoHandle;
 
@@ -112,7 +112,7 @@ ApHandle NavigationModule::findConnectionHandleByContextHandle(ApHandle hContext
   return hConnection;
 }
 
-void NavigationModule::addContextToConnection(ApHandle hContext, ApHandle hConnection)
+void NavigationModule::addContextToConnection(const ApHandle& hContext, const ApHandle& hConnection)
 {
   ConnectionContextListNode* pNode = connectionContexts_.Find(hConnection);
   if (pNode == 0) {
@@ -125,7 +125,7 @@ void NavigationModule::addContextToConnection(ApHandle hContext, ApHandle hConne
   }
 }
 
-void NavigationModule::removeContextFromConnection(ApHandle hContext, ApHandle hConnection)
+void NavigationModule::removeContextFromConnection(const ApHandle& hContext, const ApHandle& hConnection)
 {
   ConnectionContextListNode* pNode = connectionContexts_.Find(hConnection);
   if (pNode) {
@@ -138,7 +138,7 @@ void NavigationModule::removeContextFromConnection(ApHandle hContext, ApHandle h
 
 //----------------------------------------------------------
 
-Context* NavigationModule::createContext(ApHandle hContext)
+Context* NavigationModule::createContext(const ApHandle& hContext)
 {
   Context* pContext = new Context(hContext);
   if (pContext != 0) {
@@ -156,7 +156,7 @@ Context* NavigationModule::createContext(ApHandle hContext)
   return pContext;
 }
 
-int NavigationModule::destroyContext(ApHandle hContext)
+int NavigationModule::destroyContext(const ApHandle& hContext)
 {
   int ok = 0;
 

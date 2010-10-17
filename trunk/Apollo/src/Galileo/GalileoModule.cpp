@@ -180,7 +180,7 @@ AP_MSG_HANDLER_METHOD(GalileoModule, Animation_Event)
 //  pMsg->apStatus = ApMessage::Ok;
 //}
 
-Item* GalileoModule::GetItemByTimer(ApHandle hTimer)
+Item* GalileoModule::GetItemByTimer(const ApHandle& hTimer)
 {
   Item* pResult = 0;
 

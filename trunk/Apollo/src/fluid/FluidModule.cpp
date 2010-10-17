@@ -12,7 +12,7 @@
 #include "Connection.h"
 #include "SrpcServer.h"
 
-int FluidModule::addConnection(ApHandle hConnection, Connection* pConnection)
+int FluidModule::addConnection(const ApHandle& hConnection, Connection* pConnection)
 {
   int ok = 1;
 
@@ -21,7 +21,7 @@ int FluidModule::addConnection(ApHandle hConnection, Connection* pConnection)
   return ok;
 }
 
-int FluidModule::removeConnection(ApHandle hConnection)
+int FluidModule::removeConnection(const ApHandle& hConnection)
 {
   int ok = 1;
 
@@ -69,7 +69,7 @@ int FluidModule::removeConnection(ApHandle hConnection)
   return ok;
 }
 
-Display* FluidModule::findDisplay(ApHandle h)
+Display* FluidModule::findDisplay(const ApHandle& h)
 {
   Display* pDisplay = 0; 
 
@@ -81,7 +81,7 @@ Display* FluidModule::findDisplay(ApHandle h)
   return pDisplay; 
 }
 
-Display* FluidModule::findDestroyedDisplay(ApHandle h)
+Display* FluidModule::findDestroyedDisplay(const ApHandle& h)
 {
   Display* pDisplay = 0; 
 
@@ -111,7 +111,7 @@ Display* FluidModule::findDisplayById(const String& sId)
   return pDisplay; 
 }
 
-Connection* FluidModule::findConnection(ApHandle h)
+Connection* FluidModule::findConnection(const ApHandle& h)
 {
   Connection* pConnection = 0; 
 
@@ -123,19 +123,19 @@ Connection* FluidModule::findConnection(ApHandle h)
   return pConnection; 
 }
 
-void FluidModule::setConnectionDisplayMapping(ApHandle hConnection, ApHandle hDisplay)
+void FluidModule::setConnectionDisplayMapping(const ApHandle& hConnection, const ApHandle& hDisplay)
 {
   connection2Display_.Set(hConnection, hDisplay);
   display2Connection_.Set(hDisplay, hConnection);
 }
 
-void FluidModule::unsetConnectionDisplayMapping(ApHandle hConnection, ApHandle hDisplay)
+void FluidModule::unsetConnectionDisplayMapping(const ApHandle& hConnection, const ApHandle& hDisplay)
 {
   connection2Display_.Unset(hConnection);
   display2Connection_.Unset(hDisplay);
 }
 
-ApHandle FluidModule::findDisplayHandleByConnectionHandle(ApHandle hConnection)
+ApHandle FluidModule::findDisplayHandleByConnectionHandle(const ApHandle& hConnection)
 {
   ApHandle hDisplay = ApNoHandle;
 
@@ -147,7 +147,7 @@ ApHandle FluidModule::findDisplayHandleByConnectionHandle(ApHandle hConnection)
   return hDisplay;
 }
 
-ApHandle FluidModule::findConnectionHandleByDisplayHandle(ApHandle hDisplay)
+ApHandle FluidModule::findConnectionHandleByDisplayHandle(const ApHandle& hDisplay)
 {
   ApHandle hConnection = ApNoHandle;
 
