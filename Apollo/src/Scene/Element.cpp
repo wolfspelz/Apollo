@@ -294,9 +294,10 @@ void Element::MouseEventRecursive(EventContext& gc, double fX, double fY)
 {
   if (bHide_) { return; }
 
+  gc.nDepth_++;
+
   // Depth first
   if (pChildren_) {
-    gc.nDepth_++;
     ElementIterator iter(*pChildren_);
     for (ElementNode* pNode = 0; (pNode = iter.Next()) && !gc.Fired(); ) {
       Element* pElement = pNode->Value();
@@ -309,5 +310,7 @@ void Element::MouseEventRecursive(EventContext& gc, double fX, double fY)
   if (IsSensor()) {
     AsSensor()->MouseEvent(gc, fX, fY);
   }
+
+  gc.nDepth_--;
 }
 

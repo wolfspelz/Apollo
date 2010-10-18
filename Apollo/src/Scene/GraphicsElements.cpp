@@ -247,14 +247,14 @@ void SensorElement::Draw(DrawContext& gc)
   FillAndStroke(gc);
 }
 
-void SensorElement::CaptureMouse()
+void SensorElement::MouseCaptured()
 {
-  bHitAll_ = 1;
+  bCaptured_ = 1;
 }
 
-void SensorElement::ReleaseMouse()
+void SensorElement::MouseReleased()
 {
-  bHitAll_ = 0;
+  bCaptured_ = 0;
 }
 
 void SensorElement::MouseEvent(EventContext& gc, double fX, double fY)
@@ -264,7 +264,7 @@ void SensorElement::MouseEvent(EventContext& gc, double fX, double fY)
   fX -= fTranslateX_;
   fY -= fTranslateY_;
 
-  if (bHitAll_) {
+  if (bCaptured_) {
     bHit = 1;
   }
 

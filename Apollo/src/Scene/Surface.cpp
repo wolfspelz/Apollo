@@ -76,10 +76,8 @@ LRESULT Surface::HandleMouseEvent(int nEvent, int nButton, LPARAM lParam)
       root_.MouseEventRecursive(gc, fX, fY);
     } else {
       Element* pElement = GetElement(sCaptureMouseElement_);
-      if (pElement) {
-        if (pElement->IsSensor()) {
-          pElement->AsSensor()->MouseEvent(gc, fX, fY);
-        }
+      if (pElement && pElement->IsSensor()) {
+        pElement->AsSensor()->MouseEvent(gc, fX, fY);
       }
     }
   }
@@ -499,7 +497,7 @@ void Surface::CaptureMouse(const String& sPath)
 {
   SensorElement* pSensor = GetElement(sPath)->AsSensor();
   if (pSensor) {
-    pSensor->CaptureMouse();
+    pSensor->MouseCaptured();
 #if defined(WIN32)
     if (hWnd_ != NULL) {
       ::SetCapture(hWnd_);
@@ -513,7 +511,7 @@ void Surface::ReleaseMouse()
 {
   SensorElement* pSensor = GetElement(sCaptureMouseElement_)->AsSensor();
   if (pSensor) {
-    pSensor->ReleaseMouse();
+    pSensor->MouseReleased();
 #if defined(WIN32)
     if (hWnd_ != NULL) {
       ::ReleaseCapture();
