@@ -166,7 +166,7 @@ public:
   SensorElement(Surface* pSurface, const String& sPath)
     :RectangleElement(pSurface)
     ,sPath_(sPath)
-    ,bHitAll_(0)
+    ,bCaptured_(0)
   {}
   virtual ~SensorElement() {}
 
@@ -174,12 +174,12 @@ public:
   void Draw(DrawContext& gc);
   void MouseEvent(EventContext& gc, double fX, double fY);
 
-  void CaptureMouse();
-  void ReleaseMouse();
+  void MouseCaptured();
+  void MouseReleased();
 
 protected:
   String sPath_;
-  int bHitAll_;
+  int bCaptured_;
 };
 
 #endif // Graphics_H_INCLUDED
