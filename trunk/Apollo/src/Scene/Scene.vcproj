@@ -230,6 +230,10 @@
 			UniqueIdentifier="{A20355D8-DBF5-4bbb-BF20-D95147DA822B}"
 			>
 		</Filter>
+		<File
+			RelativePath="..\..\bin\Win32\Debug\modules\Scene\config.txt"
+			>
+		</File>
 	</Files>
 	<Globals>
 	</Globals>
