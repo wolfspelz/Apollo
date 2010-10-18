@@ -32,6 +32,7 @@ public:
 //  static String SensorListOps();
 
   static int bHasCursor_;
+  static ApHandle hScene_;
 };
 #endif
 

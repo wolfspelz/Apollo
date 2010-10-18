@@ -167,6 +167,8 @@ int Surface::Create()
   }
 #endif // WIN32
 
+  bLogDraw_ = Apollo::getModuleConfig(MODULE_NAME, "LogRecursiveDrawing", 0);
+
   return ok;
 }
 
