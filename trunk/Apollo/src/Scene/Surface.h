@@ -28,6 +28,7 @@ class Surface
 public:
   Surface(const ApHandle& hSurface)
     :hAp_(hSurface)
+    ,bLogDraw_(0)
     ,bVisible_(0)
     ,nX_(0)
     ,nY_(0)
@@ -52,6 +53,7 @@ public:
   virtual ~Surface();
 
   inline ApHandle apHandle() { return hAp_; }
+  inline int LogDraw() { return bLogDraw_; }
 
   int Create();
   void Destroy();
@@ -95,6 +97,7 @@ protected:
 
 protected:
   ApHandle hAp_;
+  int bLogDraw_;
   int bVisible_;
   int nX_;
   int nY_;

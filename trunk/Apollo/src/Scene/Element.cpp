@@ -233,6 +233,14 @@ void Element::DrawRecursive(DrawContext& gc)
 {
   if (bHide_) { return; }
 
+  if (gc.nDepth_ == 0) {
+    if (pSurface_->LogDraw()) {
+      apLog_Verbose((LOG_CHANNEL, "Element::DrawRecursive", "Begin"));
+    }
+  }
+
+  gc.nDepth_++;
+
   if (bSave_) {
     cairo_save(gc.Cairo());
 
@@ -256,9 +264,13 @@ void Element::DrawRecursive(DrawContext& gc)
   // ...the depth
   if (pChildren_) {
     ElementIterator iter(*pChildren_);
+    String sWSP = "                      ";
     for (ElementNode* pNode = 0; pNode = iter.Next(); ) {
       Element* pElement = pNode->Value();
       if (pElement != 0) {
+        if (pSurface_->LogDraw()) {
+          apLog_Verbose((LOG_CHANNEL, "Element::DrawRecursive", "%s%s", StringType(sWSP.subString(0, 2*gc.nDepth_)), StringType(pNode->Key())));
+        }
         pElement->DrawRecursive(gc);
       }
     }
@@ -267,6 +279,15 @@ void Element::DrawRecursive(DrawContext& gc)
   if (bSave_) {
     cairo_restore(gc.Cairo());
   }
+
+  gc.nDepth_--;
+
+  if (gc.nDepth_ == 0) {
+    if (pSurface_->LogDraw()) {
+      apLog_Verbose((LOG_CHANNEL, "Element::DrawRecursive", "End"));
+    }
+  }
+
 }
 
 void Element::MouseEventRecursive(EventContext& gc, double fX, double fY)
@@ -275,6 +296,7 @@ void Element::MouseEventRecursive(EventContext& gc, double fX, double fY)
 
   // Depth first
   if (pChildren_) {
+    gc.nDepth_++;
     ElementIterator iter(*pChildren_);
     for (ElementNode* pNode = 0; (pNode = iter.Next()) && !gc.Fired(); ) {
       Element* pElement = pNode->Value();

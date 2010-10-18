@@ -68,6 +68,12 @@ class Msg_Scene_Draw: public ApRequestMessage
 {
 public:
   Msg_Scene_Draw() : ApRequestMessage("Scene_Draw") {}
+  static int _(const ApHandle& hScene)
+  {
+    Msg_Scene_Draw msg;
+    msg.hScene = hScene;
+    return msg.Request();
+  }
   ApIN ApHandle hScene;
 };
 

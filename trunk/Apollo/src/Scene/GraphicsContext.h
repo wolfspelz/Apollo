@@ -17,11 +17,13 @@ class GraphicsContext
 public:
   GraphicsContext()
     :pCairo_(0)
+    ,nDepth_(0)
   {}
 
   inline cairo_t* Cairo() { return pCairo_; }
 
   cairo_t* pCairo_;
+  int nDepth_;
 };
 
 class DrawContext: public GraphicsContext
