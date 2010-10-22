@@ -149,13 +149,6 @@ void Element::Translate(double fX, double fY)
   CheckSaveRestore();
 }
 
-void Element::GetTranslate(double& fX, double& fY)
-{
-  fX = fTranslateX_;
-  fY = fTranslateY_;
-  CheckSaveRestore();
-}
-
 void Element::Scale(double fX, double fY)
 {
   fScaleX_ = fX;
@@ -178,6 +171,25 @@ void Element::CopyMode(int nMode)
 {
   nCopyMode_ = nMode;
   CheckSaveRestore();
+}
+
+// ----------------------------------------------------------
+
+void Element::GetTranslate(double& fX, double& fY)
+{
+  fX = fTranslateX_;
+  fY = fTranslateY_;
+}
+
+void Element::GetScale(double& fX, double& fY)
+{
+  fX = fScaleX_;
+  fY = fScaleY_;
+}
+
+void Element::GetRotate(double& fRotate)
+{
+  fRotate = fRotate_;
 }
 
 // ----------------------------------------------------------

@@ -93,5 +93,16 @@ void Context::SetSize(int nW, int nH)
   if (!msg.Request()) {
     apLog_Error((LOG_CHANNEL, "Context::SetSize", "Msg_Scene_Position(" ApHandleFormat ") failed", ApHandleType(msg.hScene)));
   }
+
+  {
+    int bExists = 0;
+    if (Msg_Scene_ElementExists::_(hScene_, "_a_frame", bExists) && bExists) {
+      Msg_Scene_DeleteElement::_(hScene_, "_a_frame");
+    }
+    Msg_Scene_CreateRectangle::_(hScene_, "_a_frame", 0.5, 0.5, nW_ - 0.5, nH_ - 0.5);
+    Msg_Scene_SetFillColor::_(hScene_, "_a_frame", 1, 1, 1, 1);
+    Msg_Scene_SetStrokeColor::_(hScene_, "_a_frame", 0, 0, 0, 1);
+    Msg_Scene_SetStrokeWidth::_(hScene_, "_a_frame", 1);
+  }
 }
 
