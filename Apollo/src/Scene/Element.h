@@ -71,11 +71,14 @@ public:
   int DeleteElement(const String& sPath);
 
   void Translate(double fX, double fY);
-  void GetTranslate(double& fX, double& fY);
   void Scale(double fX, double fY);
   void Rotate(double fAngle);
   void Hide(int bHide);
   void CopyMode(int nMode);
+
+  void GetTranslate(double& fX, double& fY);
+  void GetScale(double& fX, double& fY);
+  void GetRotate(double& fRotate);
 
   inline virtual bool IsShape() { return false; }
   inline virtual bool IsRectangle() { return false; }

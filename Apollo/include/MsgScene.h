@@ -95,6 +95,44 @@ public:
   ApIN String sPath;
 };
 
+class Msg_Scene_DeleteElement: public ApRequestMessage
+{
+public:
+  Msg_Scene_DeleteElement() : ApRequestMessage("Scene_DeleteElement") {}
+  static int _(const ApHandle& hScene, const String& sPath)
+  {
+    Msg_Scene_DeleteElement msg;
+    msg.hScene = hScene;
+    msg.sPath = sPath;
+    return msg.Request();
+  }
+  ApIN ApHandle hScene;
+  ApIN String sPath;
+};
+
+class Msg_Scene_ElementExists: public ApRequestMessage
+{
+public:
+  Msg_Scene_ElementExists() : ApRequestMessage("Scene_ElementExists"), bExists(0) {}
+  static int _(const ApHandle& hScene, const String& sPath, int& bExists)
+  {
+    Msg_Scene_ElementExists msg;
+    msg.hScene = hScene;
+    msg.sPath = sPath;
+    int ok = msg.Request();
+    if (ok) {
+      bExists = msg.bExists;
+    } 
+    return ok;
+  }
+  ApIN ApHandle hScene;
+  ApIN String sPath;
+  ApOUT int bExists;
+};
+
+//--------------------------
+// Manipulate elements
+
 class Msg_Scene_TranslateElement: public ApRequestMessage
 {
 public:
@@ -107,28 +145,6 @@ public:
     msg.fX = fX;
     msg.fY = fY;
     return msg.Request();
-  }
-  ApIN ApHandle hScene;
-  ApIN String sPath;
-  ApIN double fX;
-  ApIN double fY;
-};
-
-class Msg_Scene_GetTranslateElement: public ApRequestMessage
-{
-public:
-  Msg_Scene_GetTranslateElement() : ApRequestMessage("Scene_GetTranslateElement"), fX(0), fY(0) {}
-  static int _(const ApHandle& hScene, const String& sPath, double& fX, double& fY)
-  {
-    Msg_Scene_GetTranslateElement msg;
-    msg.hScene = hScene;
-    msg.sPath = sPath;
-    int ok = msg.Request();
-    if (ok) {
-      fX = msg.fX;
-      fY = msg.fY;
-    } 
-    return ok;
   }
   ApIN ApHandle hScene;
   ApIN String sPath;
@@ -172,6 +188,23 @@ public:
   ApIN double fAngle;
 };
 
+class Msg_Scene_HideElement: public ApRequestMessage
+{
+public:
+  Msg_Scene_HideElement() : ApRequestMessage("Scene_HideElement"), bHide(1) {}
+  static int _(const ApHandle& hScene, const String& sPath, int bHide)
+  {
+    Msg_Scene_HideElement msg;
+    msg.hScene = hScene;
+    msg.sPath = sPath;
+    msg.bHide = bHide;
+    return msg.Request();
+  }
+  ApIN ApHandle hScene;
+  ApIN String sPath;
+  ApIN int bHide;
+};
+
 class Msg_Scene_SetCopyMode: public ApRequestMessage
 {
 public:
@@ -207,36 +240,71 @@ public:
   ApIN int nMode;
 };
 
-class Msg_Scene_HideElement: public ApRequestMessage
+//--------------------------
+// Get info
+
+class Msg_Scene_GetTranslateElement: public ApRequestMessage
 {
 public:
-  Msg_Scene_HideElement() : ApRequestMessage("Scene_HideElement"), bHide(1) {}
-  static int _(const ApHandle& hScene, const String& sPath, int bHide)
+  Msg_Scene_GetTranslateElement() : ApRequestMessage("Scene_GetTranslateElement"), fX(0), fY(0) {}
+  static int _(const ApHandle& hScene, const String& sPath, double& fX, double& fY)
   {
-    Msg_Scene_HideElement msg;
+    Msg_Scene_GetTranslateElement msg;
     msg.hScene = hScene;
     msg.sPath = sPath;
-    msg.bHide = bHide;
-    return msg.Request();
+    int ok = msg.Request();
+    if (ok) {
+      fX = msg.fX;
+      fY = msg.fY;
+    } 
+    return ok;
   }
   ApIN ApHandle hScene;
   ApIN String sPath;
-  ApIN int bHide;
+  ApIN double fX;
+  ApIN double fY;
 };
 
-class Msg_Scene_DeleteElement: public ApRequestMessage
+class Msg_Scene_GetScaleElement: public ApRequestMessage
 {
 public:
-  Msg_Scene_DeleteElement() : ApRequestMessage("Scene_DeleteElement") {}
-  static int _(const ApHandle& hScene, const String& sPath)
+  Msg_Scene_GetScaleElement() : ApRequestMessage("Scene_GetScaleElement"), fX(0), fY(0) {}
+  static int _(const ApHandle& hScene, const String& sPath, double& fX, double& fY)
   {
-    Msg_Scene_DeleteElement msg;
+    Msg_Scene_GetScaleElement msg;
     msg.hScene = hScene;
     msg.sPath = sPath;
-    return msg.Request();
+    int ok = msg.Request();
+    if (ok) {
+      fX = msg.fX;
+      fY = msg.fY;
+    } 
+    return ok;
   }
   ApIN ApHandle hScene;
   ApIN String sPath;
+  ApIN double fX;
+  ApIN double fY;
+};
+
+class Msg_Scene_GetRotateElement: public ApRequestMessage
+{
+public:
+  Msg_Scene_GetRotateElement() : ApRequestMessage("Scene_GetRotateElement"), fAngle(0) {}
+  static int _(const ApHandle& hScene, const String& sPath, double& fAngle)
+  {
+    Msg_Scene_GetRotateElement msg;
+    msg.hScene = hScene;
+    msg.sPath = sPath;
+    int ok = msg.Request();
+    if (ok) {
+      fAngle = msg.fAngle;
+    } 
+    return ok;
+  }
+  ApIN ApHandle hScene;
+  ApIN String sPath;
+  ApIN double fAngle;
 };
 
 //--------------------------

@@ -118,18 +118,18 @@ AP_MSG_HANDLER_METHOD(SceneModule, Scene_DeleteElement)
   pMsg->apStatus = ApMessage::Ok;
 }
 
+AP_MSG_HANDLER_METHOD(SceneModule, Scene_ElementExists)
+{
+  Surface* pSurface = FindSurface(pMsg->hScene);
+  pMsg->bExists = pSurface->HasElement(pMsg->sPath);
+  pMsg->apStatus = ApMessage::Ok;
+}
+
 AP_MSG_HANDLER_METHOD(SceneModule, Scene_TranslateElement)
 {
   Surface* pSurface = FindSurface(pMsg->hScene);
   pSurface->GetElement(pMsg->sPath)->Translate(pMsg->fX, pMsg->fY);
   pSurface->AutoDraw();
-  pMsg->apStatus = ApMessage::Ok;
-}
-
-AP_MSG_HANDLER_METHOD(SceneModule, Scene_GetTranslateElement)
-{
-  Surface* pSurface = FindSurface(pMsg->hScene);
-  pSurface->GetElement(pMsg->sPath)->GetTranslate(pMsg->fX, pMsg->fY);
   pMsg->apStatus = ApMessage::Ok;
 }
 
@@ -162,6 +162,27 @@ AP_MSG_HANDLER_METHOD(SceneModule, Scene_SetCopyMode)
   Surface* pSurface = FindSurface(pMsg->hScene);
   pSurface->GetElement(pMsg->sPath)->CopyMode(pMsg->nMode);
   pSurface->AutoDraw();
+  pMsg->apStatus = ApMessage::Ok;
+}
+
+AP_MSG_HANDLER_METHOD(SceneModule, Scene_GetTranslateElement)
+{
+  Surface* pSurface = FindSurface(pMsg->hScene);
+  pSurface->GetElement(pMsg->sPath)->GetTranslate(pMsg->fX, pMsg->fY);
+  pMsg->apStatus = ApMessage::Ok;
+}
+
+AP_MSG_HANDLER_METHOD(SceneModule, Scene_GetScaleElement)
+{
+  Surface* pSurface = FindSurface(pMsg->hScene);
+  pSurface->GetElement(pMsg->sPath)->GetScale(pMsg->fX, pMsg->fY);
+  pMsg->apStatus = ApMessage::Ok;
+}
+
+AP_MSG_HANDLER_METHOD(SceneModule, Scene_GetRotateElement)
+{
+  Surface* pSurface = FindSurface(pMsg->hScene);
+  pSurface->GetElement(pMsg->sPath)->GetRotate(pMsg->fAngle);
   pMsg->apStatus = ApMessage::Ok;
 }
 
@@ -438,13 +459,16 @@ int SceneModule::Init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_Draw, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_CreateElement, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_DeleteElement, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_ElementExists, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_CreateRectangle, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_TranslateElement, this, ApCallbackPosNormal);
-  AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_GetTranslateElement, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_ScaleElement, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_RotateElement, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_HideElement, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_SetCopyMode, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_GetTranslateElement, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_GetScaleElement, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_GetRotateElement, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_CreateMouseSensor, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_CreateImageFromData, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_CreateImageFromFile, this, ApCallbackPosNormal);

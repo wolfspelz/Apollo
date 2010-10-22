@@ -36,13 +36,16 @@ public:
   void On_Scene_Draw(Msg_Scene_Draw* pMsg);
   void On_Scene_CreateElement(Msg_Scene_CreateElement* pMsg);
   void On_Scene_DeleteElement(Msg_Scene_DeleteElement* pMsg);
+  void On_Scene_ElementExists(Msg_Scene_ElementExists* pMsg);
   void On_Scene_CreateRectangle(Msg_Scene_CreateRectangle* pMsg);
   void On_Scene_TranslateElement(Msg_Scene_TranslateElement* pMsg);
-  void On_Scene_GetTranslateElement(Msg_Scene_GetTranslateElement* pMsg);
   void On_Scene_ScaleElement(Msg_Scene_ScaleElement* pMsg);
   void On_Scene_RotateElement(Msg_Scene_RotateElement* pMsg);
   void On_Scene_HideElement(Msg_Scene_HideElement* pMsg);
   void On_Scene_SetCopyMode(Msg_Scene_SetCopyMode* pMsg);
+  void On_Scene_GetTranslateElement(Msg_Scene_GetTranslateElement* pMsg);
+  void On_Scene_GetScaleElement(Msg_Scene_GetScaleElement* pMsg);
+  void On_Scene_GetRotateElement(Msg_Scene_GetRotateElement* pMsg);
   void On_Scene_CreateImageFromData(Msg_Scene_CreateImageFromData* pMsg);
   void On_Scene_CreateImageFromFile(Msg_Scene_CreateImageFromFile* pMsg);
   void On_Scene_CreateText(Msg_Scene_CreateText* pMsg);
