@@ -90,7 +90,7 @@ String SceneModuleTester::Rectangle()
   // ------------------------
 
   if (!s) { if (!Msg_Scene_CreateRectangle::_(hScene_, "_a_frame", 0.5, 0.5, nWidth - 0.5, nHeight - 0.5)) { s = "Msg_Scene_CreateRectangle failed"; }}
-  if (!s) { if (!Msg_Scene_SetFillColor::_(hScene_, "_a_frame", 1, 1, 1, 0.5)) { s = "Msg_Scene_SetFillColor failed"; }}
+//  if (!s) { if (!Msg_Scene_SetFillColor::_(hScene_, "_a_frame", 1, 1, 1, 0.5)) { s = "Msg_Scene_SetFillColor failed"; }}
   if (!s) { if (!Msg_Scene_SetStrokeColor::_(hScene_, "_a_frame", 0, 0, 0, 1)) { s = "Msg_Scene_SetStrokeColor failed"; }}
   if (!s) { if (!Msg_Scene_SetStrokeWidth::_(hScene_, "_a_frame", 1)) { s = "Msg_Scene_SetStrokeWidth failed"; }}
 
@@ -148,7 +148,7 @@ String SceneModuleTester::Rectangle()
   Apollo::Image apImg1; // from PNG
   {
     Buffer sbData;
-    Apollo::loadFile(Apollo::getAppResourcePath() + "test/" + "test2.png", sbData);
+    Apollo::loadFile(Apollo::getAppResourcePath() + "test/" + "tassadar.png", sbData);
     CxImage cxImg(sbData.Data(), sbData.Length(), CXIMAGE_FORMAT_UNKNOWN);
     apImg1.Allocate(cxImg.GetWidth(), cxImg.GetHeight());
     CxMemFile mfDest((BYTE*) apImg1.Pixels(), apImg1.Size());
@@ -173,9 +173,9 @@ String SceneModuleTester::Rectangle()
   }
 
   double fImage1W, fImage1H;
-  if (!s) { if (!Msg_Scene_GetImageSizeFromData::_(hScene_, apImg2, fImage1W, fImage1H)) { s = "Msg_Scene_GetImageSizeFromData failed"; }}
+  if (!s) { if (!Msg_Scene_GetImageSizeFromData::_(hScene_, apImg1, fImage1W, fImage1H)) { s = "Msg_Scene_GetImageSizeFromData failed"; }}
   if (!s) { if (fImage1W != 100.0 || fImage1H != 100.0) { s = "Msg_Scene_GetImageSizeFromFile returned wrong size"; }}
-  if (!s) { if (!Msg_Scene_CreateImageFromData::_(hScene_, "image1", - fImage1W / 2.0, - fImage1H / 2.0, apImg2)) { s = "Msg_Scene_CreateImageFromData failed"; }}
+  if (!s) { if (!Msg_Scene_CreateImageFromData::_(hScene_, "image1", - fImage1W / 2.0, - fImage1H / 2.0, apImg1)) { s = "Msg_Scene_CreateImageFromData failed"; }}
   if (!s) { if (!Msg_Scene_TranslateElement::_(hScene_, "image1", 40, 190)) { s = "Msg_Scene_RotateElement failed"; }}
   if (!s) { if (!Msg_Scene_RotateElement::_(hScene_, "image1", 30.0 / 180.0 * 3.1415)) { s = "Msg_Scene_RotateElement failed"; }}
   if (!s) { if (!Msg_Scene_ScaleElement::_(hScene_, "image1", 0.8, 0.8)) { s = "Msg_Scene_ScaleElement failed"; }}

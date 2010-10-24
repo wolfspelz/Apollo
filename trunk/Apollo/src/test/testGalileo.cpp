@@ -188,7 +188,7 @@ void Test_Galileo_Display_Controller::CreateDisplay()
     BITMAPINFO bi;
     bi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
     bi.bmiHeader.biWidth = nW_;
-    bi.bmiHeader.biHeight = nH_;
+    bi.bmiHeader.biHeight = -nH_;
     bi.bmiHeader.biPlanes = 1;
     bi.bmiHeader.biBitCount = 32;
     bi.bmiHeader.biCompression = BI_RGB;

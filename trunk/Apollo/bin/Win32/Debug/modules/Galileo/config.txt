@@ -1,6 +1,6 @@
 DefaultStatus=idle
-DefaultFrameDuration=500
-DefaultAnimationDuration=500
+DefaultFrameDuration=1000
+DefaultAnimationDuration=1000
 MaxAnimationFileSize=200000
 MinSuspendRequestSec=5
 MaxSuspendRequestSec=1800

@@ -333,6 +333,25 @@ public:
   ApIN double fH;
 };
 
+class Msg_Scene_CreateImage: public ApRequestMessage
+{
+public:
+  Msg_Scene_CreateImage() : ApRequestMessage("Scene_CreateImage"), fX(0), fY(0) {}
+  static int _(const ApHandle& hScene, const String& sPath, double fX, double fY)
+  {
+    Msg_Scene_CreateImage msg;
+    msg.hScene = hScene;
+    msg.sPath = sPath;
+    msg.fX = fX;
+    msg.fY = fY;
+    return msg.Request();
+  }
+  ApIN ApHandle hScene;
+  ApIN String sPath;
+  ApIN double fX;
+  ApIN double fY;
+};
+
 class Msg_Scene_CreateImageFromData: public ApRequestMessage
 {
 public:
