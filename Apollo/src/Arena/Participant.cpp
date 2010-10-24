@@ -177,6 +177,10 @@ void Participant::UnSubscribeDetail(const String& sKey)
 
 void Participant::Show()
 {
+  if (pLocation_ != 0 && pLocation_->GetContext() != 0) {
+    hScene_ = pLocation_->GetContext()->Scene();
+  }
+
   SubscribeAndGetDetail(Msg_VpView_ParticipantDetail_Nickname);
   SubscribeAndGetDetail(Msg_VpView_ParticipantDetail_avatar);
   SubscribeAndGetDetail(Msg_VpView_ParticipantDetail_OnlineStatus);
@@ -185,20 +189,21 @@ void Participant::Show()
   SubscribeAndGetDetail(Msg_VpView_ParticipantDetail_Condition);
   SubscribeAndGetDetail(Msg_VpView_ParticipantDetail_ProfileUrl);
 
-  if (pLocation_ != 0 && pLocation_->GetContext() != 0) {
-    ApHandle hScene = pLocation_->GetContext()->Scene();
-    Msg_Scene_CreateRectangle::_(hScene, GetAvatarElementPath(), -50, 0, 100, 100);
-    Msg_Scene_SetFillColor::_(hScene, GetAvatarElementPath(), 1, 0, 0, 0.5);
-    Msg_Scene_TranslateElement::_(hScene, GetAvatarElementPath(), 200, 0);
+  Msg_Scene_CreateElement::_(hScene_, GetAvatarElementPath());
+  Msg_Scene_TranslateElement::_(hScene_, GetAvatarElementPath(), 200, 0);
 
-    Msg_Scene_CreateImage::_(hScene, GetAvatarElementPath() + "/m_image", 0,0);
-    Msg_Scene_TranslateElement::_(hScene, GetAvatarElementPath() + "/m_image", -50, 100);
-    //Msg_Scene_Draw::_(hScene);
-  }
+  Msg_Scene_CreateRectangle::_(hScene_, GetAvatarElementPath() + "/b_frame", -50, 0, 100, 100);
+  Msg_Scene_SetStrokeColor::_(hScene_, GetAvatarElementPath() + "/b_frame", 1, 0, 0, 0.5);
+
+  Msg_Scene_CreateImage::_(hScene_, GetAvatarElementPath() + "/m_image", 0,0);
+  Msg_Scene_TranslateElement::_(hScene_, GetAvatarElementPath() + "/m_image", -50, 0);
+  //Msg_Scene_Draw::_(hScene_);
 }
 
 void Participant::Hide()
 {
+  Msg_Scene_DeleteElement::_(hScene_, GetAvatarElementPath());
+
   UnSubscribeDetail(Msg_VpView_ParticipantDetail_Nickname);
   UnSubscribeDetail(Msg_VpView_ParticipantDetail_avatar);
   UnSubscribeDetail(Msg_VpView_ParticipantDetail_OnlineStatus);
@@ -244,39 +249,8 @@ void Participant::ReceivePublicChat(const ApHandle& hChat, const String& sNickna
   chats_.Set(hChat, chat);
 }
 
-#include "ximagif.h"
 void Participant::AnimationFrame(const Apollo::Image& image)
 {
-  if (pLocation_ != 0 && pLocation_->GetContext() != 0) {
-    ApHandle hScene = pLocation_->GetContext()->Scene();
-
-    //Msg_Scene_CreateImageFromData::_(hScene, "xx", 0,0, image);
-    //Msg_Scene_TranslateElement::_(hScene, "xx", 100, 100);
-
-    Msg_Scene_SetImageData::_(hScene, GetAvatarElementPath() + "/m_image", image);
- 
-    //Msg_Scene_CreateImageFromFile::_(hScene, "xx", 0,0, Apollo::getAppResourcePath() + "test/test2.png");
-    //Msg_Scene_TranslateElement::_(hScene, "xx", 100, 100);
-
-    //Apollo::Image apImg2; // from animated GIF
-    //{
-    //  Buffer sbData;
-    //  Apollo::loadFile(Apollo::getAppResourcePath() + "test/tassadar/" + "idle.gif", sbData);
-    //  CxImage cxImg(sbData.Data(), sbData.Length(), CXIMAGE_FORMAT_UNKNOWN);
-    //  cxImg.SetRetreiveAllFrames(true);
-    //  int nFrames = cxImg.GetNumFrames();
-    //  cxImg.SetFrame(nFrames - 1);
-    //  cxImg.Decode(sbData.Data(), sbData.Length(), CXIMAGE_FORMAT_GIF);
-    //  CxImage* pCxImgFrame = cxImg.GetFrame(0);
-    //  apImg2.Allocate(pCxImgFrame->GetWidth(), pCxImgFrame->GetHeight());
-    //  CxMemFile mfDest((BYTE*) apImg2.Pixels(), apImg2.Size());
-    //  pCxImgFrame->AlphaFromTransparency();
-    //  pCxImgFrame->Encode2RGBA(&mfDest, true);
-    //}
-    //  Msg_Scene_CreateImageFromData::_(hScene, GetAvatarElementPath() + "/m_image", 0,0, apImg2);
-    //  Msg_Scene_TranslateElement::_(hScene, GetAvatarElementPath() + "/m_image", 100, 100);
-
-    //Msg_Scene_Draw::_(hScene);
-  }
+  Msg_Scene_SetImageData::_(hScene_, GetAvatarElementPath() + "/m_image", image);
 }
 

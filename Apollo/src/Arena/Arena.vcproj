@@ -38,7 +38,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\..\src\CxImage\CxImage"
+				AdditionalIncludeDirectories=""
 				PreprocessorDefinitions="ARENA_EXPORTS"
 				DebugInformationFormat="4"
 			/>
@@ -53,7 +53,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="Apollo.lib cximagecrtdu.lib"
+				AdditionalDependencies="Apollo.lib"
 				AdditionalLibraryDirectories=""
 			/>
 			<Tool
