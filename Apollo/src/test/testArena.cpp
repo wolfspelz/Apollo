@@ -212,8 +212,8 @@ String Test_Setup::Begin()
   hLocation2_ = Apollo::newHandle();
   nLeft_ = 100;
   nBottom_ = 400;
-  nWidth_ = 500;
-  nHeight_ = 300;
+  nWidth_ = 600;
+  nHeight_ = 200;
 
   {
     Test_Participant p;

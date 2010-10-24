@@ -20,6 +20,8 @@ public:
   void SetPosition(int nX, int nY);
   void SetSize(int nW, int nH);
 
+  inline ApHandle Scene() { return hScene_; }
+
 protected:
   ApHandle hAp_;
   int bVisible_;

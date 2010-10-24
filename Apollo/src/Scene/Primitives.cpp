@@ -7,7 +7,7 @@
 #include "Apollo.h"
 #include "ApLog.h"
 #include "Local.h"
-#include "GraphicsElements.h"
+#include "Primitives.h"
 #include "Surface.h"
 
 void ShapeElement::SetPosition(double fX, double fY)
@@ -194,15 +194,29 @@ void ImageElement::Draw(DrawContext& gc)
   }
 
   if (pImage) {
-    //int nImageW = cairo_image_surface_get_width(pImage);
-    int nImageH = cairo_image_surface_get_height(pImage);
-    cairo_scale(gc.Cairo(), 1.0, -1.0);
-    cairo_set_source_surface(gc.Cairo(), pImage, fX_, fY_);
-    cairo_scale(gc.Cairo(), 1.0, -1.0);
-    if (fAlpha_ > 0.99) {
-      cairo_paint(gc.Cairo());
+    cairo_status_t nCairoStatus = cairo_surface_status(pImage);
+    if (nCairoStatus != CAIRO_STATUS_SUCCESS) {
+      if (bData_) {
+        apLog_Error((LOG_CHANNEL, "ImageElement::Draw", "cairo_image_surface_create_for_data failed err=%d:%s w=%d h=%d", nCairoStatus, cairo_status_to_string(nCairoStatus), image_.Width(), image_.Height()));
+        DeleteData();
+        this->image_.Free();
+      } else if (bFile_) {
+        apLog_Error((LOG_CHANNEL, "ImageElement::Draw", "cairo_image_surface_create_from_pngfailed err=%d:%s file=%s", nCairoStatus, cairo_status_to_string(nCairoStatus), StringType(sFile_)));
+        DeleteFile();
+      }
     } else {
-      cairo_paint_with_alpha(gc.Cairo(), fAlpha_);
+
+      //int nImageW = cairo_image_surface_get_width(pImage);
+      int nImageH = cairo_image_surface_get_height(pImage);
+      cairo_scale(gc.Cairo(), 1.0, -1.0);
+      cairo_set_source_surface(gc.Cairo(), pImage, fX_, fY_);
+      cairo_scale(gc.Cairo(), 1.0, -1.0);
+      if (fAlpha_ > 0.99) {
+        cairo_paint(gc.Cairo());
+      } else {
+        cairo_paint_with_alpha(gc.Cairo(), fAlpha_);
+      }
+
     }
 
     cairo_surface_destroy(pImage);

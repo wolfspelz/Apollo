@@ -1,10 +1,10 @@
 <config xmlns='http://schema.bluehands.de/character-config' version='1.0'>
   <param name='defaultsequence' value='idle'/>
   <sequence group='idle' name='idle' type='status' probability='1000' in='standard' out='standard'><animation src='idle.gif'/></sequence>
-  <sequence group='idle' name='idle-1' type='status' probability='50' in='standard' out='standard'><animation src='idle-1.gif'/></sequence>
-  <sequence group='idle' name='idle-2' type='status' probability='5' in='standard' out='standard'><animation src='idle-2.gif'/></sequence>
-  <sequence group='idle' name='idle-3' type='status' probability='2' in='standard' out='standard'><animation src='idle-3.gif'/></sequence>
-  <sequence group='idle' name='idle-4' type='status' probability='1' in='standard' out='standard'><animation src='idle-4.gif'/></sequence>
+  <sequence group='idle' name='idle-1' type='status' probability='30' in='standard' out='standard'><animation src='idle-1.gif'/></sequence>
+  <sequence group='idle' name='idle-2' type='status' probability='30' in='standard' out='standard'><animation src='idle-2.gif'/></sequence>
+  <sequence group='idle' name='idle-3' type='status' probability='10' in='standard' out='standard'><animation src='idle-3.gif'/></sequence>
+  <sequence group='idle' name='idle-4' type='status' probability='3' in='standard' out='standard'><animation src='idle-4.gif'/></sequence>
   <sequence group='moveleft' name='moveleft' type='basic' probability='1' in='moveleft' out='moveleft'><animation dx='-55' dy='0' src='walk-l.gif'/></sequence>
   <sequence group='moveright' name='moveright' type='basic' probability='1' in='moveright' out='moveright'><animation dx='55' dy='0' src='walk-r.gif'/></sequence>
   <sequence group='chat' name='chat' type='basic' probability='1000' in='standard' out='standard'><animation src='chat.gif'/></sequence>

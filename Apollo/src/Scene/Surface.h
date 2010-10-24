@@ -8,7 +8,7 @@
 #define Surface_H_INCLUDED
 
 #include "Element.h"
-#include "GraphicsElements.h"
+#include "Primitives.h"
 
 class RootElement: public Element
 {

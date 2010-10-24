@@ -46,6 +46,7 @@ public:
   void On_Scene_GetTranslateElement(Msg_Scene_GetTranslateElement* pMsg);
   void On_Scene_GetScaleElement(Msg_Scene_GetScaleElement* pMsg);
   void On_Scene_GetRotateElement(Msg_Scene_GetRotateElement* pMsg);
+  void On_Scene_CreateImage(Msg_Scene_CreateImage* pMsg);
   void On_Scene_CreateImageFromData(Msg_Scene_CreateImageFromData* pMsg);
   void On_Scene_CreateImageFromFile(Msg_Scene_CreateImageFromFile* pMsg);
   void On_Scene_CreateText(Msg_Scene_CreateText* pMsg);

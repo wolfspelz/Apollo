@@ -15,6 +15,7 @@ typedef ApHandlePointerTreeNode<Participant*> ParticipantListNode;
 typedef ApHandlePointerTreeIterator<Participant*> ParticipantListIterator;
 
 class ArenaModule;
+class Context;
 
 class Location
 {
@@ -22,6 +23,10 @@ public:
   Location(const ApHandle& hLocation, ArenaModule* pModule);
 
   inline ApHandle apHandle() { return hAp_; }
+
+  inline Context* GetContext() { return pContext_; }
+  inline void ContextAssigned(Context* pContext) { pContext_ = pContext; }
+  inline void ContextUnassigned(Context* pContext) { pContext_ = 0; }
 
   void ProcessParticipantList(Apollo::ValueList& vlParticipants);
   void ParticipantDetailsChanged(const ApHandle& hParticipant, Apollo::ValueList& vlKeys);
@@ -40,6 +45,7 @@ protected:
 protected:
   ApHandle hAp_;
   ArenaModule* pModule_;
+  Context* pContext_;
   ParticipantList participants_;
   ApHandleTree<int> addedParticipants_;
   ApHandleTree<int> removedParticipants_;

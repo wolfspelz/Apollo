@@ -14,6 +14,7 @@
 Location::Location(const ApHandle& hLocation, ArenaModule* pModule)
 :hAp_(hLocation)
 ,pModule_(pModule)
+,pContext_(0)
 {
 }
 

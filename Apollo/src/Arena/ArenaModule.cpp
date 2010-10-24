@@ -179,6 +179,7 @@ AP_MSG_HANDLER_METHOD(ArenaModule, VpView_ContextLocationAssigned)
   if (pContext == 0) { throw ApException("ArenaModule::VpView_ContextLocationAssigned: FindContext(" ApHandleFormat ") failed", ApHandleType(pMsg->hContext)); }
 
   SetLocationOfContext(pMsg->hContext, pMsg->hLocation);
+  pLocation->ContextAssigned(pContext);
 }
 
 AP_MSG_HANDLER_METHOD(ArenaModule, VpView_ContextLocationUnassigned)
@@ -189,6 +190,7 @@ AP_MSG_HANDLER_METHOD(ArenaModule, VpView_ContextLocationUnassigned)
   if (pContext == 0) { throw ApException("ArenaModule::VpView_ContextLocationUnassigned: FindContext(" ApHandleFormat ") failed", ApHandleType(pMsg->hContext)); }
 
   DeleteLocationOfContext(pMsg->hContext, pMsg->hLocation);
+  pLocation->ContextUnassigned(pContext);
 }
 
 AP_MSG_HANDLER_METHOD(ArenaModule, VpView_EnterLocationRequested){}

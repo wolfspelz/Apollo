@@ -50,12 +50,15 @@ protected:
   void GetDetailData(const String& sKey, Apollo::ValueList& vlMimeTypes);
   void UnSubscribeDetail(const String& sKey);
   void HandleAvatarData(const String& sMimeType, const String& sSource, Buffer& sbData);
+  
+  String& GetAvatarElementPath();
 
 protected:
   ApHandle hAp_;
   ArenaModule* pModule_;
   Location* pLocation_;
   String sNickname_;
+  String sPath_;
 
   Apollo::ValueList noMimeTypes_;
   Apollo::ValueList avatarMimeTypes_;

@@ -4,8 +4,8 @@
 //
 // ============================================================================
 
-#if !defined(Graphics_H_INCLUDED)
-#define Graphics_H_INCLUDED
+#if !defined(Primitives_H_INCLUDED)
+#define Primitives_H_INCLUDED
 
 #include "Element.h"
 
@@ -182,4 +182,4 @@ protected:
   int bCaptured_;
 };
 
-#endif // Graphics_H_INCLUDED
+#endif // Primitives_H_INCLUDED

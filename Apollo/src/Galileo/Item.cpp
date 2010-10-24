@@ -180,7 +180,7 @@ int Animation::LoadData()
           pFrame->img_.Allocate(pImgFrame->GetWidth(), pImgFrame->GetHeight());
           CxMemFile mfDest((BYTE*) pFrame->img_.Pixels(), pFrame->img_.Size());
           pImgFrame->AlphaFromTransparency();
-          pImgFrame->Encode2RGBA(&mfDest, false);
+          pImgFrame->Encode2RGBA(&mfDest, true);
 
           int nDuration = (int) pImgFrame->GetFrameDelay() * 10; // in 1/100 s
           if (nDuration == 0) {
@@ -636,6 +636,7 @@ Sequence* Item::SelectNextSequence()
       sSequence = sNextSequence_;
       sNextSequence_ = "";
       bFinal = 1;
+      apLog_Verbose((LOG_CHANNEL, "Item::SelectNextSequence", "item=" ApHandleFormat " selecting next definitive seq=%s", ApHandleType(hAp_), StringType(sSequence)));
     }
   }
 
@@ -657,12 +658,14 @@ Sequence* Item::SelectNextSequence()
     if (sEvent_) {
       sSequence = sEvent_;
       sEvent_ = "";
+      apLog_Verbose((LOG_CHANNEL, "Item::SelectNextSequence", "item=" ApHandleFormat " selecting event seq=%s", ApHandleType(hAp_), StringType(sSequence)));
     }
   }
 
   if (!sSequence) {
     if (sStatus_) {
       sSequence = sStatus_;
+      apLog_Verbose((LOG_CHANNEL, "Item::SelectNextSequence", "item=" ApHandleFormat " selecting status seq=%s", ApHandleType(hAp_), StringType(sSequence)));
     }
   }
 
@@ -674,6 +677,7 @@ Sequence* Item::SelectNextSequence()
         if (pTransitionSequence) {
           sNextSequence_ = sSequence;
           sSequence = sTransitionSequence;
+          apLog_Verbose((LOG_CHANNEL, "Item::SelectNextSequence", "item=" ApHandleFormat " selecting transition seq=%s", ApHandleType(hAp_), StringType(sSequence)));
         }
       }
     }
@@ -711,11 +715,13 @@ Sequence* Item::SelectNextSequence()
 
     if (sModified) {
       sSequence = sModified;
+      apLog_Verbose((LOG_CHANNEL, "Item::SelectNextSequence", "item=" ApHandleFormat " selecting modified seq=%s", ApHandleType(hAp_), StringType(sSequence)));
     }
   }
 
   if (!sSequence) {
     sSequence = GetDefaultSequence();
+    apLog_Verbose((LOG_CHANNEL, "Item::SelectNextSequence", "item=" ApHandleFormat " selecting default seq=%s", ApHandleType(hAp_), StringType(sSequence)));
   }
 
   pSequence = GetSequenceByGroupOrName(sSequence);
@@ -783,8 +789,10 @@ Sequence* Item::GetSequenceByGroup(const String& sGroup)
 
   Group* pGroup = lGroups_.FindByName(sGroup);
   if (pGroup) {
-    int nRnd = Apollo::getRandom(pGroup->GetProbabilitySum());
+    int nSum = pGroup->GetProbabilitySum();
+    int nRnd = Apollo::getRandom(nSum);
     pSequence = pGroup->GetRandomSequence(nRnd);
+    apLog_Verbose((LOG_CHANNEL, "Item::GetSequenceByGroup", "item=" ApHandleFormat " sum=%d rnd=%d %s -> %s", ApHandleType(hAp_), nSum, nRnd, StringType(sGroup), StringType(pSequence->getName())));
   }
 
   return pSequence;
