@@ -421,7 +421,7 @@ void MainLoopModule::On_MainLoop_Win32Loop(Msg_MainLoop_Win32Loop* pMsg)
                 sClass,
                 sTitle,
                 WS_OVERLAPPEDWINDOW,
-                0, 0, 300, 100,
+                0, 0, 150, 80,
                 NULL,
                 NULL,
                 g_hDllInstance,

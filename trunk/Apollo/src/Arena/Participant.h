@@ -65,6 +65,8 @@ protected:
   
   ApHandle hAnimatedItem_;
   ChatlineList chats_;
+
+  ApHandle hScene_;
 };
 
 #endif // Participant_H_INCLUDED

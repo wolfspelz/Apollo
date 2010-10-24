@@ -89,6 +89,12 @@ String SceneModuleTester::Rectangle()
 
   // ------------------------
 
+  //Msg_Scene_CreateImageFromFile::_(hScene_, "xx", -50, -50, Apollo::getAppResourcePath() + "test/test2.png");
+  //Msg_Scene_TranslateElement::_(hScene_, "xx", 100, 100);
+  //Msg_Scene_RotateElement::_(hScene_, "xx", 45.0 / 180.0 * 3.1415);
+
+  // ------------------------
+
   if (!s) { if (!Msg_Scene_CreateRectangle::_(hScene_, "_a_frame", 0.5, 0.5, nWidth - 0.5, nHeight - 0.5)) { s = "Msg_Scene_CreateRectangle failed"; }}
 //  if (!s) { if (!Msg_Scene_SetFillColor::_(hScene_, "_a_frame", 1, 1, 1, 0.5)) { s = "Msg_Scene_SetFillColor failed"; }}
   if (!s) { if (!Msg_Scene_SetStrokeColor::_(hScene_, "_a_frame", 0, 0, 0, 1)) { s = "Msg_Scene_SetStrokeColor failed"; }}
@@ -101,7 +107,7 @@ String SceneModuleTester::Rectangle()
   if (!s) { if (!Msg_Scene_SetFillColor::_(hScene_, "rect1", 0, 0, 1, 0.5)) { s = "Msg_Scene_SetFillColor failed"; }}
   if (!s) { if (!Msg_Scene_SetStrokeColor::_(hScene_, "rect1", 1, 0, 0, 0.5)) { s = "Msg_Scene_SetStrokeColor failed"; }}
   if (!s) { if (!Msg_Scene_SetStrokeWidth::_(hScene_, "rect1", 10)) { s = "Msg_Scene_SetStrokeWidth failed"; }}
-  if (!s) { if (!Msg_Scene_TranslateElement::_(hScene_, "rect1", 70, 70)) { s = "Msg_Scene_TranslateElement failed"; }}
+  if (!s) { if (!Msg_Scene_TranslateElement::_(hScene_, "rect1", 100, 80)) { s = "Msg_Scene_TranslateElement failed"; }}
   if (!s) { if (!Msg_Scene_RotateElement::_(hScene_, "rect1", 10.0 / 180.0 * 3.1415)) { s = "Msg_Scene_RotateElement failed"; }}
 
   // ------------------------
@@ -114,34 +120,6 @@ String SceneModuleTester::Rectangle()
 
   if (!s) { if (!Msg_Scene_CreateMouseSensor::_(hScene_, "z_sensor2", 0, 0, 100, 100)) { s = "Msg_Scene_CreateMouseSensor failed"; }}
   if (!s) { if (!Msg_Scene_TranslateElement::_(hScene_, "z_sensor2", 200, 200)) { s = "Msg_Scene_TranslateElement failed"; }}
-
-  // ------------------------
-
-  if (!s) { if (!Msg_Scene_CreateRectangle::_(hScene_, "copymode1", -50, -25, 100, 50)) { s = "Msg_Scene_CreateRectangle failed"; }}
-  if (!s) { if (!Msg_Scene_SetFillColor::_(hScene_, "copymode1", 1, 1, 1, 1)) { s = "Msg_Scene_SetFillColor failed"; }}
-  if (!s) { if (!Msg_Scene_SetStrokeColor::_(hScene_, "copymode1", 0, 0, 0, 1)) { s = "Msg_Scene_SetStrokeColor failed"; }}
-  if (!s) { if (!Msg_Scene_SetStrokeWidth::_(hScene_, "copymode1", 1)) { s = "Msg_Scene_SetStrokeWidth failed"; }}
-  if (!s) { if (!Msg_Scene_TranslateElement::_(hScene_, "copymode1", 210.5, 40.5)) { s = "Msg_Scene_TranslateElement failed"; }}
-  if (!s) { if (!Msg_Scene_CreateRectangle::_(hScene_, "copymode2", -50, -15, 100, 30)) { s = "Msg_Scene_CreateRectangle failed"; }}
-  if (!s) { if (!Msg_Scene_SetFillColor::_(hScene_, "copymode2", 0, 1, 0, 0.5)) { s = "Msg_Scene_SetFillColor failed"; }}
-  if (!s) { if (!Msg_Scene_TranslateElement::_(hScene_, "copymode2", 260.5, 40.5)) { s = "Msg_Scene_TranslateElement failed"; }}
-  if (!s) { if (!Msg_Scene_SetCopyMode::_(hScene_, "copymode2", Msg_Scene_SetCopyMode::Source)) { s = "Msg_Scene_SetCopyMode failed"; }}
-
-  // ------------------------
-
-  for (int i = 0; i < 4; i++) {
-    String sPath; sPath.appendf("hide-%d/", i);
-    if (!s) { if (!Msg_Scene_CreateRectangle::_(hScene_, sPath + "1-outer-green", 0, 0, 40, 35)) { s = "Msg_Scene_CreateRectangle failed"; }}
-    if (!s) { if (!Msg_Scene_SetFillColor::_(hScene_, sPath + "1-outer-green", 0, 1, 0, 1)) { s = "Msg_Scene_SetFillColor failed"; }}
-    if (!s) { if (!Msg_Scene_CreateRectangle::_(hScene_, sPath + "2-inner/1-blue", 5, 5, 30, 20)) { s = "Msg_Scene_CreateRectangle failed"; }}
-    if (!s) { if (!Msg_Scene_SetFillColor::_(hScene_, sPath + "2-inner/1-blue", 0, 0, 1, 1)) { s = "Msg_Scene_SetFillColor failed"; }}
-    if (!s) { if (!Msg_Scene_CreateRectangle::_(hScene_, sPath + "2-inner/2-red", 10, 10, 20, 20)) { s = "Msg_Scene_CreateRectangle failed"; }}
-    if (!s) { if (!Msg_Scene_SetFillColor::_(hScene_, sPath + "2-inner/2-red", 1, 0, 0, 1)) { s = "Msg_Scene_SetFillColor failed"; }}
-    if (!s) { if (!Msg_Scene_TranslateElement::_(hScene_, sPath, 160 + 42 * i, 90)) { s = "Msg_Scene_TranslateElement failed"; }}
-    if (i == 1) {
-      if (!s) { if (!Msg_Scene_HideElement::_(hScene_, sPath + "2-inner", 1)) { s = "Msg_Scene_HideElement failed"; }}
-    }
-  }
 
   // ------------------------
 
@@ -194,11 +172,18 @@ String SceneModuleTester::Rectangle()
   // ------------------------
 
   double fImage3W, fImage3H;
-  if (!s) { if (!Msg_Scene_GetImageSizeFromFile::_(hScene_, Apollo::getAppResourcePath() + "test/" + "test2.png", fImage3W, fImage3H)) { s = "Msg_Scene_GetImageSizeFromFile failed"; }}
+  if (!s) { if (!Msg_Scene_GetImageSizeFromFile::_(hScene_, Apollo::getAppResourcePath() + "test/" + "test1.png", fImage3W, fImage3H)) { s = "Msg_Scene_GetImageSizeFromFile failed"; }}
   if (!s) { if (fImage3W != 100.0 || fImage3H != 100.0) { s = "Msg_Scene_GetImageSizeFromFile returned wrong size"; }}
-  if (!s) { if (!Msg_Scene_CreateImageFromFile::_(hScene_, "image3", - fImage3W / 2.0, - fImage3H / 2.0, Apollo::getAppResourcePath() + "test/" + "test2.png")) { s = "Msg_Scene_CreateImageFromFile failed"; }}
-  if (!s) { if (!Msg_Scene_TranslateElement::_(hScene_, "image3", 60, 290)) { s = "Msg_Scene_RotateElement failed"; }}
-  if (!s) { if (!Msg_Scene_RotateElement::_(hScene_, "image3", - 10.0 / 180.0 * 3.1415)) { s = "Msg_Scene_RotateElement failed"; }}
+  if (!s) { if (!Msg_Scene_CreateImageFromFile::_(hScene_, "image3", - fImage3W / 2.0, - fImage3H / 2.0, Apollo::getAppResourcePath() + "test/" + "test1.png")) { s = "Msg_Scene_CreateImageFromFile failed"; }}
+
+  // ------------------------
+
+  double fImage4W, fImage4H;
+  if (!s) { if (!Msg_Scene_GetImageSizeFromFile::_(hScene_, Apollo::getAppResourcePath() + "test/" + "test2.png", fImage4W, fImage4H)) { s = "Msg_Scene_GetImageSizeFromFile failed"; }}
+  if (!s) { if (fImage4W != 100.0 || fImage4H != 100.0) { s = "Msg_Scene_GetImageSizeFromFile returned wrong size"; }}
+  if (!s) { if (!Msg_Scene_CreateImageFromFile::_(hScene_, "image4", - fImage4W / 2.0, - fImage4H / 2.0, Apollo::getAppResourcePath() + "test/" + "test2.png")) { s = "Msg_Scene_CreateImageFromFile failed"; }}
+  if (!s) { if (!Msg_Scene_TranslateElement::_(hScene_, "image4", 60, 290)) { s = "Msg_Scene_RotateElement failed"; }}
+  if (!s) { if (!Msg_Scene_RotateElement::_(hScene_, "image4", - 10.0 / 180.0 * 3.1415)) { s = "Msg_Scene_RotateElement failed"; }}
 
   // ------------------------
 
@@ -208,7 +193,7 @@ String SceneModuleTester::Rectangle()
   double fText1BearingX, fText1BearingY, fText1W, fText1H, fText1AdvanceX, fText1AdvanceY;
   if (!s) { if (!Msg_Scene_GetTextExtents::_(hScene_, sText1, "Courier New", 30, Msg_Scene_FontFlags::Bold, fText1BearingX, fText1BearingY, fText1W, fText1H, fText1AdvanceX, fText1AdvanceY)) { s = "Msg_Scene_MeasureText failed"; }}
   double fText1Padding = 2.5;
-  double fText1X = 130;
+  double fText1X = 145;
   double fText1Y = 140;
   double fText1Size = 30;
   if (!s) { if (!Msg_Scene_CreateText::_(hScene_, "text1/text", fText1X, fText1Y, sText1, "Courier New", 30, Msg_Scene_FontFlags::Bold)) { s = "Msg_Scene_CreateText failed"; }}
@@ -274,6 +259,34 @@ String SceneModuleTester::Rectangle()
   if (!s) { if (!Msg_Scene_SetStrokeColor::_(hScene_, "fillimage", 1, 1, 0, 1)) { s = "Msg_Scene_SetStrokeColor failed"; }}
   if (!s) { if (!Msg_Scene_SetStrokeWidth::_(hScene_, "fillimage", 1)) { s = "Msg_Scene_SetStrokeWidth failed"; }}
   if (!s) { if (!Msg_Scene_TranslateElement::_(hScene_, "fillimage", 285, 280)) { s = "Msg_Scene_TranslateElement failed"; }}
+
+  // ------------------------
+
+  if (!s) { if (!Msg_Scene_CreateRectangle::_(hScene_, "copymode1", -50, -25, 100, 50)) { s = "Msg_Scene_CreateRectangle failed"; }}
+  if (!s) { if (!Msg_Scene_SetFillColor::_(hScene_, "copymode1", 1, 1, 1, 1)) { s = "Msg_Scene_SetFillColor failed"; }}
+  if (!s) { if (!Msg_Scene_SetStrokeColor::_(hScene_, "copymode1", 0, 0, 0, 1)) { s = "Msg_Scene_SetStrokeColor failed"; }}
+  if (!s) { if (!Msg_Scene_SetStrokeWidth::_(hScene_, "copymode1", 1)) { s = "Msg_Scene_SetStrokeWidth failed"; }}
+  if (!s) { if (!Msg_Scene_TranslateElement::_(hScene_, "copymode1", 230.5, 40.5)) { s = "Msg_Scene_TranslateElement failed"; }}
+  if (!s) { if (!Msg_Scene_CreateRectangle::_(hScene_, "copymode2", -50, -15, 100, 30)) { s = "Msg_Scene_CreateRectangle failed"; }}
+  if (!s) { if (!Msg_Scene_SetFillColor::_(hScene_, "copymode2", 0, 1, 0, 0.5)) { s = "Msg_Scene_SetFillColor failed"; }}
+  if (!s) { if (!Msg_Scene_TranslateElement::_(hScene_, "copymode2", 280.5, 40.5)) { s = "Msg_Scene_TranslateElement failed"; }}
+  if (!s) { if (!Msg_Scene_SetCopyMode::_(hScene_, "copymode2", Msg_Scene_SetCopyMode::Source)) { s = "Msg_Scene_SetCopyMode failed"; }}
+
+  // ------------------------
+
+  for (int i = 0; i < 4; i++) {
+    String sPath; sPath.appendf("hide-%d/", i);
+    if (!s) { if (!Msg_Scene_CreateRectangle::_(hScene_, sPath + "1-outer-green", 0, 0, 40, 35)) { s = "Msg_Scene_CreateRectangle failed"; }}
+    if (!s) { if (!Msg_Scene_SetFillColor::_(hScene_, sPath + "1-outer-green", 0, 1, 0, 1)) { s = "Msg_Scene_SetFillColor failed"; }}
+    if (!s) { if (!Msg_Scene_CreateRectangle::_(hScene_, sPath + "2-inner/1-blue", 5, 5, 30, 20)) { s = "Msg_Scene_CreateRectangle failed"; }}
+    if (!s) { if (!Msg_Scene_SetFillColor::_(hScene_, sPath + "2-inner/1-blue", 0, 0, 1, 1)) { s = "Msg_Scene_SetFillColor failed"; }}
+    if (!s) { if (!Msg_Scene_CreateRectangle::_(hScene_, sPath + "2-inner/2-red", 10, 10, 20, 20)) { s = "Msg_Scene_CreateRectangle failed"; }}
+    if (!s) { if (!Msg_Scene_SetFillColor::_(hScene_, sPath + "2-inner/2-red", 1, 0, 0, 1)) { s = "Msg_Scene_SetFillColor failed"; }}
+    if (!s) { if (!Msg_Scene_TranslateElement::_(hScene_, sPath, 180 + 42 * i, 90)) { s = "Msg_Scene_TranslateElement failed"; }}
+    if (i == 1) {
+      if (!s) { if (!Msg_Scene_HideElement::_(hScene_, sPath + "2-inner", 1)) { s = "Msg_Scene_HideElement failed"; }}
+    }
+  }
 
   // ------------------------
 

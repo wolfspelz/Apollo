@@ -209,7 +209,9 @@ void ImageElement::Draw(DrawContext& gc)
       //int nImageW = cairo_image_surface_get_width(pImage);
       int nImageH = cairo_image_surface_get_height(pImage);
       cairo_scale(gc.Cairo(), 1.0, -1.0);
-      cairo_set_source_surface(gc.Cairo(), pImage, fX_, fY_);
+      cairo_translate(gc.Cairo(), 0.0, -nImageH);
+      cairo_set_source_surface(gc.Cairo(), pImage, fX_, -fY_);
+      cairo_translate(gc.Cairo(), 0.0, nImageH);
       cairo_scale(gc.Cairo(), 1.0, -1.0);
       if (fAlpha_ > 0.99) {
         cairo_paint(gc.Cairo());
