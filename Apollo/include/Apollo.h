@@ -112,12 +112,16 @@ APOLLO_API void sendLog(int nMask, const char* szChannel, const char* szContext,
 
 APOLLO_API void setConfig(const char* szPath, int nValue);
 APOLLO_API int getConfig(const char* szPath, int nDefault);
+APOLLO_API void setConfig(const char* szPath, double fValue);
+APOLLO_API double getConfig(const char* szPath, double fDefault);
 APOLLO_API void setConfig(const char* szPath, const char* szValue);
 APOLLO_API String getConfig(const char* szPath, const char* szDefault);
 APOLLO_API void deleteConfig(const char* szPath);
 APOLLO_API int getConfigKeys(const char* szPath, ValueList& vlKeys);
 APOLLO_API void setModuleConfig(const char* szModuleName, const char* szPath, int nValue);
 APOLLO_API int getModuleConfig(const char* szModuleName, const char* szPath, int nDefault);
+APOLLO_API void setModuleConfig(const char* szModuleName, const char* szPath, double fValue);
+APOLLO_API double getModuleConfig(const char* szModuleName, const char* szPath, double fDefault);
 APOLLO_API void setModuleConfig(const char* szModuleName, const char* szPath, const char* szValue);
 APOLLO_API String getModuleConfig(const char* szModuleName, const char* szPath, const char* szDefault);
 APOLLO_API void deleteModuleConfig(const char* szModuleName, const char* szPath);
