@@ -4,3 +4,18 @@ LoadDLL/3=[[MODULE_LIBRARY_PATH]]/../../freetype6.dll
 LoadDLL/4=[[MODULE_LIBRARY_PATH]]/../../libfontconfig-1.dll
 LoadDLL/5=[[MODULE_LIBRARY_PATH]]/../../libexpat-1.dll
 LoadDLL/6=[[MODULE_LIBRARY_PATH]]/../../libcairo-2.dll
+
+Avatar/Image/Default=DefaultAvatar.png
+
+Nickname/Ellipsis=...
+Nickname/Text/Font=Arial Narrow
+Nickname/Text/Size=14
+Nickname/Text/Weight=0
+Nickname/Text/Color=#ff000000
+Nickname/Background/Color=#a0ffffff
+Nickname/Border/Color=#ff000000
+Nickname/Text/Width=60
+Nickname/Text/Left=20
+Nickname/Text/Bottom=12
+Nickname/Border/Width=1.0
+Nickname/Text/Padding=2.5

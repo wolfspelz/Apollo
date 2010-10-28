@@ -279,6 +279,7 @@ AP_MSG_HANDLER_METHOD(ArenaModule, UnitTest_Begin)
 {
   AP_UNUSED_ARG(pMsg);
   if (Apollo::getConfig("Test/Arena", 0)) {
+    AP_UNITTEST_REGISTER(Participant::Test_TruncateNickname);
   }
 }
 
@@ -286,6 +287,7 @@ AP_MSG_HANDLER_METHOD(ArenaModule, UnitTest_Execute)
 {
   AP_UNUSED_ARG(pMsg);
   if (Apollo::getConfig("Test/Arena", 0)) {
+    AP_UNITTEST_EXECUTE(Participant::Test_TruncateNickname);
   }
 }
 

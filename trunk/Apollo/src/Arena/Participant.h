@@ -43,6 +43,11 @@ public:
   void ReceivePublicChat(const ApHandle& hChat, const String& sNickname, const String& sText, const Apollo::TimeValue& tv);
   void AnimationFrame(const Apollo::Image& image);
 
+#if defined(AP_TEST)
+  static String Test_TruncateNickname1(const ApHandle& hScene, const String& sNickname, const String& sFont, int nSize, int nFlags, int nWidth, const String& sExpected);
+  static String Test_TruncateNickname();
+#endif // #if defined(AP_TEST)
+
 protected:
   void SubscribeAndGetDetail(const String& sKey);
   void GetDetail(const String& sKey);
@@ -52,6 +57,7 @@ protected:
   void HandleAvatarData(const String& sMimeType, const String& sSource, Buffer& sbData);
   
   String& GetAvatarElementPath();
+  static String TruncateNickname(const ApHandle& hScene, const String& sText, const String& sFont, int nSize, int nFlags, int nWidth);
 
 protected:
   ApHandle hAp_;

@@ -332,6 +332,23 @@ int Apollo::getConfig(const char* szPath, int nDefault)
   }
 }
 
+void Apollo::setConfig(const char* szPath, double fValue)
+{
+  String sValue;
+  sValue.appendf("%f", fValue);
+  Apollo::setConfig(szPath, sValue);
+}
+
+double Apollo::getConfig(const char* szPath, double fDefault)
+{
+  String sValue = Apollo::getConfig(szPath, "");
+  if (sValue.empty()) {
+    return fDefault;
+  } else {
+    return String::atof(sValue.c_str());
+  }
+}
+
 void Apollo::setConfig(const char* szPath, const char* szValue)
 {
   Msg_Config_SetValue msg;
@@ -412,6 +429,30 @@ int Apollo::getModuleConfig(const char* szModuleName, const char* szPath, int nD
   }
 
   return nValue;
+}
+
+void Apollo::setModuleConfig(const char* szModuleName, const char* szPath, double fValue)
+{
+  String sModuleName = szModuleName;
+  String sPath = szPath;
+  if (!sModuleName.empty() && !sPath.empty()) {
+    String sConfigKey = _getModuleConfigPath(sModuleName, sPath);
+    Apollo::setConfig(sConfigKey, fValue);
+  }
+}
+
+double Apollo::getModuleConfig(const char* szModuleName, const char* szPath, double fDefault)
+{
+  double fValue = fDefault;
+
+  String sModuleName = szModuleName;
+  String sPath = szPath;
+  if (!sModuleName.empty() && !sPath.empty()) {
+    String sConfigKey = _getModuleConfigPath(sModuleName, sPath);
+    fValue = Apollo::getConfig(sConfigKey, fDefault);
+  }
+
+  return fValue;
 }
 
 void Apollo::setModuleConfig(const char* szModuleName, const char* szPath, const char* szValue)
