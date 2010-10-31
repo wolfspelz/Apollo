@@ -275,6 +275,25 @@ AP_MSG_HANDLER_METHOD(SceneModule, Scene_SetRectangle)
   pMsg->apStatus = ApMessage::Ok;
 }
 
+AP_MSG_HANDLER_METHOD(SceneModule, Scene_RoundRectangleCorners)
+{
+  Surface* pSurface = FindSurface(pMsg->hScene);
+  RectangleElement* pRectangle = pSurface->GetElement(pMsg->sPath)->AsRectangle();
+  pRectangle->SetCorners(RectangleElement::RoundCorners);
+  pRectangle->SetCornerRadius(pMsg->fRadius);
+  pSurface->AutoDraw();
+  pMsg->apStatus = ApMessage::Ok;
+}
+
+AP_MSG_HANDLER_METHOD(SceneModule, Scene_CurvedRectangle)
+{
+  Surface* pSurface = FindSurface(pMsg->hScene);
+  RectangleElement* pRectangle = pSurface->GetElement(pMsg->sPath)->AsRectangle();
+  pRectangle->SetCorners(RectangleElement::CurvedCorners);
+  pSurface->AutoDraw();
+  pMsg->apStatus = ApMessage::Ok;
+}
+
 AP_MSG_HANDLER_METHOD(SceneModule, Scene_SetFillColor)
 {
   Surface* pSurface = FindSurface(pMsg->hScene);
@@ -492,6 +511,8 @@ int SceneModule::Init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_CreateText, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_SetPosition, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_SetRectangle, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_RoundRectangleCorners, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_CurvedRectangle, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_SetFillColor, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_SetStrokeColor, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_SetStrokeWidth, this, ApCallbackPosNormal);

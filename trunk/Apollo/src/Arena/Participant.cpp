@@ -13,6 +13,7 @@
 #include "Participant.h"
 #include "ArenaModule.h"
 #include "ColorString.h"
+#include "Location.h"
 
 #if defined(AP_TEST)
 
@@ -96,18 +97,12 @@ Participant::Participant(const ApHandle& hParticipant, ArenaModule* pModule, Loc
 ,pModule_(pModule)
 ,pLocation_(pLocation)
 ,hAnimatedItem_(ApNoHandle)
+,nX_(300)
+,nPositionConfirmed_(0)
 {
   avatarMimeTypes_.add("avatar/gif");
   avatarMimeTypes_.add("image/gif");
   avatarMimeTypes_.add("image/png");
-}
-
-String& Participant::AvatarPath()
-{
-  if (sPath_.empty()) {
-    sPath_ = "m_avatars/" + apHandle().toString();
-  }
-  return sPath_;
 }
 
 void Participant::SubscribeAndGetDetail(const String& sKey)
@@ -150,8 +145,7 @@ void Participant::GetDetailString(const String& sKey, Apollo::ValueList& vlMimeT
 
     if (0) {
     } else if (sKey == Msg_VpView_ParticipantDetail_Nickname) {
-      sNickname_ = msg.sValue;
-      ShowNickname(sNickname_);
+      SetNickname(msg.sValue);
 
     } else if (sKey == Msg_VpView_ParticipantDetail_OnlineStatus) {
       //= sValue;
@@ -160,7 +154,13 @@ void Participant::GetDetailString(const String& sKey, Apollo::ValueList& vlMimeT
       //= sValue;
 
     } else if (sKey == Msg_VpView_ParticipantDetail_Position) {
-      //= sValue;
+      List lCoords;
+      KeyValueLfBlob2List(msg.sValue, lCoords);
+      Elem* e = lCoords.FindByNameCase("x");
+      if (e) {
+        int nX = String::atoi(e->getString());
+        SetPosition(nX);
+      }
 
     } else if (sKey == Msg_VpView_ParticipantDetail_Condition) {
       //= sValue;
@@ -261,15 +261,15 @@ void Participant::Show()
   }
 
   Msg_Scene_CreateElement::_(hScene_, AvatarPath());
-  Msg_Scene_TranslateElement::_(hScene_, AvatarPath(), 200, 0);
+  SetUnknownPosition();
 
   Msg_Scene_CreateRectangle::_(hScene_, AvatarPath() + "/" ELEMENT_FRAME, -50, 0, 100, 100);
   Msg_Scene_SetStrokeColor::_(hScene_, AvatarPath() + "/" ELEMENT_FRAME, 0, 0, 1, 0.5);
 
-  Msg_Scene_CreateImage::_(hScene_, AvatarPath() + "/" ELEMENT_IMAGE, 0, 0);
-  Msg_Scene_TranslateElement::_(hScene_, AvatarPath() + "/" ELEMENT_IMAGE, -50, 0);
+  Msg_Scene_CreateImage::_(hScene_, ImagePath(), 0, 0);
+  Msg_Scene_TranslateElement::_(hScene_, ImagePath(), -50, 0);
   String sDefaultAvatar = Apollo::getModuleResourcePath(MODULE_NAME) + Apollo::getModuleConfig(MODULE_NAME, "Avatar/Image/Default", "DefaultAvatar.png");
-  Msg_Scene_SetImageFile::_(hScene_, AvatarPath() + "/" ELEMENT_IMAGE, sDefaultAvatar);
+  Msg_Scene_SetImageFile::_(hScene_, ImagePath(), sDefaultAvatar);
 
   SubscribeAndGetDetail(Msg_VpView_ParticipantDetail_Nickname);
   SubscribeAndGetDetail(Msg_VpView_ParticipantDetail_avatar);
@@ -328,7 +328,7 @@ void Participant::ReceivePublicChat(const ApHandle& hChat, const String& sNickna
   if (pChat) {
     if (pChat->sText_ != sText) {
       pChat->sText_ = sText;
-      ShowChatline(hChat, sText);
+      SetChatline(hChat, sText);
     }
     if (pChat->tv_ != tv) {
       pChat->tv_ = tv;
@@ -336,16 +336,28 @@ void Participant::ReceivePublicChat(const ApHandle& hChat, const String& sNickna
   } else {
     pChat = new Chatline(sText, tv);
     chats_.Set(hChat, pChat);
-    ShowChatline(hChat, sText);
+
+    if (tvNewestChat_ < tv) {
+      tvNewestChat_ = tv;
+      SetChatline(hChat, sText);
+    }
   }
 }
 
 void Participant::AnimationFrame(const Apollo::Image& image)
 {
-  Msg_Scene_SetImageData::_(hScene_, AvatarPath() + "/" ELEMENT_IMAGE, image);
+  Msg_Scene_SetImageData::_(hScene_, ImagePath(), image);
 }
 
 //----------------------------------------------------------
+
+String& Participant::AvatarPath()
+{
+  if (sPath_.empty()) {
+    sPath_ = "m_avatars/" + apHandle().toString();
+  }
+  return sPath_;
+}
 
 int Participant::ElementExists(const String& sPath)
 {
@@ -354,9 +366,11 @@ int Participant::ElementExists(const String& sPath)
   return bExists;
 }
 
-void Participant::ShowNickname(const String& sNickname)
+void Participant::SetNickname(const String& sNickname)
 {
-  String sNicknamePath = AvatarPath() + "/" ELEMENT_NICKNAME;
+  sNickname_ = sNickname;
+
+  String sNicknamePath = NicknamePath();
 
   if (ElementExists(sNicknamePath)) {
     Msg_Scene_DeleteElement::_(hScene_, sNicknamePath);
@@ -417,9 +431,9 @@ void Participant::DeleteAllChatBubbles(const String& sContainer)
   }
 }
 
-void Participant::ShowChatline(const ApHandle& hChat, const String& sText)
+void Participant::SetChatline(const ApHandle& hChat, const String& sText)
 {
-  String sContainerPath = AvatarPath() + "/" + ELEMENT_CHAT;
+  String sContainerPath = ChatContainerPath();
   String sChatPath = sContainerPath + "/" + hChat.toString();
 
   CreateChatContainer(sContainerPath);
@@ -452,8 +466,34 @@ void Participant::ShowChatline(const ApHandle& hChat, const String& sText)
   Msg_Scene_SetFillColor::_(hScene_, sChatPath + "/" ELEMENT_CHAT_BOX, cBackground.r, cBackground.g, cBackground.b, cBackground.a);
   Msg_Scene_SetStrokeColor::_(hScene_, sChatPath + "/" ELEMENT_CHAT_BOX, cBorder.r, cBorder.g, cBorder.b, cBorder.a);
   Msg_Scene_SetStrokeWidth::_(hScene_, sChatPath + "/" ELEMENT_CHAT_BOX, fBorderWidth);
+  Msg_Scene_RoundRectangleCorners::_(hScene_, sChatPath + "/" ELEMENT_CHAT_BOX, 0);
 
   Msg_Scene_CreateText::_(hScene_, sChatPath + "/" ELEMENT_CHAT_TEXT, 0, 0, sTruncatedChat, sFont, nSize, nFlags);
   Msg_Scene_SetFillColor::_(hScene_, sChatPath + "/" ELEMENT_CHAT_TEXT, cText.r, cText.g, cText.b, cText.a);
 }
 
+void Participant::SetUnknownPosition()
+{
+  int nX = 300;
+  int nMin = 100;
+  int nMax = 500;
+
+  if (pLocation_) {
+    Context* pContext = pLocation_->GetContext();
+    if (pContext) {
+      nMax = pContext->GetWidth();
+    }
+  }
+
+  nX = nMin + Apollo::getRandom(nMax - nMin);
+
+  nPositionConfirmed_ = 0;
+  Msg_Scene_TranslateElement::_(hScene_, AvatarPath(), nX, 0);
+}
+
+void Participant::SetPosition(int nX)
+{
+  nX_ = nX;
+  nPositionConfirmed_ = 1;
+  Msg_Scene_TranslateElement::_(hScene_, AvatarPath(), nX, 0);
+}

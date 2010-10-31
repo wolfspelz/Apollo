@@ -60,6 +60,8 @@ protected:
   String sStrokeImageFile_;
   double fStrokeImageX_;
   double fStrokeImageY_;
+
+  static double PI;
 };
 
 class RectangleElement: public ShapeElement
@@ -69,17 +71,28 @@ public:
     :ShapeElement(pSurface)
     ,fW_(0.0)
     ,fH_(0.0)
+    ,nCorners_(NormalCorners)
+    ,fRadius_(0.0)
   {}
   virtual ~RectangleElement() {}
+
+  typedef enum _Corners { NormalCorners
+    ,RoundCorners
+    ,CurvedCorners
+  } Corners;
 
   inline virtual bool IsRectangle() { return true; }
   virtual void Draw(DrawContext& gc);
 
   inline virtual void SetSize(double fW, double fH) { fW_ = fW; fH_ = fH; }
+  inline virtual void SetCorners(Corners nCorners) { nCorners_ = nCorners; }
+  inline virtual void SetCornerRadius(double fRadius) { fRadius_ = fRadius; }
 
 protected:
   double fW_;
   double fH_;
+  Corners nCorners_;
+  double fRadius_;
 };
 
 class TextExtents

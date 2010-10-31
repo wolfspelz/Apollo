@@ -53,6 +53,8 @@ public:
   void On_Scene_CreateText(Msg_Scene_CreateText* pMsg);
   void On_Scene_SetPosition(Msg_Scene_SetPosition* pMsg);
   void On_Scene_SetRectangle(Msg_Scene_SetRectangle* pMsg);
+  void On_Scene_RoundRectangleCorners(Msg_Scene_RoundRectangleCorners* pMsg);
+  void On_Scene_CurvedRectangle(Msg_Scene_CurvedRectangle* pMsg);
   void On_Scene_SetFillColor(Msg_Scene_SetFillColor* pMsg);
   void On_Scene_SetStrokeColor(Msg_Scene_SetStrokeColor* pMsg);
   void On_Scene_SetStrokeWidth(Msg_Scene_SetStrokeWidth* pMsg);
