@@ -97,6 +97,12 @@ Participant::Participant(const ApHandle& hParticipant, ArenaModule* pModule, Loc
 ,pModule_(pModule)
 ,pLocation_(pLocation)
 ,hAnimatedItem_(ApNoHandle)
+,nMaxW_(100)
+,nMaxH_(100)
+,nW_(100)
+,nH_(100)
+,nMinW_(20)
+,nMinH_(20)
 ,nX_(300)
 ,nPositionConfirmed_(0)
 {
@@ -260,15 +266,27 @@ void Participant::Show()
     hScene_ = pLocation_->GetContext()->Scene();
   }
 
+  nMaxW_ = Apollo::getModuleConfig(MODULE_NAME, "Avatar/MaxWidth", 100);
+  nMaxH_ = Apollo::getModuleConfig(MODULE_NAME, "Avatar/MaxHeight", 100);
+  nW_ = nMaxW_;
+  nH_ = nMaxH_;
+  nMinW_ = Apollo::getModuleConfig(MODULE_NAME, "Avatar/MinWidth", 20);
+  nMinH_ = Apollo::getModuleConfig(MODULE_NAME, "Avatar/MinHeight", 20);
+
   Msg_Scene_CreateElement::_(hScene_, AvatarPath());
   SetUnknownPosition();
 
-  Msg_Scene_CreateRectangle::_(hScene_, AvatarPath() + "/" ELEMENT_FRAME, -50, 0, 100, 100);
-  Msg_Scene_SetStrokeColor::_(hScene_, AvatarPath() + "/" ELEMENT_FRAME, 0, 0, 1, 0.5);
+  if (Apollo::getModuleConfig(MODULE_NAME, "DebugFrame/Participant", 0)) {
+    Msg_Scene_CreateRectangle::_(hScene_, AvatarPath() + "/" ELEMENT_FRAME, - (((double) nMaxW_) / 2.0) - 0.5, -0.5, (double) nMaxW_ + 1, (double) nMaxH_ + 1);
+    Msg_Scene_SetStrokeColor::_(hScene_, AvatarPath() + "/" ELEMENT_FRAME, 0, 0, 1, 1);
+  }
 
   Msg_Scene_CreateImage::_(hScene_, ImagePath(), 0, 0);
-  Msg_Scene_TranslateElement::_(hScene_, ImagePath(), -50, 0);
   String sDefaultAvatar = Apollo::getModuleResourcePath(MODULE_NAME) + Apollo::getModuleConfig(MODULE_NAME, "Avatar/Image/Default", "DefaultAvatar.png");
+  double fImageW, fImageH;
+  if (Msg_Scene_GetImageSizeFromFile::_(hScene_, sDefaultAvatar, fImageW, fImageH)) {
+    Msg_Scene_TranslateElement::_(hScene_, ImagePath(), - fImageW / 2.0, 0);
+  }
   Msg_Scene_SetImageFile::_(hScene_, ImagePath(), sDefaultAvatar);
 
   SubscribeAndGetDetail(Msg_VpView_ParticipantDetail_Nickname);
@@ -347,6 +365,7 @@ void Participant::ReceivePublicChat(const ApHandle& hChat, const String& sNickna
 void Participant::AnimationFrame(const Apollo::Image& image)
 {
   Msg_Scene_SetImageData::_(hScene_, ImagePath(), image);
+  Msg_Scene_TranslateElement::_(hScene_, ImagePath(), - (double) image.Width() / 2.0, 0);
 }
 
 //----------------------------------------------------------
@@ -399,7 +418,7 @@ void Participant::SetNickname(const String& sNickname)
   Msg_Scene_CreateElement::_(hScene_, sNicknamePath);
   Msg_Scene_TranslateElement::_(hScene_, sNicknamePath, nLeft, nBottom);
 
-  Msg_Scene_CreateRectangle::_(hScene_, sNicknamePath + "/" ELEMENT_NICKNAME_BOX, -fTextPadding, -fTextPadding, fTextAdvanceX + 2 * fTextPadding, fTextH + 2 * fTextPadding);
+  Msg_Scene_CreateRectangle::_(hScene_, sNicknamePath + "/" ELEMENT_NICKNAME_BOX, -fTextPadding, -fTextPadding, fTextAdvanceX + 2 * fTextPadding + 1, fTextH + 2 * fTextPadding);
   Msg_Scene_SetFillColor::_(hScene_, sNicknamePath + "/" ELEMENT_NICKNAME_BOX, cBackground.r, cBackground.g, cBackground.b, cBackground.a);
   Msg_Scene_SetStrokeColor::_(hScene_, sNicknamePath + "/" ELEMENT_NICKNAME_BOX, cBorder.r, cBorder.g, cBorder.b, cBorder.a);
   Msg_Scene_SetStrokeWidth::_(hScene_, sNicknamePath + "/" ELEMENT_NICKNAME_BOX, fBorderWidth);
@@ -466,7 +485,7 @@ void Participant::SetChatline(const ApHandle& hChat, const String& sText)
   Msg_Scene_SetFillColor::_(hScene_, sChatPath + "/" ELEMENT_CHAT_BOX, cBackground.r, cBackground.g, cBackground.b, cBackground.a);
   Msg_Scene_SetStrokeColor::_(hScene_, sChatPath + "/" ELEMENT_CHAT_BOX, cBorder.r, cBorder.g, cBorder.b, cBorder.a);
   Msg_Scene_SetStrokeWidth::_(hScene_, sChatPath + "/" ELEMENT_CHAT_BOX, fBorderWidth);
-  Msg_Scene_RoundRectangleCorners::_(hScene_, sChatPath + "/" ELEMENT_CHAT_BOX, 0);
+  Msg_Scene_RoundedRectangle::_(hScene_, sChatPath + "/" ELEMENT_CHAT_BOX, 0);
 
   Msg_Scene_CreateText::_(hScene_, sChatPath + "/" ELEMENT_CHAT_TEXT, 0, 0, sTruncatedChat, sFont, nSize, nFlags);
   Msg_Scene_SetFillColor::_(hScene_, sChatPath + "/" ELEMENT_CHAT_TEXT, cText.r, cText.g, cText.b, cText.a);

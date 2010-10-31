@@ -267,10 +267,12 @@ String SceneModuleTester::Rectangle()
   if (!s) { if (!Msg_Scene_SetStrokeColor::_(hScene_, "copymode1", 0, 0, 0, 1)) { s = "Msg_Scene_SetStrokeColor failed"; }}
   if (!s) { if (!Msg_Scene_SetStrokeWidth::_(hScene_, "copymode1", 1)) { s = "Msg_Scene_SetStrokeWidth failed"; }}
   if (!s) { if (!Msg_Scene_TranslateElement::_(hScene_, "copymode1", 230.5, 40.5)) { s = "Msg_Scene_TranslateElement failed"; }}
+  if (!s) { if (!Msg_Scene_RoundedRectangle::_(hScene_, "copymode1", 0)) { s = "Msg_Scene_RoundRectangleCorners failed"; }}
   if (!s) { if (!Msg_Scene_CreateRectangle::_(hScene_, "copymode2", -50, -15, 100, 30)) { s = "Msg_Scene_CreateRectangle failed"; }}
   if (!s) { if (!Msg_Scene_SetFillColor::_(hScene_, "copymode2", 0, 1, 0, 0.5)) { s = "Msg_Scene_SetFillColor failed"; }}
   if (!s) { if (!Msg_Scene_TranslateElement::_(hScene_, "copymode2", 280.5, 40.5)) { s = "Msg_Scene_TranslateElement failed"; }}
   if (!s) { if (!Msg_Scene_SetCopyMode::_(hScene_, "copymode2", Msg_Scene_SetCopyMode::Source)) { s = "Msg_Scene_SetCopyMode failed"; }}
+  if (!s) { if (!Msg_Scene_CurvedRectangle::_(hScene_, "copymode2")) { s = "Msg_Scene_CurvedRectangle failed"; }}
 
   // ------------------------
 

@@ -485,13 +485,13 @@ public:
   ApIN double fH;
 };
 
-class Msg_Scene_RoundRectangleCorners: public ApRequestMessage
+class Msg_Scene_RoundedRectangle: public ApRequestMessage
 {
 public:
-  Msg_Scene_RoundRectangleCorners() : ApRequestMessage("Scene_RoundRectangleCorners"), fRadius(0.0) {}
+  Msg_Scene_RoundedRectangle() : ApRequestMessage("Scene_RoundedRectangle"), fRadius(0.0) {}
   static int _(const ApHandle& hScene, const String& sPath, double fRadius)
   {
-    Msg_Scene_RoundRectangleCorners msg;
+    Msg_Scene_RoundedRectangle msg;
     msg.hScene = hScene;
     msg.sPath = sPath;
     msg.fRadius = fRadius;

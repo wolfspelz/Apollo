@@ -1,3 +1,11 @@
+DebugFrame/Context=1
+DebugFrame/Participant=1
+
+  Avatar/MaxWidth=100
+  Avatar/MaxHeight=100
+  Avatar/MinWidth=20
+  Avatar/MinHeight=20
+
 Avatar/Image/Default=DefaultAvatar.png
 
   Nickname/Ellipsis=...
