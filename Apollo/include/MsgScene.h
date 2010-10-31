@@ -485,6 +485,38 @@ public:
   ApIN double fH;
 };
 
+class Msg_Scene_RoundRectangleCorners: public ApRequestMessage
+{
+public:
+  Msg_Scene_RoundRectangleCorners() : ApRequestMessage("Scene_RoundRectangleCorners"), fRadius(0.0) {}
+  static int _(const ApHandle& hScene, const String& sPath, double fRadius)
+  {
+    Msg_Scene_RoundRectangleCorners msg;
+    msg.hScene = hScene;
+    msg.sPath = sPath;
+    msg.fRadius = fRadius;
+    return msg.Request();
+  }
+  ApIN ApHandle hScene;
+  ApIN String sPath;
+  ApIN double fRadius;
+};
+
+class Msg_Scene_CurvedRectangle: public ApRequestMessage
+{
+public:
+  Msg_Scene_CurvedRectangle() : ApRequestMessage("Scene_CurvedRectangle") {}
+  static int _(const ApHandle& hScene, const String& sPath)
+  {
+    Msg_Scene_CurvedRectangle msg;
+    msg.hScene = hScene;
+    msg.sPath = sPath;
+    return msg.Request();
+  }
+  ApIN ApHandle hScene;
+  ApIN String sPath;
+};
+
 class Msg_Scene_SetFillColor: public ApRequestMessage
 {
 public:

@@ -56,10 +56,17 @@ protected:
   void UnSubscribeDetail(const String& sKey);
   void HandleAvatarData(const String& sMimeType, const String& sSource, Buffer& sbData);
   
+  void SetNickname(const String& sNickname);
+  void SetChatline(const ApHandle& hChat, const String& sText);
+  void SetPosition(int nX);
+  void SetUnknownPosition();
+
   String& AvatarPath();
+  String NicknamePath() { return AvatarPath() + "/" ELEMENT_NICKNAME; }
+  String ImagePath() { return AvatarPath() + "/" ELEMENT_IMAGE; }
+  String ChatContainerPath() { return AvatarPath() + "/" + ELEMENT_CHAT; }
+
   int ElementExists(const String& sPath);
-  void ShowNickname(const String& sNickname);
-  void ShowChatline(const ApHandle& hChat, const String& sText);
   void CreateChatContainer(const String& sContainer);
   void DeleteAllChatBubbles(const String& sContainer);
 
@@ -77,6 +84,10 @@ protected:
   
   ApHandle hAnimatedItem_;
   ChatlineList chats_;
+  Apollo::TimeValue tvNewestChat_;
+
+  int nX_;
+  int nPositionConfirmed_;
 
   ApHandle hScene_;
 };

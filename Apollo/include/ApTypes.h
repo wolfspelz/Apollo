@@ -233,12 +233,12 @@ public:
   TimeValue operator+(TimeValue& tv);
   inline TimeValue& operator+=(TimeValue& tv) { *this = *this + tv; return *this; }
   TimeValue operator-(TimeValue& tv);
-  bool operator<(TimeValue& tv);
-  bool operator>(TimeValue& tv);
+  bool operator<(const TimeValue& tv);
+  bool operator>(const TimeValue& tv);
   bool operator==(const TimeValue& tv);
   inline bool operator!=(const TimeValue& tv) { return !operator==(tv); }
-  bool operator>=(TimeValue& tv);
-  bool operator<=(TimeValue& tv);
+  bool operator>=(const TimeValue& tv);
+  bool operator<=(const TimeValue& tv);
   inline unsigned int Sec() { return nSec_; }
   inline unsigned MicroSec() { return nMicroSec_; }
   inline unsigned MilliSec() { return nSec_ * 1000 + nMicroSec_ / 1000; }

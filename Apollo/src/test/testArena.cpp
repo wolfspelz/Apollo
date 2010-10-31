@@ -236,11 +236,11 @@ String Test_Setup::Begin()
       p->sAvatarSource = "IdentityItemUrl=http://ydentiti.org/test/Tassadar/config.xml";
       p->sOnlineStatus = "";
       p->sMessage = "Hallo";
-      p->sPosition;
+      p->sPosition = "x=234\ny=0\nz=0";
       p->sCondition;
       p->sProfileUrl;
-      p->slChats.AddLast("Hello World 2", 2);
-      p->slChats.AddLast("Hello World 10", 10);
+      p->slChats.AddLast("2 Hello World Hello World Hello World Hello World", 2);
+      p->slChats.AddLast("10 Hello World Hello World Hello World Hello World", 10);
       pl1_.Set(Apollo::newHandle(), p);
     }
   }

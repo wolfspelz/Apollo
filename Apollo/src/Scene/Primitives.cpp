@@ -10,6 +10,8 @@
 #include "Primitives.h"
 #include "Surface.h"
 
+double ShapeElement::PI = 3.14159265358979323;
+
 void ShapeElement::SetPosition(double fX, double fY)
 {
   fX_ = fX;
@@ -128,8 +130,42 @@ void ShapeElement::FillAndStroke(DrawContext& gc)
 
 void RectangleElement::Draw(DrawContext& gc)
 {
-  cairo_rectangle(gc.Cairo(), fX_, fY_, fW_, fH_);
+  switch (nCorners_) {
+    case NormalCorners:
+      cairo_rectangle(gc.Cairo(), fX_, fY_, fW_, fH_);
+      break;
 
+    case RoundCorners:
+      {
+        double fRadius = fRadius_;
+        double fH2 = fH_ / 2.0;
+        double fW2 = fW_ / 2.0;
+        if (fRadius == 0.0 || fRadius > fW2 || fRadius > fH2) {
+          fRadius = fW2 < fH2 ? fW2 / 2.0 : fH2 / 2.0;
+        }
+
+        cairo_move_to(gc.Cairo(), fX_, fY_ + fRadius);
+	      cairo_arc(gc.Cairo(), fX_ + fRadius, fY_ + fRadius, fRadius, PI, -PI / 2);
+	      cairo_line_to(gc.Cairo(), fX_ + fW_ - fRadius, fY_);
+	      cairo_arc(gc.Cairo(), fX_ + fW_ - fRadius, fY_ + fRadius, fRadius, -PI / 2, 0);
+	      cairo_line_to(gc.Cairo(), fX_ + fW_, fY_ + fH_ - fRadius);
+	      cairo_arc(gc.Cairo(), fX_ + fW_ - fRadius, fY_ + fH_ - fRadius, fRadius, 0, PI / 2);
+	      cairo_line_to(gc.Cairo(), fX_ + fRadius, fY_ + fH_);
+	      cairo_arc(gc.Cairo(), fX_ + fRadius, fY_ + fH_ - fRadius, fRadius, PI / 2, PI);
+	      cairo_close_path(gc.Cairo());
+
+      }
+      break;
+
+    case CurvedCorners:
+      cairo_move_to(gc.Cairo(), fX_, fY_ + fH_ / 2);
+	    cairo_curve_to(gc.Cairo(), fX_, fY_, fX_, fY_, fX_ + fW_ / 2, fY_);
+	    cairo_curve_to(gc.Cairo(), fX_ + fW_, fY_, fX_ + fW_, fY_, fX_ + fW_, fY_ + fH_ / 2);
+	    cairo_curve_to(gc.Cairo(), fX_ + fW_, fY_ + fH_, fX_ + fW_, fY_ + fH_, fX_ + fW_ / 2, fY_ + fH_);
+	    cairo_curve_to(gc.Cairo(), fX_, fY_ + fH_, fX_, fY_ + fH_, fX_, fY_ + fH_ / 2);
+      break;
+  }
+  
   FillAndStroke(gc);
 }
 

@@ -20,6 +20,9 @@ public:
   void SetPosition(int nX, int nY);
   void SetSize(int nW, int nH);
 
+  inline int GetWidth() { return nW_; }
+  inline int GetHeight() { return nH_; }
+
   inline ApHandle Scene() { return hScene_; }
 
 protected:

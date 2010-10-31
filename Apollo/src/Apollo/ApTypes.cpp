@@ -374,7 +374,7 @@ void Apollo::TimeValue::operator=(time_t nSec)
   nMicroSec_ = 0;
 }
 
-bool Apollo::TimeValue::operator<(Apollo::TimeValue& tv)
+bool Apollo::TimeValue::operator<(const Apollo::TimeValue& tv)
 {
   if (nSec_ == tv.nSec_) {
     return nMicroSec_ < tv.nMicroSec_;
@@ -383,7 +383,7 @@ bool Apollo::TimeValue::operator<(Apollo::TimeValue& tv)
   }
 }
 
-bool Apollo::TimeValue::operator>(Apollo::TimeValue& tv)
+bool Apollo::TimeValue::operator>(const Apollo::TimeValue& tv)
 {
   if (nSec_ == tv.nSec_) {
     return nMicroSec_ > tv.nMicroSec_;
@@ -397,12 +397,12 @@ bool Apollo::TimeValue::operator==(const Apollo::TimeValue& tv)
   return nSec_ == tv.nSec_ && nMicroSec_ == tv.nMicroSec_;
 }
 
-bool Apollo::TimeValue::operator>=(Apollo::TimeValue& tv)
+bool Apollo::TimeValue::operator>=(const Apollo::TimeValue& tv)
 {
   return operator>(tv) || operator==(tv);
 }
 
-bool Apollo::TimeValue::operator<=(Apollo::TimeValue& tv)
+bool Apollo::TimeValue::operator<=(const Apollo::TimeValue& tv)
 {
   return operator<(tv) || operator==(tv);
 }

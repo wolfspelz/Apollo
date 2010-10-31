@@ -14,15 +14,15 @@ Avatar/Image/Default=DefaultAvatar.png
   Nickname/Text/Padding=2.5
 
   Chat/Container/Center=0
-Chat/Container/Bottom=105
+Chat/Container/Bottom=107
 
   Chat/Ellipsis=...
   Chat/Text/Font=Verdana
   Chat/Text/Size=11
   Chat/Text/Weight=0
-  Chat/Text/Color=#000000
+  Chat/Text/Color=#202020
   Chat/Background/Color=#ffffff
-  Chat/Border/Color=#000000
+Chat/Border/Color=#80808080
   Chat/Text/Width=150
-  Chat/Border/Width=1.0
-  Chat/Text/Padding=2.5
+Chat/Border/Width=3
+Chat/Text/Padding=6
