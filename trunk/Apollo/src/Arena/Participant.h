@@ -23,9 +23,9 @@ public:
   Apollo::TimeValue tv_;
 };
 
-typedef ApHandleTree<Chatline> ChatlineList;
-typedef ApHandleTreeIterator<Chatline> ChatlineListIterator;
-typedef ApHandleTreeNode<Chatline> ChatlineListNode;
+typedef ApHandlePointerTree<Chatline*> ChatlineList;
+typedef ApHandlePointerTreeIterator<Chatline*> ChatlineListIterator;
+typedef ApHandlePointerTreeNode<Chatline*> ChatlineListNode;
 
 class ArenaModule;
 class Location;
@@ -44,8 +44,8 @@ public:
   void AnimationFrame(const Apollo::Image& image);
 
 #if defined(AP_TEST)
-  static String Test_TruncateNickname1(const ApHandle& hScene, const String& sNickname, const String& sFont, int nSize, int nFlags, int nWidth, const String& sExpected);
-  static String Test_TruncateNickname();
+  static String Test_TruncateElementText1(const ApHandle& hScene, const String& sNickname, const String& sFont, int nSize, int nFlags, int nWidth, const String& sExpected);
+  static String Test_TruncateElementText();
 #endif // #if defined(AP_TEST)
 
 protected:
@@ -57,7 +57,13 @@ protected:
   void HandleAvatarData(const String& sMimeType, const String& sSource, Buffer& sbData);
   
   String& AvatarPath();
-  static String TruncateNickname(const ApHandle& hScene, const String& sText, const String& sFont, int nSize, int nFlags, int nWidth);
+  int ElementExists(const String& sPath);
+  void ShowNickname(const String& sNickname);
+  void ShowChatline(const ApHandle& hChat, const String& sText);
+  void CreateChatContainer(const String& sContainer);
+  void DeleteAllChatBubbles(const String& sContainer);
+
+  static String TruncateElementText(const ApHandle& hScene, const String& sText, const String& sFont, int nSize, int nFlags, int nWidth);
 
 protected:
   ApHandle hAp_;

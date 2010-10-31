@@ -384,7 +384,7 @@ String SceneModuleTester::SameConstants_EventContext()
   return s;
 }
 
-String SceneModuleTester::CheckChildren(Element* pNode, const String& sExpectedChildren)
+String SceneModuleTester::CheckChildrenByInspection(Element* pNode, const String& sExpectedChildren)
 {
   String s;
 
@@ -429,66 +429,120 @@ String SceneModuleTester::ElementTree()
   Element elem(0);
 
   if (!s) { if (!elem.CreateElement("a")) { s = "CreateElement failed"; } }
-  if (!s) { s = CheckChildren(&elem, "a"); }
+  if (!s) { s = CheckChildrenByInspection(&elem, "a"); }
 
   if (!s) { if (!elem.CreateElement("a/b/c")) { s = "CreateElement failed"; } }
-  if (!s) { s = CheckChildren(&elem, "a"); }
-  if (!s) { s = CheckChildren(elem.pChildren_->Find("a")->Value(), "b"); }
-  if (!s) { s = CheckChildren(elem.pChildren_->Find("a")->Value()->pChildren_->Find("b")->Value(), "c"); }
-  if (!s) { s = CheckChildren(elem.pChildren_->Find("a")->Value()->pChildren_->Find("b")->Value()->pChildren_->Find("c")->Value(), ""); }
+  if (!s) { s = CheckChildrenByInspection(&elem, "a"); }
+  if (!s) { s = CheckChildrenByInspection(elem.pChildren_->Find("a")->Value(), "b"); }
+  if (!s) { s = CheckChildrenByInspection(elem.pChildren_->Find("a")->Value()->pChildren_->Find("b")->Value(), "c"); }
+  if (!s) { s = CheckChildrenByInspection(elem.pChildren_->Find("a")->Value()->pChildren_->Find("b")->Value()->pChildren_->Find("c")->Value(), ""); }
 
   if (!s) { if (!elem.CreateElement("a/b/d")) { s = "CreateElement failed"; } }
-  if (!s) { s = CheckChildren(&elem, "a"); }
-  if (!s) { s = CheckChildren(elem.pChildren_->Find("a")->Value(), "b"); }
-  if (!s) { s = CheckChildren(elem.pChildren_->Find("a")->Value()->pChildren_->Find("b")->Value(), "c d"); }
+  if (!s) { s = CheckChildrenByInspection(&elem, "a"); }
+  if (!s) { s = CheckChildrenByInspection(elem.pChildren_->Find("a")->Value(), "b"); }
+  if (!s) { s = CheckChildrenByInspection(elem.pChildren_->Find("a")->Value()->pChildren_->Find("b")->Value(), "c d"); }
 
   if (!s) { if (!elem.CreateElement("a/e/c")) { s = "CreateElement failed"; } }
-  if (!s) { s = CheckChildren(&elem, "a"); }
-  if (!s) { s = CheckChildren(elem.pChildren_->Find("a")->Value(), "b e"); }
-  if (!s) { s = CheckChildren(elem.pChildren_->Find("a")->Value()->pChildren_->Find("b")->Value(), "c d"); }
-  if (!s) { s = CheckChildren(elem.pChildren_->Find("a")->Value()->pChildren_->Find("e")->Value(), "c"); }
+  if (!s) { s = CheckChildrenByInspection(&elem, "a"); }
+  if (!s) { s = CheckChildrenByInspection(elem.pChildren_->Find("a")->Value(), "b e"); }
+  if (!s) { s = CheckChildrenByInspection(elem.pChildren_->Find("a")->Value()->pChildren_->Find("b")->Value(), "c d"); }
+  if (!s) { s = CheckChildrenByInspection(elem.pChildren_->Find("a")->Value()->pChildren_->Find("e")->Value(), "c"); }
 
   if (!s) { if (!elem.CreateElement("a/e/d")) { s = "CreateElement failed"; } }
-  if (!s) { s = CheckChildren(&elem, "a"); }
-  if (!s) { s = CheckChildren(elem.pChildren_->Find("a")->Value(), "b e"); }
-  if (!s) { s = CheckChildren(elem.pChildren_->Find("a")->Value()->pChildren_->Find("b")->Value(), "c d"); }
-  if (!s) { s = CheckChildren(elem.pChildren_->Find("a")->Value()->pChildren_->Find("e")->Value(), "c d"); }
+  if (!s) { s = CheckChildrenByInspection(&elem, "a"); }
+  if (!s) { s = CheckChildrenByInspection(elem.pChildren_->Find("a")->Value(), "b e"); }
+  if (!s) { s = CheckChildrenByInspection(elem.pChildren_->Find("a")->Value()->pChildren_->Find("b")->Value(), "c d"); }
+  if (!s) { s = CheckChildrenByInspection(elem.pChildren_->Find("a")->Value()->pChildren_->Find("e")->Value(), "c d"); }
 
   if (!s) { if (!elem.CreateElement("f/b/c")) { s = "CreateElement failed"; } }
-  if (!s) { s = CheckChildren(&elem, "a f"); }
-  if (!s) { s = CheckChildren(elem.pChildren_->Find("a")->Value(), "b e"); }
-  if (!s) { s = CheckChildren(elem.pChildren_->Find("a")->Value()->pChildren_->Find("b")->Value(), "c d"); }
-  if (!s) { s = CheckChildren(elem.pChildren_->Find("a")->Value()->pChildren_->Find("e")->Value(), "c d"); }
-  if (!s) { s = CheckChildren(elem.pChildren_->Find("f")->Value(), "b"); }
-  if (!s) { s = CheckChildren(elem.pChildren_->Find("f")->Value()->pChildren_->Find("b")->Value(), "c"); }
+  if (!s) { s = CheckChildrenByInspection(&elem, "a f"); }
+  if (!s) { s = CheckChildrenByInspection(elem.pChildren_->Find("a")->Value(), "b e"); }
+  if (!s) { s = CheckChildrenByInspection(elem.pChildren_->Find("a")->Value()->pChildren_->Find("b")->Value(), "c d"); }
+  if (!s) { s = CheckChildrenByInspection(elem.pChildren_->Find("a")->Value()->pChildren_->Find("e")->Value(), "c d"); }
+  if (!s) { s = CheckChildrenByInspection(elem.pChildren_->Find("f")->Value(), "b"); }
+  if (!s) { s = CheckChildrenByInspection(elem.pChildren_->Find("f")->Value()->pChildren_->Find("b")->Value(), "c"); }
 
   if (!s) { if (!elem.CreateElement("a/b/c/d")) { s = "CreateElement failed"; } }
-  if (!s) { s = CheckChildren(&elem, "a f"); }
-  if (!s) { s = CheckChildren(elem.pChildren_->Find("a")->Value(), "b e"); }
-  if (!s) { s = CheckChildren(elem.pChildren_->Find("a")->Value()->pChildren_->Find("b")->Value(), "c d"); }
-  if (!s) { s = CheckChildren(elem.pChildren_->Find("a")->Value()->pChildren_->Find("e")->Value(), "c d"); }
-  if (!s) { s = CheckChildren(elem.pChildren_->Find("f")->Value(), "b"); }
-  if (!s) { s = CheckChildren(elem.pChildren_->Find("f")->Value()->pChildren_->Find("b")->Value(), "c"); }
-  if (!s) { s = CheckChildren(elem.pChildren_->Find("a")->Value()->pChildren_->Find("b")->Value()->pChildren_->Find("c")->Value(), "d"); }
+  if (!s) { s = CheckChildrenByInspection(&elem, "a f"); }
+  if (!s) { s = CheckChildrenByInspection(elem.pChildren_->Find("a")->Value(), "b e"); }
+  if (!s) { s = CheckChildrenByInspection(elem.pChildren_->Find("a")->Value()->pChildren_->Find("b")->Value(), "c d"); }
+  if (!s) { s = CheckChildrenByInspection(elem.pChildren_->Find("a")->Value()->pChildren_->Find("e")->Value(), "c d"); }
+  if (!s) { s = CheckChildrenByInspection(elem.pChildren_->Find("f")->Value(), "b"); }
+  if (!s) { s = CheckChildrenByInspection(elem.pChildren_->Find("f")->Value()->pChildren_->Find("b")->Value(), "c"); }
+  if (!s) { s = CheckChildrenByInspection(elem.pChildren_->Find("a")->Value()->pChildren_->Find("b")->Value()->pChildren_->Find("c")->Value(), "d"); }
 
   if (!s) { if (!elem.DeleteElement("a/b/c/d")) { s = "DeleteElement failed"; } }
-  if (!s) { s = CheckChildren(&elem, "a f"); }
-  if (!s) { s = CheckChildren(elem.pChildren_->Find("a")->Value(), "b e"); }
-  if (!s) { s = CheckChildren(elem.pChildren_->Find("a")->Value()->pChildren_->Find("b")->Value(), "c d"); }
-  if (!s) { s = CheckChildren(elem.pChildren_->Find("a")->Value()->pChildren_->Find("e")->Value(), "c d"); }
-  if (!s) { s = CheckChildren(elem.pChildren_->Find("f")->Value(), "b"); }
-  if (!s) { s = CheckChildren(elem.pChildren_->Find("f")->Value()->pChildren_->Find("b")->Value(), "c"); }
-  if (!s) { s = CheckChildren(elem.pChildren_->Find("a")->Value()->pChildren_->Find("b")->Value()->pChildren_->Find("c")->Value(), ""); }
+  if (!s) { s = CheckChildrenByInspection(&elem, "a f"); }
+  if (!s) { s = CheckChildrenByInspection(elem.pChildren_->Find("a")->Value(), "b e"); }
+  if (!s) { s = CheckChildrenByInspection(elem.pChildren_->Find("a")->Value()->pChildren_->Find("b")->Value(), "c d"); }
+  if (!s) { s = CheckChildrenByInspection(elem.pChildren_->Find("a")->Value()->pChildren_->Find("e")->Value(), "c d"); }
+  if (!s) { s = CheckChildrenByInspection(elem.pChildren_->Find("f")->Value(), "b"); }
+  if (!s) { s = CheckChildrenByInspection(elem.pChildren_->Find("f")->Value()->pChildren_->Find("b")->Value(), "c"); }
+  if (!s) { s = CheckChildrenByInspection(elem.pChildren_->Find("a")->Value()->pChildren_->Find("b")->Value()->pChildren_->Find("c")->Value(), ""); }
 
   if (!s) { if (!elem.DeleteElement("a/b")) { s = "DeleteElement failed"; } }
-  if (!s) { s = CheckChildren(&elem, "a f"); }
-  if (!s) { s = CheckChildren(elem.pChildren_->Find("a")->Value(), "e"); }
+  if (!s) { s = CheckChildrenByInspection(&elem, "a f"); }
+  if (!s) { s = CheckChildrenByInspection(elem.pChildren_->Find("a")->Value(), "e"); }
 
   if (!s) { if (!elem.DeleteElement("a/e")) { s = "DeleteElement failed"; } }
-  if (!s) { s = CheckChildren(&elem, "a f"); }
-  if (!s) { s = CheckChildren(elem.pChildren_->Find("a")->Value(), ""); }
-  if (!s) { s = CheckChildren(elem.pChildren_->Find("f")->Value(), "b"); }
-  if (!s) { s = CheckChildren(elem.pChildren_->Find("f")->Value()->pChildren_->Find("b")->Value(), "c"); }
+  if (!s) { s = CheckChildrenByInspection(&elem, "a f"); }
+  if (!s) { s = CheckChildrenByInspection(elem.pChildren_->Find("a")->Value(), ""); }
+  if (!s) { s = CheckChildrenByInspection(elem.pChildren_->Find("f")->Value(), "b"); }
+  if (!s) { s = CheckChildrenByInspection(elem.pChildren_->Find("f")->Value()->pChildren_->Find("b")->Value(), "c"); }
+
+  return s;
+}
+
+String SceneModuleTester::CheckChildrenByApi(Element* pNode, const String& sExpectedChildren)
+{
+  String s;
+
+  Apollo::StringList lExpectedChildren(sExpectedChildren);
+
+  Apollo::ValueList children;
+  pNode->GetChildren(children);
+
+  if (!s) {
+    if (children.length() != lExpectedChildren.length()) {
+      s.appendf("Expected: %s, unequal length: expected=%d, got=%d", StringType(sExpectedChildren), lExpectedChildren.length(), children.length());
+    }
+  }
+  
+  if (!s) {
+    int nCnt = 0;
+    Apollo::ValueElem* pChild = 0;
+    for (Elem* pExpectedChild = 0; (pExpectedChild = lExpectedChildren.Next(pExpectedChild)) != 0; ) {
+      nCnt++;
+      pChild = children.nextElem(pChild);
+      if (pChild) {
+        if (pExpectedChild->getName() != pChild->getString()) {
+          s.appendf("Position %d expected=%s, got=%s", nCnt, StringType(pExpectedChild->getName()), StringType(pChild->getString()));
+          break;
+        }
+      }
+    }
+  }
+
+  return s;
+}
+
+String SceneModuleTester::GetChildren()
+{
+  String s;
+
+  Element elem(0);
+
+  if (!s) { if (!elem.CreateElement("a/b")) { s = "CreateElement failed"; } }
+  if (!s) { if (!elem.CreateElement("a/c")) { s = "CreateElement failed"; } }
+
+  if (!s) { s = CheckChildrenByInspection(&elem, "a"); }
+  if (!s) { s = CheckChildrenByApi       (&elem, "a"); }
+
+  if (!s) { s = CheckChildrenByInspection(elem.pChildren_->Find("a")->Value(), "b c"); }
+  if (!s) { s = CheckChildrenByApi       (elem.pChildren_->Find("a")->Value(), "b c"); }
+
+  if (!s) { s = CheckChildrenByInspection(elem.pChildren_->Find("a")->Value()->pChildren_->Find("b")->Value(), ""); }
+  if (!s) { s = CheckChildrenByApi       (elem.pChildren_->Find("a")->Value()->pChildren_->Find("b")->Value(), ""); }
 
   return s;
 }
@@ -559,6 +613,7 @@ void SceneModuleTester::Begin()
   AP_UNITTEST_REGISTER(SceneModuleTester::SameConstants_Operator);
   AP_UNITTEST_REGISTER(SceneModuleTester::SameConstants_EventContext);
   AP_UNITTEST_REGISTER(SceneModuleTester::ElementTree);
+  AP_UNITTEST_REGISTER(SceneModuleTester::GetChildren);
 //  AP_UNITTEST_REGISTER(SceneModuleTester::SensorListOps);
 }
 
@@ -569,6 +624,7 @@ void SceneModuleTester::Execute()
   AP_UNITTEST_EXECUTE(SceneModuleTester::SameConstants_Operator);
   AP_UNITTEST_EXECUTE(SceneModuleTester::SameConstants_EventContext);
   AP_UNITTEST_EXECUTE(SceneModuleTester::ElementTree);
+  AP_UNITTEST_EXECUTE(SceneModuleTester::GetChildren);
 //  AP_UNITTEST_EXECUTE(SceneModuleTester::SensorListOps);
 }
 

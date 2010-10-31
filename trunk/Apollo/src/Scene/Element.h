@@ -69,6 +69,7 @@ public:
   void AddChild(const String& sName, Element* pElement);
   Element* CreateElement(const String& sPath);
   int DeleteElement(const String& sPath);
+  void GetChildren(Apollo::ValueList& vlChildren);
 
   void Translate(double fX, double fY);
   void Scale(double fX, double fY);

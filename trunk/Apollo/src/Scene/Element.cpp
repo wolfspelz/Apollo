@@ -128,6 +128,16 @@ int Element::DeleteElement(const String& sPath)
   return ok;
 }
 
+void Element::GetChildren(Apollo::ValueList& vlChildren)
+{
+  if (pChildren_) {
+    ElementIterator iter(*pChildren_);
+    for (ElementNode* pNode = 0; (pNode = iter.Next()); ) {
+      vlChildren.add(pNode->Key());
+    }
+  }
+}
+
 // ----------------------------------------------------------
 
 void Element::CheckSaveRestore()

@@ -26,11 +26,12 @@ public:
   String sPosition;
   String sCondition;
   String sProfileUrl;
+  List slChats;
 };
 
-typedef ApHandleTree<Test_Participant> Test_ParticipantList;
-typedef ApHandleTreeIterator<Test_Participant> Test_ParticipantListIterator;
-typedef ApHandleTreeNode<Test_Participant> Test_ParticipantListNode;
+typedef ApHandlePointerTree<Test_Participant*> Test_ParticipantList;
+typedef ApHandlePointerTreeIterator<Test_Participant*> Test_ParticipantListIterator;
+typedef ApHandlePointerTreeNode<Test_Participant*> Test_ParticipantListNode;
 
 class Test_Setup
 {
@@ -96,63 +97,69 @@ static void Test_VpView_GetParticipants(Msg_VpView_GetParticipants* pMsg)
 static void Test_VpView_SubscribeParticipantDetail(Msg_VpView_SubscribeParticipantDetail* pMsg)
 {
   Test_Setup* t = (Test_Setup*) pMsg->Ref();
-  Test_Participant p;
+  Test_Participant* p = 0;
   t->pl1_.Get(pMsg->hParticipant, p);
 
-  String sKey = pMsg->sKey;
-  if (0) {
-  } else if (sKey == Msg_VpView_ParticipantDetail_Nickname) {
-    pMsg->bAvailable = 1;
-  } else if (sKey == Msg_VpView_ParticipantDetail_avatar) {
-    pMsg->bAvailable = 1;
-  } else if (sKey == Msg_VpView_ParticipantDetail_OnlineStatus) {
-    pMsg->bAvailable = 1;
-  } else if (sKey == Msg_VpView_ParticipantDetail_Message) {
-    pMsg->bAvailable = 1;
-  } else if (sKey == Msg_VpView_ParticipantDetail_Position) {
-    pMsg->bAvailable = 1;
-  } else if (sKey == Msg_VpView_ParticipantDetail_Condition) {
-    pMsg->bAvailable = 1;
-  } else if (sKey == Msg_VpView_ParticipantDetail_ProfileUrl) {
-    pMsg->bAvailable = 1;
+  if (p) {
+    String sKey = pMsg->sKey;
+    if (0) {
+    } else if (sKey == Msg_VpView_ParticipantDetail_Nickname) {
+      pMsg->bAvailable = 1;
+    } else if (sKey == Msg_VpView_ParticipantDetail_avatar) {
+      pMsg->bAvailable = 1;
+    } else if (sKey == Msg_VpView_ParticipantDetail_OnlineStatus) {
+      pMsg->bAvailable = 1;
+    } else if (sKey == Msg_VpView_ParticipantDetail_Message) {
+      pMsg->bAvailable = 1;
+    } else if (sKey == Msg_VpView_ParticipantDetail_Position) {
+      pMsg->bAvailable = 1;
+    } else if (sKey == Msg_VpView_ParticipantDetail_Condition) {
+      pMsg->bAvailable = 1;
+    } else if (sKey == Msg_VpView_ParticipantDetail_ProfileUrl) {
+      pMsg->bAvailable = 1;
+    }
   }
 }
 
 static void Test_VpView_GetParticipantDetailString(Msg_VpView_GetParticipantDetailString* pMsg)
 {
   Test_Setup* t = (Test_Setup*) pMsg->Ref();
-  Test_Participant p;
+  Test_Participant* p = 0;
   t->pl1_.Get(pMsg->hParticipant, p);
 
-  String sKey = pMsg->sKey;
-  if (0) {
-  } else if (sKey == Msg_VpView_ParticipantDetail_Nickname) {
-    pMsg->sValue = p.sNickname;
-  } else if (sKey == Msg_VpView_ParticipantDetail_OnlineStatus) {
-    pMsg->sValue = p.sOnlineStatus;
-  } else if (sKey == Msg_VpView_ParticipantDetail_Message) {
-    pMsg->sValue = p.sMessage;
-  } else if (sKey == Msg_VpView_ParticipantDetail_Position) {
-    pMsg->sValue = p.sPosition;
-  } else if (sKey == Msg_VpView_ParticipantDetail_Condition) {
-    pMsg->sValue = p.sCondition;
-  } else if (sKey == Msg_VpView_ParticipantDetail_ProfileUrl) {
-    pMsg->sValue = p.sProfileUrl;
+  if (p) {
+    String sKey = pMsg->sKey;
+    if (0) {
+    } else if (sKey == Msg_VpView_ParticipantDetail_Nickname) {
+      pMsg->sValue = p->sNickname;
+    } else if (sKey == Msg_VpView_ParticipantDetail_OnlineStatus) {
+      pMsg->sValue = p->sOnlineStatus;
+    } else if (sKey == Msg_VpView_ParticipantDetail_Message) {
+      pMsg->sValue = p->sMessage;
+    } else if (sKey == Msg_VpView_ParticipantDetail_Position) {
+      pMsg->sValue = p->sPosition;
+    } else if (sKey == Msg_VpView_ParticipantDetail_Condition) {
+      pMsg->sValue = p->sCondition;
+    } else if (sKey == Msg_VpView_ParticipantDetail_ProfileUrl) {
+      pMsg->sValue = p->sProfileUrl;
+    }
   }
 }
 
 static void Test_VpView_GetParticipantDetailData(Msg_VpView_GetParticipantDetailData* pMsg)
 {
   Test_Setup* t = (Test_Setup*) pMsg->Ref();
-  Test_Participant p;
+  Test_Participant* p = 0;
   t->pl1_.Get(pMsg->hParticipant, p);
 
-  String sKey = pMsg->sKey;
-  if (0) {
-  } else if (sKey == Msg_VpView_ParticipantDetail_avatar) {
-    pMsg->sbData = p.sbAvatar;
-    pMsg->sMimeType = p.sAvatarMimetype;
-    pMsg->sSource = p.sAvatarSource;
+  if (p) {
+    String sKey = pMsg->sKey;
+    if (0) {
+    } else if (sKey == Msg_VpView_ParticipantDetail_avatar) {
+      pMsg->sbData = p->sbAvatar;
+      pMsg->sMimeType = p->sAvatarMimetype;
+      pMsg->sSource = p->sAvatarSource;
+    }
   }
 }
 
@@ -161,20 +168,25 @@ static void Test_VpView_ReplayLocationPublicChat(Msg_VpView_ReplayLocationPublic
   Test_Setup* t = (Test_Setup*) pMsg->Ref();
 
   Apollo::TimeValue tNow = Apollo::getNow();
-  Apollo::TimeValue tAge(2, 0);
-  Apollo::TimeValue tThen = tNow - tAge;
 
   Test_ParticipantListIterator iter(t->pl1_);
   for (Test_ParticipantListNode* pNode = 0; (pNode = iter.Next()) != 0; ) {
-    Msg_VpView_LocationPublicChat msg;
-    msg.hLocation = pMsg->hLocation;
-    msg.hParticipant = pNode->Key();
-    msg.hChat = Apollo::newHandle();
-    msg.sNickname = pNode->Value().sNickname;
-    msg.sText = "Hello World";
-    msg.nSec = tThen.Sec();
-    msg.nMicroSec = tThen.MicroSec();
-    msg.Send();
+    for (Elem* e = 0; (e = pNode->Value()->slChats.Next(e)); ) {
+      Msg_VpView_LocationPublicChat msg;
+
+      msg.hLocation = pMsg->hLocation;
+      msg.hParticipant = pNode->Key();
+      msg.hChat = Apollo::newHandle();
+      msg.sNickname = pNode->Value()->sNickname;
+      msg.sText = e->getName(); // Text
+
+      Apollo::TimeValue tAge(e->getInt(), 0); // Age in sec
+      Apollo::TimeValue tThen = tNow - tAge;
+      msg.nSec = tThen.Sec();
+      msg.nMicroSec = tThen.MicroSec();
+
+      msg.Send();
+    }
   }
 
   // todo: remove me
@@ -216,17 +228,21 @@ String Test_Setup::Begin()
   nHeight_ = 200;
 
   {
-    Test_Participant p;
-    p.sNickname = "Tassadar";
-    Apollo::loadFile(Apollo::getAppResourcePath() + "test/tassadar/" + "config.xml", p.sbAvatar);
-    p.sAvatarMimetype = "avatar/gif";
-    p.sAvatarSource = "IdentityItemUrl=http://ydentiti.org/test/Tassadar/config.xml";
-    p.sOnlineStatus = "";
-    p.sMessage = "Hallo";
-    p.sPosition;
-    p.sCondition;
-    p.sProfileUrl;
-    pl1_.Set(Apollo::newHandle(), p);
+    Test_Participant* p = new Test_Participant();
+    if (p) {
+      p->sNickname = "Tassadar";
+      Apollo::loadFile(Apollo::getAppResourcePath() + "test/tassadar/" + "config.xml", p->sbAvatar);
+      p->sAvatarMimetype = "avatar/gif";
+      p->sAvatarSource = "IdentityItemUrl=http://ydentiti.org/test/Tassadar/config.xml";
+      p->sOnlineStatus = "";
+      p->sMessage = "Hallo";
+      p->sPosition;
+      p->sCondition;
+      p->sProfileUrl;
+      p->slChats.AddLast("Hello World 2", 2);
+      p->slChats.AddLast("Hello World 10", 10);
+      pl1_.Set(Apollo::newHandle(), p);
+    }
   }
 
   { Msg_VpView_GetParticipants msg; msg.Hook(MODULE_NAME, (ApCallback) Test_VpView_GetParticipants, this, ApCallbackPosEarly); }

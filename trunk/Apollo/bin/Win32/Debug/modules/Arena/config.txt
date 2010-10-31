@@ -1,14 +1,28 @@
 Avatar/Image/Default=DefaultAvatar.png
 
-Nickname/Ellipsis=...
-Nickname/Text/Font=Verdana
-Nickname/Text/Size=11
-Nickname/Text/Weight=0
-Nickname/Text/Color=#000000
-Nickname/Background/Color=#F5F5F5C0
-Nickname/Border/Color=#7CC100
-Nickname/Text/Width=80
-Nickname/Text/Left=20
-Nickname/Text/Bottom=12
-Nickname/Border/Width=1.0
-Nickname/Text/Padding=2.5
+  Nickname/Ellipsis=...
+  Nickname/Text/Font=Verdana
+  Nickname/Text/Size=11
+  Nickname/Text/Weight=0
+  Nickname/Text/Color=#000000
+  Nickname/Background/Color=#F5F5F5C0
+  Nickname/Border/Color=#7CC100
+  Nickname/Text/Width=80
+  Nickname/Text/Left=20
+  Nickname/Text/Bottom=12
+  Nickname/Border/Width=1.0
+  Nickname/Text/Padding=2.5
+
+  Chat/Container/Center=0
+Chat/Container/Bottom=105
+
+  Chat/Ellipsis=...
+  Chat/Text/Font=Verdana
+  Chat/Text/Size=11
+  Chat/Text/Weight=0
+  Chat/Text/Color=#000000
+  Chat/Background/Color=#ffffff
+  Chat/Border/Color=#000000
+  Chat/Text/Width=150
+  Chat/Border/Width=1.0
+  Chat/Text/Padding=2.5
