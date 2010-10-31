@@ -56,7 +56,7 @@ protected:
   void UnSubscribeDetail(const String& sKey);
   void HandleAvatarData(const String& sMimeType, const String& sSource, Buffer& sbData);
   
-  String& GetAvatarElementPath();
+  String& AvatarPath();
   static String TruncateNickname(const ApHandle& hScene, const String& sText, const String& sFont, int nSize, int nFlags, int nWidth);
 
 protected:

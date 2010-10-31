@@ -1,20 +1,13 @@
-LoadDLL/1=[[MODULE_LIBRARY_PATH]]/../../zlib1.dll
-LoadDLL/2=[[MODULE_LIBRARY_PATH]]/../../libpng14-14.dll
-LoadDLL/3=[[MODULE_LIBRARY_PATH]]/../../freetype6.dll
-LoadDLL/4=[[MODULE_LIBRARY_PATH]]/../../libfontconfig-1.dll
-LoadDLL/5=[[MODULE_LIBRARY_PATH]]/../../libexpat-1.dll
-LoadDLL/6=[[MODULE_LIBRARY_PATH]]/../../libcairo-2.dll
-
 Avatar/Image/Default=DefaultAvatar.png
 
 Nickname/Ellipsis=...
-Nickname/Text/Font=Arial Narrow
-Nickname/Text/Size=14
+Nickname/Text/Font=Verdana
+Nickname/Text/Size=11
 Nickname/Text/Weight=0
-Nickname/Text/Color=#ff000000
-Nickname/Background/Color=#a0ffffff
-Nickname/Border/Color=#ff000000
-Nickname/Text/Width=60
+Nickname/Text/Color=#000000
+Nickname/Background/Color=#F5F5F5C0
+Nickname/Border/Color=#7CC100
+Nickname/Text/Width=80
 Nickname/Text/Left=20
 Nickname/Text/Bottom=12
 Nickname/Border/Width=1.0

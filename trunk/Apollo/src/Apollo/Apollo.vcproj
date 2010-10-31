@@ -193,6 +193,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\ColorString.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Crypto.cpp"
 				>
 			</File>
@@ -295,6 +299,10 @@
 				</File>
 				<File
 					RelativePath="..\..\include\ApTypes.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\ColorString.h"
 					>
 				</File>
 				<File

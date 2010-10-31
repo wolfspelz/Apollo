@@ -105,7 +105,7 @@ void Context::SetSize(int nW, int nH)
       Msg_Scene_DeleteElement::_(hScene_, "_a_frame");
     }
     Msg_Scene_CreateRectangle::_(hScene_, "_a_frame", 0.5, 0.5, nW_ - 0.5, nH_ - 0.5);
-    //Msg_Scene_SetFillColor::_(hScene_, "_a_frame", 1, 1, 1, 1);
+    Msg_Scene_SetFillColor::_(hScene_, "_a_frame", 1, 1, 1, 0.5);
     Msg_Scene_SetStrokeColor::_(hScene_, "_a_frame", 0, 0, 0, 1);
     Msg_Scene_SetStrokeWidth::_(hScene_, "_a_frame", 1);
   }
