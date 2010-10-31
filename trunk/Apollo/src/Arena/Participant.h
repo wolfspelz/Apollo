@@ -43,6 +43,13 @@ public:
   void ReceivePublicChat(const ApHandle& hChat, const String& sNickname, const String& sText, const Apollo::TimeValue& tv);
   void AnimationFrame(const Apollo::Image& image);
 
+  int MaxHeight() { return nMaxH_; }
+  int MaxWidth() { return nMaxW_; }
+  int Height() { return nH_; }
+  int Width() { return nW_; }
+  int MinHeight() { return nMinH_; }
+  int MinWidth() { return nMinW_; }
+
 #if defined(AP_TEST)
   static String Test_TruncateElementText1(const ApHandle& hScene, const String& sNickname, const String& sFont, int nSize, int nFlags, int nWidth, const String& sExpected);
   static String Test_TruncateElementText();
@@ -85,6 +92,13 @@ protected:
   ApHandle hAnimatedItem_;
   ChatlineList chats_;
   Apollo::TimeValue tvNewestChat_;
+
+  int nMaxW_;
+  int nMaxH_;
+  int nW_;
+  int nH_;
+  int nMinW_;
+  int nMinH_;
 
   int nX_;
   int nPositionConfirmed_;
