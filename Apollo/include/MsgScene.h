@@ -130,6 +130,15 @@ public:
   ApOUT int bExists;
 };
 
+class Msg_Scene_GetChildren: public ApRequestMessage
+{
+public:
+  Msg_Scene_GetChildren() : ApRequestMessage("Scene_GetChildren") {}
+  ApIN ApHandle hScene;
+  ApIN String sPath;
+  ApOUT Apollo::ValueList vlChildren;
+};
+
 //--------------------------
 // Manipulate elements
 

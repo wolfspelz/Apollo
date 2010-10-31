@@ -235,8 +235,8 @@ public:
   TimeValue operator-(TimeValue& tv);
   bool operator<(TimeValue& tv);
   bool operator>(TimeValue& tv);
-  bool operator==(TimeValue& tv);
-  inline bool operator!=(TimeValue& tv) { return !operator==(tv); }
+  bool operator==(const TimeValue& tv);
+  inline bool operator!=(const TimeValue& tv) { return !operator==(tv); }
   bool operator>=(TimeValue& tv);
   bool operator<=(TimeValue& tv);
   inline unsigned int Sec() { return nSec_; }

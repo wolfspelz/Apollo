@@ -23,12 +23,15 @@ public:
 
   static void On_Scene_MouseEvent(Msg_Scene_MouseEvent* pMsg);
 
-  static String CheckChildren(Element* pNode, const String& sExpectedChildren);
+  static String CheckChildrenByInspection(Element* pNode, const String& sExpectedChildren);
+  static String CheckChildrenByApi(Element* pNode, const String& sExpectedChildren);
+
   static String Rectangle();
   static String SameConstants_FontFlags();
   static String SameConstants_Operator();
   static String SameConstants_EventContext();
   static String ElementTree();
+  static String GetChildren();
 //  static String SensorListOps();
 
   static int bHasCursor_;

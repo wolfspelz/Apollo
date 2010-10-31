@@ -16,11 +16,11 @@
 
 #if defined(AP_TEST)
 
-String Participant::Test_TruncateNickname1(const ApHandle& hScene, const String& sNickname, const String& sFont, int nSize, int nFlags, int nWidth, const String& sExpected)
+String Participant::Test_TruncateElementText1(const ApHandle& hScene, const String& sNickname, const String& sFont, int nSize, int nFlags, int nWidth, const String& sExpected)
 {
   String s;
 
-  String sTruncated = TruncateNickname(hScene, sNickname, sFont, nSize, nFlags, nWidth);
+  String sTruncated = TruncateElementText(hScene, sNickname, sFont, nSize, nFlags, nWidth);
   if (sTruncated != sExpected) {
     s.appendf("Expected=%s got=%s for font=%s size=%d flags=%d width=%d", StringType(sExpected), StringType(sTruncated), StringType(sFont), nSize, nFlags, nWidth);
   }
@@ -28,7 +28,7 @@ String Participant::Test_TruncateNickname1(const ApHandle& hScene, const String&
   return s;
 }
 
-String Participant::Test_TruncateNickname()
+String Participant::Test_TruncateElementText()
 {
   String s;
 
@@ -36,17 +36,17 @@ String Participant::Test_TruncateNickname()
   { Msg_Scene_Create msg; msg.hScene = hScene; msg.Request(); }
   { Msg_Scene_Position msg; msg.hScene = hScene; msg.nX = 100; msg.nY = 100; msg.nW = 100; msg.nH = 100; msg.Request(); }
 
-  if (!s) { s = Test_TruncateNickname1(hScene, "123456789 123456789 123456789 123456789 123456789 ", "Courier New", 14, Msg_Scene_FontFlags::Normal, 10, "1"); }
-  if (!s) { s = Test_TruncateNickname1(hScene, "123456789 123456789 123456789 123456789 123456789 ", "Courier New", 14, Msg_Scene_FontFlags::Normal, 30, "1234"); }
-  if (!s) { s = Test_TruncateNickname1(hScene, "123456789 123456789 123456789 123456789 123456789 ", "Courier New", 9, Msg_Scene_FontFlags::Normal, 30, "123456"); }
-  if (!s) { s = Test_TruncateNickname1(hScene, "123456789 123456789 123456789 123456789 123456789 ", "Courier New", 14, Msg_Scene_FontFlags::Normal, 80, "123456789 "); }
-  if (!s) { s = Test_TruncateNickname1(hScene, "123456789 123456789 123456789 123456789 123456789 ", "Arial Narrow", 14, Msg_Scene_FontFlags::Normal, 80, "123456789 1234"); }
-  if (!s) { s = Test_TruncateNickname1(hScene, "123456789 123456789 123456789 123456789 123456789 ", "Verdana", 12, Msg_Scene_FontFlags::Normal, 80, "123456789 "); }
-  if (!s) { s = Test_TruncateNickname1(hScene, "123456789 123456789 123456789 123456789 123456789 ", "Verdana", 10, Msg_Scene_FontFlags::Normal, 80, "123456789 123"); }
-  if (!s) { s = Test_TruncateNickname1(hScene, "123456789", "Verdana", 10, Msg_Scene_FontFlags::Normal, 80, "123456789"); }
-  if (!s) { s = Test_TruncateNickname1(hScene, "1", "Verdana", 10, Msg_Scene_FontFlags::Normal, 80, "1"); }
-  if (!s) { s = Test_TruncateNickname1(hScene, "\xE9\xA0\x81" "\xE9\xA6\x96", "Verdana", 10, Msg_Scene_FontFlags::Normal, 80, "\xE9\xA0\x81" "\xE9\xA6\x96"); }
-  if (!s) { s = Test_TruncateNickname1(hScene, "\xE9\xA0\x81" "\xE9\xA6\x96" "\xE9\xA0\x81" "\xE9\xA6\x96" "\xE9\xA0\x81" "\xE9\xA6\x96" "\xE9\xA0\x81" "\xE9\xA6\x96" "\xE9\xA0\x81" "\xE9\xA6\x96" "\xE9\xA0\x81" "\xE9\xA6\x96", "Verdana", 10, Msg_Scene_FontFlags::Normal, 80, "\xE9\xA0\x81" "\xE9\xA6\x96" "\xE9\xA0\x81" "\xE9\xA6\x96" "\xE9\xA0\x81" "\xE9\xA6\x96" "\xE9\xA0\x81" "\xE9\xA6\x96"); }
+  if (!s) { s = Test_TruncateElementText1(hScene, "123456789 123456789 123456789 123456789 123456789 ", "Courier New", 14, Msg_Scene_FontFlags::Normal, 10, "1"); }
+  if (!s) { s = Test_TruncateElementText1(hScene, "123456789 123456789 123456789 123456789 123456789 ", "Courier New", 14, Msg_Scene_FontFlags::Normal, 30, "1234"); }
+  if (!s) { s = Test_TruncateElementText1(hScene, "123456789 123456789 123456789 123456789 123456789 ", "Courier New", 9, Msg_Scene_FontFlags::Normal, 30, "123456"); }
+  if (!s) { s = Test_TruncateElementText1(hScene, "123456789 123456789 123456789 123456789 123456789 ", "Courier New", 14, Msg_Scene_FontFlags::Normal, 80, "123456789 "); }
+  if (!s) { s = Test_TruncateElementText1(hScene, "123456789 123456789 123456789 123456789 123456789 ", "Arial Narrow", 14, Msg_Scene_FontFlags::Normal, 80, "123456789 1234"); }
+  if (!s) { s = Test_TruncateElementText1(hScene, "123456789 123456789 123456789 123456789 123456789 ", "Verdana", 12, Msg_Scene_FontFlags::Normal, 80, "123456789 "); }
+  if (!s) { s = Test_TruncateElementText1(hScene, "123456789 123456789 123456789 123456789 123456789 ", "Verdana", 10, Msg_Scene_FontFlags::Normal, 80, "123456789 123"); }
+  if (!s) { s = Test_TruncateElementText1(hScene, "123456789", "Verdana", 10, Msg_Scene_FontFlags::Normal, 80, "123456789"); }
+  if (!s) { s = Test_TruncateElementText1(hScene, "1", "Verdana", 10, Msg_Scene_FontFlags::Normal, 80, "1"); }
+  if (!s) { s = Test_TruncateElementText1(hScene, "\xE9\xA0\x81" "\xE9\xA6\x96", "Verdana", 10, Msg_Scene_FontFlags::Normal, 80, "\xE9\xA0\x81" "\xE9\xA6\x96"); }
+  if (!s) { s = Test_TruncateElementText1(hScene, "\xE9\xA0\x81" "\xE9\xA6\x96" "\xE9\xA0\x81" "\xE9\xA6\x96" "\xE9\xA0\x81" "\xE9\xA6\x96" "\xE9\xA0\x81" "\xE9\xA6\x96" "\xE9\xA0\x81" "\xE9\xA6\x96" "\xE9\xA0\x81" "\xE9\xA6\x96", "Verdana", 10, Msg_Scene_FontFlags::Normal, 80, "\xE9\xA0\x81" "\xE9\xA6\x96" "\xE9\xA0\x81" "\xE9\xA6\x96" "\xE9\xA0\x81" "\xE9\xA6\x96" "\xE9\xA0\x81" "\xE9\xA6\x96"); }
 
   { Msg_Scene_Destroy msg; msg.hScene = hScene; msg.Request(); }
 
@@ -55,7 +55,7 @@ String Participant::Test_TruncateNickname()
 
 #endif // #if defined(AP_TEST)
 
-String Participant::TruncateNickname(const ApHandle& hScene, const String& sText, const String& sFont, int nSize, int nFlags, int nWidth)
+String Participant::TruncateElementText(const ApHandle& hScene, const String& sText, const String& sFont, int nSize, int nFlags, int nWidth)
 {
   String sResult;
   String sWork = sText;
@@ -151,42 +151,7 @@ void Participant::GetDetailString(const String& sKey, Apollo::ValueList& vlMimeT
     if (0) {
     } else if (sKey == Msg_VpView_ParticipantDetail_Nickname) {
       sNickname_ = msg.sValue;
-
-      int bExists = 0;
-      if (Msg_Scene_ElementExists::_(hScene_, AvatarPath() + "/ " ELEMENT_NICKNAME, bExists) && bExists) {
-        Msg_Scene_DeleteElement::_(hScene_, AvatarPath() + "/ " ELEMENT_NICKNAME);
-      }
-
-      String sFont = Apollo::getModuleConfig(MODULE_NAME, "Nickname/Text/Font", "Arial Narrow");
-      int nSize = Apollo::getModuleConfig(MODULE_NAME, "Nickname/Text/Size", 12);
-      int nFlags = Apollo::getModuleConfig(MODULE_NAME, "Nickname/Text/Weight", Msg_Scene_FontFlags::Normal);
-      Apollo::ColorString cText = Apollo::getModuleConfig(MODULE_NAME, "Nickname/Text/Color", "#000000");
-      Apollo::ColorString cBackground = Apollo::getModuleConfig(MODULE_NAME, "Nickname/Background/Color", "#ffffff");
-      Apollo::ColorString cBorder = Apollo::getModuleConfig(MODULE_NAME, "Nickname/Border/Color", "#000000");
-      int nWidth = Apollo::getModuleConfig(MODULE_NAME, "Nickname/Text/Width", 80);
-      int nLeft = Apollo::getModuleConfig(MODULE_NAME, "Nickname/Text/Left", 20);
-      int nBottom = Apollo::getModuleConfig(MODULE_NAME, "Nickname/Text/Bottom", 10);
-      double fBorderWidth = Apollo::getModuleConfig(MODULE_NAME, "Nickname/Border/Width", 1.0);
-      double fTextPadding = Apollo::getModuleConfig(MODULE_NAME, "Nickname/Text/Padding", 2.5);
-
-      String sTruncatedNickname = TruncateNickname(hScene_, sNickname_, sFont, nSize, nFlags, nWidth);
-      if (sTruncatedNickname != sNickname_) {
-        sTruncatedNickname += Apollo::getModuleConfig(MODULE_NAME, "Nickname/Ellipsis", "...");
-      }
-
-      double fTextBearingX, fTextBearingY, fTextW, fTextH, fTextAdvanceX, fTextAdvanceY;
-      Msg_Scene_GetTextExtents::_(hScene_, sTruncatedNickname, sFont, nSize, nFlags, fTextBearingX, fTextBearingY, fTextW, fTextH, fTextAdvanceX, fTextAdvanceY);
-
-      Msg_Scene_CreateElement::_(hScene_, AvatarPath() + "/ " ELEMENT_NICKNAME);
-      Msg_Scene_TranslateElement::_(hScene_, AvatarPath() + "/ " ELEMENT_NICKNAME, nLeft, nBottom);
-
-      Msg_Scene_CreateRectangle::_(hScene_, AvatarPath() + "/ " ELEMENT_NICKNAME "/" ELEMENT_NICKNAME_BOX, -fTextPadding, -fTextPadding, fTextAdvanceX + 2 * fTextPadding, fTextH + 2 * fTextPadding);
-      Msg_Scene_SetFillColor::_(hScene_, AvatarPath() + "/ " ELEMENT_NICKNAME "/" ELEMENT_NICKNAME_BOX, cBackground.r, cBackground.g, cBackground.b, cBackground.a);
-      Msg_Scene_SetStrokeColor::_(hScene_, AvatarPath() + "/ " ELEMENT_NICKNAME "/" ELEMENT_NICKNAME_BOX, cBorder.r, cBorder.g, cBorder.b, cBorder.a);
-      Msg_Scene_SetStrokeWidth::_(hScene_, AvatarPath() + "/ " ELEMENT_NICKNAME "/" ELEMENT_NICKNAME_BOX, fBorderWidth);
-
-      Msg_Scene_CreateText::_(hScene_, AvatarPath() + "/ " ELEMENT_NICKNAME "/" ELEMENT_NICKNAME_TEXT, 0, 0, sTruncatedNickname, sFont, nSize, nFlags);
-      Msg_Scene_SetFillColor::_(hScene_, AvatarPath() + "/ " ELEMENT_NICKNAME "/" ELEMENT_NICKNAME_TEXT, cText.r, cText.g, cText.b, cText.a);
+      ShowNickname(sNickname_);
 
     } else if (sKey == Msg_VpView_ParticipantDetail_OnlineStatus) {
       //= sValue;
@@ -298,13 +263,13 @@ void Participant::Show()
   Msg_Scene_CreateElement::_(hScene_, AvatarPath());
   Msg_Scene_TranslateElement::_(hScene_, AvatarPath(), 200, 0);
 
-  Msg_Scene_CreateRectangle::_(hScene_, AvatarPath() + "/ " ELEMENT_FRAME, -50, 0, 100, 100);
-  Msg_Scene_SetStrokeColor::_(hScene_, AvatarPath() + "/ " ELEMENT_FRAME, 0, 0, 1, 0.5);
+  Msg_Scene_CreateRectangle::_(hScene_, AvatarPath() + "/" ELEMENT_FRAME, -50, 0, 100, 100);
+  Msg_Scene_SetStrokeColor::_(hScene_, AvatarPath() + "/" ELEMENT_FRAME, 0, 0, 1, 0.5);
 
-  Msg_Scene_CreateImage::_(hScene_, AvatarPath() + "/ " ELEMENT_IMAGE, 0, 0);
-  Msg_Scene_TranslateElement::_(hScene_, AvatarPath() + "/ " ELEMENT_IMAGE, -50, 0);
+  Msg_Scene_CreateImage::_(hScene_, AvatarPath() + "/" ELEMENT_IMAGE, 0, 0);
+  Msg_Scene_TranslateElement::_(hScene_, AvatarPath() + "/" ELEMENT_IMAGE, -50, 0);
   String sDefaultAvatar = Apollo::getModuleResourcePath(MODULE_NAME) + Apollo::getModuleConfig(MODULE_NAME, "Avatar/Image/Default", "DefaultAvatar.png");
-  Msg_Scene_SetImageFile::_(hScene_, AvatarPath() + "/ " ELEMENT_IMAGE, sDefaultAvatar);
+  Msg_Scene_SetImageFile::_(hScene_, AvatarPath() + "/" ELEMENT_IMAGE, sDefaultAvatar);
 
   SubscribeAndGetDetail(Msg_VpView_ParticipantDetail_Nickname);
   SubscribeAndGetDetail(Msg_VpView_ParticipantDetail_avatar);
@@ -358,16 +323,137 @@ void Participant::DetailsChanged(Apollo::ValueList& vlKeys)
 
 void Participant::ReceivePublicChat(const ApHandle& hChat, const String& sNickname, const String& sText, const Apollo::TimeValue& tv)
 {
-  if (chats_.Find(hChat) != 0) {
-    chats_.Unset(hChat);
+  Chatline* pChat = 0;
+  chats_.Get(hChat, pChat);
+  if (pChat) {
+    if (pChat->sText_ != sText) {
+      pChat->sText_ = sText;
+      ShowChatline(hChat, sText);
+    }
+    if (pChat->tv_ != tv) {
+      pChat->tv_ = tv;
+    }
+  } else {
+    pChat = new Chatline(sText, tv);
+    chats_.Set(hChat, pChat);
+    ShowChatline(hChat, sText);
   }
-
-  Chatline chat(sText, tv);
-  chats_.Set(hChat, chat);
 }
 
 void Participant::AnimationFrame(const Apollo::Image& image)
 {
-  Msg_Scene_SetImageData::_(hScene_, AvatarPath() + "/ " ELEMENT_IMAGE, image);
+  Msg_Scene_SetImageData::_(hScene_, AvatarPath() + "/" ELEMENT_IMAGE, image);
+}
+
+//----------------------------------------------------------
+
+int Participant::ElementExists(const String& sPath)
+{
+  int bExists = 0;
+  Msg_Scene_ElementExists::_(hScene_, sPath, bExists);
+  return bExists;
+}
+
+void Participant::ShowNickname(const String& sNickname)
+{
+  String sNicknamePath = AvatarPath() + "/" ELEMENT_NICKNAME;
+
+  if (ElementExists(sNicknamePath)) {
+    Msg_Scene_DeleteElement::_(hScene_, sNicknamePath);
+  }
+
+  String sFont = Apollo::getModuleConfig(MODULE_NAME, "Nickname/Text/Font", "Arial");
+  int nSize = Apollo::getModuleConfig(MODULE_NAME, "Nickname/Text/Size", 12);
+  int nFlags = Apollo::getModuleConfig(MODULE_NAME, "Nickname/Text/Weight", Msg_Scene_FontFlags::Normal);
+  Apollo::ColorString cText = Apollo::getModuleConfig(MODULE_NAME, "Nickname/Text/Color", "#000000");
+  Apollo::ColorString cBackground = Apollo::getModuleConfig(MODULE_NAME, "Nickname/Background/Color", "#ffffff");
+  Apollo::ColorString cBorder = Apollo::getModuleConfig(MODULE_NAME, "Nickname/Border/Color", "#000000");
+  int nWidth = Apollo::getModuleConfig(MODULE_NAME, "Nickname/Text/Width", 80);
+  int nLeft = Apollo::getModuleConfig(MODULE_NAME, "Nickname/Text/Left", 20);
+  int nBottom = Apollo::getModuleConfig(MODULE_NAME, "Nickname/Text/Bottom", 10);
+  double fBorderWidth = Apollo::getModuleConfig(MODULE_NAME, "Nickname/Border/Width", 1.0);
+  double fTextPadding = Apollo::getModuleConfig(MODULE_NAME, "Nickname/Text/Padding", 2.5);
+
+  String sTruncatedNickname = TruncateElementText(hScene_, sNickname, sFont, nSize, nFlags, nWidth);
+  if (sTruncatedNickname != sNickname_) {
+    sTruncatedNickname += Apollo::getModuleConfig(MODULE_NAME, "Nickname/Ellipsis", "...");
+  }
+
+  double fTextBearingX, fTextBearingY, fTextW, fTextH, fTextAdvanceX, fTextAdvanceY;
+  Msg_Scene_GetTextExtents::_(hScene_, sTruncatedNickname, sFont, nSize, nFlags, fTextBearingX, fTextBearingY, fTextW, fTextH, fTextAdvanceX, fTextAdvanceY);
+
+  Msg_Scene_CreateElement::_(hScene_, sNicknamePath);
+  Msg_Scene_TranslateElement::_(hScene_, sNicknamePath, nLeft, nBottom);
+
+  Msg_Scene_CreateRectangle::_(hScene_, sNicknamePath + "/" ELEMENT_NICKNAME_BOX, -fTextPadding, -fTextPadding, fTextAdvanceX + 2 * fTextPadding, fTextH + 2 * fTextPadding);
+  Msg_Scene_SetFillColor::_(hScene_, sNicknamePath + "/" ELEMENT_NICKNAME_BOX, cBackground.r, cBackground.g, cBackground.b, cBackground.a);
+  Msg_Scene_SetStrokeColor::_(hScene_, sNicknamePath + "/" ELEMENT_NICKNAME_BOX, cBorder.r, cBorder.g, cBorder.b, cBorder.a);
+  Msg_Scene_SetStrokeWidth::_(hScene_, sNicknamePath + "/" ELEMENT_NICKNAME_BOX, fBorderWidth);
+
+  Msg_Scene_CreateText::_(hScene_, sNicknamePath + "/" ELEMENT_NICKNAME_TEXT, 0, 0, sTruncatedNickname, sFont, nSize, nFlags);
+  Msg_Scene_SetFillColor::_(hScene_, sNicknamePath + "/" ELEMENT_NICKNAME_TEXT, cText.r, cText.g, cText.b, cText.a);
+}
+
+void Participant::CreateChatContainer(const String& sContainer)
+{
+  if (!ElementExists(sContainer)) {
+    Msg_Scene_CreateElement::_(hScene_, sContainer);
+
+    int nCenter = Apollo::getModuleConfig(MODULE_NAME, "Chat/Container/Center", 0);
+    int nBottom = Apollo::getModuleConfig(MODULE_NAME, "Chat/Container/Bottom", 100);
+    Msg_Scene_TranslateElement::_(hScene_, sContainer, nCenter, nBottom);
+  }
+}
+
+void Participant::DeleteAllChatBubbles(const String& sContainer)
+{
+  Msg_Scene_GetChildren msg;
+  msg.hScene = hScene_;
+  msg.sPath = sContainer;
+  if (msg.Request()) {
+    for (Apollo::ValueElem* e = 0; e = msg.vlChildren.nextElem(e); ) {
+      Msg_Scene_DeleteElement::_(hScene_, sContainer + "/" + e->getString());
+    }
+  }
+}
+
+void Participant::ShowChatline(const ApHandle& hChat, const String& sText)
+{
+  String sContainerPath = AvatarPath() + "/" + ELEMENT_CHAT;
+  String sChatPath = sContainerPath + "/" + hChat.toString();
+
+  CreateChatContainer(sContainerPath);
+  //Msg_Scene_CreateRectangle::_(hScene_, sChatPath, -40, 0, 80, 20);
+  //Msg_Scene_SetFillColor::_(hScene_, sChatPath, 0, 0, 0, 1);
+  DeleteAllChatBubbles(sContainerPath);
+
+  String sFont = Apollo::getModuleConfig(MODULE_NAME, "Chat/Text/Font", "Arial");
+  int nSize = Apollo::getModuleConfig(MODULE_NAME, "Chat/Text/Size", 12);
+  int nFlags = Apollo::getModuleConfig(MODULE_NAME, "Chat/Text/Weight", Msg_Scene_FontFlags::Normal);
+  Apollo::ColorString cText = Apollo::getModuleConfig(MODULE_NAME, "Chat/Text/Color", "#000000");
+  Apollo::ColorString cBackground = Apollo::getModuleConfig(MODULE_NAME, "Chat/Background/Color", "#ffffff");
+  Apollo::ColorString cBorder = Apollo::getModuleConfig(MODULE_NAME, "Chat/Border/Color", "#000000");
+  int nWidth = Apollo::getModuleConfig(MODULE_NAME, "Chat/Text/Width", 150);
+  double fBorderWidth = Apollo::getModuleConfig(MODULE_NAME, "Chat/Border/Width", 1.0);
+  double fTextPadding = Apollo::getModuleConfig(MODULE_NAME, "Chat/Text/Padding", 2.5);
+
+  String sTruncatedChat = TruncateElementText(hScene_, sText, sFont, nSize, nFlags, nWidth);
+  if (sTruncatedChat != sText) {
+    sTruncatedChat += Apollo::getModuleConfig(MODULE_NAME, "Chat/Ellipsis", "...");
+  }
+
+  double fTextBearingX, fTextBearingY, fTextW, fTextH, fTextAdvanceX, fTextAdvanceY;
+  Msg_Scene_GetTextExtents::_(hScene_, sTruncatedChat, sFont, nSize, nFlags, fTextBearingX, fTextBearingY, fTextW, fTextH, fTextAdvanceX, fTextAdvanceY);
+
+  Msg_Scene_CreateElement::_(hScene_, sChatPath);
+  Msg_Scene_TranslateElement::_(hScene_, sChatPath, -fTextAdvanceX / 2.0, 0);
+
+  Msg_Scene_CreateRectangle::_(hScene_, sChatPath + "/" ELEMENT_CHAT_BOX, -fTextPadding, -fTextPadding, fTextAdvanceX + 2 * fTextPadding, fTextH + 2 * fTextPadding);
+  Msg_Scene_SetFillColor::_(hScene_, sChatPath + "/" ELEMENT_CHAT_BOX, cBackground.r, cBackground.g, cBackground.b, cBackground.a);
+  Msg_Scene_SetStrokeColor::_(hScene_, sChatPath + "/" ELEMENT_CHAT_BOX, cBorder.r, cBorder.g, cBorder.b, cBorder.a);
+  Msg_Scene_SetStrokeWidth::_(hScene_, sChatPath + "/" ELEMENT_CHAT_BOX, fBorderWidth);
+
+  Msg_Scene_CreateText::_(hScene_, sChatPath + "/" ELEMENT_CHAT_TEXT, 0, 0, sTruncatedChat, sFont, nSize, nFlags);
+  Msg_Scene_SetFillColor::_(hScene_, sChatPath + "/" ELEMENT_CHAT_TEXT, cText.r, cText.g, cText.b, cText.a);
 }
 

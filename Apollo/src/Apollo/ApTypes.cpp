@@ -392,7 +392,7 @@ bool Apollo::TimeValue::operator>(Apollo::TimeValue& tv)
   }
 }
 
-bool Apollo::TimeValue::operator==(Apollo::TimeValue& tv)
+bool Apollo::TimeValue::operator==(const Apollo::TimeValue& tv)
 {
   return nSec_ == tv.nSec_ && nMicroSec_ == tv.nMicroSec_;
 }
