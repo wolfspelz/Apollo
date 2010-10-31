@@ -25,6 +25,7 @@
   #define AP_TEST_Url
   #define AP_TEST_AutoPtr
   #define AP_TEST_TimeValue
+  #define AP_TEST_ColorString
 #endif
 
 #if defined(AP_TEST_String)
@@ -2530,6 +2531,50 @@ String Test_TimeValue_Benchmark()
 
 //----------------------------------------------------------
 
+#if defined(AP_TEST_ColorString)
+
+#include "ColorString.h"
+
+bool eq(double a, double b)
+{
+  double m = a;
+  if (b < a) { m = b; }
+  double e = m / 1000;
+  if (e < 0.001) { e = 0.001; }
+  return a - e < b && a + e > b;
+}
+
+bool ne(double a, double b)
+{
+  return !eq(a, b);
+}
+
+String Test_ColorString()
+{
+  String s;
+
+  if (!s) { String c = "#000"; Apollo::ColorString cs(c);      if (ne(cs.r, 0.0) || ne(cs.g, 0.0) || ne(cs.b,  0.0) || ne(cs.a, 1.0)) { s = c; }}
+  if (!s) { String c = "#000000"; Apollo::ColorString cs(c);   if (ne(cs.r, 0.0) || ne(cs.g, 0.0) || ne(cs.b,  0.0) || ne(cs.a, 1.0)) { s = c; }}
+  if (!s) { String c = "#00000000"; Apollo::ColorString cs(c); if (ne(cs.r, 0.0) || ne(cs.g, 0.0) || ne(cs.b,  0.0) || ne(cs.a, 0.0)) { s = c; }}
+  if (!s) { String c = "#abc"; Apollo::ColorString cs(c);      if (ne(cs.r, 0.666666) || ne(cs.g, 0.733333) || ne(cs.b,  0.800000) || ne(cs.a, 1.000000)) { s = c; }}
+  if (!s) { String c = "#a0b0c0"; Apollo::ColorString cs(c);   if (ne(cs.r, 0.627450) || ne(cs.g, 0.690196) || ne(cs.b,  0.752941) || ne(cs.a, 1.000000)) { s = c; }}
+  if (!s) { String c = "#ABC"; Apollo::ColorString cs(c);      if (ne(cs.r, 0.666666) || ne(cs.g, 0.733333) || ne(cs.b,  0.800000) || ne(cs.a, 1.000000)) { s = c; }}
+  if (!s) { String c = "#A0B0C0"; Apollo::ColorString cs(c);   if (ne(cs.r, 0.627450) || ne(cs.g, 0.690196) || ne(cs.b,  0.752941) || ne(cs.a, 1.000000)) { s = c; }}
+  if (!s) { String c = "#A0B0C080"; Apollo::ColorString cs(c); if (ne(cs.r, 0.627450) || ne(cs.g, 0.690196) || ne(cs.b,  0.752941) || ne(cs.a, 0.501960)) { s = c; }}
+  if (!s) { String c = "#123"; Apollo::ColorString cs(c);      if (ne(cs.r, 0.066666) || ne(cs.g, 0.133333) || ne(cs.b,  0.200000) || ne(cs.a, 1.000000)) { s = c; }}
+  if (!s) { String c = "#112233"; Apollo::ColorString cs(c);   if (ne(cs.r, 0.066666) || ne(cs.g, 0.133333) || ne(cs.b,  0.200000) || ne(cs.a, 1.000000)) { s = c; }}
+  if (!s) { String c = "#010203"; Apollo::ColorString cs(c);   if (ne(cs.r, 0.003921) || ne(cs.g, 0.007843) || ne(cs.b,  0.011764) || ne(cs.a, 1.000000)) { s = c; }}
+  if (!s) { String c = "#112233ff"; Apollo::ColorString cs(c); if (ne(cs.r, 0.066666) || ne(cs.g, 0.133333) || ne(cs.b,  0.200000) || ne(cs.a, 1.000000)) { s = c; }}
+  if (!s) { String c = "#112233FF"; Apollo::ColorString cs(c); if (ne(cs.r, 0.066666) || ne(cs.g, 0.133333) || ne(cs.b,  0.200000) || ne(cs.a, 1.000000)) { s = c; }}
+  if (!s) { String c = "#112233c0"; Apollo::ColorString cs(c); if (ne(cs.r, 0.066666) || ne(cs.g, 0.133333) || ne(cs.b,  0.200000) || ne(cs.a, 0.752941)) { s = c; }}
+
+  return s;
+}
+
+#endif // AP_TEST_ColorString
+
+//----------------------------------------------------------
+
 void Test_Builtin_Register()
 {
 #if defined(AP_TEST_String)
@@ -2603,6 +2648,10 @@ void Test_Builtin_Register()
   AP_UNITTEST_REGISTER(Test_TimeValue_Benchmark);
 #endif
 
+#if defined(AP_TEST_ColorString)
+  AP_UNITTEST_REGISTER(Test_ColorString);
+#endif
+
 #if defined(AP_TEST_RegEx)
   AP_UNITTEST_REGISTER(Test_Regex);
 #endif
@@ -2635,8 +2684,6 @@ void Test_Builtin_Register()
   AP_UNITTEST_REGISTER(Test_UrlBuilder);
 #endif // AP_TEST_Url
 }
-
-
 
 void Test_Builtin_Execute()
 {
@@ -2709,6 +2756,10 @@ void Test_Builtin_Execute()
 
 #if defined(AP_TEST_TimeValue)
   AP_UNITTEST_EXECUTE(Test_TimeValue_Benchmark);
+#endif
+
+#if defined(AP_TEST_ColorString)
+  AP_UNITTEST_EXECUTE(Test_ColorString);
 #endif
 
 #if defined(AP_TEST_RegEx)

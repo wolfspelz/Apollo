@@ -792,7 +792,9 @@ Sequence* Item::GetSequenceByGroup(const String& sGroup)
     int nSum = pGroup->GetProbabilitySum();
     int nRnd = Apollo::getRandom(nSum);
     pSequence = pGroup->GetRandomSequence(nRnd);
-    apLog_Verbose((LOG_CHANNEL, "Item::GetSequenceByGroup", "item=" ApHandleFormat " sum=%d rnd=%d %s -> %s", ApHandleType(hAp_), nSum, nRnd, StringType(sGroup), StringType(pSequence->getName())));
+    if (pSequence) {
+      apLog_Verbose((LOG_CHANNEL, "Item::GetSequenceByGroup", "item=" ApHandleFormat " sum=%d rnd=%d %s -> %s", ApHandleType(hAp_), nSum, nRnd, StringType(sGroup), StringType(pSequence->getName())));
+    }
   }
 
   return pSequence;

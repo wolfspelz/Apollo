@@ -1,1 +1,8 @@
+LoadDLL/1=[[MODULE_LIBRARY_PATH]]/../../zlib1.dll
+LoadDLL/2=[[MODULE_LIBRARY_PATH]]/../../libpng14-14.dll
+LoadDLL/3=[[MODULE_LIBRARY_PATH]]/../../freetype6.dll
+LoadDLL/4=[[MODULE_LIBRARY_PATH]]/../../libfontconfig-1.dll
+LoadDLL/5=[[MODULE_LIBRARY_PATH]]/../../libexpat-1.dll
+LoadDLL/6=[[MODULE_LIBRARY_PATH]]/../../libcairo-2.dll
+
 #LogRecursiveDrawing=1

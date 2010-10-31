@@ -267,7 +267,15 @@ ApHandle Apollo::string2Handle(const String& sString)
 
 int Apollo::getRandom(int nMax)
 {
-  return nMax * ::rand() / RAND_MAX;
+  int bDone = 0;
+  int nRnd = 0;
+  while (!bDone) {
+    nRnd = nMax * ::rand() / RAND_MAX;
+    if (nRnd < nMax) {
+      bDone = 1;
+    }
+  }
+  return nRnd;
 }
 
 String Apollo::getRandomString(int nLength)
