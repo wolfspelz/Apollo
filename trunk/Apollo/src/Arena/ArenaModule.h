@@ -14,12 +14,12 @@
 #include "MsgVpView.h"
 #include "MsgAnimation.h"
 #include "MsgSystem.h"
-#include "Context.h"
+#include "Display.h"
 #include "Location.h"
 
-typedef ApHandlePointerTree<Context*> ContextList;
-typedef ApHandlePointerTreeNode<Context*> ContextListNode;
-typedef ApHandlePointerTreeIterator<Context*> ContextListIterator;
+typedef ApHandlePointerTree<Display*> DisplayList;
+typedef ApHandlePointerTreeNode<Display*> DisplayListNode;
+typedef ApHandlePointerTreeIterator<Display*> DisplayListIterator;
 
 typedef ApHandlePointerTree<Location*> LocationList;
 typedef ApHandlePointerTreeNode<Location*> LocationListNode;
@@ -84,9 +84,9 @@ public:
   int GetLocationAvatarOfAnimatedItem(const ApHandle& hItem, ApHandle& hLocation, ApHandle& hAvatar);
 
 protected:
-  Context* CreateContext(const ApHandle& hContext);
-  Context* FindContext(const ApHandle& hContext);
-  void DeleteContext(const ApHandle& hContext);
+  Display* CreateDisplay(const ApHandle& hContext);
+  Display* FindDisplay(const ApHandle& hContext);
+  void DeleteDisplay(const ApHandle& hContext);
 
   Location* CreateLocation(const ApHandle& hLocation);
   Location* FindLocation(const ApHandle& hLocation);
@@ -98,7 +98,7 @@ protected:
   ApHandle GetLocationOfContext(const ApHandle& hContext);
 
 protected:
-  ContextList contexts_;
+  DisplayList displays_;
   LocationList locations_;
   ApHandleTree<ApHandle> locationOfContext_;
   ApHandleTree<LocationAvatar> locationAvatarOfAnimatedItem_;

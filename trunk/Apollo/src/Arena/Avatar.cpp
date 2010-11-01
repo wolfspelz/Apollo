@@ -262,8 +262,8 @@ void Avatar::UnSubscribeDetail(const String& sKey)
 
 void Avatar::Show()
 {
-  if (pLocation_ != 0 && pLocation_->GetContext() != 0) {
-    hScene_ = pLocation_->GetContext()->Scene();
+  if (pLocation_ != 0 && pLocation_->GetDisplay() != 0) {
+    hScene_ = pLocation_->GetDisplay()->Scene();
   }
 
   nMaxW_ = Apollo::getModuleConfig(MODULE_NAME, "Avatar/MaxWidth", 100);
@@ -498,9 +498,9 @@ void Avatar::SetUnknownPosition()
   int nMax = 500;
 
   if (pLocation_) {
-    Context* pContext = pLocation_->GetContext();
-    if (pContext) {
-      nMax = pContext->GetWidth();
+    Display* pDisplay = pLocation_->GetDisplay();
+    if (pDisplay) {
+      nMax = pDisplay->GetWidth();
     }
   }
 

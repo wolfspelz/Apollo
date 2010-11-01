@@ -4,14 +4,14 @@
 //
 // ============================================================================
 
-#if !defined(Context_H_INCLUDED)
-#define Context_H_INCLUDED
+#if !defined(Display_H_INCLUDED)
+#define Display_H_INCLUDED
 
-class Context
+class Display
 {
 public:
-  Context(const ApHandle& hContext);
-  virtual ~Context();
+  Display(const ApHandle& hContext);
+  virtual ~Display();
 
   int Create();
   void Destroy();
@@ -33,7 +33,8 @@ public:
   inline ApHandle Scene() { return hScene_; }
 
 protected:
-  ApHandle hAp_;
+  ApHandle hContext_;
+  ApHandle hLocation_;
   int bVisible_;
   int nX_;
   int nY_;
@@ -43,4 +44,4 @@ protected:
   ApHandle hScene_;
 };
 
-#endif // Context_H_INCLUDED
+#endif // Display_H_INCLUDED
