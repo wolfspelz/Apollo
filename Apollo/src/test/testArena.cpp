@@ -369,6 +369,7 @@ String Test_Setup::Begin()
 
   // VpView_ReplayLocationPublicChat
 
+  /*
   // CHANGE: Navigate
   {
     Msg_VpView_ContextVisibility msg;
@@ -403,7 +404,6 @@ String Test_Setup::Begin()
     msg.Send();
   }
 
-  /*
   {
     Msg_VpView_EnterLocationRequested msg;
   }

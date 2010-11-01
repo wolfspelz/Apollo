@@ -171,12 +171,19 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Context.cpp"
+				RelativePath=".\Display.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\Location.cpp"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
 			</File>
 		</Filter>
 		<Filter
@@ -197,7 +204,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Context.h"
+				RelativePath=".\Display.h"
 				>
 			</File>
 			<File
@@ -215,6 +222,10 @@
 			UniqueIdentifier="{50200952-F8D0-433e-A3A5-3951C5C54E47}"
 			>
 		</Filter>
+		<File
+			RelativePath="..\..\bin\Win32\Debug\modules\Arena\config.txt"
+			>
+		</File>
 	</Files>
 	<Globals>
 	</Globals>

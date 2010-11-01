@@ -10,37 +10,37 @@
 #include "Local.h"
 #include "ArenaModule.h"
 
-Context* ArenaModule::CreateContext(const ApHandle& hContext)
+Display* ArenaModule::CreateDisplay(const ApHandle& hContext)
 {
-  Context* pContext = new Context(hContext);
-  if (pContext) {
-    int ok = pContext->Create();
+  Display* pDisplay = new Display(hContext);
+  if (pDisplay) {
+    int ok = pDisplay->Create();
     if (ok ) {
-      contexts_.Set(hContext, pContext);
+      displays_.Set(hContext, pDisplay);
     } else {
-      delete pContext;
-      pContext = 0;
+      delete pDisplay;
+      pDisplay = 0;
     }
   }
-  return pContext;
+  return pDisplay;
 }
 
-void ArenaModule::DeleteContext(const ApHandle& hContext)
+void ArenaModule::DeleteDisplay(const ApHandle& hContext)
 {
-  Context* pContext = FindContext(hContext);
-  if (pContext) {
-    pContext->Destroy();
-    contexts_.Unset(hContext);
-    delete pContext;
-    pContext = 0;
+  Display* pDisplay = FindDisplay(hContext);
+  if (pDisplay) {
+    pDisplay->Destroy();
+    displays_.Unset(hContext);
+    delete pDisplay;
+    pDisplay = 0;
   }
 }
 
-Context* ArenaModule::FindContext(const ApHandle& hContext)
+Display* ArenaModule::FindDisplay(const ApHandle& hContext)
 {
-  Context* pContext = 0;  
-  contexts_.Get(hContext, pContext);
-  return pContext;
+  Display* pDisplay = 0;  
+  displays_.Get(hContext, pDisplay);
+  return pDisplay;
 }
 
 //---------------------------
@@ -154,43 +154,43 @@ int ArenaModule::GetLocationAvatarOfAnimatedItem(const ApHandle& hItem, ApHandle
 
 AP_MSG_HANDLER_METHOD(ArenaModule, VpView_ContextCreated)
 {
-  Context* pContext = FindContext(pMsg->hContext);
-  if (pContext != 0) { throw ApException("ArenaModule::VpView_ContextCreated: context=" ApHandleFormat " already exists", ApHandleType(pMsg->hContext)); }
-  pContext = CreateContext(pMsg->hContext);
-  if (pContext == 0) { throw ApException("ArenaModule::VpView_ContextCreated: CreateContext(" ApHandleFormat ") failed", ApHandleType(pMsg->hContext)); }
+  Display* pDisplay = FindDisplay(pMsg->hContext);
+  if (pDisplay != 0) { throw ApException("ArenaModule::VpView_ContextCreated: context=" ApHandleFormat " already exists", ApHandleType(pMsg->hContext)); }
+  pDisplay = CreateDisplay(pMsg->hContext);
+  if (pDisplay == 0) { throw ApException("ArenaModule::VpView_ContextCreated: CreateDisplay(" ApHandleFormat ") failed", ApHandleType(pMsg->hContext)); }
 }
 
 AP_MSG_HANDLER_METHOD(ArenaModule, VpView_ContextDestroyed)
 {
-  Context* pContext = FindContext(pMsg->hContext);
-  if (pContext == 0) { throw ApException("ArenaModule::VpView_ContextDestroyed: context=" ApHandleFormat " does not already exists", ApHandleType(pMsg->hContext)); }
-  if (pContext) { 
-    DeleteContext(pMsg->hContext); 
+  Display* pDisplay = FindDisplay(pMsg->hContext);
+  if (pDisplay == 0) { throw ApException("ArenaModule::VpView_ContextDestroyed: context=" ApHandleFormat " does not already exists", ApHandleType(pMsg->hContext)); }
+  if (pDisplay) { 
+    DeleteDisplay(pMsg->hContext); 
   }
 }
 
 AP_MSG_HANDLER_METHOD(ArenaModule, VpView_ContextVisibility)
 {
-  Context* pContext = FindContext(pMsg->hContext);
-  if (pContext == 0) { throw ApException("ArenaModule::VpView_ContextVisibility: FindContext(" ApHandleFormat ") failed", ApHandleType(pMsg->hContext)); }
+  Display* pDisplay = FindDisplay(pMsg->hContext);
+  if (pDisplay == 0) { throw ApException("ArenaModule::VpView_ContextVisibility: FindDisplay(" ApHandleFormat ") failed", ApHandleType(pMsg->hContext)); }
 
-  pContext->SetVisibility(pMsg->bVisible);
+  pDisplay->SetVisibility(pMsg->bVisible);
 }
 
 AP_MSG_HANDLER_METHOD(ArenaModule, VpView_ContextPosition)
 {
-  Context* pContext = FindContext(pMsg->hContext);
-  if (pContext == 0) { throw ApException("ArenaModule::VpView_ContextPosition: FindContext(" ApHandleFormat ") failed", ApHandleType(pMsg->hContext)); }
+  Display* pDisplay = FindDisplay(pMsg->hContext);
+  if (pDisplay == 0) { throw ApException("ArenaModule::VpView_ContextPosition: FindDisplay(" ApHandleFormat ") failed", ApHandleType(pMsg->hContext)); }
 
-  pContext->SetPosition(pMsg->nX, pMsg->nY);
+  pDisplay->SetPosition(pMsg->nX, pMsg->nY);
 }
 
 AP_MSG_HANDLER_METHOD(ArenaModule, VpView_ContextSize)
 {
-  Context* pContext = FindContext(pMsg->hContext);
-  if (pContext == 0) { throw ApException("ArenaModule::VpView_ContextSize: FindContext(" ApHandleFormat ") failed", ApHandleType(pMsg->hContext)); }
+  Display* pDisplay = FindDisplay(pMsg->hContext);
+  if (pDisplay == 0) { throw ApException("ArenaModule::VpView_ContextSize: FindDisplay(" ApHandleFormat ") failed", ApHandleType(pMsg->hContext)); }
 
-  pContext->SetSize(pMsg->nWidth, pMsg->nHeight);
+  pDisplay->SetSize(pMsg->nWidth, pMsg->nHeight);
 }
 
 AP_MSG_HANDLER_METHOD(ArenaModule, VpView_LocationsChanged){}
@@ -202,22 +202,22 @@ AP_MSG_HANDLER_METHOD(ArenaModule, VpView_ContextLocationAssigned)
     pLocation = CreateLocation(pMsg->hLocation);
     if (pLocation == 0) { throw ApException("ArenaModule::VpView_ContextLocationAssigned: CreateLocation(" ApHandleFormat ") failed", ApHandleType(pMsg->hLocation)); }
   }
-  Context* pContext = FindContext(pMsg->hContext);
-  if (pContext == 0) { throw ApException("ArenaModule::VpView_ContextLocationAssigned: FindContext(" ApHandleFormat ") failed", ApHandleType(pMsg->hContext)); }
+  Display* pDisplay = FindDisplay(pMsg->hContext);
+  if (pDisplay == 0) { throw ApException("ArenaModule::VpView_ContextLocationAssigned: FindDisplay(" ApHandleFormat ") failed", ApHandleType(pMsg->hContext)); }
 
   SetLocationOfContext(pMsg->hContext, pMsg->hLocation);
-  pLocation->ContextAssigned(pContext);
+  pLocation->AssignDisplay(pDisplay);
 }
 
 AP_MSG_HANDLER_METHOD(ArenaModule, VpView_ContextLocationUnassigned)
 {
   Location* pLocation = FindLocation(pMsg->hLocation);
   if (pLocation == 0) { throw ApException("ArenaModule::VpView_ContextLocationUnassigned: FindLocation(" ApHandleFormat ") failed", ApHandleType(pMsg->hLocation)); }
-  Context* pContext = FindContext(pMsg->hContext);
-  if (pContext == 0) { throw ApException("ArenaModule::VpView_ContextLocationUnassigned: FindContext(" ApHandleFormat ") failed", ApHandleType(pMsg->hContext)); }
+  Display* pDisplay = FindDisplay(pMsg->hContext);
+  if (pDisplay == 0) { throw ApException("ArenaModule::VpView_ContextLocationUnassigned: FindDisplay(" ApHandleFormat ") failed", ApHandleType(pMsg->hContext)); }
 
   DeleteLocationOfContext(pMsg->hContext, pMsg->hLocation);
-  pLocation->ContextUnassigned(pContext);
+  pLocation->UnassignDisplay(pDisplay);
 }
 
 AP_MSG_HANDLER_METHOD(ArenaModule, VpView_EnterLocationRequested)

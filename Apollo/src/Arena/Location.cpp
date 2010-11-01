@@ -14,7 +14,7 @@
 Location::Location(const ApHandle& hLocation, ArenaModule* pModule)
 :hAp_(hLocation)
 ,pModule_(pModule)
-,pContext_(0)
+,pDisplay_(0)
 ,nState_(NoState)
 {
 }
@@ -26,8 +26,8 @@ void Location::EnterRequested()
   nState_ = StateEnterRequested;
   tvEnterRequested_ = Apollo::TimeValue::getTime();
 
-  if (pContext_) {
-    pContext_->EnterRequested();
+  if (pDisplay_) {
+    pDisplay_->EnterRequested();
   }
 }
 
@@ -38,8 +38,8 @@ void Location::EnterBegin()
   nState_ = StateEnterBegin;
   tvEnterBegin_ = Apollo::TimeValue::getTime();
 
-  if (pContext_) {
-    pContext_->EnterBegin();
+  if (pDisplay_) {
+    pDisplay_->EnterBegin();
   }
 }
 
@@ -49,8 +49,8 @@ void Location::EnterComplete()
 
   nState_ = StateEnterComplete;
 
-  if (pContext_) {
-    pContext_->EnterComplete();
+  if (pDisplay_) {
+    pDisplay_->EnterComplete();
   }
 
   ApAsyncMessage<Msg_VpView_ReplayLocationPublicChat> msg;
@@ -69,8 +69,8 @@ void Location::LeaveRequested()
   nState_ = StateLeaveRequested;
   tvLeaveRequested_ = Apollo::TimeValue::getTime();
 
-  if (pContext_) {
-    pContext_->LeaveRequested();
+  if (pDisplay_) {
+    pDisplay_->LeaveRequested();
   }
 }
 
@@ -81,8 +81,8 @@ void Location::LeaveBegin()
   nState_ = StateLeaveBegin;
   tvLeaveBegin_ = Apollo::TimeValue::getTime();
 
-  if (pContext_) {
-    pContext_->LeaveBegin();
+  if (pDisplay_) {
+    pDisplay_->LeaveBegin();
   }
 }
 
@@ -92,8 +92,8 @@ void Location::LeaveComplete()
 
   nState_ = StateLeaveComplete;
 
-  if (pContext_) {
-    pContext_->LeaveComplete();
+  if (pDisplay_) {
+    pDisplay_->LeaveComplete();
   }
 }
 

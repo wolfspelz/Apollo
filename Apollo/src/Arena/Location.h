@@ -15,7 +15,7 @@ typedef ApHandlePointerTreeNode<Avatar*> AvatarListNode;
 typedef ApHandlePointerTreeIterator<Avatar*> AvatarListIterator;
 
 class ArenaModule;
-class Context;
+class Display;
 
 class Location
 {
@@ -24,9 +24,9 @@ public:
 
   inline ApHandle apHandle() { return hAp_; }
 
-  inline Context* GetContext() { return pContext_; }
-  inline void ContextAssigned(Context* pContext) { pContext_ = pContext; }
-  inline void ContextUnassigned(Context* pContext) { pContext_ = 0; }
+  inline Display* GetDisplay() { return pDisplay_; }
+  inline void AssignDisplay(Display* pDisplay) { pDisplay_ = pDisplay; }
+  inline void UnassignDisplay(Display* pDisplay) { pDisplay_ = 0; }
 
   typedef enum _State { NoState
     ,StateEnterRequested
@@ -64,7 +64,7 @@ protected:
 protected:
   ApHandle hAp_;
   ArenaModule* pModule_;
-  Context* pContext_;
+  Display* pDisplay_;
   AvatarList avatars_;
   ApHandleTree<int> addedParticipants_;
   ApHandleTree<int> removedParticipants_;

@@ -1,5 +1,5 @@
-DebugFrame/Context=1
-DebugFrame/Participant=1
+DebugFrame/Display=1
+DebugFrame/Avatar=1
 
 DisposeLocationInLeaveRequestedStateAfterSec=2
 

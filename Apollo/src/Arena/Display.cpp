@@ -8,10 +8,10 @@
 #include "ApLog.h"
 #include "MsgScene.h"
 #include "Local.h"
-#include "Context.h"
+#include "Display.h"
 
-Context::Context(const ApHandle& hContext)
-:hAp_(hContext)
+Display::Display(const ApHandle& hContext)
+:hContext_(hContext)
 ,bVisible_(0)
 ,nX_(0)
 ,nY_(0)
@@ -20,11 +20,11 @@ Context::Context(const ApHandle& hContext)
 {
 }
 
-Context::~Context()
+Display::~Display()
 {
 }
 
-int Context::Create()
+int Display::Create()
 {
   int ok = 0;
 
@@ -34,7 +34,7 @@ int Context::Create()
   msg.hScene = hScene;
   ok = msg.Request();
   if (!ok) {
-    apLog_Error((LOG_CHANNEL, "Context::Create", "Msg_Scene_Create(" ApHandleFormat ") failed", ApHandleType(msg.hScene)));
+    apLog_Error((LOG_CHANNEL, "Display::Create", "Msg_Scene_Create(" ApHandleFormat ") failed", ApHandleType(msg.hScene)));
   } else {
     hScene_ = hScene;
 
@@ -51,16 +51,16 @@ int Context::Create()
   return ok;
 }
 
-void Context::Destroy()
+void Display::Destroy()
 {
   Msg_Scene_Destroy msg;
   msg.hScene = hScene_;
   if (!msg.Request()) {
-    apLog_Error((LOG_CHANNEL, "Context::Destroy", "Msg_Scene_Destroy(" ApHandleFormat ") failed", ApHandleType(msg.hScene)));
+    apLog_Error((LOG_CHANNEL, "Display::Destroy", "Msg_Scene_Destroy(" ApHandleFormat ") failed", ApHandleType(msg.hScene)));
   }
 }
 
-void Context::SetVisibility(int bVisible)
+void Display::SetVisibility(int bVisible)
 {
   bVisible_ = bVisible;
 
@@ -68,11 +68,11 @@ void Context::SetVisibility(int bVisible)
   msg.hScene = hScene_;
   msg.bVisible = bVisible_;
   if (!msg.Request()) {
-    apLog_Error((LOG_CHANNEL, "Context::SetPosition", "Msg_Scene_Visibility(" ApHandleFormat ") failed", ApHandleType(msg.hScene)));
+    apLog_Error((LOG_CHANNEL, "Display::SetPosition", "Msg_Scene_Visibility(" ApHandleFormat ") failed", ApHandleType(msg.hScene)));
   }
 }
 
-void Context::SetPosition(int nX, int nY)
+void Display::SetPosition(int nX, int nY)
 {
   nX_ = nX;
   nY_ = nY;
@@ -84,11 +84,11 @@ void Context::SetPosition(int nX, int nY)
   msg.nW = nW_;
   msg.nH = nH_;
   if (!msg.Request()) {
-    apLog_Error((LOG_CHANNEL, "Context::SetPosition", "Msg_Scene_Position(" ApHandleFormat ") failed", ApHandleType(msg.hScene)));
+    apLog_Error((LOG_CHANNEL, "Display::SetPosition", "Msg_Scene_Position(" ApHandleFormat ") failed", ApHandleType(msg.hScene)));
   }
 }
 
-void Context::SetSize(int nW, int nH)
+void Display::SetSize(int nW, int nH)
 {
   nW_ = nW;
   nH_ = nH;
@@ -100,10 +100,10 @@ void Context::SetSize(int nW, int nH)
   msg.nW = nW_;
   msg.nH = nH_;
   if (!msg.Request()) {
-    apLog_Error((LOG_CHANNEL, "Context::SetSize", "Msg_Scene_Position(" ApHandleFormat ") failed", ApHandleType(msg.hScene)));
+    apLog_Error((LOG_CHANNEL, "Display::SetSize", "Msg_Scene_Position(" ApHandleFormat ") failed", ApHandleType(msg.hScene)));
   }
 
-  if (Apollo::getModuleConfig(MODULE_NAME, "DebugFrame/Context", 0)) {
+  if (Apollo::getModuleConfig(MODULE_NAME, "DebugFrame/Display", 0)) {
     int bExists = 0;
     if (Msg_Scene_ElementExists::_(hScene_, ELEMENT_FRAME, bExists) && bExists) {
       Msg_Scene_DeleteElement::_(hScene_, ELEMENT_FRAME);
@@ -117,37 +117,37 @@ void Context::SetSize(int nW, int nH)
 
 //---------------------------
 
-void Context::EnterRequested()
+void Display::EnterRequested()
 {
   Msg_Scene_SetFillColor::_(hScene_, ELEMENT_PROGRESS, 0.8, 0.8, 1, 1);
   Msg_Scene_Draw::_(hScene_);
 }
 
-void Context::EnterBegin()
+void Display::EnterBegin()
 {
   Msg_Scene_SetFillColor::_(hScene_, ELEMENT_PROGRESS, 0.5, 0.5, 1, 1);
   Msg_Scene_Draw::_(hScene_);
 }
 
-void Context::EnterComplete()
+void Display::EnterComplete()
 {
   Msg_Scene_SetFillColor::_(hScene_, ELEMENT_PROGRESS, 0, 0, 1, 1);
   Msg_Scene_Draw::_(hScene_);
 }
 
-void Context::LeaveRequested()
+void Display::LeaveRequested()
 {
   Msg_Scene_SetFillColor::_(hScene_, ELEMENT_PROGRESS, 1, 0, 0, 1);
   Msg_Scene_Draw::_(hScene_);
 }
 
-void Context::LeaveBegin()
+void Display::LeaveBegin()
 {
   Msg_Scene_SetFillColor::_(hScene_, ELEMENT_PROGRESS, 1, 0.6, 0.6, 1);
   Msg_Scene_Draw::_(hScene_);
 }
 
-void Context::LeaveComplete()
+void Display::LeaveComplete()
 {
   Msg_Scene_SetFillColor::_(hScene_, ELEMENT_PROGRESS, 1, 1, 1, 1);
   Msg_Scene_Draw::_(hScene_);
