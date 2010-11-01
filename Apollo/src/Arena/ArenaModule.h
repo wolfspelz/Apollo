@@ -13,6 +13,7 @@
 #include "MsgVp.h"
 #include "MsgVpView.h"
 #include "MsgAnimation.h"
+#include "MsgSystem.h"
 #include "Context.h"
 #include "Location.h"
 
@@ -24,10 +25,10 @@ typedef ApHandlePointerTree<Location*> LocationList;
 typedef ApHandlePointerTreeNode<Location*> LocationListNode;
 typedef ApHandlePointerTreeIterator<Location*> LocationListIterator;
 
-class LocationParticipant
+class LocationAvatar
 {
 public:
-  LocationParticipant(const ApHandle& hLocation, const ApHandle& hPartcipant)
+  LocationAvatar(const ApHandle& hLocation, const ApHandle& hPartcipant)
     :hLocation_(hLocation)
     ,hPartcipant_(hPartcipant)
   {}
@@ -70,6 +71,7 @@ public:
   void On_Animation_SequenceBegin(Msg_Animation_SequenceBegin* pMsg);
   void On_Animation_Frame(Msg_Animation_Frame* pMsg);
   void On_Animation_SequenceEnd(Msg_Animation_SequenceEnd* pMsg);
+  void On_System_60SecTimer(Msg_System_60SecTimer* pMsg);
 
 #if defined(AP_TEST)
   void On_UnitTest_Begin(Msg_UnitTest_Begin* pMsg);
@@ -77,9 +79,9 @@ public:
   void On_UnitTest_End(Msg_UnitTest_End* pMsg);
 #endif
 
-  void RegisterLocationParticipantOfAnimatedItem(const ApHandle& hItem, const ApHandle& hLocation, const ApHandle& hParticipant);
-  void UnregisterLocationParticipantOfAnimatedItem(const ApHandle& hItem);
-  int GetLocationParticipantOfAnimatedItem(const ApHandle& hItem, ApHandle& hLocation, ApHandle& hParticipant);
+  void RegisterLocationAvatarOfAnimatedItem(const ApHandle& hItem, const ApHandle& hLocation, const ApHandle& hAvatar);
+  void UnregisterLocationAvatarOfAnimatedItem(const ApHandle& hItem);
+  int GetLocationAvatarOfAnimatedItem(const ApHandle& hItem, ApHandle& hLocation, ApHandle& hAvatar);
 
 protected:
   Context* CreateContext(const ApHandle& hContext);
@@ -89,6 +91,7 @@ protected:
   Location* CreateLocation(const ApHandle& hLocation);
   Location* FindLocation(const ApHandle& hLocation);
   void DeleteLocation(const ApHandle& hLocation);
+  void DeleteOldLeaveRequestedLocations();
 
   void SetLocationOfContext(const ApHandle& hContext, const ApHandle& hLocation);
   void DeleteLocationOfContext(const ApHandle& hContext, const ApHandle& hLocation);
@@ -98,7 +101,7 @@ protected:
   ContextList contexts_;
   LocationList locations_;
   ApHandleTree<ApHandle> locationOfContext_;
-  ApHandleTree<LocationParticipant> locationParticipantOfAnimatedItem_;
+  ApHandleTree<LocationAvatar> locationAvatarOfAnimatedItem_;
 
 public:
 

@@ -71,6 +71,33 @@ Location* ArenaModule::FindLocation(const ApHandle& hLocation)
   return pLocation;
 }
 
+void ArenaModule::DeleteOldLeaveRequestedLocations()
+{
+  int bDone = 0;
+  while (!bDone) {
+    ApHandle hLocation;
+    bDone = 1;
+
+    LocationListIterator iter(locations_);
+    for (LocationListNode* pNode = 0; (pNode = iter.Next()) != 0; ) {
+      Location* pLocation = pNode->Value();
+      if (pLocation) {
+        int bTooOld = pLocation->TellDeleteMe();
+        if (bTooOld) {
+          hLocation = pNode->Key();
+          bDone = 0;
+          break;
+        }
+      }
+    }
+
+    if (ApIsHandle(hLocation)) {
+      apLog_Info((LOG_CHANNEL, "ArenaModule::DeleteOldLeaveRequestedLocations", "deleting location=" ApHandleFormat "", ApHandleType(hLocation)));
+      DeleteLocation(hLocation);
+    }
+  }
+}
+
 //---------------------------
 
 void ArenaModule::SetLocationOfContext(const ApHandle& hContext, const ApHandle& hLocation)
@@ -98,26 +125,26 @@ ApHandle ArenaModule::GetLocationOfContext(const ApHandle& hContext)
 
 //---------------------------
 
-void ArenaModule::RegisterLocationParticipantOfAnimatedItem(const ApHandle& hItem, const ApHandle& hLocation, const ApHandle& hParticipant)
+void ArenaModule::RegisterLocationAvatarOfAnimatedItem(const ApHandle& hItem, const ApHandle& hLocation, const ApHandle& hAvatar)
 {
-  LocationParticipant lp(hLocation, hParticipant);
-  locationParticipantOfAnimatedItem_.Set(hItem, lp);
+  LocationAvatar lp(hLocation, hAvatar);
+  locationAvatarOfAnimatedItem_.Set(hItem, lp);
 }
 
-void ArenaModule::UnregisterLocationParticipantOfAnimatedItem(const ApHandle& hItem)
+void ArenaModule::UnregisterLocationAvatarOfAnimatedItem(const ApHandle& hItem)
 {
-  locationParticipantOfAnimatedItem_.Unset(hItem);
+  locationAvatarOfAnimatedItem_.Unset(hItem);
 }
 
-int ArenaModule::GetLocationParticipantOfAnimatedItem(const ApHandle& hItem, ApHandle& hLocation, ApHandle& hParticipant)
+int ArenaModule::GetLocationAvatarOfAnimatedItem(const ApHandle& hItem, ApHandle& hLocation, ApHandle& hAvatar)
 {
   int ok = 0;
 
-  ApHandleTreeNode<LocationParticipant>* pNode = locationParticipantOfAnimatedItem_.Find(hItem);
+  ApHandleTreeNode<LocationAvatar>* pNode = locationAvatarOfAnimatedItem_.Find(hItem);
   if (pNode) {
     ok = 1;
     hLocation = pNode->Value().hLocation_;
-    hParticipant = pNode->Value().hPartcipant_;
+    hAvatar = pNode->Value().hPartcipant_;
   }
 
   return ok;
@@ -193,19 +220,28 @@ AP_MSG_HANDLER_METHOD(ArenaModule, VpView_ContextLocationUnassigned)
   pLocation->ContextUnassigned(pContext);
 }
 
-AP_MSG_HANDLER_METHOD(ArenaModule, VpView_EnterLocationRequested){}
+AP_MSG_HANDLER_METHOD(ArenaModule, VpView_EnterLocationRequested)
+{
+  Location* pLocation = FindLocation(pMsg->hLocation);
+  if (pLocation == 0) { throw ApException("ArenaModule::VpView_EnterLocationRequested: FindLocation(" ApHandleFormat ") failed", ApHandleType(pMsg->hLocation)); }
 
-AP_MSG_HANDLER_METHOD(ArenaModule, VpView_EnterLocationBegin){}
+  pLocation->EnterRequested();
+}
+
+AP_MSG_HANDLER_METHOD(ArenaModule, VpView_EnterLocationBegin)
+{
+  Location* pLocation = FindLocation(pMsg->hLocation);
+  if (pLocation == 0) { throw ApException("ArenaModule::VpView_EnterLocationBegin: FindLocation(" ApHandleFormat ") failed", ApHandleType(pMsg->hLocation)); }
+
+  pLocation->EnterBegin();
+}
 
 AP_MSG_HANDLER_METHOD(ArenaModule, VpView_EnterLocationComplete)
 {
-  ApAsyncMessage<Msg_VpView_ReplayLocationPublicChat> msg;
-  msg->hLocation = pMsg->hLocation;
-  //msg.nMaxAge;
-  //msg.nMaxLines;
-  //msg.nMaxData;
-  //if (!msg.Request()) { throw ApException("ArenaModule::VpView_EnterLocationComplete: Msg_VpView_ReplayLocationPublicChat(" ApHandleFormat ") failed", ApHandleType(pMsg->hLocation)); }
-  msg->PostAsync();
+  Location* pLocation = FindLocation(pMsg->hLocation);
+  if (pLocation == 0) { throw ApException("ArenaModule::VpView_EnterLocationBegin: FindLocation(" ApHandleFormat ") failed", ApHandleType(pMsg->hLocation)); }
+
+  pLocation->EnterComplete();
 }
 
 AP_MSG_HANDLER_METHOD(ArenaModule, VpView_LocationContextsChanged){}
@@ -218,7 +254,7 @@ AP_MSG_HANDLER_METHOD(ArenaModule, VpView_ParticipantsChanged)
   Msg_VpView_GetParticipants msg;
   msg.hLocation = pMsg->hLocation;
   if (!msg.Request()) { throw ApException("ArenaModule::VpView_ContextLocationUnassigned: Msg_VpView_GetParticipants(" ApHandleFormat ") failed", ApHandleType(pMsg->hLocation)); }
-  pLocation->ProcessParticipantList(msg.vlParticipants);
+  pLocation->ProcessAvatarList(msg.vlParticipants);
 }
 
 AP_MSG_HANDLER_METHOD(ArenaModule, VpView_LocationPublicChat)
@@ -242,11 +278,29 @@ AP_MSG_HANDLER_METHOD(ArenaModule, VpView_ParticipantDetailsChanged)
   pLocation->ParticipantDetailsChanged(pMsg->hParticipant, pMsg->vlKeys);
 }
 
-AP_MSG_HANDLER_METHOD(ArenaModule, VpView_LeaveLocationRequested){}
+AP_MSG_HANDLER_METHOD(ArenaModule, VpView_LeaveLocationRequested)
+{
+  Location* pLocation = FindLocation(pMsg->hLocation);
+  if (pLocation == 0) { throw ApException("ArenaModule::VpView_LeaveLocationRequested: FindLocation(" ApHandleFormat ") failed", ApHandleType(pMsg->hLocation)); }
 
-AP_MSG_HANDLER_METHOD(ArenaModule, VpView_LeaveLocationBegin){}
+  pLocation->LeaveRequested();
+}
 
-AP_MSG_HANDLER_METHOD(ArenaModule, VpView_LeaveLocationComplete){}
+AP_MSG_HANDLER_METHOD(ArenaModule, VpView_LeaveLocationBegin)
+{
+  Location* pLocation = FindLocation(pMsg->hLocation);
+  if (pLocation == 0) { throw ApException("ArenaModule::VpView_LeaveLocationBegin: FindLocation(" ApHandleFormat ") failed", ApHandleType(pMsg->hLocation)); }
+
+  pLocation->LeaveBegin();
+}
+
+AP_MSG_HANDLER_METHOD(ArenaModule, VpView_LeaveLocationComplete)
+{
+  Location* pLocation = FindLocation(pMsg->hLocation);
+  if (pLocation == 0) { throw ApException("ArenaModule::VpView_LeaveLocationComplete: FindLocation(" ApHandleFormat ") failed", ApHandleType(pMsg->hLocation)); }
+
+  pLocation->LeaveComplete();
+}
 
 AP_MSG_HANDLER_METHOD(ArenaModule, VpView_ParticipantAdded){}
 
@@ -259,17 +313,24 @@ AP_MSG_HANDLER_METHOD(ArenaModule, Animation_SequenceBegin){}
 AP_MSG_HANDLER_METHOD(ArenaModule, Animation_Frame)
 {
   ApHandle hLocation;
-  ApHandle hParticipant;
-//  if (!GetLocationParticipantOfAnimatedItem(pMsg->hItem, hLocation, hParticipant)) { throw ApException("ArenaModule::Animation_Frame: GetLocationParticipantOfAnimatedItem(" ApHandleFormat ") failed", ApHandleType(pMsg->hItem)); }
-  if (!GetLocationParticipantOfAnimatedItem(pMsg->hItem, hLocation, hParticipant)) { return; }
+  ApHandle hAvatar;
+//  if (!GetLocationAvatarOfAnimatedItem(pMsg->hItem, hLocation, hAvatar)) { throw ApException("ArenaModule::Animation_Frame: GetLocationAvatarOfAnimatedItem(" ApHandleFormat ") failed", ApHandleType(pMsg->hItem)); }
+  if (!GetLocationAvatarOfAnimatedItem(pMsg->hItem, hLocation, hAvatar)) { return; }
 
   Location* pLocation = FindLocation(hLocation);
   if (pLocation == 0) { throw ApException("ArenaModule::Animation_Frame: FindLocation(" ApHandleFormat ") failed", ApHandleType(hLocation)); }
 
-  pLocation->ParticipantAnimationFrame(hParticipant, pMsg->iFrame);
+  pLocation->ParticipantAnimationFrame(hAvatar, pMsg->iFrame);
 }
 
 AP_MSG_HANDLER_METHOD(ArenaModule, Animation_SequenceEnd){}
+
+//----------------------------------------------------------
+
+AP_MSG_HANDLER_METHOD(ArenaModule, System_60SecTimer)
+{
+  DeleteOldLeaveRequestedLocations();
+}
 
 //----------------------------------------------------------
 
@@ -279,7 +340,7 @@ AP_MSG_HANDLER_METHOD(ArenaModule, UnitTest_Begin)
 {
   AP_UNUSED_ARG(pMsg);
   if (Apollo::getConfig("Test/Arena", 0)) {
-    AP_UNITTEST_REGISTER(Participant::Test_TruncateElementText);
+    AP_UNITTEST_REGISTER(Avatar::Test_TruncateElementText);
   }
 }
 
@@ -287,7 +348,7 @@ AP_MSG_HANDLER_METHOD(ArenaModule, UnitTest_Execute)
 {
   AP_UNUSED_ARG(pMsg);
   if (Apollo::getConfig("Test/Arena", 0)) {
-    AP_UNITTEST_EXECUTE(Participant::Test_TruncateElementText);
+    AP_UNITTEST_EXECUTE(Avatar::Test_TruncateElementText);
   }
 }
 
@@ -338,6 +399,7 @@ int ArenaModule::Init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ArenaModule, Animation_SequenceBegin, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ArenaModule, Animation_Frame, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ArenaModule, Animation_SequenceEnd, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, ArenaModule, System_60SecTimer, this, ApCallbackPosNormal);
 
   AP_UNITTEST_HOOK(ArenaModule, this);
 

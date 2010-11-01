@@ -20,6 +20,13 @@ public:
   void SetPosition(int nX, int nY);
   void SetSize(int nW, int nH);
 
+  void EnterRequested();
+  void EnterBegin();
+  void EnterComplete();
+  void LeaveRequested();
+  void LeaveBegin();
+  void LeaveComplete();
+
   inline int GetWidth() { return nW_; }
   inline int GetHeight() { return nH_; }
 

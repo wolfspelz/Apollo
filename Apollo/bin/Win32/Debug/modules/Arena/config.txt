@@ -1,6 +1,8 @@
 DebugFrame/Context=1
 DebugFrame/Participant=1
 
+DisposeLocationInLeaveRequestedStateAfterSec=2
+
   Avatar/MaxWidth=100
   Avatar/MaxHeight=100
   Avatar/MinWidth=20
