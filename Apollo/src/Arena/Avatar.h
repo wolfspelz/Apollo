@@ -4,8 +4,8 @@
 //
 // ============================================================================
 
-#if !defined(Participant_H_INCLUDED)
-#define Participant_H_INCLUDED
+#if !defined(Avatar_H_INCLUDED)
+#define Avatar_H_INCLUDED
 
 #include "ApContainer.h"
 #include "Image.h"
@@ -104,4 +104,4 @@ protected:
   ApHandle hScene_;
 };
 
-#endif // Participant_H_INCLUDED
+#endif // Avatar_H_INCLUDED

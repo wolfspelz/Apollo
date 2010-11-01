@@ -320,7 +320,7 @@ AP_MSG_HANDLER_METHOD(ArenaModule, Animation_Frame)
   Location* pLocation = FindLocation(hLocation);
   if (pLocation == 0) { throw ApException("ArenaModule::Animation_Frame: FindLocation(" ApHandleFormat ") failed", ApHandleType(hLocation)); }
 
-  pLocation->ParticipantAnimationFrame(hAvatar, pMsg->iFrame);
+  pLocation->AvatarAnimationFrame(hAvatar, pMsg->iFrame);
 }
 
 AP_MSG_HANDLER_METHOD(ArenaModule, Animation_SequenceEnd){}

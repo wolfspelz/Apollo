@@ -217,7 +217,7 @@ void Location::ReceivePublicChat(const ApHandle& hAvatar, const ApHandle& hChat,
   }
 }
 
-void Location::ParticipantAnimationFrame(const ApHandle& hAvatar, const Apollo::Image& image)
+void Location::AvatarAnimationFrame(const ApHandle& hAvatar, const Apollo::Image& image)
 {
   AvatarListNode* pNode = avatars_.Find(hAvatar);
   if (pNode) {

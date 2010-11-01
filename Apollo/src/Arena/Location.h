@@ -50,7 +50,7 @@ public:
   void ProcessAvatarList(Apollo::ValueList& vlParticipants);
   void ParticipantDetailsChanged(const ApHandle& hAvatar, Apollo::ValueList& vlKeys);
   void ReceivePublicChat(const ApHandle& hAvatar, const ApHandle& hChat, const String& sNickname, const String& sText, const Apollo::TimeValue& tv);
-  void ParticipantAnimationFrame(const ApHandle& hAvatar, const Apollo::Image& image);
+  void AvatarAnimationFrame(const ApHandle& hAvatar, const Apollo::Image& image);
 
 protected:
   void InitRemovedParticipants();
