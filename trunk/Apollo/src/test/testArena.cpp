@@ -213,6 +213,26 @@ static void Test_Galileo_LoadAnimationDataFromStorage(Msg_Galileo_LoadAnimationD
   pMsg->apStatus = ApMessage::Ok;
 }
 
+static void Test_VpView_GetLocationContexts(Msg_VpView_GetLocationContexts* pMsg)
+{
+}
+
+static void Test_VpView_SubscribeContextDetail(Msg_VpView_SubscribeContextDetail* pMsg)
+{
+}
+
+static void Test_VpView_SubscribeLocationDetail(Msg_VpView_SubscribeLocationDetail* pMsg)
+{
+}
+
+static void Test_VpView_GetContextDetail(Msg_VpView_GetContextDetail* pMsg)
+{
+}
+
+static void Test_VpView_GetLocationDetail(Msg_VpView_GetLocationDetail* pMsg)
+{
+}
+
 // ------------------------------------------------------
 
 String Test_Setup::Begin()
@@ -252,8 +272,13 @@ String Test_Setup::Begin()
   { Msg_VpView_ReplayLocationPublicChat msg; msg.Hook(MODULE_NAME, (ApCallback) Test_VpView_ReplayLocationPublicChat, this, ApCallbackPosEarly); }
   { Msg_Galileo_IsAnimationDataInStorage msg; msg.Hook(MODULE_NAME, (ApCallback) Test_Galileo_IsAnimationDataInStorage, this, ApCallbackPosEarly); }
   { Msg_Galileo_LoadAnimationDataFromStorage msg; msg.Hook(MODULE_NAME, (ApCallback) Test_Galileo_LoadAnimationDataFromStorage, this, ApCallbackPosEarly); }
+  { Msg_VpView_GetLocationContexts msg; msg.Hook(MODULE_NAME, (ApCallback) Test_VpView_GetLocationContexts, this, ApCallbackPosEarly); }
+  { Msg_VpView_SubscribeContextDetail msg; msg.Hook(MODULE_NAME, (ApCallback) Test_VpView_SubscribeContextDetail, this, ApCallbackPosEarly); }
+  { Msg_VpView_SubscribeLocationDetail msg; msg.Hook(MODULE_NAME, (ApCallback) Test_VpView_SubscribeLocationDetail, this, ApCallbackPosEarly); }
+  { Msg_VpView_GetContextDetail msg; msg.Hook(MODULE_NAME, (ApCallback) Test_VpView_GetContextDetail, this, ApCallbackPosEarly); }
+  { Msg_VpView_GetLocationDetail msg; msg.Hook(MODULE_NAME, (ApCallback) Test_VpView_GetLocationDetail, this, ApCallbackPosEarly); }
 
-  // IN
+  // IN: Open Context, Navigate
   {
     Msg_VpView_ContextCreated msg;
     msg.hContext = hContext_;
@@ -341,30 +366,44 @@ String Test_Setup::Begin()
     msg.Send();
   }
 
+
   // VpView_ReplayLocationPublicChat
 
-  /*
-  // CHANGE
+  // CHANGE: Navigate
   {
-    Msg_VpView_ContextVisibility msg;// 1
+    Msg_VpView_ContextVisibility msg;
+    msg.hContext = hContext_;
+    msg.bVisible = 1;
+    msg.Send();
   }
 
   {
     Msg_VpView_LeaveLocationRequested msg;
+    msg.hLocation = hLocation1_;
+    msg.Send();
   }
 
   {
     Msg_VpView_LocationContextsChanged msg;
+    msg.hLocation = hLocation1_;
+    msg.Send();
   }
 
   {
     Msg_VpView_ContextLocationUnassigned msg;
+    msg.hContext = hContext_;
+    msg.hLocation = hLocation1_;
+    msg.Send();
   }
 
   {
     Msg_VpView_ContextLocationAssigned msg;
+    msg.hContext = hContext_;
+    msg.hLocation = hLocation2_;
+    msg.Send();
   }
 
+  /*
   {
     Msg_VpView_EnterLocationRequested msg;
   }
@@ -397,7 +436,7 @@ String Test_Setup::Begin()
     Msg_VpView_EnterLocationComplete msg;
   }
 
-  // OUT
+  // OUT: CloseContext
   {
     Msg_VpView_LeaveLocationRequested msg;
   }
@@ -441,6 +480,11 @@ String Test_Setup::End()
   { Msg_VpView_ReplayLocationPublicChat msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_VpView_ReplayLocationPublicChat, this); }
   { Msg_Galileo_IsAnimationDataInStorage msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_Galileo_IsAnimationDataInStorage, this); }
   { Msg_Galileo_LoadAnimationDataFromStorage msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_Galileo_LoadAnimationDataFromStorage, this); }
+  { Msg_VpView_GetLocationContexts msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_VpView_GetLocationContexts, this); }
+  { Msg_VpView_SubscribeContextDetail msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_VpView_SubscribeContextDetail, this); }
+  { Msg_VpView_SubscribeLocationDetail msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_VpView_SubscribeLocationDetail, this); }
+  { Msg_VpView_GetContextDetail msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_VpView_GetContextDetail, this); }
+  { Msg_VpView_GetLocationDetail msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_VpView_GetLocationDetail, this); }
 
   Test_Arena_UnitTest_TokenEnd();
 

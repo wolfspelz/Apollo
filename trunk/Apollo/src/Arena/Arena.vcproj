@@ -167,15 +167,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Avatar.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Context.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\Location.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Participant.cpp"
 				>
 			</File>
 		</Filter>
@@ -193,6 +193,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Avatar.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Context.h"
 				>
 			</File>
@@ -202,10 +206,6 @@
 			</File>
 			<File
 				RelativePath=".\Location.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Participant.h"
 				>
 			</File>
 		</Filter>

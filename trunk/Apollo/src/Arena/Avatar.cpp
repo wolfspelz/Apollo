@@ -10,14 +10,14 @@
 #include "MsgAnimation.h"
 #include "MsgScene.h"
 #include "Local.h"
-#include "Participant.h"
+#include "Avatar.h"
 #include "ArenaModule.h"
 #include "ColorString.h"
 #include "Location.h"
 
 #if defined(AP_TEST)
 
-String Participant::Test_TruncateElementText1(const ApHandle& hScene, const String& sNickname, const String& sFont, int nSize, int nFlags, int nWidth, const String& sExpected)
+String Avatar::Test_TruncateElementText1(const ApHandle& hScene, const String& sNickname, const String& sFont, int nSize, int nFlags, int nWidth, const String& sExpected)
 {
   String s;
 
@@ -29,7 +29,7 @@ String Participant::Test_TruncateElementText1(const ApHandle& hScene, const Stri
   return s;
 }
 
-String Participant::Test_TruncateElementText()
+String Avatar::Test_TruncateElementText()
 {
   String s;
 
@@ -56,7 +56,7 @@ String Participant::Test_TruncateElementText()
 
 #endif // #if defined(AP_TEST)
 
-String Participant::TruncateElementText(const ApHandle& hScene, const String& sText, const String& sFont, int nSize, int nFlags, int nWidth)
+String Avatar::TruncateElementText(const ApHandle& hScene, const String& sText, const String& sFont, int nSize, int nFlags, int nWidth)
 {
   String sResult;
   String sWork = sText;
@@ -92,8 +92,8 @@ String Participant::TruncateElementText(const ApHandle& hScene, const String& sT
 
 //----------------------------------------------------------
 
-Participant::Participant(const ApHandle& hParticipant, ArenaModule* pModule, Location* pLocation)
-:hAp_(hParticipant)
+Avatar::Avatar(const ApHandle& hParticipant, ArenaModule* pModule, Location* pLocation)
+:hParticipant_(hParticipant)
 ,pModule_(pModule)
 ,pLocation_(pLocation)
 ,hAnimatedItem_(ApNoHandle)
@@ -111,10 +111,10 @@ Participant::Participant(const ApHandle& hParticipant, ArenaModule* pModule, Loc
   avatarMimeTypes_.add("image/png");
 }
 
-void Participant::SubscribeAndGetDetail(const String& sKey)
+void Avatar::SubscribeAndGetDetail(const String& sKey)
 {
   Msg_VpView_SubscribeParticipantDetail msg;
-  msg.hParticipant = hAp_;
+  msg.hParticipant = hParticipant_;
   msg.sKey = sKey;
 
   if (0) {
@@ -131,7 +131,7 @@ void Participant::SubscribeAndGetDetail(const String& sKey)
   }
 }
 
-void Participant::GetDetail(const String& sKey)
+void Avatar::GetDetail(const String& sKey)
 {
   if (0) {
   } else if (sKey == Msg_VpView_ParticipantDetail_avatar) {
@@ -141,10 +141,10 @@ void Participant::GetDetail(const String& sKey)
   }
 }
 
-void Participant::GetDetailString(const String& sKey, Apollo::ValueList& vlMimeTypes)
+void Avatar::GetDetailString(const String& sKey, Apollo::ValueList& vlMimeTypes)
 {
   Msg_VpView_GetParticipantDetailString msg;
-  msg.hParticipant = hAp_;
+  msg.hParticipant = hParticipant_;
   msg.sKey = sKey;
   msg.vlMimeTypes = vlMimeTypes;
   if (msg.Request()) {
@@ -178,29 +178,29 @@ void Participant::GetDetailString(const String& sKey, Apollo::ValueList& vlMimeT
   }
 }
 
-void Participant::GetDetailData(const String& sKey, Apollo::ValueList& vlMimeTypes)
+void Avatar::GetDetailData(const String& sKey, Apollo::ValueList& vlMimeTypes)
 {
   Msg_VpView_GetParticipantDetailData msg;
-  msg.hParticipant = hAp_;
+  msg.hParticipant = hParticipant_;
   msg.sKey = sKey;
   msg.vlMimeTypes = vlMimeTypes;
   if (msg.Request()) {
 
     if (0) {
     } else if (sKey == Msg_VpView_ParticipantDetail_avatar) {
-      HandleAvatarData(msg.sMimeType, msg.sSource, msg.sbData);
+      HandleImageData(msg.sMimeType, msg.sSource, msg.sbData);
     }
   }
 }
 
-void Participant::HandleAvatarData(const String& sMimeType, const String& sSource, Buffer& sbData)
+void Avatar::HandleImageData(const String& sMimeType, const String& sSource, Buffer& sbData)
 {
   if (!ApIsHandle(hAnimatedItem_)) {
     Msg_Animation_Create msgAC;
     msgAC.hItem = Apollo::newHandle();
     msgAC.sMimeType = sMimeType;
     if (!msgAC.Request()) {
-      apLog_Error((LOG_CHANNEL, "Participant::HandleAvatarData", "Msg_Animation_Create failed: participant=" ApHandleFormat "", ApHandleType(hAp_)));
+      apLog_Error((LOG_CHANNEL, "Avatar::HandleImageData", "Msg_Animation_Create failed: participant=" ApHandleFormat "", ApHandleType(hParticipant_)));
     } else {
       hAnimatedItem_ = msgAC.hItem;
     }
@@ -211,7 +211,7 @@ void Participant::HandleAvatarData(const String& sMimeType, const String& sSourc
     msgASR.hItem = hAnimatedItem_;
     msgASR.nMaxRate = 10;
     if (!msgASR.Request()) {
-      apLog_Error((LOG_CHANNEL, "Participant::HandleAvatarData", "Msg_Animation_SetRate failed: participant=" ApHandleFormat "", ApHandleType(hAp_)));
+      apLog_Error((LOG_CHANNEL, "Avatar::HandleImageData", "Msg_Animation_SetRate failed: participant=" ApHandleFormat "", ApHandleType(hParticipant_)));
     }
   }
 
@@ -229,25 +229,25 @@ void Participant::HandleAvatarData(const String& sMimeType, const String& sSourc
     }
 
     if (!msgASD.Request()) {
-      apLog_Error((LOG_CHANNEL, "Participant::HandleAvatarData", "Msg_Animation_SetData failed: participant=" ApHandleFormat " data:%d bytes, source=%s", ApHandleType(hAp_), sbData.Length(), StringType(sSource)));
+      apLog_Error((LOG_CHANNEL, "Avatar::HandleImageData", "Msg_Animation_SetData failed: participant=" ApHandleFormat " data:%d bytes, source=%s", ApHandleType(hParticipant_), sbData.Length(), StringType(sSource)));
     }
   }
 
   if (ApIsHandle(hAnimatedItem_)) {
-    pModule_->RegisterLocationParticipantOfAnimatedItem(hAnimatedItem_, pLocation_->apHandle(), apHandle());
+    pModule_->RegisterLocationAvatarOfAnimatedItem(hAnimatedItem_, pLocation_->apHandle(), hParticipant_);
 
     Msg_Animation_Start msgAS;
     msgAS.hItem = hAnimatedItem_;
     if (!msgAS.Request()) {
-      apLog_Error((LOG_CHANNEL, "Participant::HandleAvatarData", "Msg_Animation_Start failed: participant=" ApHandleFormat "", ApHandleType(hAp_)));
+      apLog_Error((LOG_CHANNEL, "Avatar::HandleImageData", "Msg_Animation_Start failed: participant=" ApHandleFormat "", ApHandleType(hParticipant_)));
     }
   }
 }
 
-void Participant::UnSubscribeDetail(const String& sKey)
+void Avatar::UnSubscribeDetail(const String& sKey)
 {
   Msg_VpView_UnsubscribeParticipantDetail msg;
-  msg.hParticipant = hAp_;
+  msg.hParticipant = hParticipant_;
   msg.sKey = sKey;
 
   if (0) {
@@ -260,7 +260,7 @@ void Participant::UnSubscribeDetail(const String& sKey)
   (void) msg.Request();
 }
 
-void Participant::Show()
+void Avatar::Show()
 {
   if (pLocation_ != 0 && pLocation_->GetContext() != 0) {
     hScene_ = pLocation_->GetContext()->Scene();
@@ -273,21 +273,21 @@ void Participant::Show()
   nMinW_ = Apollo::getModuleConfig(MODULE_NAME, "Avatar/MinWidth", 20);
   nMinH_ = Apollo::getModuleConfig(MODULE_NAME, "Avatar/MinHeight", 20);
 
-  Msg_Scene_CreateElement::_(hScene_, AvatarPath());
+  Msg_Scene_CreateElement::_(hScene_, ElementPath());
   SetUnknownPosition();
 
-  if (Apollo::getModuleConfig(MODULE_NAME, "DebugFrame/Participant", 0)) {
-    Msg_Scene_CreateRectangle::_(hScene_, AvatarPath() + "/" ELEMENT_FRAME, - (((double) nMaxW_) / 2.0) - 0.5, -0.5, (double) nMaxW_ + 1, (double) nMaxH_ + 1);
-    Msg_Scene_SetStrokeColor::_(hScene_, AvatarPath() + "/" ELEMENT_FRAME, 0, 0, 1, 1);
+  if (Apollo::getModuleConfig(MODULE_NAME, "DebugFrame/Avatar", 0)) {
+    Msg_Scene_CreateRectangle::_(hScene_, ElementPath() + "/" ELEMENT_FRAME, - (((double) nMaxW_) / 2.0) - 0.5, -0.5, (double) nMaxW_ + 1, (double) nMaxH_ + 1);
+    Msg_Scene_SetStrokeColor::_(hScene_, ElementPath() + "/" ELEMENT_FRAME, 0, 0, 1, 1);
   }
 
   Msg_Scene_CreateImage::_(hScene_, ImagePath(), 0, 0);
-  String sDefaultAvatar = Apollo::getModuleResourcePath(MODULE_NAME) + Apollo::getModuleConfig(MODULE_NAME, "Avatar/Image/Default", "DefaultAvatar.png");
+  String sDefaultImage = Apollo::getModuleResourcePath(MODULE_NAME) + Apollo::getModuleConfig(MODULE_NAME, "Avatar/Image/Default", "DefaultAvatar.png");
   double fImageW, fImageH;
-  if (Msg_Scene_GetImageSizeFromFile::_(hScene_, sDefaultAvatar, fImageW, fImageH)) {
+  if (Msg_Scene_GetImageSizeFromFile::_(hScene_, sDefaultImage, fImageW, fImageH)) {
     Msg_Scene_TranslateElement::_(hScene_, ImagePath(), - fImageW / 2.0, 0);
   }
-  Msg_Scene_SetImageFile::_(hScene_, ImagePath(), sDefaultAvatar);
+  Msg_Scene_SetImageFile::_(hScene_, ImagePath(), sDefaultImage);
 
   SubscribeAndGetDetail(Msg_VpView_ParticipantDetail_Nickname);
   SubscribeAndGetDetail(Msg_VpView_ParticipantDetail_avatar);
@@ -300,7 +300,7 @@ void Participant::Show()
   //Msg_Scene_Draw::_(hScene_);
 }
 
-void Participant::Hide()
+void Avatar::Hide()
 {
   UnSubscribeDetail(Msg_VpView_ParticipantDetail_Nickname);
   UnSubscribeDetail(Msg_VpView_ParticipantDetail_avatar);
@@ -311,12 +311,12 @@ void Participant::Hide()
   UnSubscribeDetail(Msg_VpView_ParticipantDetail_ProfileUrl);
 
   if (ApIsHandle(hAnimatedItem_)) {
-    pModule_->UnregisterLocationParticipantOfAnimatedItem(hAnimatedItem_);
+    pModule_->UnregisterLocationAvatarOfAnimatedItem(hAnimatedItem_);
 
     Msg_Animation_Stop msgAS;
     msgAS.hItem = hAnimatedItem_;
     if (!msgAS.Request()) {
-      apLog_Error((LOG_CHANNEL, "Participant::Hide", "Msg_Animation_Stop failed: participant=" ApHandleFormat "", ApHandleType(hAp_)));
+      apLog_Error((LOG_CHANNEL, "Avatar::Hide", "Msg_Animation_Stop failed: participant=" ApHandleFormat "", ApHandleType(hParticipant_)));
     }
   }
 
@@ -324,14 +324,14 @@ void Participant::Hide()
     Msg_Animation_Destroy msg;
     msg.hItem = hAnimatedItem_;
     if (!msg.Request()) {
-      apLog_Error((LOG_CHANNEL, "Participant::Hide", "Msg_Animation_Destroy failed: participant=" ApHandleFormat "", ApHandleType(hAp_)));
+      apLog_Error((LOG_CHANNEL, "Avatar::Hide", "Msg_Animation_Destroy failed: participant=" ApHandleFormat "", ApHandleType(hParticipant_)));
     }
   }
 
-  Msg_Scene_DeleteElement::_(hScene_, AvatarPath());
+  Msg_Scene_DeleteElement::_(hScene_, ElementPath());
 }
 
-void Participant::DetailsChanged(Apollo::ValueList& vlKeys)
+void Avatar::DetailsChanged(Apollo::ValueList& vlKeys)
 {
   for (Apollo::ValueElem* e = 0; e = vlKeys.nextElem(e); ) {
     String sKey = e->getString();
@@ -339,7 +339,7 @@ void Participant::DetailsChanged(Apollo::ValueList& vlKeys)
   }
 }
 
-void Participant::ReceivePublicChat(const ApHandle& hChat, const String& sNickname, const String& sText, const Apollo::TimeValue& tv)
+void Avatar::ReceivePublicChat(const ApHandle& hChat, const String& sNickname, const String& sText, const Apollo::TimeValue& tv)
 {
   Chatline* pChat = 0;
   chats_.Get(hChat, pChat);
@@ -362,7 +362,7 @@ void Participant::ReceivePublicChat(const ApHandle& hChat, const String& sNickna
   }
 }
 
-void Participant::AnimationFrame(const Apollo::Image& image)
+void Avatar::AnimationFrame(const Apollo::Image& image)
 {
   Msg_Scene_SetImageData::_(hScene_, ImagePath(), image);
   Msg_Scene_TranslateElement::_(hScene_, ImagePath(), - (double) image.Width() / 2.0, 0);
@@ -370,22 +370,22 @@ void Participant::AnimationFrame(const Apollo::Image& image)
 
 //----------------------------------------------------------
 
-String& Participant::AvatarPath()
+String& Avatar::ElementPath()
 {
   if (sPath_.empty()) {
-    sPath_ = "m_avatars/" + apHandle().toString();
+    sPath_ = "m_avatars/" + hParticipant_.toString();
   }
   return sPath_;
 }
 
-int Participant::ElementExists(const String& sPath)
+int Avatar::ElementExists(const String& sPath)
 {
   int bExists = 0;
   Msg_Scene_ElementExists::_(hScene_, sPath, bExists);
   return bExists;
 }
 
-void Participant::SetNickname(const String& sNickname)
+void Avatar::SetNickname(const String& sNickname)
 {
   sNickname_ = sNickname;
 
@@ -427,7 +427,7 @@ void Participant::SetNickname(const String& sNickname)
   Msg_Scene_SetFillColor::_(hScene_, sNicknamePath + "/" ELEMENT_NICKNAME_TEXT, cText.r, cText.g, cText.b, cText.a);
 }
 
-void Participant::CreateChatContainer(const String& sContainer)
+void Avatar::CreateChatContainer(const String& sContainer)
 {
   if (!ElementExists(sContainer)) {
     Msg_Scene_CreateElement::_(hScene_, sContainer);
@@ -438,7 +438,7 @@ void Participant::CreateChatContainer(const String& sContainer)
   }
 }
 
-void Participant::DeleteAllChatBubbles(const String& sContainer)
+void Avatar::DeleteAllChatBubbles(const String& sContainer)
 {
   Msg_Scene_GetChildren msg;
   msg.hScene = hScene_;
@@ -450,7 +450,7 @@ void Participant::DeleteAllChatBubbles(const String& sContainer)
   }
 }
 
-void Participant::SetChatline(const ApHandle& hChat, const String& sText)
+void Avatar::SetChatline(const ApHandle& hChat, const String& sText)
 {
   String sContainerPath = ChatContainerPath();
   String sChatPath = sContainerPath + "/" + hChat.toString();
@@ -491,7 +491,7 @@ void Participant::SetChatline(const ApHandle& hChat, const String& sText)
   Msg_Scene_SetFillColor::_(hScene_, sChatPath + "/" ELEMENT_CHAT_TEXT, cText.r, cText.g, cText.b, cText.a);
 }
 
-void Participant::SetUnknownPosition()
+void Avatar::SetUnknownPosition()
 {
   int nX = 300;
   int nMin = 100;
@@ -507,12 +507,12 @@ void Participant::SetUnknownPosition()
   nX = nMin + Apollo::getRandom(nMax - nMin);
 
   nPositionConfirmed_ = 0;
-  Msg_Scene_TranslateElement::_(hScene_, AvatarPath(), nX, 0);
+  Msg_Scene_TranslateElement::_(hScene_, ElementPath(), nX, 0);
 }
 
-void Participant::SetPosition(int nX)
+void Avatar::SetPosition(int nX)
 {
   nX_ = nX;
   nPositionConfirmed_ = 1;
-  Msg_Scene_TranslateElement::_(hScene_, AvatarPath(), nX, 0);
+  Msg_Scene_TranslateElement::_(hScene_, ElementPath(), nX, 0);
 }

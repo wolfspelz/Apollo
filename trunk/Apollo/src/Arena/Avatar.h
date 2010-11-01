@@ -30,12 +30,10 @@ typedef ApHandlePointerTreeNode<Chatline*> ChatlineListNode;
 class ArenaModule;
 class Location;
 
-class Participant
+class Avatar
 {
 public:
-  Participant(const ApHandle& hParticipant, ArenaModule* pModule, Location* pLocation);
-
-  inline ApHandle apHandle() { return hAp_; }
+  Avatar(const ApHandle& hParticipant, ArenaModule* pModule, Location* pLocation);
 
   void Show();
   void Hide();
@@ -61,17 +59,17 @@ protected:
   void GetDetailString(const String& sKey, Apollo::ValueList& vlMimeTypes);
   void GetDetailData(const String& sKey, Apollo::ValueList& vlMimeTypes);
   void UnSubscribeDetail(const String& sKey);
-  void HandleAvatarData(const String& sMimeType, const String& sSource, Buffer& sbData);
-  
+  void HandleImageData(const String& sMimeType, const String& sSource, Buffer& sbData);
+
   void SetNickname(const String& sNickname);
   void SetChatline(const ApHandle& hChat, const String& sText);
   void SetPosition(int nX);
   void SetUnknownPosition();
 
-  String& AvatarPath();
-  String NicknamePath() { return AvatarPath() + "/" ELEMENT_NICKNAME; }
-  String ImagePath() { return AvatarPath() + "/" ELEMENT_IMAGE; }
-  String ChatContainerPath() { return AvatarPath() + "/" + ELEMENT_CHAT; }
+  String& ElementPath();
+  String NicknamePath() { return ElementPath() + "/" ELEMENT_NICKNAME; }
+  String ImagePath() { return ElementPath() + "/" ELEMENT_IMAGE; }
+  String ChatContainerPath() { return ElementPath() + "/" + ELEMENT_CHAT; }
 
   int ElementExists(const String& sPath);
   void CreateChatContainer(const String& sContainer);
@@ -80,7 +78,7 @@ protected:
   static String TruncateElementText(const ApHandle& hScene, const String& sText, const String& sFont, int nSize, int nFlags, int nWidth);
 
 protected:
-  ApHandle hAp_;
+  ApHandle hParticipant_;
   ArenaModule* pModule_;
   Location* pLocation_;
   String sNickname_;

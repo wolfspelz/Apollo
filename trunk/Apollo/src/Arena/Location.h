@@ -8,11 +8,11 @@
 #define Location_H_INCLUDED
 
 #include "ApContainer.h"
-#include "Participant.h"
+#include "Avatar.h"
 
-typedef ApHandlePointerTree<Participant*> ParticipantList;
-typedef ApHandlePointerTreeNode<Participant*> ParticipantListNode;
-typedef ApHandlePointerTreeIterator<Participant*> ParticipantListIterator;
+typedef ApHandlePointerTree<Avatar*> AvatarList;
+typedef ApHandlePointerTreeNode<Avatar*> AvatarListNode;
+typedef ApHandlePointerTreeIterator<Avatar*> AvatarListIterator;
 
 class ArenaModule;
 class Context;
@@ -28,17 +28,36 @@ public:
   inline void ContextAssigned(Context* pContext) { pContext_ = pContext; }
   inline void ContextUnassigned(Context* pContext) { pContext_ = 0; }
 
-  void ProcessParticipantList(Apollo::ValueList& vlParticipants);
-  void ParticipantDetailsChanged(const ApHandle& hParticipant, Apollo::ValueList& vlKeys);
-  void ReceivePublicChat(const ApHandle& hParticipant, const ApHandle& hChat, const String& sNickname, const String& sText, const Apollo::TimeValue& tv);
-  void ParticipantAnimationFrame(const ApHandle& hParticipant, const Apollo::Image& image);
+  typedef enum _State { NoState
+    ,StateEnterRequested
+    ,StateEnterBegin
+    ,StateEnterComplete
+    ,StateLeaveRequested
+    ,StateLeaveBegin
+    ,StateLeaveComplete
+  } State;
+
+  inline State GetState() { return nState_; }
+  int TellDeleteMe();
+
+  void EnterRequested();
+  void EnterBegin();
+  void EnterComplete();
+  void LeaveRequested();
+  void LeaveBegin();
+  void LeaveComplete();
+
+  void ProcessAvatarList(Apollo::ValueList& vlParticipants);
+  void ParticipantDetailsChanged(const ApHandle& hAvatar, Apollo::ValueList& vlKeys);
+  void ReceivePublicChat(const ApHandle& hAvatar, const ApHandle& hChat, const String& sNickname, const String& sText, const Apollo::TimeValue& tv);
+  void ParticipantAnimationFrame(const ApHandle& hAvatar, const Apollo::Image& image);
 
 protected:
   void InitRemovedParticipants();
   void InitAddedParticipants();
   void RemoveFromRemovedParticipants(const ApHandle& h);
   void AddToAddedParticipants(const ApHandle& h);
-  void EvaluateNewParticipantList(Apollo::ValueList& vlParticipants);
+  void EvaluateNewAvatarList(Apollo::ValueList& vlParticipants);
   void ProcessRemovedParticipants();
   void ProcessAddedParticipants();
 
@@ -46,9 +65,15 @@ protected:
   ApHandle hAp_;
   ArenaModule* pModule_;
   Context* pContext_;
-  ParticipantList participants_;
+  AvatarList avatars_;
   ApHandleTree<int> addedParticipants_;
   ApHandleTree<int> removedParticipants_;
+
+  State nState_;
+  Apollo::TimeValue tvEnterRequested_;
+  Apollo::TimeValue tvEnterBegin_;
+  Apollo::TimeValue tvLeaveRequested_;
+  Apollo::TimeValue tvLeaveBegin_;
 };
 
 #endif // Location_H_INCLUDED

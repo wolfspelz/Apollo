@@ -42,6 +42,10 @@ int Context::Create()
     msgSSAD.hScene = hScene_;
     msgSSAD.nMilliSec = 100;
     msgSSAD.Request();
+
+    Msg_Scene_CreateRectangle::_(hScene_, ELEMENT_PROGRESS, 0.5, 0.5, 20, 20);
+    Msg_Scene_SetStrokeColor::_(hScene_, ELEMENT_PROGRESS, 0, 0, 0, 1);
+    Msg_Scene_SetFillColor::_(hScene_, ELEMENT_PROGRESS, 1, 1, 1, 1);
   }
 
   return ok;
@@ -101,13 +105,50 @@ void Context::SetSize(int nW, int nH)
 
   if (Apollo::getModuleConfig(MODULE_NAME, "DebugFrame/Context", 0)) {
     int bExists = 0;
-    if (Msg_Scene_ElementExists::_(hScene_, "_a_frame", bExists) && bExists) {
-      Msg_Scene_DeleteElement::_(hScene_, "_a_frame");
+    if (Msg_Scene_ElementExists::_(hScene_, ELEMENT_FRAME, bExists) && bExists) {
+      Msg_Scene_DeleteElement::_(hScene_, ELEMENT_FRAME);
     }
-    Msg_Scene_CreateRectangle::_(hScene_, "_a_frame", 0.5, 0.5, nW_ - 0.5, nH_ - 0.5);
-    //Msg_Scene_SetFillColor::_(hScene_, "_a_frame", 1, 1, 1, 0.5);
-    Msg_Scene_SetStrokeColor::_(hScene_, "_a_frame", 0, 0, 1, 1);
-    Msg_Scene_SetStrokeWidth::_(hScene_, "_a_frame", 1);
+    Msg_Scene_CreateRectangle::_(hScene_, ELEMENT_FRAME, 0.5, 0.5, nW_ - 0.5, nH_ - 0.5);
+    //Msg_Scene_SetFillColor::_(hScene_, ELEMENT_FRAME, 1, 1, 1, 0.5);
+    Msg_Scene_SetStrokeColor::_(hScene_, ELEMENT_FRAME, 0, 0, 1, 1);
+    Msg_Scene_SetStrokeWidth::_(hScene_, ELEMENT_FRAME, 1);
   }
 }
 
+//---------------------------
+
+void Context::EnterRequested()
+{
+  Msg_Scene_SetFillColor::_(hScene_, ELEMENT_PROGRESS, 0.8, 0.8, 1, 1);
+  Msg_Scene_Draw::_(hScene_);
+}
+
+void Context::EnterBegin()
+{
+  Msg_Scene_SetFillColor::_(hScene_, ELEMENT_PROGRESS, 0.5, 0.5, 1, 1);
+  Msg_Scene_Draw::_(hScene_);
+}
+
+void Context::EnterComplete()
+{
+  Msg_Scene_SetFillColor::_(hScene_, ELEMENT_PROGRESS, 0, 0, 1, 1);
+  Msg_Scene_Draw::_(hScene_);
+}
+
+void Context::LeaveRequested()
+{
+  Msg_Scene_SetFillColor::_(hScene_, ELEMENT_PROGRESS, 1, 0, 0, 1);
+  Msg_Scene_Draw::_(hScene_);
+}
+
+void Context::LeaveBegin()
+{
+  Msg_Scene_SetFillColor::_(hScene_, ELEMENT_PROGRESS, 1, 0.6, 0.6, 1);
+  Msg_Scene_Draw::_(hScene_);
+}
+
+void Context::LeaveComplete()
+{
+  Msg_Scene_SetFillColor::_(hScene_, ELEMENT_PROGRESS, 1, 1, 1, 1);
+  Msg_Scene_Draw::_(hScene_);
+}

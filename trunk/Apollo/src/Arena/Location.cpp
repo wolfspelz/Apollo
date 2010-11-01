@@ -15,14 +15,109 @@ Location::Location(const ApHandle& hLocation, ArenaModule* pModule)
 :hAp_(hLocation)
 ,pModule_(pModule)
 ,pContext_(0)
+,nState_(NoState)
 {
 }
 
-void Location::ProcessParticipantList(Apollo::ValueList& vlParticipants)
+void Location::EnterRequested()
+{
+  apLog_Verbose((LOG_CHANNEL, "Location::EnterRequested", "" ApHandleFormat "", ApHandleType(apHandle())));
+
+  nState_ = StateEnterRequested;
+  tvEnterRequested_ = Apollo::TimeValue::getTime();
+
+  if (pContext_) {
+    pContext_->EnterRequested();
+  }
+}
+
+void Location::EnterBegin()
+{
+  apLog_Verbose((LOG_CHANNEL, "Location::EnterBegin", "" ApHandleFormat "", ApHandleType(apHandle())));
+
+  nState_ = StateEnterBegin;
+  tvEnterBegin_ = Apollo::TimeValue::getTime();
+
+  if (pContext_) {
+    pContext_->EnterBegin();
+  }
+}
+
+void Location::EnterComplete()
+{
+  apLog_Verbose((LOG_CHANNEL, "Location::EnterComplete", "" ApHandleFormat "", ApHandleType(apHandle())));
+
+  nState_ = StateEnterComplete;
+
+  if (pContext_) {
+    pContext_->EnterComplete();
+  }
+
+  ApAsyncMessage<Msg_VpView_ReplayLocationPublicChat> msg;
+  msg->hLocation = apHandle();
+  //msg.nMaxAge;
+  //msg.nMaxLines;
+  //msg.nMaxData;
+  //if (!msg.Request()) { throw ApException("ArenaModule::VpView_EnterLocationComplete: Msg_VpView_ReplayLocationPublicChat(" ApHandleFormat ") failed", ApHandleType(pMsg->hLocation)); }
+  msg->PostAsync();
+}
+
+void Location::LeaveRequested()
+{
+  apLog_Verbose((LOG_CHANNEL, "Location::LeaveRequested", "" ApHandleFormat "", ApHandleType(apHandle())));
+
+  nState_ = StateLeaveRequested;
+  tvLeaveRequested_ = Apollo::TimeValue::getTime();
+
+  if (pContext_) {
+    pContext_->LeaveRequested();
+  }
+}
+
+void Location::LeaveBegin()
+{
+  apLog_Verbose((LOG_CHANNEL, "Location::LeaveBegin", "" ApHandleFormat "", ApHandleType(apHandle())));
+
+  nState_ = StateLeaveBegin;
+  tvLeaveBegin_ = Apollo::TimeValue::getTime();
+
+  if (pContext_) {
+    pContext_->LeaveBegin();
+  }
+}
+
+void Location::LeaveComplete()
+{
+  apLog_Verbose((LOG_CHANNEL, "Location::LeaveComplete", "" ApHandleFormat "", ApHandleType(apHandle())));
+
+  nState_ = StateLeaveComplete;
+
+  if (pContext_) {
+    pContext_->LeaveComplete();
+  }
+}
+
+int Location::TellDeleteMe()
+{
+  int bResult = 0;
+
+  if (nState_ == StateLeaveRequested) {
+    Apollo::TimeValue tvSinceLeaveRequested = Apollo::TimeValue::getTime() - tvLeaveRequested_;
+    if (tvSinceLeaveRequested.Sec() > Apollo::getModuleConfig(MODULE_NAME, "DisposeLocationInLeaveRequestedStateAfterSec", 180)) {
+      bResult = 1;
+    }
+  }
+
+  return bResult;
+}
+
+// -------------------------
+
+void Location::ProcessAvatarList(Apollo::ValueList& vlParticipants)
 {
   InitRemovedParticipants();
   InitAddedParticipants();
-  EvaluateNewParticipantList(vlParticipants);
+  EvaluateNewAvatarList(vlParticipants);
   ProcessRemovedParticipants();
   ProcessAddedParticipants();
 }
@@ -36,10 +131,10 @@ void Location::InitRemovedParticipants()
     }
   }
 
-  ParticipantListIterator iter(participants_);
-  for (ParticipantListNode* pNode = 0; (pNode = iter.Next()) != 0; ) {
-    ApHandle hParticipant = pNode->Key();
-    removedParticipants_.Set(hParticipant, 1);
+  AvatarListIterator iter(avatars_);
+  for (AvatarListNode* pNode = 0; (pNode = iter.Next()) != 0; ) {
+    ApHandle hAvatar = pNode->Key();
+    removedParticipants_.Set(hAvatar, 1);
   }
 }
 
@@ -53,10 +148,10 @@ void Location::InitAddedParticipants()
   }
 }
 
-void Location::EvaluateNewParticipantList(Apollo::ValueList& vlParticipants)
+void Location::EvaluateNewAvatarList(Apollo::ValueList& vlParticipants)
 {
   for (Apollo::ValueElem* e = 0; e = vlParticipants.nextElem(e); ) {
-    ParticipantListNode* pNode = participants_.Find(e->getHandle());
+    AvatarListNode* pNode = avatars_.Find(e->getHandle());
     if (pNode) {
       RemoveFromRemovedParticipants(e->getHandle());
     } else {
@@ -79,11 +174,11 @@ void Location::ProcessAddedParticipants()
 {
   ApHandleTreeIterator<int> iter(addedParticipants_);
   for (ApHandleTreeNode<int>* pNode = 0; (pNode = iter.Next()) != 0; ) {
-    ApHandle hParticipant = pNode->Key();
-    Participant* pParticipant = new Participant(hParticipant, pModule_, this);
-    if (pParticipant) {
-      participants_.Set(hParticipant, pParticipant);
-      pParticipant->Show();
+    ApHandle hAvatar = pNode->Key();
+    Avatar* pAvatar = new Avatar(hAvatar, pModule_, this);
+    if (pAvatar) {
+      avatars_.Set(hAvatar, pAvatar);
+      pAvatar->Show();
     }
   }
 }
@@ -92,39 +187,39 @@ void Location::ProcessRemovedParticipants()
 {
   ApHandleTreeIterator<int> iter(removedParticipants_);
   for (ApHandleTreeNode<int>* pNode = 0; (pNode = iter.Next()) != 0; ) {
-    ApHandle hParticipant = pNode->Key();
-    Participant* pParticipant = 0;
-    participants_.Get(hParticipant, pParticipant);
-    if (pParticipant) {
-      pParticipant->Hide();
-      participants_.Unset(hParticipant);
-      delete pParticipant;
-      pParticipant = 0;
+    ApHandle hAvatar = pNode->Key();
+    Avatar* pAvatar = 0;
+    avatars_.Get(hAvatar, pAvatar);
+    if (pAvatar) {
+      pAvatar->Hide();
+      avatars_.Unset(hAvatar);
+      delete pAvatar;
+      pAvatar = 0;
     }
   }
 }
 
 // -------------------------
 
-void Location::ParticipantDetailsChanged(const ApHandle& hParticipant, Apollo::ValueList& vlKeys)
+void Location::ParticipantDetailsChanged(const ApHandle& hAvatar, Apollo::ValueList& vlKeys)
 {
-  ParticipantListNode* pNode = participants_.Find(hParticipant);
+  AvatarListNode* pNode = avatars_.Find(hAvatar);
   if (pNode) {
     pNode->Value()->DetailsChanged(vlKeys);
   }
 }
 
-void Location::ReceivePublicChat(const ApHandle& hParticipant, const ApHandle& hChat, const String& sNickname, const String& sText, const Apollo::TimeValue& tv)
+void Location::ReceivePublicChat(const ApHandle& hAvatar, const ApHandle& hChat, const String& sNickname, const String& sText, const Apollo::TimeValue& tv)
 {
-  ParticipantListNode* pNode = participants_.Find(hParticipant);
+  AvatarListNode* pNode = avatars_.Find(hAvatar);
   if (pNode) {
     pNode->Value()->ReceivePublicChat(hChat, sNickname, sText, tv);
   }
 }
 
-void Location::ParticipantAnimationFrame(const ApHandle& hParticipant, const Apollo::Image& image)
+void Location::ParticipantAnimationFrame(const ApHandle& hAvatar, const Apollo::Image& image)
 {
-  ParticipantListNode* pNode = participants_.Find(hParticipant);
+  AvatarListNode* pNode = avatars_.Find(hAvatar);
   if (pNode) {
     pNode->Value()->AnimationFrame(image);
   }
