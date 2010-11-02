@@ -28,12 +28,12 @@ typedef ApHandlePointerTreeIterator<Chatline*> ChatlineListIterator;
 typedef ApHandlePointerTreeNode<Chatline*> ChatlineListNode;
 
 class ArenaModule;
-class Location;
+class Display;
 
 class Avatar
 {
 public:
-  Avatar(const ApHandle& hParticipant, ArenaModule* pModule, Location* pLocation);
+  Avatar(ArenaModule* pModule, Display* pDisplay, const ApHandle& hParticipant);
 
   void Show();
   void Hide();
@@ -78,9 +78,10 @@ protected:
   static String TruncateElementText(const ApHandle& hScene, const String& sText, const String& sFont, int nSize, int nFlags, int nWidth);
 
 protected:
-  ApHandle hParticipant_;
   ArenaModule* pModule_;
-  Location* pLocation_;
+  Display* pDisplay_;
+  ApHandle hParticipant_;
+
   String sNickname_;
   String sPath_;
 

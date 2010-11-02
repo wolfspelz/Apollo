@@ -128,7 +128,7 @@ public:
 class Msg_Animation_SequenceBegin: public ApNotificationMessage
 {
 public:
-  Msg_Animation_SequenceBegin() : ApNotificationMessage("SequenceBegin") {}
+  Msg_Animation_SequenceBegin() : ApNotificationMessage("Animation_SequenceBegin") {}
   ApIN ApHandle hItem;
   ApIN String sName;
   ApIN String sGroup;
@@ -147,7 +147,7 @@ public:
 class Msg_Animation_SequenceEnd: public ApNotificationMessage
 {
 public:
-  Msg_Animation_SequenceEnd() : ApNotificationMessage("SequenceEnd") {}
+  Msg_Animation_SequenceEnd() : ApNotificationMessage("Animation_SequenceEnd") {}
   ApIN ApHandle hItem;
   ApIN String sName;
   ApIN String sGroup;

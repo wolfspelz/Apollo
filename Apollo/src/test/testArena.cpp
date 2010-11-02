@@ -10,6 +10,7 @@
 #include "MsgUnitTest.h"
 #include "MsgVpView.h"
 #include "MsgGalileo.h"
+#include "MsgTimer.h"
 
 #if defined(AP_TEST_Arena)
 
@@ -33,11 +34,66 @@ typedef ApHandlePointerTree<Test_Participant*> Test_ParticipantList;
 typedef ApHandlePointerTreeIterator<Test_Participant*> Test_ParticipantListIterator;
 typedef ApHandlePointerTreeNode<Test_Participant*> Test_ParticipantListNode;
 
-class Test_Setup
+class Action: public Elem
 {
 public:
-  String Begin();
-  String End();
+  Action()
+    :nWaitMSec_(100)
+  {}
+  virtual void Execute() {}
+  int nWaitMSec_;
+};
+
+class ActionList: public ListT<Action, Elem>
+{
+public:
+  ActionList()
+    :pCurrent_(0)
+  {}
+  virtual void Begin();
+  virtual void End() {}
+  void DoCurrent();
+  static void On_Timer_Event(Msg_Timer_Event* pMsg);
+  Action* pCurrent_;
+  ApHandle hTimer_;
+};
+
+void ActionList::Begin()
+{
+  pCurrent_ = First();
+  DoCurrent();
+}
+
+void ActionList::DoCurrent()
+{
+  pCurrent_->Execute();
+  pCurrent_ = Next(pCurrent_);
+  if (pCurrent_) {
+    int nSec = 0;
+    int nMSec = pCurrent_->nWaitMSec_;
+    if (nMSec > 1000) {
+      nSec = nMSec % 1000;
+      nMSec = pCurrent_->nWaitMSec_ - nSec * 1000;
+    }
+    hTimer_ = Apollo::startTimeout(nSec, nMSec * 1000);
+  } else {
+    End();
+  }
+}
+
+void ActionList::On_Timer_Event(Msg_Timer_Event* pMsg)
+{
+  if (pMsg->Ref()) {
+    ActionList* pList = (ActionList*) pMsg->Ref();
+    pList->DoCurrent();
+  }
+}
+
+class Test_Setup: public ActionList
+{
+public:
+  void Begin();
+  void End();
 
   ApHandle hContext_;
   ApHandle hLocation1_;
@@ -65,7 +121,7 @@ static String Test_Arena_InChangeOut_Begin()
   String s;
 
   gTest_Arena_InChangeOut = new Test_Setup();
-  s = gTest_Arena_InChangeOut->Begin();
+  gTest_Arena_InChangeOut->Begin();
 
   return s;
 }
@@ -74,7 +130,7 @@ static String Test_Arena_InChangeOut_End()
 {
   String s;
 
-  s = gTest_Arena_InChangeOut->End();
+  gTest_Arena_InChangeOut->End();
   delete gTest_Arena_InChangeOut;
   gTest_Arena_InChangeOut = 0;
 
@@ -190,7 +246,7 @@ static void Test_VpView_ReplayLocationPublicChat(Msg_VpView_ReplayLocationPublic
   }
 
   // todo: remove me
-  Test_Arena_InChangeOut_End();
+  //Test_Arena_InChangeOut_End();
 }
 
 static void Test_Galileo_IsAnimationDataInStorage(Msg_Galileo_IsAnimationDataInStorage* pMsg)
@@ -235,10 +291,8 @@ static void Test_VpView_GetLocationDetail(Msg_VpView_GetLocationDetail* pMsg)
 
 // ------------------------------------------------------
 
-String Test_Setup::Begin()
+void Test_Setup::Begin()
 {
-  String s;
-
   hContext_ = Apollo::newHandle();
   hLocation1_ = Apollo::newHandle();
   hLocation2_ = Apollo::newHandle();
@@ -349,7 +403,7 @@ String Test_Setup::Begin()
   {
     Msg_VpView_ParticipantsChanged msg;
     msg.hLocation = hLocation1_;
-    msg.nCount = 1;
+    msg.nCount = pl1_.Count();
     msg.Send();
   }
 
@@ -369,7 +423,6 @@ String Test_Setup::Begin()
 
   // VpView_ReplayLocationPublicChat
 
-  /*
   // CHANGE: Navigate
   {
     Msg_VpView_ContextVisibility msg;
@@ -406,36 +459,55 @@ String Test_Setup::Begin()
 
   {
     Msg_VpView_EnterLocationRequested msg;
+    msg.hLocation = hLocation2_;
+    msg.Send();
   }
 
   {
     Msg_VpView_LocationContextsChanged msg;
+    msg.hLocation = hLocation2_;
+    msg.Send();
   }
 
   {
     Msg_VpView_LeaveLocationBegin msg;
+    msg.hLocation = hLocation1_;
+    msg.Send();
   }
 
   {
     Msg_VpView_ParticipantsChanged msg;
+    msg.hLocation = hLocation1_;
+    msg.nCount = 0;
+    msg.Send();
   }
 
   {
     Msg_VpView_LeaveLocationComplete msg;
+    msg.hLocation = hLocation1_;
+    msg.Send();
   }
 
   {
     Msg_VpView_EnterLocationBegin msg;
+    msg.hLocation = hLocation2_;
+    msg.Send();
   }
 
   {
     Msg_VpView_ParticipantsChanged msg;
+    msg.hLocation = hLocation2_;
+    msg.nCount = pl1_.Count();
+    msg.Send();
   }
 
   {
     Msg_VpView_EnterLocationComplete msg;
+    msg.hLocation = hLocation2_;
+    msg.Send();
   }
 
+  /*
   // OUT: CloseContext
   {
     Msg_VpView_LeaveLocationRequested msg;
@@ -465,14 +537,10 @@ String Test_Setup::Begin()
     Msg_VpView_LeaveLocationComplete msg;
   }
   */
-
-  return s;
 }
 
-String Test_Setup::End()
+void Test_Setup::End()
 {
-  String s;
-
   { Msg_VpView_GetParticipants msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_VpView_GetParticipants, this); }
   { Msg_VpView_SubscribeParticipantDetail msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_VpView_SubscribeParticipantDetail, this); }
   { Msg_VpView_GetParticipantDetailString msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_VpView_GetParticipantDetailString, this); }
@@ -487,8 +555,6 @@ String Test_Setup::End()
   { Msg_VpView_GetLocationDetail msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_VpView_GetLocationDetail, this); }
 
   Test_Arena_UnitTest_TokenEnd();
-
-  return s;
 }
 
 // ------------------------------------------------------

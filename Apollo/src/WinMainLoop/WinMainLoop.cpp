@@ -263,6 +263,18 @@ int MainLoopModule::Handle_WM_DESTROY(HWND hWnd, UINT message, WPARAM wParam, LP
 
 int MainLoopModule::Handle_WM_APMSG(ApMessage* pMsg)
 {
+  //if (0
+  //  || pMsg->getName() == "Timer_Event"
+  //  || pMsg->getName() == "Animation_SequenceBegin"
+  //  || pMsg->getName() == "Animation_SequenceEnd"
+  //  || pMsg->getName() == "Animation_Frame"
+  //  || pMsg->getName() == "UnitTest_Token"
+  //  || pMsg->getName() == "Net_TCP_Listening"
+  //  ) {
+  //} else {
+  //  int x = 1;
+  //}
+
   Apollo::callMsg(pMsg);
   delete pMsg;
 

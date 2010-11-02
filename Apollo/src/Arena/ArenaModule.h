@@ -15,27 +15,27 @@
 #include "MsgAnimation.h"
 #include "MsgSystem.h"
 #include "Display.h"
-#include "Location.h"
+//#include "Location.h"
 
 typedef ApHandlePointerTree<Display*> DisplayList;
 typedef ApHandlePointerTreeNode<Display*> DisplayListNode;
 typedef ApHandlePointerTreeIterator<Display*> DisplayListIterator;
 
-typedef ApHandlePointerTree<Location*> LocationList;
-typedef ApHandlePointerTreeNode<Location*> LocationListNode;
-typedef ApHandlePointerTreeIterator<Location*> LocationListIterator;
+//typedef ApHandlePointerTree<Location*> LocationList;
+//typedef ApHandlePointerTreeNode<Location*> LocationListNode;
+//typedef ApHandlePointerTreeIterator<Location*> LocationListIterator;
 
-class LocationAvatar
-{
-public:
-  LocationAvatar(const ApHandle& hLocation, const ApHandle& hPartcipant)
-    :hLocation_(hLocation)
-    ,hPartcipant_(hPartcipant)
-  {}
-
-  ApHandle hLocation_;
-  ApHandle hPartcipant_;
-};
+//class LocationAvatar
+//{
+//public:
+//  LocationAvatar(const ApHandle& hLocation, const ApHandle& hPartcipant)
+//    :hLocation_(hLocation)
+//    ,hPartcipant_(hPartcipant)
+//  {}
+//
+//  ApHandle hLocation_;
+//  ApHandle hPartcipant_;
+//};
 
 class ArenaModule
 {
@@ -79,32 +79,32 @@ public:
   void On_UnitTest_End(Msg_UnitTest_End* pMsg);
 #endif
 
-  void RegisterLocationAvatarOfAnimatedItem(const ApHandle& hItem, const ApHandle& hLocation, const ApHandle& hAvatar);
-  void UnregisterLocationAvatarOfAnimatedItem(const ApHandle& hItem);
-  int GetLocationAvatarOfAnimatedItem(const ApHandle& hItem, ApHandle& hLocation, ApHandle& hAvatar);
+  void SetContextOfLocation(const ApHandle& hLocation, const ApHandle& hContext);
+  void DeleteContextOfLocation(const ApHandle& hLocation, const ApHandle& hContext);
+  ApHandle GetContextOfLocation(const ApHandle& hLocation);
+  Display* GetDisplayOfLocation(const ApHandle& hLocation);
+
+  void SetContextOfAnimation(const ApHandle& hAnimation, const ApHandle& hContext);
+  void DeleteContextOfAnimation(const ApHandle& hAnimation, const ApHandle& hContext);
+  ApHandle GetContextOfAnimation(const ApHandle& hAnimation);
+  Display* GetDisplayOfAnimation(const ApHandle& hAnimation);
+
+  void SetParticipantOfAnimation(const ApHandle& hAnimation, const ApHandle& hParticipant);
+  void DeleteParticipantOfAnimation(const ApHandle& hAnimation, const ApHandle& hParticipant);
+  ApHandle GetParticipantOfAnimation(const ApHandle& hAnimation);
 
 protected:
   Display* CreateDisplay(const ApHandle& hContext);
   Display* FindDisplay(const ApHandle& hContext);
   void DeleteDisplay(const ApHandle& hContext);
 
-  Location* CreateLocation(const ApHandle& hLocation);
-  Location* FindLocation(const ApHandle& hLocation);
-  void DeleteLocation(const ApHandle& hLocation);
-  void DeleteOldLeaveRequestedLocations();
-
-  void SetLocationOfContext(const ApHandle& hContext, const ApHandle& hLocation);
-  void DeleteLocationOfContext(const ApHandle& hContext, const ApHandle& hLocation);
-  ApHandle GetLocationOfContext(const ApHandle& hContext);
-
 protected:
   DisplayList displays_;
-  LocationList locations_;
-  ApHandleTree<ApHandle> locationOfContext_;
-  ApHandleTree<LocationAvatar> locationAvatarOfAnimatedItem_;
+  ApHandleTree<ApHandle> contextOfLocation_;
+  ApHandleTree<ApHandle> contextOfAnimation_;
+  ApHandleTree<ApHandle> participantOfAnimation_;
 
 public:
-
   AP_MSG_REGISTRY_DECLARE;
 };
 

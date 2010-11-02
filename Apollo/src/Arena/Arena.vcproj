@@ -174,17 +174,6 @@
 				RelativePath=".\Display.cpp"
 				>
 			</File>
-			<File
-				RelativePath=".\Location.cpp"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-					/>
-				</FileConfiguration>
-			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -209,10 +198,6 @@
 			</File>
 			<File
 				RelativePath=".\Local.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Location.h"
 				>
 			</File>
 		</Filter>
