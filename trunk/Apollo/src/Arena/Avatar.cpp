@@ -13,7 +13,7 @@
 #include "Avatar.h"
 #include "ArenaModule.h"
 #include "ColorString.h"
-#include "Location.h"
+//#include "Location.h"
 
 #if defined(AP_TEST)
 
@@ -92,10 +92,10 @@ String Avatar::TruncateElementText(const ApHandle& hScene, const String& sText, 
 
 //----------------------------------------------------------
 
-Avatar::Avatar(const ApHandle& hParticipant, ArenaModule* pModule, Location* pLocation)
-:hParticipant_(hParticipant)
-,pModule_(pModule)
-,pLocation_(pLocation)
+Avatar::Avatar(ArenaModule* pModule, Display* pDisplay, const ApHandle& hParticipant)
+:pModule_(pModule)
+,pDisplay_(pDisplay)
+,hParticipant_(hParticipant)
 ,hAnimatedItem_(ApNoHandle)
 ,nMaxW_(100)
 ,nMaxH_(100)
@@ -234,7 +234,10 @@ void Avatar::HandleImageData(const String& sMimeType, const String& sSource, Buf
   }
 
   if (ApIsHandle(hAnimatedItem_)) {
-    pModule_->RegisterLocationAvatarOfAnimatedItem(hAnimatedItem_, pLocation_->apHandle(), hParticipant_);
+    if (pModule_) {
+      pModule_->SetContextOfAnimation(hAnimatedItem_, pDisplay_->GetContext());
+      pModule_->SetParticipantOfAnimation(hAnimatedItem_, hParticipant_);
+    }
 
     Msg_Animation_Start msgAS;
     msgAS.hItem = hAnimatedItem_;
@@ -262,8 +265,8 @@ void Avatar::UnSubscribeDetail(const String& sKey)
 
 void Avatar::Show()
 {
-  if (pLocation_ != 0 && pLocation_->GetDisplay() != 0) {
-    hScene_ = pLocation_->GetDisplay()->Scene();
+  if (pDisplay_) {
+    hScene_ = pDisplay_->GetScene();
   }
 
   nMaxW_ = Apollo::getModuleConfig(MODULE_NAME, "Avatar/MaxWidth", 100);
@@ -311,7 +314,10 @@ void Avatar::Hide()
   UnSubscribeDetail(Msg_VpView_ParticipantDetail_ProfileUrl);
 
   if (ApIsHandle(hAnimatedItem_)) {
-    pModule_->UnregisterLocationAvatarOfAnimatedItem(hAnimatedItem_);
+    if (pModule_) {
+      pModule_->DeleteContextOfAnimation(hAnimatedItem_, pDisplay_->GetContext());
+      pModule_->DeleteParticipantOfAnimation(hAnimatedItem_, hParticipant_);
+    }
 
     Msg_Animation_Stop msgAS;
     msgAS.hItem = hAnimatedItem_;
@@ -497,11 +503,8 @@ void Avatar::SetUnknownPosition()
   int nMin = 100;
   int nMax = 500;
 
-  if (pLocation_) {
-    Display* pDisplay = pLocation_->GetDisplay();
-    if (pDisplay) {
-      nMax = pDisplay->GetWidth();
-    }
+  if (pDisplay_) {
+    nMax = pDisplay_->GetWidth();
   }
 
   nX = nMin + Apollo::getRandom(nMax - nMin);

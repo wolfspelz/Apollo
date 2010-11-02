@@ -9,10 +9,11 @@
 #include "MsgConfig.h"
 #include "Local.h"
 #include "ArenaModule.h"
+#include "Avatar.h"
 
 Display* ArenaModule::CreateDisplay(const ApHandle& hContext)
 {
-  Display* pDisplay = new Display(hContext);
+  Display* pDisplay = new Display(this, hContext);
   if (pDisplay) {
     int ok = pDisplay->Create();
     if (ok ) {
@@ -45,109 +46,137 @@ Display* ArenaModule::FindDisplay(const ApHandle& hContext)
 
 //---------------------------
 
-Location* ArenaModule::CreateLocation(const ApHandle& hLocation)
-{
-  Location* pLocation = new Location(hLocation, this);
-  if (pLocation) {
-    locations_.Set(hLocation, pLocation);
-  }
-  return pLocation;
-}
-
-void ArenaModule::DeleteLocation(const ApHandle& hLocation)
-{
-  Location* pLocation = FindLocation(hLocation);
-  if (pLocation) {
-    locations_.Unset(hLocation);
-    delete pLocation;
-    pLocation = 0;
-  }
-}
-
-Location* ArenaModule::FindLocation(const ApHandle& hLocation)
-{
-  Location* pLocation = 0;  
-  locations_.Get(hLocation, pLocation);
-  return pLocation;
-}
-
-void ArenaModule::DeleteOldLeaveRequestedLocations()
-{
-  int bDone = 0;
-  while (!bDone) {
-    ApHandle hLocation;
-    bDone = 1;
-
-    LocationListIterator iter(locations_);
-    for (LocationListNode* pNode = 0; (pNode = iter.Next()) != 0; ) {
-      Location* pLocation = pNode->Value();
-      if (pLocation) {
-        int bTooOld = pLocation->TellDeleteMe();
-        if (bTooOld) {
-          hLocation = pNode->Key();
-          bDone = 0;
-          break;
-        }
-      }
-    }
-
-    if (ApIsHandle(hLocation)) {
-      apLog_Info((LOG_CHANNEL, "ArenaModule::DeleteOldLeaveRequestedLocations", "deleting location=" ApHandleFormat "", ApHandleType(hLocation)));
-      DeleteLocation(hLocation);
-    }
-  }
-}
+//void ArenaModule::DeleteOldLeaveRequestedLocations()
+//{
+//  int bDone = 0;
+//  while (!bDone) {
+//    ApHandle hLocation;
+//    bDone = 1;
+//
+//    LocationListIterator iter(locations_);
+//    for (LocationListNode* pNode = 0; (pNode = iter.Next()) != 0; ) {
+//      Location* pLocation = pNode->Value();
+//      if (pLocation) {
+//        int bTooOld = pLocation->TellDeleteMe();
+//        if (bTooOld) {
+//          hLocation = pNode->Key();
+//          bDone = 0;
+//          break;
+//        }
+//      }
+//    }
+//
+//    if (ApIsHandle(hLocation)) {
+//      apLog_Info((LOG_CHANNEL, "ArenaModule::DeleteOldLeaveRequestedLocations", "deleting location=" ApHandleFormat "", ApHandleType(hLocation)));
+//      DeleteLocation(hLocation);
+//    }
+//  }
+//}
 
 //---------------------------
 
-void ArenaModule::SetLocationOfContext(const ApHandle& hContext, const ApHandle& hLocation)
+void ArenaModule::SetContextOfLocation(const ApHandle& hLocation, const ApHandle& hContext)
 {
-  if (locationOfContext_.IsSet(hContext)) {
-    locationOfContext_.Unset(hContext);
+  if (contextOfLocation_.IsSet(hLocation)) {
+    contextOfLocation_.Unset(hLocation);
   }
-  locationOfContext_.Set(hContext, hLocation);
+  contextOfLocation_.Set(hLocation, hContext);
 }
 
-void ArenaModule::DeleteLocationOfContext(const ApHandle& hContext, const ApHandle& hLocation)
+void ArenaModule::DeleteContextOfLocation(const ApHandle& hLocation, const ApHandle& hContext)
 {
-  if (locationOfContext_.IsSet(hContext)) {
-    locationOfContext_.Unset(hContext);
+  ApHandle h;
+  contextOfLocation_.Get(hLocation, h);
+  if (h != hContext) {
+    apLog_Warning((LOG_CHANNEL, "ArenaModule::DeleteContextOfLocation", "Context not found for loc=" ApHandleFormat " ctxt=" ApHandleFormat "", ApHandleType(hContext)));
+  } else {
+    contextOfLocation_.Unset(hLocation);
   }
 }
 
-ApHandle ArenaModule::GetLocationOfContext(const ApHandle& hContext)
+ApHandle ArenaModule::GetContextOfLocation(const ApHandle& hLocation)
 {
-  if (locationOfContext_.IsSet(hContext)) {
-    return locationOfContext_.Find(hContext)->Value();
+  if (contextOfLocation_.IsSet(hLocation)) {
+    return contextOfLocation_.Find(hLocation)->Value();
   }
   return ApNoHandle;
 }
 
+Display* ArenaModule::GetDisplayOfLocation(const ApHandle& hLocation)
+{
+  ApHandle hContext = GetContextOfLocation(hLocation);
+  if (ApIsHandle(hContext)) {
+    return FindDisplay(hContext);
+  }
+  return 0;
+}
+
 //---------------------------
 
-void ArenaModule::RegisterLocationAvatarOfAnimatedItem(const ApHandle& hItem, const ApHandle& hLocation, const ApHandle& hAvatar)
+void ArenaModule::SetContextOfAnimation(const ApHandle& hAnimation, const ApHandle& hContext)
 {
-  LocationAvatar lp(hLocation, hAvatar);
-  locationAvatarOfAnimatedItem_.Set(hItem, lp);
-}
-
-void ArenaModule::UnregisterLocationAvatarOfAnimatedItem(const ApHandle& hItem)
-{
-  locationAvatarOfAnimatedItem_.Unset(hItem);
-}
-
-int ArenaModule::GetLocationAvatarOfAnimatedItem(const ApHandle& hItem, ApHandle& hLocation, ApHandle& hAvatar)
-{
-  int ok = 0;
-
-  ApHandleTreeNode<LocationAvatar>* pNode = locationAvatarOfAnimatedItem_.Find(hItem);
-  if (pNode) {
-    ok = 1;
-    hLocation = pNode->Value().hLocation_;
-    hAvatar = pNode->Value().hPartcipant_;
+  if (contextOfAnimation_.IsSet(hAnimation)) {
+    contextOfAnimation_.Unset(hAnimation);
   }
+  contextOfAnimation_.Set(hAnimation, hContext);
+}
 
-  return ok;
+void ArenaModule::DeleteContextOfAnimation(const ApHandle& hAnimation, const ApHandle& hContext)
+{
+  ApHandle h;
+  contextOfAnimation_.Get(hAnimation, h);
+  if (h != hContext) {
+    apLog_Warning((LOG_CHANNEL, "ArenaModule::DeleteContextOfAnimation", "Context not found for loc=" ApHandleFormat " ctxt=" ApHandleFormat "", ApHandleType(hContext)));
+  } else {
+    contextOfAnimation_.Unset(hAnimation);
+  }
+}
+
+ApHandle ArenaModule::GetContextOfAnimation(const ApHandle& hAnimation)
+{
+  if (contextOfAnimation_.IsSet(hAnimation)) {
+    return contextOfAnimation_.Find(hAnimation)->Value();
+  }
+  return ApNoHandle;
+}
+
+Display* ArenaModule::GetDisplayOfAnimation(const ApHandle& hAnimation)
+{
+  ApHandle hContext = GetContextOfAnimation(hAnimation);
+  if (ApIsHandle(hContext)) {
+    return FindDisplay(hContext);
+  }
+  return 0;
+}
+
+
+//---------------------------
+
+void ArenaModule::SetParticipantOfAnimation(const ApHandle& hAnimation, const ApHandle& hParticipant)
+{
+  if (participantOfAnimation_.IsSet(hAnimation)) {
+    participantOfAnimation_.Unset(hAnimation);
+  }
+  participantOfAnimation_.Set(hAnimation, hParticipant);
+}
+
+void ArenaModule::DeleteParticipantOfAnimation(const ApHandle& hAnimation, const ApHandle& hParticipant)
+{
+  ApHandle h;
+  participantOfAnimation_.Get(hAnimation, h);
+  if (h != hParticipant) {
+    apLog_Warning((LOG_CHANNEL, "ArenaModule::DeleteParticipantOfAnimation", "Participant not found for loc=" ApHandleFormat " ctxt=" ApHandleFormat "", ApHandleType(hParticipant)));
+  } else {
+    participantOfAnimation_.Unset(hAnimation);
+  }
+}
+
+ApHandle ArenaModule::GetParticipantOfAnimation(const ApHandle& hAnimation)
+{
+  if (participantOfAnimation_.IsSet(hAnimation)) {
+    return participantOfAnimation_.Find(hAnimation)->Value();
+  }
+  return ApNoHandle;
 }
 
 //----------------------------------------------------------
@@ -155,115 +184,106 @@ int ArenaModule::GetLocationAvatarOfAnimatedItem(const ApHandle& hItem, ApHandle
 AP_MSG_HANDLER_METHOD(ArenaModule, VpView_ContextCreated)
 {
   Display* pDisplay = FindDisplay(pMsg->hContext);
-  if (pDisplay != 0) { throw ApException("ArenaModule::VpView_ContextCreated: context=" ApHandleFormat " already exists", ApHandleType(pMsg->hContext)); }
-  pDisplay = CreateDisplay(pMsg->hContext);
-  if (pDisplay == 0) { throw ApException("ArenaModule::VpView_ContextCreated: CreateDisplay(" ApHandleFormat ") failed", ApHandleType(pMsg->hContext)); }
+  if (pDisplay) {
+    apLog_Warning((LOG_CHANNEL, "ArenaModule:VpView_ContextCreated", "Display already exists for ctxt=" ApHandleFormat "", ApHandleType(pMsg->hContext)));
+  } else {
+    pDisplay = CreateDisplay(pMsg->hContext);
+  }
 }
 
 AP_MSG_HANDLER_METHOD(ArenaModule, VpView_ContextDestroyed)
 {
   Display* pDisplay = FindDisplay(pMsg->hContext);
-  if (pDisplay == 0) { throw ApException("ArenaModule::VpView_ContextDestroyed: context=" ApHandleFormat " does not already exists", ApHandleType(pMsg->hContext)); }
-  if (pDisplay) { 
-    DeleteDisplay(pMsg->hContext); 
+  if (pDisplay == 0) {
+    apLog_Warning((LOG_CHANNEL, "ArenaModule::VpView_ContextDestroyed", "No display for ctxt=" ApHandleFormat "", ApHandleType(pMsg->hContext)));
+  } else {
+    DeleteDisplay(pMsg->hContext);
   }
 }
 
 AP_MSG_HANDLER_METHOD(ArenaModule, VpView_ContextVisibility)
 {
   Display* pDisplay = FindDisplay(pMsg->hContext);
-  if (pDisplay == 0) { throw ApException("ArenaModule::VpView_ContextVisibility: FindDisplay(" ApHandleFormat ") failed", ApHandleType(pMsg->hContext)); }
-
-  pDisplay->SetVisibility(pMsg->bVisible);
+  if (pDisplay) {
+    pDisplay->SetVisibility(pMsg->bVisible);
+  }
 }
 
 AP_MSG_HANDLER_METHOD(ArenaModule, VpView_ContextPosition)
 {
   Display* pDisplay = FindDisplay(pMsg->hContext);
-  if (pDisplay == 0) { throw ApException("ArenaModule::VpView_ContextPosition: FindDisplay(" ApHandleFormat ") failed", ApHandleType(pMsg->hContext)); }
-
-  pDisplay->SetPosition(pMsg->nX, pMsg->nY);
+  if (pDisplay) {
+    pDisplay->SetPosition(pMsg->nX, pMsg->nY);
+  }
 }
 
 AP_MSG_HANDLER_METHOD(ArenaModule, VpView_ContextSize)
 {
   Display* pDisplay = FindDisplay(pMsg->hContext);
-  if (pDisplay == 0) { throw ApException("ArenaModule::VpView_ContextSize: FindDisplay(" ApHandleFormat ") failed", ApHandleType(pMsg->hContext)); }
-
-  pDisplay->SetSize(pMsg->nWidth, pMsg->nHeight);
+  if (pDisplay) {
+    pDisplay->SetSize(pMsg->nWidth, pMsg->nHeight);
+  }
 }
 
 AP_MSG_HANDLER_METHOD(ArenaModule, VpView_LocationsChanged){}
 
 AP_MSG_HANDLER_METHOD(ArenaModule, VpView_ContextLocationAssigned)
 {
-  Location* pLocation = FindLocation(pMsg->hLocation);
-  if (pLocation == 0) {
-    pLocation = CreateLocation(pMsg->hLocation);
-    if (pLocation == 0) { throw ApException("ArenaModule::VpView_ContextLocationAssigned: CreateLocation(" ApHandleFormat ") failed", ApHandleType(pMsg->hLocation)); }
-  }
   Display* pDisplay = FindDisplay(pMsg->hContext);
-  if (pDisplay == 0) { throw ApException("ArenaModule::VpView_ContextLocationAssigned: FindDisplay(" ApHandleFormat ") failed", ApHandleType(pMsg->hContext)); }
-
-  SetLocationOfContext(pMsg->hContext, pMsg->hLocation);
-  pLocation->AssignDisplay(pDisplay);
+  if (pDisplay) {
+    pDisplay->AttachLocation(pMsg->hLocation);
+  }
 }
 
 AP_MSG_HANDLER_METHOD(ArenaModule, VpView_ContextLocationUnassigned)
 {
-  Location* pLocation = FindLocation(pMsg->hLocation);
-  if (pLocation == 0) { throw ApException("ArenaModule::VpView_ContextLocationUnassigned: FindLocation(" ApHandleFormat ") failed", ApHandleType(pMsg->hLocation)); }
   Display* pDisplay = FindDisplay(pMsg->hContext);
-  if (pDisplay == 0) { throw ApException("ArenaModule::VpView_ContextLocationUnassigned: FindDisplay(" ApHandleFormat ") failed", ApHandleType(pMsg->hContext)); }
-
-  DeleteLocationOfContext(pMsg->hContext, pMsg->hLocation);
-  pLocation->UnassignDisplay(pDisplay);
+  if (pDisplay) {
+    pDisplay->DetachLocation(pMsg->hLocation);
+  }
 }
 
 AP_MSG_HANDLER_METHOD(ArenaModule, VpView_EnterLocationRequested)
 {
-  Location* pLocation = FindLocation(pMsg->hLocation);
-  if (pLocation == 0) { throw ApException("ArenaModule::VpView_EnterLocationRequested: FindLocation(" ApHandleFormat ") failed", ApHandleType(pMsg->hLocation)); }
-
-  pLocation->EnterRequested();
+  Display* pDisplay = GetDisplayOfLocation(pMsg->hLocation);
+  if (pDisplay) { 
+    pDisplay->OnEnterRequested();
+  }
 }
 
 AP_MSG_HANDLER_METHOD(ArenaModule, VpView_EnterLocationBegin)
 {
-  Location* pLocation = FindLocation(pMsg->hLocation);
-  if (pLocation == 0) { throw ApException("ArenaModule::VpView_EnterLocationBegin: FindLocation(" ApHandleFormat ") failed", ApHandleType(pMsg->hLocation)); }
-
-  pLocation->EnterBegin();
+  Display* pDisplay = GetDisplayOfLocation(pMsg->hLocation);
+  if (pDisplay) { 
+    pDisplay->OnEnterBegin();
+  }
 }
 
 AP_MSG_HANDLER_METHOD(ArenaModule, VpView_EnterLocationComplete)
 {
-  Location* pLocation = FindLocation(pMsg->hLocation);
-  if (pLocation == 0) { throw ApException("ArenaModule::VpView_EnterLocationBegin: FindLocation(" ApHandleFormat ") failed", ApHandleType(pMsg->hLocation)); }
-
-  pLocation->EnterComplete();
+  Display* pDisplay = GetDisplayOfLocation(pMsg->hLocation);
+  if (pDisplay) { 
+    pDisplay->OnEnterComplete();
+  }
 }
 
 AP_MSG_HANDLER_METHOD(ArenaModule, VpView_LocationContextsChanged){}
 
 AP_MSG_HANDLER_METHOD(ArenaModule, VpView_ParticipantsChanged)
 {
-  Location* pLocation = FindLocation(pMsg->hLocation);
-  if (pLocation == 0) { throw ApException("ArenaModule::VpView_ContextLocationUnassigned: FindLocation(" ApHandleFormat ") failed", ApHandleType(pMsg->hLocation)); }
-
-  Msg_VpView_GetParticipants msg;
-  msg.hLocation = pMsg->hLocation;
-  if (!msg.Request()) { throw ApException("ArenaModule::VpView_ContextLocationUnassigned: Msg_VpView_GetParticipants(" ApHandleFormat ") failed", ApHandleType(pMsg->hLocation)); }
-  pLocation->ProcessAvatarList(msg.vlParticipants);
+  Display* pDisplay = GetDisplayOfLocation(pMsg->hLocation);
+  if (pDisplay) { 
+    pDisplay->OnParticipantsChanged();
+  }
 }
 
 AP_MSG_HANDLER_METHOD(ArenaModule, VpView_LocationPublicChat)
 {
-  Location* pLocation = FindLocation(pMsg->hLocation);
-  if (pLocation == 0) { throw ApException("ArenaModule::VpView_LocationPublicChat: FindLocation(" ApHandleFormat ") failed", ApHandleType(pMsg->hLocation)); }
-
-  Apollo::TimeValue tv(pMsg->nSec, pMsg->nMicroSec);
-  pLocation->ReceivePublicChat(pMsg->hParticipant, pMsg->hChat, pMsg->sNickname, pMsg->sText, tv);
+  Display* pDisplay = GetDisplayOfLocation(pMsg->hLocation);
+  if (pDisplay) { 
+    Apollo::TimeValue tv(pMsg->nSec, pMsg->nMicroSec);
+    pDisplay->OnReceivePublicChat(pMsg->hParticipant, pMsg->hChat, pMsg->sNickname, pMsg->sText, tv);
+  }
 }
 
 AP_MSG_HANDLER_METHOD(ArenaModule, VpView_LocationDetailsChanged){}
@@ -272,34 +292,34 @@ AP_MSG_HANDLER_METHOD(ArenaModule, VpView_ContextDetailsChanged){}
 
 AP_MSG_HANDLER_METHOD(ArenaModule, VpView_ParticipantDetailsChanged)
 {
-  Location* pLocation = FindLocation(pMsg->hLocation);
-  if (pLocation == 0) { throw ApException("ArenaModule::VpView_ContextLocationUnassigned: FindLocation(" ApHandleFormat ") failed", ApHandleType(pMsg->hLocation)); }
-
-  pLocation->ParticipantDetailsChanged(pMsg->hParticipant, pMsg->vlKeys);
+  Display* pDisplay = GetDisplayOfLocation(pMsg->hLocation);
+  if (pDisplay) { 
+    pDisplay->OnParticipantDetailsChanged(pMsg->hParticipant, pMsg->vlKeys);
+  }
 }
 
 AP_MSG_HANDLER_METHOD(ArenaModule, VpView_LeaveLocationRequested)
 {
-  Location* pLocation = FindLocation(pMsg->hLocation);
-  if (pLocation == 0) { throw ApException("ArenaModule::VpView_LeaveLocationRequested: FindLocation(" ApHandleFormat ") failed", ApHandleType(pMsg->hLocation)); }
-
-  pLocation->LeaveRequested();
+  Display* pDisplay = GetDisplayOfLocation(pMsg->hLocation);
+  if (pDisplay) { 
+    pDisplay->OnLeaveRequested();
+  }
 }
 
 AP_MSG_HANDLER_METHOD(ArenaModule, VpView_LeaveLocationBegin)
 {
-  Location* pLocation = FindLocation(pMsg->hLocation);
-  if (pLocation == 0) { throw ApException("ArenaModule::VpView_LeaveLocationBegin: FindLocation(" ApHandleFormat ") failed", ApHandleType(pMsg->hLocation)); }
-
-  pLocation->LeaveBegin();
+  Display* pDisplay = GetDisplayOfLocation(pMsg->hLocation);
+  if (pDisplay) { 
+    pDisplay->OnLeaveBegin();
+  }
 }
 
 AP_MSG_HANDLER_METHOD(ArenaModule, VpView_LeaveLocationComplete)
 {
-  Location* pLocation = FindLocation(pMsg->hLocation);
-  if (pLocation == 0) { throw ApException("ArenaModule::VpView_LeaveLocationComplete: FindLocation(" ApHandleFormat ") failed", ApHandleType(pMsg->hLocation)); }
-
-  pLocation->LeaveComplete();
+  Display* pDisplay = GetDisplayOfLocation(pMsg->hLocation);
+  if (pDisplay) { 
+    pDisplay->OnLeaveComplete();
+  }
 }
 
 AP_MSG_HANDLER_METHOD(ArenaModule, VpView_ParticipantAdded){}
@@ -312,15 +332,11 @@ AP_MSG_HANDLER_METHOD(ArenaModule, Animation_SequenceBegin){}
 
 AP_MSG_HANDLER_METHOD(ArenaModule, Animation_Frame)
 {
-  ApHandle hLocation;
-  ApHandle hAvatar;
-//  if (!GetLocationAvatarOfAnimatedItem(pMsg->hItem, hLocation, hAvatar)) { throw ApException("ArenaModule::Animation_Frame: GetLocationAvatarOfAnimatedItem(" ApHandleFormat ") failed", ApHandleType(pMsg->hItem)); }
-  if (!GetLocationAvatarOfAnimatedItem(pMsg->hItem, hLocation, hAvatar)) { return; }
-
-  Location* pLocation = FindLocation(hLocation);
-  if (pLocation == 0) { throw ApException("ArenaModule::Animation_Frame: FindLocation(" ApHandleFormat ") failed", ApHandleType(hLocation)); }
-
-  pLocation->AvatarAnimationFrame(hAvatar, pMsg->iFrame);
+  Display* pDisplay = GetDisplayOfAnimation(pMsg->hItem);
+  if (pDisplay) {
+    ApHandle hParticipant = GetParticipantOfAnimation(pMsg->hItem);
+    pDisplay->OnAvatarAnimationFrame(hParticipant, pMsg->iFrame);
+  }
 }
 
 AP_MSG_HANDLER_METHOD(ArenaModule, Animation_SequenceEnd){}
@@ -329,7 +345,7 @@ AP_MSG_HANDLER_METHOD(ArenaModule, Animation_SequenceEnd){}
 
 AP_MSG_HANDLER_METHOD(ArenaModule, System_60SecTimer)
 {
-  DeleteOldLeaveRequestedLocations();
+//  DeleteOldLeaveRequestedLocations();
 }
 
 //----------------------------------------------------------
@@ -364,15 +380,6 @@ AP_MSG_HANDLER_METHOD(ArenaModule, UnitTest_End)
 int ArenaModule::Init()
 {
   int ok = 1;
-
- // HDC dcScreen = ::GetDC(NULL);
-	//HDC dcMemory = ::CreateCompatibleDC(dcScreen);
- // cairo_surface_t *surface = cairo_win32_surface_create(dcMemory);
- // cairo_t *cr = cairo_create(surface);
- // cairo_destroy(cr); 
- // cairo_surface_destroy(surface);
- // ::DeleteDC(dcMemory);
- // ::ReleaseDC(NULL, dcScreen);
 
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ArenaModule, VpView_ContextCreated, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ArenaModule, VpView_ContextDestroyed, this, ApCallbackPosNormal);
