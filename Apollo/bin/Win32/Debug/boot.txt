@@ -22,8 +22,8 @@ Core/Modules/020/BrowserInfo/Path=browserinfo
 Core/Modules/021/Navigation/Path=navigation
 Core/Modules/022/Gm/Path=gm
 Core/Modules/023/Galileo/Path=Galileo
-Core/Modules/024/Arena/Path=Arena
-Core/Modules/025/Scene/Path=Scene
+Core/Modules/024/Scene/Path=Scene
+Core/Modules/025/Arena/Path=Arena
 
 Core/ModulesDirectory=modules
 

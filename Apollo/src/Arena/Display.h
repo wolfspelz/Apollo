@@ -8,12 +8,15 @@
 #define Display_H_INCLUDED
 
 #include "ApContainer.h"
+#include "Meta.h"
 
 class Avatar;
 
 typedef ApHandlePointerTree<Avatar*> AvatarList;
 typedef ApHandlePointerTreeNode<Avatar*> AvatarListNode;
 typedef ApHandlePointerTreeIterator<Avatar*> AvatarListIterator;
+
+typedef ApHandleTree<int> ParticipantFlags;
 
 class ArenaModule;
 
@@ -32,20 +35,10 @@ public:
 
   inline ApHandle GetContext() { return hContext_; }
   inline ApHandle GetLocation() { return hLocation_; }
+
   void AttachLocation(const ApHandle& hLocation);
   void DetachLocation(const ApHandle& hLocation);
 
-  typedef enum _State { NoState
-    ,StateEnterRequested
-    ,StateEnterBegin
-    ,StateEnterComplete
-    ,StateLeaveRequested
-    ,StateLeaveBegin
-    ,StateLeaveComplete
-  } State;
-
-  inline State GetState() { return nState_; }
-  
   void OnEnterRequested();
   void OnEnterBegin();
   void OnEnterComplete();
@@ -62,21 +55,22 @@ public:
   inline int GetHeight() { return nH_; }
   inline ApHandle GetScene() { return hScene_; }
 
-  int CheckLeaveRequestedAndAbandoned();
-
 protected:
   void ProcessAvatarList(Apollo::ValueList& vlParticipants);
-  void InitRemovedParticipants();
-  void InitAddedParticipants();
-  void RemoveFromRemovedParticipants(const ApHandle& h);
-  void AddToAddedParticipants(const ApHandle& h);
-  void EvaluateNewAvatarList(Apollo::ValueList& vlParticipants);
-  void ProcessRemovedParticipants();
-  void ProcessAddedParticipants();
+  void InitRemovedParticipants(ParticipantFlags& removedParticipants);
+  void InitAddedParticipants(ParticipantFlags& addedParticipants);
+  void RemoveFromRemovedParticipants(const ApHandle& h, ParticipantFlags& removedParticipants);
+  void AddToAddedParticipants(const ApHandle& h, ParticipantFlags& addedParticipants);
+  void EvaluateNewAvatarList(Apollo::ValueList& vlParticipants, ParticipantFlags& addedParticipants, ParticipantFlags& removedParticipants);
+  void ProcessRemovedParticipants(ParticipantFlags& removedParticipants);
+  void ProcessAddedParticipants(ParticipantFlags& addedParticipants);
 
   void RemoveAllAvatars();
   void RemoveAllObjects();
   void ResetLocationInfo();
+
+  Meta* GetMeta();
+  void DeleteMeta();
 
 protected:
   ArenaModule* pModule_;
@@ -91,15 +85,13 @@ protected:
 
   ApHandle hScene_;
 
-  State nState_;
   Apollo::TimeValue tvEnterRequested_;
   Apollo::TimeValue tvEnterBegin_;
   Apollo::TimeValue tvLeaveRequested_;
   Apollo::TimeValue tvLeaveBegin_;
 
   AvatarList avatars_;
-  ApHandleTree<int> addedParticipants_;
-  ApHandleTree<int> removedParticipants_;
+  Meta* pMeta_;
 };
 
 #endif // Display_H_INCLUDED

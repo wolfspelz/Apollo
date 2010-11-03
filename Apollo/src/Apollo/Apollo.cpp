@@ -558,7 +558,7 @@ ApHandle Apollo::startInterval(int nSec, int nMicroSec)
   msg.nCount = 0; // 0 means infinite
   if (!msg.Request()) {
     hTimer = ApNoHandle;
-    apLog_Error((APOLLO_NAME, "Apollo::startInterval", "Message failed"));
+    apLog_Error((APOLLO_NAME, "Apollo::startInterval", "Msg_Timer_Start failed"));
   }
 
   return hTimer;
@@ -575,7 +575,7 @@ ApHandle Apollo::startTimeout(int nSec, int nMicroSec)
   msg.nCount = 1;
   if (!msg.Request()) {
     hTimer = ApNoHandle;
-    apLog_Error((APOLLO_NAME, "Apollo::startTimeout", "Message failed"));
+    apLog_Error((APOLLO_NAME, "Apollo::startTimeout", "Msg_Timer_Start failed"));
   }
 
   return hTimer;
@@ -590,7 +590,7 @@ int Apollo::cancelTimeout(const ApHandle& hTimer)
   msg.Request();
   ok = msg.Request();
   if (!ok) {
-    apLog_Error((APOLLO_NAME, "Apollo::cancelTimeout", "Message failed"));
+    apLog_Error((APOLLO_NAME, "Apollo::cancelTimeout", "Msg_Timer_Cancel failed"));
   }
 
   return ok;
