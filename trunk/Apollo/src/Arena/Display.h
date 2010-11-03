@@ -50,6 +50,7 @@ public:
   void OnParticipantDetailsChanged(const ApHandle& hParticipant, Apollo::ValueList& vlKeys);
   void OnReceivePublicChat(const ApHandle& hParticipant, const ApHandle& hChat, const String& sNickname, const String& sText, const Apollo::TimeValue& tv);
   void OnAvatarAnimationFrame(const ApHandle& hParticipant, const Apollo::Image& image);
+  void OnContextDetailsChanged(Apollo::ValueList& vlKeys);
 
   inline int GetWidth() { return nW_; }
   inline int GetHeight() { return nH_; }

@@ -36,13 +36,19 @@ public:
   void OnLeaveBegin();
   void OnLeaveComplete();
 
+  void OnDocumentUrl(const String& sUrl);
+  void OnLocationUrl(const String& sUrl);
+
 protected:
+  void ShowText();
 
 protected:
   Display* pDisplay_;
   int bActive_;
   State nState_;
   ApHandle hScene_;
+  String sDocumentUrl_;
+  String sLocationUrl_;
 };
 
 #endif // Meta_H_INCLUDED

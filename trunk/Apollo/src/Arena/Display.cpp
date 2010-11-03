@@ -54,6 +54,13 @@ int Display::Create()
     msgSSAD.Request();
 
     GetMeta();
+
+    { Msg_VpView_SubscribeContextDetail msg; msg.hContext = hContext_; msg.sKey = Msg_VpView_ContextDetail_DocumentUrl; msg.Request(); }
+    { Msg_VpView_SubscribeContextDetail msg; msg.hContext = hContext_; msg.sKey = Msg_VpView_ContextDetail_LocationUrl; msg.Request(); }
+
+    { Msg_VpView_GetContextDetail msg; msg.hContext = hContext_; msg.sKey = Msg_VpView_ContextDetail_DocumentUrl; if (msg.Request()) { GetMeta()->OnDocumentUrl(msg.sValue); } }
+    { Msg_VpView_GetContextDetail msg; msg.hContext = hContext_; msg.sKey = Msg_VpView_ContextDetail_LocationUrl; if (msg.Request()) { GetMeta()->OnLocationUrl(msg.sValue); } }
+
   }
 
   return ok;
@@ -358,6 +365,29 @@ void Display::ResetLocationInfo()
 {
   DeleteMeta();
   GetMeta();
+}
+
+//---------------------------------------------------
+
+void Display::OnContextDetailsChanged(Apollo::ValueList& vlKeys)
+{
+  Msg_VpView_GetContextDetail msg;
+  msg.hContext = hContext_;
+
+  for (Apollo::ValueElem* e = 0; e = vlKeys.nextElem(e); ) {
+    msg.sKey = e->getString();
+
+    if (0) {
+    } else if (e->getString() == Msg_VpView_ContextDetail_DocumentUrl) {
+      if (msg.Request()) {
+        GetMeta()->OnDocumentUrl(msg.sValue);
+      }
+    } else if (e->getString() == Msg_VpView_ContextDetail_LocationUrl) {
+      if (msg.Request()) {
+        GetMeta()->OnLocationUrl(msg.sValue);
+      }
+    }
+  }
 }
 
 //---------------------------------------------------
