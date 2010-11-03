@@ -10,6 +10,7 @@
   #include "MsgMainLoop.h"
 #endif // WIN32
 #include "MsgScene.h"
+#include "MsgTimer.h"
 #include "Local.h"
 #include "Surface.h"
 #include "GraphicsContext.h"
@@ -344,7 +345,7 @@ void Surface::DeleteAutoDraw()
 void Surface::SetAutoDraw(int nMilliSec, int bAsync)
 {
   bAutoDraw_ = true;
-  bAutoDrawAsync_ = bAsync == 1;
+  bAutoDrawAsync_ = bAsync;
   int nSec = nMilliSec / 1000;
   nMilliSec = nMilliSec % 1000;
   autoDrawInterval_ = Apollo::TimeValue(nSec, nMilliSec * 1000);
@@ -370,8 +371,29 @@ void Surface::AutoDraw()
       }
 
       lastDraw_ = now;
+    } else {
+
+      if (!bTimerRunning_) {
+        Msg_Timer_Start msg;
+        msg.hTimer = apHandle(); // Misusing scene handle as timer handle
+        msg.nSec = autoDrawInterval_.Sec();
+        msg.nMicroSec = autoDrawInterval_.MicroSec();
+        msg.nCount = 1;
+        if (!msg.Request()) {
+          apLog_Error((APOLLO_NAME, "Surface::AutoDraw", "Msg_Timer_Start failed"));
+        } else {
+          bTimerRunning_ = 1;
+        }
+      }
+
     }
   }
+}
+
+void Surface::OnAutoDrawTimer()
+{
+  bTimerRunning_ = 0;
+  AutoDraw();
 }
 
 //------------------------------------

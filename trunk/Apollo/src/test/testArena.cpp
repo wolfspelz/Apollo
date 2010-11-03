@@ -40,16 +40,17 @@ class Action: public Elem
 {
 public:
   Action()
-    :nContinueMSec_(100)
+    :nDelayMSec_(100)
   {}
-  virtual void Execute(ActionList* pList) {}
-  int nContinueMSec_;
+  virtual void SetList(ActionList* pList) {}
+  virtual void Execute() {}
+  int nDelayMSec_;
 };
 
 class NopAction: public Action
 {
 public:
-  void Execute(ActionList* pList);
+  void Execute();
 };
 
 class ActionList: public ListT<Action, Elem>
@@ -57,25 +58,27 @@ class ActionList: public ListT<Action, Elem>
 public:
   ActionList(const char* szName)
     :ListT<Action, Elem>(szName)
-    ,pCurrent_(0)
+    ,pNext_(0)
   {}
   virtual void Begin();
   virtual void End();
-  void DoCurrent();
+  void Proceed();
   static void On_Timer_Event(Msg_Timer_Event* pMsg);
   String Result() { return sError_; }
-  Action* pCurrent_;
+  Action* pNext_;
   ApHandle hTimer_;
   String sError_;
 };
 
-void NopAction::Execute(ActionList* pList) {}
+void NopAction::Execute()
+{
+}
 
 void ActionList::Begin()
 {
-  pCurrent_ = First();
+  pNext_ = First();
   { Msg_Timer_Event msg; msg.Hook(MODULE_NAME, (ApCallback) On_Timer_Event, this, ApCallbackPosEarly); }
-  DoCurrent();
+  Proceed();
 }
 
 void ActionList::End()
@@ -87,15 +90,20 @@ void ActionList::End()
   delete this;
 }
 
-void ActionList::DoCurrent()
+void ActionList::Proceed()
 {
-  pCurrent_->Execute(this);
-  int nDelayMSec = pCurrent_->nContinueMSec_;
-  
-  pCurrent_ = Next(pCurrent_);
-  if (pCurrent_) {
+  if (pNext_ == 0) {
+    End();
+  } else {
+
+    pNext_->SetList(this);
+    pNext_->Execute();
+    int nDelayMSec = pNext_->nDelayMSec_;
+
+    pNext_ = Next(pNext_);
+
     if (nDelayMSec == 0) {
-      // Do nothing, wait for someone else to continue on the queue
+      // Do nothing, wait for someone else to call Proceed()
     } else {
       int nSec = 0;
       int nMSec = nDelayMSec;
@@ -105,8 +113,6 @@ void ActionList::DoCurrent()
       }
       hTimer_ = Apollo::startTimeout(nSec, nMSec * 1000);
     }
-  } else {
-    End();
   }
 }
 
@@ -114,7 +120,9 @@ void ActionList::On_Timer_Event(Msg_Timer_Event* pMsg)
 {
   if (pMsg->Ref()) {
     ActionList* pList = (ActionList*) pMsg->Ref();
-    pList->DoCurrent();
+    if (pMsg->hTimer == pList->hTimer_) {
+      pList->Proceed();
+    }
   }
 }
 
@@ -125,8 +133,6 @@ class Test_InChangeOut: public ActionList
 public:
   Test_InChangeOut()
     :ActionList("Test_InChangeOut")
-    ,bReplayChat1_(0)
-    ,bReplayChat2_(0)
   {}
 
   void Begin();
@@ -140,10 +146,19 @@ public:
   int nWidth_;
   int nHeight_;
 
-  int bReplayChat1_;
-  int bReplayChat2_;
-
   Test_ParticipantList lParticipants_;
+};
+
+class Test_InChangeOut_Action: public Action
+{
+public:
+  Test_InChangeOut_Action()
+    :pTest_(0)
+  {}
+
+  void SetList(ActionList* pList) { pTest_ = (Test_InChangeOut*) pList; }
+
+  Test_InChangeOut* pTest_;
 };
 
 // ------------------------------------------------------
@@ -260,8 +275,12 @@ static void Test_VpView_ReplayLocationPublicChat(Msg_VpView_ReplayLocationPublic
     }
   }
 
-  // todo: remove me
-  //Test_Arena_InChangeOut_End();
+  if (pMsg->hLocation == t->hLocation1_) {
+    t->Proceed();
+  }
+  if (pMsg->hLocation == t->hLocation2_) {
+    t->Proceed();
+  }
 }
 
 static void Test_Galileo_IsAnimationDataInStorage(Msg_Galileo_IsAnimationDataInStorage* pMsg)
@@ -306,79 +325,88 @@ static void Test_VpView_GetLocationDetail(Msg_VpView_GetLocationDetail* pMsg)
 
 // ------------------------------------------------------
 
-class Test_InChangeOut_CreateContextAction: public Action
+class Test_InChangeOut_Wait: public Test_InChangeOut_Action
 {
 public:
-  void Execute(ActionList* pList)
+  Test_InChangeOut_Wait(int nMSec)
+  {
+    nDelayMSec_ = nMSec;
+  }
+};
+
+class Test_InChangeOut_CreateAndConfigureContext: public Test_InChangeOut_Action
+{
+public:
+  void Execute()
   {
     {
       Msg_VpView_ContextCreated msg;
-      msg.hContext = ((Test_InChangeOut*) pList)->hContext_;
+      msg.hContext = pTest_->hContext_;
       msg.Send();
     }
 
     {
       Msg_VpView_ContextVisibility msg;
-      msg.hContext = ((Test_InChangeOut*) pList)->hContext_;
+      msg.hContext = pTest_->hContext_;
       msg.bVisible = 0;
       msg.Send();
     }
 
     {
       Msg_VpView_ContextPosition msg;
-      msg.hContext = ((Test_InChangeOut*) pList)->hContext_;
-      msg.nX = ((Test_InChangeOut*) pList)->nLeft_;
-      msg.nY = ((Test_InChangeOut*) pList)->nBottom_;
+      msg.hContext = pTest_->hContext_;
+      msg.nX = pTest_->nLeft_;
+      msg.nY = pTest_->nBottom_;
       msg.Send();
     }
 
     {
       Msg_VpView_ContextSize msg;
-      msg.hContext = ((Test_InChangeOut*) pList)->hContext_;
-      msg.nWidth = ((Test_InChangeOut*) pList)->nWidth_;
-      msg.nHeight = ((Test_InChangeOut*) pList)->nHeight_;
+      msg.hContext = pTest_->hContext_;
+      msg.nWidth = pTest_->nWidth_;
+      msg.nHeight = pTest_->nHeight_;
       msg.Send();
     }
 
     {
       Msg_VpView_ContextVisibility msg;
-      msg.hContext = ((Test_InChangeOut*) pList)->hContext_;
+      msg.hContext = pTest_->hContext_;
       msg.bVisible = 1;
       msg.Send();
     }
   }
 };
 
-class Test_InChangeOut_ContextLocationAssigned1: public Action
+class Test_InChangeOut_ContextLocationAssigned1: public Test_InChangeOut_Action
 {
 public:
-  void Execute(ActionList* pList)
+  void Execute()
   {
     Msg_VpView_ContextLocationAssigned msg;
-    msg.hContext = ((Test_InChangeOut*) pList)->hContext_;
-    msg.hLocation = ((Test_InChangeOut*) pList)->hLocation1_;
+    msg.hContext = pTest_->hContext_;
+    msg.hLocation = pTest_->hLocation1_;
     msg.Send();
   }
 };
 
-class Test_InChangeOut_EnterLocationRequested1: public Action
+class Test_InChangeOut_EnterLocationRequested1: public Test_InChangeOut_Action
 {
 public:
-  void Execute(ActionList* pList)
+  void Execute()
   {
     Msg_VpView_EnterLocationRequested msg;
-    msg.hLocation = ((Test_InChangeOut*) pList)->hLocation1_;
+    msg.hLocation = pTest_->hLocation1_;
     msg.Send();
   }
 };
 
-class Test_InChangeOut_LocationContextsChanged1: public Action
+class Test_InChangeOut_LocationContextsChanged1a: public Test_InChangeOut_Action
 {
 public:
-  void Execute(ActionList* pList)
+  void Execute()
   {
     Msg_VpView_LocationContextsChanged msg;
-    msg.hLocation = ((Test_InChangeOut*) pList)->hLocation1_;
+    msg.hLocation = pTest_->hLocation1_;
     msg.Send();
   }
 };
@@ -389,25 +417,25 @@ public:
 // VpView_GetContextDetail
 // VpView_GetLocationDetail
 
-class Test_InChangeOut_EnterLocationBegin1: public Action
+class Test_InChangeOut_EnterLocationBegin1: public Test_InChangeOut_Action
 {
 public:
-  void Execute(ActionList* pList)
+  void Execute()
   {
     Msg_VpView_EnterLocationBegin msg;
-    msg.hLocation = ((Test_InChangeOut*) pList)->hLocation1_;
+    msg.hLocation = pTest_->hLocation1_;
     msg.Send();
   }
 };
 
-class Test_InChangeOut_ParticipantsChanged1: public Action
+class Test_InChangeOut_ParticipantsChanged1: public Test_InChangeOut_Action
 {
 public:
-  void Execute(ActionList* pList)
+  void Execute()
   {
     Msg_VpView_ParticipantsChanged msg;
-    msg.hLocation = ((Test_InChangeOut*) pList)->hLocation1_;
-    msg.nCount = ((Test_InChangeOut*) pList)->lParticipants_.Count();
+    msg.hLocation = pTest_->hLocation1_;
+    msg.nCount = pTest_->lParticipants_.Count();
     msg.Send();
   }
 };
@@ -419,143 +447,319 @@ public:
 // Galileo_IsAnimationDataInStorage
 // Galileo_LoadAnimationDataFromStorage
 
-class Test_InChangeOut_EnterLocationComplete1: public Action
+class Test_InChangeOut_EnterLocationComplete1: public Test_InChangeOut_Action
 {
 public:
-  void Execute(ActionList* pList)
+  void Execute()
   {
     Msg_VpView_EnterLocationComplete msg;
-    msg.hLocation = ((Test_InChangeOut*) pList)->hLocation1_;
+    msg.hLocation = pTest_->hLocation1_;
     msg.Send();
   }
 };
 
-class Test_InChangeOut_Wait: public Action
+// VpView_ReplayLocationPublicChat
+
+// CHANGE: Navigate
+class Test_InChangeOut_LeaveLocationRequested1: public Test_InChangeOut_Action
 {
 public:
-  void Execute(ActionList* pList)
+  void Execute()
   {
-    nContinueMSec_ = 0;
+    Msg_VpView_LeaveLocationRequested msg;
+    msg.hLocation = pTest_->hLocation1_;
+    msg.Send();
   }
 };
 
-// VpView_ReplayLocationPublicChat
-//
-//  // CHANGE: Navigate
-//  {
-//    Msg_VpView_ContextVisibility msg;
-//    msg.hContext = hContext_;
-//    msg.bVisible = 1;
-//    msg.Send();
-//  }
-//
-//  {
-//    Msg_VpView_LeaveLocationRequested msg;
-//    msg.hLocation = hLocation1_;
-//    msg.Send();
-//  }
-//
-//  {
-//    Msg_VpView_LocationContextsChanged msg;
-//    msg.hLocation = hLocation1_;
-//    msg.Send();
-//  }
-//
-//  {
-//    Msg_VpView_ContextLocationUnassigned msg;
-//    msg.hContext = hContext_;
-//    msg.hLocation = hLocation1_;
-//    msg.Send();
-//  }
-//
-//  {
-//    Msg_VpView_ContextLocationAssigned msg;
-//    msg.hContext = hContext_;
-//    msg.hLocation = hLocation2_;
-//    msg.Send();
-//  }
-//
-//  {
-//    Msg_VpView_EnterLocationRequested msg;
-//    msg.hLocation = hLocation2_;
-//    msg.Send();
-//  }
-//
-//  {
-//    Msg_VpView_LocationContextsChanged msg;
-//    msg.hLocation = hLocation2_;
-//    msg.Send();
-//  }
-//
-//  {
-//    Msg_VpView_LeaveLocationBegin msg;
-//    msg.hLocation = hLocation1_;
-//    msg.Send();
-//  }
-//
-//  {
-//    Msg_VpView_ParticipantsChanged msg;
-//    msg.hLocation = hLocation1_;
-//    msg.nCount = 0;
-//    msg.Send();
-//  }
-//
-//  {
-//    Msg_VpView_LeaveLocationComplete msg;
-//    msg.hLocation = hLocation1_;
-//    msg.Send();
-//  }
-//
-//  {
-//    Msg_VpView_EnterLocationBegin msg;
-//    msg.hLocation = hLocation2_;
-//    msg.Send();
-//  }
-//
-//  {
-//    Msg_VpView_ParticipantsChanged msg;
-//    msg.hLocation = hLocation2_;
-//    msg.nCount = lParticipants_.Count();
-//    msg.Send();
-//  }
-//
-//  {
-//    Msg_VpView_EnterLocationComplete msg;
-//    msg.hLocation = hLocation2_;
-//    msg.Send();
-//  }
-//
-//  /*
-//  // OUT: CloseContext
-//  {
-//    Msg_VpView_LeaveLocationRequested msg;
-//  }
-//
-//  {
-//    Msg_VpView_LocationContextsChanged msg;
-//  }
-//
-//  {
-//    Msg_VpView_ContextLocationUnassigned msg;
-//  }
-//
-//  {
-//    Msg_VpView_ContextDestroyed msg;
-//  }
-//
-//  {
-//    Msg_VpView_LeaveLocationBegin msg;
-//  }
-//
-//  {
-//    Msg_VpView_ParticipantsChanged msg;
-//  }
-//
-//  {
-//    Msg_VpView_LeaveLocationComplete msg;
-//  }
-//  */
-//}
+class Test_InChangeOut_LocationContextsChanged1b: public Test_InChangeOut_Action
+{
+public:
+  void Execute()
+  {
+    Msg_VpView_LocationContextsChanged msg;
+    msg.hLocation = pTest_->hLocation1_;
+    msg.Send();
+  }
+};
+
+class Test_InChangeOut_ContextLocationUnassigned1: public Test_InChangeOut_Action
+{
+public:
+  void Execute()
+  {
+    Msg_VpView_ContextLocationUnassigned msg;
+    msg.hContext = pTest_->hContext_;
+    msg.hLocation = pTest_->hLocation1_;
+    msg.Send();
+  }
+};
+
+class Test_InChangeOut_ContextLocationAssigned2: public Test_InChangeOut_Action
+{
+public:
+  void Execute()
+  {
+    Msg_VpView_ContextLocationAssigned msg;
+    msg.hContext = pTest_->hContext_;
+    msg.hLocation = pTest_->hLocation2_;
+    msg.Send();
+  }
+};
+
+class Test_InChangeOut_EnterLocationRequested2: public Test_InChangeOut_Action
+{
+public:
+  void Execute()
+  {
+    Msg_VpView_EnterLocationRequested msg;
+    msg.hLocation = pTest_->hLocation2_;
+    msg.Send();
+  }
+};
+
+class Test_InChangeOut_LocationContextsChanged2a: public Test_InChangeOut_Action
+{
+public:
+  void Execute()
+  {
+    Msg_VpView_LocationContextsChanged msg;
+    msg.hLocation = pTest_->hLocation2_;
+    msg.Send();
+  }
+};
+
+class Test_InChangeOut_VpView_LeaveLocationBegin1: public Test_InChangeOut_Action
+{
+public:
+  void Execute()
+  {
+    Msg_VpView_LeaveLocationBegin msg;
+    msg.hLocation = pTest_->hLocation1_;
+    msg.Send();
+  }
+};
+
+class Test_InChangeOut_ParticipantsChanged: public Test_InChangeOut_Action
+{
+public:
+  void Execute()
+  {
+    Msg_VpView_ParticipantsChanged msg;
+    msg.hLocation = pTest_->hLocation1_;
+    msg.nCount = 0;
+    msg.Send();
+  }
+};
+
+class Test_InChangeOut_LeaveLocationComplete1: public Test_InChangeOut_Action
+{
+public:
+  void Execute()
+  {
+    Msg_VpView_LeaveLocationComplete msg;
+    msg.hLocation = pTest_->hLocation1_;
+    msg.Send();
+  }
+};
+
+class Test_InChangeOut_EnterLocationBegin2: public Test_InChangeOut_Action
+{
+public:
+  void Execute()
+  {
+    Msg_VpView_EnterLocationBegin msg;
+    msg.hLocation = pTest_->hLocation2_;
+    msg.Send();
+  }
+};
+
+class Test_InChangeOut_ParticipantsChanged2a: public Test_InChangeOut_Action
+{
+public:
+  void Execute()
+  {
+    Msg_VpView_ParticipantsChanged msg;
+    msg.hLocation = pTest_->hLocation2_;
+    msg.nCount = pTest_->lParticipants_.Count();
+    msg.Send();
+  }
+};
+
+class Test_InChangeOut_EnterLocationComplete2: public Test_InChangeOut_Action
+{
+public:
+  void Execute()
+  {
+    Msg_VpView_EnterLocationComplete msg;
+    msg.hLocation = pTest_->hLocation2_;
+    msg.Send();
+  }
+};
+
+class Test_InChangeOut_Chat2a: public Test_InChangeOut_Action
+{
+public:
+  void Execute()
+  {
+    Msg_VpView_LocationPublicChat msg;
+    msg.hLocation = pTest_->hLocation2_;
+    msg.hParticipant = pTest_->lParticipants_.Next(0)->Key();
+    msg.hChat = Apollo::newHandle();
+    msg.sNickname = pTest_->lParticipants_.Next(0)->Value()->sNickname;
+    msg.sText = "Test_InChangeOut_Chat2a";
+    msg.nSec = Apollo::TimeValue::getTime().Sec();
+    msg.nMicroSec = Apollo::TimeValue::getTime().MicroSec();
+    msg.Send();
+  }
+};
+
+class Test_InChangeOut_Chat2b: public Test_InChangeOut_Action
+{
+public:
+  void Execute()
+  {
+    Msg_VpView_LocationPublicChat msg;
+    msg.hLocation = pTest_->hLocation2_;
+    msg.hParticipant = pTest_->lParticipants_.Next(0)->Key();
+    msg.hChat = Apollo::newHandle();
+    msg.sNickname = pTest_->lParticipants_.Next(0)->Value()->sNickname;
+    msg.sText = "Test_InChangeOut_Chat2b Test_InChangeOut_Chat2b";
+    msg.nSec = Apollo::TimeValue::getTime().Sec();
+    msg.nMicroSec = Apollo::TimeValue::getTime().MicroSec();
+    msg.Send();
+  }
+};
+
+class Test_InChangeOut_Chat2c: public Test_InChangeOut_Action
+{
+public:
+  void Execute()
+  {
+    Msg_VpView_LocationPublicChat msg;
+    msg.hLocation = pTest_->hLocation2_;
+    msg.hParticipant = pTest_->lParticipants_.Next(0)->Key();
+    msg.hChat = Apollo::newHandle();
+    msg.sNickname = pTest_->lParticipants_.Next(0)->Value()->sNickname;
+    msg.sText = "Test_InChangeOut_Chat2c Test_InChangeOut_Chat2c Test_InChangeOut_Chat2c";
+    msg.nSec = Apollo::TimeValue::getTime().Sec();
+    msg.nMicroSec = Apollo::TimeValue::getTime().MicroSec();
+    msg.Send();
+  }
+};
+
+// OUT: CloseContext
+class Test_InChangeOut_LeaveLocationRequested2: public Test_InChangeOut_Action
+{
+public:
+  void Execute()
+  {
+    Msg_VpView_LeaveLocationRequested msg;
+    msg.hLocation = pTest_->hLocation2_;
+    msg.Send();
+  }
+};
+
+class Test_InChangeOut_LocationContextsChanged2b: public Test_InChangeOut_Action
+{
+public:
+  void Execute()
+  {
+    Msg_VpView_LocationContextsChanged msg;
+    msg.hLocation = pTest_->hLocation2_;
+    msg.Send();
+  }
+};
+
+class Test_InChangeOut_ContextLocationUnassigned2: public Test_InChangeOut_Action
+{
+public:
+  void Execute()
+  {
+    Msg_VpView_ContextLocationUnassigned msg;
+    msg.hContext = pTest_->hContext_;
+    msg.hLocation = pTest_->hLocation2_;
+    msg.Send();
+  }
+};
+
+class Test_InChangeOut_ContextDestroyed: public Test_InChangeOut_Action
+{
+public:
+  void Execute()
+  {
+    Msg_VpView_ContextDestroyed msg;
+    msg.hContext = pTest_->hContext_;
+    msg.Send();
+  }
+};
+
+class Test_InChangeOut_LeaveLocationBegin2: public Test_InChangeOut_Action
+{
+public:
+  void Execute()
+  {
+    Msg_VpView_LeaveLocationBegin msg;
+    msg.hLocation = pTest_->hLocation2_;
+    msg.Send();
+  }
+};
+
+class Test_InChangeOut_ParticipantsChanged2b: public Test_InChangeOut_Action
+{
+public:
+  void Execute()
+  {
+    Msg_VpView_ParticipantsChanged msg;
+    msg.hLocation = pTest_->hLocation2_;
+    msg.nCount = 0;
+    msg.Send();
+  }
+};
+
+class Test_InChangeOut_LeaveLocationComplete2: public Test_InChangeOut_Action
+{
+public:
+  void Execute()
+  {
+    Msg_VpView_LeaveLocationComplete msg;
+    msg.hLocation = pTest_->hLocation2_;
+    msg.Send();
+  }
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 void Test_InChangeOut::Begin()
 {
@@ -599,14 +803,37 @@ void Test_InChangeOut::Begin()
   { Msg_VpView_GetLocationDetail msg; msg.Hook(MODULE_NAME, (ApCallback) Test_VpView_GetLocationDetail, this, ApCallbackPosEarly); }
 
   // IN: Open Context, Navigate
-  AddLast(new Test_InChangeOut_CreateContextAction());
+  AddLast(new Test_InChangeOut_CreateAndConfigureContext());
   AddLast(new Test_InChangeOut_ContextLocationAssigned1());
   AddLast(new Test_InChangeOut_EnterLocationRequested1());
-  AddLast(new Test_InChangeOut_LocationContextsChanged1());
+  AddLast(new Test_InChangeOut_LocationContextsChanged1a());
   AddLast(new Test_InChangeOut_EnterLocationBegin1());
   AddLast(new Test_InChangeOut_ParticipantsChanged1());
   AddLast(new Test_InChangeOut_EnterLocationComplete1());
-  AddLast(new Test_InChangeOut_Wait());
+  AddLast(new Test_InChangeOut_Wait(500));
+  //AddLast(new Test_InChangeOut_LeaveLocationRequested1());
+  //AddLast(new Test_InChangeOut_LocationContextsChanged1b());
+  //AddLast(new Test_InChangeOut_ContextLocationUnassigned1());
+  //AddLast(new Test_InChangeOut_ContextLocationAssigned2());
+  //AddLast(new Test_InChangeOut_EnterLocationRequested2());
+  //AddLast(new Test_InChangeOut_LocationContextsChanged2a());
+  //AddLast(new Test_InChangeOut_ParticipantsChanged());
+  //AddLast(new Test_InChangeOut_LeaveLocationComplete1());
+  //AddLast(new Test_InChangeOut_ParticipantsChanged2a());
+  //AddLast(new Test_InChangeOut_EnterLocationComplete2());
+  //AddLast(new Test_InChangeOut_Wait(500));
+  //AddLast(new Test_InChangeOut_Chat2a());
+  //AddLast(new Test_InChangeOut_Wait(500));
+  //AddLast(new Test_InChangeOut_Chat2b());
+  //AddLast(new Test_InChangeOut_Wait(500));
+  //AddLast(new Test_InChangeOut_Chat2c());
+  //AddLast(new Test_InChangeOut_LeaveLocationRequested2());
+  //AddLast(new Test_InChangeOut_LocationContextsChanged2b());
+  //AddLast(new Test_InChangeOut_ContextLocationUnassigned2());
+  //AddLast(new Test_InChangeOut_ContextDestroyed());
+  //AddLast(new Test_InChangeOut_LeaveLocationBegin2());
+  //AddLast(new Test_InChangeOut_ParticipantsChanged2b());
+  //AddLast(new Test_InChangeOut_LeaveLocationComplete2());
 
   ActionList::Begin();
 }

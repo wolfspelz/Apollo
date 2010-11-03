@@ -47,6 +47,11 @@ Surface* SceneModule::FindSurface(const ApHandle& hSurface)
   return pSurface;
 }
 
+int SceneModule::HasSurface(const ApHandle& hSurface)
+{
+  return surfaces_.IsSet(hSurface);
+}
+
 //---------------------------
 
 AP_MSG_HANDLER_METHOD(SceneModule, Scene_Create)
@@ -446,6 +451,15 @@ AP_MSG_HANDLER_METHOD(SceneModule, Scene_ReleaseMouse)
   pMsg->apStatus = ApMessage::Ok;
 }
 
+AP_MSG_HANDLER_METHOD(SceneModule, Timer_Event)
+{
+  // Find scene by timer handle, because scene handle misused as timer handle
+  if (HasSurface(pMsg->hTimer)) {
+    Surface* pSurface = FindSurface(pMsg->hTimer);
+    pSurface->OnAutoDrawTimer();
+  }
+}
+
 //----------------------------------------------------------
 
 #if defined(AP_TEST)
@@ -530,6 +544,7 @@ int SceneModule::Init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_GetImageSizeFromFile, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_CaptureMouse, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_ReleaseMouse, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Timer_Event, this, ApCallbackPosNormal);
 
   AP_UNITTEST_HOOK(SceneModule, this);
 

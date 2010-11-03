@@ -11,6 +11,7 @@
 #include "ApContainer.h"
 #include "MsgUnitTest.h"
 #include "MsgScene.h"
+#include "MsgTimer.h"
 #include "Surface.h"
 #include "SceneModuleTester.h"
 
@@ -73,6 +74,7 @@ public:
   void On_Scene_CreateMouseSensor(Msg_Scene_CreateMouseSensor* pMsg);
   void On_Scene_CaptureMouse(Msg_Scene_CaptureMouse* pMsg);
   void On_Scene_ReleaseMouse(Msg_Scene_ReleaseMouse* pMsg);
+  void On_Timer_Event(Msg_Timer_Event* pMsg);
 
 #if defined(AP_TEST)
   void On_UnitTest_Begin(Msg_UnitTest_Begin* pMsg);
@@ -82,8 +84,9 @@ public:
 
 protected:
   Surface* CreateSurface(const ApHandle& hSurface);
-  Surface* FindSurface(const ApHandle& hSurface);
   void DeleteSurface(const ApHandle& hSurface);
+  Surface* FindSurface(const ApHandle& hSurface);
+  int HasSurface(const ApHandle& hSurface);
 
 protected:
   SurfaceList surfaces_;

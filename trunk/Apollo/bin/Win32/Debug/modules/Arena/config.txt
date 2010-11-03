@@ -1,8 +1,6 @@
 DebugFrame/Display=1
 DebugFrame/Avatar=1
 
-CheckLeaveRequestedAndAbandonedAfterSec=180
-
   Avatar/MaxWidth=100
   Avatar/MaxHeight=100
   Avatar/MinWidth=20

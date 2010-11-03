@@ -37,6 +37,7 @@ public:
     ,bAutoDraw_(false)
     ,bAutoDrawAsync_(false)
     ,autoDrawInterval_(0, 100000)
+    ,bTimerRunning_(0)
     ,pCairoSurface_(0)
     ,pCairo_(0)
     #if defined(WIN32)
@@ -83,6 +84,7 @@ public:
   void ReleaseMouse();
 
   void Draw();
+  void OnAutoDrawTimer();
 
 #if defined(WIN32)
   static LRESULT CALLBACK StaticWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
@@ -108,6 +110,7 @@ protected:
   bool bAutoDrawAsync_;
   Apollo::TimeValue autoDrawInterval_;
   Apollo::TimeValue lastDraw_;
+  int bTimerRunning_;
 
   RootElement root_;
 

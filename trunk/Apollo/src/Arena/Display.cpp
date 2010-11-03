@@ -12,6 +12,7 @@
 #include "ArenaModule.h"
 #include "Display.h"
 #include "Avatar.h"
+#include "Meta.h"
 
 Display::Display(ArenaModule* pModule, const ApHandle& hContext)
 :pModule_(pModule)
@@ -21,12 +22,16 @@ Display::Display(ArenaModule* pModule, const ApHandle& hContext)
 ,nY_(0)
 ,nW_(0)
 ,nH_(0)
-,nState_(NoState)
+,pMeta_(0)
 {
 }
 
 Display::~Display()
 {
+  if (pMeta_) {
+    delete pMeta_;
+    pMeta_ = 0;
+  }
 }
 
 int Display::Create()
@@ -48,9 +53,7 @@ int Display::Create()
     msgSSAD.nMilliSec = 100;
     msgSSAD.Request();
 
-    Msg_Scene_CreateRectangle::_(hScene_, ELEMENT_PROGRESS, 0.5, 0.5, 20, 20);
-    Msg_Scene_SetStrokeColor::_(hScene_, ELEMENT_PROGRESS, 0, 0, 0, 1);
-    Msg_Scene_SetFillColor::_(hScene_, ELEMENT_PROGRESS, 1, 1, 1, 1);
+    GetMeta();
   }
 
   return ok;
@@ -156,32 +159,25 @@ void Display::OnEnterRequested()
 {
   apLog_Verbose((LOG_CHANNEL, "Display::OnEnterRequested", "ctxt=" ApHandleFormat " loc=" ApHandleFormat "", ApHandleType(hContext_), ApHandleType(hLocation_)));
 
-  nState_ = StateEnterRequested;
-  tvEnterRequested_ = Apollo::TimeValue::getTime();
+  GetMeta()->OnEnterRequested();
 
-  Msg_Scene_SetFillColor::_(hScene_, ELEMENT_PROGRESS, 0.8, 0.8, 1, 1);
-  //Msg_Scene_Draw::_(hScene_);
+  tvEnterRequested_ = Apollo::TimeValue::getTime();
 }
 
 void Display::OnEnterBegin()
 {
   apLog_Verbose((LOG_CHANNEL, "Display::OnEnterBegin", "ctxt=" ApHandleFormat " loc=" ApHandleFormat "", ApHandleType(hContext_), ApHandleType(hLocation_)));
 
-  nState_ = StateEnterBegin;
-  tvEnterBegin_ = Apollo::TimeValue::getTime();
+  GetMeta()->OnEnterBegin();
 
-  Msg_Scene_SetFillColor::_(hScene_, ELEMENT_PROGRESS, 0.5, 0.5, 1, 1);
-  //Msg_Scene_Draw::_(hScene_);
+  tvEnterBegin_ = Apollo::TimeValue::getTime();
 }
 
 void Display::OnEnterComplete()
 {
   apLog_Verbose((LOG_CHANNEL, "Display::OnEnterComplete", "ctxt=" ApHandleFormat " loc=" ApHandleFormat "", ApHandleType(hContext_), ApHandleType(hLocation_)));
 
-  nState_ = StateEnterComplete;
-
-  Msg_Scene_SetFillColor::_(hScene_, ELEMENT_PROGRESS, 0, 0, 1, 1);
-  //Msg_Scene_Draw::_(hScene_);
+  GetMeta()->OnEnterComplete();
 
   {
     ApAsyncMessage<Msg_VpView_ReplayLocationPublicChat> msg;
@@ -197,49 +193,28 @@ void Display::OnLeaveRequested()
 {
   apLog_Verbose((LOG_CHANNEL, "Display::OnLeaveRequested", "ctxt=" ApHandleFormat " loc=" ApHandleFormat "", ApHandleType(hContext_), ApHandleType(hLocation_)));
 
-  nState_ = StateLeaveRequested;
-  tvLeaveRequested_ = Apollo::TimeValue::getTime();
+  GetMeta()->OnLeaveRequested();
 
-  Msg_Scene_SetFillColor::_(hScene_, ELEMENT_PROGRESS, 1, 0, 0, 1);
-  //Msg_Scene_Draw::_(hScene_);
+  tvLeaveRequested_ = Apollo::TimeValue::getTime();
 }
 
 void Display::OnLeaveBegin()
 {
   apLog_Verbose((LOG_CHANNEL, "Display::OnLeaveBegin", "ctxt=" ApHandleFormat " loc=" ApHandleFormat "", ApHandleType(hContext_), ApHandleType(hLocation_)));
 
-  nState_ = StateLeaveBegin;
-  tvLeaveBegin_ = Apollo::TimeValue::getTime();
+  GetMeta()->OnLeaveBegin();
 
-  Msg_Scene_SetFillColor::_(hScene_, ELEMENT_PROGRESS, 1, 0.6, 0.6, 1);
-  //Msg_Scene_Draw::_(hScene_);
+  tvLeaveBegin_ = Apollo::TimeValue::getTime();
 }
 
 void Display::OnLeaveComplete()
 {
   apLog_Verbose((LOG_CHANNEL, "Display::OnLeaveComplete", "ctxt=" ApHandleFormat " loc=" ApHandleFormat "", ApHandleType(hContext_), ApHandleType(hLocation_)));
 
-  nState_ = StateLeaveComplete;
-
-  Msg_Scene_SetFillColor::_(hScene_, ELEMENT_PROGRESS, 1, 1, 1, 1);
-  //Msg_Scene_Draw::_(hScene_);
+  GetMeta()->OnLeaveComplete();
 }
 
 //---------------------------------------------------
-
-int Display::CheckLeaveRequestedAndAbandoned()
-{
-  int bResult = 0;
-
-  if (nState_ == StateLeaveRequested) {
-    Apollo::TimeValue tvSinceLeaveRequested = Apollo::TimeValue::getTime() - tvLeaveRequested_;
-    if (tvSinceLeaveRequested.Sec() > Apollo::getModuleConfig(MODULE_NAME, "CheckLeaveRequestedAndAbandonedAfterSec", 180)) {
-      bResult = 1;
-    }
-  }
-
-  return bResult;
-}
 
 void Display::OnReceivePublicChat(const ApHandle& hParticipant, const ApHandle& hChat, const String& sNickname, const String& sText, const Apollo::TimeValue& tv)
 {
@@ -278,64 +253,67 @@ void Display::OnParticipantsChanged()
 
 void Display::ProcessAvatarList(Apollo::ValueList& vlParticipants)
 {
-  InitRemovedParticipants();
-  InitAddedParticipants();
-  EvaluateNewAvatarList(vlParticipants);
-  ProcessRemovedParticipants();
-  ProcessAddedParticipants();
+  ParticipantFlags addedParticipants;
+  ParticipantFlags removedParticipants;
+
+  InitRemovedParticipants(removedParticipants);
+  InitAddedParticipants(addedParticipants);
+  EvaluateNewAvatarList(vlParticipants, addedParticipants, removedParticipants);
+  ProcessRemovedParticipants(removedParticipants);
+  ProcessAddedParticipants(addedParticipants);
 }
 
-void Display::InitRemovedParticipants()
+void Display::InitRemovedParticipants(ParticipantFlags& removedParticipants)
 {
-  while (removedParticipants_.Count() >0) {
-    ApHandleTreeNode<int>* pNode = removedParticipants_.Next(0);
+  while (removedParticipants.Count() >0) {
+    ApHandleTreeNode<int>* pNode = removedParticipants.Next(0);
     if (pNode) {
-      removedParticipants_.Unset(pNode->Key());
+      removedParticipants.Unset(pNode->Key());
     }
   }
 
   AvatarListIterator iter(avatars_);
   for (AvatarListNode* pNode = 0; (pNode = iter.Next()) != 0; ) {
     ApHandle hAvatar = pNode->Key();
-    removedParticipants_.Set(hAvatar, 1);
+    removedParticipants.Set(hAvatar, 1);
   }
 }
 
-void Display::InitAddedParticipants()
+void Display::InitAddedParticipants(ParticipantFlags& addedParticipants)
 {
-  while (addedParticipants_.Count() >0) {
-    ApHandleTreeNode<int>* pNode = addedParticipants_.Next(0);
+  while (addedParticipants.Count() >0) {
+    ApHandleTreeNode<int>* pNode = addedParticipants.Next(0);
     if (pNode) {
-      addedParticipants_.Unset(pNode->Key());
+      addedParticipants.Unset(pNode->Key());
     }
   }
 }
 
-void Display::EvaluateNewAvatarList(Apollo::ValueList& vlParticipants)
+void Display::EvaluateNewAvatarList(Apollo::ValueList& vlParticipants, ParticipantFlags& addedParticipants, ParticipantFlags& removedParticipants)
 {
   for (Apollo::ValueElem* e = 0; e = vlParticipants.nextElem(e); ) {
     AvatarListNode* pNode = avatars_.Find(e->getHandle());
     if (pNode) {
-      RemoveFromRemovedParticipants(e->getHandle());
+      RemoveFromRemovedParticipants(e->getHandle(), removedParticipants);
     } else {
-      AddToAddedParticipants(e->getHandle());
+      AddToAddedParticipants(e->getHandle(), addedParticipants);
     }
   }
 }
 
-void Display::RemoveFromRemovedParticipants(const ApHandle& h)
+void Display::RemoveFromRemovedParticipants(const ApHandle& h, ParticipantFlags& removedParticipants)
 {
-  removedParticipants_.Unset(h);
+  removedParticipants.Unset(h);
 }
 
-void Display::AddToAddedParticipants(const ApHandle& h)
+void Display::AddToAddedParticipants(const ApHandle& h, ParticipantFlags& addedParticipants)
 {
-  addedParticipants_.Set(h, 1);
+  addedParticipants.Set(h, 1);
 }
 
-void Display::ProcessAddedParticipants()
+void Display::ProcessAddedParticipants(ParticipantFlags& addedParticipants)
 {
-  ApHandleTreeIterator<int> iter(addedParticipants_);
+  ApHandleTreeIterator<int> iter(addedParticipants);
   for (ApHandleTreeNode<int>* pNode = 0; (pNode = iter.Next()) != 0; ) {
     ApHandle hParticipant = pNode->Key();
     Avatar* pAvatar = new Avatar(pModule_, this, hParticipant);
@@ -346,9 +324,9 @@ void Display::ProcessAddedParticipants()
   }
 }
 
-void Display::ProcessRemovedParticipants()
+void Display::ProcessRemovedParticipants(ParticipantFlags& removedParticipants)
 {
-  ApHandleTreeIterator<int> iter(removedParticipants_);
+  ApHandleTreeIterator<int> iter(removedParticipants);
   for (ApHandleTreeNode<int>* pNode = 0; (pNode = iter.Next()) != 0; ) {
     ApHandle hParticipant = pNode->Key();
     Avatar* pAvatar = 0;
@@ -366,8 +344,10 @@ void Display::ProcessRemovedParticipants()
 
 void Display::RemoveAllAvatars()
 {
-  InitRemovedParticipants();
-  ProcessRemovedParticipants();
+  ParticipantFlags removedParticipants;
+
+  InitRemovedParticipants(removedParticipants);
+  ProcessRemovedParticipants(removedParticipants);
 }
 
 void Display::RemoveAllObjects()
@@ -376,7 +356,29 @@ void Display::RemoveAllObjects()
 
 void Display::ResetLocationInfo()
 {
-  Msg_Scene_SetFillColor::_(hScene_, ELEMENT_PROGRESS, 1, 1, 1, 1);
-  //Msg_Scene_Draw::_(hScene_);
+  DeleteMeta();
+  GetMeta();
 }
+
+//---------------------------------------------------
+
+Meta* Display::GetMeta()
+{
+  if (pMeta_ == 0) {
+    pMeta_ = new Meta(this);
+    if (pMeta_) {
+      pMeta_->Create();
+    }
+  }
+  return pMeta_;
+}
+
+void Display::DeleteMeta()
+{
+  if (pMeta_) {
+    delete pMeta_;
+    pMeta_ = 0;
+    }
+}
+
 

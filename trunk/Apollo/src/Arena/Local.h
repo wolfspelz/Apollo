@@ -11,7 +11,7 @@
 #define LOG_CHANNEL MODULE_NAME
 
 #define ELEMENT_FRAME "b_frame"
-#define ELEMENT_PROGRESS "c_progress"
+#define ELEMENT_TRAY "c_tray"
 #define ELEMENT_IMAGE "m_image"
 
 #define ELEMENT_NICKNAME "p_nickname"
