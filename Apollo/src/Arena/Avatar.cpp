@@ -9,11 +9,10 @@
 #include "MsgVpView.h"
 #include "MsgAnimation.h"
 #include "MsgScene.h"
+#include "ColorString.h"
 #include "Local.h"
 #include "Avatar.h"
 #include "ArenaModule.h"
-#include "ColorString.h"
-//#include "Location.h"
 
 #if defined(AP_TEST)
 

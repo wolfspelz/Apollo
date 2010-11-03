@@ -267,7 +267,7 @@ AP_MSG_HANDLER_METHOD(ArenaModule, VpView_EnterLocationComplete)
   }
 }
 
-AP_MSG_HANDLER_METHOD(ArenaModule, VpView_LocationContextsChanged){}
+AP_MSG_HANDLER_METHOD(ArenaModule, VpView_LocationContextsChanged) {}
 
 AP_MSG_HANDLER_METHOD(ArenaModule, VpView_ParticipantsChanged)
 {
@@ -286,9 +286,15 @@ AP_MSG_HANDLER_METHOD(ArenaModule, VpView_LocationPublicChat)
   }
 }
 
-AP_MSG_HANDLER_METHOD(ArenaModule, VpView_LocationDetailsChanged){}
+AP_MSG_HANDLER_METHOD(ArenaModule, VpView_LocationDetailsChanged) {}
 
-AP_MSG_HANDLER_METHOD(ArenaModule, VpView_ContextDetailsChanged){}
+AP_MSG_HANDLER_METHOD(ArenaModule, VpView_ContextDetailsChanged)
+{
+  Display* pDisplay = FindDisplay(pMsg->hContext);
+  if (pDisplay) {
+    pDisplay->OnContextDetailsChanged(pMsg->vlKeys);
+  }
+}
 
 AP_MSG_HANDLER_METHOD(ArenaModule, VpView_ParticipantDetailsChanged)
 {
