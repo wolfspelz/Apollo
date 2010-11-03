@@ -160,7 +160,7 @@ void Display::OnEnterRequested()
   tvEnterRequested_ = Apollo::TimeValue::getTime();
 
   Msg_Scene_SetFillColor::_(hScene_, ELEMENT_PROGRESS, 0.8, 0.8, 1, 1);
-  Msg_Scene_Draw::_(hScene_);
+  //Msg_Scene_Draw::_(hScene_);
 }
 
 void Display::OnEnterBegin()
@@ -171,7 +171,7 @@ void Display::OnEnterBegin()
   tvEnterBegin_ = Apollo::TimeValue::getTime();
 
   Msg_Scene_SetFillColor::_(hScene_, ELEMENT_PROGRESS, 0.5, 0.5, 1, 1);
-  Msg_Scene_Draw::_(hScene_);
+  //Msg_Scene_Draw::_(hScene_);
 }
 
 void Display::OnEnterComplete()
@@ -181,7 +181,7 @@ void Display::OnEnterComplete()
   nState_ = StateEnterComplete;
 
   Msg_Scene_SetFillColor::_(hScene_, ELEMENT_PROGRESS, 0, 0, 1, 1);
-  Msg_Scene_Draw::_(hScene_);
+  //Msg_Scene_Draw::_(hScene_);
 
   {
     ApAsyncMessage<Msg_VpView_ReplayLocationPublicChat> msg;
@@ -201,7 +201,7 @@ void Display::OnLeaveRequested()
   tvLeaveRequested_ = Apollo::TimeValue::getTime();
 
   Msg_Scene_SetFillColor::_(hScene_, ELEMENT_PROGRESS, 1, 0, 0, 1);
-  Msg_Scene_Draw::_(hScene_);
+  //Msg_Scene_Draw::_(hScene_);
 }
 
 void Display::OnLeaveBegin()
@@ -212,7 +212,7 @@ void Display::OnLeaveBegin()
   tvLeaveBegin_ = Apollo::TimeValue::getTime();
 
   Msg_Scene_SetFillColor::_(hScene_, ELEMENT_PROGRESS, 1, 0.6, 0.6, 1);
-  Msg_Scene_Draw::_(hScene_);
+  //Msg_Scene_Draw::_(hScene_);
 }
 
 void Display::OnLeaveComplete()
@@ -222,7 +222,7 @@ void Display::OnLeaveComplete()
   nState_ = StateLeaveComplete;
 
   Msg_Scene_SetFillColor::_(hScene_, ELEMENT_PROGRESS, 1, 1, 1, 1);
-  Msg_Scene_Draw::_(hScene_);
+  //Msg_Scene_Draw::_(hScene_);
 }
 
 //---------------------------------------------------
@@ -377,6 +377,6 @@ void Display::RemoveAllObjects()
 void Display::ResetLocationInfo()
 {
   Msg_Scene_SetFillColor::_(hScene_, ELEMENT_PROGRESS, 1, 1, 1, 1);
-  Msg_Scene_Draw::_(hScene_);
+  //Msg_Scene_Draw::_(hScene_);
 }
 

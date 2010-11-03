@@ -34,48 +34,77 @@ typedef ApHandlePointerTree<Test_Participant*> Test_ParticipantList;
 typedef ApHandlePointerTreeIterator<Test_Participant*> Test_ParticipantListIterator;
 typedef ApHandlePointerTreeNode<Test_Participant*> Test_ParticipantListNode;
 
+class ActionList;
+
 class Action: public Elem
 {
 public:
   Action()
-    :nWaitMSec_(100)
+    :nContinueMSec_(100)
   {}
-  virtual void Execute() {}
-  int nWaitMSec_;
+  virtual void Execute(ActionList* pList) {}
+  int nContinueMSec_;
+};
+
+class NopAction: public Action
+{
+public:
+  void Execute(ActionList* pList);
 };
 
 class ActionList: public ListT<Action, Elem>
 {
 public:
-  ActionList()
-    :pCurrent_(0)
+  ActionList(const char* szName)
+    :ListT<Action, Elem>(szName)
+    ,pCurrent_(0)
   {}
   virtual void Begin();
-  virtual void End() {}
+  virtual void End();
   void DoCurrent();
   static void On_Timer_Event(Msg_Timer_Event* pMsg);
+  String Result() { return sError_; }
   Action* pCurrent_;
   ApHandle hTimer_;
+  String sError_;
 };
+
+void NopAction::Execute(ActionList* pList) {}
 
 void ActionList::Begin()
 {
   pCurrent_ = First();
+  { Msg_Timer_Event msg; msg.Hook(MODULE_NAME, (ApCallback) On_Timer_Event, this, ApCallbackPosEarly); }
   DoCurrent();
+}
+
+void ActionList::End()
+{
+  { Msg_Timer_Event msg; msg.UnHook(MODULE_NAME, (ApCallback) On_Timer_Event, this); }
+
+  { Msg_UnitTest_Complete msg; msg.sName = getName(); msg.bSuccess = sError_.empty(); msg.sMessage = sError_; msg.Send(); }
+
+  delete this;
 }
 
 void ActionList::DoCurrent()
 {
-  pCurrent_->Execute();
+  pCurrent_->Execute(this);
+  int nDelayMSec = pCurrent_->nContinueMSec_;
+  
   pCurrent_ = Next(pCurrent_);
   if (pCurrent_) {
-    int nSec = 0;
-    int nMSec = pCurrent_->nWaitMSec_;
-    if (nMSec > 1000) {
-      nSec = nMSec % 1000;
-      nMSec = pCurrent_->nWaitMSec_ - nSec * 1000;
+    if (nDelayMSec == 0) {
+      // Do nothing, wait for someone else to continue on the queue
+    } else {
+      int nSec = 0;
+      int nMSec = nDelayMSec;
+      if (nMSec > 1000) {
+        nSec = nMSec % 1000;
+        nMSec = nDelayMSec - nSec * 1000;
+      }
+      hTimer_ = Apollo::startTimeout(nSec, nMSec * 1000);
     }
-    hTimer_ = Apollo::startTimeout(nSec, nMSec * 1000);
   } else {
     End();
   }
@@ -89,9 +118,17 @@ void ActionList::On_Timer_Event(Msg_Timer_Event* pMsg)
   }
 }
 
-class Test_Setup: public ActionList
+// ------------------------------------------------------
+
+class Test_InChangeOut: public ActionList
 {
 public:
+  Test_InChangeOut()
+    :ActionList("Test_InChangeOut")
+    ,bReplayChat1_(0)
+    ,bReplayChat2_(0)
+  {}
+
   void Begin();
   void End();
 
@@ -103,12 +140,13 @@ public:
   int nWidth_;
   int nHeight_;
 
-  Test_ParticipantList pl1_;
+  int bReplayChat1_;
+  int bReplayChat2_;
+
+  Test_ParticipantList lParticipants_;
 };
 
 // ------------------------------------------------------
-
-Test_Setup* gTest_Arena_InChangeOut = 0;
 
 static void Test_Arena_UnitTest_TokenEnd()
 {
@@ -116,35 +154,12 @@ static void Test_Arena_UnitTest_TokenEnd()
   { ApAsyncMessage<Msg_UnitTest_Token> msg; msg.Post(); }
 }
 
-static String Test_Arena_InChangeOut_Begin()
-{
-  String s;
-
-  gTest_Arena_InChangeOut = new Test_Setup();
-  gTest_Arena_InChangeOut->Begin();
-
-  return s;
-}
-
-static String Test_Arena_InChangeOut_End()
-{
-  String s;
-
-  gTest_Arena_InChangeOut->End();
-  delete gTest_Arena_InChangeOut;
-  gTest_Arena_InChangeOut = 0;
-
-  AP_UNITTEST_RESULT(Test_Arena_InChangeOut_End, s.empty(), s);
-
-  return s;
-}
-
 // ------------------------------------------------------
 
 static void Test_VpView_GetParticipants(Msg_VpView_GetParticipants* pMsg)
 {
-  Test_Setup* t = (Test_Setup*) pMsg->Ref();
-  Test_ParticipantListIterator iter(t->pl1_);
+  Test_InChangeOut* t = (Test_InChangeOut*) pMsg->Ref();
+  Test_ParticipantListIterator iter(t->lParticipants_);
   for (Test_ParticipantListNode* pNode = 0; (pNode = iter.Next()) != 0; ) {
     pMsg->vlParticipants.add(pNode->Key());
   }
@@ -152,9 +167,9 @@ static void Test_VpView_GetParticipants(Msg_VpView_GetParticipants* pMsg)
 
 static void Test_VpView_SubscribeParticipantDetail(Msg_VpView_SubscribeParticipantDetail* pMsg)
 {
-  Test_Setup* t = (Test_Setup*) pMsg->Ref();
+  Test_InChangeOut* t = (Test_InChangeOut*) pMsg->Ref();
   Test_Participant* p = 0;
-  t->pl1_.Get(pMsg->hParticipant, p);
+  t->lParticipants_.Get(pMsg->hParticipant, p);
 
   if (p) {
     String sKey = pMsg->sKey;
@@ -179,9 +194,9 @@ static void Test_VpView_SubscribeParticipantDetail(Msg_VpView_SubscribeParticipa
 
 static void Test_VpView_GetParticipantDetailString(Msg_VpView_GetParticipantDetailString* pMsg)
 {
-  Test_Setup* t = (Test_Setup*) pMsg->Ref();
+  Test_InChangeOut* t = (Test_InChangeOut*) pMsg->Ref();
   Test_Participant* p = 0;
-  t->pl1_.Get(pMsg->hParticipant, p);
+  t->lParticipants_.Get(pMsg->hParticipant, p);
 
   if (p) {
     String sKey = pMsg->sKey;
@@ -204,9 +219,9 @@ static void Test_VpView_GetParticipantDetailString(Msg_VpView_GetParticipantDeta
 
 static void Test_VpView_GetParticipantDetailData(Msg_VpView_GetParticipantDetailData* pMsg)
 {
-  Test_Setup* t = (Test_Setup*) pMsg->Ref();
+  Test_InChangeOut* t = (Test_InChangeOut*) pMsg->Ref();
   Test_Participant* p = 0;
-  t->pl1_.Get(pMsg->hParticipant, p);
+  t->lParticipants_.Get(pMsg->hParticipant, p);
 
   if (p) {
     String sKey = pMsg->sKey;
@@ -221,11 +236,11 @@ static void Test_VpView_GetParticipantDetailData(Msg_VpView_GetParticipantDetail
 
 static void Test_VpView_ReplayLocationPublicChat(Msg_VpView_ReplayLocationPublicChat* pMsg)
 {
-  Test_Setup* t = (Test_Setup*) pMsg->Ref();
+  Test_InChangeOut* t = (Test_InChangeOut*) pMsg->Ref();
 
   Apollo::TimeValue tNow = Apollo::getNow();
 
-  Test_ParticipantListIterator iter(t->pl1_);
+  Test_ParticipantListIterator iter(t->lParticipants_);
   for (Test_ParticipantListNode* pNode = 0; (pNode = iter.Next()) != 0; ) {
     for (Elem* e = 0; (e = pNode->Value()->slChats.Next(e)); ) {
       Msg_VpView_LocationPublicChat msg;
@@ -251,7 +266,7 @@ static void Test_VpView_ReplayLocationPublicChat(Msg_VpView_ReplayLocationPublic
 
 static void Test_Galileo_IsAnimationDataInStorage(Msg_Galileo_IsAnimationDataInStorage* pMsg)
 {
-  Test_Setup* t = (Test_Setup*) pMsg->Ref();
+  Test_InChangeOut* t = (Test_InChangeOut*) pMsg->Ref();
 
   pMsg->bAvailable = 1;
 
@@ -260,7 +275,7 @@ static void Test_Galileo_IsAnimationDataInStorage(Msg_Galileo_IsAnimationDataInS
 
 static void Test_Galileo_LoadAnimationDataFromStorage(Msg_Galileo_LoadAnimationDataFromStorage* pMsg)
 {
-  Test_Setup* t = (Test_Setup*) pMsg->Ref();
+  Test_InChangeOut* t = (Test_InChangeOut*) pMsg->Ref();
 
   String sFile = String::filenameFile(pMsg->sUrl);
   Apollo::loadFile(Apollo::getAppResourcePath() + "test/tassadar/" + sFile, pMsg->sbData);
@@ -291,7 +306,258 @@ static void Test_VpView_GetLocationDetail(Msg_VpView_GetLocationDetail* pMsg)
 
 // ------------------------------------------------------
 
-void Test_Setup::Begin()
+class Test_InChangeOut_CreateContextAction: public Action
+{
+public:
+  void Execute(ActionList* pList)
+  {
+    {
+      Msg_VpView_ContextCreated msg;
+      msg.hContext = ((Test_InChangeOut*) pList)->hContext_;
+      msg.Send();
+    }
+
+    {
+      Msg_VpView_ContextVisibility msg;
+      msg.hContext = ((Test_InChangeOut*) pList)->hContext_;
+      msg.bVisible = 0;
+      msg.Send();
+    }
+
+    {
+      Msg_VpView_ContextPosition msg;
+      msg.hContext = ((Test_InChangeOut*) pList)->hContext_;
+      msg.nX = ((Test_InChangeOut*) pList)->nLeft_;
+      msg.nY = ((Test_InChangeOut*) pList)->nBottom_;
+      msg.Send();
+    }
+
+    {
+      Msg_VpView_ContextSize msg;
+      msg.hContext = ((Test_InChangeOut*) pList)->hContext_;
+      msg.nWidth = ((Test_InChangeOut*) pList)->nWidth_;
+      msg.nHeight = ((Test_InChangeOut*) pList)->nHeight_;
+      msg.Send();
+    }
+
+    {
+      Msg_VpView_ContextVisibility msg;
+      msg.hContext = ((Test_InChangeOut*) pList)->hContext_;
+      msg.bVisible = 1;
+      msg.Send();
+    }
+  }
+};
+
+class Test_InChangeOut_ContextLocationAssigned1: public Action
+{
+public:
+  void Execute(ActionList* pList)
+  {
+    Msg_VpView_ContextLocationAssigned msg;
+    msg.hContext = ((Test_InChangeOut*) pList)->hContext_;
+    msg.hLocation = ((Test_InChangeOut*) pList)->hLocation1_;
+    msg.Send();
+  }
+};
+
+class Test_InChangeOut_EnterLocationRequested1: public Action
+{
+public:
+  void Execute(ActionList* pList)
+  {
+    Msg_VpView_EnterLocationRequested msg;
+    msg.hLocation = ((Test_InChangeOut*) pList)->hLocation1_;
+    msg.Send();
+  }
+};
+
+class Test_InChangeOut_LocationContextsChanged1: public Action
+{
+public:
+  void Execute(ActionList* pList)
+  {
+    Msg_VpView_LocationContextsChanged msg;
+    msg.hLocation = ((Test_InChangeOut*) pList)->hLocation1_;
+    msg.Send();
+  }
+};
+
+// VpView_GetLocationContexts
+// VpView_SubscribeContextDetail
+// VpView_SubscribeLocationDetail
+// VpView_GetContextDetail
+// VpView_GetLocationDetail
+
+class Test_InChangeOut_EnterLocationBegin1: public Action
+{
+public:
+  void Execute(ActionList* pList)
+  {
+    Msg_VpView_EnterLocationBegin msg;
+    msg.hLocation = ((Test_InChangeOut*) pList)->hLocation1_;
+    msg.Send();
+  }
+};
+
+class Test_InChangeOut_ParticipantsChanged1: public Action
+{
+public:
+  void Execute(ActionList* pList)
+  {
+    Msg_VpView_ParticipantsChanged msg;
+    msg.hLocation = ((Test_InChangeOut*) pList)->hLocation1_;
+    msg.nCount = ((Test_InChangeOut*) pList)->lParticipants_.Count();
+    msg.Send();
+  }
+};
+
+// VpView_GetParticipants
+// VpView_SubscribeParticipantDetail
+// VpView_GetParticipantDetailString
+// VpView_GetParticipantDetailData
+// Galileo_IsAnimationDataInStorage
+// Galileo_LoadAnimationDataFromStorage
+
+class Test_InChangeOut_EnterLocationComplete1: public Action
+{
+public:
+  void Execute(ActionList* pList)
+  {
+    Msg_VpView_EnterLocationComplete msg;
+    msg.hLocation = ((Test_InChangeOut*) pList)->hLocation1_;
+    msg.Send();
+  }
+};
+
+class Test_InChangeOut_Wait: public Action
+{
+public:
+  void Execute(ActionList* pList)
+  {
+    nContinueMSec_ = 0;
+  }
+};
+
+// VpView_ReplayLocationPublicChat
+//
+//  // CHANGE: Navigate
+//  {
+//    Msg_VpView_ContextVisibility msg;
+//    msg.hContext = hContext_;
+//    msg.bVisible = 1;
+//    msg.Send();
+//  }
+//
+//  {
+//    Msg_VpView_LeaveLocationRequested msg;
+//    msg.hLocation = hLocation1_;
+//    msg.Send();
+//  }
+//
+//  {
+//    Msg_VpView_LocationContextsChanged msg;
+//    msg.hLocation = hLocation1_;
+//    msg.Send();
+//  }
+//
+//  {
+//    Msg_VpView_ContextLocationUnassigned msg;
+//    msg.hContext = hContext_;
+//    msg.hLocation = hLocation1_;
+//    msg.Send();
+//  }
+//
+//  {
+//    Msg_VpView_ContextLocationAssigned msg;
+//    msg.hContext = hContext_;
+//    msg.hLocation = hLocation2_;
+//    msg.Send();
+//  }
+//
+//  {
+//    Msg_VpView_EnterLocationRequested msg;
+//    msg.hLocation = hLocation2_;
+//    msg.Send();
+//  }
+//
+//  {
+//    Msg_VpView_LocationContextsChanged msg;
+//    msg.hLocation = hLocation2_;
+//    msg.Send();
+//  }
+//
+//  {
+//    Msg_VpView_LeaveLocationBegin msg;
+//    msg.hLocation = hLocation1_;
+//    msg.Send();
+//  }
+//
+//  {
+//    Msg_VpView_ParticipantsChanged msg;
+//    msg.hLocation = hLocation1_;
+//    msg.nCount = 0;
+//    msg.Send();
+//  }
+//
+//  {
+//    Msg_VpView_LeaveLocationComplete msg;
+//    msg.hLocation = hLocation1_;
+//    msg.Send();
+//  }
+//
+//  {
+//    Msg_VpView_EnterLocationBegin msg;
+//    msg.hLocation = hLocation2_;
+//    msg.Send();
+//  }
+//
+//  {
+//    Msg_VpView_ParticipantsChanged msg;
+//    msg.hLocation = hLocation2_;
+//    msg.nCount = lParticipants_.Count();
+//    msg.Send();
+//  }
+//
+//  {
+//    Msg_VpView_EnterLocationComplete msg;
+//    msg.hLocation = hLocation2_;
+//    msg.Send();
+//  }
+//
+//  /*
+//  // OUT: CloseContext
+//  {
+//    Msg_VpView_LeaveLocationRequested msg;
+//  }
+//
+//  {
+//    Msg_VpView_LocationContextsChanged msg;
+//  }
+//
+//  {
+//    Msg_VpView_ContextLocationUnassigned msg;
+//  }
+//
+//  {
+//    Msg_VpView_ContextDestroyed msg;
+//  }
+//
+//  {
+//    Msg_VpView_LeaveLocationBegin msg;
+//  }
+//
+//  {
+//    Msg_VpView_ParticipantsChanged msg;
+//  }
+//
+//  {
+//    Msg_VpView_LeaveLocationComplete msg;
+//  }
+//  */
+//}
+
+void Test_InChangeOut::Begin()
 {
   hContext_ = Apollo::newHandle();
   hLocation1_ = Apollo::newHandle();
@@ -315,7 +581,7 @@ void Test_Setup::Begin()
       p->sProfileUrl;
       p->slChats.AddLast("2 Hello World Hello World Hello World Hello World", 2);
       p->slChats.AddLast("10 Hello World Hello World Hello World Hello World", 10);
-      pl1_.Set(Apollo::newHandle(), p);
+      lParticipants_.Set(Apollo::newHandle(), p);
     }
   }
 
@@ -333,213 +599,19 @@ void Test_Setup::Begin()
   { Msg_VpView_GetLocationDetail msg; msg.Hook(MODULE_NAME, (ApCallback) Test_VpView_GetLocationDetail, this, ApCallbackPosEarly); }
 
   // IN: Open Context, Navigate
-  {
-    Msg_VpView_ContextCreated msg;
-    msg.hContext = hContext_;
-    msg.Send();
-  }
+  AddLast(new Test_InChangeOut_CreateContextAction());
+  AddLast(new Test_InChangeOut_ContextLocationAssigned1());
+  AddLast(new Test_InChangeOut_EnterLocationRequested1());
+  AddLast(new Test_InChangeOut_LocationContextsChanged1());
+  AddLast(new Test_InChangeOut_EnterLocationBegin1());
+  AddLast(new Test_InChangeOut_ParticipantsChanged1());
+  AddLast(new Test_InChangeOut_EnterLocationComplete1());
+  AddLast(new Test_InChangeOut_Wait());
 
-  {
-    Msg_VpView_ContextVisibility msg;
-    msg.hContext = hContext_;
-    msg.bVisible = 0;
-    msg.Send();
-  }
-
-  {
-    Msg_VpView_ContextPosition msg;
-    msg.hContext = hContext_;
-    msg.nX = nLeft_;
-    msg.nY = nBottom_;
-    msg.Send();
-  }
-
-  {
-    Msg_VpView_ContextSize msg;
-    msg.hContext = hContext_;
-    msg.nWidth = nWidth_;
-    msg.nHeight = nHeight_;
-    msg.Send();
-  }
-
-  {
-    Msg_VpView_ContextVisibility msg;
-    msg.hContext = hContext_;
-    msg.bVisible = 1;
-    msg.Send();
-  }
-
-  {
-    Msg_VpView_ContextLocationAssigned msg;
-    msg.hContext = hContext_;
-    msg.hLocation = hLocation1_;
-    msg.Send();
-  }
-
-  {
-    Msg_VpView_EnterLocationRequested msg;
-    msg.hLocation = hLocation1_;
-    msg.Send();
-  }
-
-  {
-    Msg_VpView_LocationContextsChanged msg;
-    msg.hLocation = hLocation1_;
-    msg.Send();
-  }
-
-  // VpView_GetLocationContexts
-  // VpView_SubscribeContextDetail
-  // VpView_SubscribeLocationDetail
-  // VpView_GetContextDetail
-  // VpView_GetLocationDetail
-
-  {
-    Msg_VpView_EnterLocationBegin msg;
-    msg.hLocation = hLocation1_;
-    msg.Send();
-  }
-
-  {
-    Msg_VpView_ParticipantsChanged msg;
-    msg.hLocation = hLocation1_;
-    msg.nCount = pl1_.Count();
-    msg.Send();
-  }
-
-  // VpView_GetParticipants
-  // VpView_SubscribeParticipantDetail
-  // VpView_GetParticipantDetailString
-  // VpView_GetParticipantDetailData
-  // Galileo_IsAnimationDataInStorage
-  // Galileo_LoadAnimationDataFromStorage
-
-  {
-    Msg_VpView_EnterLocationComplete msg;
-    msg.hLocation = hLocation1_;
-    msg.Send();
-  }
-
-
-  // VpView_ReplayLocationPublicChat
-
-  // CHANGE: Navigate
-  {
-    Msg_VpView_ContextVisibility msg;
-    msg.hContext = hContext_;
-    msg.bVisible = 1;
-    msg.Send();
-  }
-
-  {
-    Msg_VpView_LeaveLocationRequested msg;
-    msg.hLocation = hLocation1_;
-    msg.Send();
-  }
-
-  {
-    Msg_VpView_LocationContextsChanged msg;
-    msg.hLocation = hLocation1_;
-    msg.Send();
-  }
-
-  {
-    Msg_VpView_ContextLocationUnassigned msg;
-    msg.hContext = hContext_;
-    msg.hLocation = hLocation1_;
-    msg.Send();
-  }
-
-  {
-    Msg_VpView_ContextLocationAssigned msg;
-    msg.hContext = hContext_;
-    msg.hLocation = hLocation2_;
-    msg.Send();
-  }
-
-  {
-    Msg_VpView_EnterLocationRequested msg;
-    msg.hLocation = hLocation2_;
-    msg.Send();
-  }
-
-  {
-    Msg_VpView_LocationContextsChanged msg;
-    msg.hLocation = hLocation2_;
-    msg.Send();
-  }
-
-  {
-    Msg_VpView_LeaveLocationBegin msg;
-    msg.hLocation = hLocation1_;
-    msg.Send();
-  }
-
-  {
-    Msg_VpView_ParticipantsChanged msg;
-    msg.hLocation = hLocation1_;
-    msg.nCount = 0;
-    msg.Send();
-  }
-
-  {
-    Msg_VpView_LeaveLocationComplete msg;
-    msg.hLocation = hLocation1_;
-    msg.Send();
-  }
-
-  {
-    Msg_VpView_EnterLocationBegin msg;
-    msg.hLocation = hLocation2_;
-    msg.Send();
-  }
-
-  {
-    Msg_VpView_ParticipantsChanged msg;
-    msg.hLocation = hLocation2_;
-    msg.nCount = pl1_.Count();
-    msg.Send();
-  }
-
-  {
-    Msg_VpView_EnterLocationComplete msg;
-    msg.hLocation = hLocation2_;
-    msg.Send();
-  }
-
-  /*
-  // OUT: CloseContext
-  {
-    Msg_VpView_LeaveLocationRequested msg;
-  }
-
-  {
-    Msg_VpView_LocationContextsChanged msg;
-  }
-
-  {
-    Msg_VpView_ContextLocationUnassigned msg;
-  }
-
-  {
-    Msg_VpView_ContextDestroyed msg;
-  }
-
-  {
-    Msg_VpView_LeaveLocationBegin msg;
-  }
-
-  {
-    Msg_VpView_ParticipantsChanged msg;
-  }
-
-  {
-    Msg_VpView_LeaveLocationComplete msg;
-  }
-  */
+  ActionList::Begin();
 }
 
-void Test_Setup::End()
+void Test_InChangeOut::End()
 {
   { Msg_VpView_GetParticipants msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_VpView_GetParticipants, this); }
   { Msg_VpView_SubscribeParticipantDetail msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_VpView_SubscribeParticipantDetail, this); }
@@ -554,10 +626,14 @@ void Test_Setup::End()
   { Msg_VpView_GetContextDetail msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_VpView_GetContextDetail, this); }
   { Msg_VpView_GetLocationDetail msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_VpView_GetLocationDetail, this); }
 
+  ActionList::End();
+
   Test_Arena_UnitTest_TokenEnd();
 }
 
 // ------------------------------------------------------
+
+Test_InChangeOut* gTest_InChangeOut = 0;
 
 static void Test_Arena_UnitTest_Token(Msg_UnitTest_Token* pMsg)
 {
@@ -566,7 +642,7 @@ static void Test_Arena_UnitTest_Token(Msg_UnitTest_Token* pMsg)
   apLog_Info((LOG_CHANNEL, "Test_Arena_UnitTest_Token", "Starting Test/Arena"));
   int bTokenEndNow = 0;
 
-  AP_UNITTEST_EXECUTE(Test_Arena_InChangeOut_Begin);
+  gTest_InChangeOut->Begin();
 
   if (bTokenEndNow) { Test_Arena_UnitTest_TokenEnd(); }
 }
@@ -579,8 +655,8 @@ void Test_Arena_Register()
 {
 #if defined(AP_TEST_Arena)
   if (Apollo::isLoadedModule("Arena")) {
-    AP_UNITTEST_REGISTER(Test_Arena_InChangeOut_Begin);
-    AP_UNITTEST_REGISTER(Test_Arena_InChangeOut_End);
+
+    { gTest_InChangeOut = new Test_InChangeOut(); Msg_UnitTest_Register msg; msg.sName = gTest_InChangeOut->getName(); msg.Send(); }
   
     { Msg_UnitTest_Token msg; msg.Hook(MODULE_NAME, (ApCallback) Test_Arena_UnitTest_Token, 0, ApCallbackPosNormal); }  
   }
