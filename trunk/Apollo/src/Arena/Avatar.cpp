@@ -372,6 +372,7 @@ void Avatar::AnimationFrame(const Apollo::Image& image)
 {
   Msg_Scene_SetImageData::_(hScene_, ImagePath(), image);
   Msg_Scene_TranslateElement::_(hScene_, ImagePath(), - (double) image.Width() / 2.0, 0);
+  //Msg_Scene_Draw::_(hScene_);
 }
 
 //----------------------------------------------------------
