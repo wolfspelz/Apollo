@@ -149,6 +149,43 @@ Display* ArenaModule::GetDisplayOfAnimation(const ApHandle& hAnimation)
   return 0;
 }
 
+//---------------------------
+
+void ArenaModule::SetContextOfScene(const ApHandle& hScene, const ApHandle& hContext)
+{
+  if (contextOfScene_.IsSet(hScene)) {
+    contextOfScene_.Unset(hScene);
+  }
+  contextOfScene_.Set(hScene, hContext);
+}
+
+void ArenaModule::DeleteContextOfScene(const ApHandle& hScene, const ApHandle& hContext)
+{
+  ApHandle h;
+  contextOfScene_.Get(hScene, h);
+  if (h != hContext) {
+    apLog_Warning((LOG_CHANNEL, "ArenaModule::DeleteContextOfScene", "Context not found for loc=" ApHandleFormat " ctxt=" ApHandleFormat "", ApHandleType(hContext)));
+  } else {
+    contextOfScene_.Unset(hScene);
+  }
+}
+
+ApHandle ArenaModule::GetContextOfScene(const ApHandle& hScene)
+{
+  if (contextOfScene_.IsSet(hScene)) {
+    return contextOfScene_.Find(hScene)->Value();
+  }
+  return ApNoHandle;
+}
+
+Display* ArenaModule::GetDisplayOfScene(const ApHandle& hScene)
+{
+  ApHandle hContext = GetContextOfScene(hScene);
+  if (ApIsHandle(hContext)) {
+    return FindDisplay(hContext);
+  }
+  return 0;
+}
 
 //---------------------------
 
@@ -351,7 +388,18 @@ AP_MSG_HANDLER_METHOD(ArenaModule, Animation_SequenceEnd){}
 
 AP_MSG_HANDLER_METHOD(ArenaModule, System_60SecTimer)
 {
-//  DeleteOldLeaveRequestedLocations();
+//  Maintenance ?
+}
+
+AP_MSG_HANDLER_METHOD(ArenaModule, Scene_MouseEvent)
+{
+  Display* pDisplay = GetDisplayOfScene(pMsg->hScene);
+  if (pDisplay) { 
+    int bHandled = pDisplay->OnMouseEvent(pMsg);
+    if (bHandled) {
+      pMsg->Stop();
+    }
+  }
 }
 
 //----------------------------------------------------------
@@ -413,6 +461,7 @@ int ArenaModule::Init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ArenaModule, Animation_Frame, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ArenaModule, Animation_SequenceEnd, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ArenaModule, System_60SecTimer, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, ArenaModule, Scene_MouseEvent, this, ApCallbackPosNormal);
 
   AP_UNITTEST_HOOK(ArenaModule, this);
 

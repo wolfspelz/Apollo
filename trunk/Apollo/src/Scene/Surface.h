@@ -70,7 +70,7 @@ public:
   Element* CreateElement(const String& sPath);
   void DeleteElement(const String& sPath);
 
-  void CreateGraphicsElement(const String& sPath, Element* pElement);
+  void AddElement(const String& sPath, Element* pElement);
   RectangleElement* CreateRectangle(const String& sPath);
   ImageElement* CreateImage(const String& sPath);
   TextElement* CreateText(const String& sPath);

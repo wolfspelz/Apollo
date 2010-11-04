@@ -13,75 +13,54 @@
 #include "Display.h"
 
 Meta::Meta(Display* pDisplay)
-:pDisplay_(pDisplay)
-,bActive_(0)
+:Layer(pDisplay)
 {
+  Msg_Scene_CreateRectangle::_(hScene_, ELEMENT_TRAY, 0.5, 0.5, 20, 20);
+  Msg_Scene_SetStrokeColor::_(hScene_, ELEMENT_TRAY, 0, 0, 0, 1);
+  Msg_Scene_SetFillColor::_(hScene_, ELEMENT_TRAY, 1, 1, 1, 1);
 }
 
 Meta::~Meta()
 {
-  if (bActive_) {
-    Destroy();
-  }
-}
-
-int Meta::Create()
-{
-  int ok = 1;
-
-  if (pDisplay_) {
-    hScene_ = pDisplay_->GetScene();
-  }
-
-  Msg_Scene_CreateRectangle::_(hScene_, ELEMENT_TRAY, 0.5, 0.5, 20, 20);
-  Msg_Scene_SetStrokeColor::_(hScene_, ELEMENT_TRAY, 0, 0, 0, 1);
-  Msg_Scene_SetFillColor::_(hScene_, ELEMENT_TRAY, 1, 1, 1, 1);
-
-  bActive_ = ok;
-  return ok;
-}
-
-void Meta::Destroy()
-{
   Msg_Scene_DeleteElement::_(hScene_, ELEMENT_TRAY);
-
-  bActive_ = 0;
 }
+
+//---------------------------
 
 void Meta::OnEnterRequested()
 {
   nState_ = StateEnterRequested;
-  Msg_Scene_SetFillColor::_(hScene_, ELEMENT_TRAY, 0.8, 0.8, 1, 1);
+  SetTrayColor(0.8, 0.8, 1);
 }
 
 void Meta::OnEnterBegin()
 {
   nState_ = StateEnterBegin;
-  Msg_Scene_SetFillColor::_(hScene_, ELEMENT_TRAY, 0.5, 0.5, 1, 1);
+  SetTrayColor(0.5, 0.5, 1);
 }
 
 void Meta::OnEnterComplete()
 {
   nState_ = StateEnterComplete;
-  Msg_Scene_SetFillColor::_(hScene_, ELEMENT_TRAY, 0, 0, 1, 1);
+  SetTrayColor(0, 0, 1);
 }
 
 void Meta::OnLeaveRequested()
 {
   nState_ = StateLeaveRequested;
-  Msg_Scene_SetFillColor::_(hScene_, ELEMENT_TRAY, 1, 0, 0, 1);
+  SetTrayColor(1, 0, 0);
 }
 
 void Meta::OnLeaveBegin()
 {
   nState_ = StateLeaveBegin;
-  Msg_Scene_SetFillColor::_(hScene_, ELEMENT_TRAY, 1, 0.6, 0.6, 1);
+  SetTrayColor(1, 0.6, 0.6);
 }
 
 void Meta::OnLeaveComplete()
 {
   nState_ = StateLeaveComplete;
-  Msg_Scene_SetFillColor::_(hScene_, ELEMENT_TRAY, 1, 1, 1, 1);
+  SetTrayColor(1, 1, 1);
 }
 
 void Meta::OnDocumentUrl(const String& sUrl)
@@ -94,6 +73,13 @@ void Meta::OnLocationUrl(const String& sUrl)
 {
   sLocationUrl_ = sUrl;
   ShowText();
+}
+
+//---------------------------
+
+void Meta::SetTrayColor(double r, double g, double b)
+{
+  Msg_Scene_SetFillColor::_(hScene_, ELEMENT_TRAY, r, g, b, 1);
 }
 
 void Meta::ShowText()
@@ -109,8 +95,7 @@ void Meta::ShowText()
     sText += sLocationUrl_;
   }
 
-  int bExists = 0;
-  if (Msg_Scene_ElementExists::_(hScene_, sTextPath, bExists) && bExists) {
+  if (Msg_Scene_ElementExists::_(hScene_, sTextPath)) {
     Msg_Scene_DeleteElement::_(hScene_, sTextPath);
   }
 

@@ -264,9 +264,7 @@ void Avatar::UnSubscribeDetail(const String& sKey)
 
 void Avatar::Show()
 {
-  if (pDisplay_) {
-    hScene_ = pDisplay_->GetScene();
-  }
+  hScene_ = pDisplay_->GetScene();
 
   nMaxW_ = Apollo::getModuleConfig(MODULE_NAME, "Avatar/MaxWidth", 100);
   nMaxH_ = Apollo::getModuleConfig(MODULE_NAME, "Avatar/MaxHeight", 100);
@@ -280,7 +278,7 @@ void Avatar::Show()
 
   if (Apollo::getModuleConfig(MODULE_NAME, "DebugFrame/Avatar", 0)) {
     Msg_Scene_CreateRectangle::_(hScene_, ElementPath() + "/" ELEMENT_FRAME, - (((double) nMaxW_) / 2.0) - 0.5, -0.5, (double) nMaxW_ + 1, (double) nMaxH_ + 1);
-    Msg_Scene_SetStrokeColor::_(hScene_, ElementPath() + "/" ELEMENT_FRAME, 0, 0, 1, 1);
+    pDisplay_->SetDebugFrameColor(ElementPath() + "/" ELEMENT_FRAME);
   }
 
   Msg_Scene_CreateImage::_(hScene_, ImagePath(), 0, 0);
@@ -298,8 +296,6 @@ void Avatar::Show()
   SubscribeAndGetDetail(Msg_VpView_ParticipantDetail_Position);
   SubscribeAndGetDetail(Msg_VpView_ParticipantDetail_Condition);
   SubscribeAndGetDetail(Msg_VpView_ParticipantDetail_ProfileUrl);
-
-  //Msg_Scene_Draw::_(hScene_);
 }
 
 void Avatar::Hide()
@@ -384,20 +380,13 @@ String& Avatar::ElementPath()
   return sPath_;
 }
 
-int Avatar::ElementExists(const String& sPath)
-{
-  int bExists = 0;
-  Msg_Scene_ElementExists::_(hScene_, sPath, bExists);
-  return bExists;
-}
-
 void Avatar::SetNickname(const String& sNickname)
 {
   sNickname_ = sNickname;
 
   String sNicknamePath = NicknamePath();
 
-  if (ElementExists(sNicknamePath)) {
+  if (Msg_Scene_ElementExists::_(hScene_, sNicknamePath)) {
     Msg_Scene_DeleteElement::_(hScene_, sNicknamePath);
   }
 
@@ -435,7 +424,7 @@ void Avatar::SetNickname(const String& sNickname)
 
 void Avatar::CreateChatContainer(const String& sContainer)
 {
-  if (!ElementExists(sContainer)) {
+  if (!Msg_Scene_ElementExists::_(hScene_, sContainer)) {
     Msg_Scene_CreateElement::_(hScene_, sContainer);
 
     int nCenter = Apollo::getModuleConfig(MODULE_NAME, "Chat/Container/Center", 0);

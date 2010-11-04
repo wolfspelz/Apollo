@@ -427,7 +427,7 @@ void Surface::DeleteElement(const String& sPath)
   }
 }
 
-void Surface::CreateGraphicsElement(const String& sPath, Element* pElement)
+void Surface::AddElement(const String& sPath, Element* pElement)
 {
   String sParent = String::filenameBasePath(sPath); sParent.trim("/");
   String sName = String::filenameFile(sPath);
@@ -442,7 +442,7 @@ void Surface::CreateGraphicsElement(const String& sPath, Element* pElement)
   if (pParent) {
     pParent->AddChild(sName, pElement);
   } else {
-    throw ApException("Surface::CreateGraphicsElement(%s) failed: no parent",  StringType(sPath));
+    throw ApException("Surface::AddElement(%s) failed: no parent for path",  StringType(sPath));
   }
 }
 
@@ -450,7 +450,7 @@ RectangleElement* Surface::CreateRectangle(const String& sPath)
 {
   RectangleElement* pRectangle = new RectangleElement(this);
   if (pRectangle == 0) { throw ApException("Surface::CreateRectangle(%s) failed",  StringType(sPath)); }
-  CreateGraphicsElement(sPath, pRectangle);
+  AddElement(sPath, pRectangle);
   return pRectangle;
 }
 
@@ -458,7 +458,7 @@ ImageElement* Surface::CreateImage(const String& sPath)
 {
   ImageElement* pImage = new ImageElement(this);
   if (pImage == 0) { throw ApException("Surface::CreateImage(%s) failed",  StringType(sPath)); }
-  CreateGraphicsElement(sPath, pImage);
+  AddElement(sPath, pImage);
   return pImage;
 }
 
@@ -466,7 +466,7 @@ TextElement* Surface::CreateText(const String& sPath)
 {
   TextElement* pText = new TextElement(this);
   if (pText == 0) { throw ApException("Surface::CreateText(%s) failed",  StringType(sPath)); }
-  CreateGraphicsElement(sPath, pText);
+  AddElement(sPath, pText);
   return pText;
 }
 
@@ -474,7 +474,7 @@ SensorElement* Surface::CreateSensor(const String& sPath)
 {
   SensorElement* pSensor = new SensorElement(this, sPath);
   if (pSensor == 0) { throw ApException("Surface::CreateSensor(%s) failed",  StringType(sPath)); }
-  CreateGraphicsElement(sPath, pSensor);
+  AddElement(sPath, pSensor);
   return pSensor;
 }
 

@@ -8,11 +8,13 @@
 #include "ApLog.h"
 #include "MsgScene.h"
 #include "MsgVpView.h"
+#include "ColorString.h"
 #include "Local.h"
 #include "ArenaModule.h"
 #include "Display.h"
 #include "Avatar.h"
 #include "Meta.h"
+#include "Hud.h"
 
 Display::Display(ArenaModule* pModule, const ApHandle& hContext)
 :pModule_(pModule)
@@ -22,16 +24,11 @@ Display::Display(ArenaModule* pModule, const ApHandle& hContext)
 ,nY_(0)
 ,nW_(0)
 ,nH_(0)
-,pMeta_(0)
 {
 }
 
 Display::~Display()
 {
-  if (pMeta_) {
-    delete pMeta_;
-    pMeta_ = 0;
-  }
 }
 
 int Display::Create()
@@ -48,19 +45,21 @@ int Display::Create()
   } else {
     hScene_ = hScene;
 
+    pModule_->SetContextOfScene(hScene_, hContext_);
+
     Msg_Scene_SetAutoDraw msgSSAD;
     msgSSAD.hScene = hScene_;
     msgSSAD.nMilliSec = 100;
     msgSSAD.Request();
 
-    GetMeta();
+    { Meta* p = new Meta(this); if (p) { layers_.Set("Meta", p); }}
+    { Hud* p = new Hud(this); if (p) { layers_.Set("Hud", p); }}
 
     { Msg_VpView_SubscribeContextDetail msg; msg.hContext = hContext_; msg.sKey = Msg_VpView_ContextDetail_DocumentUrl; msg.Request(); }
     { Msg_VpView_SubscribeContextDetail msg; msg.hContext = hContext_; msg.sKey = Msg_VpView_ContextDetail_LocationUrl; msg.Request(); }
 
     { Msg_VpView_GetContextDetail msg; msg.hContext = hContext_; msg.sKey = Msg_VpView_ContextDetail_DocumentUrl; if (msg.Request()) { GetMeta()->OnDocumentUrl(msg.sValue); } }
     { Msg_VpView_GetContextDetail msg; msg.hContext = hContext_; msg.sKey = Msg_VpView_ContextDetail_LocationUrl; if (msg.Request()) { GetMeta()->OnLocationUrl(msg.sValue); } }
-
   }
 
   return ok;
@@ -68,6 +67,8 @@ int Display::Create()
 
 void Display::Destroy()
 {
+  pModule_->DeleteContextOfScene(hScene_, hContext_);
+
   Msg_Scene_Destroy msg;
   msg.hScene = hScene_;
   if (!msg.Request()) {
@@ -118,15 +119,11 @@ void Display::SetSize(int nW, int nH)
     apLog_Error((LOG_CHANNEL, "Display::SetSize", "Msg_Scene_Position(" ApHandleFormat ") failed", ApHandleType(msg.hScene)));
   }
 
-  if (Apollo::getModuleConfig(MODULE_NAME, "DebugFrame/Display", 0)) {
-    int bExists = 0;
-    if (Msg_Scene_ElementExists::_(hScene_, ELEMENT_FRAME, bExists) && bExists) {
-      Msg_Scene_DeleteElement::_(hScene_, ELEMENT_FRAME);
+  for (LayerListNode* pNode = 0; pNode = layers_.Next(pNode); ) {
+    Layer* pLayer = pNode->Value();
+    if (pLayer) {
+      pLayer->OnSetSize(nW, nH);
     }
-    Msg_Scene_CreateRectangle::_(hScene_, ELEMENT_FRAME, 0.5, 0.5, nW_ - 0.5, nH_ - 0.5);
-    //Msg_Scene_SetFillColor::_(hScene_, ELEMENT_FRAME, 1, 1, 1, 0.5);
-    Msg_Scene_SetStrokeColor::_(hScene_, ELEMENT_FRAME, 0, 0, 1, 1);
-    Msg_Scene_SetStrokeWidth::_(hScene_, ELEMENT_FRAME, 1);
   }
 }
 
@@ -247,6 +244,19 @@ void Display::OnAvatarAnimationFrame(const ApHandle& hParticipant, const Apollo:
   }
 }
 
+int Display::OnMouseEvent(Msg_Scene_MouseEvent* pMsg)
+{
+  for (LayerListNode* pNode = 0; pNode = layers_.Next(pNode); ) {
+    Layer* pLayer = pNode->Value();
+    if (pLayer) {
+      if (pLayer->OnMouseEvent(pMsg)) {
+        return 1;
+      }
+    }
+  }
+  return 0;
+}
+
 //---------------------------------------------------
 
 void Display::OnParticipantsChanged()
@@ -363,8 +373,17 @@ void Display::RemoveAllObjects()
 
 void Display::ResetLocationInfo()
 {
-  DeleteMeta();
-  GetMeta();
+  Layer* p = 0;
+  if (layers_.Get("Meta", p)) {
+    layers_.Unset("Meta");
+    delete p;
+    p = 0;
+  }
+
+  p = new Meta(this);
+  if (p) {
+    layers_.Set("Meta", p);
+  }
 }
 
 //---------------------------------------------------
@@ -394,21 +413,29 @@ void Display::OnContextDetailsChanged(Apollo::ValueList& vlKeys)
 
 Meta* Display::GetMeta()
 {
-  if (pMeta_ == 0) {
-    pMeta_ = new Meta(this);
-    if (pMeta_) {
-      pMeta_->Create();
-    }
+  Layer* p = 0;
+  layers_.Get("Meta", p);
+  if (p == 0) {
+    apLog_Fatal((LOG_CHANNEL, "Display::GetMeta", "No layer for name 'Meta'"));
   }
-  return pMeta_;
+  return (Meta*) p;
 }
 
-void Display::DeleteMeta()
+Hud* Display::GetHud()
 {
-  if (pMeta_) {
-    delete pMeta_;
-    pMeta_ = 0;
-    }
+  Layer* p = 0;
+  layers_.Get("Hud", p);
+  if (p == 0) {
+    apLog_Fatal((LOG_CHANNEL, "Display::GetHud", "No layer for name 'Hud'"));
+  }
+  return (Hud*) p;
 }
 
+//---------------------------------------------------
+
+void Display::SetDebugFrameColor(const String& sPath)
+{
+  Apollo::ColorString c = Apollo::getModuleConfig(MODULE_NAME, "DebugFrameColor", "#0000ff");
+  Msg_Scene_SetStrokeColor::_(hScene_, sPath, c.r, c.g, c.b, c.a);
+}
 

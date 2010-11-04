@@ -7,16 +7,13 @@
 #if !defined(Meta_H_INCLUDED)
 #define Meta_H_INCLUDED
 
-class Display;
+#include "Layer.h"
 
-class Meta
+class Meta: public Layer
 {
 public:
   Meta(Display* pDisplay);
   virtual ~Meta();
-
-  int Meta::Create();
-  void Meta::Destroy();
 
   typedef enum _State { NoState
     ,StateEnterRequested
@@ -40,13 +37,11 @@ public:
   void OnLocationUrl(const String& sUrl);
 
 protected:
+  void SetTrayColor(double r, double g, double b);
   void ShowText();
 
 protected:
-  Display* pDisplay_;
-  int bActive_;
   State nState_;
-  ApHandle hScene_;
   String sDocumentUrl_;
   String sLocationUrl_;
 };

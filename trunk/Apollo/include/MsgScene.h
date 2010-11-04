@@ -114,16 +114,17 @@ class Msg_Scene_ElementExists: public ApRequestMessage
 {
 public:
   Msg_Scene_ElementExists() : ApRequestMessage("Scene_ElementExists"), bExists(0) {}
-  static int _(const ApHandle& hScene, const String& sPath, int& bExists)
+  static int _(const ApHandle& hScene, const String& sPath)
   {
+    int bExists = 0;
     Msg_Scene_ElementExists msg;
     msg.hScene = hScene;
     msg.sPath = sPath;
     int ok = msg.Request();
     if (ok) {
       bExists = msg.bExists;
-    } 
-    return ok;
+    }
+    return bExists; // Return code is not request success, but the query result in deviation from standard behaviour
   }
   ApIN ApHandle hScene;
   ApIN String sPath;
