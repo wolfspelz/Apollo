@@ -238,7 +238,7 @@ class StringPointerTree : public PointerTree<String, INT_ID, LessThan<String> >
 {
 public:
   inline StringPointerTreeNode<INT_ID>* Find(const String &ext_id) { return (StringPointerTreeNode<INT_ID>*) PointerTree<String, INT_ID, LessThan<String> >::Find(ext_id); }
-  inline StringPointerTreeNode<INT_ID>* Next(StringTreeNode<INT_ID>* entry) { return (StringPointerTreeNode<INT_ID>*) PointerTree<String, INT_ID, LessThan<String> >::Next(entry); }
+  inline StringPointerTreeNode<INT_ID>* Next(StringPointerTreeNode<INT_ID>* entry) { return (StringPointerTreeNode<INT_ID>*) PointerTree<String, INT_ID, LessThan<String> >::Next(entry); }
 };
 
 template <class INT_ID>

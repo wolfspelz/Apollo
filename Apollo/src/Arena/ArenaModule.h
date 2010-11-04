@@ -14,6 +14,7 @@
 #include "MsgVpView.h"
 #include "MsgAnimation.h"
 #include "MsgSystem.h"
+#include "MsgScene.h"
 #include "Display.h"
 //#include "Location.h"
 
@@ -72,6 +73,7 @@ public:
   void On_Animation_Frame(Msg_Animation_Frame* pMsg);
   void On_Animation_SequenceEnd(Msg_Animation_SequenceEnd* pMsg);
   void On_System_60SecTimer(Msg_System_60SecTimer* pMsg);
+  void On_Scene_MouseEvent(Msg_Scene_MouseEvent* pMsg);
 
 #if defined(AP_TEST)
   void On_UnitTest_Begin(Msg_UnitTest_Begin* pMsg);
@@ -89,6 +91,11 @@ public:
   ApHandle GetContextOfAnimation(const ApHandle& hAnimation);
   Display* GetDisplayOfAnimation(const ApHandle& hAnimation);
 
+  void SetContextOfScene(const ApHandle& hScene, const ApHandle& hContext);
+  void DeleteContextOfScene(const ApHandle& hScene, const ApHandle& hContext);
+  ApHandle GetContextOfScene(const ApHandle& hScene);
+  Display* GetDisplayOfScene(const ApHandle& hScene);
+
   void SetParticipantOfAnimation(const ApHandle& hAnimation, const ApHandle& hParticipant);
   void DeleteParticipantOfAnimation(const ApHandle& hAnimation, const ApHandle& hParticipant);
   ApHandle GetParticipantOfAnimation(const ApHandle& hAnimation);
@@ -102,6 +109,7 @@ protected:
   DisplayList displays_;
   ApHandleTree<ApHandle> contextOfLocation_;
   ApHandleTree<ApHandle> contextOfAnimation_;
+  ApHandleTree<ApHandle> contextOfScene_;
   ApHandleTree<ApHandle> participantOfAnimation_;
 
 public:

@@ -175,6 +175,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Hud.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Layer.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Meta.cpp"
 				>
 			</File>
@@ -198,6 +206,14 @@
 			</File>
 			<File
 				RelativePath=".\Display.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Hud.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Layer.h"
 				>
 			</File>
 			<File

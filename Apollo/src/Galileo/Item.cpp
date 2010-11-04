@@ -665,7 +665,7 @@ Sequence* Item::SelectNextSequence()
   if (!sSequence) {
     if (sStatus_) {
       sSequence = sStatus_;
-      apLog_Verbose((LOG_CHANNEL, "Item::SelectNextSequence", "item=" ApHandleFormat " selecting status seq=%s", ApHandleType(hAp_), StringType(sSequence)));
+      apLog_VeryVerbose((LOG_CHANNEL, "Item::SelectNextSequence", "item=" ApHandleFormat " selecting status seq=%s", ApHandleType(hAp_), StringType(sSequence)));
     }
   }
 
@@ -715,13 +715,13 @@ Sequence* Item::SelectNextSequence()
 
     if (sModified) {
       sSequence = sModified;
-      apLog_Verbose((LOG_CHANNEL, "Item::SelectNextSequence", "item=" ApHandleFormat " selecting modified seq=%s", ApHandleType(hAp_), StringType(sSequence)));
+      apLog_VeryVerbose((LOG_CHANNEL, "Item::SelectNextSequence", "item=" ApHandleFormat " selecting modified seq=%s", ApHandleType(hAp_), StringType(sSequence)));
     }
   }
 
   if (!sSequence) {
     sSequence = GetDefaultSequence();
-    apLog_Verbose((LOG_CHANNEL, "Item::SelectNextSequence", "item=" ApHandleFormat " selecting default seq=%s", ApHandleType(hAp_), StringType(sSequence)));
+    apLog_VeryVerbose((LOG_CHANNEL, "Item::SelectNextSequence", "item=" ApHandleFormat " selecting default seq=%s", ApHandleType(hAp_), StringType(sSequence)));
   }
 
   pSequence = GetSequenceByGroupOrName(sSequence);
@@ -793,7 +793,7 @@ Sequence* Item::GetSequenceByGroup(const String& sGroup)
     int nRnd = Apollo::getRandom(nSum);
     pSequence = pGroup->GetRandomSequence(nRnd);
     if (pSequence) {
-      apLog_Verbose((LOG_CHANNEL, "Item::GetSequenceByGroup", "item=" ApHandleFormat " sum=%d rnd=%d %s -> %s", ApHandleType(hAp_), nSum, nRnd, StringType(sGroup), StringType(pSequence->getName())));
+      apLog_VeryVerbose((LOG_CHANNEL, "Item::GetSequenceByGroup", "item=" ApHandleFormat " sum=%d rnd=%d %s -> %s", ApHandleType(hAp_), nSum, nRnd, StringType(sGroup), StringType(pSequence->getName())));
     }
   }
 
