@@ -157,7 +157,7 @@
 			UniqueIdentifier="{4ED89411-8C7D-409d-9532-18535095FFFF}"
 			>
 			<File
-				RelativePath=".\sample.cpp"
+				RelativePath=".\dll.cpp"
 				>
 			</File>
 			<File
@@ -171,11 +171,11 @@
 			UniqueIdentifier="{972D6162-E457-495a-9894-CCEC0D958743}"
 			>
 			<File
-				RelativePath=".\Local.h"
+				RelativePath=".\dll.h"
 				>
 			</File>
 			<File
-				RelativePath=".\sample.h"
+				RelativePath=".\Local.h"
 				>
 			</File>
 			<File
