@@ -5,7 +5,7 @@
 // ============================================================================
 
 #include "Apollo.h"
-#include "ScWidget.h"
+#include "dll.h"
 #include "MsgScWidget.h"
 #include "MsgUnitTest.h"
 #include "Local.h"

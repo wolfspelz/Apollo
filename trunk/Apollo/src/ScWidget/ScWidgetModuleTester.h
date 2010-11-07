@@ -21,8 +21,9 @@ public:
   static void Execute();
   static void End();
 
-//  static String SensorListOps();
+  static String Button();
 
+  static ApHandle hScene_;
 };
 #endif
 

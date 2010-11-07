@@ -13,6 +13,37 @@
 #include "MsgScWidget.h"
 #include "ScWidgetModuleTester.h"
 
+class Widget
+{
+public:
+  Widget(const String& sPath)
+    :sPath_(sPath)
+  {}
+
+protected:
+  String sPath_;
+};
+
+typedef StringPointerTree<Widget*> WidgetList;
+typedef StringPointerTreeNode<Widget*> WidgetListNode;
+typedef StringPointerTreeIterator<Widget*> WidgetListIterator;
+
+class Scene
+{
+public:
+  Scene(const ApHandle& hScene)
+    :hScene_(hScene)
+  {}
+
+protected:
+  ApHandle hScene_;
+  WidgetList widgets_;
+};
+
+typedef ApHandlePointerTree<Scene*> SceneList;
+typedef ApHandlePointerTreeNode<Scene*> SceneListNode;
+typedef ApHandlePointerTreeIterator<Scene*> SceneListIterator;
+
 class ScWidgetModule
 {
 public:
@@ -22,7 +53,7 @@ public:
   int Init();
   void Exit();
 
-  //void On_ScWidget_Create(Msg_ScWidget_Create* pMsg);
+  void On_ScWidget_CreateButton(Msg_ScWidget_CreateButton* pMsg);
 
 #if defined(AP_TEST)
   void On_UnitTest_Begin(Msg_UnitTest_Begin* pMsg);
@@ -31,6 +62,7 @@ public:
 #endif
 
 protected:
+  SceneList scenes_;
 
 public:
 

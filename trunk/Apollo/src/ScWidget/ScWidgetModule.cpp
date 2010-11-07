@@ -11,10 +11,13 @@
 
 //---------------------------
 
-//AP_MSG_HANDLER_METHOD(ScWidgetModule, ScWidget_Create)
-//{
-//  pMsg->apStatus = ApMessage::Ok;
-//}
+AP_MSG_HANDLER_METHOD(ScWidgetModule, ScWidget_CreateButton)
+{
+  pMsg->hScene;
+  pMsg->sPath;
+
+  pMsg->apStatus = ApMessage::Ok;
+}
 
 //----------------------------------------------------------
 
@@ -54,7 +57,7 @@ int ScWidgetModule::Init()
 {
   int ok = 1;
 
-  //AP_MSG_REGISTRY_ADD(MODULE_NAME, ScWidgetModule, ScWidget_Create, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, ScWidgetModule, ScWidget_CreateButton, this, ApCallbackPosNormal);
 
   AP_UNITTEST_HOOK(ScWidgetModule, this);
 
