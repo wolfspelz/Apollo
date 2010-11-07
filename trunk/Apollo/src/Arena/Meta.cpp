@@ -14,6 +14,9 @@
 
 Meta::Meta(Display* pDisplay)
 :Layer(pDisplay)
+,nW_(0)
+,nH_(0)
+,nState_(NoState)
 {
   Msg_Scene_CreateRectangle::_(hScene_, ELEMENT_TRAY, 0.5, 0.5, 20, 20);
   Msg_Scene_SetStrokeColor::_(hScene_, ELEMENT_TRAY, 0, 0, 0, 1);
@@ -23,6 +26,14 @@ Meta::Meta(Display* pDisplay)
 Meta::~Meta()
 {
   Msg_Scene_DeleteElement::_(hScene_, ELEMENT_TRAY);
+}
+
+void Meta::OnSetSize(int nW, int nH)
+{
+  nW_ = nW;
+  nH_ = nH;
+
+  ShowText();
 }
 
 //---------------------------
@@ -108,7 +119,7 @@ void Meta::ShowText()
     Apollo::ColorString cBorder = "#000000";
     int nWidth = 200;
     int nLeft = 2.5;
-    int nBottom = 2.5;
+    int nTop = 2.5;
     double fBorderWidth = 1.0;
     double fTextPadding = 1.5;
 
@@ -116,7 +127,7 @@ void Meta::ShowText()
     Msg_Scene_GetTextExtents::_(hScene_, sText, sFont, nSize, nFlags, fTextBearingX, fTextBearingY, fTextW, fTextH, fTextAdvanceX, fTextAdvanceY);
 
     Msg_Scene_CreateElement::_(hScene_, sTextPath);
-    Msg_Scene_TranslateElement::_(hScene_, sTextPath, nLeft, nBottom);
+    Msg_Scene_TranslateElement::_(hScene_, sTextPath, nLeft, nH_ - fTextH - nTop);
 
     Msg_Scene_CreateRectangle::_(hScene_, sTextPath + "/" ELEMENT_NICKNAME_BOX, -fTextPadding, -fTextPadding, fTextAdvanceX + 2 * fTextPadding + 1, fTextH + 2 * fTextPadding);
     Msg_Scene_SetFillColor::_(hScene_, sTextPath + "/" ELEMENT_NICKNAME_BOX, cBackground.r, cBackground.g, cBackground.b, cBackground.a);
