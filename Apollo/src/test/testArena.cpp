@@ -840,6 +840,7 @@ void Test_InChangeOut::Begin()
   AddLast(new Test_InChangeOut_EnterLocationBegin1());
   AddLast(new Test_InChangeOut_ParticipantsChanged1());
   AddLast(new Test_InChangeOut_EnterLocationComplete1());
+
   //AddLast(new Test_InChangeOut_Wait(500));
   //AddLast(new Test_InChangeOut_LeaveLocationRequested1());
   //AddLast(new Test_InChangeOut_ContextDetailsChanged_LocationUrl());

@@ -11,6 +11,7 @@
 #define LOG_CHANNEL MODULE_NAME
 
 #define ELEMENT_FRAME "b_frame"
+
 #define ELEMENT_IMAGE "m_image"
 
 #define ELEMENT_TRAY "c_tray"
@@ -23,6 +24,13 @@
   #define ELEMENT_CHAT_BOX "a_box"
   #define ELEMENT_CHAT_TEXT "m_text"
 
-#define ELEMENT_BOTTOMHUDSENSOR "u_bottom_hud_sensor"
+#define ELEMENT_BOTTOMSENSOR "u_bottom_sensor"
+
+#define ELEMENT_SIZESENSOR "u_size_sensor"
+
+#define ELEMENT_BOTTOMBAR "u_bottom_bar"
+  #define ELEMENT_BOTTOMBAR_RECT "u_bottom_bar"
+
+#define BOTTOMSENSOR_HEIGHT 10
 
 #endif // Local_H_INCLUDED

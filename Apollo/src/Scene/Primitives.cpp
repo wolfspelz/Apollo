@@ -284,7 +284,7 @@ void TextElement::GetExtents(DrawContext& gc, TextExtents& te)
   cairo_text_extents(gc.Cairo(), sText_, &extents);
 
   te.fBearingX_ = extents.x_bearing;
-  te.fBearingY_ = extents.y_bearing;
+  te.fBearingY_ = -extents.y_bearing;
   te.fWidth_ = extents.width;
   te.fHeight_ = extents.height;
   te.fAdvanceX_ = extents.x_advance;

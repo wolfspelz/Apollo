@@ -75,112 +75,36 @@ Display* ArenaModule::FindDisplay(const ApHandle& hContext)
 
 //---------------------------
 
-void ArenaModule::SetContextOfLocation(const ApHandle& hLocation, const ApHandle& hContext)
+void ArenaModule::SetContextOfHandle(const ApHandle& h, const ApHandle& hContext)
 {
-  if (contextOfLocation_.IsSet(hLocation)) {
-    contextOfLocation_.Unset(hLocation);
+  if (contextOfHandle_.IsSet(h)) {
+    contextOfHandle_.Unset(h);
   }
-  contextOfLocation_.Set(hLocation, hContext);
+  contextOfHandle_.Set(h, hContext);
 }
 
-void ArenaModule::DeleteContextOfLocation(const ApHandle& hLocation, const ApHandle& hContext)
+void ArenaModule::DeleteContextOfHandle(const ApHandle& h, const ApHandle& hContext)
 {
-  ApHandle h;
-  contextOfLocation_.Get(hLocation, h);
-  if (h != hContext) {
-    apLog_Warning((LOG_CHANNEL, "ArenaModule::DeleteContextOfLocation", "Context not found for loc=" ApHandleFormat " ctxt=" ApHandleFormat "", ApHandleType(hContext)));
+  ApHandle hDelete;
+  contextOfHandle_.Get(h, hDelete);
+  if (hDelete != hContext) {
+    apLog_Warning((LOG_CHANNEL, "ArenaModule::DeleteContextOfHandle", "Context not found for handle=" ApHandleFormat " ctxt=" ApHandleFormat "", ApHandleType(h), ApHandleType(hContext)));
   } else {
-    contextOfLocation_.Unset(hLocation);
+    contextOfHandle_.Unset(h);
   }
 }
 
-ApHandle ArenaModule::GetContextOfLocation(const ApHandle& hLocation)
+ApHandle ArenaModule::GetContextOfHandle(const ApHandle& h)
 {
-  if (contextOfLocation_.IsSet(hLocation)) {
-    return contextOfLocation_.Find(hLocation)->Value();
+  if (contextOfHandle_.IsSet(h)) {
+    return contextOfHandle_.Find(h)->Value();
   }
   return ApNoHandle;
 }
 
-Display* ArenaModule::GetDisplayOfLocation(const ApHandle& hLocation)
+Display* ArenaModule::GetDisplayOfHandle(const ApHandle& h)
 {
-  ApHandle hContext = GetContextOfLocation(hLocation);
-  if (ApIsHandle(hContext)) {
-    return FindDisplay(hContext);
-  }
-  return 0;
-}
-
-//---------------------------
-
-void ArenaModule::SetContextOfAnimation(const ApHandle& hAnimation, const ApHandle& hContext)
-{
-  if (contextOfAnimation_.IsSet(hAnimation)) {
-    contextOfAnimation_.Unset(hAnimation);
-  }
-  contextOfAnimation_.Set(hAnimation, hContext);
-}
-
-void ArenaModule::DeleteContextOfAnimation(const ApHandle& hAnimation, const ApHandle& hContext)
-{
-  ApHandle h;
-  contextOfAnimation_.Get(hAnimation, h);
-  if (h != hContext) {
-    apLog_Warning((LOG_CHANNEL, "ArenaModule::DeleteContextOfAnimation", "Context not found for loc=" ApHandleFormat " ctxt=" ApHandleFormat "", ApHandleType(hContext)));
-  } else {
-    contextOfAnimation_.Unset(hAnimation);
-  }
-}
-
-ApHandle ArenaModule::GetContextOfAnimation(const ApHandle& hAnimation)
-{
-  if (contextOfAnimation_.IsSet(hAnimation)) {
-    return contextOfAnimation_.Find(hAnimation)->Value();
-  }
-  return ApNoHandle;
-}
-
-Display* ArenaModule::GetDisplayOfAnimation(const ApHandle& hAnimation)
-{
-  ApHandle hContext = GetContextOfAnimation(hAnimation);
-  if (ApIsHandle(hContext)) {
-    return FindDisplay(hContext);
-  }
-  return 0;
-}
-
-//---------------------------
-
-void ArenaModule::SetContextOfScene(const ApHandle& hScene, const ApHandle& hContext)
-{
-  if (contextOfScene_.IsSet(hScene)) {
-    contextOfScene_.Unset(hScene);
-  }
-  contextOfScene_.Set(hScene, hContext);
-}
-
-void ArenaModule::DeleteContextOfScene(const ApHandle& hScene, const ApHandle& hContext)
-{
-  ApHandle h;
-  contextOfScene_.Get(hScene, h);
-  if (h != hContext) {
-    apLog_Warning((LOG_CHANNEL, "ArenaModule::DeleteContextOfScene", "Context not found for loc=" ApHandleFormat " ctxt=" ApHandleFormat "", ApHandleType(hContext)));
-  } else {
-    contextOfScene_.Unset(hScene);
-  }
-}
-
-ApHandle ArenaModule::GetContextOfScene(const ApHandle& hScene)
-{
-  if (contextOfScene_.IsSet(hScene)) {
-    return contextOfScene_.Find(hScene)->Value();
-  }
-  return ApNoHandle;
-}
-
-Display* ArenaModule::GetDisplayOfScene(const ApHandle& hScene)
-{
-  ApHandle hContext = GetContextOfScene(hScene);
+  ApHandle hContext = GetContextOfHandle(h);
   if (ApIsHandle(hContext)) {
     return FindDisplay(hContext);
   }
@@ -282,7 +206,7 @@ AP_MSG_HANDLER_METHOD(ArenaModule, VpView_ContextLocationUnassigned)
 
 AP_MSG_HANDLER_METHOD(ArenaModule, VpView_EnterLocationRequested)
 {
-  Display* pDisplay = GetDisplayOfLocation(pMsg->hLocation);
+  Display* pDisplay = GetDisplayOfHandle(pMsg->hLocation);
   if (pDisplay) { 
     pDisplay->OnEnterRequested();
   }
@@ -290,7 +214,7 @@ AP_MSG_HANDLER_METHOD(ArenaModule, VpView_EnterLocationRequested)
 
 AP_MSG_HANDLER_METHOD(ArenaModule, VpView_EnterLocationBegin)
 {
-  Display* pDisplay = GetDisplayOfLocation(pMsg->hLocation);
+  Display* pDisplay = GetDisplayOfHandle(pMsg->hLocation);
   if (pDisplay) { 
     pDisplay->OnEnterBegin();
   }
@@ -298,7 +222,7 @@ AP_MSG_HANDLER_METHOD(ArenaModule, VpView_EnterLocationBegin)
 
 AP_MSG_HANDLER_METHOD(ArenaModule, VpView_EnterLocationComplete)
 {
-  Display* pDisplay = GetDisplayOfLocation(pMsg->hLocation);
+  Display* pDisplay = GetDisplayOfHandle(pMsg->hLocation);
   if (pDisplay) { 
     pDisplay->OnEnterComplete();
   }
@@ -308,7 +232,7 @@ AP_MSG_HANDLER_METHOD(ArenaModule, VpView_LocationContextsChanged) {}
 
 AP_MSG_HANDLER_METHOD(ArenaModule, VpView_ParticipantsChanged)
 {
-  Display* pDisplay = GetDisplayOfLocation(pMsg->hLocation);
+  Display* pDisplay = GetDisplayOfHandle(pMsg->hLocation);
   if (pDisplay) { 
     pDisplay->OnParticipantsChanged();
   }
@@ -316,7 +240,7 @@ AP_MSG_HANDLER_METHOD(ArenaModule, VpView_ParticipantsChanged)
 
 AP_MSG_HANDLER_METHOD(ArenaModule, VpView_LocationPublicChat)
 {
-  Display* pDisplay = GetDisplayOfLocation(pMsg->hLocation);
+  Display* pDisplay = GetDisplayOfHandle(pMsg->hLocation);
   if (pDisplay) { 
     Apollo::TimeValue tv(pMsg->nSec, pMsg->nMicroSec);
     pDisplay->OnReceivePublicChat(pMsg->hParticipant, pMsg->hChat, pMsg->sNickname, pMsg->sText, tv);
@@ -335,7 +259,7 @@ AP_MSG_HANDLER_METHOD(ArenaModule, VpView_ContextDetailsChanged)
 
 AP_MSG_HANDLER_METHOD(ArenaModule, VpView_ParticipantDetailsChanged)
 {
-  Display* pDisplay = GetDisplayOfLocation(pMsg->hLocation);
+  Display* pDisplay = GetDisplayOfHandle(pMsg->hLocation);
   if (pDisplay) { 
     pDisplay->OnParticipantDetailsChanged(pMsg->hParticipant, pMsg->vlKeys);
   }
@@ -343,7 +267,7 @@ AP_MSG_HANDLER_METHOD(ArenaModule, VpView_ParticipantDetailsChanged)
 
 AP_MSG_HANDLER_METHOD(ArenaModule, VpView_LeaveLocationRequested)
 {
-  Display* pDisplay = GetDisplayOfLocation(pMsg->hLocation);
+  Display* pDisplay = GetDisplayOfHandle(pMsg->hLocation);
   if (pDisplay) { 
     pDisplay->OnLeaveRequested();
   }
@@ -351,7 +275,7 @@ AP_MSG_HANDLER_METHOD(ArenaModule, VpView_LeaveLocationRequested)
 
 AP_MSG_HANDLER_METHOD(ArenaModule, VpView_LeaveLocationBegin)
 {
-  Display* pDisplay = GetDisplayOfLocation(pMsg->hLocation);
+  Display* pDisplay = GetDisplayOfHandle(pMsg->hLocation);
   if (pDisplay) { 
     pDisplay->OnLeaveBegin();
   }
@@ -359,7 +283,7 @@ AP_MSG_HANDLER_METHOD(ArenaModule, VpView_LeaveLocationBegin)
 
 AP_MSG_HANDLER_METHOD(ArenaModule, VpView_LeaveLocationComplete)
 {
-  Display* pDisplay = GetDisplayOfLocation(pMsg->hLocation);
+  Display* pDisplay = GetDisplayOfHandle(pMsg->hLocation);
   if (pDisplay) { 
     pDisplay->OnLeaveComplete();
   }
@@ -375,7 +299,7 @@ AP_MSG_HANDLER_METHOD(ArenaModule, Animation_SequenceBegin){}
 
 AP_MSG_HANDLER_METHOD(ArenaModule, Animation_Frame)
 {
-  Display* pDisplay = GetDisplayOfAnimation(pMsg->hItem);
+  Display* pDisplay = GetDisplayOfHandle(pMsg->hItem);
   if (pDisplay) {
     ApHandle hParticipant = GetParticipantOfAnimation(pMsg->hItem);
     pDisplay->OnAvatarAnimationFrame(hParticipant, pMsg->iFrame);
@@ -386,14 +310,20 @@ AP_MSG_HANDLER_METHOD(ArenaModule, Animation_SequenceEnd){}
 
 //----------------------------------------------------------
 
-AP_MSG_HANDLER_METHOD(ArenaModule, System_60SecTimer)
+AP_MSG_HANDLER_METHOD(ArenaModule, Timer_Event)
 {
-//  Maintenance ?
+  Display* pDisplay = GetDisplayOfHandle(pMsg->hTimer);
+  if (pDisplay) { 
+    int bConsumed = pDisplay->OnTimerEvent(pMsg);
+    if (bConsumed) {
+      pMsg->Stop();
+    }
+  }
 }
 
 AP_MSG_HANDLER_METHOD(ArenaModule, Scene_MouseEvent)
 {
-  Display* pDisplay = GetDisplayOfScene(pMsg->hScene);
+  Display* pDisplay = GetDisplayOfHandle(pMsg->hScene);
   if (pDisplay) { 
     int bHandled = pDisplay->OnMouseEvent(pMsg);
     if (bHandled) {
@@ -460,7 +390,7 @@ int ArenaModule::Init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ArenaModule, Animation_SequenceBegin, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ArenaModule, Animation_Frame, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ArenaModule, Animation_SequenceEnd, this, ApCallbackPosNormal);
-  AP_MSG_REGISTRY_ADD(MODULE_NAME, ArenaModule, System_60SecTimer, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, ArenaModule, Timer_Event, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ArenaModule, Scene_MouseEvent, this, ApCallbackPosNormal);
 
   AP_UNITTEST_HOOK(ArenaModule, this);

@@ -37,4 +37,4 @@ Chat/Border/Color=#80808080
 Chat/Border/Width=3
 Chat/Text/Padding=6
 
-Hud/BottomSensor/Height=20
+  Hud/BottomSensor/Height=20
