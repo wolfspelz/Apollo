@@ -8,7 +8,7 @@
 #include "ApLog.h"
 #include "Local.h"
 #include "Primitives.h"
-#include "Surface.h"
+#include "Scene.h"
 
 double ShapeElement::PI = 3.14159265358979323;
 
@@ -328,7 +328,7 @@ void SensorElement::MouseEvent(EventContext& gc, double fX, double fY)
 
   if (bHit) {
     Msg_Scene_MouseEvent msg;
-    msg.hScene = pSurface_->apHandle();
+    msg.hScene = pScene_->apHandle();
     msg.sPath = sPath_;
     msg.nEvent = gc.nEvent_;
     msg.nButton = gc.nButton_;

@@ -8,7 +8,7 @@
 #include "ApLog.h"
 #include "Local.h"
 #include "Element.h"
-#include "Surface.h"
+#include "Scene.h"
 
 Element::~Element()
 {
@@ -75,7 +75,7 @@ Element* Element::CreateElement(const String& sPath)
   String sPart;
   if (sElement.nextToken("/", sPart)) {
     if (sElement.empty()) {
-      Element* pElement = new Element(pSurface_);
+      Element* pElement = new Element(pScene_);
       if (pElement) {
         AddChild(sPart, pElement);
         pResult = pElement;
@@ -89,7 +89,7 @@ Element* Element::CreateElement(const String& sPath)
         if (pChildren_->Get(sPart, pNext)) {
           pResult = pNext->CreateElement(sElement);
         } else {
-          pNext = new Element(pSurface_);
+          pNext = new Element(pScene_);
           if (pNext) {
             pChildren_->Set(sPart, pNext);
             pResult = pNext->CreateElement(sElement);
@@ -256,7 +256,7 @@ void Element::DrawRecursive(DrawContext& gc)
   if (bHide_) { return; }
 
   if (gc.nDepth_ == 0) {
-    if (pSurface_->LogDraw()) {
+    if (pScene_->LogDraw()) {
       apLog_Verbose((LOG_CHANNEL, "Element::DrawRecursive", "Begin"));
     }
   }
@@ -290,7 +290,7 @@ void Element::DrawRecursive(DrawContext& gc)
     for (ElementNode* pNode = 0; pNode = iter.Next(); ) {
       Element* pElement = pNode->Value();
       if (pElement != 0) {
-        if (pSurface_->LogDraw()) {
+        if (pScene_->LogDraw()) {
           apLog_Verbose((LOG_CHANNEL, "Element::DrawRecursive", "%s%s", StringType(sWSP.subString(0, 2*gc.nDepth_)), StringType(pNode->Key())));
         }
         pElement->DrawRecursive(gc);
@@ -305,7 +305,7 @@ void Element::DrawRecursive(DrawContext& gc)
   gc.nDepth_--;
 
   if (gc.nDepth_ == 0) {
-    if (pSurface_->LogDraw()) {
+    if (pScene_->LogDraw()) {
       apLog_Verbose((LOG_CHANNEL, "Element::DrawRecursive", "End"));
     }
   }

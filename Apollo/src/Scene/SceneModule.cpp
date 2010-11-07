@@ -9,47 +9,47 @@
 #include "Local.h"
 #include "SceneModule.h"
 
-Surface* SceneModule::CreateSurface(const ApHandle& hSurface)
+Scene* SceneModule::CreateScene(const ApHandle& hScene)
 {
-  Surface* pSurface = new Surface(hSurface);
-  if (pSurface) {
-    int ok = pSurface->Create();
+  Scene* pScene = new Scene(hScene);
+  if (pScene) {
+    int ok = pScene->Create();
     if (ok) {
-      surfaces_.Set(hSurface, pSurface);
+      surfaces_.Set(hScene, pScene);
     } else {
-      delete pSurface;
-      pSurface = 0;
-      throw ApException("SceneModule::CreateSurface " ApHandleFormat " Create() failed", ApHandleType(hSurface));
+      delete pScene;
+      pScene = 0;
+      throw ApException("SceneModule::CreateScene " ApHandleFormat " Create() failed", ApHandleType(hScene));
     }
   }
 
-  return pSurface;
+  return pScene;
 }
 
-void SceneModule::DeleteSurface(const ApHandle& hSurface)
+void SceneModule::DeleteScene(const ApHandle& hScene)
 {
-  Surface* pSurface = FindSurface(hSurface);
-  if (pSurface) {
-    pSurface->Destroy();
-    surfaces_.Unset(hSurface);
-    delete pSurface;
-    pSurface = 0;
+  Scene* pScene = FindScene(hScene);
+  if (pScene) {
+    pScene->Destroy();
+    surfaces_.Unset(hScene);
+    delete pScene;
+    pScene = 0;
   }
 }
 
-Surface* SceneModule::FindSurface(const ApHandle& hSurface)
+Scene* SceneModule::FindScene(const ApHandle& hScene)
 {
-  Surface* pSurface = 0;  
+  Scene* pScene = 0;  
 
-  surfaces_.Get(hSurface, pSurface);
-  if (pSurface == 0) { throw ApException("SceneModule::FindSurface no surface=" ApHandleFormat "", ApHandleType(hSurface)); }
+  surfaces_.Get(hScene, pScene);
+  if (pScene == 0) { throw ApException("SceneModule::FindScene no surface=" ApHandleFormat "", ApHandleType(hScene)); }
 
-  return pSurface;
+  return pScene;
 }
 
-int SceneModule::HasSurface(const ApHandle& hSurface)
+int SceneModule::HasScene(const ApHandle& hScene)
 {
-  return surfaces_.IsSet(hSurface);
+  return surfaces_.IsSet(hScene);
 }
 
 //---------------------------
@@ -57,362 +57,362 @@ int SceneModule::HasSurface(const ApHandle& hSurface)
 AP_MSG_HANDLER_METHOD(SceneModule, Scene_Create)
 {
   if (surfaces_.Find(pMsg->hScene) != 0) { throw ApException("SceneModule::Scene_Create: scene=" ApHandleFormat " already exists", ApHandleType(pMsg->hScene)); }
-  Surface* pSurface = CreateSurface(pMsg->hScene);
+  Scene* pScene = CreateScene(pMsg->hScene);
   pMsg->apStatus = ApMessage::Ok;
 }
 
 AP_MSG_HANDLER_METHOD(SceneModule, Scene_Destroy)
 {
-  Surface* pSurface = FindSurface(pMsg->hScene);
-  DeleteSurface(pMsg->hScene); 
+  Scene* pScene = FindScene(pMsg->hScene);
+  DeleteScene(pMsg->hScene); 
   pMsg->apStatus = ApMessage::Ok;
 }
 
 AP_MSG_HANDLER_METHOD(SceneModule, Scene_Position)
 {
-  Surface* pSurface = FindSurface(pMsg->hScene);
-  pSurface->SetPosition(pMsg->nX, pMsg->nY, pMsg->nW, pMsg->nH);
+  Scene* pScene = FindScene(pMsg->hScene);
+  pScene->SetPosition(pMsg->nX, pMsg->nY, pMsg->nW, pMsg->nH);
   pMsg->apStatus = ApMessage::Ok;
 }
 
 AP_MSG_HANDLER_METHOD(SceneModule, Scene_Visibility)
 {
-  Surface* pSurface = FindSurface(pMsg->hScene);
-  pSurface->SetVisibility(pMsg->bVisible);
+  Scene* pScene = FindScene(pMsg->hScene);
+  pScene->SetVisibility(pMsg->bVisible);
   pMsg->apStatus = ApMessage::Ok;
 }
 
 AP_MSG_HANDLER_METHOD(SceneModule, Scene_SetAutoDraw)
 {
-  Surface* pSurface = FindSurface(pMsg->hScene);
+  Scene* pScene = FindScene(pMsg->hScene);
   if (pMsg->nMilliSec == Msg_Scene_SetAutoDraw::Disabled) {
-    pSurface->DeleteAutoDraw();
+    pScene->DeleteAutoDraw();
   } else {
-    pSurface->SetAutoDraw(pMsg->nMilliSec, pMsg->bAsync);
+    pScene->SetAutoDraw(pMsg->nMilliSec, pMsg->bAsync);
   }
   pMsg->apStatus = ApMessage::Ok;
 }
 
 AP_MSG_HANDLER_METHOD(SceneModule, Scene_AutoDraw)
 {
-  Surface* pSurface = FindSurface(pMsg->hScene);
-  pSurface->AutoDraw();
+  Scene* pScene = FindScene(pMsg->hScene);
+  pScene->AutoDraw();
   pMsg->apStatus = ApMessage::Ok;
 }
 
 AP_MSG_HANDLER_METHOD(SceneModule, Scene_Draw)
 {
-  Surface* pSurface = FindSurface(pMsg->hScene);
-  pSurface->Draw();
+  Scene* pScene = FindScene(pMsg->hScene);
+  pScene->Draw();
   pMsg->apStatus = ApMessage::Ok;
 }
 
 AP_MSG_HANDLER_METHOD(SceneModule, Scene_CreateElement)
 {
-  Surface* pSurface = FindSurface(pMsg->hScene);
-  pSurface->CreateElement(pMsg->sPath);
-  pSurface->AutoDraw();
+  Scene* pScene = FindScene(pMsg->hScene);
+  pScene->CreateElement(pMsg->sPath);
+  pScene->AutoDraw();
   pMsg->apStatus = ApMessage::Ok;
 }
 
 AP_MSG_HANDLER_METHOD(SceneModule, Scene_DeleteElement)
 {
-  Surface* pSurface = FindSurface(pMsg->hScene);
-  pSurface->DeleteElement(pMsg->sPath);
-  pSurface->AutoDraw();
+  Scene* pScene = FindScene(pMsg->hScene);
+  pScene->DeleteElement(pMsg->sPath);
+  pScene->AutoDraw();
   pMsg->apStatus = ApMessage::Ok;
 }
 
 AP_MSG_HANDLER_METHOD(SceneModule, Scene_ElementExists)
 {
-  Surface* pSurface = FindSurface(pMsg->hScene);
-  pMsg->bExists = pSurface->HasElement(pMsg->sPath);
+  Scene* pScene = FindScene(pMsg->hScene);
+  pMsg->bExists = pScene->HasElement(pMsg->sPath);
   pMsg->apStatus = ApMessage::Ok;
 }
 
 AP_MSG_HANDLER_METHOD(SceneModule, Scene_GetChildren)
 {
-  Surface* pSurface = FindSurface(pMsg->hScene);
-  pSurface->GetElement(pMsg->sPath)->GetChildren(pMsg->vlChildren);
+  Scene* pScene = FindScene(pMsg->hScene);
+  pScene->GetElement(pMsg->sPath)->GetChildren(pMsg->vlChildren);
   pMsg->apStatus = ApMessage::Ok;
 }
 
 AP_MSG_HANDLER_METHOD(SceneModule, Scene_TranslateElement)
 {
-  Surface* pSurface = FindSurface(pMsg->hScene);
-  pSurface->GetElement(pMsg->sPath)->Translate(pMsg->fX, pMsg->fY);
-  pSurface->AutoDraw();
+  Scene* pScene = FindScene(pMsg->hScene);
+  pScene->GetElement(pMsg->sPath)->Translate(pMsg->fX, pMsg->fY);
+  pScene->AutoDraw();
   pMsg->apStatus = ApMessage::Ok;
 }
 
 AP_MSG_HANDLER_METHOD(SceneModule, Scene_ScaleElement)
 {
-  Surface* pSurface = FindSurface(pMsg->hScene);
-  pSurface->GetElement(pMsg->sPath)->Scale(pMsg->fX, pMsg->fY);
-  pSurface->AutoDraw();
+  Scene* pScene = FindScene(pMsg->hScene);
+  pScene->GetElement(pMsg->sPath)->Scale(pMsg->fX, pMsg->fY);
+  pScene->AutoDraw();
   pMsg->apStatus = ApMessage::Ok;
 }
 
 AP_MSG_HANDLER_METHOD(SceneModule, Scene_RotateElement)
 {
-  Surface* pSurface = FindSurface(pMsg->hScene);
-  pSurface->GetElement(pMsg->sPath)->Rotate(pMsg->fAngle);
-  pSurface->AutoDraw();
+  Scene* pScene = FindScene(pMsg->hScene);
+  pScene->GetElement(pMsg->sPath)->Rotate(pMsg->fAngle);
+  pScene->AutoDraw();
   pMsg->apStatus = ApMessage::Ok;
 }
 
 AP_MSG_HANDLER_METHOD(SceneModule, Scene_HideElement)
 {
-  Surface* pSurface = FindSurface(pMsg->hScene);
-  pSurface->GetElement(pMsg->sPath)->Hide(pMsg->bHide);
-  pSurface->AutoDraw();
+  Scene* pScene = FindScene(pMsg->hScene);
+  pScene->GetElement(pMsg->sPath)->Hide(pMsg->bHide);
+  pScene->AutoDraw();
   pMsg->apStatus = ApMessage::Ok;
 }
 
 AP_MSG_HANDLER_METHOD(SceneModule, Scene_SetCopyMode)
 {
-  Surface* pSurface = FindSurface(pMsg->hScene);
-  pSurface->GetElement(pMsg->sPath)->CopyMode(pMsg->nMode);
-  pSurface->AutoDraw();
+  Scene* pScene = FindScene(pMsg->hScene);
+  pScene->GetElement(pMsg->sPath)->CopyMode(pMsg->nMode);
+  pScene->AutoDraw();
   pMsg->apStatus = ApMessage::Ok;
 }
 
 AP_MSG_HANDLER_METHOD(SceneModule, Scene_GetTranslateElement)
 {
-  Surface* pSurface = FindSurface(pMsg->hScene);
-  pSurface->GetElement(pMsg->sPath)->GetTranslate(pMsg->fX, pMsg->fY);
+  Scene* pScene = FindScene(pMsg->hScene);
+  pScene->GetElement(pMsg->sPath)->GetTranslate(pMsg->fX, pMsg->fY);
   pMsg->apStatus = ApMessage::Ok;
 }
 
 AP_MSG_HANDLER_METHOD(SceneModule, Scene_GetScaleElement)
 {
-  Surface* pSurface = FindSurface(pMsg->hScene);
-  pSurface->GetElement(pMsg->sPath)->GetScale(pMsg->fX, pMsg->fY);
+  Scene* pScene = FindScene(pMsg->hScene);
+  pScene->GetElement(pMsg->sPath)->GetScale(pMsg->fX, pMsg->fY);
   pMsg->apStatus = ApMessage::Ok;
 }
 
 AP_MSG_HANDLER_METHOD(SceneModule, Scene_GetRotateElement)
 {
-  Surface* pSurface = FindSurface(pMsg->hScene);
-  pSurface->GetElement(pMsg->sPath)->GetRotate(pMsg->fAngle);
+  Scene* pScene = FindScene(pMsg->hScene);
+  pScene->GetElement(pMsg->sPath)->GetRotate(pMsg->fAngle);
   pMsg->apStatus = ApMessage::Ok;
 }
 
 AP_MSG_HANDLER_METHOD(SceneModule, Scene_CreateRectangle)
 {
-  Surface* pSurface = FindSurface(pMsg->hScene);
-  RectangleElement* pRectangle = pSurface->CreateRectangle(pMsg->sPath);
+  Scene* pScene = FindScene(pMsg->hScene);
+  RectangleElement* pRectangle = pScene->CreateRectangle(pMsg->sPath);
   pRectangle->SetPosition(pMsg->fX, pMsg->fY);
   pRectangle->SetSize(pMsg->fW, pMsg->fH);
-  pSurface->AutoDraw();
+  pScene->AutoDraw();
   pMsg->apStatus = ApMessage::Ok;
 }
 
 AP_MSG_HANDLER_METHOD(SceneModule, Scene_CreateImage)
 {
-  Surface* pSurface = FindSurface(pMsg->hScene);
-  ImageElement* pImage = pSurface->CreateImage(pMsg->sPath);
+  Scene* pScene = FindScene(pMsg->hScene);
+  ImageElement* pImage = pScene->CreateImage(pMsg->sPath);
   pImage->SetPosition(pMsg->fX, pMsg->fY);
   pMsg->apStatus = ApMessage::Ok;
 }
 
 AP_MSG_HANDLER_METHOD(SceneModule, Scene_CreateImageFromData)
 {
-  Surface* pSurface = FindSurface(pMsg->hScene);
-  ImageElement* pImage = pSurface->CreateImage(pMsg->sPath);
+  Scene* pScene = FindScene(pMsg->hScene);
+  ImageElement* pImage = pScene->CreateImage(pMsg->sPath);
   pImage->SetData(pMsg->image);
   pImage->SetPosition(pMsg->fX, pMsg->fY);
-  pSurface->AutoDraw();
+  pScene->AutoDraw();
   pMsg->apStatus = ApMessage::Ok;
 }
 
 AP_MSG_HANDLER_METHOD(SceneModule, Scene_CreateImageFromFile)
 {
-  Surface* pSurface = FindSurface(pMsg->hScene);
-  ImageElement* pImage = pSurface->CreateImage(pMsg->sPath);
+  Scene* pScene = FindScene(pMsg->hScene);
+  ImageElement* pImage = pScene->CreateImage(pMsg->sPath);
   pImage->SetFile(pMsg->sFile);
   pImage->SetPosition(pMsg->fX, pMsg->fY);
-  pSurface->AutoDraw();
+  pScene->AutoDraw();
   pMsg->apStatus = ApMessage::Ok;
 }
 
 AP_MSG_HANDLER_METHOD(SceneModule, Scene_CreateText)
 {
-  Surface* pSurface = FindSurface(pMsg->hScene);
-  TextElement* pText = pSurface->CreateText(pMsg->sPath);
+  Scene* pScene = FindScene(pMsg->hScene);
+  TextElement* pText = pScene->CreateText(pMsg->sPath);
   pText->SetPosition(pMsg->fX, pMsg->fY);
   pText->SetString(pMsg->sText);
   pText->SetFont(pMsg->sFont, pMsg->fSize, pMsg->nFlags);
-  pSurface->AutoDraw();
+  pScene->AutoDraw();
   pMsg->apStatus = ApMessage::Ok;
 }
 
 AP_MSG_HANDLER_METHOD(SceneModule, Scene_CreateMouseSensor)
 {
-  Surface* pSurface = FindSurface(pMsg->hScene);
-  SensorElement* pSensor = pSurface->CreateSensor(pMsg->sPath);
+  Scene* pScene = FindScene(pMsg->hScene);
+  SensorElement* pSensor = pScene->CreateSensor(pMsg->sPath);
   pSensor->SetPosition(pMsg->fX, pMsg->fY);
   pSensor->SetSize(pMsg->fW, pMsg->fH);
-  pSurface->AutoDraw();
+  pScene->AutoDraw();
   pMsg->apStatus = ApMessage::Ok;
 }
 
 AP_MSG_HANDLER_METHOD(SceneModule, Scene_SetPosition)
 {
-  Surface* pSurface = FindSurface(pMsg->hScene);
-  Element* pElement = pSurface->GetElement(pMsg->sPath);
+  Scene* pScene = FindScene(pMsg->hScene);
+  Element* pElement = pScene->GetElement(pMsg->sPath);
   if (pElement->IsShape()) {
     pElement->AsShape()->SetPosition(pMsg->fX, pMsg->fY);
   } else if (pElement->IsImage()) {
     pElement->AsImage()->SetPosition(pMsg->fX, pMsg->fY);
   }
-  pSurface->AutoDraw();
+  pScene->AutoDraw();
   pMsg->apStatus = ApMessage::Ok;
 }
 
 AP_MSG_HANDLER_METHOD(SceneModule, Scene_SetRectangle)
 {
-  Surface* pSurface = FindSurface(pMsg->hScene);
-  RectangleElement* pRectangle = pSurface->GetElement(pMsg->sPath)->AsRectangle();
+  Scene* pScene = FindScene(pMsg->hScene);
+  RectangleElement* pRectangle = pScene->GetElement(pMsg->sPath)->AsRectangle();
   pRectangle->SetPosition(pMsg->fX, pMsg->fY);
   pRectangle->SetSize(pMsg->fW, pMsg->fH);
-  pSurface->AutoDraw();
+  pScene->AutoDraw();
   pMsg->apStatus = ApMessage::Ok;
 }
 
 AP_MSG_HANDLER_METHOD(SceneModule, Scene_RoundedRectangle)
 {
-  Surface* pSurface = FindSurface(pMsg->hScene);
-  RectangleElement* pRectangle = pSurface->GetElement(pMsg->sPath)->AsRectangle();
+  Scene* pScene = FindScene(pMsg->hScene);
+  RectangleElement* pRectangle = pScene->GetElement(pMsg->sPath)->AsRectangle();
   pRectangle->SetCorners(RectangleElement::RoundCorners);
   pRectangle->SetCornerRadius(pMsg->fRadius);
-  pSurface->AutoDraw();
+  pScene->AutoDraw();
   pMsg->apStatus = ApMessage::Ok;
 }
 
 AP_MSG_HANDLER_METHOD(SceneModule, Scene_CurvedRectangle)
 {
-  Surface* pSurface = FindSurface(pMsg->hScene);
-  RectangleElement* pRectangle = pSurface->GetElement(pMsg->sPath)->AsRectangle();
+  Scene* pScene = FindScene(pMsg->hScene);
+  RectangleElement* pRectangle = pScene->GetElement(pMsg->sPath)->AsRectangle();
   pRectangle->SetCorners(RectangleElement::CurvedCorners);
-  pSurface->AutoDraw();
+  pScene->AutoDraw();
   pMsg->apStatus = ApMessage::Ok;
 }
 
 AP_MSG_HANDLER_METHOD(SceneModule, Scene_SetFillColor)
 {
-  Surface* pSurface = FindSurface(pMsg->hScene);
-  ShapeElement* pShape = pSurface->GetElement(pMsg->sPath)->AsShape();
+  Scene* pScene = FindScene(pMsg->hScene);
+  ShapeElement* pShape = pScene->GetElement(pMsg->sPath)->AsShape();
   pShape->SetFillColor(pMsg->fRed, pMsg->fGreen, pMsg->fBlue, pMsg->fAlpha);
-  pSurface->AutoDraw();
+  pScene->AutoDraw();
   pMsg->apStatus = ApMessage::Ok;
 }
 
 AP_MSG_HANDLER_METHOD(SceneModule, Scene_SetStrokeColor)
 {
-  Surface* pSurface = FindSurface(pMsg->hScene);
-  ShapeElement* pShape = pSurface->GetElement(pMsg->sPath)->AsShape();
+  Scene* pScene = FindScene(pMsg->hScene);
+  ShapeElement* pShape = pScene->GetElement(pMsg->sPath)->AsShape();
   pShape->SetStrokeColor(pMsg->fRed, pMsg->fGreen, pMsg->fBlue, pMsg->fAlpha);
-  pSurface->AutoDraw();
+  pScene->AutoDraw();
   pMsg->apStatus = ApMessage::Ok;
 }
 
 AP_MSG_HANDLER_METHOD(SceneModule, Scene_SetStrokeWidth)
 {
-  Surface* pSurface = FindSurface(pMsg->hScene);
-  ShapeElement* pShape = pSurface->GetElement(pMsg->sPath)->AsShape();
+  Scene* pScene = FindScene(pMsg->hScene);
+  ShapeElement* pShape = pScene->GetElement(pMsg->sPath)->AsShape();
   pShape->SetStrokeWidth(pMsg->fWidth);
-  pSurface->AutoDraw();
+  pScene->AutoDraw();
   pMsg->apStatus = ApMessage::Ok;
 }
 
 AP_MSG_HANDLER_METHOD(SceneModule, Scene_SetStrokeImageFile)
 {
-  Surface* pSurface = FindSurface(pMsg->hScene);
-  ShapeElement* pShape = pSurface->GetElement(pMsg->sPath)->AsShape();
+  Scene* pScene = FindScene(pMsg->hScene);
+  ShapeElement* pShape = pScene->GetElement(pMsg->sPath)->AsShape();
   pShape->SetStrokeImageFile(pMsg->sFile);
-  pSurface->AutoDraw();
+  pScene->AutoDraw();
   pMsg->apStatus = ApMessage::Ok;
 }
 
 AP_MSG_HANDLER_METHOD(SceneModule, Scene_SetFillImageFile)
 {
-  Surface* pSurface = FindSurface(pMsg->hScene);
-  ShapeElement* pShape = pSurface->GetElement(pMsg->sPath)->AsShape();
+  Scene* pScene = FindScene(pMsg->hScene);
+  ShapeElement* pShape = pScene->GetElement(pMsg->sPath)->AsShape();
   pShape->SetFillImageFile(pMsg->sFile);
-  pSurface->AutoDraw();
+  pScene->AutoDraw();
   pMsg->apStatus = ApMessage::Ok;
 }
 
 AP_MSG_HANDLER_METHOD(SceneModule, Scene_SetStrokeImageOffset)
 {
-  Surface* pSurface = FindSurface(pMsg->hScene);
-  ShapeElement* pShape = pSurface->GetElement(pMsg->sPath)->AsShape();
+  Scene* pScene = FindScene(pMsg->hScene);
+  ShapeElement* pShape = pScene->GetElement(pMsg->sPath)->AsShape();
   pShape->SetStrokeImageOffset(pMsg->fX, pMsg->fY);
-  pSurface->AutoDraw();
+  pScene->AutoDraw();
   pMsg->apStatus = ApMessage::Ok;
 }
 
 AP_MSG_HANDLER_METHOD(SceneModule, Scene_SetFillImageOffset)
 {
-  Surface* pSurface = FindSurface(pMsg->hScene);
-  ShapeElement* pShape = pSurface->GetElement(pMsg->sPath)->AsShape();
+  Scene* pScene = FindScene(pMsg->hScene);
+  ShapeElement* pShape = pScene->GetElement(pMsg->sPath)->AsShape();
   pShape->SetFillImageOffset(pMsg->fX, pMsg->fY);
-  pSurface->AutoDraw();
+  pScene->AutoDraw();
   pMsg->apStatus = ApMessage::Ok;
 }
 
 AP_MSG_HANDLER_METHOD(SceneModule, Scene_SetImageData)
 {
-  Surface* pSurface = FindSurface(pMsg->hScene);
-  ImageElement* pImage = pSurface->GetElement(pMsg->sPath)->AsImage();
+  Scene* pScene = FindScene(pMsg->hScene);
+  ImageElement* pImage = pScene->GetElement(pMsg->sPath)->AsImage();
   pImage->SetData(pMsg->image);
-  pSurface->AutoDraw();
+  pScene->AutoDraw();
   pMsg->apStatus = ApMessage::Ok;
 }
 
 AP_MSG_HANDLER_METHOD(SceneModule, Scene_DeleteImageData)
 {
-  Surface* pSurface = FindSurface(pMsg->hScene);
-  ImageElement* pImage = pSurface->GetElement(pMsg->sPath)->AsImage();
+  Scene* pScene = FindScene(pMsg->hScene);
+  ImageElement* pImage = pScene->GetElement(pMsg->sPath)->AsImage();
   pImage->DeleteData();
-  pSurface->AutoDraw();
+  pScene->AutoDraw();
   pMsg->apStatus = ApMessage::Ok;
 }
 
 AP_MSG_HANDLER_METHOD(SceneModule, Scene_SetImageFile)
 {
-  Surface* pSurface = FindSurface(pMsg->hScene);
-  ImageElement* pImage = pSurface->GetElement(pMsg->sPath)->AsImage();
+  Scene* pScene = FindScene(pMsg->hScene);
+  ImageElement* pImage = pScene->GetElement(pMsg->sPath)->AsImage();
   pImage->SetFile(pMsg->sFile);
-  pSurface->AutoDraw();
+  pScene->AutoDraw();
   pMsg->apStatus = ApMessage::Ok;
 }
 
 AP_MSG_HANDLER_METHOD(SceneModule, Scene_DeleteImageFile)
 {
-  Surface* pSurface = FindSurface(pMsg->hScene);
-  ImageElement* pImage = pSurface->GetElement(pMsg->sPath)->AsImage();
+  Scene* pScene = FindScene(pMsg->hScene);
+  ImageElement* pImage = pScene->GetElement(pMsg->sPath)->AsImage();
   pImage->DeleteFile();
-  pSurface->AutoDraw();
+  pScene->AutoDraw();
   pMsg->apStatus = ApMessage::Ok;
 }
 
 AP_MSG_HANDLER_METHOD(SceneModule, Scene_SetImageAlpha)
 {
-  Surface* pSurface = FindSurface(pMsg->hScene);
-  ImageElement* pImage = pSurface->GetElement(pMsg->sPath)->AsImage();
+  Scene* pScene = FindScene(pMsg->hScene);
+  ImageElement* pImage = pScene->GetElement(pMsg->sPath)->AsImage();
   pImage->SetAlpha(pMsg->fAlpha);
-  pSurface->AutoDraw();
+  pScene->AutoDraw();
   pMsg->apStatus = ApMessage::Ok;
 }
 
 AP_MSG_HANDLER_METHOD(SceneModule, Scene_GetTextExtents)
 {
-  Surface* pSurface = FindSurface(pMsg->hScene);
+  Scene* pScene = FindScene(pMsg->hScene);
 
   TextExtents te;
-  pSurface->GetTextExtents(pMsg->sText, pMsg->sFont, pMsg->fSize, pMsg->nFlags, te);
+  pScene->GetTextExtents(pMsg->sText, pMsg->sFont, pMsg->fSize, pMsg->nFlags, te);
   pMsg->fBearingX = te.fBearingX_;
   pMsg->fBearingY = te.fBearingY_;
   pMsg->fWidth = te.fWidth_;
@@ -425,38 +425,38 @@ AP_MSG_HANDLER_METHOD(SceneModule, Scene_GetTextExtents)
 
 AP_MSG_HANDLER_METHOD(SceneModule, Scene_GetImageSizeFromData)
 {
-  Surface* pSurface = FindSurface(pMsg->hScene);
-  pSurface->GetImageSizeFromData(pMsg->image, pMsg->fW, pMsg->fH);
+  Scene* pScene = FindScene(pMsg->hScene);
+  pScene->GetImageSizeFromData(pMsg->image, pMsg->fW, pMsg->fH);
   pMsg->apStatus = ApMessage::Ok;
 }
 
 AP_MSG_HANDLER_METHOD(SceneModule, Scene_GetImageSizeFromFile)
 {
-  Surface* pSurface = FindSurface(pMsg->hScene);
-  pSurface->GetImageSizeFromFile(pMsg->sFile, pMsg->fW, pMsg->fH);
+  Scene* pScene = FindScene(pMsg->hScene);
+  pScene->GetImageSizeFromFile(pMsg->sFile, pMsg->fW, pMsg->fH);
   pMsg->apStatus = ApMessage::Ok;
 }
 
 AP_MSG_HANDLER_METHOD(SceneModule, Scene_CaptureMouse)
 {
-  Surface* pSurface = FindSurface(pMsg->hScene);
-  pSurface->CaptureMouse(pMsg->sPath);
+  Scene* pScene = FindScene(pMsg->hScene);
+  pScene->CaptureMouse(pMsg->sPath);
   pMsg->apStatus = ApMessage::Ok;
 }
 
 AP_MSG_HANDLER_METHOD(SceneModule, Scene_ReleaseMouse)
 {
-  Surface* pSurface = FindSurface(pMsg->hScene);
-  pSurface->ReleaseMouse();
+  Scene* pScene = FindScene(pMsg->hScene);
+  pScene->ReleaseMouse();
   pMsg->apStatus = ApMessage::Ok;
 }
 
 AP_MSG_HANDLER_METHOD(SceneModule, Timer_Event)
 {
   // Find scene by timer handle, because scene handle misused as timer handle
-  if (HasSurface(pMsg->hTimer)) {
-    Surface* pSurface = FindSurface(pMsg->hTimer);
-    pSurface->OnAutoDrawTimer();
+  if (HasScene(pMsg->hTimer)) {
+    Scene* pScene = FindScene(pMsg->hTimer);
+    pScene->OnAutoDrawTimer();
   }
 }
 

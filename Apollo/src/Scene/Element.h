@@ -15,7 +15,7 @@
 #endif // #if defined(AP_TEST)
 
 class Element;
-class Surface;
+class Scene;
 
 typedef StringPointerTree<Element*> ElementList;
 typedef StringPointerTreeNode<Element*> ElementNode;
@@ -45,8 +45,8 @@ public:
 class Element
 {
 public:
-  Element(Surface* pSurface)
-    :pSurface_(pSurface)
+  Element(Scene* pScene)
+    :pScene_(pScene)
     ,pChildren_(0)
     ,bSave_(false)
     ,fTranslateX_(0.0)
@@ -97,7 +97,7 @@ protected:
   void CheckSaveRestore();
 
 protected:
-  Surface* pSurface_;
+  Scene* pScene_;
   ElementList* pChildren_;
 
   bool bSave_;

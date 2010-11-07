@@ -4,8 +4,8 @@
 //
 // ============================================================================
 
-#if !defined(Surface_H_INCLUDED)
-#define Surface_H_INCLUDED
+#if !defined(Scene_H_INCLUDED)
+#define Scene_H_INCLUDED
 
 #include "Element.h"
 #include "Primitives.h"
@@ -18,16 +18,16 @@ public:
   {}
   virtual ~RootElement() {}
 
-  void SetSurface(Surface* pSurface) { pSurface_ = pSurface; }
+  void SetScene(Scene* pScene) { pScene_ = pScene; }
 };
 
 //----------------------------------------------------------
 
-class Surface
+class Scene
 {
 public:
-  Surface(const ApHandle& hSurface)
-    :hAp_(hSurface)
+  Scene(const ApHandle& hScene)
+    :hAp_(hScene)
     ,bLogDraw_(0)
     ,bVisible_(0)
     ,nX_(0)
@@ -49,9 +49,9 @@ public:
     ,hOldBitmap_(NULL)
     #endif // WIN32
   {
-    root_.SetSurface(this);
+    root_.SetScene(this);
   }
-  virtual ~Surface();
+  virtual ~Scene();
 
   inline ApHandle apHandle() { return hAp_; }
   inline int LogDraw() { return bLogDraw_; }
@@ -133,4 +133,4 @@ protected:
 #endif
 };
 
-#endif // Surface_H_INCLUDED
+#endif // Scene_H_INCLUDED

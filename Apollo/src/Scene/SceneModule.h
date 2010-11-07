@@ -12,12 +12,12 @@
 #include "MsgUnitTest.h"
 #include "MsgScene.h"
 #include "MsgTimer.h"
-#include "Surface.h"
+#include "Scene.h"
 #include "SceneModuleTester.h"
 
-typedef ApHandlePointerTree<Surface*> SurfaceList;
-typedef ApHandlePointerTreeNode<Surface*> SurfaceListNode;
-typedef ApHandlePointerTreeIterator<Surface*> SurfaceListIterator;
+typedef ApHandlePointerTree<Scene*> SceneList;
+typedef ApHandlePointerTreeNode<Scene*> SceneListNode;
+typedef ApHandlePointerTreeIterator<Scene*> SceneListIterator;
 
 class SceneModule
 {
@@ -83,13 +83,13 @@ public:
 #endif
 
 protected:
-  Surface* CreateSurface(const ApHandle& hSurface);
-  void DeleteSurface(const ApHandle& hSurface);
-  Surface* FindSurface(const ApHandle& hSurface);
-  int HasSurface(const ApHandle& hSurface);
+  Scene* CreateScene(const ApHandle& hScene);
+  void DeleteScene(const ApHandle& hScene);
+  Scene* FindScene(const ApHandle& hScene);
+  int HasScene(const ApHandle& hScene);
 
 protected:
-  SurfaceList surfaces_;
+  SceneList surfaces_;
 
 public:
 

@@ -12,12 +12,12 @@
 #include "MsgScene.h"
 #include "MsgTimer.h"
 #include "Local.h"
-#include "Surface.h"
+#include "Scene.h"
 #include "GraphicsContext.h"
 
-int Surface::nCntWindows_ = 0;
+int Scene::nCntWindows_ = 0;
 
-Surface::~Surface()
+Scene::~Scene()
 {
   if (!sCaptureMouseElement_.empty()) {
     ReleaseMouse();
@@ -29,10 +29,10 @@ Surface::~Surface()
 #if defined(WIN32)
 #include <windowsx.h>
 
-#define Surface_WindowClass _T("ApolloSurfaceClass_gthjbvi43765iftvb")
-#define Surface_WindowCaption _T("ApolloSurface")
+#define Scene_WindowClass _T("ApolloSceneClass_gthjbvi43765iftvb")
+#define Scene_WindowCaption _T("ApolloScene")
 
-LRESULT CALLBACK Surface::StaticWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK Scene::StaticWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
   LRESULT nResult = 0;
 
@@ -46,10 +46,10 @@ LRESULT CALLBACK Surface::StaticWndProc(HWND hWnd, UINT message, WPARAM wParam, 
   } else {
     #pragma warning(push)
     #pragma warning(disable : 4312)
-    Surface* pSurface = (Surface*) ::GetWindowLong(hWnd, GWL_USERDATA);
+    Scene* pScene = (Scene*) ::GetWindowLong(hWnd, GWL_USERDATA);
     #pragma warning(pop)
-    if (pSurface != 0) {
-      nResult = pSurface->WndProc(hWnd, message, wParam, lParam);
+    if (pScene != 0) {
+      nResult = pScene->WndProc(hWnd, message, wParam, lParam);
     } else {
       nResult = ::DefWindowProc(hWnd, message, wParam, lParam);
     }
@@ -58,7 +58,7 @@ LRESULT CALLBACK Surface::StaticWndProc(HWND hWnd, UINT message, WPARAM wParam, 
   return nResult;
 }
 
-LRESULT Surface::HandleMouseEvent(int nEvent, int nButton, LPARAM lParam)
+LRESULT Scene::HandleMouseEvent(int nEvent, int nButton, LPARAM lParam)
 {
   int nX = GET_X_LPARAM(lParam);
   int nY = GET_Y_LPARAM(lParam);
@@ -86,7 +86,7 @@ LRESULT Surface::HandleMouseEvent(int nEvent, int nButton, LPARAM lParam)
   return 0;
 }
 
-LRESULT CALLBACK Surface::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK Scene::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
   switch (message) {
     case WM_NCCALCSIZE:
@@ -113,7 +113,7 @@ LRESULT CALLBACK Surface::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM
 }
 #endif // WIN32
 
-int Surface::Create()
+int Scene::Create()
 {
   int ok = 0;
 
@@ -121,7 +121,7 @@ int Surface::Create()
   {
     Msg_Win32_GetInstance msg;
     if (!msg.Request()) {
-      apLog_Error((LOG_CHANNEL, "Surface::Create", "Msg_Win32_GetInstance failed"));
+      apLog_Error((LOG_CHANNEL, "Scene::Create", "Msg_Win32_GetInstance failed"));
     } else {
       hInstance_ = msg.hInstance;
     }
@@ -138,18 +138,18 @@ int Surface::Create()
       wcex.hbrBackground = (HBRUSH) GetStockObject(WHITE_BRUSH);
       wcex.hCursor = LoadCursor(NULL, IDC_HAND);
       wcex.hInstance = hInstance_;
-      wcex.lpszClassName = Surface_WindowClass;
-      wcex.lpfnWndProc = Surface::StaticWndProc;
+      wcex.lpszClassName = Scene_WindowClass;
+      wcex.lpfnWndProc = Scene::StaticWndProc;
       BOOL bOK = ::RegisterClassEx(&wcex);
       if (!bOK) {
-        apLog_Error((LOG_CHANNEL, "Surface::Create", "RegisterClassEx failed"));
+        apLog_Error((LOG_CHANNEL, "Scene::Create", "RegisterClassEx failed"));
       }
     }
 
     hWnd_ = ::CreateWindowEx(
       WS_EX_LAYERED | WS_EX_TOOLWINDOW, 
-      Surface_WindowClass, 
-      Surface_WindowCaption, 
+      Scene_WindowClass, 
+      Scene_WindowCaption, 
       0, 
       0, CW_USEDEFAULT, 0, CW_USEDEFAULT, 
       NULL, 
@@ -158,7 +158,7 @@ int Surface::Create()
       this
       );
     if (hWnd_ == NULL) {
-      apLog_Error((LOG_CHANNEL, "Surface::Create", "CreateWindowEx failed"));
+      apLog_Error((LOG_CHANNEL, "Scene::Create", "CreateWindowEx failed"));
     }
 
     if (hWnd_ != NULL) {
@@ -172,7 +172,7 @@ int Surface::Create()
   return ok;
 }
 
-void Surface::Destroy()
+void Scene::Destroy()
 {
 #if defined(WIN32)
   if (hWnd_ != NULL) {
@@ -181,7 +181,7 @@ void Surface::Destroy()
 
     nCntWindows_--;
     if (nCntWindows_ == 0) {
-      ::UnregisterClass(Surface_WindowClass, hInstance_);
+      ::UnregisterClass(Scene_WindowClass, hInstance_);
     }
   }
 
@@ -195,7 +195,7 @@ void Surface::Destroy()
 
 //------------------------------------
 
-int Surface::CreateBitmap()
+int Scene::CreateBitmap()
 {
   int ok = 1;
 
@@ -224,14 +224,14 @@ int Surface::CreateBitmap()
   );
   if (hBitmap_ == NULL) {
     DWORD dw = ::GetLastError(); // returns ERROR_NOT_ENOUGH_MEMORY ?
-    apLog_Error((LOG_CHANNEL, "Surface::Size", "CreateDIBSection failed: GetLastError()=%d", dw));
+    apLog_Error((LOG_CHANNEL, "Scene::Size", "CreateDIBSection failed: GetLastError()=%d", dw));
     ok = 0;
   }
 
   dcMemory_ = ::CreateCompatibleDC(dcScreen);
   if (dcMemory_ == NULL) {
     DWORD dw = ::GetLastError();
-    apLog_Error((LOG_CHANNEL, "Surface::Size", "::CreateCompatibleDC(dcScreen) failed: GetLastError()=%d", dw));
+    apLog_Error((LOG_CHANNEL, "Scene::Size", "::CreateCompatibleDC(dcScreen) failed: GetLastError()=%d", dw));
     ok = 0;
   }
 
@@ -247,7 +247,7 @@ int Surface::CreateBitmap()
   return ok;
 }
 
-void Surface::DestroyBitmap()
+void Scene::DestroyBitmap()
 {
   if (hBitmap_!= NULL) {
     ::DeleteObject(hBitmap_);
@@ -274,7 +274,7 @@ void Surface::DestroyBitmap()
   }
 }
 
-void Surface::SetPosition(int nX, int nY, int nW, int nH)
+void Scene::SetPosition(int nX, int nY, int nW, int nH)
 {
   int bMove = 0;
   int bSize = 0;
@@ -306,7 +306,7 @@ void Surface::SetPosition(int nX, int nY, int nW, int nH)
     }
 
     if (!CreateBitmap()) {
-      apLog_Error((LOG_CHANNEL, "Surface::SetPosition", "CreateBitmap failed"));
+      apLog_Error((LOG_CHANNEL, "Scene::SetPosition", "CreateBitmap failed"));
     }
 
     if (bVisible_) {
@@ -321,7 +321,7 @@ void Surface::SetPosition(int nX, int nY, int nW, int nH)
 #endif // WIN32
 }
 
-void Surface::SetVisibility(int bVisible)
+void Scene::SetVisibility(int bVisible)
 {
   int bChanged = (bVisible_ != bVisible);
   bVisible_ = bVisible;
@@ -338,12 +338,12 @@ void Surface::SetVisibility(int bVisible)
   }
 }
 
-void Surface::DeleteAutoDraw()
+void Scene::DeleteAutoDraw()
 {
   bAutoDraw_ = false;
 }
 
-void Surface::SetAutoDraw(int nMilliSec, int bAsync)
+void Scene::SetAutoDraw(int nMilliSec, int bAsync)
 {
   bAutoDraw_ = true;
   bAutoDrawAsync_ = bAsync;
@@ -353,7 +353,7 @@ void Surface::SetAutoDraw(int nMilliSec, int bAsync)
   lastDraw_ = 0;
 }
 
-void Surface::AutoDraw()
+void Scene::AutoDraw()
 {
   if (bAutoDraw_) {
     Apollo::TimeValue now = Apollo::TimeValue::getTime();
@@ -367,7 +367,7 @@ void Surface::AutoDraw()
         Msg_Scene_Draw msg;
         msg.hScene = hAp_;
         if (!msg.Request()) {
-          apLog_Error((LOG_CHANNEL, "Surface::AutoDraw", "Msg_Scene_Draw failed"));
+          apLog_Error((LOG_CHANNEL, "Scene::AutoDraw", "Msg_Scene_Draw failed"));
         }
       }
 
@@ -381,7 +381,7 @@ void Surface::AutoDraw()
         msg.nMicroSec = autoDrawInterval_.MicroSec();
         msg.nCount = 1;
         if (!msg.Request()) {
-          apLog_Error((APOLLO_NAME, "Surface::AutoDraw", "Msg_Timer_Start failed"));
+          apLog_Error((APOLLO_NAME, "Scene::AutoDraw", "Msg_Timer_Start failed"));
         } else {
           bTimerRunning_ = 1;
         }
@@ -391,7 +391,7 @@ void Surface::AutoDraw()
   }
 }
 
-void Surface::OnAutoDrawTimer()
+void Scene::OnAutoDrawTimer()
 {
   bTimerRunning_ = 0;
   AutoDraw();
@@ -399,36 +399,36 @@ void Surface::OnAutoDrawTimer()
 
 //------------------------------------
 
-Element* Surface::GetElement(const String& sPath)
+Element* Scene::GetElement(const String& sPath)
 {
   Element* pElement = root_.FindElement(sPath);
 
   if (pElement == 0) {
-    throw ApException("Surface::FindElement scene=" ApHandleFormat " no element=%s", ApHandleType(hAp_), StringType(sPath));
+    throw ApException("Scene::FindElement scene=" ApHandleFormat " no element=%s", ApHandleType(hAp_), StringType(sPath));
   }
 
   return pElement;
 }
 
-int Surface::HasElement(const String& sPath)
+int Scene::HasElement(const String& sPath)
 {
   Element* pElement = root_.FindElement(sPath);
   return (pElement != 0);
 }
 
-Element* Surface::CreateElement(const String& sPath)
+Element* Scene::CreateElement(const String& sPath)
 {
   return root_.CreateElement(sPath);
 }
 
-void Surface::DeleteElement(const String& sPath)
+void Scene::DeleteElement(const String& sPath)
 {
   if (!root_.DeleteElement(sPath)) {
-    throw ApException("Surface::DeleteElement scene=" ApHandleFormat " root_.DeleteElement(%s) failed", ApHandleType(hAp_), StringType(sPath));
+    throw ApException("Scene::DeleteElement scene=" ApHandleFormat " root_.DeleteElement(%s) failed", ApHandleType(hAp_), StringType(sPath));
   }
 }
 
-void Surface::AddElement(const String& sPath, Element* pElement)
+void Scene::AddElement(const String& sPath, Element* pElement)
 {
   String sParent = String::filenameBasePath(sPath); sParent.trim("/");
   String sName = String::filenameFile(sPath);
@@ -443,43 +443,43 @@ void Surface::AddElement(const String& sPath, Element* pElement)
   if (pParent) {
     pParent->AddChild(sName, pElement);
   } else {
-    throw ApException("Surface::AddElement(%s) failed: no parent for path",  StringType(sPath));
+    throw ApException("Scene::AddElement(%s) failed: no parent for path",  StringType(sPath));
   }
 }
 
-RectangleElement* Surface::CreateRectangle(const String& sPath)
+RectangleElement* Scene::CreateRectangle(const String& sPath)
 {
   RectangleElement* pRectangle = new RectangleElement(this);
-  if (pRectangle == 0) { throw ApException("Surface::CreateRectangle(%s) failed",  StringType(sPath)); }
+  if (pRectangle == 0) { throw ApException("Scene::CreateRectangle(%s) failed",  StringType(sPath)); }
   AddElement(sPath, pRectangle);
   return pRectangle;
 }
 
-ImageElement* Surface::CreateImage(const String& sPath)
+ImageElement* Scene::CreateImage(const String& sPath)
 {
   ImageElement* pImage = new ImageElement(this);
-  if (pImage == 0) { throw ApException("Surface::CreateImage(%s) failed",  StringType(sPath)); }
+  if (pImage == 0) { throw ApException("Scene::CreateImage(%s) failed",  StringType(sPath)); }
   AddElement(sPath, pImage);
   return pImage;
 }
 
-TextElement* Surface::CreateText(const String& sPath)
+TextElement* Scene::CreateText(const String& sPath)
 {
   TextElement* pText = new TextElement(this);
-  if (pText == 0) { throw ApException("Surface::CreateText(%s) failed",  StringType(sPath)); }
+  if (pText == 0) { throw ApException("Scene::CreateText(%s) failed",  StringType(sPath)); }
   AddElement(sPath, pText);
   return pText;
 }
 
-SensorElement* Surface::CreateSensor(const String& sPath)
+SensorElement* Scene::CreateSensor(const String& sPath)
 {
   SensorElement* pSensor = new SensorElement(this, sPath);
-  if (pSensor == 0) { throw ApException("Surface::CreateSensor(%s) failed",  StringType(sPath)); }
+  if (pSensor == 0) { throw ApException("Scene::CreateSensor(%s) failed",  StringType(sPath)); }
   AddElement(sPath, pSensor);
   return pSensor;
 }
 
-void Surface::GetTextExtents(const String& sText, const String& sFont, double fSize, int nFlags, TextExtents& te)
+void Scene::GetTextExtents(const String& sText, const String& sFont, double fSize, int nFlags, TextExtents& te)
 {
   DrawContext gc;
   gc.pCairo_ = pCairo_;
@@ -492,7 +492,7 @@ void Surface::GetTextExtents(const String& sText, const String& sFont, double fS
   t.GetExtents(gc, te);
 }
 
-void Surface::GetImageSizeFromData(const Apollo::Image& image, double& fW, double& fH)
+void Scene::GetImageSizeFromData(const Apollo::Image& image, double& fW, double& fH)
 {
   DrawContext gc;
   gc.pCairo_ = pCairo_;
@@ -504,7 +504,7 @@ void Surface::GetImageSizeFromData(const Apollo::Image& image, double& fW, doubl
   i.GetSize(gc, fW, fH);
 }
 
-void Surface::GetImageSizeFromFile(const String& sFile, double& fW, double& fH)
+void Scene::GetImageSizeFromFile(const String& sFile, double& fW, double& fH)
 {
   DrawContext gc;
   gc.pCairo_ = pCairo_;
@@ -516,7 +516,7 @@ void Surface::GetImageSizeFromFile(const String& sFile, double& fW, double& fH)
   i.GetSize(gc, fW, fH);
 }
 
-void Surface::CaptureMouse(const String& sPath)
+void Scene::CaptureMouse(const String& sPath)
 {
   SensorElement* pSensor = GetElement(sPath)->AsSensor();
   if (pSensor) {
@@ -530,7 +530,7 @@ void Surface::CaptureMouse(const String& sPath)
   }
 }
 
-void Surface::ReleaseMouse()
+void Scene::ReleaseMouse()
 {
   if (sCaptureMouseElement_) {
     SensorElement* pSensor = GetElement(sCaptureMouseElement_)->AsSensor();
@@ -555,7 +555,7 @@ void Surface::ReleaseMouse()
 
 #endif
 
-void Surface::EraseBackground()
+void Scene::EraseBackground()
 {
   //unsigned char* pPixel = pBits_;
   //for (int y = 0; y < nH_; ++y) {
@@ -573,7 +573,7 @@ void Surface::EraseBackground()
   cairo_restore(pCairo_);
 }
 
-void Surface::Draw()
+void Scene::Draw()
 {
   if (hBitmap_ == NULL) { return; }
 
