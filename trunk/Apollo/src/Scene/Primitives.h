@@ -12,8 +12,8 @@
 class ShapeElement: public Element
 {
 public:
-  ShapeElement(Surface* pSurface)
-    :Element(pSurface)
+  ShapeElement(Scene* pScene)
+    :Element(pScene)
     ,fX_(0.0)
     ,fY_(0.0)
     ,bFillColor_(false)
@@ -67,8 +67,8 @@ protected:
 class RectangleElement: public ShapeElement
 {
 public:
-  RectangleElement(Surface* pSurface)
-    :ShapeElement(pSurface)
+  RectangleElement(Scene* pScene)
+    :ShapeElement(pScene)
     ,fW_(0.0)
     ,fH_(0.0)
     ,nCorners_(NormalCorners)
@@ -116,8 +116,8 @@ public:
     ,LastFlag = 1 << 2
   } FontFlags;
 
-  TextElement(Surface* pSurface)
-    :ShapeElement(pSurface)
+  TextElement(Scene* pScene)
+    :ShapeElement(pScene)
     ,fSize_(0.0)
     ,nFlags_(0)
   {}
@@ -141,8 +141,8 @@ protected:
 class ImageElement: public Element
 {
 public:
-  ImageElement(Surface* pSurface)
-    :Element(pSurface)
+  ImageElement(Scene* pScene)
+    :Element(pScene)
     ,fX_(0.0)
     ,fY_(0.0)
     ,bData_(false)
@@ -176,8 +176,8 @@ protected:
 class SensorElement: public RectangleElement
 {
 public:
-  SensorElement(Surface* pSurface, const String& sPath)
-    :RectangleElement(pSurface)
+  SensorElement(Scene* pScene, const String& sPath)
+    :RectangleElement(pScene)
     ,sPath_(sPath)
     ,bCaptured_(0)
   {}

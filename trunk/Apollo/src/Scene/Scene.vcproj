@@ -174,15 +174,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Scene.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\SceneModule.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\SceneModuleTester.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Surface.cpp"
 				>
 			</File>
 		</Filter>
@@ -212,15 +212,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Scene.h"
+				>
+			</File>
+			<File
 				RelativePath=".\SceneModule.h"
 				>
 			</File>
 			<File
 				RelativePath=".\SceneModuleTester.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Surface.h"
 				>
 			</File>
 		</Filter>

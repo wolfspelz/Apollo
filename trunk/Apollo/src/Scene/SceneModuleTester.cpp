@@ -11,7 +11,7 @@
 #include "MsgUnitTest.h"
 #include "SceneModuleTester.h"
 #include "Element.h"
-#include "Surface.h"
+#include "Scene.h"
 
 #if defined(AP_TEST)
 
