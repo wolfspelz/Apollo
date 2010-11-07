@@ -66,7 +66,7 @@ String SceneModuleTester::Rectangle()
     Msg_Scene_Position msg;
     msg.hScene = hScene_;
     msg.nX = 100;
-    msg.nY = 700;
+    msg.nY = 800;
     msg.nW = nWidth;
     msg.nH = nHeight;
     if (!msg.Request()) { s = "Msg_Scene_Position failed"; }
