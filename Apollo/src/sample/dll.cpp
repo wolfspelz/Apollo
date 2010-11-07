@@ -5,11 +5,11 @@
 // ============================================================================
 
 #include "Apollo.h"
-#include "Scene.h"
-#include "MsgScene.h"
+#include "dll.h"
+#include "MsgSample.h"
 #include "MsgUnitTest.h"
 #include "Local.h"
-#include "SceneModule.h"
+#include "SampleModule.h"
 
 #if defined(WIN32)
 BOOL APIENTRY DllMain(HANDLE hModule, DWORD dwReason, LPVOID lpReserved)
@@ -27,17 +27,17 @@ static AP_MODULE_INFO g_info = {
   AP_MODULE_INTERFACE_FLAGS_CPP | AP_MODULE_INTERFACE_FLAGS_UTF8
   ,
   MODULE_NAME,
-  "Scene",
-  "Scene Module",
+  "Sample",
+  "Sample Module",
   "1",
-  "Maintain and paint a 2d scene graph.",
+  "Used as sample and for module load/unload unit tests.",
   PROJECT_Author,
   PROJECT_Email,
   PROJECT_Copyright,
   PROJECT_HomepageUrl
 };
 
-SCENE_API AP_MODULE_INFO* Info(AP_MODULE_CALL* pModuleData)
+SAMPLE_API AP_MODULE_INFO* Info(AP_MODULE_CALL* pModuleData)
 {
   AP_UNUSED_ARG(pModuleData);
   return &g_info;
@@ -45,27 +45,27 @@ SCENE_API AP_MODULE_INFO* Info(AP_MODULE_CALL* pModuleData)
 
 //----------------------------------------------------------
 
-SCENE_API int Load(AP_MODULE_CALL* pModuleData)
+SAMPLE_API int Load(AP_MODULE_CALL* pModuleData)
 {
   AP_UNUSED_ARG(pModuleData);
-
+  
   int ok = 0;
 
-  SceneModuleInstance::Delete();
-  if (SceneModuleInstance::Get() != 0) { ok = SceneModuleInstance::Get()->Init(); }
+  SampleModuleInstance::Delete();
+  if (SampleModuleInstance::Get() != 0) { ok = SampleModuleInstance::Get()->init(); }
 
   return ok;
 }
 
-SCENE_API int UnLoad(AP_MODULE_CALL* pModuleData)
+SAMPLE_API int UnLoad(AP_MODULE_CALL* pModuleData)
 {
   AP_UNUSED_ARG(pModuleData);
-
+  
   int ok = 1;
 
-  if (SceneModuleInstance::Get() != 0) {
-    SceneModuleInstance::Get()->Exit();
-    SceneModuleInstance::Delete();
+  if (SampleModuleInstance::Get() != 0) {
+    SampleModuleInstance::Get()->exit();
+    SampleModuleInstance::Delete();
   }
 
   return ok;
