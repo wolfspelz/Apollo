@@ -15,6 +15,8 @@ public:
   Meta(Display* pDisplay);
   virtual ~Meta();
 
+  void OnSetSize(int nW, int nH);
+
   typedef enum _State { NoState
     ,StateEnterRequested
     ,StateEnterBegin
@@ -41,6 +43,9 @@ protected:
   void ShowText();
 
 protected:
+  int nW_;
+  int nH_;
+
   State nState_;
   String sDocumentUrl_;
   String sLocationUrl_;
