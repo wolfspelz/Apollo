@@ -6,7 +6,6 @@
 
 #include "Apollo.h"
 #include "ApLog.h"
-#include "MsgScene.h"
 #include "Local.h"
 #include "Layer.h"
 #include "Display.h"
@@ -25,7 +24,7 @@ void Layer::OnSetSize(int nW, int nH)
 {
 }
 
-int Layer::OnTimer(const ApHandle& hTimer)
+int Layer::OnTimerEvent(Msg_Timer_Event* pMsg)
 {
   int bProcessed = 0;
   return bProcessed;
@@ -35,5 +34,11 @@ int Layer::OnMouseEvent(Msg_Scene_MouseEvent* pMsg)
 {
   int bProcessed = 0;
   return bProcessed;
+}
+
+
+ArenaModule* Layer::GetModule()
+{
+  return GetDisplay()->GetModule();
 }
 

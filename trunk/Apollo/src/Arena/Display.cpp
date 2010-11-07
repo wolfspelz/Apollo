@@ -45,7 +45,7 @@ int Display::Create()
   } else {
     hScene_ = hScene;
 
-    pModule_->SetContextOfScene(hScene_, hContext_);
+    pModule_->SetContextOfHandle(hScene_, hContext_);
 
     Msg_Scene_SetAutoDraw msgSSAD;
     msgSSAD.hScene = hScene_;
@@ -67,7 +67,7 @@ int Display::Create()
 
 void Display::Destroy()
 {
-  pModule_->DeleteContextOfScene(hScene_, hContext_);
+  pModule_->DeleteContextOfHandle(hScene_, hContext_);
 
   Msg_Scene_Destroy msg;
   msg.hScene = hScene_;
@@ -138,14 +138,14 @@ void Display::AttachLocation(const ApHandle& hLocation)
   //}
 
   if (pModule_) {
-    pModule_->SetContextOfLocation(hLocation, hContext_);
+    pModule_->SetContextOfHandle(hLocation, hContext_);
   }
 }
 
 void Display::DetachLocation(const ApHandle& hLocation)
 {
   if (pModule_) {
-    pModule_->DeleteContextOfLocation(hLocation, hContext_);
+    pModule_->DeleteContextOfHandle(hLocation, hContext_);
   }
 
   RemoveAllAvatars();
@@ -242,6 +242,19 @@ void Display::OnAvatarAnimationFrame(const ApHandle& hParticipant, const Apollo:
   if (pNode) {
     pNode->Value()->AnimationFrame(image);
   }
+}
+
+int Display::OnTimerEvent(Msg_Timer_Event* pMsg)
+{
+  for (LayerListNode* pNode = 0; pNode = layers_.Next(pNode); ) {
+    Layer* pLayer = pNode->Value();
+    if (pLayer) {
+      if (pLayer->OnTimerEvent(pMsg)) {
+        return 1;
+      }
+    }
+  }
+  return 0;
 }
 
 int Display::OnMouseEvent(Msg_Scene_MouseEvent* pMsg)

@@ -234,7 +234,7 @@ void Avatar::HandleImageData(const String& sMimeType, const String& sSource, Buf
 
   if (ApIsHandle(hAnimatedItem_)) {
     if (pModule_) {
-      pModule_->SetContextOfAnimation(hAnimatedItem_, pDisplay_->GetContext());
+      pModule_->SetContextOfHandle(hAnimatedItem_, pDisplay_->GetContext());
       pModule_->SetParticipantOfAnimation(hAnimatedItem_, hParticipant_);
     }
 
@@ -310,7 +310,7 @@ void Avatar::Hide()
 
   if (ApIsHandle(hAnimatedItem_)) {
     if (pModule_) {
-      pModule_->DeleteContextOfAnimation(hAnimatedItem_, pDisplay_->GetContext());
+      pModule_->DeleteContextOfHandle(hAnimatedItem_, pDisplay_->GetContext());
       pModule_->DeleteParticipantOfAnimation(hAnimatedItem_, hParticipant_);
     }
 

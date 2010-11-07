@@ -134,6 +134,7 @@ int Surface::Create()
       WNDCLASSEX wcex;
       memset(&wcex, 0, sizeof(wcex));
       wcex.cbSize = sizeof(wcex);
+      wcex.style = CS_DBLCLKS;
       wcex.hbrBackground = (HBRUSH) GetStockObject(WHITE_BRUSH);
       wcex.hCursor = LoadCursor(NULL, IDC_HAND);
       wcex.hInstance = hInstance_;
@@ -299,9 +300,9 @@ void Surface::SetPosition(int nX, int nY, int nW, int nH)
     DestroyBitmap();
 
     if (bMove) {
-      ::SetWindowPos(hWnd_, NULL, nX_, nY_ - nH_, nW_, nH_, SWP_NOZORDER | SWP_NOACTIVATE);
+      ::SetWindowPos(hWnd_, NULL, nX_, nY_ - nH_, nW_, nH_, SWP_NOZORDER | SWP_NOACTIVATE | SWP_NOCOPYBITS | SWP_NOREDRAW);
     } else {
-      ::SetWindowPos(hWnd_, NULL, 0, 0, nW_, nH_, SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE);
+      ::SetWindowPos(hWnd_, NULL, 0, 0, nW_, nH_, SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE | SWP_NOCOPYBITS | SWP_NOREDRAW);
     }
 
     if (!CreateBitmap()) {
@@ -531,14 +532,16 @@ void Surface::CaptureMouse(const String& sPath)
 
 void Surface::ReleaseMouse()
 {
-  SensorElement* pSensor = GetElement(sCaptureMouseElement_)->AsSensor();
-  if (pSensor) {
-    pSensor->MouseReleased();
+  if (sCaptureMouseElement_) {
+    SensorElement* pSensor = GetElement(sCaptureMouseElement_)->AsSensor();
+    if (pSensor) {
+      pSensor->MouseReleased();
 #if defined(WIN32)
-    if (hWnd_ != NULL) {
-      ::ReleaseCapture();
-    }
+      if (hWnd_ != NULL) {
+        ::ReleaseCapture();
+      }
 #endif // WIN32
+    }
   }
   sCaptureMouseElement_ = "";
 }

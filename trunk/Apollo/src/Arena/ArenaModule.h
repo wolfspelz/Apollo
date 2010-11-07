@@ -13,7 +13,7 @@
 #include "MsgVp.h"
 #include "MsgVpView.h"
 #include "MsgAnimation.h"
-#include "MsgSystem.h"
+#include "MsgTimer.h"
 #include "MsgScene.h"
 #include "Display.h"
 //#include "Location.h"
@@ -72,7 +72,7 @@ public:
   void On_Animation_SequenceBegin(Msg_Animation_SequenceBegin* pMsg);
   void On_Animation_Frame(Msg_Animation_Frame* pMsg);
   void On_Animation_SequenceEnd(Msg_Animation_SequenceEnd* pMsg);
-  void On_System_60SecTimer(Msg_System_60SecTimer* pMsg);
+  void On_Timer_Event(Msg_Timer_Event* pMsg);
   void On_Scene_MouseEvent(Msg_Scene_MouseEvent* pMsg);
 
 #if defined(AP_TEST)
@@ -81,20 +81,10 @@ public:
   void On_UnitTest_End(Msg_UnitTest_End* pMsg);
 #endif
 
-  void SetContextOfLocation(const ApHandle& hLocation, const ApHandle& hContext);
-  void DeleteContextOfLocation(const ApHandle& hLocation, const ApHandle& hContext);
-  ApHandle GetContextOfLocation(const ApHandle& hLocation);
-  Display* GetDisplayOfLocation(const ApHandle& hLocation);
-
-  void SetContextOfAnimation(const ApHandle& hAnimation, const ApHandle& hContext);
-  void DeleteContextOfAnimation(const ApHandle& hAnimation, const ApHandle& hContext);
-  ApHandle GetContextOfAnimation(const ApHandle& hAnimation);
-  Display* GetDisplayOfAnimation(const ApHandle& hAnimation);
-
-  void SetContextOfScene(const ApHandle& hScene, const ApHandle& hContext);
-  void DeleteContextOfScene(const ApHandle& hScene, const ApHandle& hContext);
-  ApHandle GetContextOfScene(const ApHandle& hScene);
-  Display* GetDisplayOfScene(const ApHandle& hScene);
+  void SetContextOfHandle(const ApHandle& h, const ApHandle& hContext);
+  void DeleteContextOfHandle(const ApHandle& h, const ApHandle& hContext);
+  ApHandle GetContextOfHandle(const ApHandle& h);
+  Display* GetDisplayOfHandle(const ApHandle& h);
 
   void SetParticipantOfAnimation(const ApHandle& hAnimation, const ApHandle& hParticipant);
   void DeleteParticipantOfAnimation(const ApHandle& hAnimation, const ApHandle& hParticipant);
@@ -107,9 +97,7 @@ protected:
 
 protected:
   DisplayList displays_;
-  ApHandleTree<ApHandle> contextOfLocation_;
-  ApHandleTree<ApHandle> contextOfAnimation_;
-  ApHandleTree<ApHandle> contextOfScene_;
+  ApHandleTree<ApHandle> contextOfHandle_;
   ApHandleTree<ApHandle> participantOfAnimation_;
 
 public:
