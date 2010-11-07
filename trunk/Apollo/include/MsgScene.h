@@ -404,7 +404,7 @@ public:
   ApIN String sFile;
 };
 
-class Msg_Scene_FontFlags: public ApRequestMessage
+class Msg_Scene_FontFlags
 {
 public:
   typedef enum _FontFlags { Normal = 0
