@@ -158,6 +158,10 @@
 			UniqueIdentifier="{4AAB929A-F4AC-42a9-931D-4FC71881CEF3}"
 			>
 			<File
+				RelativePath=".\dll.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Element.cpp"
 				>
 			</File>
@@ -167,10 +171,6 @@
 			</File>
 			<File
 				RelativePath=".\Primitives.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Scene.cpp"
 				>
 			</File>
 			<File
@@ -192,6 +192,10 @@
 			UniqueIdentifier="{CB8D0B81-4C4B-442d-9EEC-B18302AB3F2E}"
 			>
 			<File
+				RelativePath=".\dll.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Element.h"
 				>
 			</File>
@@ -205,10 +209,6 @@
 			</File>
 			<File
 				RelativePath=".\Primitives.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Scene.h"
 				>
 			</File>
 			<File
