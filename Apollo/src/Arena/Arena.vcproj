@@ -159,10 +159,6 @@
 			UniqueIdentifier="{C0292BEB-CAB7-472d-AE79-14232C0D3BF5}"
 			>
 			<File
-				RelativePath=".\Arena.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\ArenaModule.cpp"
 				>
 			</File>
@@ -172,6 +168,10 @@
 			</File>
 			<File
 				RelativePath=".\Display.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\dll.cpp"
 				>
 			</File>
 			<File
@@ -193,10 +193,6 @@
 			UniqueIdentifier="{05CE6F93-2DB3-4c95-820E-475A38C422D4}"
 			>
 			<File
-				RelativePath=".\Arena.h"
-				>
-			</File>
-			<File
 				RelativePath=".\ArenaModule.h"
 				>
 			</File>
@@ -206,6 +202,10 @@
 			</File>
 			<File
 				RelativePath=".\Display.h"
+				>
+			</File>
+			<File
+				RelativePath=".\dll.h"
 				>
 			</File>
 			<File

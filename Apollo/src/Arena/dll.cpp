@@ -5,7 +5,7 @@
 // ============================================================================
 
 #include "Apollo.h"
-#include "Arena.h"
+#include "dll.h"
 #include "MsgUnitTest.h"
 #include "Local.h"
 #include "ArenaModule.h"
