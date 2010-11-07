@@ -398,6 +398,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\include\MsgScWidget.h"
+					>
+				</File>
+				<File
 					RelativePath="..\..\include\MsgServer.h"
 					>
 				</File>
