@@ -326,17 +326,47 @@ void SensorElement::MouseEvent(EventContext& gc, double fX, double fY)
     }
   }
 
-  if (bHit) {
-    Msg_Scene_MouseEvent msg;
-    msg.hScene = pScene_->apHandle();
-    msg.sPath = sPath_;
-    msg.nEvent = gc.nEvent_;
-    msg.nButton = gc.nButton_;
-    msg.fX = fX;
-    msg.fY = fY;
-    msg.Send();
+  int nEvent = 0;
 
-    gc.bFired_ = true;
+  if (gc.bTimer_) {
+
+    if (!bHit && bSentMouseMove_) {
+
+      Msg_Scene_MouseEvent msg;
+      msg.hScene = pScene_->apHandle();
+      msg.sPath = sPath_;
+      msg.nEvent = EventContext::MouseOut;
+      msg.nButton = EventContext::NoMouseButton;
+      msg.fX = fX;
+      msg.fY = fY;
+      msg.Send();
+      nEvent = msg.nEvent;
+
+      bSentMouseMove_ = 0;
+    }
+
+  } else {
+
+    if (bHit) {
+      Msg_Scene_MouseEvent msg;
+      msg.hScene = pScene_->apHandle();
+      msg.sPath = sPath_;
+      msg.nEvent = gc.nEvent_;
+      msg.nButton = gc.nButton_;
+      msg.fX = fX;
+      msg.fY = fY;
+      msg.Send();
+      nEvent = msg.nEvent;
+
+      gc.bFired_ = 1;
+
+      if (gc.nEvent_ == EventContext::MouseMove) {
+        bSentMouseMove_ = 1;
+      }
+    }
+
   }
+
+  apLog_Debug((LOG_CHANNEL, "SensorElement::MouseEvent", "timer=%d hit=%d x=%d y=%d ev=%d", gc.bTimer_, bHit, (int) fX, (int) fY, nEvent));
 }
 

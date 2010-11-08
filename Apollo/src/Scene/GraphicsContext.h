@@ -51,6 +51,8 @@ public:
     ,MouseUp
     ,MouseClick
     ,MouseDoubleClick
+    ,MouseOut
+    ,LastEventType
   } EventType;
 
   // Same as Msg_Scene_MouseEvent::MouseButton
@@ -58,19 +60,22 @@ public:
     ,LeftButton
     ,MiddleButton
     ,RightButton
+    ,LastMouseButton
   } MouseButton;
 
   EventContext()
-    :bFired_(false)
+    :bFired_(0)
     ,nEvent_(NoEventType)
     ,nButton_(NoMouseButton)
+    ,bTimer_(0)
   {}
 
-  inline bool Fired() { return bFired_; }
+  inline int Fired() { return bFired_; }
 
-  bool bFired_;
+  int bFired_;
   int nEvent_;
   int nButton_;
+  int bTimer_;
 };
 
 #endif // GraphicsContext_H_INCLUDED

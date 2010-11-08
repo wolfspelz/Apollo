@@ -321,7 +321,7 @@ void Element::MouseEventRecursive(EventContext& gc, double fX, double fY)
   // Depth first
   if (pChildren_) {
     ElementIterator iter(*pChildren_);
-    for (ElementNode* pNode = 0; (pNode = iter.Next()) && !gc.Fired(); ) {
+    for (ElementNode* pNode = 0; pNode = iter.Next(); ) {
       Element* pElement = pNode->Value();
       if (pElement != 0) {
         pElement->MouseEventRecursive(gc, fX, fY);

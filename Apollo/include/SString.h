@@ -170,6 +170,7 @@ SExport String operator+(const char* a, const String& b);
   #define String_FILEPATHSEPARATOR "/" 
 #endif
 
+#define StringFormat "%s"
 #define StringType(__s__) (const char*) __s__ // extractor for printf
 
 // ============================================================================

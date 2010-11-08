@@ -180,6 +180,7 @@ public:
     :RectangleElement(pScene)
     ,sPath_(sPath)
     ,bCaptured_(0)
+    ,bSentMouseMove_(0)
   {}
   virtual ~SensorElement() {}
 
@@ -193,6 +194,7 @@ public:
 protected:
   String sPath_;
   int bCaptured_;
+  int bSentMouseMove_;
 };
 
 #endif // Primitives_H_INCLUDED

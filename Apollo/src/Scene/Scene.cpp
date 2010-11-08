@@ -58,6 +58,88 @@ LRESULT CALLBACK Scene::StaticWndProc(HWND hWnd, UINT message, WPARAM wParam, LP
   return nResult;
 }
 
+int Scene::HasMoveTimer()
+{
+  return nMoveTimer_ != 0;
+}
+
+void Scene::StartMoveTimer(HWND hWnd)
+{
+  nMoveTimer_ = ::SetTimer(hWnd, MOVE_TIMER, 100, NULL);
+}
+
+void Scene::StopMoveTimer(HWND hWnd)
+{
+  ::KillTimer(hWnd, MOVE_TIMER);
+  nMoveTimer_ = 0;
+}
+
+LRESULT CALLBACK Scene::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+  switch (message) {
+    case WM_NCCALCSIZE:
+      {
+        // When wParam is TRUE, simply returning 0 without processing the NCCALCSIZE_PARAMS rectangles will cause the client area to resize to the size of the window, including the window frame. This will remove the window frame and caption items from your window, leaving only the client area displayed.
+        return 0;
+      }
+      break;
+
+    case WM_TIMER:
+      {
+        StopMoveTimer(hWnd);
+
+        POINT pt;
+        if (::GetCursorPos(&pt)) {
+          ::ScreenToClient(hWnd, &pt);
+          //apLog_Debug((LOG_CHANNEL, "Scene::WndProc", "x=%d y=%d", pt.x, pt.y));
+
+          int nX = pt.x;
+          int nY = pt.y;
+
+          if (pCairo_) {
+            double fX = nX;
+            double fY = nY;
+            cairo_user_to_device(pCairo_, &fX, &fY);
+
+            EventContext gc;
+            gc.pCairo_ = pCairo_;
+            gc.nEvent_ = EventContext::MouseMove;
+            gc.nButton_ = EventContext::NoMouseButton;
+            gc.bTimer_ = 1;
+
+            if (sCaptureMouseElement_.empty()) {
+              root_.MouseEventRecursive(gc, fX, fY);
+            }
+          }
+        }
+        return 0;
+      } break;
+
+    case WM_MOUSEMOVE:
+      {
+        if (sCaptureMouseElement_.empty()) {
+          if (!HasMoveTimer()) {
+            StartMoveTimer(hWnd);
+          }
+        }
+        return HandleMouseEvent(EventContext::MouseMove, EventContext::NoMouseButton, lParam);
+      } break;
+
+    case WM_LBUTTONDOWN: { return HandleMouseEvent(EventContext::MouseDown, EventContext::LeftButton, lParam); } break;
+    case WM_MBUTTONDOWN: { return HandleMouseEvent(EventContext::MouseDown, EventContext::MiddleButton, lParam); } break;
+    case WM_RBUTTONDOWN: { return HandleMouseEvent(EventContext::MouseDown, EventContext::RightButton, lParam); } break;
+    case WM_LBUTTONUP: { return HandleMouseEvent(EventContext::MouseUp, EventContext::LeftButton, lParam); } break;
+    case WM_MBUTTONUP: { return HandleMouseEvent(EventContext::MouseUp, EventContext::MiddleButton, lParam); } break;
+    case WM_RBUTTONUP: { return HandleMouseEvent(EventContext::MouseUp, EventContext::RightButton, lParam); } break;
+    case WM_LBUTTONDBLCLK: { return HandleMouseEvent(EventContext::MouseDoubleClick, EventContext::LeftButton, lParam); } break;
+    case WM_MBUTTONDBLCLK: { return HandleMouseEvent(EventContext::MouseDoubleClick, EventContext::MiddleButton, lParam); } break;
+    case WM_RBUTTONDBLCLK: { return HandleMouseEvent(EventContext::MouseDoubleClick, EventContext::RightButton, lParam); } break;
+
+    default:
+      return DefWindowProc(hWnd, message, wParam, lParam);
+  }
+}
+
 LRESULT Scene::HandleMouseEvent(int nEvent, int nButton, LPARAM lParam)
 {
   int nX = GET_X_LPARAM(lParam);
@@ -86,31 +168,6 @@ LRESULT Scene::HandleMouseEvent(int nEvent, int nButton, LPARAM lParam)
   return 0;
 }
 
-LRESULT CALLBACK Scene::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
-{
-  switch (message) {
-    case WM_NCCALCSIZE:
-      {
-        // When wParam is TRUE, simply returning 0 without processing the NCCALCSIZE_PARAMS rectangles will cause the client area to resize to the size of the window, including the window frame. This will remove the window frame and caption items from your window, leaving only the client area displayed.
-        return 0;
-      }
-      break;
-
-    case WM_MOUSEMOVE: { return HandleMouseEvent(EventContext::MouseMove, EventContext::NoMouseButton, lParam); } break;
-    case WM_LBUTTONDOWN: { return HandleMouseEvent(EventContext::MouseDown, EventContext::LeftButton, lParam); } break;
-    case WM_MBUTTONDOWN: { return HandleMouseEvent(EventContext::MouseDown, EventContext::MiddleButton, lParam); } break;
-    case WM_RBUTTONDOWN: { return HandleMouseEvent(EventContext::MouseDown, EventContext::RightButton, lParam); } break;
-    case WM_LBUTTONUP: { return HandleMouseEvent(EventContext::MouseUp, EventContext::LeftButton, lParam); } break;
-    case WM_MBUTTONUP: { return HandleMouseEvent(EventContext::MouseUp, EventContext::MiddleButton, lParam); } break;
-    case WM_RBUTTONUP: { return HandleMouseEvent(EventContext::MouseUp, EventContext::RightButton, lParam); } break;
-    case WM_LBUTTONDBLCLK: { return HandleMouseEvent(EventContext::MouseDoubleClick, EventContext::LeftButton, lParam); } break;
-    case WM_MBUTTONDBLCLK: { return HandleMouseEvent(EventContext::MouseDoubleClick, EventContext::MiddleButton, lParam); } break;
-    case WM_RBUTTONDBLCLK: { return HandleMouseEvent(EventContext::MouseDoubleClick, EventContext::RightButton, lParam); } break;
-
-    default:
-      return DefWindowProc(hWnd, message, wParam, lParam);
-  }
-}
 #endif // WIN32
 
 int Scene::Create()
