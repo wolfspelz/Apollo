@@ -17,6 +17,12 @@ class Msg_Scene_Create: public ApRequestMessage
 {
 public:
   Msg_Scene_Create() : ApRequestMessage("Scene_Create") {}
+  static int _(const ApHandle& hScene)
+  {
+    Msg_Scene_Create msg;
+    msg.hScene = hScene;
+    return msg.Request();
+  }
   ApIN ApHandle hScene;
 };
 
@@ -24,6 +30,12 @@ class Msg_Scene_Destroy: public ApRequestMessage
 {
 public:
   Msg_Scene_Destroy() : ApRequestMessage("Scene_Destroy") {}
+  static int _(const ApHandle& hScene)
+  {
+    Msg_Scene_Destroy msg;
+    msg.hScene = hScene;
+    return msg.Request();
+  }
   ApIN ApHandle hScene;
 };
 
@@ -31,6 +43,16 @@ class Msg_Scene_Position: public ApRequestMessage
 {
 public:
   Msg_Scene_Position() : ApRequestMessage("Scene_Position"), nX(0), nY(0), nW(0), nH(0) {}
+  static int _(const ApHandle& hScene, int nX, int nY, int nW, int nH)
+  {
+    Msg_Scene_Position msg;
+    msg.hScene = hScene;
+    msg.nX = nX;
+    msg.nY = nY;
+    msg.nW = nW;
+    msg.nH = nH;
+    return msg.Request();
+  }
   ApIN ApHandle hScene;
   ApIN int nX;
   ApIN int nY;
@@ -42,6 +64,13 @@ class Msg_Scene_Visibility: public ApRequestMessage
 {
 public:
   Msg_Scene_Visibility() : ApRequestMessage("Scene_Visibility"), bVisible(0) {}
+  static int _(const ApHandle& hScene, int bVisible)
+  {
+    Msg_Scene_Visibility msg;
+    msg.hScene = hScene;
+    msg.bVisible = bVisible;
+    return msg.Request();
+  }
   ApIN ApHandle hScene;
   ApIN int bVisible;
 };
@@ -52,6 +81,14 @@ public:
   typedef enum _AutoDrawConst { Disabled = -1 } AutoDrawConst;
 
   Msg_Scene_SetAutoDraw() : ApRequestMessage("Scene_SetAutoDraw"), nMilliSec(Disabled), bAsync(0) {}
+  static int _(const ApHandle& hScene, int nMilliSec, int bAsync)
+  {
+    Msg_Scene_SetAutoDraw msg;
+    msg.hScene = hScene;
+    msg.nMilliSec = nMilliSec;
+    msg.bAsync = bAsync;
+    return msg.Request();
+  }
   ApIN ApHandle hScene;
   ApIN int nMilliSec;
   ApIN int bAsync;
@@ -61,6 +98,12 @@ class Msg_Scene_AutoDraw: public ApRequestMessage
 {
 public:
   Msg_Scene_AutoDraw() : ApRequestMessage("Scene_AutoDraw") {}
+  static int _(const ApHandle& hScene)
+  {
+    Msg_Scene_AutoDraw msg;
+    msg.hScene = hScene;
+    return msg.Request();
+  }
   ApIN ApHandle hScene;
 };
 
@@ -882,12 +925,15 @@ public:
     ,MouseUp
     ,MouseClick
     ,MouseDoubleClick
+    ,MouseOut
+    ,LastEventType
   } EventType;
 
   typedef enum _MouseButton { NoMouseButton
     ,LeftButton
     ,MiddleButton
     ,RightButton
+    ,LastMouseButton
   } MouseButton;
 
   Msg_Scene_MouseEvent() : ApNotificationMessage("Scene_MouseEvent"), nEvent(NoEventType), nButton(NoMouseButton), fX(0), fY(0) {}

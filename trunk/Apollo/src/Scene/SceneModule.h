@@ -89,7 +89,7 @@ protected:
   int HasScene(const ApHandle& hScene);
 
 protected:
-  SceneList surfaces_;
+  SceneList scenes_;
 
 public:
 

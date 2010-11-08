@@ -47,6 +47,7 @@ public:
     ,pBits_(0)
     ,dcMemory_(NULL)
     ,hOldBitmap_(NULL)
+    ,nMoveTimer_(0)
     #endif // WIN32
   {
     root_.SetScene(this);
@@ -90,6 +91,10 @@ public:
   static LRESULT CALLBACK StaticWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
   LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
   LRESULT HandleMouseEvent(int nEvent, int nButton, LPARAM lParam);
+  #define MOVE_TIMER 1
+  int HasMoveTimer();
+  void StartMoveTimer(HWND hWnd);
+  void StopMoveTimer(HWND hWnd);
 #endif // WIN32
 
 protected:
@@ -126,6 +131,7 @@ protected:
   unsigned char* pBits_;
   HDC dcMemory_;
   HBITMAP hOldBitmap_;
+  int nMoveTimer_;
 #endif // WIN32
 
 #if defined(AP_TEST)

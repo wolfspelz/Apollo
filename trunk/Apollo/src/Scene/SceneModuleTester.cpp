@@ -54,38 +54,12 @@ String SceneModuleTester::Rectangle()
 
   hScene_ = Apollo::newHandle();
 
-  if (!s) {
-    Msg_Scene_Create msg;
-    msg.hScene = hScene_;
-    if (!msg.Request()) { s = "Msg_Scene_Create failed"; }
-  }
-
+  if (!s) { if (!Msg_Scene_Create::_(hScene_)) { s = "Msg_Scene_Create failed"; }}
   int nWidth = 350;
   int nHeight = 350;
-  if (!s) {
-    Msg_Scene_Position msg;
-    msg.hScene = hScene_;
-    msg.nX = 100;
-    msg.nY = 800;
-    msg.nW = nWidth;
-    msg.nH = nHeight;
-    if (!msg.Request()) { s = "Msg_Scene_Position failed"; }
-  }
-
-  if (!s) {
-    Msg_Scene_Visibility msg;
-    msg.hScene = hScene_;
-    msg.bVisible = 1;
-    if (!msg.Request()) { s = "Msg_Scene_Visibility failed"; }
-  }
-
-  if (!s) {
-    Msg_Scene_SetAutoDraw msg;
-    msg.hScene = hScene_;
-    msg.nMilliSec = 50;
-    msg.bAsync = 1;
-    if (!msg.Request()) { s = "Msg_Scene_SetAutoDraw failed"; }
-  }
+  if (!s) { if (!Msg_Scene_Position::_(hScene_, 100, 800, nWidth, nHeight)) { s = "Msg_Scene_Position failed"; }}
+  if (!s) { if (!Msg_Scene_Visibility::_(hScene_, 1)) { s = "Msg_Scene_Visibility failed"; }}
+  if (!s) { if (!Msg_Scene_SetAutoDraw::_(hScene_, 50, 1)) { s = "Msg_Scene_SetAutoDraw failed"; }}
 
   // ------------------------
 
@@ -292,11 +266,7 @@ String SceneModuleTester::Rectangle()
 
   // ------------------------
 
-  if (!s) {
-    Msg_Scene_Draw msg;
-    msg.hScene = hScene_;
-    if (!msg.Request()) { s = "Msg_Scene_Draw failed"; }
-  }
+  if (!s) { if (!Msg_Scene_Draw::_(hScene_)) { s = "Msg_Scene_Draw failed"; }}
 
   // ------------------------
 
@@ -310,27 +280,10 @@ String SceneModuleTester::Rectangle()
   //  if (!msg.Request()) { s = "Msg_Scene_Position failed"; }
   //}
 
-  if (!s) {
-    Msg_Scene_AutoDraw msg;
-    msg.hScene = hScene_;
-    if (!msg.Request()) { s = "Msg_Scene_AutoDraw failed"; }
-  }
-
-    //if (!s) {
-  //  Msg_Scene_Draw msg;
-  //  msg.hScene = hScene_;
-  //  if (!msg.Request()) { s = "Msg_Scene_Draw failed"; }
-  //}
-  //if (!s) {
-  //  Msg_Scene_Draw msg;
-  //  msg.hScene = hScene_;
-  //  if (!msg.Request()) { s = "Msg_Scene_Draw failed"; }
-  //}
+  if (!s) { if (!Msg_Scene_AutoDraw::_(hScene_)) { s = "Msg_Scene_AutoDraw failed"; } }
 
   if (0) {
-    Msg_Scene_Destroy msg;
-    msg.hScene = hScene_;
-    if (!msg.Request()) { s = "Msg_Scene_Destroy failed"; }
+    if (!s) { if (!Msg_Scene_Destroy::_(hScene_)) { s = "Msg_Scene_Destroy failed"; }}
   }
 
   return s;
@@ -378,10 +331,13 @@ String SceneModuleTester::SameConstants_EventContext()
   if (!s) { if (Msg_Scene_MouseEvent::MouseUp != EventContext::MouseUp                  ) { s = "Msg_Scene_MouseEvent::MouseUp != EventContext::MouseUp                  "; }}
   if (!s) { if (Msg_Scene_MouseEvent::MouseClick != EventContext::MouseClick            ) { s = "Msg_Scene_MouseEvent::MouseClick != EventContext::MouseClick            "; }}
   if (!s) { if (Msg_Scene_MouseEvent::MouseDoubleClick != EventContext::MouseDoubleClick) { s = "Msg_Scene_MouseEvent::MouseDoubleClick != EventContext::MouseDoubleClick"; }}
+  if (!s) { if (Msg_Scene_MouseEvent::MouseOut != EventContext::MouseOut                ) { s = "Msg_Scene_MouseEvent::MouseOut != EventContext::MouseOut"; }}
+  if (!s) { if (Msg_Scene_MouseEvent::LastEventType != EventContext::LastEventType      ) { s = "Msg_Scene_MouseEvent::LastEventType != EventContext::LastEventType"; }}
 
-  if (!s) { if (Msg_Scene_MouseEvent::LeftButton != EventContext::LeftButton    ) { s = "Msg_Scene_MouseEvent::LeftButton != EventContext::LeftButton    "; }}
-  if (!s) { if (Msg_Scene_MouseEvent::MiddleButton != EventContext::MiddleButton) { s = "Msg_Scene_MouseEvent::MiddleButton != EventContext::MiddleButton"; }}
-  if (!s) { if (Msg_Scene_MouseEvent::RightButton != EventContext::RightButton  ) { s = "Msg_Scene_MouseEvent::RightButton != EventContext::RightButton  "; }}
+  if (!s) { if (Msg_Scene_MouseEvent::LeftButton != EventContext::LeftButton            ) { s = "Msg_Scene_MouseEvent::LeftButton != EventContext::LeftButton    "; }}
+  if (!s) { if (Msg_Scene_MouseEvent::MiddleButton != EventContext::MiddleButton        ) { s = "Msg_Scene_MouseEvent::MiddleButton != EventContext::MiddleButton"; }}
+  if (!s) { if (Msg_Scene_MouseEvent::RightButton != EventContext::RightButton          ) { s = "Msg_Scene_MouseEvent::RightButton != EventContext::RightButton  "; }}
+  if (!s) { if (Msg_Scene_MouseEvent::LastMouseButton != EventContext::LastMouseButton  ) { s = "Msg_Scene_MouseEvent::LastMouseButton != EventContext::LastMouseButton  "; }}
 
   return s;
 }

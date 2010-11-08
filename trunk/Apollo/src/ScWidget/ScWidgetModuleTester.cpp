@@ -23,7 +23,7 @@ String ScWidgetModuleTester::Button()
   hScene_ = Apollo::newHandle();
 
   if (!s) { if (!Msg_Scene_Create::_(hScene_)) { s = "Msg_Scene_Create failed"; }}
-  int nWidth = 200;
+  int nWidth = 100;
   int nHeight = 100;
   if (!s) { if (!Msg_Scene_Position::_(hScene_, 100, 400, nWidth, nHeight)) { s = "Msg_Scene_Position failed"; }}
   if (!s) { if (!Msg_Scene_Visibility::_(hScene_, 1)) { s = "Msg_Scene_Visibility failed"; }}
@@ -38,8 +38,14 @@ String ScWidgetModuleTester::Button()
 
   // ------------------------
 
-  if (!s) { if (!Msg_ScWidget_CreateButton::_(hScene_, "button1", -20, -10, 40, 20)) { s = "Msg_ScWidget_CreateButton failed"; }}
-  if (!s) { if (!Msg_Scene_TranslateElement::_(hScene_, "button1", 100, 50)) { s = "Msg_Scene_TranslateElement failed"; }}
+  if (!s) { if (!Msg_ScWidget_CreateButton::_(hScene_, "button1", -50, -50, 100, 100)) { s = "Msg_ScWidget_CreateButton failed"; }}
+  if (!s) { if (!Msg_ScWidget_SetButtonImageFile::_(hScene_, "button1", Msg_ScWidget_ButtonState_Normal, Apollo::getAppResourcePath() + "test/test1.png", 0, 0)) { s = "Msg_ScWidget_SetButtonImageFile failed"; }}
+  if (!s) { if (!Msg_ScWidget_SetButtonImageFile::_(hScene_, "button1", Msg_ScWidget_ButtonState_Down, Apollo::getAppResourcePath() + "test/test2.png", 0, 0)) { s = "Msg_ScWidget_SetButtonImageFile failed"; }}
+  if (!s) { if (!Msg_ScWidget_SetButtonImageFile::_(hScene_, "button1", Msg_ScWidget_ButtonState_Up, Apollo::getAppResourcePath() + "test/test2.png", 0, 0)) { s = "Msg_ScWidget_SetButtonImageFile failed"; }}
+  if (!s) { if (!Msg_ScWidget_SetButtonState::_(hScene_, "button1", Msg_ScWidget_ButtonState_Normal)) { s = "Msg_ScWidget_SetButtonState failed"; }}
+  if (!s) { if (!Msg_Scene_TranslateElement::_(hScene_, "button1", 50, 50)) { s = "Msg_Scene_TranslateElement failed"; }}
+
+  //if (!s) { if (!Msg_Scene_DeleteElement::_(hScene_, "button1")) { s = "Msg_Scene_DeleteElement failed"; }}
 
   // ------------------------
 

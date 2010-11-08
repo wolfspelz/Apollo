@@ -15,7 +15,7 @@ Scene* SceneModule::CreateScene(const ApHandle& hScene)
   if (pScene) {
     int ok = pScene->Create();
     if (ok) {
-      surfaces_.Set(hScene, pScene);
+      scenes_.Set(hScene, pScene);
     } else {
       delete pScene;
       pScene = 0;
@@ -31,7 +31,7 @@ void SceneModule::DeleteScene(const ApHandle& hScene)
   Scene* pScene = FindScene(hScene);
   if (pScene) {
     pScene->Destroy();
-    surfaces_.Unset(hScene);
+    scenes_.Unset(hScene);
     delete pScene;
     pScene = 0;
   }
@@ -41,7 +41,7 @@ Scene* SceneModule::FindScene(const ApHandle& hScene)
 {
   Scene* pScene = 0;  
 
-  surfaces_.Get(hScene, pScene);
+  scenes_.Get(hScene, pScene);
   if (pScene == 0) { throw ApException("SceneModule::FindScene no surface=" ApHandleFormat "", ApHandleType(hScene)); }
 
   return pScene;
@@ -49,14 +49,14 @@ Scene* SceneModule::FindScene(const ApHandle& hScene)
 
 int SceneModule::HasScene(const ApHandle& hScene)
 {
-  return surfaces_.IsSet(hScene);
+  return scenes_.IsSet(hScene);
 }
 
 //---------------------------
 
 AP_MSG_HANDLER_METHOD(SceneModule, Scene_Create)
 {
-  if (surfaces_.Find(pMsg->hScene) != 0) { throw ApException("SceneModule::Scene_Create: scene=" ApHandleFormat " already exists", ApHandleType(pMsg->hScene)); }
+  if (scenes_.Find(pMsg->hScene) != 0) { throw ApException("SceneModule::Scene_Create: scene=" ApHandleFormat " already exists", ApHandleType(pMsg->hScene)); }
   Scene* pScene = CreateScene(pMsg->hScene);
   pMsg->apStatus = ApMessage::Ok;
 }
