@@ -241,21 +241,21 @@ public:
   ApIN double fAngle;
 };
 
-class Msg_Scene_HideElement: public ApRequestMessage
+class Msg_Scene_ShowElement: public ApRequestMessage
 {
 public:
-  Msg_Scene_HideElement() : ApRequestMessage("Scene_HideElement"), bHide(1) {}
-  static int _(const ApHandle& hScene, const String& sPath, int bHide)
+  Msg_Scene_ShowElement() : ApRequestMessage("Scene_ShowElement"), bShow(1) {}
+  static int _(const ApHandle& hScene, const String& sPath, int bShow)
   {
-    Msg_Scene_HideElement msg;
+    Msg_Scene_ShowElement msg;
     msg.hScene = hScene;
     msg.sPath = sPath;
-    msg.bHide = bHide;
+    msg.bShow = bShow;
     return msg.Request();
   }
   ApIN ApHandle hScene;
   ApIN String sPath;
-  ApIN int bHide;
+  ApIN int bShow;
 };
 
 class Msg_Scene_SetCopyMode: public ApRequestMessage
@@ -484,8 +484,95 @@ public:
   ApIN int nFlags;
 };
 
+class Msg_Scene_CreateTextElement: public ApRequestMessage
+{
+public:
+  Msg_Scene_CreateTextElement() : ApRequestMessage("Scene_CreateTextElement") {}
+  static int _(const ApHandle& hScene, const String& sPath)
+  {
+    Msg_Scene_CreateTextElement msg;
+    msg.hScene = hScene;
+    msg.sPath = sPath;
+    return msg.Request();
+  }
+  ApIN ApHandle hScene;
+  ApIN String sPath;
+};
+
 //--------------------------
 // Change properties
+
+//Msg_Scene_SetFontFamily' : is not a class or namespace name
+//Msg_Scene_SetFontSize' : is not a class or namespace name
+//Msg_Scene_SetFontFlags' : is not a class or namespace name
+
+class Msg_Scene_SetText: public ApRequestMessage
+{
+public:
+  Msg_Scene_SetText() : ApRequestMessage("Scene_SetText") {}
+  static int _(const ApHandle& hScene, const String& sPath, const String& sText)
+  {
+    Msg_Scene_SetText msg;
+    msg.hScene = hScene;
+    msg.sPath = sPath;
+    msg.sText = sText;
+    return msg.Request();
+  }
+  ApIN ApHandle hScene;
+  ApIN String sPath;
+  ApIN String sText;
+};
+
+class Msg_Scene_SetFontFamily: public ApRequestMessage
+{
+public:
+  Msg_Scene_SetFontFamily() : ApRequestMessage("Scene_SetFontFamily") {}
+  static int _(const ApHandle& hScene, const String& sPath, const String& sFont)
+  {
+    Msg_Scene_SetFontFamily msg;
+    msg.hScene = hScene;
+    msg.sPath = sPath;
+    msg.sFont = sFont;
+    return msg.Request();
+  }
+  ApIN ApHandle hScene;
+  ApIN String sPath;
+  ApIN String sFont;
+};
+
+class Msg_Scene_SetFontSize: public ApRequestMessage
+{
+public:
+  Msg_Scene_SetFontSize() : ApRequestMessage("Scene_SetFontSize") {}
+  static int _(const ApHandle& hScene, const String& sPath, double fSize)
+  {
+    Msg_Scene_SetFontSize msg;
+    msg.hScene = hScene;
+    msg.sPath = sPath;
+    msg.fSize = fSize;
+    return msg.Request();
+  }
+  ApIN ApHandle hScene;
+  ApIN String sPath;
+  ApIN double fSize;
+};
+
+class Msg_Scene_SetFontFlags: public ApRequestMessage
+{
+public:
+  Msg_Scene_SetFontFlags() : ApRequestMessage("Scene_SetFontFlags") {}
+  static int _(const ApHandle& hScene, const String& sPath, int nFlags)
+  {
+    Msg_Scene_SetFontFlags msg;
+    msg.hScene = hScene;
+    msg.sPath = sPath;
+    msg.nFlags = nFlags;
+    return msg.Request();
+  }
+  ApIN ApHandle hScene;
+  ApIN String sPath;
+  ApIN int nFlags;
+};
 
 class Msg_Scene_SetPosition: public ApRequestMessage
 {
@@ -529,13 +616,13 @@ public:
   ApIN double fH;
 };
 
-class Msg_Scene_RoundedRectangle: public ApRequestMessage
+class Msg_Scene_SetRoundedRectangle: public ApRequestMessage
 {
 public:
-  Msg_Scene_RoundedRectangle() : ApRequestMessage("Scene_RoundedRectangle"), fRadius(0.0) {}
+  Msg_Scene_SetRoundedRectangle() : ApRequestMessage("Scene_SetRoundedRectangle"), fRadius(0.0) {}
   static int _(const ApHandle& hScene, const String& sPath, double fRadius)
   {
-    Msg_Scene_RoundedRectangle msg;
+    Msg_Scene_SetRoundedRectangle msg;
     msg.hScene = hScene;
     msg.sPath = sPath;
     msg.fRadius = fRadius;
@@ -546,13 +633,13 @@ public:
   ApIN double fRadius;
 };
 
-class Msg_Scene_CurvedRectangle: public ApRequestMessage
+class Msg_Scene_SetCurvedRectangle: public ApRequestMessage
 {
 public:
-  Msg_Scene_CurvedRectangle() : ApRequestMessage("Scene_CurvedRectangle") {}
+  Msg_Scene_SetCurvedRectangle() : ApRequestMessage("Scene_SetCurvedRectangle") {}
   static int _(const ApHandle& hScene, const String& sPath)
   {
-    Msg_Scene_CurvedRectangle msg;
+    Msg_Scene_SetCurvedRectangle msg;
     msg.hScene = hScene;
     msg.sPath = sPath;
     return msg.Request();
@@ -816,6 +903,36 @@ public:
   ApOUT double fAdvanceY;
 };
 
+class Msg_Scene_MeasureText: public ApRequestMessage
+{
+public:
+  Msg_Scene_MeasureText() : ApRequestMessage("Scene_MeasureText") {}
+  static int _(const ApHandle& hScene, const String& sPath, double& fBearingX, double& fBearingY, double& fWidth, double& fHeight, double& fAdvanceX, double& fAdvanceY)
+  {
+    Msg_Scene_MeasureText msg;
+    msg.hScene = hScene;
+    msg.sPath = sPath;
+    int ok = msg.Request();
+    if (ok) {
+      fBearingX = msg.fBearingX;
+      fBearingY = msg.fBearingY;
+      fWidth = msg.fWidth;
+      fHeight = msg.fHeight;
+      fAdvanceX = msg.fAdvanceX;
+      fAdvanceY = msg.fAdvanceY;
+    } 
+    return ok;
+  }
+  ApIN ApHandle hScene;
+  ApIN String sPath;
+  ApOUT double fBearingX;
+  ApOUT double fBearingY;
+  ApOUT double fWidth;
+  ApOUT double fHeight;
+  ApOUT double fAdvanceX;
+  ApOUT double fAdvanceY;
+};
+
 class Msg_Scene_GetImageSizeFromData: public ApRequestMessage
 {
 public:
@@ -936,13 +1053,14 @@ public:
     ,LastMouseButton
   } MouseButton;
 
-  Msg_Scene_MouseEvent() : ApNotificationMessage("Scene_MouseEvent"), nEvent(NoEventType), nButton(NoMouseButton), fX(0), fY(0) {}
+  Msg_Scene_MouseEvent() : ApNotificationMessage("Scene_MouseEvent"), nEvent(NoEventType), nButton(NoMouseButton), fX(0), fY(0), bInside(0) {}
   ApIN ApHandle hScene;
   ApIN String sPath;
   ApIN int nEvent;
   ApIN int nButton;
   ApIN double fX;
   ApIN double fY;
+  ApIN int bInside;
 };
 
 #endif // !defined(MsgScene_h_INCLUDED)

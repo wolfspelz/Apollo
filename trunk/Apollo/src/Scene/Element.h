@@ -55,7 +55,7 @@ public:
     ,fScaleY_(1.0)
     ,fRotate_(0.0)
     ,nCopyMode_(CAIRO_OPERATOR_OVER)
-    ,bHide_(0)
+    ,bShow_(1)
   {}
   virtual ~Element();
 
@@ -74,7 +74,7 @@ public:
   void Translate(double fX, double fY);
   void Scale(double fX, double fY);
   void Rotate(double fAngle);
-  void Hide(int bHide);
+  void Show(int bShow);
   void CopyMode(int nMode);
 
   void GetTranslate(double& fX, double& fY);
@@ -109,7 +109,7 @@ protected:
 
   int nCopyMode_;
 
-  int bHide_;
+  int bShow_;
 
 #if defined(AP_TEST)
   friend class SceneModuleTester;

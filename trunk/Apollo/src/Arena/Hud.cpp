@@ -190,7 +190,7 @@ void Hud::ShowBottomBar()
   bBottomBarEngaged_ = 1;
 
   SizeBottomSensor();
-  Msg_Scene_HideElement::_(hScene_, ELEMENT_BOTTOMBAR, 0);
+  Msg_Scene_ShowElement::_(hScene_, ELEMENT_BOTTOMBAR, 1);
   RestartBottomBarTimer();
 }
 
@@ -221,7 +221,7 @@ void Hud::HideBottomBar()
 {
   bBottomBarEngaged_ = 0;
 
-  Msg_Scene_HideElement::_(hScene_, ELEMENT_BOTTOMBAR, 1);
+  Msg_Scene_ShowElement::_(hScene_, ELEMENT_BOTTOMBAR, 0);
   SizeBottomSensor();
 }
 

@@ -6,7 +6,6 @@
 
 #include "Local.h"
 #include "ApTypes.h"
-#include "ApLog.h"
 #include "MsgScene.h"
 #include "MsgUnitTest.h"
 #include "SceneModuleTester.h"
@@ -206,11 +205,18 @@ String SceneModuleTester::Rectangle()
   double fText3X = fText2X;
   double fText3Y = fText2Y + fText2H * fText2Scale + fText2Padding + 4;
   double fText3Size = 30;
+  double fText3Scale = 0.7;
   if (!s) { if (!Msg_Scene_CreateElement::_(hScene_, "text3")) { s = "Msg_Scene_CreateElement failed"; }}
   if (!s) { if (!Msg_Scene_TranslateElement::_(hScene_, "text3", fText3X + fText3W / 2, fText3Y + fText3H / 2)) { s = "Msg_Scene_TranslateElement failed"; }}
-  if (!s) { if (!Msg_Scene_ScaleElement::_(hScene_, "text3", 0.7, 0.7)) { s = "Msg_Scene_ScaleElement failed"; }}
-  if (!s) { if (!Msg_Scene_CreateText::_(hScene_, "text3/text", - fText3W / 2, - fText3H / 2, sText3, "Courier New", 30, Msg_Scene_FontFlags::Bold)) { s = "Msg_Scene_CreateText failed"; }}
+  if (!s) { if (!Msg_Scene_ScaleElement::_(hScene_, "text3", fText3Scale, fText3Scale)) { s = "Msg_Scene_ScaleElement failed"; }}
+  if (!s) { if (!Msg_Scene_CreateTextElement::_(hScene_, "text3/text")) { s = "Msg_Scene_CreateText failed"; }}
+  if (!s) { if (!Msg_Scene_SetText::_(hScene_, "text3/text", sText3)) { s = "Msg_Scene_CreateText failed"; }}
+  if (!s) { if (!Msg_Scene_SetPosition::_(hScene_, "text3/text", - fText3W / 2, - fText3H / 2)) { s = "Msg_Scene_CreateText failed"; }}
+  if (!s) { if (!Msg_Scene_SetFontFamily::_(hScene_, "text3/text", "Courier New")) { s = "Msg_Scene_CreateText failed"; }}
+  if (!s) { if (!Msg_Scene_SetFontSize::_(hScene_, "text3/text", 30)) { s = "Msg_Scene_CreateText failed"; }}
+  if (!s) { if (!Msg_Scene_SetFontFlags::_(hScene_, "text3/text", Msg_Scene_FontFlags::Bold)) { s = "Msg_Scene_CreateText failed"; }}
   if (!s) { if (!Msg_Scene_SetFillColor::_(hScene_, "text3/text", 0.5, 0, 0.5, 1)) { s = "Msg_Scene_SetFillColor failed"; }}
+  //if (!s) { if (!Msg_Scene_ShowElement::_(hScene_, "text3/text", 1)) { s = "Msg_Scene_ShowElement failed"; }}
   if (!s) { if (!Msg_Scene_CreateRectangle::_(hScene_, "text3/frame", - fText3Padding - fText3W / 2, - fText3Padding - fText3H / 2, fText3W + 2*fText3Padding, fText3H + 2*fText3Padding)) { s = "Msg_Scene_CreateRectangle failed"; }}
   if (!s) { if (!Msg_Scene_SetFillColor::_(hScene_, "text3/frame", 1, 0, 1, 0.5)) { s = "Msg_Scene_SetFillColor failed"; }}
   if (!s) { if (!Msg_Scene_SetStrokeColor::_(hScene_, "text3/frame", 0, 0, 0, 1)) { s = "Msg_Scene_SetStrokeColor failed"; }}
@@ -241,12 +247,12 @@ String SceneModuleTester::Rectangle()
   if (!s) { if (!Msg_Scene_SetStrokeColor::_(hScene_, "copymode1", 0, 0, 0, 1)) { s = "Msg_Scene_SetStrokeColor failed"; }}
   if (!s) { if (!Msg_Scene_SetStrokeWidth::_(hScene_, "copymode1", 1)) { s = "Msg_Scene_SetStrokeWidth failed"; }}
   if (!s) { if (!Msg_Scene_TranslateElement::_(hScene_, "copymode1", 230.5, 40.5)) { s = "Msg_Scene_TranslateElement failed"; }}
-  if (!s) { if (!Msg_Scene_RoundedRectangle::_(hScene_, "copymode1", 0)) { s = "Msg_Scene_RoundRectangleCorners failed"; }}
+  if (!s) { if (!Msg_Scene_SetRoundedRectangle::_(hScene_, "copymode1", 0)) { s = "Msg_Scene_RoundRectangleCorners failed"; }}
   if (!s) { if (!Msg_Scene_CreateRectangle::_(hScene_, "copymode2", -50, -15, 100, 30)) { s = "Msg_Scene_CreateRectangle failed"; }}
   if (!s) { if (!Msg_Scene_SetFillColor::_(hScene_, "copymode2", 0, 1, 0, 0.5)) { s = "Msg_Scene_SetFillColor failed"; }}
   if (!s) { if (!Msg_Scene_TranslateElement::_(hScene_, "copymode2", 280.5, 40.5)) { s = "Msg_Scene_TranslateElement failed"; }}
   if (!s) { if (!Msg_Scene_SetCopyMode::_(hScene_, "copymode2", Msg_Scene_SetCopyMode::Source)) { s = "Msg_Scene_SetCopyMode failed"; }}
-  if (!s) { if (!Msg_Scene_CurvedRectangle::_(hScene_, "copymode2")) { s = "Msg_Scene_CurvedRectangle failed"; }}
+  if (!s) { if (!Msg_Scene_SetCurvedRectangle::_(hScene_, "copymode2")) { s = "Msg_Scene_SetCurvedRectangle failed"; }}
 
   // ------------------------
 
@@ -260,7 +266,7 @@ String SceneModuleTester::Rectangle()
     if (!s) { if (!Msg_Scene_SetFillColor::_(hScene_, sPath + "2-inner/2-red", 1, 0, 0, 1)) { s = "Msg_Scene_SetFillColor failed"; }}
     if (!s) { if (!Msg_Scene_TranslateElement::_(hScene_, sPath, 180 + 42 * i, 90)) { s = "Msg_Scene_TranslateElement failed"; }}
     if (i == 1) {
-      if (!s) { if (!Msg_Scene_HideElement::_(hScene_, sPath + "2-inner", 1)) { s = "Msg_Scene_HideElement failed"; }}
+      if (!s) { if (!Msg_Scene_ShowElement::_(hScene_, sPath + "2-inner", 0)) { s = "Msg_Scene_ShowElement failed"; }}
     }
   }
 

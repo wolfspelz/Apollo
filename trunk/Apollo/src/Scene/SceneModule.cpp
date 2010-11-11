@@ -42,7 +42,7 @@ Scene* SceneModule::FindScene(const ApHandle& hScene)
   Scene* pScene = 0;  
 
   scenes_.Get(hScene, pScene);
-  if (pScene == 0) { throw ApException("SceneModule::FindScene no surface=" ApHandleFormat "", ApHandleType(hScene)); }
+  if (pScene == 0) { throw ApException("SceneModule::FindScene no scene=" ApHandleFormat "", ApHandleType(hScene)); }
 
   return pScene;
 }
@@ -161,10 +161,10 @@ AP_MSG_HANDLER_METHOD(SceneModule, Scene_RotateElement)
   pMsg->apStatus = ApMessage::Ok;
 }
 
-AP_MSG_HANDLER_METHOD(SceneModule, Scene_HideElement)
+AP_MSG_HANDLER_METHOD(SceneModule, Scene_ShowElement)
 {
   Scene* pScene = FindScene(pMsg->hScene);
-  pScene->GetElement(pMsg->sPath)->Hide(pMsg->bHide);
+  pScene->GetElement(pMsg->sPath)->Show(pMsg->bShow);
   pScene->AutoDraw();
   pMsg->apStatus = ApMessage::Ok;
 }
@@ -195,6 +195,16 @@ AP_MSG_HANDLER_METHOD(SceneModule, Scene_GetRotateElement)
 {
   Scene* pScene = FindScene(pMsg->hScene);
   pScene->GetElement(pMsg->sPath)->GetRotate(pMsg->fAngle);
+  pMsg->apStatus = ApMessage::Ok;
+}
+
+AP_MSG_HANDLER_METHOD(SceneModule, Scene_CreateMouseSensor)
+{
+  Scene* pScene = FindScene(pMsg->hScene);
+  SensorElement* pSensor = pScene->CreateSensor(pMsg->sPath);
+  pSensor->SetPosition(pMsg->fX, pMsg->fY);
+  pSensor->SetSize(pMsg->fW, pMsg->fH);
+  pScene->AutoDraw();
   pMsg->apStatus = ApMessage::Ok;
 }
 
@@ -242,17 +252,53 @@ AP_MSG_HANDLER_METHOD(SceneModule, Scene_CreateText)
   TextElement* pText = pScene->CreateText(pMsg->sPath);
   pText->SetPosition(pMsg->fX, pMsg->fY);
   pText->SetString(pMsg->sText);
-  pText->SetFont(pMsg->sFont, pMsg->fSize, pMsg->nFlags);
+  pText->SetFont(pMsg->sFont);
+  pText->SetSize(pMsg->fSize);
+  pText->SetFlags(pMsg->nFlags);
   pScene->AutoDraw();
   pMsg->apStatus = ApMessage::Ok;
 }
 
-AP_MSG_HANDLER_METHOD(SceneModule, Scene_CreateMouseSensor)
+AP_MSG_HANDLER_METHOD(SceneModule, Scene_CreateTextElement)
 {
   Scene* pScene = FindScene(pMsg->hScene);
-  SensorElement* pSensor = pScene->CreateSensor(pMsg->sPath);
-  pSensor->SetPosition(pMsg->fX, pMsg->fY);
-  pSensor->SetSize(pMsg->fW, pMsg->fH);
+  TextElement* pText = pScene->CreateText(pMsg->sPath);
+  //pText->Hide(1);
+  pMsg->apStatus = ApMessage::Ok;
+}
+
+AP_MSG_HANDLER_METHOD(SceneModule, Scene_SetText)
+{
+  Scene* pScene = FindScene(pMsg->hScene);
+  TextElement* pText = pScene->GetElement(pMsg->sPath)->AsText();
+  pText->SetString(pMsg->sText);
+  pScene->AutoDraw();
+  pMsg->apStatus = ApMessage::Ok;
+}
+
+AP_MSG_HANDLER_METHOD(SceneModule, Scene_SetFontFamily)
+{
+  Scene* pScene = FindScene(pMsg->hScene);
+  TextElement* pText = pScene->GetElement(pMsg->sPath)->AsText();
+  pText->SetFont(pMsg->sFont);
+  pScene->AutoDraw();
+  pMsg->apStatus = ApMessage::Ok;
+}
+
+AP_MSG_HANDLER_METHOD(SceneModule, Scene_SetFontSize)
+{
+  Scene* pScene = FindScene(pMsg->hScene);
+  TextElement* pText = pScene->GetElement(pMsg->sPath)->AsText();
+  pText->SetSize(pMsg->fSize);
+  pScene->AutoDraw();
+  pMsg->apStatus = ApMessage::Ok;
+}
+
+AP_MSG_HANDLER_METHOD(SceneModule, Scene_SetFontFlags)
+{
+  Scene* pScene = FindScene(pMsg->hScene);
+  TextElement* pText = pScene->GetElement(pMsg->sPath)->AsText();
+  pText->SetFlags(pMsg->nFlags);
   pScene->AutoDraw();
   pMsg->apStatus = ApMessage::Ok;
 }
@@ -280,7 +326,7 @@ AP_MSG_HANDLER_METHOD(SceneModule, Scene_SetRectangle)
   pMsg->apStatus = ApMessage::Ok;
 }
 
-AP_MSG_HANDLER_METHOD(SceneModule, Scene_RoundedRectangle)
+AP_MSG_HANDLER_METHOD(SceneModule, Scene_SetRoundedRectangle)
 {
   Scene* pScene = FindScene(pMsg->hScene);
   RectangleElement* pRectangle = pScene->GetElement(pMsg->sPath)->AsRectangle();
@@ -290,7 +336,7 @@ AP_MSG_HANDLER_METHOD(SceneModule, Scene_RoundedRectangle)
   pMsg->apStatus = ApMessage::Ok;
 }
 
-AP_MSG_HANDLER_METHOD(SceneModule, Scene_CurvedRectangle)
+AP_MSG_HANDLER_METHOD(SceneModule, Scene_SetCurvedRectangle)
 {
   Scene* pScene = FindScene(pMsg->hScene);
   RectangleElement* pRectangle = pScene->GetElement(pMsg->sPath)->AsRectangle();
@@ -423,6 +469,28 @@ AP_MSG_HANDLER_METHOD(SceneModule, Scene_GetTextExtents)
   pMsg->apStatus = ApMessage::Ok;
 }
 
+AP_MSG_HANDLER_METHOD(SceneModule, Scene_MeasureText)
+{
+  Scene* pScene = FindScene(pMsg->hScene);
+  TextElement* pText = pScene->GetElement(pMsg->sPath)->AsText();
+
+  String sFont = pText->GetFont();
+  double fSize = pText->GetSize();
+
+  if (sFont.empty() || fSize == 0.0) { throw ApException("SceneModule::Scene_GetTextExtents missing font or size scene=" ApHandleFormat " path=%s", ApHandleType(pMsg->hScene), StringType(pMsg->sPath)); }
+
+  TextExtents te;
+  pScene->GetTextExtents(pText->GetString(), sFont, fSize, pText->GetFlags(), te);
+  pMsg->fBearingX = te.fBearingX_;
+  pMsg->fBearingY = te.fBearingY_;
+  pMsg->fWidth = te.fWidth_;
+  pMsg->fHeight = te.fHeight_;
+  pMsg->fAdvanceX = te.fAdvanceX_;
+  pMsg->fAdvanceY = te.fAdvanceY_;
+ 
+  pMsg->apStatus = ApMessage::Ok;
+}
+
 AP_MSG_HANDLER_METHOD(SceneModule, Scene_GetImageSizeFromData)
 {
   Scene* pScene = FindScene(pMsg->hScene);
@@ -513,7 +581,7 @@ int SceneModule::Init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_TranslateElement, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_ScaleElement, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_RotateElement, this, ApCallbackPosNormal);
-  AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_HideElement, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_ShowElement, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_SetCopyMode, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_GetTranslateElement, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_GetScaleElement, this, ApCallbackPosNormal);
@@ -523,10 +591,15 @@ int SceneModule::Init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_CreateImageFromData, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_CreateImageFromFile, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_CreateText, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_CreateTextElement, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_SetText, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_SetFontFamily, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_SetFontSize, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_SetFontFlags, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_SetPosition, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_SetRectangle, this, ApCallbackPosNormal);
-  AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_RoundedRectangle, this, ApCallbackPosNormal);
-  AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_CurvedRectangle, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_SetRoundedRectangle, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_SetCurvedRectangle, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_SetFillColor, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_SetStrokeColor, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_SetStrokeWidth, this, ApCallbackPosNormal);
@@ -540,6 +613,7 @@ int SceneModule::Init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_DeleteImageFile, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_SetImageAlpha, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_GetTextExtents, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_MeasureText, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_GetImageSizeFromData, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_GetImageSizeFromFile, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_CaptureMouse, this, ApCallbackPosNormal);

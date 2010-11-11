@@ -5,7 +5,6 @@
 // ============================================================================
 
 #include "Apollo.h"
-#include "ApLog.h"
 #include "Local.h"
 #include "Primitives.h"
 #include "Scene.h"
@@ -312,6 +311,7 @@ void SensorElement::MouseReleased()
 void SensorElement::MouseEvent(EventContext& gc, double fX, double fY)
 {
   int bHit = 0;
+  int bInside = 0;
 
   fX -= fTranslateX_;
   fY -= fTranslateY_;
@@ -320,10 +320,9 @@ void SensorElement::MouseEvent(EventContext& gc, double fX, double fY)
     bHit = 1;
   }
 
-  if (!bHit) {
-    if (fX_ < fX && fX_ + fW_ > fX && fY_ < fY && fY_ + fH_ > fY) {
-      bHit = true;
-    }
+  if (fX_ < fX && fX_ + fW_ > fX && fY_ < fY && fY_ + fH_ > fY) {
+    bInside = 1;
+    bHit = 1;
   }
 
   int nEvent = 0;
@@ -339,6 +338,7 @@ void SensorElement::MouseEvent(EventContext& gc, double fX, double fY)
       msg.nButton = EventContext::NoMouseButton;
       msg.fX = fX;
       msg.fY = fY;
+      msg.bInside = bInside;
       msg.Send();
       nEvent = msg.nEvent;
 
@@ -355,6 +355,7 @@ void SensorElement::MouseEvent(EventContext& gc, double fX, double fY)
       msg.nButton = gc.nButton_;
       msg.fX = fX;
       msg.fY = fY;
+      msg.bInside = bInside;
       msg.Send();
       nEvent = msg.nEvent;
 
@@ -367,6 +368,6 @@ void SensorElement::MouseEvent(EventContext& gc, double fX, double fY)
 
   }
 
-  apLog_Debug((LOG_CHANNEL, "SensorElement::MouseEvent", "timer=%d hit=%d x=%d y=%d ev=%d", gc.bTimer_, bHit, (int) fX, (int) fY, nEvent));
+  //apLog_Debug((LOG_CHANNEL, "SensorElement::MouseEvent", "timer=%d hit=%d x=%d y=%d ev=%d", gc.bTimer_, bHit, (int) fX, (int) fY, nEvent));
 }
 

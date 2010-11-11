@@ -5,7 +5,6 @@
 // ============================================================================
 
 #include "Apollo.h"
-#include "ApLog.h"
 #if defined(WIN32)
   #include "MsgMainLoop.h"
 #endif // WIN32
@@ -545,7 +544,9 @@ void Scene::GetTextExtents(const String& sText, const String& sFont, double fSiz
 
   TextElement t(this);
   t.SetString(sText);
-  t.SetFont(sFont, fSize, nFlags);
+  t.SetFont(sFont);
+  t.SetSize(fSize);
+  t.SetFlags(nFlags);
   t.GetExtents(gc, te);
 }
 
