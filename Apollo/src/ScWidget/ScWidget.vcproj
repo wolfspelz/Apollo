@@ -158,6 +158,10 @@
 			UniqueIdentifier="{25176522-3EBF-4f71-A198-9D3575408D88}"
 			>
 			<File
+				RelativePath=".\Button.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\dll.cpp"
 				>
 			</File>
@@ -169,12 +173,20 @@
 				RelativePath=".\ScWidgetModuleTester.cpp"
 				>
 			</File>
+			<File
+				RelativePath=".\Widget.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{AB435BB3-9075-442a-B525-3317326416EA}"
 			>
+			<File
+				RelativePath=".\Button.h"
+				>
+			</File>
 			<File
 				RelativePath=".\dll.h"
 				>
@@ -189,6 +201,10 @@
 			</File>
 			<File
 				RelativePath=".\ScWidgetModuleTester.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Widget.h"
 				>
 			</File>
 		</Filter>
