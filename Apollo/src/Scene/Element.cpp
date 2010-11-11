@@ -5,7 +5,6 @@
 // ============================================================================
 
 #include "Apollo.h"
-#include "ApLog.h"
 #include "Local.h"
 #include "Element.h"
 #include "Scene.h"
@@ -172,9 +171,9 @@ void Element::Rotate(double fAngle)
   CheckSaveRestore();
 }
 
-void Element::Hide(int bHide)
+void Element::Show(int bShow)
 {
-  bHide_ = bHide;
+  bShow_ = bShow;
 }
 
 void Element::CopyMode(int nMode)
@@ -253,7 +252,7 @@ SensorElement* Element::AsSensor()
 
 void Element::DrawRecursive(DrawContext& gc)
 {
-  if (bHide_) { return; }
+  if (!bShow_) { return; }
 
   if (gc.nDepth_ == 0) {
     if (pScene_->LogDraw()) {
@@ -314,7 +313,7 @@ void Element::DrawRecursive(DrawContext& gc)
 
 void Element::MouseEventRecursive(EventContext& gc, double fX, double fY)
 {
-  if (bHide_) { return; }
+  if (!bShow_) { return; }
 
   gc.nDepth_++;
 

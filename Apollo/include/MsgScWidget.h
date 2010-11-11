@@ -11,23 +11,6 @@
 
 //--------------------------
 
-class Msg_ScWidget_Show: public ApRequestMessage
-{
-public:
-  Msg_ScWidget_Show() : ApRequestMessage("ScWidget_Show") {}
-  static int _(const ApHandle& hScene, const String& sPath)
-  {
-    Msg_ScWidget_Show msg;
-    msg.hScene = hScene;
-    msg.sPath = sPath;
-    return msg.Request();
-  }
-  ApIN ApHandle hScene;
-  ApIN String sPath;
-};
-
-//--------------------------
-
 class Msg_ScWidget_CreateButton: public ApRequestMessage
 {
 public:
@@ -76,7 +59,7 @@ public:
 
 #define Msg_ScWidget_ButtonState_Normal "Normal"
 #define Msg_ScWidget_ButtonState_Down "Down"
-#define Msg_ScWidget_ButtonState_Up "Up"
+#define Msg_ScWidget_ButtonState_High "High"
 #define Msg_ScWidget_ButtonState_Disabled "Disabled"
 
 class Msg_ScWidget_SetButtonState: public ApRequestMessage
@@ -94,6 +77,129 @@ public:
   ApIN ApHandle hScene;
   ApIN String sPath;
   ApIN String sState;
+};
+
+class Msg_ScWidget_SetButtonActive: public ApRequestMessage
+{
+public:
+  Msg_ScWidget_SetButtonActive() : ApRequestMessage("ScWidget_SetButtonActive"), bActive(1) {}
+  static int _(const ApHandle& hScene, const String& sPath, int bActive)
+  {
+    Msg_ScWidget_SetButtonActive msg;
+    msg.hScene = hScene;
+    msg.sPath = sPath;
+    msg.bActive = bActive;
+    return msg.Request();
+  }
+  ApIN ApHandle hScene;
+  ApIN String sPath;
+  int bActive;
+};
+
+class Msg_ScWidget_SetButtonText: public ApRequestMessage
+{
+public:
+  Msg_ScWidget_SetButtonText() : ApRequestMessage("ScWidget_SetButtonText") {}
+  static int _(const ApHandle& hScene, const String& sPath, const String& sText)
+  {
+    Msg_ScWidget_SetButtonText msg;
+    msg.hScene = hScene;
+    msg.sPath = sPath;
+    msg.sText = sText;
+    return msg.Request();
+  }
+  ApIN ApHandle hScene;
+  ApIN String sPath;
+  ApIN String sText;
+};
+
+class Msg_ScWidget_SetButtonTextFont: public ApRequestMessage
+{
+public:
+  Msg_ScWidget_SetButtonTextFont() : ApRequestMessage("ScWidget_SetButtonTextFont") {}
+  static int _(const ApHandle& hScene, const String& sPath, const String& sFont)
+  {
+    Msg_ScWidget_SetButtonTextFont msg;
+    msg.hScene = hScene;
+    msg.sPath = sPath;
+    msg.sFont = sFont;
+    return msg.Request();
+  }
+  ApIN ApHandle hScene;
+  ApIN String sPath;
+  ApIN String sFont;
+};
+
+class Msg_ScWidget_SetButtonTextSize: public ApRequestMessage
+{
+public:
+  Msg_ScWidget_SetButtonTextSize() : ApRequestMessage("ScWidget_SetButtonTextSize") {}
+  static int _(const ApHandle& hScene, const String& sPath, double fSize)
+  {
+    Msg_ScWidget_SetButtonTextSize msg;
+    msg.hScene = hScene;
+    msg.sPath = sPath;
+    msg.fSize = fSize;
+    return msg.Request();
+  }
+  ApIN ApHandle hScene;
+  ApIN String sPath;
+  ApIN double fSize;
+};
+
+class Msg_ScWidget_SetButtonTextFlags: public ApRequestMessage
+{
+public:
+  Msg_ScWidget_SetButtonTextFlags() : ApRequestMessage("ScWidget_SetButtonTextFlags") {}
+  static int _(const ApHandle& hScene, const String& sPath, int nFlags)
+  {
+    Msg_ScWidget_SetButtonTextFlags msg;
+    msg.hScene = hScene;
+    msg.sPath = sPath;
+    msg.nFlags = nFlags;
+    return msg.Request();
+  }
+  ApIN ApHandle hScene;
+  ApIN String sPath;
+  ApIN int nFlags;
+};
+
+class Msg_ScWidget_SetButtonTextColor: public ApRequestMessage
+{
+public:
+  Msg_ScWidget_SetButtonTextColor() : ApRequestMessage("ScWidget_SetButtonTextColor"), fRed(0.0), fGreen(0.0), fBlue(0.0), fAlpha(1.0) {}
+  static int _(const ApHandle& hScene, const String& sPath, double fRed, double fGreen, double fBlue, double fAlpha)
+  {
+    Msg_ScWidget_SetButtonTextColor msg;
+    msg.hScene = hScene;
+    msg.sPath = sPath;
+    msg.fRed = fRed;
+    msg.fGreen = fGreen;
+    msg.fBlue = fBlue;
+    msg.fAlpha = fAlpha;
+    return msg.Request();
+  }
+  ApIN ApHandle hScene;
+  ApIN String sPath;
+  ApIN double fRed;
+  ApIN double fGreen;
+  ApIN double fBlue;
+  ApIN double fAlpha;
+};
+
+class Msg_ScWidget_DeleteButtonText: public ApRequestMessage
+{
+public:
+  Msg_ScWidget_DeleteButtonText() : ApRequestMessage("ScWidget_DeleteButtonText") {}
+  static int _(const ApHandle& hScene, const String& sPath)
+  {
+    Msg_ScWidget_DeleteButtonText msg;
+    msg.hScene = hScene;
+    msg.sPath = sPath;
+    return msg.Request();
+  }
+  ApIN ApHandle hScene;
+  ApIN String sPath;
 };
 
 class Msg_ScWidget_SetButtonImageFile: public ApRequestMessage
@@ -117,6 +223,23 @@ public:
   ApIN String sFile;
   ApIN double fX;
   ApIN double fY;
+};
+
+// Widget ->
+class Msg_ScWidget_ButtonEvent: public ApNotificationMessage
+{
+public:
+  typedef enum _EventType { NoButtonEvent
+    ,ButtonHigh
+    ,ButtonDown
+    ,ButtonClick
+    ,LastButtonEvent
+  } EventType;
+
+  Msg_ScWidget_ButtonEvent() : ApNotificationMessage("ScWidget_ButtonEvent"), nEvent(NoButtonEvent) {}
+  ApIN ApHandle hScene;
+  ApIN String sPath;
+  ApIN int nEvent;
 };
 
 

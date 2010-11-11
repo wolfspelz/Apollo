@@ -480,7 +480,7 @@ void Avatar::SetChatline(const ApHandle& hChat, const String& sText)
   Msg_Scene_SetFillColor::_(hScene_, sChatPath + "/" ELEMENT_CHAT_BOX, cBackground.r, cBackground.g, cBackground.b, cBackground.a);
   Msg_Scene_SetStrokeColor::_(hScene_, sChatPath + "/" ELEMENT_CHAT_BOX, cBorder.r, cBorder.g, cBorder.b, cBorder.a);
   Msg_Scene_SetStrokeWidth::_(hScene_, sChatPath + "/" ELEMENT_CHAT_BOX, fBorderWidth);
-  Msg_Scene_RoundedRectangle::_(hScene_, sChatPath + "/" ELEMENT_CHAT_BOX, 0);
+  Msg_Scene_SetRoundedRectangle::_(hScene_, sChatPath + "/" ELEMENT_CHAT_BOX, 0);
 
   Msg_Scene_CreateText::_(hScene_, sChatPath + "/" ELEMENT_CHAT_TEXT, 0, 0, sTruncatedChat, sFont, nSize, nFlags);
   Msg_Scene_SetFillColor::_(hScene_, sChatPath + "/" ELEMENT_CHAT_TEXT, cText.r, cText.g, cText.b, cText.a);

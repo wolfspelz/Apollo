@@ -27,7 +27,6 @@ public:
 
   inline int IsButton() { return 0; }
 
-  virtual void Show() {}
   virtual void Delete() {}
   virtual void SetCoordinates(double fX, double fY, double fW, double fH);
   Button* AsButton();
@@ -44,10 +43,10 @@ protected:
   double fH_;
 };
 
-class ButtonState
+class ButtonStateConfig
 {
 public:
-  ButtonState()
+  ButtonStateConfig()
     :fX_(0.0)
     ,fY_(0.0)
   {}
@@ -57,28 +56,57 @@ public:
   double fY_;
 };
 
-typedef StringTree<ButtonState> ButtonStateList;
-typedef StringTreeNode<ButtonState> ButtonStateListNode;
-typedef StringTreeIterator<ButtonState> ButtonStateListIterator;
+typedef Tree<int, ButtonStateConfig, LessThan<int>> ButtonStateConfigList;
+typedef TreeNode<int, ButtonStateConfig> ButtonStateConfigListNode;
+typedef TreeIterator<int, ButtonStateConfig, LessThan<int>> ButtonStateConfigListIterator;
 
 class Button: public Widget
 {
 public:
   Button(const ApHandle& hScene, const String& sPath);
-  virtual Button::~Button() {}
+  virtual ~Button() {}
+
+  typedef enum _ButtonState { NoButtonState
+    ,NormalButtonState
+    ,DownButtonState
+    ,HighButtonState
+    ,DisabledButtonState
+    ,LastButtonState
+  } ButtonState;
 
   inline int IsButton() { return 1; }
 
+  static ButtonState String2State(const String& sName);
+
   void Create();
-  void SetState(const String& sName);
-  void ShowState();
-  void SetImageFile(const String& sName, const String& sFile, double fX, double fY);
+  void Active(int bActive);
+  void SetState(ButtonState nState);
+  void SetText(const String& sText);
+  void DeleteText();
+  void SetFontFamily(const String& sFont);
+  void SetFontSize(double fSize);
+  void SetFontFlags(int nFlags);
+  void SetFontColor(double fRed, double fGreen, double fBlue, double fAlpha);
+  void SetImageFile(ButtonState nState, const String& sFile, double fX, double fY);
+  String GetTextPath();
 
   void OnMouseEvent(Msg_Scene_MouseEvent* pMsg);
 
 protected:
-  ButtonStateList states_;
-  String sState_;
+  void ShowState();
+  void PositionText();
+  void DoClick();
+  void GetTextPos(double& fTextX, double& fTextY);
+
+protected:
+  ButtonStateConfigList states_;
+  ButtonState nState_;
+  int bActive_;
+  int bMouseDown_;
+
+  int bHasText_;
+  double fTextOffsetX_;
+  double fTextOffsetY_;
 };
 
 typedef StringPointerTree<Widget*> WidgetList;
@@ -113,8 +141,14 @@ public:
   void On_ScWidget_CreateButton(Msg_ScWidget_CreateButton* pMsg);
   void On_ScWidget_SetCoordinates(Msg_ScWidget_SetCoordinates* pMsg);
   void On_ScWidget_SetButtonState(Msg_ScWidget_SetButtonState* pMsg);
+  void On_ScWidget_SetButtonActive(Msg_ScWidget_SetButtonActive* pMsg);
+  void On_ScWidget_SetButtonText(Msg_ScWidget_SetButtonText* pMsg);
+  void On_ScWidget_DeleteButtonText(Msg_ScWidget_DeleteButtonText* pMsg);
+  void On_ScWidget_SetButtonTextFont(Msg_ScWidget_SetButtonTextFont* pMsg);
+  void On_ScWidget_SetButtonTextSize(Msg_ScWidget_SetButtonTextSize* pMsg);
+  void On_ScWidget_SetButtonTextFlags(Msg_ScWidget_SetButtonTextFlags* pMsg);
+  void On_ScWidget_SetButtonTextColor(Msg_ScWidget_SetButtonTextColor* pMsg);
   void On_ScWidget_SetButtonImageFile(Msg_ScWidget_SetButtonImageFile* pMsg);
-  void On_ScWidget_Show(Msg_ScWidget_Show* pMsg);
   void On_Scene_DeleteElement(Msg_Scene_DeleteElement* pMsg);
   void On_Scene_MouseEvent(Msg_Scene_MouseEvent* pMsg);
 

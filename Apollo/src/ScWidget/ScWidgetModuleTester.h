@@ -21,6 +21,8 @@ public:
   static void Execute();
   static void End();
 
+  static void On_ScWidget_ButtonEvent(Msg_ScWidget_ButtonEvent* pMsg);
+
   static String Button();
 
   static ApHandle hScene_;

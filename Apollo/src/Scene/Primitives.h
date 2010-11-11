@@ -127,7 +127,14 @@ public:
   virtual void Draw(DrawContext& gc);
 
   inline virtual void SetString(const String& sText) { sText_ = sText; }
-  inline virtual void SetFont(const String& sFont, double fSize, int nFlags) { sFont_ = sFont; fSize_ = fSize; nFlags_ = nFlags; }
+  inline virtual void SetFont(const String& sFont) { sFont_ = sFont; }
+  inline virtual void SetSize(double fSize) { fSize_ = fSize; }
+  inline virtual void SetFlags(int nFlags) { nFlags_ = nFlags; }
+
+  inline virtual String GetString() { return sText_; }
+  inline virtual String GetFont() { return sFont_; }
+  inline virtual double GetSize() { return fSize_; }
+  inline virtual int GetFlags() { return nFlags_; }
 
   void GetExtents(DrawContext& gc, TextExtents& te);
 
