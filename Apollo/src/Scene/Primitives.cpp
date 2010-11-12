@@ -294,8 +294,10 @@ void TextElement::GetExtents(DrawContext& gc, TextExtents& te)
 
 void SensorElement::Draw(DrawContext& gc)
 {
-  cairo_rectangle(gc.Cairo(), fX_, fY_, fW_, fH_);
-  FillAndStroke(gc);
+  if (bFillImageFile_ || bFillColor_ || bStrokeImageFile_ || bStrokeColor_) {
+    cairo_rectangle(gc.Cairo(), fX_, fY_, fW_, fH_);
+    FillAndStroke(gc);
+  }
 }
 
 void SensorElement::MouseCaptured()

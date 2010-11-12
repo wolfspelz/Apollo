@@ -166,6 +166,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Edit.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\ScWidgetModule.cpp"
 				>
 			</File>
@@ -189,6 +193,10 @@
 			</File>
 			<File
 				RelativePath=".\dll.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Edit.h"
 				>
 			</File>
 			<File

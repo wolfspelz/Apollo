@@ -60,6 +60,7 @@ public:
   void On_ScWidget_SetButtonTextColor(Msg_ScWidget_SetButtonTextColor* pMsg);
   void On_ScWidget_SetButtonImageFile(Msg_ScWidget_SetButtonImageFile* pMsg);
   void On_ScWidget_SetButtonTextOffset(Msg_ScWidget_SetButtonTextOffset* pMsg);
+  void On_ScWidget_CreateEdit(Msg_ScWidget_CreateEdit* pMsg);
   void On_Scene_DeleteElement(Msg_Scene_DeleteElement* pMsg);
   void On_Scene_MouseEvent(Msg_Scene_MouseEvent* pMsg);
 
