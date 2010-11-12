@@ -10,6 +10,7 @@
 #include "ScWidgetModule.h"
 #include "Widget.h"
 #include "Button.h"
+#include "Edit.h"
 
 void Scene::AddWidget(const String& sPath, Widget* pWidget)
 {
@@ -177,6 +178,26 @@ AP_MSG_HANDLER_METHOD(ScWidgetModule, ScWidget_SetButtonTextOffset)
   pMsg->apStatus = ApMessage::Ok;
 }
 
+//---------------------------
+
+AP_MSG_HANDLER_METHOD(ScWidgetModule, ScWidget_CreateEdit)
+{
+  Scene* pScene = FindOrCreateScene(pMsg->hScene);
+  if (pScene) {
+    if (pScene->HasWidget(pMsg->sPath)) { throw ApException("ScWidgetModule::ScWidget_CreateEdit widget already there, scene=" ApHandleFormat " path=%s", ApHandleType(pMsg->hScene), StringType(pMsg->sPath)); }
+    Edit* pEdit = new Edit(pMsg->hScene, pMsg->sPath);
+    if (pEdit) {
+      pEdit->SetCoordinates(pMsg->fX, pMsg->fY, pMsg->fW, pMsg->fH);
+      pEdit->Create();
+      pScene->AddWidget(pMsg->sPath, pEdit);
+    }
+  }
+
+  pMsg->apStatus = ApMessage::Ok;
+}
+
+//---------------------------
+
 AP_MSG_HANDLER_METHOD(ScWidgetModule, Scene_DeleteElement)
 {
   if (HasScene(pMsg->hScene)) {
@@ -248,6 +269,7 @@ int ScWidgetModule::Init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ScWidgetModule, ScWidget_SetButtonTextColor, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ScWidgetModule, ScWidget_SetButtonImageFile, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ScWidgetModule, ScWidget_SetButtonTextOffset, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, ScWidgetModule, ScWidget_CreateEdit, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ScWidgetModule, Scene_DeleteElement, this, ApCallbackPosLate);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ScWidgetModule, Scene_MouseEvent, this, ApCallbackPosLate);
 

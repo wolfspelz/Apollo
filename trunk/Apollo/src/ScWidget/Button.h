@@ -4,8 +4,8 @@
 //
 // ============================================================================
 
-#if !defined(´Button_H_INCLUDED)
-#define ´Button_H_INCLUDED
+#if !defined(Button_H_INCLUDED)
+#define Button_H_INCLUDED
 
 #include "Widget.h"
 
@@ -61,11 +61,11 @@ public:
   void SetFontColor(double fRed, double fGreen, double fBlue, double fAlpha);
   void SetImageFile(ButtonState nState, const String& sFile);
   void SetTextOffset(ButtonState nState, double fX, double fY);
-  String GetTextPath();
 
   void OnMouseEvent(Msg_Scene_MouseEvent* pMsg);
 
 protected:
+  String GetTextPath();
   void ShowState();
   void PositionText();
   void DoClick();
@@ -80,4 +80,4 @@ protected:
   int bHasText_;
 };
 
-#endif // ´Button_H_INCLUDED
+#endif // Button_H_INCLUDED

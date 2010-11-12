@@ -259,33 +259,30 @@ public:
   ApIN int nEvent;
 };
 
+//--------------------------
 
-
-//class Msg_ScWidget_CreateBorder: public ApRequestMessage
-//{
-//public:
-//  Msg_ScWidget_CreateBorder() : ApRequestMessage("ScWidget_CreateBorder") {}
-//  ApIN ApHandle hScene;
-//  ApIN String sPath;
-//  ApIN double fX;
-//  ApIN double fY;
-//  ApIN double fW;
-//  ApIN double fH;
-//};
-//
-//class Msg_ScWidget_SetBorderImageFile: public ApRequestMessage
-//{
-//public:
-//  Msg_ScWidget_SetBorderImageFile() : ApRequestMessage("ScWidget_SetBorderImageFile") {}
-//  ApIN ApHandle hScene;
-//  ApIN String sPath;
-//  ApIN int nPosition
-//  ApIN double fX;
-//  ApIN double fY;
-//  ApIN double fW;
-//  ApIN double fH;
-//  ApIN String sFile;
-//};
+class Msg_ScWidget_CreateEdit: public ApRequestMessage
+{
+public:
+  Msg_ScWidget_CreateEdit() : ApRequestMessage("ScWidget_CreateEdit"), fX(0), fY(0), fW(0), fH(0) {}
+  static int _(const ApHandle& hScene, const String& sPath, double fX, double fY, double fW, double fH)
+  {
+    Msg_ScWidget_CreateEdit msg;
+    msg.hScene = hScene;
+    msg.sPath = sPath;
+    msg.fX = fX;
+    msg.fY = fY;
+    msg.fW = fW;
+    msg.fH = fH;
+    return msg.Request();
+  }
+  ApIN ApHandle hScene;
+  ApIN String sPath;
+  ApIN double fX;
+  ApIN double fY;
+  ApIN double fW;
+  ApIN double fH;
+};
 
 
 #endif // !defined(MsgScWidget_h_INCLUDED)

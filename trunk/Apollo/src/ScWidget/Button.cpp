@@ -147,7 +147,7 @@ void Button::SetTextOffset(ButtonState nState, double fX, double fY)
 void Button::Create()
 {
   Msg_Scene_CreateMouseSensor::_(hScene_, sPath_, fX_, fY_, fW_, fH_);
-  Msg_Scene_CreateRectangle::_(hScene_, sPath_ + "/h_image", 0, 0, fW_, fH_);
+  Msg_Scene_CreateRectangle::_(hScene_, sPath_ + "/h_image", fX_, fY_, fW_, fH_);
 }
 
 void Button::ShowState()

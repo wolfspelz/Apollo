@@ -24,8 +24,10 @@ public:
   static void On_ScWidget_ButtonEvent(Msg_ScWidget_ButtonEvent* pMsg);
 
   static String Button();
+  static String Edit();
 
-  static ApHandle hScene_;
+  static ApHandle hButtonScene_;
+  static ApHandle hEditScene_;
 };
 #endif
 
