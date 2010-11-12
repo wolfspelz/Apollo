@@ -40,15 +40,27 @@ String ScWidgetModuleTester::Button()
   if (!s) { if (!Msg_Scene_CreateRectangle::_(hScene_, "_a_frame", 0.5, 0.5, nWidth - 1, nHeight - 1)) { s = "Msg_Scene_CreateRectangle failed"; }}
   if (!s) { if (!Msg_Scene_SetFillColor::_(hScene_, "_a_frame", 1, 1, 1, 0.5)) { s = "Msg_Scene_SetFillColor failed"; }}
   if (!s) { if (!Msg_Scene_SetStrokeColor::_(hScene_, "_a_frame", 0, 0, 0, 1)) { s = "Msg_Scene_SetStrokeColor failed"; }}
-  if (!s) { if (!Msg_Scene_SetStrokeWidth::_(hScene_, "_a_frame", 1)) { s = "Msg_Scene_SetStrokeWidth failed"; }}
+
+  if (!s) { if (!Msg_Scene_CreateRectangle::_(hScene_, "_b_quarter1", 0.5, 0.5, nWidth/2 - 1, nHeight/2 - 1)) { s = "Msg_Scene_CreateRectangle failed"; }}
+  if (!s) { if (!Msg_Scene_SetStrokeColor::_(hScene_, "_b_quarter1", 0, 0, 0, 0.5)) { s = "Msg_Scene_SetStrokeColor failed"; }}
+
+  if (!s) { if (!Msg_Scene_CreateRectangle::_(hScene_, "_b_quarter2", nWidth/2 - 0.5, nHeight/2 - 0.5, nWidth/2 - 1, nHeight/2 - 1)) { s = "Msg_Scene_CreateRectangle failed"; }}
+  if (!s) { if (!Msg_Scene_SetStrokeColor::_(hScene_, "_b_quarter2", 0, 0, 0, 0.5)) { s = "Msg_Scene_SetStrokeColor failed"; }}
+
+  if (!s) { if (!Msg_Scene_CreateRectangle::_(hScene_, "_b_line1", 0.5, 0.5, nWidth/2 - 1 + 10, nHeight/2 - 1 + 10)) { s = "Msg_Scene_CreateRectangle failed"; }}
+  if (!s) { if (!Msg_Scene_SetStrokeColor::_(hScene_, "_b_line1", 0, 0, 0, 0.5)) { s = "Msg_Scene_SetStrokeColor failed"; }}
+
+  if (!s) { if (!Msg_Scene_CreateRectangle::_(hScene_, "_b_line2", 0.5, 0.5, nWidth/2 + 10 + 70, nHeight/2 + 10 + 20)) { s = "Msg_Scene_CreateRectangle failed"; }}
+  if (!s) { if (!Msg_Scene_SetStrokeColor::_(hScene_, "_b_line2", 0, 0, 0, 0.5)) { s = "Msg_Scene_SetStrokeColor failed"; }}
 
   // ------------------------
 
-  if (!s) { if (!Msg_ScWidget_CreateButton::_(hScene_, "button1", -35, -10, 70, 20)) { s = "Msg_ScWidget_CreateButton failed"; }}
-  if (!s) { if (!Msg_ScWidget_SetButtonImageFile::_(hScene_, "button1", Msg_ScWidget_ButtonState_Normal, Apollo::getAppResourcePath() + "test/widget/Button.png", 0, 0)) { s = "Msg_ScWidget_SetButtonImageFile failed"; }}
-  if (!s) { if (!Msg_ScWidget_SetButtonImageFile::_(hScene_, "button1", Msg_ScWidget_ButtonState_Down, Apollo::getAppResourcePath() + "test/widget/ButtonDown.png", 0, 0)) { s = "Msg_ScWidget_SetButtonImageFile failed"; }}
-  if (!s) { if (!Msg_ScWidget_SetButtonImageFile::_(hScene_, "button1", Msg_ScWidget_ButtonState_High, Apollo::getAppResourcePath() + "test/widget/ButtonHigh.png", 0, 0)) { s = "Msg_ScWidget_SetButtonImageFile failed"; }}
-  if (!s) { if (!Msg_ScWidget_SetButtonImageFile::_(hScene_, "button1", Msg_ScWidget_ButtonState_Disabled, Apollo::getAppResourcePath() + "test/widget/ButtonDisabled.png", 0, 0)) { s = "Msg_ScWidget_SetButtonImageFile failed"; }}
+  if (!s) { if (!Msg_ScWidget_CreateButton::_(hScene_, "button1", 10, 10, 70, 20)) { s = "Msg_ScWidget_CreateButton failed"; }}
+  if (!s) { if (!Msg_ScWidget_SetButtonImageFile::_(hScene_, "button1", Msg_ScWidget_ButtonState_Normal, Apollo::getAppResourcePath() + "test/widget/Button.png")) { s = "Msg_ScWidget_SetButtonImageFile failed"; }}
+  if (!s) { if (!Msg_ScWidget_SetButtonImageFile::_(hScene_, "button1", Msg_ScWidget_ButtonState_Down, Apollo::getAppResourcePath() + "test/widget/ButtonDown.png")) { s = "Msg_ScWidget_SetButtonImageFile failed"; }}
+  if (!s) { if (!Msg_ScWidget_SetButtonImageFile::_(hScene_, "button1", Msg_ScWidget_ButtonState_High, Apollo::getAppResourcePath() + "test/widget/ButtonHigh.png")) { s = "Msg_ScWidget_SetButtonImageFile failed"; }}
+  if (!s) { if (!Msg_ScWidget_SetButtonImageFile::_(hScene_, "button1", Msg_ScWidget_ButtonState_Disabled, Apollo::getAppResourcePath() + "test/widget/ButtonDisabled.png")) { s = "Msg_ScWidget_SetButtonImageFile failed"; }}
+  if (!s) { if (!Msg_ScWidget_SetButtonTextOffset::_(hScene_, "button1", Msg_ScWidget_ButtonState_Down, 0.5, -0.5)) { s = "Msg_ScWidget_SetButtonTextOffset failed"; }}
   if (!s) { if (!Msg_ScWidget_SetButtonState::_(hScene_, "button1", Msg_ScWidget_ButtonState_Normal)) { s = "Msg_ScWidget_SetButtonState failed"; }}
   if (!s) { if (!Msg_ScWidget_SetButtonText::_(hScene_, "button1", "XXXXX")) { s = "Msg_ScWidget_SetButtonText failed"; }}
   if (!s) { if (!Msg_ScWidget_DeleteButtonText::_(hScene_, "button1")) { s = "Msg_ScWidget_DeleteButtonText failed"; }}

@@ -14,8 +14,6 @@ Button::Button(const ApHandle& hScene, const String& sPath)
 ,nState_(NoButtonState)
 ,bMouseDown_(0)
 ,bHasText_(0)
-,fTextOffsetX_(1.0)
-,fTextOffsetY_(-1.0)
 {
 }
 
@@ -110,16 +108,40 @@ void Button::SetFontColor(double fRed, double fGreen, double fBlue, double fAlph
   }
 }
 
-void Button::SetImageFile(ButtonState nState, const String& sFile, double fX, double fY)
+void Button::SetImageFile(ButtonState nState, const String& sFile)
 {
-  if (states_.IsSet(nState)) {
-    states_.Unset(nState);
+  ButtonStateConfigListNode* pNode = states_.Find(nState);
+  if (pNode == 0) {
+    ButtonStateConfig state;
+    states_.Set(nState, state);
+    pNode = states_.Find(nState);
   }
-  ButtonStateConfig state;
-  state.sFile_ = sFile;
-  state.fX_ = fX;
-  state.fY_ = fY;
-  states_.Set(nState, state);
+
+  if (pNode != 0) {
+    pNode->Value().sFile_ = sFile;
+
+    double fW = 0.0;
+    double fH = 0.0;
+    Msg_Scene_GetImageSizeFromFile::_(hScene_, sFile, fW, fH);
+    pNode->Value().fW_ = fW;
+    pNode->Value().fH_ = fH;
+  }
+}
+
+void Button::SetTextOffset(ButtonState nState, double fX, double fY)
+{
+  ButtonStateConfigListNode* pNode = states_.Find(nState);
+  if (pNode == 0) {
+    ButtonStateConfig state;
+    states_.Set(nState, state);
+    pNode = states_.Find(nState);
+  }
+
+  if (pNode != 0) {
+    pNode->Value().fTextOffsetX_ = fX;
+    pNode->Value().fTextOffsetY_ = fY;
+    pNode->Value().bTextOffsetValid_ = 1;
+  }
 }
 
 void Button::Create()
@@ -133,7 +155,7 @@ void Button::ShowState()
   ButtonStateConfigListNode* pNode = states_.Find(nState_);
   if (pNode) {
     Msg_Scene_SetFillImageFile::_(hScene_, sPath_ + "/h_image", pNode->Value().sFile_);
-    Msg_Scene_SetFillImageOffset::_(hScene_, sPath_ + "/h_image", fX_, fY_);
+    Msg_Scene_SetFillImageOffset::_(hScene_, sPath_ + "/h_image", fX_, - fY_ - pNode->Value().fH_);
     //Msg_Scene_SetFillImageOffset::_(hScene_, sPath_ + "/h_image", fX_ + pNode->Value().fX_, fY_ + pNode->Value().fY_);
   } else {
     Msg_Scene_SetFillColor::_(hScene_, sPath_ + "/h_image", 1, 0, 0, 1);
@@ -156,10 +178,24 @@ void Button::GetTextPos(double& fTextX, double& fTextY)
   double fTextBearingX, fTextBearingY, fTextW, fTextH, fTextAdvanceX, fTextAdvanceY;
   if (Msg_Scene_MeasureText::_(hScene_, GetTextPath(), fTextBearingX, fTextBearingY, fTextW, fTextH, fTextAdvanceX, fTextAdvanceY)) {
 
-    int nOffset = (nState_ == DownButtonState) ? 1 : 0;
+    double fOffsetX = 0.0;
+    double fOffsetY = 0.0;
 
-    fTextX = fX_ + fW_/2 - fTextW / 2 + nOffset * fTextOffsetX_;
-    fTextY = fY_ + fH_/2 - fTextH / 2 + nOffset * fTextOffsetY_;
+    ButtonStateConfigListNode* pNode = states_.Find(nState_);
+    if (pNode) {
+      if (pNode->Value().bTextOffsetValid_) {
+        fOffsetX = pNode->Value().fTextOffsetX_;
+        fOffsetY = pNode->Value().fTextOffsetY_;
+      } else {
+        if (nState_ == Button::DownButtonState) {
+          fOffsetX = 1.0;
+          fOffsetY = -1.0;
+        }
+      }
+    }
+
+    fTextX = fX_ + fW_/2 - fTextW / 2 + fOffsetX;
+    fTextY = fY_ + fH_/2 - fTextH / 2 + fOffsetY;
 
   } else {
     fTextX = 0;

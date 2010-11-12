@@ -13,13 +13,19 @@ class ButtonStateConfig
 {
 public:
   ButtonStateConfig()
-    :fX_(0.0)
-    ,fY_(0.0)
+    :bTextOffsetValid_(0)
+    ,fTextOffsetX_(0.0)
+    ,fTextOffsetY_(0.0)
+    ,fW_(0.0)
+    ,fH_(0.0)
   {}
 
   String sFile_;
-  double fX_;
-  double fY_;
+  int bTextOffsetValid_;
+  double fTextOffsetX_;
+  double fTextOffsetY_;
+  double fW_;
+  double fH_;
 };
 
 typedef Tree<int, ButtonStateConfig, LessThan<int>> ButtonStateConfigList;
@@ -53,7 +59,8 @@ public:
   void SetFontSize(double fSize);
   void SetFontFlags(int nFlags);
   void SetFontColor(double fRed, double fGreen, double fBlue, double fAlpha);
-  void SetImageFile(ButtonState nState, const String& sFile, double fX, double fY);
+  void SetImageFile(ButtonState nState, const String& sFile);
+  void SetTextOffset(ButtonState nState, double fX, double fY);
   String GetTextPath();
 
   void OnMouseEvent(Msg_Scene_MouseEvent* pMsg);
@@ -71,8 +78,6 @@ protected:
   int bMouseDown_;
 
   int bHasText_;
-  double fTextOffsetX_;
-  double fTextOffsetY_;
 };
 
 #endif // ´Button_H_INCLUDED
