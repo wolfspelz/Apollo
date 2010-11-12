@@ -167,7 +167,13 @@ AP_MSG_HANDLER_METHOD(ScWidgetModule, ScWidget_SetButtonTextColor)
 
 AP_MSG_HANDLER_METHOD(ScWidgetModule, ScWidget_SetButtonImageFile)
 {
-  FindWidget(pMsg->hScene, pMsg->sPath)->AsButton()->SetImageFile(Button::String2State(pMsg->sState), pMsg->sFile, pMsg->fX, pMsg->fY);
+  FindWidget(pMsg->hScene, pMsg->sPath)->AsButton()->SetImageFile(Button::String2State(pMsg->sState), pMsg->sFile);
+  pMsg->apStatus = ApMessage::Ok;
+}
+
+AP_MSG_HANDLER_METHOD(ScWidgetModule, ScWidget_SetButtonTextOffset)
+{
+  FindWidget(pMsg->hScene, pMsg->sPath)->AsButton()->SetTextOffset(Button::String2State(pMsg->sState), pMsg->fX, pMsg->fY);
   pMsg->apStatus = ApMessage::Ok;
 }
 
@@ -241,6 +247,7 @@ int ScWidgetModule::Init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ScWidgetModule, ScWidget_SetButtonTextFlags, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ScWidgetModule, ScWidget_SetButtonTextColor, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ScWidgetModule, ScWidget_SetButtonImageFile, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, ScWidgetModule, ScWidget_SetButtonTextOffset, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ScWidgetModule, Scene_DeleteElement, this, ApCallbackPosLate);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ScWidgetModule, Scene_MouseEvent, this, ApCallbackPosLate);
 

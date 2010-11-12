@@ -205,14 +205,32 @@ public:
 class Msg_ScWidget_SetButtonImageFile: public ApRequestMessage
 {
 public:
-  Msg_ScWidget_SetButtonImageFile() : ApRequestMessage("ScWidget_SetButtonImageFile"), fX(0), fY(0) {}
-  static int _(const ApHandle& hScene, const String& sPath, const String& sState, const String& sFile, double fX, double fY)
+  Msg_ScWidget_SetButtonImageFile() : ApRequestMessage("ScWidget_SetButtonImageFile") {}
+  static int _(const ApHandle& hScene, const String& sPath, const String& sState, const String& sFile)
   {
     Msg_ScWidget_SetButtonImageFile msg;
     msg.hScene = hScene;
     msg.sPath = sPath;
     msg.sState = sState;
     msg.sFile = sFile;
+    return msg.Request();
+  }
+  ApIN ApHandle hScene;
+  ApIN String sPath;
+  ApIN String sState;
+  ApIN String sFile;
+};
+
+class Msg_ScWidget_SetButtonTextOffset: public ApRequestMessage
+{
+public:
+  Msg_ScWidget_SetButtonTextOffset() : ApRequestMessage("ScWidget_SetButtonTextOffset") {}
+  static int _(const ApHandle& hScene, const String& sPath, const String& sState, double fX, double fY)
+  {
+    Msg_ScWidget_SetButtonTextOffset msg;
+    msg.hScene = hScene;
+    msg.sPath = sPath;
+    msg.sState = sState;
     msg.fX = fX;
     msg.fY = fY;
     return msg.Request();
@@ -220,7 +238,6 @@ public:
   ApIN ApHandle hScene;
   ApIN String sPath;
   ApIN String sState;
-  ApIN String sFile;
   ApIN double fX;
   ApIN double fY;
 };
