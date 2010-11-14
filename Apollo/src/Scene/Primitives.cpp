@@ -129,43 +129,57 @@ void ShapeElement::FillAndStroke(DrawContext& gc)
 
 void RectangleElement::Draw(DrawContext& gc)
 {
-  switch (nCorners_) {
-    case NormalCorners:
-      cairo_rectangle(gc.Cairo(), fX_, fY_, fW_, fH_);
-      break;
+  if (HasFillOrStroke()) {
+    if (gc.bLogDraw_) {
+      gc.sLogDraw_.appendf(" x=%.3f y=%.3f w=%.3f h=%.3f", fX_, fY_, fW_, fH_);
+    }
 
-    case RoundCorners:
-      {
-        double fRadius = fRadius_;
-        double fH2 = fH_ / 2.0;
-        double fW2 = fW_ / 2.0;
-        if (fRadius == 0.0 || fRadius > fW2 || fRadius > fH2) {
-          fRadius = fW2 < fH2 ? fW2 / 2.0 : fH2 / 2.0;
+    switch (nCorners_) {
+      case NormalCorners:
+        cairo_rectangle(gc.Cairo(), fX_, fY_, fW_, fH_);
+        break;
+
+      case RoundCorners:
+        {
+          double fRadius = fRadius_;
+          double fH2 = fH_ / 2.0;
+          double fW2 = fW_ / 2.0;
+          if (fRadius == 0.0 || fRadius > fW2 || fRadius > fH2) {
+            fRadius = fW2 < fH2 ? fW2 / 2.0 : fH2 / 2.0;
+          }
+
+          if (gc.bLogDraw_) {
+            gc.sLogDraw_.appendf(" round=%.3f", fRadius);
+          }
+
+          cairo_move_to(gc.Cairo(), fX_, fY_ + fRadius);
+	        cairo_arc(gc.Cairo(), fX_ + fRadius, fY_ + fRadius, fRadius, PI, -PI / 2);
+	        cairo_line_to(gc.Cairo(), fX_ + fW_ - fRadius, fY_);
+	        cairo_arc(gc.Cairo(), fX_ + fW_ - fRadius, fY_ + fRadius, fRadius, -PI / 2, 0);
+	        cairo_line_to(gc.Cairo(), fX_ + fW_, fY_ + fH_ - fRadius);
+	        cairo_arc(gc.Cairo(), fX_ + fW_ - fRadius, fY_ + fH_ - fRadius, fRadius, 0, PI / 2);
+	        cairo_line_to(gc.Cairo(), fX_ + fRadius, fY_ + fH_);
+	        cairo_arc(gc.Cairo(), fX_ + fRadius, fY_ + fH_ - fRadius, fRadius, PI / 2, PI);
+	        cairo_close_path(gc.Cairo());
+
+        }
+        break;
+
+      case CurvedCorners:
+        if (gc.bLogDraw_) {
+          gc.sLogDraw_.appendf(" curved");
         }
 
-        cairo_move_to(gc.Cairo(), fX_, fY_ + fRadius);
-	      cairo_arc(gc.Cairo(), fX_ + fRadius, fY_ + fRadius, fRadius, PI, -PI / 2);
-	      cairo_line_to(gc.Cairo(), fX_ + fW_ - fRadius, fY_);
-	      cairo_arc(gc.Cairo(), fX_ + fW_ - fRadius, fY_ + fRadius, fRadius, -PI / 2, 0);
-	      cairo_line_to(gc.Cairo(), fX_ + fW_, fY_ + fH_ - fRadius);
-	      cairo_arc(gc.Cairo(), fX_ + fW_ - fRadius, fY_ + fH_ - fRadius, fRadius, 0, PI / 2);
-	      cairo_line_to(gc.Cairo(), fX_ + fRadius, fY_ + fH_);
-	      cairo_arc(gc.Cairo(), fX_ + fRadius, fY_ + fH_ - fRadius, fRadius, PI / 2, PI);
-	      cairo_close_path(gc.Cairo());
-
-      }
-      break;
-
-    case CurvedCorners:
-      cairo_move_to(gc.Cairo(), fX_, fY_ + fH_ / 2);
-	    cairo_curve_to(gc.Cairo(), fX_, fY_, fX_, fY_, fX_ + fW_ / 2, fY_);
-	    cairo_curve_to(gc.Cairo(), fX_ + fW_, fY_, fX_ + fW_, fY_, fX_ + fW_, fY_ + fH_ / 2);
-	    cairo_curve_to(gc.Cairo(), fX_ + fW_, fY_ + fH_, fX_ + fW_, fY_ + fH_, fX_ + fW_ / 2, fY_ + fH_);
-	    cairo_curve_to(gc.Cairo(), fX_, fY_ + fH_, fX_, fY_ + fH_, fX_, fY_ + fH_ / 2);
-      break;
+        cairo_move_to(gc.Cairo(), fX_, fY_ + fH_ / 2);
+	      cairo_curve_to(gc.Cairo(), fX_, fY_, fX_, fY_, fX_ + fW_ / 2, fY_);
+	      cairo_curve_to(gc.Cairo(), fX_ + fW_, fY_, fX_ + fW_, fY_, fX_ + fW_, fY_ + fH_ / 2);
+	      cairo_curve_to(gc.Cairo(), fX_ + fW_, fY_ + fH_, fX_ + fW_, fY_ + fH_, fX_ + fW_ / 2, fY_ + fH_);
+	      cairo_curve_to(gc.Cairo(), fX_, fY_ + fH_, fX_, fY_ + fH_, fX_, fY_ + fH_ / 2);
+        break;
+    }
+    
+    FillAndStroke(gc);
   }
-  
-  FillAndStroke(gc);
 }
 
 // ----------------------------------------------------------
@@ -223,8 +237,14 @@ void ImageElement::Draw(DrawContext& gc)
   cairo_surface_t* pImage = 0;
   
   if (bData_) {
+    if (gc.bLogDraw_) {
+      gc.sLogDraw_.appendf(" data");
+    }
     pImage = cairo_image_surface_create_for_data((unsigned char *) image_.Pixels(), CAIRO_FORMAT_ARGB32, image_.Width(), image_.Height(), image_.Width() * 4);
   } else if (bFile_) {
+    if (gc.bLogDraw_) {
+      gc.sLogDraw_.appendf(" %s", StringType(sFile_));
+    }
     pImage = cairo_image_surface_create_from_png(sFile_);
   }
 
@@ -264,14 +284,20 @@ void ImageElement::Draw(DrawContext& gc)
 
 void TextElement::Draw(DrawContext& gc)
 {
-  cairo_move_to(gc.Cairo(), fX_, fY_);
-  cairo_select_font_face(gc.Cairo(), sFont_, nFlags_ & Italic ? CAIRO_FONT_SLANT_ITALIC : CAIRO_FONT_SLANT_NORMAL, nFlags_ & Bold ? CAIRO_FONT_WEIGHT_BOLD : CAIRO_FONT_WEIGHT_NORMAL);
-  cairo_set_font_size(gc.Cairo(), fSize_);
-  cairo_scale(gc.Cairo(), 1.0, -1.0);
-  cairo_text_path(gc.Cairo(), sText_);
-  cairo_scale(gc.Cairo(), 1.0, -1.0);
+  if (HasFillOrStroke()) {
+    if (gc.bLogDraw_) {
+      gc.sLogDraw_.appendf(" x=%.3f y=%.3f fl=%d \"%s\"", fX_, fY_, nFlags_, StringType(sText_));
+    }
 
-  FillAndStroke(gc);
+    cairo_move_to(gc.Cairo(), fX_, fY_);
+    cairo_select_font_face(gc.Cairo(), sFont_, nFlags_ & Italic ? CAIRO_FONT_SLANT_ITALIC : CAIRO_FONT_SLANT_NORMAL, nFlags_ & Bold ? CAIRO_FONT_WEIGHT_BOLD : CAIRO_FONT_WEIGHT_NORMAL);
+    cairo_set_font_size(gc.Cairo(), fSize_);
+    cairo_scale(gc.Cairo(), 1.0, -1.0);
+    cairo_text_path(gc.Cairo(), sText_);
+    cairo_scale(gc.Cairo(), 1.0, -1.0);
+
+    FillAndStroke(gc);
+  }
 }
 
 void TextElement::GetExtents(DrawContext& gc, TextExtents& te)
@@ -294,7 +320,7 @@ void TextElement::GetExtents(DrawContext& gc, TextExtents& te)
 
 void SensorElement::Draw(DrawContext& gc)
 {
-  if (bFillImageFile_ || bFillColor_ || bStrokeImageFile_ || bStrokeColor_) {
+  if (HasFillOrStroke()) {
     cairo_rectangle(gc.Cairo(), fX_, fY_, fW_, fH_);
     FillAndStroke(gc);
   }

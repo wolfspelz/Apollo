@@ -32,6 +32,7 @@ public:
   DrawContext()
     :nH_(0)
     ,nW_(0)
+    ,bLogDraw_(0)
   {}
 
   inline int Height() { return nH_; }
@@ -39,6 +40,8 @@ public:
 
   int nH_;
   int nW_;
+  int bLogDraw_;
+  String sLogDraw_;
 };
 
 class EventContext: public GraphicsContext

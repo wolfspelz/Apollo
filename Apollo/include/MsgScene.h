@@ -1063,4 +1063,30 @@ public:
   ApIN int bInside;
 };
 
+class Msg_Scene_SetKeyboardFocus: public ApRequestMessage
+{
+public:
+  Msg_Scene_SetKeyboardFocus() : ApRequestMessage("Scene_SetKeyboardFocus") {}
+  static int _(const ApHandle& hScene, const String& sPath)
+  {
+    Msg_Scene_SetKeyboardFocus msg;
+    msg.hScene = hScene;
+    msg.sPath = sPath;
+    return msg.Request();
+  }
+  ApIN ApHandle hScene;
+  ApIN String sPath;
+};
+
+// Scene ->
+class Msg_Scene_KeyEvent: public ApNotificationMessage
+{
+public:
+  Msg_Scene_KeyEvent() : ApNotificationMessage("Scene_KeyEvent"), nFlags(0) {}
+  ApIN ApHandle hScene;
+  ApIN String sPath;
+  ApIN int nFlags;
+  ApIN String sKey;
+};
+
 #endif // !defined(MsgScene_h_INCLUDED)

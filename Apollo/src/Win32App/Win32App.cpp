@@ -21,6 +21,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     ::freopen("conout$", "w", stdout);
     ::freopen("conout$", "w", stderr);
   }
+  ::SetConsoleOutputCP(CP_UTF8);
 #endif
 
   //apLog_SetMask(apLog_MaskNoTrace);

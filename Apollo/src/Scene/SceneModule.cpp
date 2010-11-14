@@ -519,6 +519,13 @@ AP_MSG_HANDLER_METHOD(SceneModule, Scene_ReleaseMouse)
   pMsg->apStatus = ApMessage::Ok;
 }
 
+AP_MSG_HANDLER_METHOD(SceneModule, Scene_SetKeyboardFocus)
+{
+  Scene* pScene = FindScene(pMsg->hScene);
+  pScene->SetKeyboardFocus(pMsg->sPath);
+  pMsg->apStatus = ApMessage::Ok;
+}
+
 AP_MSG_HANDLER_METHOD(SceneModule, Timer_Event)
 {
   // Find scene by timer handle, because scene handle misused as timer handle
@@ -618,6 +625,7 @@ int SceneModule::Init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_GetImageSizeFromFile, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_CaptureMouse, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_ReleaseMouse, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_SetKeyboardFocus, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Timer_Event, this, ApCallbackPosNormal);
 
   AP_UNITTEST_HOOK(SceneModule, this);

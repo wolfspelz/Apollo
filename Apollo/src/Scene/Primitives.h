@@ -40,6 +40,7 @@ public:
   virtual void SetStrokeWidth(double fWidth);
 
 protected:
+  inline int HasFillOrStroke() { return bFillImageFile_ || bFillColor_ || bStrokeImageFile_ || bStrokeColor_; }
   void FillAndStroke(DrawContext& gc);
 
 protected:

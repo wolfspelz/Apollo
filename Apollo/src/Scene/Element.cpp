@@ -255,7 +255,7 @@ void Element::DrawRecursive(DrawContext& gc)
   if (!bShow_) { return; }
 
   if (gc.nDepth_ == 0) {
-    if (pScene_->LogDraw()) {
+    if (gc.bLogDraw_) {
       apLog_Verbose((LOG_CHANNEL, "Element::DrawRecursive", "Begin"));
     }
   }
@@ -285,14 +285,20 @@ void Element::DrawRecursive(DrawContext& gc)
   // ...the depth
   if (pChildren_) {
     ElementIterator iter(*pChildren_);
-    String sWSP = "                      ";
     for (ElementNode* pNode = 0; pNode = iter.Next(); ) {
       Element* pElement = pNode->Value();
       if (pElement != 0) {
-        if (pScene_->LogDraw()) {
-          apLog_Verbose((LOG_CHANNEL, "Element::DrawRecursive", "%s%s", StringType(sWSP.subString(0, 2*gc.nDepth_)), StringType(pNode->Key())));
+        if (gc.bLogDraw_) {
+          String sWSP = "                               ";
+          gc.sLogDraw_ = sWSP.subString(0, 2*gc.nDepth_) + " " + pNode->Key();
         }
         pElement->DrawRecursive(gc);
+        if (gc.bLogDraw_) {
+          if (gc.sLogDraw_) {
+            apLog_Verbose((LOG_CHANNEL, "Element::DrawRecursive", "%s", StringType(gc.sLogDraw_)));
+            gc.sLogDraw_.clear();
+          }
+        }
       }
     }
   }
@@ -304,7 +310,7 @@ void Element::DrawRecursive(DrawContext& gc)
   gc.nDepth_--;
 
   if (gc.nDepth_ == 0) {
-    if (pScene_->LogDraw()) {
+    if (gc.bLogDraw_) {
       apLog_Verbose((LOG_CHANNEL, "Element::DrawRecursive", "End"));
     }
   }

@@ -24,12 +24,14 @@ public:
   inline int IsButton() { return 0; }
   inline int IsEdit() { return 0; }
 
-  virtual void Delete() {}
-  virtual void SetCoordinates(double fX, double fY, double fW, double fH);
   Button* AsButton();
   Edit* AsEdit();
 
+  virtual void Delete() {}
+  virtual void SetCoordinates(double fX, double fY, double fW, double fH);
+
   virtual void OnMouseEvent(Msg_Scene_MouseEvent* pMsg) {}
+  virtual void OnKeyEvent(Msg_Scene_KeyEvent* pMsg) {}
 
 protected:
   ApHandle hScene_;

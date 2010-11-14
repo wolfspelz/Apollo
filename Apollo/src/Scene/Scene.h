@@ -84,6 +84,8 @@ public:
   void CaptureMouse(const String& sPath);
   void ReleaseMouse();
 
+  void SetKeyboardFocus(const String& sPath);
+
   void Draw();
   void OnAutoDrawTimer();
 
@@ -91,6 +93,10 @@ public:
   static LRESULT CALLBACK StaticWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
   LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
   LRESULT HandleMouseEvent(int nEvent, int nButton, LPARAM lParam);
+  LRESULT HandleKeyEvent();
+  LRESULT HandleCharEvent(WPARAM wParam, LPARAM lParam);
+  LRESULT HandleUniCharEvent(WPARAM wParam, LPARAM lParam);
+
   #define MOVE_TIMER 1
   int HasMoveTimer();
   void StartMoveTimer(HWND hWnd);
@@ -122,6 +128,8 @@ protected:
   cairo_surface_t *pCairoSurface_;
   cairo_t *pCairo_;
   String sCaptureMouseElement_;
+
+  String sKeyboardFocus_;
 
 #if defined(WIN32)
   static int nCntWindows_;

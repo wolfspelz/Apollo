@@ -134,6 +134,11 @@ LRESULT CALLBACK Scene::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
     case WM_MBUTTONDBLCLK: { return HandleMouseEvent(EventContext::MouseDoubleClick, EventContext::MiddleButton, lParam); } break;
     case WM_RBUTTONDBLCLK: { return HandleMouseEvent(EventContext::MouseDoubleClick, EventContext::RightButton, lParam); } break;
 
+    case WM_KEYDOWN: { return HandleKeyEvent(); } break;
+    case WM_KEYUP: { return HandleKeyEvent(); } break;
+    case WM_CHAR: { return HandleCharEvent(wParam, lParam); } break;
+    case WM_UNICHAR: { return HandleUniCharEvent(wParam, lParam); } break;
+
     default:
       return DefWindowProc(hWnd, message, wParam, lParam);
   }
@@ -164,6 +169,44 @@ LRESULT Scene::HandleMouseEvent(int nEvent, int nButton, LPARAM lParam)
     }
   }
 
+  return 0;
+}
+
+LRESULT Scene::HandleKeyEvent()
+{
+  //apLog_Debug((LOG_CHANNEL, "Scene::HandleKeyEvent", "scene=" ApHandleFormat "", ApHandleType(apHandle())));
+  return 0;
+}
+
+LRESULT Scene::HandleCharEvent(WPARAM wParam, LPARAM lParam)
+{
+  //apLog_Debug((LOG_CHANNEL, "Scene::HandleCharEvent", "scene=" ApHandleFormat " wParam=%d lParam=%d", ApHandleType(apHandle()), wParam, lParam));
+
+  if (sKeyboardFocus_) {
+    int nBufferSize = ::WideCharToMultiByte(CP_UTF8, 0, (LPCWSTR) &wParam, -1, NULL, 0, NULL, NULL);
+    if (nBufferSize > 0) {
+      Flexbuf<char> buf(nBufferSize);
+      WideCharToMultiByte(CP_UTF8, 0, (LPCWSTR) &wParam, -1, (char*) buf, nBufferSize, NULL, NULL);
+
+      // http://unicode.org/cldr/utility/character.jsp?a=91d1
+      // jin
+      // 37329
+      // e9 87 91
+
+      Msg_Scene_KeyEvent msg;
+      msg.hScene = apHandle();
+      msg.sPath = sKeyboardFocus_;
+      msg.sKey = (char*) buf;
+      msg.Send();
+    }
+  }
+
+  return 0;
+}
+
+LRESULT Scene::HandleUniCharEvent(WPARAM wParam, LPARAM lParam)
+{
+  //apLog_Debug((LOG_CHANNEL, "Scene::HandleUniCharEvent", "scene=" ApHandleFormat " wParam=%d lParam=%d", ApHandleType(apHandle()), wParam, lParam));
   return 0;
 }
 
@@ -604,6 +647,11 @@ void Scene::ReleaseMouse()
   sCaptureMouseElement_ = "";
 }
 
+void Scene::SetKeyboardFocus(const String& sPath)
+{
+  sKeyboardFocus_ = sPath;
+}
+
 //------------------------------------
 
 #if defined(_DEBUG)
@@ -641,6 +689,7 @@ void Scene::Draw()
   gc.pCairo_ = pCairo_;
   gc.nH_ = nH_;
   gc.nW_ = nW_;
+  gc.bLogDraw_ = LogDraw();
 
   root_.DrawRecursive(gc);
 
