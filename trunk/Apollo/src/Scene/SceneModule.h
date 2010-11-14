@@ -80,6 +80,7 @@ public:
   void On_Scene_GetImageSizeFromFile(Msg_Scene_GetImageSizeFromFile* pMsg);
   void On_Scene_CaptureMouse(Msg_Scene_CaptureMouse* pMsg);
   void On_Scene_ReleaseMouse(Msg_Scene_ReleaseMouse* pMsg);
+  void On_Scene_SetKeyboardFocus(Msg_Scene_SetKeyboardFocus* pMsg);
   void On_Timer_Event(Msg_Timer_Event* pMsg);
 
 #if defined(AP_TEST)

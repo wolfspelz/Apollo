@@ -18,10 +18,17 @@ public:
   inline int IsEdit() { return 1; }
 
   void Create();
+  void SetText(const String& sText);
+
+  void OnMouseEvent(Msg_Scene_MouseEvent* pMsg);
+  void OnKeyEvent(Msg_Scene_KeyEvent* pMsg);
 
 protected:
+  String GetTextPath();
+  void ShowText();
 
 protected:
+  String sText_;
 };
 
 #endif // Edit_H_INCLUDED
