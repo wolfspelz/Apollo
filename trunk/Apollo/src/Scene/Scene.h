@@ -93,9 +93,9 @@ public:
   static LRESULT CALLBACK StaticWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
   LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
   LRESULT HandleMouseEvent(int nEvent, int nButton, LPARAM lParam);
-  LRESULT HandleKeyEvent();
-  LRESULT HandleCharEvent(WPARAM wParam, LPARAM lParam);
-  LRESULT HandleUniCharEvent(WPARAM wParam, LPARAM lParam);
+  LRESULT HandleKeyEvent(Msg_Scene_KeyEvent::EventType nEvent, WPARAM wParam);
+  void SendControlKey(Msg_Scene_KeyEvent::EventType nEvent, Msg_Scene_KeyEvent::KeyCode nKey);
+  void SendChar(Msg_Scene_KeyEvent::EventType nEvent, WPARAM wParam);
 
   #define MOVE_TIMER 1
   int HasMoveTimer();

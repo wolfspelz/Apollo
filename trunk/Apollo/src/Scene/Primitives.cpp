@@ -336,7 +336,7 @@ void SensorElement::MouseReleased()
   bCaptured_ = 0;
 }
 
-void SensorElement::MouseEvent(EventContext& gc, double fX, double fY)
+void SensorElement::MouseEvent(MouseEventContext& gc, double fX, double fY)
 {
   int bHit = 0;
   int bInside = 0;
@@ -362,8 +362,8 @@ void SensorElement::MouseEvent(EventContext& gc, double fX, double fY)
       Msg_Scene_MouseEvent msg;
       msg.hScene = pScene_->apHandle();
       msg.sPath = sPath_;
-      msg.nEvent = EventContext::MouseOut;
-      msg.nButton = EventContext::NoMouseButton;
+      msg.nEvent = MouseEventContext::MouseOut;
+      msg.nButton = MouseEventContext::NoMouseButton;
       msg.fX = fX;
       msg.fY = fY;
       msg.bInside = bInside;
@@ -389,7 +389,7 @@ void SensorElement::MouseEvent(EventContext& gc, double fX, double fY)
 
       gc.bFired_ = 1;
 
-      if (gc.nEvent_ == EventContext::MouseMove) {
+      if (gc.nEvent_ == MouseEventContext::MouseMove) {
         bSentMouseMove_ = 1;
       }
     }

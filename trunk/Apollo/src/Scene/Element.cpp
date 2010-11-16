@@ -317,7 +317,7 @@ void Element::DrawRecursive(DrawContext& gc)
 
 }
 
-void Element::MouseEventRecursive(EventContext& gc, double fX, double fY)
+void Element::MouseEventRecursive(MouseEventContext& gc, double fX, double fY)
 {
   if (!bShow_) { return; }
 

@@ -196,6 +196,54 @@ AP_MSG_HANDLER_METHOD(ScWidgetModule, ScWidget_CreateEdit)
   pMsg->apStatus = ApMessage::Ok;
 }
 
+AP_MSG_HANDLER_METHOD(ScWidgetModule, ScWidget_SetEditText)
+{
+  FindWidget(pMsg->hScene, pMsg->sPath)->AsEdit()->SetText(pMsg->sText);
+  pMsg->apStatus = ApMessage::Ok;
+}
+
+AP_MSG_HANDLER_METHOD(ScWidgetModule, ScWidget_GetEditText)
+{
+  pMsg->sText = FindWidget(pMsg->hScene, pMsg->sPath)->AsEdit()->GetText();
+  pMsg->apStatus = ApMessage::Ok;
+}
+
+AP_MSG_HANDLER_METHOD(ScWidgetModule, ScWidget_SetEditAlign)
+{
+  FindWidget(pMsg->hScene, pMsg->sPath)->AsEdit()->SetAlign(pMsg->nAlignH, pMsg->nAlignV);
+  pMsg->apStatus = ApMessage::Ok;
+}
+
+AP_MSG_HANDLER_METHOD(ScWidgetModule, ScWidget_SetEditPadding)
+{
+  FindWidget(pMsg->hScene, pMsg->sPath)->AsEdit()->SetPadding(pMsg->fPadding);
+  pMsg->apStatus = ApMessage::Ok;
+}
+
+AP_MSG_HANDLER_METHOD(ScWidgetModule, ScWidget_SetEditTextFont)
+{
+  FindWidget(pMsg->hScene, pMsg->sPath)->AsEdit()->SetFontFamily(pMsg->sFont);
+  pMsg->apStatus = ApMessage::Ok;
+}
+
+AP_MSG_HANDLER_METHOD(ScWidgetModule, ScWidget_SetEditTextSize)
+{
+  FindWidget(pMsg->hScene, pMsg->sPath)->AsEdit()->SetFontSize(pMsg->fSize);
+  pMsg->apStatus = ApMessage::Ok;
+}
+
+AP_MSG_HANDLER_METHOD(ScWidgetModule, ScWidget_SetEditTextFlags)
+{
+  FindWidget(pMsg->hScene, pMsg->sPath)->AsEdit()->SetFontFlags(pMsg->nFlags);
+  pMsg->apStatus = ApMessage::Ok;
+}
+
+AP_MSG_HANDLER_METHOD(ScWidgetModule, ScWidget_SetEditTextColor)
+{
+  FindWidget(pMsg->hScene, pMsg->sPath)->AsEdit()->SetFontColor(pMsg->fRed, pMsg->fGreen, pMsg->fBlue, pMsg->fAlpha);
+  pMsg->apStatus = ApMessage::Ok;
+}
+
 //---------------------------
 
 AP_MSG_HANDLER_METHOD(ScWidgetModule, Scene_DeleteElement)
@@ -280,6 +328,14 @@ int ScWidgetModule::Init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ScWidgetModule, ScWidget_SetButtonImageFile, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ScWidgetModule, ScWidget_SetButtonTextOffset, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ScWidgetModule, ScWidget_CreateEdit, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, ScWidgetModule, ScWidget_SetEditText, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, ScWidgetModule, ScWidget_GetEditText, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, ScWidgetModule, ScWidget_SetEditAlign, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, ScWidgetModule, ScWidget_SetEditPadding, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, ScWidgetModule, ScWidget_SetEditTextFont, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, ScWidgetModule, ScWidget_SetEditTextSize, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, ScWidgetModule, ScWidget_SetEditTextFlags, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, ScWidgetModule, ScWidget_SetEditTextColor, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ScWidgetModule, Scene_DeleteElement, this, ApCallbackPosLate);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ScWidgetModule, Scene_MouseEvent, this, ApCallbackPosLate);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ScWidgetModule, Scene_KeyEvent, this, ApCallbackPosLate);
