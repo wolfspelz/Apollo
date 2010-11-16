@@ -49,6 +49,7 @@ public:
   void On_Scene_GetRotateElement(Msg_Scene_GetRotateElement* pMsg);
   void On_Scene_CreateMouseSensor(Msg_Scene_CreateMouseSensor* pMsg);
   void On_Scene_CreateRectangle(Msg_Scene_CreateRectangle* pMsg);
+  void On_Scene_CreateRectangleElement(Msg_Scene_CreateRectangleElement* pMsg);
   void On_Scene_CreateImage(Msg_Scene_CreateImage* pMsg);
   void On_Scene_CreateImageFromData(Msg_Scene_CreateImageFromData* pMsg);
   void On_Scene_CreateImageFromFile(Msg_Scene_CreateImageFromFile* pMsg);
@@ -59,6 +60,7 @@ public:
   void On_Scene_SetFontSize(Msg_Scene_SetFontSize* pMsg);
   void On_Scene_SetFontFlags(Msg_Scene_SetFontFlags* pMsg);
   void On_Scene_SetPosition(Msg_Scene_SetPosition* pMsg);
+  void On_Scene_SetSize(Msg_Scene_SetSize* pMsg);
   void On_Scene_SetRectangle(Msg_Scene_SetRectangle* pMsg);
   void On_Scene_SetRoundedRectangle(Msg_Scene_SetRoundedRectangle* pMsg);
   void On_Scene_SetCurvedRectangle(Msg_Scene_SetCurvedRectangle* pMsg);

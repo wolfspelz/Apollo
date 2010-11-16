@@ -133,7 +133,7 @@ public:
 class Msg_ScWidget_SetButtonTextSize: public ApRequestMessage
 {
 public:
-  Msg_ScWidget_SetButtonTextSize() : ApRequestMessage("ScWidget_SetButtonTextSize") {}
+  Msg_ScWidget_SetButtonTextSize() : ApRequestMessage("ScWidget_SetButtonTextSize"), fSize(12) {}
   static int _(const ApHandle& hScene, const String& sPath, double fSize)
   {
     Msg_ScWidget_SetButtonTextSize msg;
@@ -150,7 +150,7 @@ public:
 class Msg_ScWidget_SetButtonTextFlags: public ApRequestMessage
 {
 public:
-  Msg_ScWidget_SetButtonTextFlags() : ApRequestMessage("ScWidget_SetButtonTextFlags") {}
+  Msg_ScWidget_SetButtonTextFlags() : ApRequestMessage("ScWidget_SetButtonTextFlags"), nFlags(0) {}
   static int _(const ApHandle& hScene, const String& sPath, int nFlags)
   {
     Msg_ScWidget_SetButtonTextFlags msg;
@@ -284,5 +284,177 @@ public:
   ApIN double fH;
 };
 
+class Msg_ScWidget_SetEditText: public ApRequestMessage
+{
+public:
+  Msg_ScWidget_SetEditText() : ApRequestMessage("ScWidget_SetEditText") {}
+  static int _(const ApHandle& hScene, const String& sPath, const String& sText)
+  {
+    Msg_ScWidget_SetEditText msg;
+    msg.hScene = hScene;
+    msg.sPath = sPath;
+    msg.sText = sText;
+    return msg.Request();
+  }
+  ApIN ApHandle hScene;
+  ApIN String sPath;
+  ApIN String sText;
+};
+
+class Msg_ScWidget_GetEditText: public ApRequestMessage
+{
+public:
+  Msg_ScWidget_GetEditText() : ApRequestMessage("ScWidget_GetEditText") {}
+  static int _(const ApHandle& hScene, const String& sPath, String& sText)
+  {
+    Msg_ScWidget_GetEditText msg;
+    msg.hScene = hScene;
+    msg.sPath = sPath;
+    int ok = msg.Request();
+    if (ok) {
+      sText = msg.sText;
+    } 
+    return ok;
+  }
+  ApIN ApHandle hScene;
+  ApIN String sPath;
+  ApOUT String sText;
+};
+
+class Msg_ScWidget_SetEditPadding: public ApRequestMessage
+{
+public:
+  Msg_ScWidget_SetEditPadding() : ApRequestMessage("ScWidget_SetEditPadding"), fPadding(0) {}
+  static int _(const ApHandle& hScene, const String& sPath, double fPadding)
+  {
+    Msg_ScWidget_SetEditPadding msg;
+    msg.hScene = hScene;
+    msg.sPath = sPath;
+    msg.fPadding = fPadding;
+    return msg.Request();
+  }
+  ApIN ApHandle hScene;
+  ApIN String sPath;
+  ApIN double fPadding;
+};
+
+class Msg_ScWidget_SetEditAlign: public ApRequestMessage
+{
+public:
+  // Same as ScWidget/Edit
+  typedef enum _Align { NoAlign
+    ,AlignLeft
+    ,AlignCenter // Horizontal
+    ,AlignRight
+    ,AlignTop
+    ,AlignMiddle // Vertical
+    ,AlignBottom
+    ,LastAlign
+  } Align;
+
+  Msg_ScWidget_SetEditAlign() : ApRequestMessage("ScWidget_SetEditAlign"), nAlignH(AlignLeft), nAlignV(AlignTop) {}
+  static int _(const ApHandle& hScene, const String& sPath, int nAlignH, int nAlignV)
+  {
+    Msg_ScWidget_SetEditAlign msg;
+    msg.hScene = hScene;
+    msg.sPath = sPath;
+    msg.nAlignH = nAlignH;
+    msg.nAlignV = nAlignV;
+    return msg.Request();
+  }
+  ApIN ApHandle hScene;
+  ApIN String sPath;
+  ApIN int nAlignH;
+  ApIN int nAlignV;
+};
+
+class Msg_ScWidget_SetEditTextFont: public ApRequestMessage
+{
+public:
+  Msg_ScWidget_SetEditTextFont() : ApRequestMessage("ScWidget_SetEditTextFont") {}
+  static int _(const ApHandle& hScene, const String& sPath, const String& sFont)
+  {
+    Msg_ScWidget_SetEditTextFont msg;
+    msg.hScene = hScene;
+    msg.sPath = sPath;
+    msg.sFont = sFont;
+    return msg.Request();
+  }
+  ApIN ApHandle hScene;
+  ApIN String sPath;
+  ApIN String sFont;
+};
+
+class Msg_ScWidget_SetEditTextSize: public ApRequestMessage
+{
+public:
+  Msg_ScWidget_SetEditTextSize() : ApRequestMessage("ScWidget_SetEditTextSize"), fSize(12) {}
+  static int _(const ApHandle& hScene, const String& sPath, double fSize)
+  {
+    Msg_ScWidget_SetEditTextSize msg;
+    msg.hScene = hScene;
+    msg.sPath = sPath;
+    msg.fSize = fSize;
+    return msg.Request();
+  }
+  ApIN ApHandle hScene;
+  ApIN String sPath;
+  ApIN double fSize;
+};
+
+class Msg_ScWidget_SetEditTextFlags: public ApRequestMessage
+{
+public:
+  Msg_ScWidget_SetEditTextFlags() : ApRequestMessage("ScWidget_SetEditTextFlags"), nFlags(0) {}
+  static int _(const ApHandle& hScene, const String& sPath, int nFlags)
+  {
+    Msg_ScWidget_SetEditTextFlags msg;
+    msg.hScene = hScene;
+    msg.sPath = sPath;
+    msg.nFlags = nFlags;
+    return msg.Request();
+  }
+  ApIN ApHandle hScene;
+  ApIN String sPath;
+  ApIN int nFlags;
+};
+
+class Msg_ScWidget_SetEditTextColor: public ApRequestMessage
+{
+public:
+  Msg_ScWidget_SetEditTextColor() : ApRequestMessage("ScWidget_SetEditTextColor"), fRed(0.0), fGreen(0.0), fBlue(0.0), fAlpha(1.0) {}
+  static int _(const ApHandle& hScene, const String& sPath, double fRed, double fGreen, double fBlue, double fAlpha)
+  {
+    Msg_ScWidget_SetEditTextColor msg;
+    msg.hScene = hScene;
+    msg.sPath = sPath;
+    msg.fRed = fRed;
+    msg.fGreen = fGreen;
+    msg.fBlue = fBlue;
+    msg.fAlpha = fAlpha;
+    return msg.Request();
+  }
+  ApIN ApHandle hScene;
+  ApIN String sPath;
+  ApIN double fRed;
+  ApIN double fGreen;
+  ApIN double fBlue;
+  ApIN double fAlpha;
+};
+
+// Widget ->
+class Msg_ScWidget_EditEvent: public ApNotificationMessage
+{
+public:
+  typedef enum _EventType { NoEditEvent
+    ,EditEnter
+    ,LastEditEvent
+  } EventType;
+
+  Msg_ScWidget_EditEvent() : ApNotificationMessage("ScWidget_EditEvent"), nEvent(NoEditEvent) {}
+  ApIN ApHandle hScene;
+  ApIN String sPath;
+  ApIN int nEvent;
+};
 
 #endif // !defined(MsgScWidget_h_INCLUDED)

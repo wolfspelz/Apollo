@@ -194,7 +194,7 @@ public:
 
   inline bool IsSensor() { return true; }
   void Draw(DrawContext& gc);
-  void MouseEvent(EventContext& gc, double fX, double fY);
+  void MouseEvent(MouseEventContext& gc, double fX, double fY);
 
   void MouseCaptured();
   void MouseReleased();

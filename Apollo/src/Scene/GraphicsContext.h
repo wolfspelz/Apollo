@@ -44,7 +44,7 @@ public:
   String sLogDraw_;
 };
 
-class EventContext: public GraphicsContext
+class MouseEventContext: public GraphicsContext
 {
 public:
   // Same as Msg_Scene_MouseEvent::EventType
@@ -66,7 +66,7 @@ public:
     ,LastMouseButton
   } MouseButton;
 
-  EventContext()
+  MouseEventContext()
     :bFired_(0)
     ,nEvent_(NoEventType)
     ,nButton_(NoMouseButton)

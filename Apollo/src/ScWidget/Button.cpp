@@ -57,6 +57,9 @@ void Button::SetText(const String& sText)
 {
   if (!Msg_Scene_ElementExists::_(hScene_, GetTextPath())) {
     Msg_Scene_CreateTextElement::_(hScene_, GetTextPath());
+    Msg_Scene_SetFontFamily::_(hScene_, GetTextPath(), "Arial");
+    Msg_Scene_SetFontSize::_(hScene_, GetTextPath(), 12);
+    Msg_Scene_SetFillColor::_(hScene_, GetTextPath(), 0, 0, 0, 1);
   }
   Msg_Scene_SetText::_(hScene_, GetTextPath(), sText);
   bHasText_ = 1;

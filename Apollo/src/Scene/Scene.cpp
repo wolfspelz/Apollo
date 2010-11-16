@@ -100,10 +100,10 @@ LRESULT CALLBACK Scene::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
             double fY = nY;
             cairo_user_to_device(pCairo_, &fX, &fY);
 
-            EventContext gc;
+            MouseEventContext gc;
             gc.pCairo_ = pCairo_;
-            gc.nEvent_ = EventContext::MouseMove;
-            gc.nButton_ = EventContext::NoMouseButton;
+            gc.nEvent_ = MouseEventContext::MouseMove;
+            gc.nButton_ = MouseEventContext::NoMouseButton;
             gc.bTimer_ = 1;
 
             if (sCaptureMouseElement_.empty()) {
@@ -121,23 +121,23 @@ LRESULT CALLBACK Scene::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
             StartMoveTimer(hWnd);
           }
         }
-        return HandleMouseEvent(EventContext::MouseMove, EventContext::NoMouseButton, lParam);
+        return HandleMouseEvent(MouseEventContext::MouseMove, MouseEventContext::NoMouseButton, lParam);
       } break;
 
-    case WM_LBUTTONDOWN: { return HandleMouseEvent(EventContext::MouseDown, EventContext::LeftButton, lParam); } break;
-    case WM_MBUTTONDOWN: { return HandleMouseEvent(EventContext::MouseDown, EventContext::MiddleButton, lParam); } break;
-    case WM_RBUTTONDOWN: { return HandleMouseEvent(EventContext::MouseDown, EventContext::RightButton, lParam); } break;
-    case WM_LBUTTONUP: { return HandleMouseEvent(EventContext::MouseUp, EventContext::LeftButton, lParam); } break;
-    case WM_MBUTTONUP: { return HandleMouseEvent(EventContext::MouseUp, EventContext::MiddleButton, lParam); } break;
-    case WM_RBUTTONUP: { return HandleMouseEvent(EventContext::MouseUp, EventContext::RightButton, lParam); } break;
-    case WM_LBUTTONDBLCLK: { return HandleMouseEvent(EventContext::MouseDoubleClick, EventContext::LeftButton, lParam); } break;
-    case WM_MBUTTONDBLCLK: { return HandleMouseEvent(EventContext::MouseDoubleClick, EventContext::MiddleButton, lParam); } break;
-    case WM_RBUTTONDBLCLK: { return HandleMouseEvent(EventContext::MouseDoubleClick, EventContext::RightButton, lParam); } break;
+    case WM_LBUTTONDOWN: { return HandleMouseEvent(MouseEventContext::MouseDown, MouseEventContext::LeftButton, lParam); } break;
+    case WM_MBUTTONDOWN: { return HandleMouseEvent(MouseEventContext::MouseDown, MouseEventContext::MiddleButton, lParam); } break;
+    case WM_RBUTTONDOWN: { return HandleMouseEvent(MouseEventContext::MouseDown, MouseEventContext::RightButton, lParam); } break;
+    case WM_LBUTTONUP: { return HandleMouseEvent(MouseEventContext::MouseUp, MouseEventContext::LeftButton, lParam); } break;
+    case WM_MBUTTONUP: { return HandleMouseEvent(MouseEventContext::MouseUp, MouseEventContext::MiddleButton, lParam); } break;
+    case WM_RBUTTONUP: { return HandleMouseEvent(MouseEventContext::MouseUp, MouseEventContext::RightButton, lParam); } break;
+    case WM_LBUTTONDBLCLK: { return HandleMouseEvent(MouseEventContext::MouseDoubleClick, MouseEventContext::LeftButton, lParam); } break;
+    case WM_MBUTTONDBLCLK: { return HandleMouseEvent(MouseEventContext::MouseDoubleClick, MouseEventContext::MiddleButton, lParam); } break;
+    case WM_RBUTTONDBLCLK: { return HandleMouseEvent(MouseEventContext::MouseDoubleClick, MouseEventContext::RightButton, lParam); } break;
 
-    case WM_KEYDOWN: { return HandleKeyEvent(); } break;
-    case WM_KEYUP: { return HandleKeyEvent(); } break;
-    case WM_CHAR: { return HandleCharEvent(wParam, lParam); } break;
-    case WM_UNICHAR: { return HandleUniCharEvent(wParam, lParam); } break;
+    case WM_KEYDOWN: { return HandleKeyEvent(Msg_Scene_KeyEvent::KeyDown, wParam); } break;
+    case WM_KEYUP: { return HandleKeyEvent(Msg_Scene_KeyEvent::KeyUp, wParam); } break;
+    case WM_CHAR: { return HandleKeyEvent(Msg_Scene_KeyEvent::Char, wParam); } break;
+    //case WM_UNICHAR: {} break;
 
     default:
       return DefWindowProc(hWnd, message, wParam, lParam);
@@ -154,7 +154,7 @@ LRESULT Scene::HandleMouseEvent(int nEvent, int nButton, LPARAM lParam)
     double fY = nY;
     cairo_user_to_device(pCairo_, &fX, &fY);
 
-    EventContext gc;
+    MouseEventContext gc;
     gc.pCairo_ = pCairo_;
     gc.nEvent_ = nEvent;
     gc.nButton_ = nButton;
@@ -172,42 +172,75 @@ LRESULT Scene::HandleMouseEvent(int nEvent, int nButton, LPARAM lParam)
   return 0;
 }
 
-LRESULT Scene::HandleKeyEvent()
+LRESULT Scene::HandleKeyEvent(Msg_Scene_KeyEvent::EventType nEvent, WPARAM wParam)
 {
-  //apLog_Debug((LOG_CHANNEL, "Scene::HandleKeyEvent", "scene=" ApHandleFormat "", ApHandleType(apHandle())));
-  return 0;
-}
-
-LRESULT Scene::HandleCharEvent(WPARAM wParam, LPARAM lParam)
-{
-  //apLog_Debug((LOG_CHANNEL, "Scene::HandleCharEvent", "scene=" ApHandleFormat " wParam=%d lParam=%d", ApHandleType(apHandle()), wParam, lParam));
+  //apLog_Debug((LOG_CHANNEL, "Scene::HandleKeyEvent", "scene=" ApHandleFormat " ev=%d wParam=%d", ApHandleType(apHandle()), nEvent, wParam));
 
   if (sKeyboardFocus_) {
-    int nBufferSize = ::WideCharToMultiByte(CP_UTF8, 0, (LPCWSTR) &wParam, -1, NULL, 0, NULL, NULL);
-    if (nBufferSize > 0) {
-      Flexbuf<char> buf(nBufferSize);
-      WideCharToMultiByte(CP_UTF8, 0, (LPCWSTR) &wParam, -1, (char*) buf, nBufferSize, NULL, NULL);
+    switch (nEvent) {
+      case Msg_Scene_KeyEvent::KeyDown:
+      case Msg_Scene_KeyEvent::KeyUp:
+        {
+          switch (wParam) {
+            case VK_LEFT: { SendControlKey(nEvent, Msg_Scene_KeyEvent::MoveLeft); } break;
+            case VK_RIGHT: { SendControlKey(nEvent, Msg_Scene_KeyEvent::MoveRight); } break;
+            case VK_UP: { SendControlKey(nEvent, Msg_Scene_KeyEvent::MoveUp); } break;
+            case VK_DOWN: { SendControlKey(nEvent, Msg_Scene_KeyEvent::MoveDown); } break;
+            case VK_BACK: { SendControlKey(nEvent, Msg_Scene_KeyEvent::DeleteLeft); } break;
+            case VK_DELETE: { SendControlKey(nEvent, Msg_Scene_KeyEvent::DeleteRight); } break;
+            case VK_SHIFT: { SendControlKey(nEvent, Msg_Scene_KeyEvent::Shift); } break;
+            case VK_CONTROL: { SendControlKey(nEvent, Msg_Scene_KeyEvent::Control); } break;
+            case 10: { SendControlKey(nEvent, Msg_Scene_KeyEvent::Newline); } break;
+            case 13: { SendControlKey(nEvent, Msg_Scene_KeyEvent::Newline); } break;
+            default:;
+          }
+        } break;
 
-      // http://unicode.org/cldr/utility/character.jsp?a=91d1
-      // jin
-      // 37329
-      // e9 87 91
+      case Msg_Scene_KeyEvent::Char:
+        {
+          if (wParam >= 0x20) {
+            SendChar(nEvent, wParam);
+          }
+        } break;
 
-      Msg_Scene_KeyEvent msg;
-      msg.hScene = apHandle();
-      msg.sPath = sKeyboardFocus_;
-      msg.sKey = (char*) buf;
-      msg.Send();
+      default:;
     }
+
   }
 
   return 0;
 }
 
-LRESULT Scene::HandleUniCharEvent(WPARAM wParam, LPARAM lParam)
+void Scene::SendControlKey(Msg_Scene_KeyEvent::EventType nEvent, Msg_Scene_KeyEvent::KeyCode nKey)
 {
-  //apLog_Debug((LOG_CHANNEL, "Scene::HandleUniCharEvent", "scene=" ApHandleFormat " wParam=%d lParam=%d", ApHandleType(apHandle()), wParam, lParam));
-  return 0;
+  Msg_Scene_KeyEvent msg;
+  msg.hScene = apHandle();
+  msg.sPath = sKeyboardFocus_;
+  msg.nEvent = nEvent;
+  msg.nKey = nKey;
+  msg.Send();
+}
+
+void Scene::SendChar(Msg_Scene_KeyEvent::EventType nEvent, WPARAM wParam)
+{
+  int nBufferSize = ::WideCharToMultiByte(CP_UTF8, 0, (LPCWSTR) &wParam, -1, NULL, 0, NULL, NULL);
+  if (nBufferSize > 0) {
+    Flexbuf<char> buf(nBufferSize);
+    WideCharToMultiByte(CP_UTF8, 0, (LPCWSTR) &wParam, -1, (char*) buf, nBufferSize, NULL, NULL);
+
+    // http://unicode.org/cldr/utility/character.jsp?a=91d1
+    // jin
+    // 37329
+    // U+91D1
+    // e9 87 91
+
+    Msg_Scene_KeyEvent msg;
+    msg.hScene = apHandle();
+    msg.sPath = sKeyboardFocus_;
+    msg.nEvent = nEvent;
+    msg.sChar = (char*) buf;
+    msg.Send();
+  }
 }
 
 #endif // WIN32
@@ -700,6 +733,9 @@ void Scene::Draw()
   }
 
 #if defined(_DEBUG) && 0
+  cairo_scale(pCairo_, 1.0, -1.0);
+  cairo_translate(pCairo_, 0.0, -nH_);
+
   #define M_PI 3.14159265358979323
 
   double xc = 128.0;
@@ -781,9 +817,9 @@ void Scene::Draw()
   cairo_set_source_surface(pCairo_, pCairoImage, 0, 0);
   cairo_paint(pCairo_);
 
-  cairo_select_font_face(pCairo_, "Verdana", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
+  cairo_select_font_face(pCairo_, "Microsoft YaHei", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
   cairo_set_font_size(pCairo_, 32.0);
-  const char* text = "Tassadar";
+  const char* text = "Tassadar \xe9\x87\x91";
   cairo_text_extents_t extents;
   cairo_text_extents(pCairo_, text, &extents);
 
@@ -814,6 +850,14 @@ void Scene::Draw()
   cairo_set_source_rgba(pCairo_, 0.0, 0.0, 0.0, 0.5);
   cairo_fill(pCairo_);
 
+  // ----------------------------
+
+
+
+  // ----------------------------
+
+  cairo_translate(pCairo_, 0.0, nH_);
+  cairo_scale(pCairo_, 1.0, -1.0);
 #endif
 
   // setup the blend function

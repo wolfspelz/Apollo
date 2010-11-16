@@ -386,6 +386,21 @@ public:
   ApIN double fH;
 };
 
+class Msg_Scene_CreateRectangleElement: public ApRequestMessage
+{
+public:
+  Msg_Scene_CreateRectangleElement() : ApRequestMessage("Scene_CreateRectangleElement") {}
+  static int _(const ApHandle& hScene, const String& sPath)
+  {
+    Msg_Scene_CreateRectangleElement msg;
+    msg.hScene = hScene;
+    msg.sPath = sPath;
+    return msg.Request();
+  }
+  ApIN ApHandle hScene;
+  ApIN String sPath;
+};
+
 class Msg_Scene_CreateImage: public ApRequestMessage
 {
 public:
@@ -591,6 +606,25 @@ public:
   ApIN String sPath;
   ApIN double fX;
   ApIN double fY;
+};
+
+class Msg_Scene_SetSize: public ApRequestMessage
+{
+public:
+  Msg_Scene_SetSize() : ApRequestMessage("Scene_SetSize"), fW(0), fH(0) {}
+  static int _(const ApHandle& hScene, const String& sPath, double fW, double fH)
+  {
+    Msg_Scene_SetSize msg;
+    msg.hScene = hScene;
+    msg.sPath = sPath;
+    msg.fW = fW;
+    msg.fH = fH;
+    return msg.Request();
+  }
+  ApIN ApHandle hScene;
+  ApIN String sPath;
+  ApIN double fW;
+  ApIN double fH;
 };
 
 class Msg_Scene_SetRectangle: public ApRequestMessage
@@ -1082,11 +1116,41 @@ public:
 class Msg_Scene_KeyEvent: public ApNotificationMessage
 {
 public:
-  Msg_Scene_KeyEvent() : ApNotificationMessage("Scene_KeyEvent"), nFlags(0) {}
+  //8 Bs
+  //38 Up
+  //40 Down
+  //37 Left
+  //39 Right
+  //46 Del
+  //16 Shift
+  //17 Ctrl
+  typedef enum _EventType { NoEventType
+    ,KeyDown
+    ,KeyUp
+    ,Char
+    ,LastEventType
+  } EventType;
+
+  typedef enum _KeyCode { NoKeyCode
+    ,MoveLeft
+    ,MoveRight
+    ,MoveUp
+    ,MoveDown
+    ,DeleteLeft
+    ,DeleteRight
+    ,Shift
+    ,Control
+    ,Newline
+    ,LastKeyCode
+  } KeyCode;
+
+  Msg_Scene_KeyEvent() : ApNotificationMessage("Scene_KeyEvent"), nEvent(0), nKey(0), nFlags(0) {}
   ApIN ApHandle hScene;
   ApIN String sPath;
+  ApIN int nEvent;
+  ApIN int nKey;
+  ApIN String sChar;
   ApIN int nFlags;
-  ApIN String sKey;
 };
 
 #endif // !defined(MsgScene_h_INCLUDED)
