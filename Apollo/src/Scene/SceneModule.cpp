@@ -177,6 +177,14 @@ AP_MSG_HANDLER_METHOD(SceneModule, Scene_SetCopyMode)
   pMsg->apStatus = ApMessage::Ok;
 }
 
+AP_MSG_HANDLER_METHOD(SceneModule, Scene_GetElementPosition)
+{
+  Scene* pScene = FindScene(pMsg->hScene);
+  pMsg->fX = 100;
+  pMsg->fY = 100;
+  pMsg->apStatus = ApMessage::Ok;
+}
+
 AP_MSG_HANDLER_METHOD(SceneModule, Scene_GetTranslateElement)
 {
   Scene* pScene = FindScene(pMsg->hScene);
@@ -606,6 +614,7 @@ int SceneModule::Init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_RotateElement, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_ShowElement, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_SetCopyMode, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_GetElementPosition, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_GetTranslateElement, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_GetScaleElement, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_GetRotateElement, this, ApCallbackPosNormal);

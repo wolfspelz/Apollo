@@ -277,6 +277,16 @@ AP_MSG_HANDLER_METHOD(ScWidgetModule, Scene_KeyEvent)
   }
 }
 
+AP_MSG_HANDLER_METHOD(ScWidgetModule, Scene_KeyboardFocusEvent)
+{
+  if (HasScene(pMsg->hScene)) {
+    Scene* pScene = FindScene(pMsg->hScene);
+    if (pScene->HasWidget(pMsg->sPath)) {
+      pScene->FindWidget(pMsg->sPath)->OnKeyboardFocusEvent(pMsg);
+    }
+  }
+}
+
 //----------------------------------------------------------
 
 #if defined(AP_TEST)
@@ -339,6 +349,7 @@ int ScWidgetModule::Init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ScWidgetModule, Scene_DeleteElement, this, ApCallbackPosLate);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ScWidgetModule, Scene_MouseEvent, this, ApCallbackPosLate);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ScWidgetModule, Scene_KeyEvent, this, ApCallbackPosLate);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, ScWidgetModule, Scene_KeyboardFocusEvent, this, ApCallbackPosLate);
 
   AP_UNITTEST_HOOK(ScWidgetModule, this);
 

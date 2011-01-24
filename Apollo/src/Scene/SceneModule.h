@@ -44,6 +44,7 @@ public:
   void On_Scene_RotateElement(Msg_Scene_RotateElement* pMsg);
   void On_Scene_ShowElement(Msg_Scene_ShowElement* pMsg);
   void On_Scene_SetCopyMode(Msg_Scene_SetCopyMode* pMsg);
+  void On_Scene_GetElementPosition(Msg_Scene_GetElementPosition* pMsg);
   void On_Scene_GetTranslateElement(Msg_Scene_GetTranslateElement* pMsg);
   void On_Scene_GetScaleElement(Msg_Scene_GetScaleElement* pMsg);
   void On_Scene_GetRotateElement(Msg_Scene_GetRotateElement* pMsg);

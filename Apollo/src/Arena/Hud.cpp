@@ -7,6 +7,7 @@
 #include "Apollo.h"
 #include "ApLog.h"
 #include "MsgScene.h"
+#include "MsgScWidget.h"
 #include "Local.h"
 #include "Hud.h"
 #include "Display.h"
@@ -229,8 +230,19 @@ void Hud::CreateBottomBar()
 {
   if (!Msg_Scene_ElementExists::_(hScene_, ELEMENT_BOTTOMBAR)) {
     Msg_Scene_CreateElement::_(hScene_, ELEMENT_BOTTOMBAR);
+
     Msg_Scene_CreateRectangle::_(hScene_, ELEMENT_BOTTOMBAR "/" ELEMENT_BOTTOMBAR_RECT, 0, 0, 1, 1);
-    Msg_Scene_SetFillColor::_(hScene_, ELEMENT_BOTTOMBAR "/" ELEMENT_BOTTOMBAR_RECT, 0.8, 0.8, 0.8, 1);
+    Msg_Scene_SetFillColor::_(hScene_, ELEMENT_BOTTOMBAR "/" ELEMENT_BOTTOMBAR_RECT, 1, 0, 0, 0.7);
+
+    Msg_ScWidget_CreateEdit::_(hScene_, ELEMENT_BOTTOMBAR "/" ELEMENT_BOTTOMBAR_EDIT, 0, 0, 100, 20);
+    //Msg_Scene_SetStrokeColor::_(hScene_, ELEMENT_BOTTOMBAR "/" ELEMENT_BOTTOMBAR_EDIT, 0, 0, 0, 1);
+    //Msg_Scene_SetFillColor::_(hScene_, ELEMENT_BOTTOMBAR "/" ELEMENT_BOTTOMBAR_EDIT, 1, 1, 1, 1);
+    Msg_ScWidget_SetEditText::_(hScene_, ELEMENT_BOTTOMBAR "/" ELEMENT_BOTTOMBAR_EDIT, "Hallo Welt");
+    Msg_ScWidget_SetEditTextFont::_(hScene_, ELEMENT_BOTTOMBAR "/" ELEMENT_BOTTOMBAR_EDIT, "Arial");
+    Msg_ScWidget_SetEditTextSize::_(hScene_, ELEMENT_BOTTOMBAR "/" ELEMENT_BOTTOMBAR_EDIT, 14);
+    Msg_ScWidget_SetEditTextColor::_(hScene_, ELEMENT_BOTTOMBAR "/" ELEMENT_BOTTOMBAR_EDIT, 0, 0, 1, 1);
+    Msg_ScWidget_SetEditPadding::_(hScene_, ELEMENT_BOTTOMBAR "/" ELEMENT_BOTTOMBAR_EDIT, 3);
+    Msg_ScWidget_SetEditAlign::_(hScene_, ELEMENT_BOTTOMBAR "/" ELEMENT_BOTTOMBAR_EDIT, Msg_ScWidget_SetEditAlign::AlignCenter, Msg_ScWidget_SetEditAlign::AlignMiddle);
   }
 }
 

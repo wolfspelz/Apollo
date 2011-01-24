@@ -271,7 +271,7 @@ void Element::DrawRecursive(DrawContext& gc)
     if (fRotate_ != 0.0) {
       cairo_rotate(gc.Cairo(), -fRotate_);
     }
-    if (fScaleX_ != 0.0 || fScaleY_ != 0.0) {
+    if (fScaleX_ != 1.0 || fScaleY_ != 1.0) {
       cairo_scale(gc.Cairo(), fScaleX_, fScaleY_);
     }
     if (nCopyMode_ != CAIRO_OPERATOR_OVER) {
@@ -323,7 +323,20 @@ void Element::MouseEventRecursive(MouseEventContext& gc, double fX, double fY)
 
   gc.nDepth_++;
 
-  // Depth first
+  if (bSave_) {
+    cairo_save(gc.Cairo());
+
+    if (fTranslateX_ != 0.0 || fTranslateY_ != 0.0) {
+      cairo_translate(gc.Cairo(), fTranslateX_, fTranslateY_);
+    }
+    if (fRotate_ != 0.0) {
+      cairo_rotate(gc.Cairo(), -fRotate_);
+    }
+    if (fScaleX_ != 1.0 || fScaleY_ != 1.0) {
+      cairo_scale(gc.Cairo(), fScaleX_, fScaleY_);
+    }
+  }
+
   if (pChildren_) {
     ElementIterator iter(*pChildren_);
     for (ElementNode* pNode = 0; pNode = iter.Next(); ) {
@@ -336,6 +349,10 @@ void Element::MouseEventRecursive(MouseEventContext& gc, double fX, double fY)
 
   if (IsSensor()) {
     AsSensor()->MouseEvent(gc, fX, fY);
+  }
+
+  if (bSave_) {
+    cairo_restore(gc.Cairo());
   }
 
   gc.nDepth_--;

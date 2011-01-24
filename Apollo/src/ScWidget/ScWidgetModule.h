@@ -72,6 +72,7 @@ public:
   void On_Scene_DeleteElement(Msg_Scene_DeleteElement* pMsg);
   void On_Scene_MouseEvent(Msg_Scene_MouseEvent* pMsg);
   void On_Scene_KeyEvent(Msg_Scene_KeyEvent* pMsg);
+  void On_Scene_KeyboardFocusEvent(Msg_Scene_KeyboardFocusEvent* pMsg);
 
 #if defined(AP_TEST)
   void On_UnitTest_Begin(Msg_UnitTest_Begin* pMsg);

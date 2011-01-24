@@ -16,7 +16,8 @@ Edit::Edit(const ApHandle& hScene, const String& sPath)
 ,nAlignH_(AlignLeft)
 ,nAlignV_(AlignTop)
 ,fPadding_(1.0)
-,nInsert_(0)
+,bHasFocus_(0)
+,nInsertPos_(0)
 {
 }
 
@@ -54,18 +55,23 @@ void Edit::OnMouseEvent(Msg_Scene_MouseEvent* pMsg)
   }
 }
 
+void Edit::OnKeyboardFocusEvent(Msg_Scene_KeyboardFocusEvent* pMsg)
+{
+  //apLog_Debug((LOG_CHANNEL, "Edit::OnKeyboardFocusEvent", "path=%s focus=%d", StringType(pMsg->sPath), pMsg->bFocus));
+}
+
 void Edit::OnKeyEvent(Msg_Scene_KeyEvent* pMsg)
 {
-  apLog_Debug((LOG_CHANNEL, "Edit::OnKeyEvent", "path=%s ev=%d key=%d unicode=%08x char=%s", StringType(pMsg->sPath), pMsg->nEvent, pMsg->nKey, String::UTF8_Char(pMsg->sChar), StringType(pMsg->sChar)));
+  //apLog_Debug((LOG_CHANNEL, "Edit::OnKeyEvent", "path=%s ev=%d key=%d unicode=%08x char=%s", StringType(pMsg->sPath), pMsg->nEvent, pMsg->nKey, String::UTF8_Char(pMsg->sChar), StringType(pMsg->sChar)));
   //::MessageBox(NULL, (PTSTR) pMsg->sKey, _T("Test"), MB_OK);
 
   switch (pMsg->nEvent) {
     case Msg_Scene_KeyEvent::Char:
       {
-        String sLeft = sText_.subString(0, nInsert_);
-        String sRight = sText_.subString(nInsert_);
+        String sLeft = sText_.subString(0, nInsertPos_);
+        String sRight = sText_.subString(nInsertPos_);
         sLeft += pMsg->sChar;
-        nInsert_ += pMsg->sChar.chars();
+        nInsertPos_ += pMsg->sChar.chars();
         sText_ = sLeft + sRight;
       } break;
 
@@ -74,30 +80,30 @@ void Edit::OnKeyEvent(Msg_Scene_KeyEvent* pMsg)
         switch (pMsg->nKey) {
           case Msg_Scene_KeyEvent::MoveLeft:
             {
-              nInsert_--;
-              if (nInsert_ < 0) {
-                nInsert_ = 0;
+              nInsertPos_--;
+              if (nInsertPos_ < 0) {
+                nInsertPos_ = 0;
               }
             } break;
 
           case Msg_Scene_KeyEvent::MoveRight:
             {
-              nInsert_++;
-              if (nInsert_ > sText_.chars()) {
-                nInsert_ = sText_.chars();
+              nInsertPos_++;
+              if (nInsertPos_ > sText_.chars()) {
+                nInsertPos_ = sText_.chars();
               }
             } break;
 
           case Msg_Scene_KeyEvent::DeleteLeft:
             {
               if (sText_.chars() > 0) {
-                String sLeft = sText_.subString(0, nInsert_);
-                String sRight = sText_.subString(nInsert_);
-                sLeft = sLeft.subString(0, nInsert_ - 1);
+                String sLeft = sText_.subString(0, nInsertPos_);
+                String sRight = sText_.subString(nInsertPos_);
+                sLeft = sLeft.subString(0, nInsertPos_ - 1);
                 sText_ = sLeft + sRight;
-                nInsert_--;
-                if (nInsert_ < 0) {
-                  nInsert_ = 0;
+                nInsertPos_--;
+                if (nInsertPos_ < 0) {
+                  nInsertPos_ = 0;
                 }
               }
             } break;
@@ -105,11 +111,11 @@ void Edit::OnKeyEvent(Msg_Scene_KeyEvent* pMsg)
           case Msg_Scene_KeyEvent::DeleteRight:
             {
               if (sText_.chars() > 0) {
-                String sLeft = sText_.subString(0, nInsert_);
-                String sRight = sText_.subString(nInsert_);
+                String sLeft = sText_.subString(0, nInsertPos_);
+                String sRight = sText_.subString(nInsertPos_);
                 sRight = sRight.subString(1);
                 sText_ = sLeft + sRight;
-                //nInsert_--;
+                //nInsertPos_--;
               }
             } break;
 
@@ -177,7 +183,7 @@ void Edit::SetFontColor(double fRed, double fGreen, double fBlue, double fAlpha)
 void Edit::SetText(const String& sText)
 {
   sText_ = sText;
-  nInsert_ = sText_.chars();
+  nInsertPos_ = sText_.chars();
 
   ShowText();
 }
@@ -197,13 +203,13 @@ void Edit::PositionText()
 
   double fInsertX = fTextX;
   double fInsertY = fTextY;
-  String sLeft = sText_.subString(0, nInsert_);
+  String sLeft = sText_.subString(0, nInsertPos_);
   double fLeftBearingX, fLeftBearingY, fLeftWidth, fLeftHeight, fLeftAdvanceX, fLeftAdvanceY;
   if (Msg_Scene_GetTextExtents::_(hScene_, sLeft, sFont_, fSize_, nFlags_, fLeftBearingX, fLeftBearingY, fLeftWidth, fLeftHeight, fLeftAdvanceX, fLeftAdvanceY)) {
     fInsertX = fTextX + fLeftAdvanceX;
   }
 
-  Msg_Scene_SetRectangle::_(hScene_, GetInsertPath(), fInsertX + 0.5, fInsertY - 1, 1, fTextH + 2);
+  Msg_Scene_SetRectangle::_(hScene_, GetInsertPath(), fInsertX - 0.5, fInsertY - 2, 1, fTextH + 4);
 }
 
 void Edit::GetTextRect(double& fTextX, double& fTextY, double& fTextW, double& fTextH)

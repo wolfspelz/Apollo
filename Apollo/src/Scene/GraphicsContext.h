@@ -79,6 +79,8 @@ public:
   int nEvent_;
   int nButton_;
   int bTimer_;
+  int nX_;
+  int nY_;
 };
 
 #endif // GraphicsContext_H_INCLUDED

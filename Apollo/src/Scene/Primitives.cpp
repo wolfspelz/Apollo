@@ -341,14 +341,20 @@ void SensorElement::MouseEvent(MouseEventContext& gc, double fX, double fY)
   int bHit = 0;
   int bInside = 0;
 
-  fX -= fTranslateX_;
-  fY -= fTranslateY_;
+  double fX1 = fX;
+  double fY1 = fY;
+  //cairo_user_to_device(gc.Cairo(), &fX1, &fY1);
+  cairo_device_to_user(gc.Cairo(), &fX1, &fY1);
+
+  //if (gc.nEvent_ == MouseEventContext::MouseMove) {
+  //  apLog_Debug((LOG_CHANNEL, "SensorElement::MouseEvent", "path=%s event=%d %d,%d %.2f,%.2f %.2f,%.2f", StringType(sPath_), gc.nEvent_, gc.nX_, gc.nY_, fX, fY, fX1, fY1));
+  //}
 
   if (bCaptured_) {
     bHit = 1;
   }
 
-  if (fX_ < fX && fX_ + fW_ > fX && fY_ < fY && fY_ + fH_ > fY) {
+  if (fX_ < fX1 && fX_ + fW_ > fX1 && fY_ < fY1 && fY_ + fH_ > fY1) {
     bInside = 1;
     bHit = 1;
   }
@@ -364,8 +370,8 @@ void SensorElement::MouseEvent(MouseEventContext& gc, double fX, double fY)
       msg.sPath = sPath_;
       msg.nEvent = MouseEventContext::MouseOut;
       msg.nButton = MouseEventContext::NoMouseButton;
-      msg.fX = fX;
-      msg.fY = fY;
+      msg.fX = fX1;
+      msg.fY = fY1;
       msg.bInside = bInside;
       msg.Send();
       nEvent = msg.nEvent;
@@ -381,8 +387,8 @@ void SensorElement::MouseEvent(MouseEventContext& gc, double fX, double fY)
       msg.sPath = sPath_;
       msg.nEvent = gc.nEvent_;
       msg.nButton = gc.nButton_;
-      msg.fX = fX;
-      msg.fY = fY;
+      msg.fX = fX1;
+      msg.fY = fY1;
       msg.bInside = bInside;
       msg.Send();
       nEvent = msg.nEvent;

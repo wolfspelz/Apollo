@@ -85,6 +85,7 @@ public:
   void ReleaseMouse();
 
   void SetKeyboardFocus(const String& sPath);
+  String GetKeyboardFocus() { return sKeyboardFocus_; }
 
   void Draw();
   void OnAutoDrawTimer();
