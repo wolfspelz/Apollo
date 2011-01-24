@@ -296,6 +296,28 @@ public:
 //--------------------------
 // Get info
 
+class Msg_Scene_GetElementPosition: public ApRequestMessage
+{
+public:
+  Msg_Scene_GetElementPosition() : ApRequestMessage("Scene_GetElementPosition"), fX(0), fY(0) {}
+  static int _(const ApHandle& hScene, const String& sPath, double& fX, double& fY)
+  {
+    Msg_Scene_GetElementPosition msg;
+    msg.hScene = hScene;
+    msg.sPath = sPath;
+    int ok = msg.Request();
+    if (ok) {
+      fX = msg.fX;
+      fY = msg.fY;
+    } 
+    return ok;
+  }
+  ApIN ApHandle hScene;
+  ApIN String sPath;
+  ApIN double fX;
+  ApIN double fY;
+};
+
 class Msg_Scene_GetTranslateElement: public ApRequestMessage
 {
 public:
@@ -1097,6 +1119,7 @@ public:
   ApIN int bInside;
 };
 
+// -> Scene 
 class Msg_Scene_SetKeyboardFocus: public ApRequestMessage
 {
 public:
@@ -1110,6 +1133,16 @@ public:
   }
   ApIN ApHandle hScene;
   ApIN String sPath;
+};
+
+// Scene ->
+class Msg_Scene_KeyboardFocusEvent: public ApNotificationMessage
+{
+public:
+  Msg_Scene_KeyboardFocusEvent() : ApNotificationMessage("Scene_KeyboardFocusEvent"), bFocus(1) {}
+  ApIN ApHandle hScene;
+  ApIN String sPath;
+  ApIN int bFocus;
 };
 
 // Scene ->

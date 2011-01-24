@@ -98,13 +98,14 @@ LRESULT CALLBACK Scene::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
           if (pCairo_) {
             double fX = nX;
             double fY = nY;
-            cairo_user_to_device(pCairo_, &fX, &fY);
 
             MouseEventContext gc;
             gc.pCairo_ = pCairo_;
             gc.nEvent_ = MouseEventContext::MouseMove;
             gc.nButton_ = MouseEventContext::NoMouseButton;
             gc.bTimer_ = 1;
+            gc.nX_ = nX;
+            gc.nY_ = nY;
 
             if (sCaptureMouseElement_.empty()) {
               root_.MouseEventRecursive(gc, fX, fY);
@@ -148,16 +149,17 @@ LRESULT Scene::HandleMouseEvent(int nEvent, int nButton, LPARAM lParam)
 {
   int nX = GET_X_LPARAM(lParam);
   int nY = GET_Y_LPARAM(lParam);
-
+  
   if (pCairo_) {
     double fX = nX;
     double fY = nY;
-    cairo_user_to_device(pCairo_, &fX, &fY);
 
     MouseEventContext gc;
     gc.pCairo_ = pCairo_;
     gc.nEvent_ = nEvent;
     gc.nButton_ = nButton;
+    gc.nX_ = nX;
+    gc.nY_ = nY;
 
     if (sCaptureMouseElement_.empty()) {
       root_.MouseEventRecursive(gc, fX, fY);
@@ -682,7 +684,23 @@ void Scene::ReleaseMouse()
 
 void Scene::SetKeyboardFocus(const String& sPath)
 {
-  sKeyboardFocus_ = sPath;
+  if (sPath != sKeyboardFocus_) {
+    if (sKeyboardFocus_) {
+      Msg_Scene_KeyboardFocusEvent msg;
+      msg.hScene = apHandle();
+      msg.sPath = sKeyboardFocus_;
+      msg.bFocus = 0;
+      msg.Send();
+    }
+    sKeyboardFocus_ = sPath;
+    if (sKeyboardFocus_) {
+      Msg_Scene_KeyboardFocusEvent msg;
+      msg.hScene = apHandle();
+      msg.sPath = sKeyboardFocus_;
+      msg.bFocus = 1;
+      msg.Send();
+    }
+  }
 }
 
 //------------------------------------

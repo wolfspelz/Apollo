@@ -37,9 +37,11 @@ public:
   void SetFontSize(double fSize);
   void SetFontFlags(int nFlags);
   void SetFontColor(double fRed, double fGreen, double fBlue, double fAlpha);
+  inline void SetFocus(int bHasFocus) { bHasFocus_ = bHasFocus; }
 
   void OnMouseEvent(Msg_Scene_MouseEvent* pMsg);
   void OnKeyEvent(Msg_Scene_KeyEvent* pMsg);
+  void OnKeyboardFocusEvent(Msg_Scene_KeyboardFocusEvent* pMsg);
 
 protected:
   String GetTextPath();
@@ -57,8 +59,8 @@ protected:
   int nAlignH_;
   int nAlignV_;
   double fPadding_;
-
-  int nInsert_;
+  int bHasFocus_;
+  int nInsertPos_;
 };
 
 #endif // Edit_H_INCLUDED

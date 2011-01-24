@@ -28,8 +28,9 @@
 
 #define ELEMENT_SIZESENSOR "u_size_sensor"
 
-#define ELEMENT_BOTTOMBAR "u_bottom_bar"
-  #define ELEMENT_BOTTOMBAR_RECT "u_bottom_bar"
+#define ELEMENT_BOTTOMBAR "u_bottombar"
+  #define ELEMENT_BOTTOMBAR_RECT "b_rect"
+  #define ELEMENT_BOTTOMBAR_EDIT "m_edit"
 
 #define BOTTOMSENSOR_HEIGHT 10
 

@@ -23,26 +23,39 @@ void SceneModuleTester::On_Scene_MouseEvent(Msg_Scene_MouseEvent* pMsg)
 
   apLog_Verbose((LOG_CHANNEL, "SceneModuleTester::On_Scene_MouseEvent", "scene=" ApHandleFormat " path=%s event=%d button=%d x=%f y=%f", ApHandleType(pMsg->hScene), StringType(pMsg->sPath), pMsg->nEvent, pMsg->nButton, pMsg->fX, pMsg->fY));
 
-  if (!bHasCursor_) {
-    double fW = 0;
-    double fH = 0;
-    Msg_Scene_GetImageSizeFromFile::_(pMsg->hScene, Apollo::getAppResourcePath() + "test/cursor.png", fW, fH);
-    Msg_Scene_CreateImageFromFile::_(pMsg->hScene, "z_cursor", -fW/2.0, -fH/2.0, Apollo::getAppResourcePath() + "test/cursor.png");
-    bHasCursor_ = 1;
+  if (pMsg->nEvent == Msg_Scene_MouseEvent::MouseOut) {
+    if (bHasCursor_) {
+
+      ApAsyncMessage<Msg_Scene_DeleteElement> msg;
+      msg->hScene = pMsg->hScene;
+      msg->sPath = "z_cursor";
+      msg.Post();
+
+      bHasCursor_ = 0;
+    }
+  } else {
+    if (!bHasCursor_) {
+      double fW = 0;
+      double fH = 0;
+      Msg_Scene_GetImageSizeFromFile::_(pMsg->hScene, Apollo::getAppResourcePath() + "test/cursor.png", fW, fH);
+      Msg_Scene_CreateImageFromFile::_(pMsg->hScene, "z_cursor", -fW/2.0, -fH/2.0, Apollo::getAppResourcePath() + "test/cursor.png");
+      bHasCursor_ = 1;
+    }
+
+    if (pMsg->nEvent == Msg_Scene_MouseEvent::MouseDown) {
+      Msg_Scene_CaptureMouse::_(pMsg->hScene, pMsg->sPath);
+    }
+    if (pMsg->nEvent == Msg_Scene_MouseEvent::MouseUp) {
+      Msg_Scene_ReleaseMouse::_(pMsg->hScene);
+    }
+
+    double fPosX = 0;
+    double fPosY = 0;
+    Msg_Scene_GetElementPosition::_(pMsg->hScene, pMsg->sPath, fPosX, fPosY);
+    Msg_Scene_TranslateElement::_(pMsg->hScene, "z_cursor", pMsg->fX + fPosX, pMsg->fY + fPosY);
   }
 
-  if (pMsg->nEvent == Msg_Scene_MouseEvent::MouseDown) {
-    Msg_Scene_CaptureMouse::_(pMsg->hScene, pMsg->sPath);
-  }
-  if (pMsg->nEvent == Msg_Scene_MouseEvent::MouseUp) {
-    Msg_Scene_ReleaseMouse::_(pMsg->hScene);
-  }
-
-  double fTranslateX = 0;
-  double fTranslateY = 0;
-  Msg_Scene_GetTranslateElement::_(pMsg->hScene, pMsg->sPath, fTranslateX, fTranslateY);
-  Msg_Scene_TranslateElement::_(pMsg->hScene, "z_cursor", pMsg->fX + fTranslateX, pMsg->fY + fTranslateY);
-  Msg_Scene_Draw::_(pMsg->hScene);
+  //Msg_Scene_Draw::_(pMsg->hScene);
 }
 
 #include "ximagif.h"
@@ -52,20 +65,39 @@ String SceneModuleTester::Scene()
   String s;
 
   ApHandle hScene = Apollo::newHandle();
+  hScene_ = hScene;
 
   if (!s) { if (!Msg_Scene_Create::_(hScene)) { s = "Msg_Scene_Create failed"; }}
   int nWidth = 350;
   int nHeight = 350;
-  if (!s) { if (!Msg_Scene_Position::_(hScene, 100, 800, nWidth, nHeight)) { s = "Msg_Scene_Position failed"; }}
+  if (!s) { if (!Msg_Scene_Position::_(hScene, 100, 440, nWidth, nHeight)) { s = "Msg_Scene_Position failed"; }}
   if (!s) { if (!Msg_Scene_Visibility::_(hScene, 1)) { s = "Msg_Scene_Visibility failed"; }}
   if (!s) { if (!Msg_Scene_SetAutoDraw::_(hScene, 50, 1)) { s = "Msg_Scene_SetAutoDraw failed"; }}
 
   // ------------------------
 
   if (!s) { if (!Msg_Scene_CreateRectangle::_(hScene, "_a_frame", 0.5, 0.5, nWidth - 0.5, nHeight - 0.5)) { s = "Msg_Scene_CreateRectangle failed"; }}
-  if (!s) { if (!Msg_Scene_SetFillColor::_(hScene, "_a_frame", 1, 1, 1, 0.5)) { s = "Msg_Scene_SetFillColor failed"; }}
+//  if (!s) { if (!Msg_Scene_SetFillColor::_(hScene, "_a_frame", 1, 1, 1, 0.5)) { s = "Msg_Scene_SetFillColor failed"; }}
   if (!s) { if (!Msg_Scene_SetStrokeColor::_(hScene, "_a_frame", 0, 0, 0, 1)) { s = "Msg_Scene_SetStrokeColor failed"; }}
   if (!s) { if (!Msg_Scene_SetStrokeWidth::_(hScene, "_a_frame", 1)) { s = "Msg_Scene_SetStrokeWidth failed"; }}
+
+  // ------------------------
+
+  //if (!s) { if (!Msg_Scene_CreateMouseSensor::_(hScene, "z_sensor1", 0, 0, 200, 200)) { s = "Msg_Scene_CreateMouseSensor failed"; }}
+  //if (!s) { if (!Msg_Scene_SetStrokeColor::_(hScene, "z_sensor1", 1, 0, 0, 1)) { s = "Msg_Scene_SetStrokeColor failed"; }}
+  //if (!s) { if (!Msg_Scene_TranslateElement::_(hScene, "z_sensor1", 50, 50)) { s = "Msg_Scene_TranslateElement failed"; }}
+
+  //if (!s) { if (!Msg_Scene_CreateMouseSensor::_(hScene, "dummy_wrapper/z_sensor2", 0, 0, 100, 100)) { s = "Msg_Scene_CreateMouseSensor failed"; }}
+  //if (!s) { if (!Msg_Scene_SetFillColor::_(hScene, "dummy_wrapper/z_sensor2", 0, 1, 0, 0.2)) { s = "Msg_Scene_SetFillColor failed"; }}
+  //if (!s) { if (!Msg_Scene_TranslateElement::_(hScene, "dummy_wrapper/z_sensor2", 200, 200)) { s = "Msg_Scene_TranslateElement failed"; }}
+
+  if (!s) { if (!Msg_Scene_CreateRectangle::_(hScene, "translated_wrapper", 0.5, 0.5, nWidth - 0.5, nHeight - 0.5)) { s = "Msg_Scene_CreateRectangle failed"; }}
+  if (!s) { if (!Msg_Scene_TranslateElement::_(hScene, "translated_wrapper", 200, 100)) { s = "Msg_Scene_TranslateElement failed"; }}
+  if (!s) { if (!Msg_Scene_CreateMouseSensor::_(hScene, "translated_wrapper/z_sensor2", 0, 0, 100, 100)) { s = "Msg_Scene_CreateMouseSensor failed"; }}
+  if (!s) { if (!Msg_Scene_SetFillColor::_(hScene, "translated_wrapper/z_sensor2", 0, 0, 1, 0.2)) { s = "Msg_Scene_SetFillColor failed"; }}
+  //if (!s) { if (!Msg_Scene_TranslateElement::_(hScene, "translated_wrapper/z_sensor2", 50, 50)) { s = "Msg_Scene_TranslateElement failed"; }}
+
+  // ------------------------
 
   if (0) {
     if (!s) { if (!Msg_Scene_Destroy::_(hScene)) { s = "Msg_Scene_Destroy failed"; }}
@@ -74,12 +106,11 @@ String SceneModuleTester::Scene()
   return s;
 }
 
-String SceneModuleTester::Rectangle()
+String SceneModuleTester::Primitives()
 {
   String s;
 
   ApHandle hScene = Apollo::newHandle();
-  hScene_ = hScene;
 
   if (!s) { if (!Msg_Scene_Create::_(hScene)) { s = "Msg_Scene_Create failed"; }}
   int nWidth = 350;
@@ -116,11 +147,13 @@ String SceneModuleTester::Rectangle()
   //ApHandle hSensor0 = Apollo::newHandle();
   //if (!s) { if (!Msg_Scene_CreateMouseSensor::_(hScene, "z_sensor0", hSensor0, 0, 0, 350, 350)) { s = "Msg_Scene_CreateMouseSensor failed"; }}
 
-  if (!s) { if (!Msg_Scene_CreateMouseSensor::_(hScene, "z_sensor1", 0, 0, 200, 200)) { s = "Msg_Scene_CreateMouseSensor failed"; }}
-  if (!s) { if (!Msg_Scene_TranslateElement::_(hScene, "z_sensor1", 50, 50)) { s = "Msg_Scene_TranslateElement failed"; }}
+  //if (!s) { if (!Msg_Scene_CreateMouseSensor::_(hScene, "z_sensor1", 0, 0, 200, 200)) { s = "Msg_Scene_CreateMouseSensor failed"; }}
+  //if (!s) { if (!Msg_Scene_SetFillColor::_(hScene, "z_sensor1", 1, 0.5, 0.5, 0.2)) { s = "Msg_Scene_SetFillColor failed"; }}
+  //if (!s) { if (!Msg_Scene_TranslateElement::_(hScene, "z_sensor1", 50, 50)) { s = "Msg_Scene_TranslateElement failed"; }}
 
-  if (!s) { if (!Msg_Scene_CreateMouseSensor::_(hScene, "z_sensor2", 0, 0, 100, 100)) { s = "Msg_Scene_CreateMouseSensor failed"; }}
-  if (!s) { if (!Msg_Scene_TranslateElement::_(hScene, "z_sensor2", 200, 200)) { s = "Msg_Scene_TranslateElement failed"; }}
+  //if (!s) { if (!Msg_Scene_CreateMouseSensor::_(hScene, "z_sensor2", 0, 0, 100, 100)) { s = "Msg_Scene_CreateMouseSensor failed"; }}
+  //if (!s) { if (!Msg_Scene_SetFillColor::_(hScene, "z_sensor2", 0, 1, 0, 0.2)) { s = "Msg_Scene_SetFillColor failed"; }}
+  //if (!s) { if (!Msg_Scene_TranslateElement::_(hScene, "z_sensor2", 200, 200)) { s = "Msg_Scene_TranslateElement failed"; }}
 
   // ------------------------
 
@@ -546,23 +579,23 @@ void SceneModuleTester::Begin()
   { Msg_Scene_MouseEvent msg; msg.Hook(MODULE_NAME, (ApCallback) SceneModuleTester::On_Scene_MouseEvent, 0, ApCallbackPosNormal); }
 
   AP_UNITTEST_REGISTER(SceneModuleTester::Scene);
-  //AP_UNITTEST_REGISTER(SceneModuleTester::Rectangle);
-  //AP_UNITTEST_REGISTER(SceneModuleTester::SameConstants_FontFlags);
-  //AP_UNITTEST_REGISTER(SceneModuleTester::SameConstants_Operator);
-  //AP_UNITTEST_REGISTER(SceneModuleTester::SameConstants_EventContext);
-  //AP_UNITTEST_REGISTER(SceneModuleTester::ElementTree);
-  //AP_UNITTEST_REGISTER(SceneModuleTester::GetChildren);
+  AP_UNITTEST_REGISTER(SceneModuleTester::Primitives);
+  AP_UNITTEST_REGISTER(SceneModuleTester::SameConstants_FontFlags);
+  AP_UNITTEST_REGISTER(SceneModuleTester::SameConstants_Operator);
+  AP_UNITTEST_REGISTER(SceneModuleTester::SameConstants_EventContext);
+  AP_UNITTEST_REGISTER(SceneModuleTester::ElementTree);
+  AP_UNITTEST_REGISTER(SceneModuleTester::GetChildren);
 }
 
 void SceneModuleTester::Execute()
 {
   AP_UNITTEST_EXECUTE(SceneModuleTester::Scene);
-  //AP_UNITTEST_EXECUTE(SceneModuleTester::Rectangle);
-  //AP_UNITTEST_EXECUTE(SceneModuleTester::SameConstants_FontFlags);
-  //AP_UNITTEST_EXECUTE(SceneModuleTester::SameConstants_Operator);
-  //AP_UNITTEST_EXECUTE(SceneModuleTester::SameConstants_EventContext);
-  //AP_UNITTEST_EXECUTE(SceneModuleTester::ElementTree);
-  //AP_UNITTEST_EXECUTE(SceneModuleTester::GetChildren);
+  AP_UNITTEST_EXECUTE(SceneModuleTester::Primitives);
+  AP_UNITTEST_EXECUTE(SceneModuleTester::SameConstants_FontFlags);
+  AP_UNITTEST_EXECUTE(SceneModuleTester::SameConstants_Operator);
+  AP_UNITTEST_EXECUTE(SceneModuleTester::SameConstants_EventContext);
+  AP_UNITTEST_EXECUTE(SceneModuleTester::ElementTree);
+  AP_UNITTEST_EXECUTE(SceneModuleTester::GetChildren);
 }
 
 void SceneModuleTester::End()

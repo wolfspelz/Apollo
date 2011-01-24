@@ -27,7 +27,7 @@ public:
   static String CheckChildrenByApi(Element* pNode, const String& sExpectedChildren);
 
   static String Scene();
-  static String Rectangle();
+  static String Primitives();
   static String SameConstants_FontFlags();
   static String SameConstants_Operator();
   static String SameConstants_EventContext();

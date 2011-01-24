@@ -32,6 +32,7 @@ public:
 
   virtual void OnMouseEvent(Msg_Scene_MouseEvent* pMsg) {}
   virtual void OnKeyEvent(Msg_Scene_KeyEvent* pMsg) {}
+  virtual void OnKeyboardFocusEvent(Msg_Scene_KeyboardFocusEvent* pMsg) {}
 
 protected:
   ApHandle hScene_;

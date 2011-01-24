@@ -137,8 +137,10 @@ String ScWidgetModuleTester::Edit()
 
   if (!s) { if (!Msg_ScWidget_CreateEdit::_(hScene, "edit1", -75, -10, 150, 20)) { s = "Msg_ScWidget_CreateEdit failed"; }}
   if (!s) { if (!Msg_Scene_SetStrokeColor::_(hScene, "edit1", 0, 0, 0, 1)) { s = "Msg_Scene_SetStrokeColor failed"; }}
-  if (!s) { if (!Msg_ScWidget_SetEditText::_(hScene, "edit1", "Hallo Welt \xe9\x87\x91")) { s = "Msg_ScWidget_SetEditTextFont failed"; }}
-  if (!s) { if (!Msg_ScWidget_SetEditTextFont::_(hScene, "edit1", "Microsoft YaHei")) { s = "Msg_ScWidget_SetEditTextFont failed"; }}
+  if (!s) { if (!Msg_Scene_SetFillColor::_(hScene, "edit1", 1, 1, 1, 1)) { s = "Msg_Scene_SetFillColor failed"; }}
+  if (!s) { if (!Msg_ScWidget_SetEditText::_(hScene, "edit1", "Hallo Welt \xe9\x87\x91")) { s = "Msg_ScWidget_SetEditText failed"; }}
+  if (!s) { if (!Msg_ScWidget_SetEditTextFont::_(hScene, "edit1", "Arial")) { s = "Msg_ScWidget_SetEditTextFont failed"; }}
+//  if (!s) { if (!Msg_ScWidget_SetEditTextFont::_(hScene, "edit1", "Microsoft YaHei")) { s = "Msg_ScWidget_SetEditTextFont failed"; }}
   if (!s) { if (!Msg_ScWidget_SetEditTextSize::_(hScene, "edit1", 14)) { s = "Msg_ScWidget_SetEditTextSize failed"; }}
 //  if (!s) { if (!Msg_ScWidget_SetEditTextFlags::_(hScene, "edit1", Msg_Scene_FontFlags::Bold)) { s = "Msg_ScWidget_SetEditTextFlags failed"; }}
   if (!s) { if (!Msg_ScWidget_SetEditTextColor::_(hScene, "edit1", 0, 0, 1, 1)) { s = "Msg_ScWidget_SetEditTextColor failed"; }}
@@ -149,6 +151,7 @@ String ScWidgetModuleTester::Edit()
   // ------------------------
 
   if (!s) { if (!Msg_ScWidget_CreateEdit::_(hScene, "edit2", -75, -10, 150, 20)) { s = "Msg_ScWidget_CreateEdit failed"; }}
+  if (!s) { if (!Msg_Scene_SetFillColor::_(hScene, "edit2", 0.5, 0.5, 0.5, 0.5)) { s = "Msg_Scene_SetFillColor failed"; }}
   if (!s) { if (!Msg_Scene_TranslateElement::_(hScene, "edit2", 100, 100)) { s = "Msg_Scene_TranslateElement failed"; }}
 
   //if (!s) { if (!Msg_Scene_DeleteElement::_(hScene, "edit2")) { s = "Msg_Scene_DeleteElement failed"; }}
