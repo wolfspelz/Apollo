@@ -317,7 +317,7 @@ void Element::DrawRecursive(DrawContext& gc)
 
 }
 
-void Element::MouseEventRecursive(MouseEventContext& gc, double fX, double fY)
+void Element::HandleMouseEventRecursive(MouseEventContext& gc)
 {
   if (!bShow_) { return; }
 
@@ -342,13 +342,59 @@ void Element::MouseEventRecursive(MouseEventContext& gc, double fX, double fY)
     for (ElementNode* pNode = 0; pNode = iter.Next(); ) {
       Element* pElement = pNode->Value();
       if (pElement != 0) {
-        pElement->MouseEventRecursive(gc, fX, fY);
+        pElement->HandleMouseEventRecursive(gc);
       }
     }
   }
 
   if (IsSensor()) {
-    AsSensor()->MouseEvent(gc, fX, fY);
+    AsSensor()->MouseEvent(gc);
+  }
+
+  if (bSave_) {
+    cairo_restore(gc.Cairo());
+  }
+
+  gc.nDepth_--;
+}
+
+void Element::GetElementPositionRecursive(PositionContext& gc)
+{
+  if (!bShow_) { return; }
+
+  gc.nDepth_++;
+
+  if (bSave_) {
+    cairo_save(gc.Cairo());
+
+    if (fTranslateX_ != 0.0 || fTranslateY_ != 0.0) {
+      cairo_translate(gc.Cairo(), fTranslateX_, fTranslateY_);
+    }
+    if (fRotate_ != 0.0) {
+      cairo_rotate(gc.Cairo(), -fRotate_);
+    }
+    if (fScaleX_ != 1.0 || fScaleY_ != 1.0) {
+      cairo_scale(gc.Cairo(), fScaleX_, fScaleY_);
+    }
+  }
+
+  if (gc.sPath_.empty()) {
+
+    cairo_user_to_device(gc.Cairo(), &gc.fX_, &gc.fY_);
+
+  } else {
+    if (pChildren_) {
+      String sPart;
+      if (gc.sPath_.nextToken("/", sPart)) {
+        ElementNode* pNode = pChildren_->Find(sPart);
+        if (pNode) {
+          Element* pElement = pNode->Value();
+          if (pElement) {
+            pElement->GetElementPositionRecursive(gc);
+          }
+        }
+      }
+    }
   }
 
   if (bSave_) {

@@ -180,8 +180,7 @@ AP_MSG_HANDLER_METHOD(SceneModule, Scene_SetCopyMode)
 AP_MSG_HANDLER_METHOD(SceneModule, Scene_GetElementPosition)
 {
   Scene* pScene = FindScene(pMsg->hScene);
-  pMsg->fX = 100;
-  pMsg->fY = 100;
+  pScene->GetElementPosition(pMsg->sPath, pMsg->fX, pMsg->fY);
   pMsg->apStatus = ApMessage::Ok;
 }
 

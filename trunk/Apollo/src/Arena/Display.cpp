@@ -58,8 +58,8 @@ int Display::Create()
     { Msg_VpView_SubscribeContextDetail msg; msg.hContext = hContext_; msg.sKey = Msg_VpView_ContextDetail_DocumentUrl; msg.Request(); }
     { Msg_VpView_SubscribeContextDetail msg; msg.hContext = hContext_; msg.sKey = Msg_VpView_ContextDetail_LocationUrl; msg.Request(); }
 
-    { Msg_VpView_GetContextDetail msg; msg.hContext = hContext_; msg.sKey = Msg_VpView_ContextDetail_DocumentUrl; if (msg.Request()) { GetMeta()->OnDocumentUrl(msg.sValue); } }
-    { Msg_VpView_GetContextDetail msg; msg.hContext = hContext_; msg.sKey = Msg_VpView_ContextDetail_LocationUrl; if (msg.Request()) { GetMeta()->OnLocationUrl(msg.sValue); } }
+    { Msg_VpView_GetContextDetail msg; msg.hContext = hContext_; msg.sKey = Msg_VpView_ContextDetail_DocumentUrl; if (msg.Request()) { Meta* p = GetMeta(); if (p) { p->OnDocumentUrl(msg.sValue); }} }
+    { Msg_VpView_GetContextDetail msg; msg.hContext = hContext_; msg.sKey = Msg_VpView_ContextDetail_LocationUrl; if (msg.Request()) { Meta* p = GetMeta(); if (p) { p->OnLocationUrl(msg.sValue); }} }
   }
 
   return ok;
@@ -163,7 +163,7 @@ void Display::OnEnterRequested()
 {
   apLog_Verbose((LOG_CHANNEL, "Display::OnEnterRequested", "ctxt=" ApHandleFormat " loc=" ApHandleFormat "", ApHandleType(hContext_), ApHandleType(hLocation_)));
 
-  GetMeta()->OnEnterRequested();
+  { Meta* p = GetMeta(); if (p) { p->OnEnterRequested(); }}
 
   tvEnterRequested_ = Apollo::TimeValue::getTime();
 }
@@ -172,7 +172,7 @@ void Display::OnEnterBegin()
 {
   apLog_Verbose((LOG_CHANNEL, "Display::OnEnterBegin", "ctxt=" ApHandleFormat " loc=" ApHandleFormat "", ApHandleType(hContext_), ApHandleType(hLocation_)));
 
-  GetMeta()->OnEnterBegin();
+  { Meta* p = GetMeta(); if (p) { p->OnEnterBegin(); }}
 
   tvEnterBegin_ = Apollo::TimeValue::getTime();
 }
@@ -181,7 +181,7 @@ void Display::OnEnterComplete()
 {
   apLog_Verbose((LOG_CHANNEL, "Display::OnEnterComplete", "ctxt=" ApHandleFormat " loc=" ApHandleFormat "", ApHandleType(hContext_), ApHandleType(hLocation_)));
 
-  GetMeta()->OnEnterComplete();
+  { Meta* p = GetMeta(); if (p) { p->OnEnterComplete(); }}
 
   {
     ApAsyncMessage<Msg_VpView_ReplayLocationPublicChat> msg;
@@ -197,7 +197,7 @@ void Display::OnLeaveRequested()
 {
   apLog_Verbose((LOG_CHANNEL, "Display::OnLeaveRequested", "ctxt=" ApHandleFormat " loc=" ApHandleFormat "", ApHandleType(hContext_), ApHandleType(hLocation_)));
 
-  GetMeta()->OnLeaveRequested();
+  { Meta* p = GetMeta(); if (p) { p->OnLeaveRequested(); }}
 
   tvLeaveRequested_ = Apollo::TimeValue::getTime();
 }
@@ -206,7 +206,7 @@ void Display::OnLeaveBegin()
 {
   apLog_Verbose((LOG_CHANNEL, "Display::OnLeaveBegin", "ctxt=" ApHandleFormat " loc=" ApHandleFormat "", ApHandleType(hContext_), ApHandleType(hLocation_)));
 
-  GetMeta()->OnLeaveBegin();
+  { Meta* p = GetMeta(); if (p) { p->OnLeaveBegin(); }}
 
   tvLeaveBegin_ = Apollo::TimeValue::getTime();
 }
@@ -215,7 +215,7 @@ void Display::OnLeaveComplete()
 {
   apLog_Verbose((LOG_CHANNEL, "Display::OnLeaveComplete", "ctxt=" ApHandleFormat " loc=" ApHandleFormat "", ApHandleType(hContext_), ApHandleType(hLocation_)));
 
-  GetMeta()->OnLeaveComplete();
+  { Meta* p = GetMeta(); if (p) { p->OnLeaveComplete(); }}
 }
 
 //---------------------------------------------------
@@ -412,11 +412,11 @@ void Display::OnContextDetailsChanged(Apollo::ValueList& vlKeys)
     if (0) {
     } else if (e->getString() == Msg_VpView_ContextDetail_DocumentUrl) {
       if (msg.Request()) {
-        GetMeta()->OnDocumentUrl(msg.sValue);
+        { Meta* p = GetMeta(); if (p) { p->OnDocumentUrl(msg.sValue); }}
       }
     } else if (e->getString() == Msg_VpView_ContextDetail_LocationUrl) {
       if (msg.Request()) {
-        GetMeta()->OnLocationUrl(msg.sValue);
+        { Meta* p = GetMeta(); if (p) { p->OnLocationUrl(msg.sValue); }}
       }
     }
   }

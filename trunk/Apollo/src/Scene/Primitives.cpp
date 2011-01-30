@@ -321,6 +321,10 @@ void TextElement::GetExtents(DrawContext& gc, TextExtents& te)
 void SensorElement::Draw(DrawContext& gc)
 {
   if (HasFillOrStroke()) {
+    if (gc.bLogDraw_) {
+      gc.sLogDraw_.appendf(" x=%.3f y=%.3f w=%.3f h=%.3f", fX_, fY_, fW_, fH_);
+    }
+
     cairo_rectangle(gc.Cairo(), fX_, fY_, fW_, fH_);
     FillAndStroke(gc);
   }
@@ -336,18 +340,18 @@ void SensorElement::MouseReleased()
   bCaptured_ = 0;
 }
 
-void SensorElement::MouseEvent(MouseEventContext& gc, double fX, double fY)
+void SensorElement::MouseEvent(MouseEventContext& gc)
 {
   int bHit = 0;
   int bInside = 0;
 
-  double fX1 = fX;
-  double fY1 = fY;
+  double fX1 = gc.fX_;
+  double fY1 = gc.fY_;
   //cairo_user_to_device(gc.Cairo(), &fX1, &fY1);
   cairo_device_to_user(gc.Cairo(), &fX1, &fY1);
 
   //if (gc.nEvent_ == MouseEventContext::MouseMove) {
-  //  apLog_Debug((LOG_CHANNEL, "SensorElement::MouseEvent", "path=%s event=%d %d,%d %.2f,%.2f %.2f,%.2f", StringType(sPath_), gc.nEvent_, gc.nX_, gc.nY_, fX, fY, fX1, fY1));
+  //  apLog_Debug((LOG_CHANNEL, "SensorElement::MouseEvent", "path=%s event=%d %d,%d %.2f,%.2f %.2f,%.2f", StringType(sPath_), gc.nEvent_, gc.nX_, gc.nY_, gc.fX_, gc.fY_, fX1, fY1));
   //}
 
   if (bCaptured_) {

@@ -21,7 +21,7 @@ void SceneModuleTester::On_Scene_MouseEvent(Msg_Scene_MouseEvent* pMsg)
 {
   if (hScene_ != pMsg->hScene) { return; }
 
-  apLog_Verbose((LOG_CHANNEL, "SceneModuleTester::On_Scene_MouseEvent", "scene=" ApHandleFormat " path=%s event=%d button=%d x=%f y=%f", ApHandleType(pMsg->hScene), StringType(pMsg->sPath), pMsg->nEvent, pMsg->nButton, pMsg->fX, pMsg->fY));
+  //apLog_Verbose((LOG_CHANNEL, "SceneModuleTester::On_Scene_MouseEvent", "scene=" ApHandleFormat " path=%s event=%d button=%d x=%f y=%f", ApHandleType(pMsg->hScene), StringType(pMsg->sPath), pMsg->nEvent, pMsg->nButton, pMsg->fX, pMsg->fY));
 
   if (pMsg->nEvent == Msg_Scene_MouseEvent::MouseOut) {
     if (bHasCursor_) {
@@ -83,19 +83,21 @@ String SceneModuleTester::Scene()
 
   // ------------------------
 
-  //if (!s) { if (!Msg_Scene_CreateMouseSensor::_(hScene, "z_sensor1", 0, 0, 200, 200)) { s = "Msg_Scene_CreateMouseSensor failed"; }}
-  //if (!s) { if (!Msg_Scene_SetStrokeColor::_(hScene, "z_sensor1", 1, 0, 0, 1)) { s = "Msg_Scene_SetStrokeColor failed"; }}
-  //if (!s) { if (!Msg_Scene_TranslateElement::_(hScene, "z_sensor1", 50, 50)) { s = "Msg_Scene_TranslateElement failed"; }}
+  if (!s) { if (!Msg_Scene_CreateMouseSensor::_(hScene, "z_sensor1", 0, 0, 100, 100)) { s = "Msg_Scene_CreateMouseSensor failed"; }}
+  if (!s) { if (!Msg_Scene_TranslateElement::_(hScene, "z_sensor1", 50, 50)) { s = "Msg_Scene_TranslateElement failed"; }}
+  if (!s) { if (!Msg_Scene_SetFillColor::_(hScene, "z_sensor1", 1, 0, 0, 0.2)) { s = "Msg_Scene_SetFillColor failed"; }}
 
-  //if (!s) { if (!Msg_Scene_CreateMouseSensor::_(hScene, "dummy_wrapper/z_sensor2", 0, 0, 100, 100)) { s = "Msg_Scene_CreateMouseSensor failed"; }}
-  //if (!s) { if (!Msg_Scene_SetFillColor::_(hScene, "dummy_wrapper/z_sensor2", 0, 1, 0, 0.2)) { s = "Msg_Scene_SetFillColor failed"; }}
-  //if (!s) { if (!Msg_Scene_TranslateElement::_(hScene, "dummy_wrapper/z_sensor2", 200, 200)) { s = "Msg_Scene_TranslateElement failed"; }}
-
-  if (!s) { if (!Msg_Scene_CreateRectangle::_(hScene, "translated_wrapper", 0.5, 0.5, nWidth - 0.5, nHeight - 0.5)) { s = "Msg_Scene_CreateRectangle failed"; }}
-  if (!s) { if (!Msg_Scene_TranslateElement::_(hScene, "translated_wrapper", 200, 100)) { s = "Msg_Scene_TranslateElement failed"; }}
-  if (!s) { if (!Msg_Scene_CreateMouseSensor::_(hScene, "translated_wrapper/z_sensor2", 0, 0, 100, 100)) { s = "Msg_Scene_CreateMouseSensor failed"; }}
-  if (!s) { if (!Msg_Scene_SetFillColor::_(hScene, "translated_wrapper/z_sensor2", 0, 0, 1, 0.2)) { s = "Msg_Scene_SetFillColor failed"; }}
-  //if (!s) { if (!Msg_Scene_TranslateElement::_(hScene, "translated_wrapper/z_sensor2", 50, 50)) { s = "Msg_Scene_TranslateElement failed"; }}
+  // translated and scaled down
+  if (!s) { if (!Msg_Scene_CreateRectangle::_(hScene, "wrapper1", 0.5, 0.5, nWidth - 0.5, nHeight - 0.5)) { s = "Msg_Scene_CreateRectangle failed"; }}
+  if (!s) { if (!Msg_Scene_TranslateElement::_(hScene, "wrapper1", 200, 100)) { s = "Msg_Scene_TranslateElement failed"; }}
+  if (!s) { if (!Msg_Scene_ScaleElement::_(hScene, "wrapper1", 0.5, 0.5)) { s = "Msg_Scene_ScaleElement failed"; }}
+  // translated and scaled back, so that the sensor is at 1:1 scale
+  if (!s) { if (!Msg_Scene_CreateRectangle::_(hScene, "wrapper1/wrapper2", 0.5, 0.5, nWidth - 0.5, nHeight - 0.5)) { s = "Msg_Scene_CreateRectangle failed"; }}
+  if (!s) { if (!Msg_Scene_TranslateElement::_(hScene, "wrapper1/wrapper2", 50, 50)) { s = "Msg_Scene_TranslateElement failed"; }}
+  if (!s) { if (!Msg_Scene_ScaleElement::_(hScene, "wrapper1/wrapper2", 2.0, 2.0)) { s = "Msg_Scene_ScaleElement failed"; }}
+  // the sensor
+  if (!s) { if (!Msg_Scene_CreateMouseSensor::_(hScene, "wrapper1/wrapper2/z_sensor2", 0, 0, 100, 100)) { s = "Msg_Scene_CreateMouseSensor failed"; }}
+  if (!s) { if (!Msg_Scene_SetFillColor::_(hScene, "wrapper1/wrapper2/z_sensor2", 0, 0, 1, 0.2)) { s = "Msg_Scene_SetFillColor failed"; }}
 
   // ------------------------
 

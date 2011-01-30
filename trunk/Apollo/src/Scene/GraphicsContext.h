@@ -44,6 +44,16 @@ public:
   String sLogDraw_;
 };
 
+class PositionContext: public GraphicsContext
+{
+public:
+  PositionContext() {}
+
+  String sPath_;
+  double fX_;
+  double fY_;
+};
+
 class MouseEventContext: public GraphicsContext
 {
 public:
@@ -79,8 +89,8 @@ public:
   int nEvent_;
   int nButton_;
   int bTimer_;
-  int nX_;
-  int nY_;
+  double fX_;
+  double fY_;
 };
 
 #endif // GraphicsContext_H_INCLUDED

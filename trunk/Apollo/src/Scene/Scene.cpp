@@ -96,19 +96,16 @@ LRESULT CALLBACK Scene::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
           int nY = pt.y;
 
           if (pCairo_) {
-            double fX = nX;
-            double fY = nY;
-
             MouseEventContext gc;
             gc.pCairo_ = pCairo_;
             gc.nEvent_ = MouseEventContext::MouseMove;
             gc.nButton_ = MouseEventContext::NoMouseButton;
             gc.bTimer_ = 1;
-            gc.nX_ = nX;
-            gc.nY_ = nY;
+            gc.fX_ = nX;
+            gc.fY_ = nY;
 
             if (sCaptureMouseElement_.empty()) {
-              root_.MouseEventRecursive(gc, fX, fY);
+              root_.HandleMouseEventRecursive(gc);
             }
           }
         }
@@ -151,22 +148,19 @@ LRESULT Scene::HandleMouseEvent(int nEvent, int nButton, LPARAM lParam)
   int nY = GET_Y_LPARAM(lParam);
   
   if (pCairo_) {
-    double fX = nX;
-    double fY = nY;
-
     MouseEventContext gc;
     gc.pCairo_ = pCairo_;
     gc.nEvent_ = nEvent;
     gc.nButton_ = nButton;
-    gc.nX_ = nX;
-    gc.nY_ = nY;
+    gc.fX_ = nX;
+    gc.fY_ = nY;
 
     if (sCaptureMouseElement_.empty()) {
-      root_.MouseEventRecursive(gc, fX, fY);
+      root_.HandleMouseEventRecursive(gc);
     } else {
       Element* pElement = GetElement(sCaptureMouseElement_);
       if (pElement && pElement->IsSensor()) {
-        pElement->AsSensor()->MouseEvent(gc, fX, fY);
+        pElement->AsSensor()->MouseEvent(gc);
       }
     }
   }
@@ -538,7 +532,7 @@ Element* Scene::GetElement(const String& sPath)
   Element* pElement = root_.FindElement(sPath);
 
   if (pElement == 0) {
-    throw ApException("Scene::FindElement scene=" ApHandleFormat " no element=%s", ApHandleType(hAp_), StringType(sPath));
+    throw ApException("Scene::FindElement scene=" ApHandleFormat " no for path=%s", ApHandleType(hAp_), StringType(sPath));
   }
 
   return pElement;
@@ -701,6 +695,22 @@ void Scene::SetKeyboardFocus(const String& sPath)
       msg.Send();
     }
   }
+}
+
+void Scene::GetElementPosition(const String& sPath, double& fX, double& fY)
+{
+  PositionContext gc;
+  gc.pCairo_ = pCairo_;
+  gc.sPath_ = sPath;
+  gc.fX_ = 0.0;
+  gc.fY_ = 0.0;
+
+  root_.GetElementPositionRecursive(gc);
+  fX = gc.fX_;
+  fY = gc.fY_;
+
+  cairo_device_to_user(gc.Cairo(), &fX, &fY);
+  //apLog_Verbose((LOG_CHANNEL, "Scene::GetElementPosition", "scene=" ApHandleFormat " path=%s devx=%f devy=%f x=%f y=%f", ApHandleType(apHandle()), StringType(sPath), gc.fX_, gc.fY_, fX, fY));
 }
 
 //------------------------------------
