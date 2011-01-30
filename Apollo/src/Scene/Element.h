@@ -60,10 +60,11 @@ public:
   virtual ~Element();
 
   virtual void Draw(DrawContext& gc) {};
-  void MouseEvent(MouseEventContext& gc, double fX, double fY) {}
+  void MouseEvent(MouseEventContext& gc) {}
 
   void DrawRecursive(DrawContext& gc);  
-  void MouseEventRecursive(MouseEventContext& gc, double fX, double fY);
+  void HandleMouseEventRecursive(MouseEventContext& gc);
+  void GetElementPositionRecursive(PositionContext& gc);
 
   Element* FindElement(const String& sPath);
   void AddChild(const String& sName, Element* pElement);

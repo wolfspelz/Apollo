@@ -151,7 +151,7 @@ void Hud::CreateBottomSensor()
     SizeBottomSensor();
     
     // Get mouse events
-    Msg_Scene_SetFillColor::_(hScene_, ELEMENT_BOTTOMSENSOR, 1, 1, 1, 0.01);
+    Msg_Scene_SetFillColor::_(hScene_, ELEMENT_BOTTOMSENSOR, 1, 1, 1, 0.05);
 
     if (Apollo::getModuleConfig(MODULE_NAME, "DebugFrame/BottomSensor", 0)) {
       GetDisplay()->SetDebugFrameColor(ELEMENT_BOTTOMSENSOR);
@@ -170,11 +170,9 @@ void Hud::SizeBottomSensor()
 {
   if (Msg_Scene_ElementExists::_(hScene_, ELEMENT_BOTTOMSENSOR)) {
     if (bBottomBarEngaged_) {
-      Msg_Scene_TranslateElement::_(hScene_, ELEMENT_BOTTOMSENSOR, 0, 0);
       Msg_Scene_SetRectangle::_(hScene_, ELEMENT_BOTTOMSENSOR, 0, 0, nW_, nH_);
     } else {
-      Msg_Scene_TranslateElement::_(hScene_, ELEMENT_BOTTOMSENSOR, nW_ / 2, 0);
-      Msg_Scene_SetRectangle::_(hScene_, ELEMENT_BOTTOMSENSOR, -nW_ / 2, 0, nW_, BOTTOMSENSOR_HEIGHT);
+      Msg_Scene_SetRectangle::_(hScene_, ELEMENT_BOTTOMSENSOR, 0, 0, nW_, BOTTOMSENSOR_HEIGHT);
     }
   }
 }
@@ -299,7 +297,7 @@ void Hud::CreateSizeSensor()
     SizeSizeSensor();
     
     // Get mouse events
-    Msg_Scene_SetFillColor::_(hScene_, ELEMENT_SIZESENSOR, 1, 1, 1, 0.01);
+    Msg_Scene_SetFillColor::_(hScene_, ELEMENT_SIZESENSOR, 1, 1, 1, 0.05);
 
     GetDisplay()->SetDebugFrameColor(ELEMENT_SIZESENSOR);
   }
