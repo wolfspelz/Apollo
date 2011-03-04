@@ -37,6 +37,7 @@ public:
     ,bAutoDraw_(false)
     ,bAutoDrawAsync_(false)
     ,autoDrawInterval_(0, 100000)
+    ,nAutoDrawSuspendCount_(0)
     ,bTimerRunning_(0)
     ,pCairoSurface_(0)
     ,pCairo_(0)
@@ -65,6 +66,8 @@ public:
   void DeleteAutoDraw();
   void SetAutoDraw(int nMilliSec, int bAsync);
   void AutoDraw();
+  void AutoDrawSuspend();
+  void AutoDrawResume();
 
   int HasElement(const String& sPath);
   Element* GetElement(const String& sPath);
@@ -123,6 +126,7 @@ protected:
   bool bAutoDrawAsync_;
   Apollo::TimeValue autoDrawInterval_;
   Apollo::TimeValue lastDraw_;
+  int nAutoDrawSuspendCount_;
   int bTimerRunning_;
 
   RootElement root_;

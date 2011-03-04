@@ -188,10 +188,20 @@ void Edit::SetText(const String& sText)
   ShowText();
 }
 
+class SceneDrawingSuspender
+{
+public:
+  SceneDrawingSuspender(ApHandle hScene) : hScene_(hScene) { Msg_Scene_AutoDrawSuspend::_(hScene_); }
+  ~SceneDrawingSuspender() {  Msg_Scene_AutoDrawResume::_(hScene_); }
+protected:
+  ApHandle hScene_;
+};
+
 void Edit::ShowText()
 {
-  Msg_Scene_SetText::_(hScene_, GetTextPath(), sText_);
+  SceneDrawingSuspender s(hScene_);
 
+  Msg_Scene_SetText::_(hScene_, GetTextPath(), sText_);
   PositionText();
 }
 
