@@ -35,6 +35,8 @@ public:
   void On_Scene_SetAutoDraw(Msg_Scene_SetAutoDraw* pMsg);
   void On_Scene_AutoDraw(Msg_Scene_AutoDraw* pMsg);
   void On_Scene_Draw(Msg_Scene_Draw* pMsg);
+  void On_Scene_AutoDrawSuspend(Msg_Scene_AutoDrawSuspend* pMsg);
+  void On_Scene_AutoDrawResume(Msg_Scene_AutoDrawResume* pMsg);
   void On_Scene_CreateElement(Msg_Scene_CreateElement* pMsg);
   void On_Scene_DeleteElement(Msg_Scene_DeleteElement* pMsg);
   void On_Scene_ElementExists(Msg_Scene_ElementExists* pMsg);

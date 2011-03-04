@@ -107,6 +107,20 @@ AP_MSG_HANDLER_METHOD(SceneModule, Scene_Draw)
   pMsg->apStatus = ApMessage::Ok;
 }
 
+AP_MSG_HANDLER_METHOD(SceneModule, Scene_AutoDrawSuspend)
+{
+  Scene* pScene = FindScene(pMsg->hScene);
+  pScene->AutoDrawSuspend();
+  pMsg->apStatus = ApMessage::Ok;
+}
+
+AP_MSG_HANDLER_METHOD(SceneModule, Scene_AutoDrawResume)
+{
+  Scene* pScene = FindScene(pMsg->hScene);
+  pScene->AutoDrawResume();
+  pMsg->apStatus = ApMessage::Ok;
+}
+
 AP_MSG_HANDLER_METHOD(SceneModule, Scene_CreateElement)
 {
   Scene* pScene = FindScene(pMsg->hScene);
@@ -602,6 +616,8 @@ int SceneModule::Init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_SetAutoDraw, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_AutoDraw, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_Draw, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_AutoDrawSuspend, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_AutoDrawResume, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_CreateElement, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_DeleteElement, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SceneModule, Scene_ElementExists, this, ApCallbackPosNormal);

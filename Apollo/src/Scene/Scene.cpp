@@ -484,8 +484,18 @@ void Scene::SetAutoDraw(int nMilliSec, int bAsync)
 void Scene::AutoDraw()
 {
   if (bAutoDraw_) {
+
+    int bDrawNow = 0;
+
     Apollo::TimeValue now = Apollo::TimeValue::getTime();
-    if (now > lastDraw_ + autoDrawInterval_) {
+    if (nAutoDrawSuspendCount_ == 0) {
+      if (now > lastDraw_ + autoDrawInterval_) {
+        bDrawNow = 1;
+      }
+    }
+
+    if (bDrawNow) {
+      // Draw now snc or async
 
       if (bAutoDrawAsync_) {
         ApAsyncMessage<Msg_Scene_Draw> msg;
@@ -498,9 +508,10 @@ void Scene::AutoDraw()
           apLog_Error((LOG_CHANNEL, "Scene::AutoDraw", "Msg_Scene_Draw failed"));
         }
       }
-
       lastDraw_ = now;
+
     } else {
+      // Set timer for later drawing, just in case there are no scene changes anymore
 
       if (!bTimerRunning_) {
         Msg_Timer_Start msg;
@@ -523,6 +534,19 @@ void Scene::OnAutoDrawTimer()
 {
   bTimerRunning_ = 0;
   AutoDraw();
+}
+
+void Scene::AutoDrawSuspend()
+{
+  nAutoDrawSuspendCount_++;
+}
+
+void Scene::AutoDrawResume()
+{
+  nAutoDrawSuspendCount_--;
+  if (nAutoDrawSuspendCount_ < 0) {
+    nAutoDrawSuspendCount_ = 0;
+  }
 }
 
 //------------------------------------

@@ -120,6 +120,32 @@ public:
   ApIN ApHandle hScene;
 };
 
+class Msg_Scene_AutoDrawSuspend: public ApRequestMessage
+{
+public:
+  Msg_Scene_AutoDrawSuspend() : ApRequestMessage("Scene_AutoDrawSuspend") {}
+  static int _(const ApHandle& hScene)
+  {
+    Msg_Scene_AutoDrawSuspend msg;
+    msg.hScene = hScene;
+    return msg.Request();
+  }
+  ApIN ApHandle hScene;
+};
+
+class Msg_Scene_AutoDrawResume: public ApRequestMessage
+{
+public:
+  Msg_Scene_AutoDrawResume() : ApRequestMessage("Scene_AutoDrawResume") {}
+  static int _(const ApHandle& hScene)
+  {
+    Msg_Scene_AutoDrawResume msg;
+    msg.hScene = hScene;
+    return msg.Request();
+  }
+  ApIN ApHandle hScene;
+};
+
 //--------------------------
 // Manage elements
 
