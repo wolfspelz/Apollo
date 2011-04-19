@@ -403,6 +403,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Scene", "..\..\src\Scene\Sc
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ScWidget", "..\..\src\ScWidget\ScWidget.vcproj", "{4F485477-1A53-4F09-BD7C-6352014264CB}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WebView", "..\..\src\WebView\WebView.vcproj", "{4AC6E41F-A2DF-44E6-A354-D29727770396}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -581,6 +583,10 @@ Global
 		{4F485477-1A53-4F09-BD7C-6352014264CB}.Debug|Win32.Build.0 = Debug|Win32
 		{4F485477-1A53-4F09-BD7C-6352014264CB}.Release|Win32.ActiveCfg = Release|Win32
 		{4F485477-1A53-4F09-BD7C-6352014264CB}.Release|Win32.Build.0 = Release|Win32
+		{4AC6E41F-A2DF-44E6-A354-D29727770396}.Debug|Win32.ActiveCfg = Debug|Win32
+		{4AC6E41F-A2DF-44E6-A354-D29727770396}.Debug|Win32.Build.0 = Debug|Win32
+		{4AC6E41F-A2DF-44E6-A354-D29727770396}.Release|Win32.ActiveCfg = Release|Win32
+		{4AC6E41F-A2DF-44E6-A354-D29727770396}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
