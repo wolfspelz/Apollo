@@ -8,6 +8,7 @@ using System.IO;
 using Microsoft.Win32;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
+using System.Net;
 using System.Net.Sockets;
 
 /*
@@ -29,7 +30,11 @@ namespace AvatarNavigator
     string _sUrl = "";
     static int _nCnt = 0;
     static int _nInstance = -1;
-    TcpClient _socket = null;
+    Socket _socket = null;
+    bool _bDoConnect = true;
+    bool _bIsConnected = false;
+    StringBuilder _sbSendBuffer = null;
+    StringBuilder _sbReceiveBuffer = null;
 
     #region Main
 
@@ -38,12 +43,16 @@ namespace AvatarNavigator
       _nInstance = _nCnt;
       Log("Ctor " + _nCnt++);
       //Log("Ctor");
+
+      if (_bDoConnect) {
+        Connect();
+      }
     }
 
     int _nLogCnt = 0;
     public void Log(string s)
     {
-      Debug.WriteLine("### " + _nInstance + " " + _nLogCnt++ + " " + s);
+      Debug.WriteLine("### " + _nInstance + " " + _nLogCnt++ + " " + s.Replace("\n", "\\n"));
     }
 
     #endregion
@@ -90,45 +99,120 @@ namespace AvatarNavigator
     void UrlChanged(string sUrl)
     {
       Log("UrlChanged " + sUrl);
-
-      SendData(sUrl);
+      Send(sUrl + "\n");
     }
 
-    void SendData(string sData)
+    void Send(string sData)
     {
-      var ns = GetConnection();
-      if (ns != null) {
-        byte[] aData = System.Text.Encoding.ASCII.GetBytes(sData);
-        ns.Write(aData, 0, aData.Length);
+      if (_bIsConnected) {
+        WriteDataToConnection(sData);
+      } else {
+        if (_sbSendBuffer == null) {
+          _sbSendBuffer = new StringBuilder();
+        }
+        _sbSendBuffer.Append(sData);
+        if (_bDoConnect) {
+          Connect();
+        }
       }
     }
 
-    NetworkStream GetConnection()
+    void WriteDataToConnection(string sData)
+    {
+      if (!_bIsConnected) {
+        Log("WriteDataToConnection: not connected");
+      } else {
+        byte[] aData = System.Text.Encoding.UTF8.GetBytes(sData);
+        _socket.BeginSend(aData, 0, aData.Length, SocketFlags.None, null, _socket);
+      }
+    }
+
+    void Connect()
     {
       try {
-        if (_socket == null) {
-          _socket = new TcpClient();
-          _socket.Connect("osiris", 12345);
-        }
-        if (_socket != null) {
-          return _socket.GetStream();
-        }
+        _bDoConnect = false;
+        var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+        var host = Dns.GetHostEntry("osiris");
+        var iep = new IPEndPoint(host.AddressList[0], 12345);
+        socket.BeginConnect(iep, new AsyncCallback(OnConnected), socket);
       } catch (Exception ex) {
-        Log("GetSocket Exception " + ex.Message);
+        Log("Connect: " + ex.Message);
       }
-      return null;
+    }
+
+    void OnConnected(IAsyncResult iar)
+    {
+      _socket = (Socket) iar.AsyncState;
+      try {
+        _socket.EndConnect(iar);
+        _bIsConnected = true;
+
+        ReadDataFromConnection();
+
+        if (_sbSendBuffer != null && _sbSendBuffer.Length > 0) {
+          WriteDataToConnection(_sbSendBuffer.ToString());
+        }
+        _sbSendBuffer = null;
+
+      } catch (Exception ex) {
+        _socket = null;
+        _bDoConnect = true;
+        Log("OnConnected: " + ex.Message);
+      }
+    }
+
+    class ReceiveState
+    {
+      static int SIZE = 1024;
+      public int nSize = SIZE;
+      public byte[] aBuffer = new byte[SIZE];
+      public Socket socket = null;
+    }
+
+    void ReadDataFromConnection()
+    {
+      var state = new ReceiveState();
+      state.socket = _socket;
+      _socket.BeginReceive(state.aBuffer, 0, state.nSize, SocketFlags.None, new AsyncCallback(OnReceiveData), state);
+    }
+
+    void OnReceiveData(IAsyncResult iar)
+    {
+      var state = (ReceiveState) iar.AsyncState;
+      int nRead = state.socket.EndReceive(iar);
+
+      if (state.socket.Connected == false || nRead <= 0) {
+        OnDisconnected();
+      } else {
+
+        if (nRead > 0) {
+          if (_sbReceiveBuffer == null) {
+            _sbReceiveBuffer = new StringBuilder();
+          }
+          _sbReceiveBuffer.Append(Encoding.UTF8.GetString(state.aBuffer, 0, nRead));
+          Log("OnReceiveData " + _sbReceiveBuffer.ToString());
+          _sbReceiveBuffer = null;
+        }
+
+        ReadDataFromConnection();
+      }
+    }
+
+    void OnDisconnected()
+    {
+      CloseConnection();
     }
 
     void CloseConnection()
     {
       if (_socket != null) {
-        using (_socket) {
-          NetworkStream ns = GetConnection();
-          ns.Close();
-        }
+        _socket.Close();
         _socket = null;
       }
+      _bDoConnect = true;
+      _bIsConnected = false;
     }
+
 
     #region IObjectWithSite Members
 
@@ -161,6 +245,7 @@ namespace AvatarNavigator
     #endregion
 
     #region Register BHO
+
     public static string BHOKEYNAME = "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Browser Helper Objects";
 
     [ComRegisterFunction]
