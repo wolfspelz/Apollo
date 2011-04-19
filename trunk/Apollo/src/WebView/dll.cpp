@@ -8,7 +8,7 @@
 #include "dll.h"
 #include "MsgUnitTest.h"
 #include "Local.h"
-#include "SampleModule.h"
+#include "WebViewModule.h"
 
 #if defined(WIN32)
 BOOL APIENTRY DllMain(HANDLE hModule, DWORD dwReason, LPVOID lpReserved)
@@ -26,17 +26,17 @@ static AP_MODULE_INFO g_info = {
   AP_MODULE_INTERFACE_FLAGS_CPP | AP_MODULE_INTERFACE_FLAGS_UTF8
   ,
   MODULE_NAME,
-  "Sample",
-  "Sample Module",
+  "WebView",
+  "WebView Module",
   "1",
-  "Used as sample and for module load/unload unit tests.",
+  "HTML based GUI",
   PROJECT_Author,
   PROJECT_Email,
   PROJECT_Copyright,
   PROJECT_HomepageUrl
 };
 
-SAMPLE_API AP_MODULE_INFO* Info(AP_MODULE_CALL* pModuleData)
+WEBVIEW_API AP_MODULE_INFO* Info(AP_MODULE_CALL* pModuleData)
 {
   AP_UNUSED_ARG(pModuleData);
   return &g_info;
@@ -44,27 +44,27 @@ SAMPLE_API AP_MODULE_INFO* Info(AP_MODULE_CALL* pModuleData)
 
 //----------------------------------------------------------
 
-SAMPLE_API int Load(AP_MODULE_CALL* pModuleData)
+WEBVIEW_API int Load(AP_MODULE_CALL* pModuleData)
 {
   AP_UNUSED_ARG(pModuleData);
   
   int ok = 0;
 
-  SampleModuleInstance::Delete();
-  if (SampleModuleInstance::Get() != 0) { ok = SampleModuleInstance::Get()->init(); }
+  WebViewModuleInstance::Delete();
+  if (WebViewModuleInstance::Get() != 0) { ok = WebViewModuleInstance::Get()->init(); }
 
   return ok;
 }
 
-SAMPLE_API int UnLoad(AP_MODULE_CALL* pModuleData)
+WEBVIEW_API int UnLoad(AP_MODULE_CALL* pModuleData)
 {
   AP_UNUSED_ARG(pModuleData);
   
   int ok = 1;
 
-  if (SampleModuleInstance::Get() != 0) {
-    SampleModuleInstance::Get()->exit();
-    SampleModuleInstance::Delete();
+  if (WebViewModuleInstance::Get() != 0) {
+    WebViewModuleInstance::Get()->exit();
+    WebViewModuleInstance::Delete();
   }
 
   return ok;
