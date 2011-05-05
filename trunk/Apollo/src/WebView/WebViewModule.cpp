@@ -57,43 +57,115 @@ AP_MSG_HANDLER_METHOD(WebViewModule, UnitTest_End)
 #include <WebKit/WebKit.h>
 #include <WebKit/WebKitCOMAPI.h>
 
+#include <shlwapi.h>
+#include <wininet.h>
+
 IWebView* gWebView = 0;
 HWND gViewWindow = NULL;
 
-static void loadURL(BSTR urlBStr)
+void CreateHUD()
 {
-    IWebFrame* frame = 0;
-    IWebMutableURLRequest* request = 0;
+  RECT clientRect = { 100, 100, 800, 800 };
 
-    static BSTR methodBStr = SysAllocString(TEXT("GET"));
+  IWebViewPrivate* webViewPrivate = 0;
+  IWebMutableURLRequest* request = 0;
+  IWebPreferences* tmpPreferences = 0;
+  IWebPreferences* standardPreferences = 0;
+  if (FAILED(WebKitCreateInstance(CLSID_WebPreferences, 0, IID_IWebPreferences, reinterpret_cast<void**>(&tmpPreferences))))
+    goto exit;
 
-    HRESULT hr = gWebView->mainFrame(&frame);
-    if (FAILED(hr))
-        goto exit;
+  if (FAILED(tmpPreferences->standardPreferences(&standardPreferences)))
+    goto exit;
 
-    hr = WebKitCreateInstance(CLSID_WebMutableURLRequest, 0, IID_IWebMutableURLRequest, (void**)&request);
-    if (FAILED(hr))
-        goto exit;
+  standardPreferences->setAcceleratedCompositingEnabled(TRUE);
 
-    hr = request->initWithURL(urlBStr, WebURLRequestUseProtocolCachePolicy, 60);
-    if (FAILED(hr))
-        goto exit;
+  HRESULT hr = WebKitCreateInstance(CLSID_WebView, 0, IID_IWebView, reinterpret_cast<void**>(&gWebView));
+  if (FAILED(hr))
+    goto exit;
 
-    hr = request->setHTTPMethod(methodBStr);
-    if (FAILED(hr))
-        goto exit;
+  hr = gWebView->QueryInterface(IID_IWebViewPrivate, reinterpret_cast<void**>(&webViewPrivate));
+  if (FAILED(hr))
+    goto exit;
 
-    hr = frame->loadRequest(request);
-    if (FAILED(hr))
-        goto exit;
+  hr = gWebView->initWithFrame(clientRect, 0, 0);
+  if (FAILED(hr))
+    goto exit;
 
-    SetFocus(gViewWindow);
+  IWebFrame* frame;
+  hr = gWebView->mainFrame(&frame);
+  if (FAILED(hr))
+    goto exit;
+
+#if 0
+  static BSTR defaultHTML = SysAllocString(TEXT("<p style=\"background-color: #00FF00\">Testing</p><img src=\"http://webkit.org/images/icon-gold.png\" alt=\"Face\"><div style=\"border: solid blue; background: white;\" contenteditable=\"true\">div with blue border</div><ul><li>foo<li>bar<li>baz</ul><iframe src=\"http://www.wolfspelz.de\" style=\"width:100%;height:300px\" />"));
+  frame->loadHTMLString(defaultHTML, 0);
+  frame->Release();
+#else
+  //static BSTR urlBStr = 0;
+  static BSTR urlBStr = SysAllocString(_T("http://www.wolfspelz.de"));
+  if (!urlBStr) {
+    TCHAR szFileName[MAX_PATH];
+    ::GetModuleFileName(NULL, szFileName, MAX_PATH);
+    ::PathRemoveFileSpec(szFileName);
+    ::PathAddBackslash(szFileName);
+    ::PathAppend(szFileName, _T("frame.html"));
+
+    TCHAR szFileName2[MAX_PATH];
+    _stprintf_s(szFileName2, MAX_PATH, _T("file://%s"), szFileName);
+    urlBStr = SysAllocString(szFileName2);
+  }
+
+  if ((PathFileExists(urlBStr) || PathIsUNC(urlBStr))) {
+    TCHAR fileURL[INTERNET_MAX_URL_LENGTH];
+    DWORD fileURLLength = sizeof(fileURL)/sizeof(fileURL[0]);
+    if (SUCCEEDED(UrlCreateFromPath(urlBStr, fileURL, &fileURLLength, 0)))
+      urlBStr = fileURL;
+  }
+
+  if (FAILED(WebKitCreateInstance(CLSID_WebMutableURLRequest, 0, IID_IWebMutableURLRequest, (void**)&request)))
+    goto exit;
+
+  hr = request->initWithURL(urlBStr, WebURLRequestUseProtocolCachePolicy, 60);
+  if (FAILED(hr))
+    goto exit;
+
+  hr = frame->loadRequest(request);
+  if (FAILED(hr))
+    goto exit;
+
+  if (request)
+    request->Release();
+
+  frame->Release();
+#endif
+
+  hr = webViewPrivate->setTransparent(TRUE);
+  if (FAILED(hr))
+    goto exit;
+
+  hr = webViewPrivate->setUsesLayeredWindow(TRUE);
+  if (FAILED(hr))
+    goto exit;
+
+  hr = webViewPrivate->viewWindow(reinterpret_cast<OLE_HANDLE*>(&gViewWindow));
+  if (FAILED(hr) || !gViewWindow)
+    goto exit;
+
+  ::ShowWindow(gViewWindow, SW_SHOW);
+  ::UpdateWindow(gViewWindow);
+
+  // Put our two partner windows (the dialog and the HUD) in proper Z-order
+  //::SetWindowPos(m_dialog, gViewWindow, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
 
 exit:
-    if (frame)
-        frame->Release();
-    if (request)
-        request->Release();
+  if (standardPreferences)
+    standardPreferences->Release();
+
+  if (tmpPreferences)
+    tmpPreferences->Release();
+
+  if (webViewPrivate)
+    webViewPrivate->Release();
 }
 
 int WebViewModule::init()
@@ -104,46 +176,7 @@ int WebViewModule::init()
   ::OleInitialize(NULL);
 #endif
 
-  if (ok) {
-    if (FAILED( WebKitCreateInstance(CLSID_WebView, 0, IID_IWebView, (void**)&gWebView) )) { ok = 0; }
-  }
-
-  if (ok) {
-    RECT clientRect = { 200, 200, 800, 600 };
-    if (FAILED( gWebView->initTransparentViewWithFrame(clientRect, 0, 0) )) { ok = 0; }
-  }
-
-  IWebFrame* frame = 0;
-  if (ok) {
-    if (FAILED( gWebView->mainFrame(&frame) )) { ok = 0; }
-  }
-
-  if (ok) {
-    static BSTR defaultHTML = SysAllocString(TEXT("<p style=\"background-color: #00FF00\">Testing</p><img src=\"http://webkit.org/images/icon-gold.png\" alt=\"Face\"><div style=\"border: solid blue; background: white;\" contenteditable=\"true\">div with blue border</div><ul><li>foo<li>bar<li>baz</ul>"));
-    frame->loadHTMLString(defaultHTML, 0);
-    frame->Release();
-  }
-
-  IWebViewPrivate* webViewPrivate = 0;
-  if (ok) {
-    if (FAILED( gWebView->QueryInterface(IID_IWebViewPrivate, (void**)&webViewPrivate) )) { ok = 0; }
-  }
-
-  if (ok) {
-    if (FAILED( webViewPrivate->setTransparent(TRUE ))) { ok = 0; }
-  }
-
-  if (ok) {
-    if (FAILED( webViewPrivate->viewWindow((OLE_HANDLE*) &gViewWindow) )) { ok = 0; }
-    webViewPrivate->Release();
-  }
-
-  if (ok) {
-#define URL "http://wolfspelz.de"
-    BSTR bstr = SysAllocStringLen(_T(URL), _tcslen(_T(URL)));
-    loadURL(bstr);
-    SysFreeString(bstr);
-  }
+  CreateHUD();
 
   //AP_MSG_REGISTRY_ADD(MODULE_NAME, WebViewModule, WebView_Get, this, ApCallbackPosNormal);
   AP_UNITTEST_HOOK(WebViewModule, this);
@@ -156,9 +189,12 @@ void WebViewModule::exit()
   AP_UNITTEST_UNHOOK(WebViewModule, this);
   AP_MSG_REGISTRY_FINISH;
 
-  if (gWebView != 0) {
-    gWebView->Release();
-  }
+  //if (gWebView != 0) {
+  //  gWebView->Release();
+  //}
+
+  if (gWebView)
+      gWebView->Release();
 
   shutDownWebKit();
 
