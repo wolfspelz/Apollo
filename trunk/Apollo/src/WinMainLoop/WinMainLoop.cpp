@@ -107,6 +107,7 @@ public:
   void On_MainLoop_EndLoop(Msg_MainLoop_EndLoop* pMsg);
   void On_MainLoop_ModuleFinished(Msg_MainLoop_ModuleFinished* pMsg);
   void On_Win32_GetInstance(Msg_Win32_GetInstance* pMsg);
+  void On_Win32_GetMainWindow(Msg_Win32_GetMainWindow* pMsg);
   void On_System_ThreadMessage(Msg_System_ThreadMessage* pMsg);
   void On_Timer_ClearAll(Msg_Timer_ClearAll* pMsg);
   void On_Timer_Start(Msg_Timer_Start* pMsg);
@@ -490,6 +491,12 @@ void MainLoopModule::On_Win32_GetInstance(Msg_Win32_GetInstance* pMsg)
   pMsg->apStatus = ApMessage::Ok;
 }
 
+void MainLoopModule::On_Win32_GetMainWindow(Msg_Win32_GetMainWindow* pMsg)
+{
+  pMsg->hWnd = hWnd_;
+  pMsg->apStatus = ApMessage::Ok;
+}
+
 void MainLoopModule::On_MainLoop_ModuleFinished(Msg_MainLoop_ModuleFinished* pMsg)
 {
   nFinishedModules_++;
@@ -844,6 +851,7 @@ AP_REFINSTANCE_MSG_HANDLER(MainLoopModule, MainLoop_Win32Loop)
 AP_REFINSTANCE_MSG_HANDLER(MainLoopModule, MainLoop_EndLoop)
 AP_REFINSTANCE_MSG_HANDLER(MainLoopModule, MainLoop_ModuleFinished)
 AP_REFINSTANCE_MSG_HANDLER(MainLoopModule, Win32_GetInstance)
+AP_REFINSTANCE_MSG_HANDLER(MainLoopModule, Win32_GetMainWindow)
 AP_REFINSTANCE_MSG_HANDLER(MainLoopModule, System_ThreadMessage)
 AP_REFINSTANCE_MSG_HANDLER(MainLoopModule, Timer_ClearAll)
 AP_REFINSTANCE_MSG_HANDLER(MainLoopModule, Timer_Start)
@@ -866,6 +874,7 @@ WINMAINLOOP_API int Load(AP_MODULE_CALL* pModuleData)
   { Msg_MainLoop_EndLoop msg; msg.Hook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(MainLoopModule, MainLoop_EndLoop), MainLoopModuleInstance::Get(), ApCallbackPosNormal); }
   { Msg_MainLoop_ModuleFinished msg; msg.Hook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(MainLoopModule, MainLoop_ModuleFinished), MainLoopModuleInstance::Get(), ApCallbackPosNormal); }
   { Msg_Win32_GetInstance msg; msg.Hook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(MainLoopModule, Win32_GetInstance), MainLoopModuleInstance::Get(), ApCallbackPosNormal); }
+  { Msg_Win32_GetMainWindow msg; msg.Hook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(MainLoopModule, Win32_GetMainWindow), MainLoopModuleInstance::Get(), ApCallbackPosNormal); }
   { Msg_System_ThreadMessage msg; msg.Hook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(MainLoopModule, System_ThreadMessage), MainLoopModuleInstance::Get(), ApCallbackPosNormal); }
   { Msg_Timer_ClearAll msg; msg.Hook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(MainLoopModule, Timer_ClearAll), MainLoopModuleInstance::Get(), ApCallbackPosNormal); }
   { Msg_Timer_Start msg; msg.Hook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(MainLoopModule, Timer_Start), MainLoopModuleInstance::Get(), ApCallbackPosNormal); }
@@ -888,6 +897,7 @@ WINMAINLOOP_API int UnLoad(AP_MODULE_CALL* pModuleData)
   { Msg_MainLoop_EndLoop msg; msg.UnHook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(MainLoopModule, MainLoop_EndLoop), MainLoopModuleInstance::Get()); }
   { Msg_MainLoop_ModuleFinished msg; msg.UnHook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(MainLoopModule, MainLoop_ModuleFinished), MainLoopModuleInstance::Get()); }
   { Msg_Win32_GetInstance msg; msg.UnHook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(MainLoopModule, Win32_GetInstance), MainLoopModuleInstance::Get()); }
+  { Msg_Win32_GetMainWindow msg; msg.UnHook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(MainLoopModule, Win32_GetMainWindow), MainLoopModuleInstance::Get()); }
   { Msg_System_ThreadMessage msg; msg.UnHook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(MainLoopModule, System_ThreadMessage), MainLoopModuleInstance::Get()); }
   { Msg_Timer_ClearAll msg; msg.UnHook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(MainLoopModule, Timer_ClearAll), MainLoopModuleInstance::Get()); }
   { Msg_Timer_Start msg; msg.UnHook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(MainLoopModule, Timer_Start), MainLoopModuleInstance::Get()); }
