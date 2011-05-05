@@ -247,11 +247,9 @@ int Scene::Create()
 
 #if defined(WIN32)
   {
-    Msg_Win32_GetInstance msg;
-    if (!msg.Request()) {
+    hInstance_ = Msg_Win32_GetInstance::_();
+    if (hInstance_ == NULL) {
       apLog_Error((LOG_CHANNEL, "Scene::Create", "Msg_Win32_GetInstance failed"));
-    } else {
-      hInstance_ = msg.hInstance;
     }
   }
 

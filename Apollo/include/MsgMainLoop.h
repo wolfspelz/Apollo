@@ -27,7 +27,34 @@ class Msg_Win32_GetInstance: public ApRequestMessage
 {
 public:
   Msg_Win32_GetInstance() : ApRequestMessage("Win32_GetInstance"), hInstance(NULL) {}
+  static HINSTANCE _()
+  {
+    HINSTANCE hInstance = NULL;
+    Msg_Win32_GetInstance msg;
+    int ok = msg.Request();
+    if (ok) {
+      hInstance = msg.hInstance;
+    }
+    return hInstance;
+  }
   ApOUT HINSTANCE hInstance;
+};
+
+class Msg_Win32_GetMainWindow: public ApRequestMessage
+{
+public:
+  Msg_Win32_GetMainWindow() : ApRequestMessage("Win32_GetMainWindow"), hWnd(NULL) {}
+  static HWND _()
+  {
+    HWND hWnd = NULL;
+    Msg_Win32_GetMainWindow msg;
+    int ok = msg.Request();
+    if (ok) {
+      hWnd = msg.hWnd;
+    }
+    return hWnd;
+  }
+  ApOUT HWND hWnd;
 };
 
 #elif defined(LINUX) || defined(MAC) || defined(_CONSOLE)
