@@ -105,5 +105,11 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
   ::OutputDebugString(_T("############################## Shutdown #######################################\r\n"));
 #endif
 
+#if defined(_DEBUG)
+#if defined(_WIN32) && defined(_MSC_VER)
+  _CrtCheckMemory();
+#endif
+#endif
+
   return nResult;
 }
