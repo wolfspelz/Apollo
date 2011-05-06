@@ -71,6 +71,11 @@ void WebViewModuleTester::Execute()
 void WebViewModuleTester::End()
 {
   //{ Msg_WebView_MouseEvent msg; msg.UnHook(MODULE_NAME, (ApCallback) WebViewModuleTester::On_WebView_MouseEvent, 0); }
+
+  if (ApIsHandle(hWebView_)) {
+    Msg_WebView_Destroy::_(hWebView_);
+    hWebView_ = ApNoHandle;
+  }
 }
 
 #endif // #if defined(AP_TEST)

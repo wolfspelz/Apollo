@@ -81,19 +81,19 @@ AP_MSG_HANDLER_METHOD(WebViewModule, WebView_Visibility)
 int g_nCnt = 0;
 AP_MSG_HANDLER_METHOD(WebViewModule, System_3SecTimer)
 {
-  WebViewListNode *pNode = webviews_.Next(0);
-  if (pNode) {
-    ApHandle hWebView = pNode->Key();
-    WebView* pWebView = pNode->Value();
+  //WebViewListNode *pNode = webviews_.Next(0);
+  //if (pNode) {
+  //  ApHandle hWebView = pNode->Key();
+  //  WebView* pWebView = pNode->Value();
 
-    if (pWebView) {
-      //if (g_nCnt++ == 3) {
-      //  Msg_WebView_Destroy::_(hWebView);
-      //}
+  //  if (pWebView) {
+  //    //if (g_nCnt++ == 3) {
+  //    //  Msg_WebView_Destroy::_(hWebView);
+  //    //}
 
-      pWebView->SetVisibility(g_nCnt++ % 2 == 0 ? 1 : 0);
-    }    
-  }
+  //    //pWebView->SetVisibility(g_nCnt++ % 2 == 0 ? 1 : 0);
+  //  }    
+  //}
 }
 
 //----------------------------------------------------------
