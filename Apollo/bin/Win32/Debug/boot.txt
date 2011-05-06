@@ -22,9 +22,9 @@ Core/Modules/020/BrowserInfo/Path=browserinfo
 Core/Modules/021/Navigation/Path=navigation
 Core/Modules/022/Gm/Path=gm
 Core/Modules/023/Galileo/Path=Galileo
-Core/Modules/024/Scene/Path=Scene
-Core/Modules/025/ScWidget/Path=ScWidget
-Core/Modules/026/Arena/Path=Arena
+#Core/Modules/024/Scene/Path=Scene
+#Core/Modules/025/ScWidget/Path=ScWidget
+#Core/Modules/026/Arena/Path=Arena
 Core/Modules/027/WebView/Path=WebView
 
 Core/ModulesDirectory=modules

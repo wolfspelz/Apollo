@@ -210,15 +210,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "babelfish", "..\..\src\babe
 		Release.AspNetCompiler.Debug = "False"
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "fluid", "..\..\src\fluid\fluid.vcproj", "{285191C8-1C64-40AA-9182-BFDBA3262B81}"
-	ProjectSection(ProjectDependencies) = postProject
-		{9B3FBA6A-ED3F-479A-8919-A463882F19B1} = {9B3FBA6A-ED3F-479A-8919-A463882F19B1}
-	EndProjectSection
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestDialog", "..\..\src\TestDialog\TestDialog.vcproj", "{E39213B4-9C24-46C0-BB01-5DBCCDF6DB45}"
 	ProjectSection(ProjectDependencies) = postProject
 		{9B3FBA6A-ED3F-479A-8919-A463882F19B1} = {9B3FBA6A-ED3F-479A-8919-A463882F19B1}
@@ -342,15 +333,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "browserinfo", "..\..\src\br
 		Release.AspNetCompiler.Debug = "False"
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Arena", "..\..\src\Arena\Arena.vcproj", "{A43A7CB4-A368-4AA0-8999-12E13DF300D2}"
-	ProjectSection(ProjectDependencies) = postProject
-		{9B3FBA6A-ED3F-479A-8919-A463882F19B1} = {9B3FBA6A-ED3F-479A-8919-A463882F19B1}
-	EndProjectSection
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Galileo", "..\..\src\Galileo\Galileo.vcproj", "{F4710121-86D9-42FB-B48D-E7FD8070B2F8}"
 	ProjectSection(ProjectDependencies) = postProject
 		{3E874A06-8AE1-460D-A6B6-AD2C0D66318F} = {3E874A06-8AE1-460D-A6B6-AD2C0D66318F}
@@ -398,10 +380,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vld", "..\..\src\vld\vld.vc
 		Debug.AspNetCompiler.Debug = "True"
 		Release.AspNetCompiler.Debug = "False"
 	EndProjectSection
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Scene", "..\..\src\Scene\Scene.vcproj", "{4C72990C-CF85-4D74-BDF3-ADE806A0ABCD}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ScWidget", "..\..\src\ScWidget\ScWidget.vcproj", "{4F485477-1A53-4F09-BD7C-6352014264CB}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WebView", "..\..\src\WebView\WebView.vcproj", "{4AC6E41F-A2DF-44E6-A354-D29727770396}"
 EndProject
@@ -495,10 +473,6 @@ Global
 		{823EE957-94FA-414C-A40D-C57316A27F2D}.Debug|Win32.Build.0 = Debug|Win32
 		{823EE957-94FA-414C-A40D-C57316A27F2D}.Release|Win32.ActiveCfg = Release|Win32
 		{823EE957-94FA-414C-A40D-C57316A27F2D}.Release|Win32.Build.0 = Release|Win32
-		{285191C8-1C64-40AA-9182-BFDBA3262B81}.Debug|Win32.ActiveCfg = Debug|Win32
-		{285191C8-1C64-40AA-9182-BFDBA3262B81}.Debug|Win32.Build.0 = Debug|Win32
-		{285191C8-1C64-40AA-9182-BFDBA3262B81}.Release|Win32.ActiveCfg = Release|Win32
-		{285191C8-1C64-40AA-9182-BFDBA3262B81}.Release|Win32.Build.0 = Release|Win32
 		{E39213B4-9C24-46C0-BB01-5DBCCDF6DB45}.Debug|Win32.ActiveCfg = Debug|Win32
 		{E39213B4-9C24-46C0-BB01-5DBCCDF6DB45}.Debug|Win32.Build.0 = Debug|Win32
 		{E39213B4-9C24-46C0-BB01-5DBCCDF6DB45}.Release|Win32.ActiveCfg = Release|Win32
@@ -547,10 +521,6 @@ Global
 		{1CE0F920-F520-41A7-B01C-DEF856CD6CAD}.Debug|Win32.Build.0 = Debug|Win32
 		{1CE0F920-F520-41A7-B01C-DEF856CD6CAD}.Release|Win32.ActiveCfg = Release|Win32
 		{1CE0F920-F520-41A7-B01C-DEF856CD6CAD}.Release|Win32.Build.0 = Release|Win32
-		{A43A7CB4-A368-4AA0-8999-12E13DF300D2}.Debug|Win32.ActiveCfg = Debug|Win32
-		{A43A7CB4-A368-4AA0-8999-12E13DF300D2}.Debug|Win32.Build.0 = Debug|Win32
-		{A43A7CB4-A368-4AA0-8999-12E13DF300D2}.Release|Win32.ActiveCfg = Release|Win32
-		{A43A7CB4-A368-4AA0-8999-12E13DF300D2}.Release|Win32.Build.0 = Release|Win32
 		{F4710121-86D9-42FB-B48D-E7FD8070B2F8}.Debug|Win32.ActiveCfg = Debug|Win32
 		{F4710121-86D9-42FB-B48D-E7FD8070B2F8}.Debug|Win32.Build.0 = Debug|Win32
 		{F4710121-86D9-42FB-B48D-E7FD8070B2F8}.Release|Win32.ActiveCfg = Release|Win32
@@ -575,14 +545,6 @@ Global
 		{0D30FFCB-45DA-4D2B-8E3C-81BC145BF2DE}.Debug|Win32.Build.0 = Debug|Win32
 		{0D30FFCB-45DA-4D2B-8E3C-81BC145BF2DE}.Release|Win32.ActiveCfg = Release|Win32
 		{0D30FFCB-45DA-4D2B-8E3C-81BC145BF2DE}.Release|Win32.Build.0 = Release|Win32
-		{4C72990C-CF85-4D74-BDF3-ADE806A0ABCD}.Debug|Win32.ActiveCfg = Debug|Win32
-		{4C72990C-CF85-4D74-BDF3-ADE806A0ABCD}.Debug|Win32.Build.0 = Debug|Win32
-		{4C72990C-CF85-4D74-BDF3-ADE806A0ABCD}.Release|Win32.ActiveCfg = Release|Win32
-		{4C72990C-CF85-4D74-BDF3-ADE806A0ABCD}.Release|Win32.Build.0 = Release|Win32
-		{4F485477-1A53-4F09-BD7C-6352014264CB}.Debug|Win32.ActiveCfg = Debug|Win32
-		{4F485477-1A53-4F09-BD7C-6352014264CB}.Debug|Win32.Build.0 = Debug|Win32
-		{4F485477-1A53-4F09-BD7C-6352014264CB}.Release|Win32.ActiveCfg = Release|Win32
-		{4F485477-1A53-4F09-BD7C-6352014264CB}.Release|Win32.Build.0 = Release|Win32
 		{4AC6E41F-A2DF-44E6-A354-D29727770396}.Debug|Win32.ActiveCfg = Debug|Win32
 		{4AC6E41F-A2DF-44E6-A354-D29727770396}.Debug|Win32.Build.0 = Debug|Win32
 		{4AC6E41F-A2DF-44E6-A354-D29727770396}.Release|Win32.ActiveCfg = Release|Win32
