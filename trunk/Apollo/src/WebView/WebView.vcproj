@@ -38,7 +38,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="C:\cygwin\home\wolf\WebKit\WebKitBuild\Debug_Cairo_CFLite\include"
+				AdditionalIncludeDirectories="C:\cygwin\home\wolf\WebKit\WebKitBuild\Debug_Cairo_CFLite\include\"
 				PreprocessorDefinitions="WEBVIEW_EXPORTS"
 				DebugInformationFormat="4"
 			/>
