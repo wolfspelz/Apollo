@@ -1,0 +1,12 @@
+prefix=c:/devel/target/a99af9c83971eecdc12777a56dbe2644
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: cairo-win32-font
+Description: Microsoft Windows font backend for cairo graphics library
+Version: 1.8.10
+
+Requires: cairo 
+Libs: 
+Cflags: -I${includedir}/cairo 

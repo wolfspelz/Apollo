@@ -1,0 +1,5 @@
+ShowWindow=0
+#ShutdownDelay=2
+#Singleton=1
+#WindowClass=ApolloWinMainLoopClass
+WindowTitle=Avatar

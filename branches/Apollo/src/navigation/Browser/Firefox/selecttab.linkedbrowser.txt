@@ -1,0 +1,890 @@
+tab.linkedBrowser.clientHeight=206
+tab.linkedBrowser.clientWidth=768
+
+
+
+
+
+Avatar DEBUG... mDragDropHandler=[xpconnect wrapped nsIDragDropHandler]
+
+_docShell=[xpconnect wrapped (nsISupports, nsIDocShell, nsIInterfaceRequestor, nsIWebNavigation, nsIWebProgress, nsIDocShellHistory, nsIRequestObserver, nsIDocShell_MOZILLA_1_9_1_SessionStorage)]
+
+addEventListener=function addEventListener() {
+    [native code]
+}
+
+mFormFillAttached=true
+
+pageReport=null
+
+mIconURL=http://www.spiegel.de/favicon.ico
+
+userTypedClear=0
+
+frameListener=[object Object]
+
+feeds=[object Object],[object Object]
+
+engines=null
+
+_userTypedValue=null
+
+_fastFind=[xpconnect wrapped nsITypeAheadFind]
+
+_scrollingView=null
+
+missingPlugins=null
+
+isSystemPage=undefined
+
+lastURI=[xpconnect wrapped nsIURI]
+
+focusedWindow=[object ChromeWindow]
+
+focusedElement=null
+
+_webBrowserFind=null
+
+mPrefs=[xpconnect wrapped nsIPrefBranch]
+
+mAtomService=[xpconnect wrapped nsIAtomService]
+
+_mStrBundle=null
+
+isShowingMessage=false
+
+mDestroyed=false
+
+_AUTOSCROLL_SPEED=3
+
+_AUTOSCROLL_SNAP=10
+
+_autoScrollTimer=null
+
+_startX=null
+
+_startY=null
+
+_screenX=null
+
+_screenY=null
+
+_autoScrollPopup=null
+
+_autoScrollNeedsCleanup=false
+
+accessibleType=1
+
+autoscrollEnabled=true
+
+canGoBack=false
+
+canGoForward=false
+
+goBack=function goBack() {
+    var webNavigation = this.webNavigation;
+    if (webNavigation.canGoBack) {
+        try {
+            this.userTypedClear++;
+            webNavigation.goBack();
+        } finally {
+            if (this.userTypedClear) {
+                this.userTypedClear--;
+            }
+        }
+    }
+}
+
+goForward=function goForward() {
+    var webNavigation = this.webNavigation;
+    if (webNavigation.canGoForward) {
+        try {
+            this.userTypedClear++;
+            webNavigation.goForward();
+        } finally {
+            if (this.userTypedClear) {
+                this.userTypedClear--;
+            }
+        }
+    }
+}
+
+reload=function reload() {
+    const nsIWebNavigation = Components.interfaces.nsIWebNavigation;
+    const flags = nsIWebNavigation.LOAD_FLAGS_NONE;
+    this.reloadWithFlags(flags);
+}
+
+reloadWithFlags=function reloadWithFlags(aFlags) {
+    this.webNavigation.reload(aFlags);
+}
+
+stop=function stop() {
+    const nsIWebNavigation = Components.interfaces.nsIWebNavigation;
+    const flags = nsIWebNavigation.STOP_ALL;
+    this.webNavigation.stop(flags);
+}
+
+loadURI=function loadURI(aURI, aReferrerURI, aCharset) {
+    const nsIWebNavigation = Components.interfaces.nsIWebNavigation;
+    const flags = nsIWebNavigation.LOAD_FLAGS_NONE;
+    this.loadURIWithFlags(aURI, flags, aReferrerURI, aCharset);
+}
+
+loadURIWithFlags=function loadURIWithFlags(aURI, aFlags, aReferrerURI, aCharset, aPostData) {
+    if (!aURI) {
+        aURI = "about:blank";
+    }
+    if (aCharset) {
+        try {
+            this.documentCharsetInfo.parentCharset = this.mAtomService.getAtom(aCharset);
+        } catch (e) {
+        }
+    }
+    try {
+        this.userTypedClear++;
+        this.webNavigation.loadURI(aURI, aFlags, aReferrerURI, aPostData, null);
+    } finally {
+        if (this.userTypedClear) {
+            this.userTypedClear--;
+        }
+    }
+}
+
+goHome=function goHome() {
+    try {
+        this.loadURI(this.homePage);
+    } catch (e) {
+    }
+}
+
+homePage=http://www.mozilla.org/
+
+gotoIndex=function gotoIndex(aIndex) {
+    try {
+        this.userTypedClear++;
+        this.webNavigation.gotoIndex(aIndex);
+    } finally {
+        if (this.userTypedClear) {
+            this.userTypedClear--;
+        }
+    }
+}
+
+currentURI=[xpconnect wrapped nsIURI]
+
+preferences=[xpconnect wrapped (nsISupports, nsIPrefBranch, nsIPrefService, nsIPrefBranch2)]
+
+docShell=[xpconnect wrapped (nsISupports, nsIDocShell, nsIInterfaceRequestor, nsIWebNavigation, nsIWebProgress, nsIDocShellHistory, nsIRequestObserver, nsIDocShell_MOZILLA_1_9_1_SessionStorage)]
+
+webNavigation=[xpconnect wrapped (nsISupports, nsIDocShell, nsIInterfaceRequestor, nsIWebNavigation, nsIWebProgress, nsIDocShellHistory, nsIRequestObserver, nsIDocShell_MOZILLA_1_9_1_SessionStorage)]
+
+webBrowserFind=[xpconnect wrapped nsIWebBrowserFind]
+
+getTabBrowser=function getTabBrowser() {
+    var tabBrowser = this.parentNode;
+    while (tabBrowser && tabBrowser.localName != "tabbrowser") {
+        tabBrowser = tabBrowser.parentNode;
+    }
+    return tabBrowser;
+}
+
+fastFind=[xpconnect wrapped nsITypeAheadFind]
+
+webProgress=[xpconnect wrapped (nsISupports, nsIDocShell, nsIInterfaceRequestor, nsIWebNavigation, nsIWebProgress, nsIDocShellHistory, nsIRequestObserver, nsIDocShell_MOZILLA_1_9_1_SessionStorage)]
+
+contentWindow=[object XPCNativeWrapper [object Window]]
+
+sessionHistory=[xpconnect wrapped nsISHistory]
+
+markupDocumentViewer=[xpconnect wrapped (nsISupports, nsIContentViewer, nsIMarkupDocumentViewer)]
+
+contentViewerEdit=[xpconnect wrapped (nsISupports, nsIContentViewer, nsIMarkupDocumentViewer, nsIContentViewerEdit)]
+
+contentViewerFile=[xpconnect wrapped (nsISupports, nsIContentViewer, nsIMarkupDocumentViewer, nsIContentViewerEdit, nsIContentViewerFile)]
+
+documentCharsetInfo=[xpconnect wrapped nsIDocumentCharsetInfo]
+
+contentDocument=[object XPCNativeWrapper [object HTMLDocument]]
+
+contentTitle=SPIEGEL ONLINE - Nachrichten
+
+contentPrincipal=[object XPCNativeWrapper [xpconnect wrapped (nsISupports, nsIPrincipal, nsISerializable)]]
+
+mStrBundle=[xpconnect wrapped nsIStringBundle]
+
+addProgressListener=function addProgressListener(aListener) {
+    this.webProgress.addProgressListener(aListener, Components.interfaces.nsIWebProgress.NOTIFY_ALL);
+}
+
+removeProgressListener=function removeProgressListener(aListener) {
+    this.webProgress.removeProgressListener(aListener);
+}
+
+attachFormFill=function attachFormFill() {
+    if (!this.mFormFillAttached && this.hasAttribute("autocompletepopup")) {
+        var controller = Components.classes['@mozilla.org/satchel/form-fill-controller;1'].getService(Components.interfaces.nsIFormFillController);
+        var popup = document.getElementById(this.getAttribute("autocompletepopup"));
+        if (popup) {
+            controller.attachToBrowser(this.docShell, popup.QueryInterface(Components.interfaces.nsIAutoCompletePopup));
+            this.mFormFillAttached = true;
+        }
+    }
+}
+
+detachFormFill=function detachFormFill() {
+    if (this.mFormFillAttached) {
+        var controller = Components.classes['@mozilla.org/satchel/form-fill-controller;1'].getService(Components.interfaces.nsIFormFillController);
+        controller.detachFromBrowser(this.docShell);
+        this.mFormFillAttached = false;
+    }
+}
+
+findChildShell=function findChildShell(aDocShell, aSoughtURI) {
+    if (aDocShell.QueryInterface(Components.interfaces.nsIWebNavigation).currentURI.spec == aSoughtURI.spec) {
+        return aDocShell;
+    }
+    var node = aDocShell.QueryInterface(Components.interfaces.nsIDocShellTreeNode);
+    for (var i = 0; i < node.childCount; ++i) {
+        var docShell = node.getChildAt(i);
+        docShell = this.findChildShell(docShell, aSoughtURI);
+        if (docShell) {
+            return docShell;
+        }
+    }
+    return null;
+}
+
+onPageShow=function onPageShow(aEvent) {
+    this.attachFormFill();
+    if (this.pageReport) {
+        var i = 0;
+        while (i < this.pageReport.length) {
+            if (this.pageReport[i].requestingWindow &&
+                this.pageReport[i].requestingWindow.document == this.pageReport[i].requestingDocument) {
+                i++;
+            } else {
+                this.pageReport.splice(i, 1);
+            }
+        }
+        if (this.pageReport.length == 0) {
+            this.pageReport = null;
+            this.updatePageReport();
+        }
+    }
+}
+
+onPageHide=function onPageHide(aEvent) {
+    if (this.pageReport) {
+        this.pageReport = null;
+        this.updatePageReport();
+    }
+    if (this.feeds && aEvent.target == this.contentDocument) {
+        this.feeds = null;
+    }
+    if (!this.docShell || !this.fastFind) {
+        return;
+    }
+    var tabBrowser = this.getTabBrowser();
+    if (!tabBrowser || tabBrowser.mCurrentBrowser == this) {
+        this.fastFind.setDocShell(this.docShell);
+    }
+    if (this._scrollingView) {
+        this._autoScrollPopup.hidePopup();
+    }
+}
+
+updatePageReport=function updatePageReport() {
+    var event = document.createEvent("Events");
+    event.initEvent("DOMUpdatePageReport", true, true);
+    this.dispatchEvent(event);
+}
+
+onPopupBlocked=function onPopupBlocked(evt) {
+    if (!this.pageReport) {
+        this.pageReport = new Array;
+    }
+    var obj = {requestingWindow: evt.requestingWindow, requestingDocument: evt.requestingWindow.document, popupWindowURI: evt.popupWindowURI, popupWindowFeatures: evt.popupWindowFeatures, popupWindowName: evt.popupWindowName};
+    this.pageReport.push(obj);
+    this.pageReport.reported = false;
+    this.updatePageReport();
+}
+
+securityUI=[xpconnect wrapped (nsISupports, nsISecureBrowserUI, nsISSLStatusProvider)]
+
+userTypedValue=null
+
+destroy=function destroy() {
+    if (this.mDestroyed) {
+        return;
+    }
+    this.mDestroyed = true;
+    if (!this.hasAttribute("disablehistory")) {
+        var os = Components.classes['@mozilla.org/observer-service;1'].getService(Components.interfaces.nsIObserverService);
+        try {
+            os.removeObserver(this, "browser:purge-session-history");
+        } catch (ex) {
+        }
+    }
+    if (this.mDragDropHandler) {
+        this.mDragDropHandler.detach();
+    }
+    this.mDragDropHandler = null;
+    this.detachFormFill();
+    this._fastFind = null;
+    this._webBrowserFind = null;
+    this.feeds = null;
+    this.removeEventListener("pageshow", this.onPageShow, true);
+    this.removeEventListener("pagehide", this.onPageHide, true);
+    this.removeEventListener("DOMPopupBlocked", this.onPopupBlocked, true);
+    if (this._autoScrollNeedsCleanup) {
+        this._autoScrollPopup.parentNode.removeChild(this._autoScrollPopup);
+    }
+}
+
+observe=function observe(aSubject, aTopic, aState) {
+    if (aTopic != "browser:purge-session-history" || !this.sessionHistory) {
+        return;
+    }
+    if (this.sessionHistory.index < this.sessionHistory.count - 1) {
+        var indexEntry = this.sessionHistory.getEntryAtIndex(this.sessionHistory.index, false);
+        this.sessionHistory.QueryInterface(Components.interfaces.nsISHistoryInternal);
+        indexEntry.QueryInterface(Components.interfaces.nsISHEntry);
+        this.sessionHistory.addEntry(indexEntry, true);
+    }
+    var purge = this.sessionHistory.count;
+    if (this.currentURI != "about:blank") {
+        --purge;
+    }
+    if (purge > 0) {
+        this.sessionHistory.PurgeHistory(purge);
+    }
+}
+
+stopScroll=function stopScroll() {
+    if (this._scrollingView) {
+        this._scrollingView = null;
+        window.removeEventListener("mousemove", this, true);
+        window.removeEventListener("mousedown", this, true);
+        window.removeEventListener("mouseup", this, true);
+        window.removeEventListener("contextmenu", this, true);
+        clearInterval(this._autoScrollTimer);
+    }
+}
+
+_createAutoScrollPopup=function _createAutoScrollPopup() {
+    const XUL_NS = "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
+    var popup = document.createElementNS(XUL_NS, "popup");
+    popup.id = "autoscroller";
+    return popup;
+}
+
+startScroll=function startScroll(event) {
+    if (!this._autoScrollPopup) {
+        if (this.hasAttribute("autoscrollpopup")) {
+            this._autoScrollPopup = document.getElementById(this.getAttribute("autoscrollpopup"));
+        } else {
+            this._autoScrollPopup = this._createAutoScrollPopup();
+            document.documentElement.appendChild(this._autoScrollPopup);
+            this._autoScrollNeedsCleanup = true;
+        }
+    }
+    this._autoScrollPopup.addEventListener("popuphidden", this, true);
+    if (screen.colorDepth > 8) {
+        this._autoScrollPopup.setAttribute("transparent", !/BeOS|OS\\/2|Photon/.test(navigator.appVersion));
+        this._autoScrollPopup.setAttribute("translucent", /Win|Mac/.test(navigator.platform));
+    }
+    this._scrollingView = event.originalTarget.ownerDocument.defaultView;
+    if (this._scrollingView.scrollMaxX > 0) {
+        this._autoScrollPopup.setAttribute("scrolldir", this._scrollingView.scrollMaxY > 0 ? "NSEW" : "EW");
+    } else if (this._scrollingView.scrollMaxY > 0) {
+        this._autoScrollPopup.setAttribute("scrolldir", "NS");
+    } else {
+        this._scrollingView = null;
+        return;
+    }
+    document.popupNode = null;
+    this._autoScrollPopup.showPopup(document.documentElement, event.screenX, event.screenY, "popup", null, null);
+    this._ignoreMouseEvents = true;
+    this._startX = event.screenX;
+    this._startY = event.screenY;
+    this._screenX = event.screenX;
+    this._screenY = event.screenY;
+    window.addEventListener("mousemove", this, true);
+    window.addEventListener("mousedown", this, true);
+    window.addEventListener("mouseup", this, true);
+    window.addEventListener("contextmenu", this, true);
+    this._scrollErrorX = 0;
+    this._scrollErrorY = 0;
+    this._autoScrollTimer = setInterval(function (self) {self.autoScrollLoop();}, 20, this);
+}
+
+_roundToZero=function _roundToZero(num) {
+    if (num > 0) {
+        return Math.floor(num);
+    }
+    return Math.ceil(num);
+}
+
+_accelerate=function _accelerate(curr, start) {
+    const speed = 12;
+    var val = (curr - start) / speed;
+    if (val > 1) {
+        return val * Math.sqrt(val) - 1;
+    }
+    if (val < -1) {
+        return val * Math.sqrt(- val) + 1;
+    }
+    return 0;
+}
+
+autoScrollLoop=function autoScrollLoop() {
+    var x = this._accelerate(this._screenX, this._startX);
+    var y = this._accelerate(this._screenY, this._startY);
+    var desiredScrollX = this._scrollErrorX + x;
+    var actualScrollX = this._roundToZero(desiredScrollX);
+    this._scrollErrorX = desiredScrollX - actualScrollX;
+    var desiredScrollY = this._scrollErrorY + y;
+    var actualScrollY = this._roundToZero(desiredScrollY);
+    this._scrollErrorY = desiredScrollY - actualScrollY;
+    this._scrollingView.scrollBy(actualScrollX, actualScrollY);
+}
+
+isAutoscrollBlocker=function isAutoscrollBlocker(node) {
+    var mmPaste = false;
+    var mmScrollbarPosition = false;
+    try {
+        mmPaste = this.mPrefs.getBoolPref("middlemouse.paste");
+    } catch (ex) {
+    }
+    try {
+        mmScrollbarPosition = this.mPrefs.getBoolPref("middlemouse.scrollbarPosition");
+    } catch (ex) {
+    }
+    while (node) {
+        if ((node instanceof HTMLAnchorElement ||
+            node instanceof HTMLAreaElement) &&
+            node.hasAttribute("href")) {
+            return true;
+        }
+        if (mmPaste &&
+            (node instanceof HTMLInputElement ||
+            node instanceof HTMLTextAreaElement)) {
+            return true;
+        }
+        if (node instanceof XULElement &&
+            mmScrollbarPosition &&
+            (node.localName == "scrollbar" ||
+            node.localName == "scrollcorner")) {
+            return true;
+        }
+        node = node.parentNode;
+    }
+    return false;
+}
+
+handleEvent=function handleEvent(aEvent) {
+    if (this._scrollingView) {
+        switch (aEvent.type) {
+          case "mousemove":
+            this._screenX = aEvent.screenX;
+            this._screenY = aEvent.screenY;
+            var x = this._screenX - this._startX;
+            var y = this._screenY - this._startY;
+            if (x > this._AUTOSCROLL_SNAP || x < - this._AUTOSCROLL_SNAP ||
+                y > this._AUTOSCROLL_SNAP || y < - this._AUTOSCROLL_SNAP) {
+                this._ignoreMouseEvents = false;
+            }
+            break;
+          case "mouseup":
+          case "mousedown":
+          case "contextmenu":
+            if (!this._ignoreMouseEvents) {
+                this._autoScrollPopup.hidePopup();
+            }
+            this._ignoreMouseEvents = false;
+            break;
+          case "popuphidden":
+            this._autoScrollPopup.removeEventListener("popuphidden", this, true);
+            this.stopScroll();
+            break;
+          default:;
+        }
+    }
+}
+
+swapDocShells=function swapDocShells(aOtherBrowser) {
+    var fieldsToSwap = ["_docShell", "_webBrowserFind", "_contentWindow", "_webNavigation"];
+    var ourTabBrowser = this.getTabBrowser();
+    if (ourTabBrowser != null != (aOtherBrowser.getTabBrowser() != null)) {
+        throw "Unable to perform swap on <browsers> if one is in a <tabbrowser> and one is not";
+    }
+    if (!ourTabBrowser) {
+        fieldsToSwap.push("_fastFind");
+    }
+    var ourFieldValues = {};
+    var otherFieldValues = {};
+    for each (var field in fieldsToSwap) {
+        ourFieldValues[field] = this[field];
+        otherFieldValues[field] = aOtherBrowser[field];
+    }
+    this.QueryInterface(Components.interfaces.nsIFrameLoaderOwner).swapFrameLoaders(aOtherBrowser);
+    for each (var field in fieldsToSwap) {
+        this[field] = otherFieldValues[field];
+        aOtherBrowser[field] = ourFieldValues[field];
+    }
+}
+
+style=[object CSSStyleDeclaration]
+
+scrollWidth=768
+
+clientLeft=0
+
+clientHeight=206
+
+clientWidth=768
+
+clientTop=0
+
+getClientRects=function getClientRects() {
+    [native code]
+}
+
+getBoundingClientRect=function getBoundingClientRect() {
+    [native code]
+}
+
+getElementsByClassName=function getElementsByClassName() {
+    [native code]
+}
+
+baseURI=chrome://browser/content/browser.xul
+
+textContent=
+
+compareDocumentPosition=function compareDocumentPosition() {
+    [native code]
+}
+
+getUserData=function getUserData() {
+    [native code]
+}
+
+isSameNode=function isSameNode() {
+    [native code]
+}
+
+lookupNamespaceURI=function lookupNamespaceURI() {
+    [native code]
+}
+
+setUserData=function setUserData() {
+    [native code]
+}
+
+lookupPrefix=function lookupPrefix() {
+    [native code]
+}
+
+isDefaultNamespace=function isDefaultNamespace() {
+    [native code]
+}
+
+isEqualNode=function isEqualNode() {
+    [native code]
+}
+
+dispatchEvent=function dispatchEvent() {
+    [native code]
+}
+
+removeEventListener=function removeEventListener() {
+    [native code]
+}
+
+tagName=xul:browser
+
+removeAttributeNS=function removeAttributeNS() {
+    [native code]
+}
+
+removeAttribute=function removeAttribute() {
+    [native code]
+}
+
+getAttribute=function getAttribute() {
+    [native code]
+}
+
+getElementsByTagName=function getElementsByTagName() {
+    [native code]
+}
+
+setAttribute=function setAttribute() {
+    [native code]
+}
+
+getElementsByTagNameNS=function getElementsByTagNameNS() {
+    [native code]
+}
+
+hasAttributeNS=function hasAttributeNS() {
+    [native code]
+}
+
+setAttributeNS=function setAttributeNS() {
+    [native code]
+}
+
+hasAttribute=function hasAttribute() {
+    [native code]
+}
+
+getAttributeNS=function getAttributeNS() {
+    [native code]
+}
+
+nextSibling=null
+
+firstChild=null
+
+prefix=xul
+
+nodeValue=null
+
+childNodes=[object NodeList]
+
+nodeName=xul:browser
+
+namespaceURI=http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul
+
+previousSibling=null
+
+nodeType=1
+
+localName=browser
+
+lastChild=null
+
+ownerDocument=[object XULDocument]
+
+parentNode=[object XULElement]
+
+attributes=[object NamedNodeMap]
+
+appendChild=function appendChild() {
+    [native code]
+}
+
+cloneNode=function cloneNode() {
+    [native code]
+}
+
+normalize=function normalize() {
+    [native code]
+}
+
+hasChildNodes=function hasChildNodes() {
+    [native code]
+}
+
+insertBefore=function insertBefore() {
+    [native code]
+}
+
+replaceChild=function replaceChild() {
+    [native code]
+}
+
+removeChild=function removeChild() {
+    [native code]
+}
+
+hasAttributes=function hasAttributes() {
+    [native code]
+}
+
+controllers=[object XULControllers]
+
+boxObject=[object BoxObject]
+
+id=
+
+minWidth=
+
+maxWidth=
+
+collapsed=false
+
+getElementsByAttribute=function getElementsByAttribute() {
+    [native code]
+}
+
+className=
+
+tooltipText=
+
+hidden=false
+
+statusText=
+
+width=
+
+focus=function focus() {
+    [native code]
+}
+
+isSupported=function isSupported() {
+    [native code]
+}
+
+ELEMENT_NODE=1
+
+ATTRIBUTE_NODE=2
+
+TEXT_NODE=3
+
+CDATA_SECTION_NODE=4
+
+ENTITY_REFERENCE_NODE=5
+
+ENTITY_NODE=6
+
+PROCESSING_INSTRUCTION_NODE=7
+
+COMMENT_NODE=8
+
+DOCUMENT_NODE=9
+
+DOCUMENT_TYPE_NODE=10
+
+DOCUMENT_FRAGMENT_NODE=11
+
+NOTATION_NODE=12
+
+getAttributeNode=function getAttributeNode() {
+    [native code]
+}
+
+setAttributeNode=function setAttributeNode() {
+    [native code]
+}
+
+removeAttributeNode=function removeAttributeNode() {
+    [native code]
+}
+
+getAttributeNodeNS=function getAttributeNodeNS() {
+    [native code]
+}
+
+setAttributeNodeNS=function setAttributeNodeNS() {
+    [native code]
+}
+
+align=
+
+dir=
+
+flex=1
+
+flexGroup=
+
+ordinal=
+
+orient=
+
+pack=
+
+observes=
+
+menu=
+
+contextMenu=contentAreaContextMenu
+
+tooltip=aHTMLTooltip
+
+height=
+
+minHeight=
+
+maxHeight=
+
+persist=
+
+left=
+
+top=
+
+datasources=
+
+ref=
+
+allowEvents=false
+
+database=null
+
+builder=null
+
+resource=null
+
+blur=function blur() {
+    [native code]
+}
+
+click=function click() {
+    [native code]
+}
+
+doCommand=function doCommand() {
+    [native code]
+}
+
+getElementsByAttributeNS=function getElementsByAttributeNS() {
+    [native code]
+}
+
+getFeature=function getFeature() {
+    [native code]
+}
+
+DOCUMENT_POSITION_DISCONNECTED=1
+
+DOCUMENT_POSITION_PRECEDING=2
+
+DOCUMENT_POSITION_FOLLOWING=4
+
+DOCUMENT_POSITION_CONTAINS=8
+
+DOCUMENT_POSITION_CONTAINED_BY=16
+
+DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC=32
+
+scrollTop=0
+
+scrollLeft=0
+
+scrollHeight=206
+
+firstElementChild=null
+
+lastElementChild=null
+
+previousElementSibling=null
+
+nextElementSibling=null
+
+childElementCount=0
+
+children=[object HTMLCollection]
+
+querySelector=function querySelector() {
+    [native code]
+}
+
+querySelectorAll=function querySelectorAll() {
+    [native code]
+}
+
+

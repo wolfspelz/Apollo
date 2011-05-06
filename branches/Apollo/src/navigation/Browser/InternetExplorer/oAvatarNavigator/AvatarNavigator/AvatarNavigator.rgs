@@ -1,0 +1,11 @@
+HKCR
+{
+	NoRemove AppID
+	{
+		'%APPID%' = s 'AvatarNavigator'
+		'AvatarNavigator.DLL'
+		{
+			val AppID = s '%APPID%'
+		}
+	}
+}

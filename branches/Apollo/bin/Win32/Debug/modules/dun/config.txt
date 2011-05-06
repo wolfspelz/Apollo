@@ -1,0 +1,2 @@
+# Comma separated list, omit extensions, e.g.: Identity,config
+#OnLoad/DeleteDbFiles=

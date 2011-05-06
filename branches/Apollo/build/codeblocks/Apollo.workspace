@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_workspace_file>
+	<Workspace title="Apollo workspace">
+		<Project filename="expat\expat.cbp" />
+		<Project filename="pcre\pcre.cbp" />
+		<Project filename="sha1\sha1.cbp" />
+		<Project filename="libvpi\libvpi.cbp" />
+		<Project filename="SQLite3\SQLite3.cbp" />
+		<Project filename="Apollo\Apollo.cbp" />
+		<Project filename="os\os.cbp" />
+		<Project filename="Win32App\Win32App.cbp" />
+		<Project filename="WinMainLoop\WinMainLoop.cbp" />
+		<Project filename="LinuxApp\LinuxApp.cbp" />
+		<Project filename="WxMainLoop\WxMainLoop.cbp" />
+		<Project filename="MacApp\MacApp.cbp" />
+		<Project filename="MacMainLoop\MacMainLoop.cbp" />
+		<Project filename="db\db.cbp" />
+		<Project filename="ConsoleApp\ConsoleApp.cbp" />
+		<Project filename="ConsoleLoop\ConsoleLoop.cbp" />
+		<Project filename="WinUnitTest\WinUnitTest.cbp" />
+		<Project filename="config\config.cbp" />
+		<Project filename="net\net.cbp" />
+		<Project filename="netapi\netapi.cbp" />
+		<Project filename="sample\sample.cbp" />
+		<Project filename="test\test.cbp" />
+		<Project filename="vpi\vpi.cbp" />
+		<Project filename="xmpp\xmpp.cbp" />
+		<Project filename="xmpptestserver\xmpptestserver.cbp" />
+	</Workspace>
+</CodeBlocks_workspace_file>

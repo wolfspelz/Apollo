@@ -1,0 +1,10 @@
+#version=1
+#ässert UTF-8
+text1=1
+text2withlf=
+context3.text3=
+
+text5=
+text6=
+context7.text7=
+context8.text8=

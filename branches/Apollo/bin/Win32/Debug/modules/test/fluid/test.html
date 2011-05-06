@@ -1,0 +1,130 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<script type="text/javascript" src="apollo.js"></script>
+<style>
+* { padding:0; margin:0; }
+input[type="button"] { padding-top:1px; padding-bottom:1px; padding-left:5px; padding-right:5px; }
+</style>
+</head>
+<body style="background-color:#ffffcc;">
+<script type="text/javascript">
+function log(s) { document.getElementById('iOut').value = document.getElementById('iOut').value + s + '\n'; }
+function writeMessage(msg) { var sMsg = ''; for (var i in msg.getList()) { sMsg += i + '=' + msg.getList()[i] + '\n'; } log(sMsg); }
+
+var g_values =
+{
+  sString: '',
+  sStringLF: '',
+  sStringUnicode: '',
+  nInt: 0,
+  kvList: null
+}
+
+function onMessage(msg)
+{
+  writeMessage(msg);
+
+  var sMethod = msg.getString('Method');
+  switch (sMethod) {
+
+    case 'SetValues':
+      g_values.sString = msg.getString('sString');
+      g_values.sStringLF = msg.getString('sStringLF');
+      g_values.sStringUnicode = msg.getString('sStringUnicode');
+      g_values.nInt = msg.getInt('nInt');
+      g_values.kvList = msg.getKeyValueList('kvList');
+      break;
+
+    case 'GetValues':
+      var msg1 = new ApMessage('Test_Fluid');
+      msg1.setString('Method', 'GetValuesResponse');
+      msg1.setString('sString', g_values.sString);
+      msg1.setString('sStringLF', g_values.sStringLF);
+      msg1.setString('sStringUnicode', g_values.sStringUnicode);
+      msg1.setInt('nInt', g_values.nInt);
+      msg1.setKeyValueList('kvList', g_values.kvList);
+      msg1.send();
+      break;
+
+    case 'StartExchange':
+      var msg1 = new ApMessage('Test_Fluid');
+      msg1.setString('Method', 'SetValues');
+      msg1.setString('sString', 'abc');
+      msg1.setString('sStringLF', 'abc\ndef');
+      msg1.setString('sStringUnicode', '首頁äöa');
+      msg1.setInt('nInt', 43);
+      msg1.send();
+
+      var msg2 = new ApMessage('Test_Fluid');
+      msg2.setString('Method', 'GetValues');
+      msg2.send();
+      break;
+
+    case 'GetValuesResponse':
+      var sString = msg.getString('sString');
+      var sStringLF = msg.getString('sStringLF');
+      var sStringUnicode = msg.getString('sStringUnicode');
+      var nInt = msg.getInt('nInt');
+
+      var s = '';
+
+      if (!s)  { if (sString != 'abc') { s = 'sString != abc'; }}
+      if (!s)  { if (sStringLF != 'abc\ndef') { s = 'sStringLF != abc\\ndef'; }}
+      if (!s)  { if (sStringUnicode != '首頁äöa') { s = 'sStringUnicode != 首頁äöa'; }}
+      if (!s)  { if (nInt != 43) { s = 'nInt != 43'; }}
+
+      var msg1 = new ApMessage('Test_Fluid');
+      msg1.setString('Method', 'ExchangeResult');
+      msg1.setString('sResult', s);
+      msg1.send();
+      break;
+
+    case 'GetTotalMemory':
+      var msg1 = new ApMessage('Test_Fluid');
+      msg1.setString('Method', 'GetTotalMemoryResponse');
+      var s = '';
+
+      var nTotalMemory = 0;
+      try {
+        nTotalMemory = window.apollo.totalMemory;
+      } catch (ex) {
+        s = ex.toString();
+      }
+
+      msg1.setInt('nTotalMemory', nTotalMemory);
+      msg1.setString('sResult', s);
+      msg1.send();
+      break;
+
+    case 'StartConfigTest':
+	    if (window.apollo) {
+		    window.apollo.requestConfig(msg.getString('sModule'), msg.getString('sKey'), 'ConfigTestRef');
+	    }
+      break;
+
+    default:
+  }
+}
+
+function onConfigResponse(sValue, sRef)
+{
+  switch (sRef) {
+    case 'ConfigTestRef':
+      var msg1 = new ApMessage('Test_Fluid');
+      msg1.setString('Method', 'ConfigTestResult');
+      msg1.setString('sValue', sValue);
+      msg1.send();
+      break;
+  }
+}
+
+</script>
+
+<input type="button" value="Reload" onclick="window.location.reload();" />
+<input type="button" value=" UnitTest " onclick="var m = new SrpcMessage(); var s = m.unitTest(); if (s) { log(s); } else { log('OK'); }" />
+
+<textarea id="iOut" cols="10" rows="10" style="width:100%; height:95%"></textarea>
+
+</body>
+</html>

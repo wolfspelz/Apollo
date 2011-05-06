@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<VisualStudioPropertySheet
+	ProjectType="Visual C++"
+	Version="8.00"
+	Name="webkit"
+	>
+	<Tool
+		Name="VCCLCompilerTool"
+		AdditionalIncludeDirectories="&quot;$(WebKitSourceDir)include&quot;;&quot;$(WebKitSourceDir)include\JavaScriptCore&quot;;&quot;$(WebKitSourceDir)include\WebKitLibraries&quot;"
+	/>
+	<Tool
+		Name="VCLinkerTool"
+		AdditionalDependencies=" WebKit.lib WebKitGUID.lib"
+		OutputFile=""
+		AdditionalLibraryDirectories="$(WebKitSourceDir)lib"
+	/>
+	<UserMacro
+		Name="WebKitSourceDir"
+		Value="../../../ApWebKit/trunk/Win32/$(ConfigurationName)/"
+		PerformEnvironmentSet="true"
+	/>
+</VisualStudioPropertySheet>

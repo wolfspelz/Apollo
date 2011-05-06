@@ -1,0 +1,4 @@
+#HTTP/IndexFile=HttpIndex.txt
+#HTTP/LogFile=http.log
+
+#IgnoreLocalIp/192.168.0.1=1

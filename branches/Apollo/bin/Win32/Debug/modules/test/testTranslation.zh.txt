@@ -1,0 +1,10 @@
+#version=1
+#ässert UTF-8
+text1=頁1
+text2withlf=頁\n首\n
+context3.text3=頁3
+
+text5=頁
+text6=頁首
+context7.text7=頁首7
+context8.text8=   8頁 首8  

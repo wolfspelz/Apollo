@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<VisualStudioPropertySheet
+	ProjectType="Visual C++"
+	Version="8.00"
+	Name="dll"
+	>
+	<Tool
+		Name="VCCLCompilerTool"
+		PreprocessorDefinitions="_USRDLL"
+	/>
+	<Tool
+		Name="VCLinkerTool"
+		OutputFile="$(BinDir)\$(ProjectName).dll"
+		ImportLibrary="$(LibDir)\$(ProjectName).lib"
+	/>
+</VisualStudioPropertySheet>

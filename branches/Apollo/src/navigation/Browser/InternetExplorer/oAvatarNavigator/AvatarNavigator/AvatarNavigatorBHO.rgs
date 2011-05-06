@@ -1,0 +1,45 @@
+HKCR
+{
+	AvatarNavigator.AvatarNavigatorBHO.1 = s 'AvatarNavigatorBHO Class'
+	{
+		CLSID = s '{4B2C4F08-7B67-4A7D-8DF6-EC64F046C6EC}'
+	}
+	AvatarNavigator.AvatarNavigatorBHO = s 'AvatarNavigatorBHO Class'
+	{
+		CLSID = s '{4B2C4F08-7B67-4A7D-8DF6-EC64F046C6EC}'
+		CurVer = s 'AvatarNavigator.AvatarNavigatorBHO.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {4B2C4F08-7B67-4A7D-8DF6-EC64F046C6EC} = s 'AvatarNavigatorBHO Class'
+		{
+			ProgID = s 'AvatarNavigator.AvatarNavigatorBHO.1'
+			VersionIndependentProgID = s 'AvatarNavigator.AvatarNavigatorBHO'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Apartment'
+			}
+			val AppID = s '%APPID%'
+			'TypeLib' = s '{3C93F8D4-C230-436D-839D-653B411BB417}'
+		}
+	}
+}
+
+HKLM {
+  NoRemove SOFTWARE {
+    NoRemove Microsoft {   
+      NoRemove Windows {
+        NoRemove CurrentVersion {
+          NoRemove Explorer {
+            NoRemove 'Browser Helper Objects' {
+              ForceRemove '{4B2C4F08-7B67-4A7D-8DF6-EC64F046C6EC}' = s 'AvatarNavigatorBHO' {
+                val 'NoExplorer' = d '1'
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
