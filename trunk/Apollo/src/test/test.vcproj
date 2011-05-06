@@ -161,10 +161,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\testArena.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\testBuiltin.cpp"
 				>
 			</File>
@@ -177,15 +173,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\testFluid.cpp"
+				RelativePath=".\testGalileo.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\testNet.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\testGalileo.cpp"
 				>
 			</File>
 			<File

@@ -47,8 +47,6 @@ extern "C" {
   #define AP_TEST_Net
   #define AP_TEST_Vpi
   #define AP_TEST_Vp
-  #define AP_TEST_Fluid
-  #define AP_TEST_Arena
   #define AP_TEST_Galileo
   #if defined (AP_TEST_Net)
     #define AP_TEST_Net_TCP
@@ -81,17 +79,9 @@ void Test_Threads_Register();
 void Test_Threads_Begin();
 void Test_Threads_End();
 
-void Test_Fluid_Register();
-void Test_Fluid_Begin();
-void Test_Fluid_End();
-
 void Test_Vp_Register();
 void Test_Vp_Begin();
 void Test_Vp_End();
-
-void Test_Arena_Register();
-void Test_Arena_Begin();
-void Test_Arena_End();
 
 void Test_Galileo_Register();
 void Test_Galileo_Begin();
