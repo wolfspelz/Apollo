@@ -24,8 +24,6 @@ Win32App.pdb
 ConsoleApp.pdb
 ApCore.pdb
 Apollo.pdb
-ExDisplay.pdb
-TestDialog.pdb
 UnitTest.pdb
 WinMainLoop.pdb
 babelfish.pdb
@@ -33,7 +31,6 @@ config.pdb
 db.pdb
 dbghelp.pdb
 dun.pdb
-fluid.pdb
 gm.pdb
 identity.pdb
 log.pdb

@@ -19,23 +19,14 @@ ApCore.ilk
 Apollo.dll
 Apollo.ilk
 
-ConsoleApp.ilk
 ConsoleLoop.dll
-
 ConsoleLoop.ilk
-ExDisplay.dll
-
-ExDisplay.ilk
-TestDialog.dll
-
-TestDialog.ilk
-UnitTest.dll
-
-UnitTest.dll
-UnitTest.ilk
 
 WinMainLoop.dll
 WinMainLoop.ilk
+
+UnitTest.dll
+UnitTest.ilk
 
 babelfish.dll
 babelfish.ilk
@@ -51,9 +42,6 @@ dbghelp.ilk
 
 dun.dll
 dun.ilk
-
-fluid.dll
-fluid.ilk
 
 gm.dll
 gm.ilk
