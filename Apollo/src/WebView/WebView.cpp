@@ -10,6 +10,8 @@
 #endif // WIN32
 #include "Local.h"
 #include "WebView.h"
+#include "SAutoPtr.h"
+#include <JavaScriptCore/JavaScriptCore.h>
 
 WebView::WebView(const ApHandle& hWebView)
 :hAp_(hWebView)
@@ -19,9 +21,11 @@ WebView::WebView(const ApHandle& hWebView)
 ,nW_(600)
 ,nH_(400)
 ,pWebKit_(0)
+,pWebFrame_(0)
 #if defined(WIN32)
 ,hWnd_(NULL)
 #endif // WIN32
+,nRefCount_(0)
 {
 }
 
@@ -50,6 +54,14 @@ int WebView::Create(const String& sHtml, const String& sBase)
   standardPreferences->setAcceleratedCompositingEnabled(TRUE);
 
   HRESULT hr = WebKitCreateInstance(CLSID_WebView, 0, IID_IWebView, reinterpret_cast<void**>(&pWebKit_));
+  if (FAILED(hr))
+    goto exit;
+
+  hr = pWebKit_->setUIDelegate(this);
+  if (FAILED(hr))
+    goto exit;
+
+  hr = pWebKit_->setFrameLoadDelegate(this);
   if (FAILED(hr))
     goto exit;
 
@@ -86,20 +98,17 @@ int WebView::Create(const String& sHtml, const String& sBase)
 
   // -----------------------------
 
-  IWebFrame* frame;
-  hr = pWebKit_->mainFrame(&frame);
+  hr = pWebKit_->mainFrame(&pWebFrame_);
   if (FAILED(hr))
     goto exit;
 
 #if 1
   static BSTR defaultHTML = SysAllocString(sHtml);
-  frame->loadHTMLString(defaultHTML, SysAllocString(sBase));
-  frame->Release();
+  pWebFrame_->loadHTMLString(defaultHTML, SysAllocString(sBase));
 #else
 #if 0
   static BSTR defaultHTML = SysAllocString(TEXT("<p style=\"background-color: #00FF00\">Testing</p><img src=\"http://webkit.org/images/icon-gold.png\" alt=\"Face\"><div style=\"border: solid blue; background: white;\" contenteditable=\"true\">div with blue border</div><ul><li>foo<li>bar<li>baz</ul><iframe src=\"http://www.wolfspelz.de\" style=\"width:100%;height:300px\" />"));
-  frame->loadHTMLString(defaultHTML, 0);
-  frame->Release();
+  pWebFrame_->loadHTMLString(defaultHTML, 0);
 #else
   static BSTR urlBStr = 0;
   //static BSTR urlBStr = SysAllocString(_T("http://www.wolfspelz.de"));
@@ -130,14 +139,12 @@ int WebView::Create(const String& sHtml, const String& sBase)
   if (FAILED(hr))
     goto exit;
 
-  hr = frame->loadRequest(request);
+  hr = pWebFrame_->loadRequest(request);
   if (FAILED(hr))
     goto exit;
 
   if (request)
     request->Release();
-
-  frame->Release();
 #endif
 #endif
 
@@ -161,6 +168,10 @@ exit:
 void WebView::Destroy()
 {
 #if defined(WIN32)
+  if (pWebFrame_) {
+    pWebFrame_->Release();
+    pWebFrame_ = 0;
+  }
   if (pWebKit_) {
     pWebKit_->Release();
     pWebKit_ = 0;
@@ -202,3 +213,106 @@ void WebView::SetVisibility(int bVisible)
 #endif // WIN32
   }
 }
+
+//------------------------------------
+
+String WebView::CallJSFunction(const String& sFunction, List& lArgs)
+{
+  String sResult;
+
+  JSGlobalContextRef runCtx = pWebFrame_->globalContext();
+
+  static JSStringRef methodName = 0;
+  if (!methodName)
+    methodName = JSStringCreateWithUTF8CString(sFunction);
+
+  JSObjectRef global = JSContextGetGlobalObject(runCtx);
+
+  JSValueRef* exception = 0;
+  JSValueRef sampleFunction = JSObjectGetProperty(runCtx, global, methodName, exception);
+  if (exception)
+    goto exit;
+
+  if (!JSValueIsObject(runCtx, sampleFunction))
+    goto exit;
+
+  JSObjectRef function = JSValueToObject(runCtx, sampleFunction, exception);
+  if (exception)
+    goto exit;
+
+  JSValueRef result = 0;
+
+  if (lArgs.length() > 0) {
+    AutoPtr<JSValueRef> pJSArgs(new JSValueRef[lArgs.length()]);
+    int nCnt = 0;
+    for (Elem* e = 0; (e = lArgs.Next(e)) != 0; ) {
+      pJSArgs[nCnt++] = JSValueMakeString (runCtx, JSStringCreateWithCharacters((LPCTSTR) e->getName(), e->getName().chars()));
+    }
+    result = JSObjectCallAsFunction (runCtx, function, global, lArgs.length(), pJSArgs.get(), exception);
+  } else {
+    result = JSObjectCallAsFunction (runCtx, function, global, 0, 0, exception);
+  }
+  if (exception)
+    goto exit;
+
+  // Convert the result into a string.
+  if (JSValueIsString(runCtx, result))
+  {
+    JSStringRef temp = JSValueToStringCopy (runCtx, result, exception);
+    if (exception)
+      goto exit;
+
+    sResult.set((PWSTR) JSStringGetCharactersPtr(temp), JSStringGetLength(temp));
+    JSStringRelease(temp);
+  }
+  else if (JSValueIsNumber(runCtx, result))
+  {
+    double temp = JSValueToNumber(runCtx, result, exception);
+    if (exception)
+      goto exit;
+
+    sResult.appendf("%g", temp);
+  }
+  else if (JSValueIsBoolean(runCtx, result))
+  {
+    bool temp = JSValueToBoolean(runCtx, result);
+    if (exception)
+      goto exit;
+
+    sResult = temp ? "true" : "false";
+  }
+
+exit:
+  return sResult;
+}
+
+//------------------------------------
+
+HRESULT WebView::QueryInterface(REFIID riid, void** ppvObject)
+{
+    *ppvObject = 0;
+    if (IsEqualIID(riid, IID_IUnknown))
+        *ppvObject = static_cast<IWebUIDelegate*>(this);
+    else if (IsEqualIID(riid, IID_IWebUIDelegate))
+        *ppvObject = static_cast<IWebUIDelegate*>(this);
+    else
+        return E_NOINTERFACE;
+
+    AddRef();
+    return S_OK;
+}
+
+ULONG WebView::AddRef(void)
+{
+    return ++nRefCount_;
+}
+
+ULONG WebView::Release(void)
+{
+    ULONG newRef = --nRefCount_;
+    if (!newRef)
+        delete this;
+
+    return newRef;
+}
+

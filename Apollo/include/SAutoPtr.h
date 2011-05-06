@@ -23,6 +23,7 @@ public:
   X& operator=(X* p);
 
   X& operator*() const;
+  X& operator[](int n) const;
   X* get(void) const;
   X* release(void);
   X* operator->() const;
@@ -82,6 +83,11 @@ template<class X> SInline AutoPtr<X>::~AutoPtr(void)
 template<class X> SInline X& AutoPtr<X>::operator*() const
 {
   return *this->get();
+}
+
+template<class X> SInline X& AutoPtr<X>::operator[](int n) const
+{
+  return this->get()[n];
 }
 
 template<class X> SInline X* AutoPtr<X>::operator->() const
