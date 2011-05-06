@@ -210,25 +210,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "babelfish", "..\..\src\babe
 		Release.AspNetCompiler.Debug = "False"
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestDialog", "..\..\src\TestDialog\TestDialog.vcproj", "{E39213B4-9C24-46C0-BB01-5DBCCDF6DB45}"
-	ProjectSection(ProjectDependencies) = postProject
-		{9B3FBA6A-ED3F-479A-8919-A463882F19B1} = {9B3FBA6A-ED3F-479A-8919-A463882F19B1}
-	EndProjectSection
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "identity", "..\..\src\identity\identity.vcproj", "{C25A24A0-2F84-427A-96D4-3BB32207404C}"
-	ProjectSection(ProjectDependencies) = postProject
-		{9B3FBA6A-ED3F-479A-8919-A463882F19B1} = {9B3FBA6A-ED3F-479A-8919-A463882F19B1}
-	EndProjectSection
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ExDisplay", "..\..\src\ExDisplay\ExDisplay.vcproj", "{3F81FBAB-41CB-4426-AC93-FBDFC40CC21D}"
 	ProjectSection(ProjectDependencies) = postProject
 		{9B3FBA6A-ED3F-479A-8919-A463882F19B1} = {9B3FBA6A-ED3F-479A-8919-A463882F19B1}
 	EndProjectSection
@@ -473,18 +455,10 @@ Global
 		{823EE957-94FA-414C-A40D-C57316A27F2D}.Debug|Win32.Build.0 = Debug|Win32
 		{823EE957-94FA-414C-A40D-C57316A27F2D}.Release|Win32.ActiveCfg = Release|Win32
 		{823EE957-94FA-414C-A40D-C57316A27F2D}.Release|Win32.Build.0 = Release|Win32
-		{E39213B4-9C24-46C0-BB01-5DBCCDF6DB45}.Debug|Win32.ActiveCfg = Debug|Win32
-		{E39213B4-9C24-46C0-BB01-5DBCCDF6DB45}.Debug|Win32.Build.0 = Debug|Win32
-		{E39213B4-9C24-46C0-BB01-5DBCCDF6DB45}.Release|Win32.ActiveCfg = Release|Win32
-		{E39213B4-9C24-46C0-BB01-5DBCCDF6DB45}.Release|Win32.Build.0 = Release|Win32
 		{C25A24A0-2F84-427A-96D4-3BB32207404C}.Debug|Win32.ActiveCfg = Debug|Win32
 		{C25A24A0-2F84-427A-96D4-3BB32207404C}.Debug|Win32.Build.0 = Debug|Win32
 		{C25A24A0-2F84-427A-96D4-3BB32207404C}.Release|Win32.ActiveCfg = Release|Win32
 		{C25A24A0-2F84-427A-96D4-3BB32207404C}.Release|Win32.Build.0 = Release|Win32
-		{3F81FBAB-41CB-4426-AC93-FBDFC40CC21D}.Debug|Win32.ActiveCfg = Debug|Win32
-		{3F81FBAB-41CB-4426-AC93-FBDFC40CC21D}.Debug|Win32.Build.0 = Debug|Win32
-		{3F81FBAB-41CB-4426-AC93-FBDFC40CC21D}.Release|Win32.ActiveCfg = Release|Win32
-		{3F81FBAB-41CB-4426-AC93-FBDFC40CC21D}.Release|Win32.Build.0 = Release|Win32
 		{C300E246-C70B-403B-887F-D0B0E5D33393}.Debug|Win32.ActiveCfg = Debug|Win32
 		{C300E246-C70B-403B-887F-D0B0E5D33393}.Debug|Win32.Build.0 = Debug|Win32
 		{C300E246-C70B-403B-887F-D0B0E5D33393}.Release|Win32.ActiveCfg = Release|Win32
