@@ -51,7 +51,7 @@ WEBVIEW_API int Load(AP_MODULE_CALL* pModuleData)
   int ok = 0;
 
   WebViewModuleInstance::Delete();
-  if (WebViewModuleInstance::Get() != 0) { ok = WebViewModuleInstance::Get()->init(); }
+  if (WebViewModuleInstance::Get() != 0) { ok = WebViewModuleInstance::Get()->Init(); }
 
   return ok;
 }
@@ -63,7 +63,7 @@ WEBVIEW_API int UnLoad(AP_MODULE_CALL* pModuleData)
   int ok = 1;
 
   if (WebViewModuleInstance::Get() != 0) {
-    WebViewModuleInstance::Get()->exit();
+    WebViewModuleInstance::Get()->Exit();
     WebViewModuleInstance::Delete();
   }
 

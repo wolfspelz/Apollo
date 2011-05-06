@@ -8,20 +8,30 @@
 #define WebViewModule_H_INCLUDED
 
 #include "ApModule.h"
+#include "ApContainer.h"
 #include "MsgUnitTest.h"
-//#include "MsgWebView.h"
+#include "MsgSystem.h"
+#include "MsgWebView.h"
+#include "WebView.h"
+
+typedef ApHandlePointerTree<WebView*> WebViewList;
+typedef ApHandlePointerTreeNode<WebView*> WebViewListNode;
+typedef ApHandlePointerTreeIterator<WebView*> WebViewListIterator;
 
 class WebViewModule
 {
 public:
   WebViewModule()
-    :nTheAnswer_(42)
     {}
 
-  int init();
-  void exit();
+  int Init();
+  void Exit();
 
-  //void On_WebView_Get(Msg_WebView_Get* pMsg);
+  void On_WebView_Create(Msg_WebView_Create* pMsg);
+  void On_WebView_Destroy(Msg_WebView_Destroy* pMsg);
+  void On_WebView_Position(Msg_WebView_Position* pMsg);
+  void On_WebView_Visibility(Msg_WebView_Visibility* pMsg);
+  void On_System_3SecTimer(Msg_System_3SecTimer* pMsg);
 
 #if defined(AP_TEST)
   void On_UnitTest_Begin(Msg_UnitTest_Begin* pMsg);
@@ -30,7 +40,12 @@ public:
 #endif
 
 public:
-  int nTheAnswer_;
+  WebView* CreateWebView(const ApHandle& hWebView, const String& sHtml, const String& sBase);
+  void DeleteWebView(const ApHandle& hWebView);
+  WebView* FindWebView(const ApHandle& hWebView);
+
+public:
+  WebViewList webviews_;
 
   AP_MSG_REGISTRY_DECLARE;
 };

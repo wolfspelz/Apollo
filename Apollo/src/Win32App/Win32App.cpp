@@ -24,9 +24,10 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
   ::SetConsoleOutputCP(CP_UTF8);
 #endif
 
+  //apLog_SetMask(apLog_MaskSilent);
   //apLog_SetMask(apLog_MaskNoTrace);
-  apLog_SetMask(apLog_MaskMaxVerbose);
   //apLog_SetMask(apLog_MaskMaxInfo);
+  apLog_SetMask(apLog_MaskMaxVerbose);
   
   if (!Apollo::Init(__argc, __argv)) {
     apLog_Alert(("Main", "WinMain", "Apollo::Init() failed"));

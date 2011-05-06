@@ -10,31 +10,103 @@
 #include "Local.h"
 #include "WebViewModule.h"
 
-// Replace regex: 
-// \(Msg_[a-zA-Z]+_[^ *]+\* pMsg\)
+WebView* WebViewModule::CreateWebView(const ApHandle& hWebView, const String& sHtml, const String& sBase)
+{
+  WebView* pWebView = new WebView(hWebView);
+  if (pWebView) {
+    int ok = pWebView->Create(sHtml, sBase);
+    if (ok) {
+      webviews_.Set(hWebView, pWebView);
+    } else {
+      delete pWebView;
+      pWebView = 0;
+      throw ApException("WebViewModule::CreateWebView " ApHandleFormat " Create() failed", ApHandleType(hWebView));
+    }
+  }
 
-//AP_MSG_HANDLER_METHOD(WebViewModule, WebView_Get)
-//{
-//  String sSomeConfigValue;
-//  Msg_Config_GetValue msg;
-//  msg.sPath = "path";
-//  msg.Request();
-//  sSomeConfigValue = msg.sValue;
-//
-//  sSomeConfigValue = Apollo::getConfig("path", "default");
-//
-//  pMsg->nValue = nTheAnswer_;
-//  pMsg->apStatus = ApMessage::Ok;
-//}
+  return pWebView;
+}
+
+void WebViewModule::DeleteWebView(const ApHandle& hWebView)
+{
+  WebView* pWebView = FindWebView(hWebView);
+  if (pWebView) {
+    pWebView->Destroy();
+    webviews_.Unset(hWebView);
+    delete pWebView;
+    pWebView = 0;
+  }
+}
+
+WebView* WebViewModule::FindWebView(const ApHandle& hWebView)
+{
+  WebView* pWebView = 0;  
+
+  webviews_.Get(hWebView, pWebView);
+  if (pWebView == 0) { throw ApException("WebViewModule::FindWebView no scene=" ApHandleFormat "", ApHandleType(hWebView)); }
+
+  return pWebView;
+}
+
+//---------------------------
+
+AP_MSG_HANDLER_METHOD(WebViewModule, WebView_Create)
+{
+  if (webviews_.Find(pMsg->hWebView) != 0) { throw ApException("WebViewModule::WebView_Create: scene=" ApHandleFormat " already exists", ApHandleType(pMsg->hWebView)); }
+  WebView* pWebView = CreateWebView(pMsg->hWebView, pMsg->sHtml, pMsg->sBase);
+  pMsg->apStatus = ApMessage::Ok;
+}
+
+AP_MSG_HANDLER_METHOD(WebViewModule, WebView_Destroy)
+{
+  WebView* pWebView = FindWebView(pMsg->hWebView);
+  DeleteWebView(pMsg->hWebView); 
+  pMsg->apStatus = ApMessage::Ok;
+}
+
+AP_MSG_HANDLER_METHOD(WebViewModule, WebView_Position)
+{
+  WebView* pWebView = FindWebView(pMsg->hWebView);
+  pWebView->SetPosition(pMsg->nX, pMsg->nY, pMsg->nW, pMsg->nH);
+  pMsg->apStatus = ApMessage::Ok;
+}
+
+AP_MSG_HANDLER_METHOD(WebViewModule, WebView_Visibility)
+{
+  WebView* pWebView = FindWebView(pMsg->hWebView);
+  pWebView->SetVisibility(pMsg->bVisible);
+  pMsg->apStatus = ApMessage::Ok;
+}
+
+int g_nCnt = 0;
+AP_MSG_HANDLER_METHOD(WebViewModule, System_3SecTimer)
+{
+  WebViewListNode *pNode = webviews_.Next(0);
+  if (pNode) {
+    ApHandle hWebView = pNode->Key();
+    WebView* pWebView = pNode->Value();
+
+    if (pWebView) {
+      //if (g_nCnt++ == 3) {
+      //  Msg_WebView_Destroy::_(hWebView);
+      //}
+
+      pWebView->SetVisibility(g_nCnt++ % 2 == 0 ? 1 : 0);
+    }    
+  }
+}
 
 //----------------------------------------------------------
 
 #if defined(AP_TEST)
 
+#include "WebViewModuleTester.h"
+
 AP_MSG_HANDLER_METHOD(WebViewModule, UnitTest_Begin)
 {
   AP_UNUSED_ARG(pMsg);
   if (Apollo::getConfig("Test/WebView", 0)) {
+    WebViewModuleTester::Begin();
   }
 }
 
@@ -42,20 +114,21 @@ AP_MSG_HANDLER_METHOD(WebViewModule, UnitTest_Execute)
 {
   AP_UNUSED_ARG(pMsg);
   if (Apollo::getConfig("Test/WebView", 0)) {
+    WebViewModuleTester::Execute();
   }
 }
 
 AP_MSG_HANDLER_METHOD(WebViewModule, UnitTest_End)
 {
   AP_UNUSED_ARG(pMsg);
+  if (Apollo::getConfig("Test/WebView", 0)) {
+    WebViewModuleTester::End();
+  }
 }
 
 #endif // #if defined(AP_TEST)
 
 //----------------------------------------------------------
-
-#include <WebKit/WebKit.h>
-#include <WebKit/WebKitCOMAPI.h>
 
 #include <shlwapi.h>
 #include <wininet.h>
@@ -65,7 +138,7 @@ HWND gViewWindow = NULL;
 
 void CreateHUD()
 {
-  RECT clientRect = { 100, 100, 800, 800 };
+  RECT clientRect = { -10000, 100, 800, 800 };
 
   IWebViewPrivate* webViewPrivate = 0;
   IWebMutableURLRequest* request = 0;
@@ -168,7 +241,7 @@ exit:
     webViewPrivate->Release();
 }
 
-int WebViewModule::init()
+int WebViewModule::Init()
 {
   int ok = 1;
 
@@ -176,15 +249,19 @@ int WebViewModule::init()
   ::OleInitialize(NULL);
 #endif
 
-  CreateHUD();
+  //CreateHUD();
 
-  //AP_MSG_REGISTRY_ADD(MODULE_NAME, WebViewModule, WebView_Get, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, WebViewModule, WebView_Create, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, WebViewModule, WebView_Destroy, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, WebViewModule, WebView_Position, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, WebViewModule, WebView_Visibility, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, WebViewModule, System_3SecTimer, this, ApCallbackPosNormal);
   AP_UNITTEST_HOOK(WebViewModule, this);
 
   return ok;
 }
 
-void WebViewModule::exit()
+void WebViewModule::Exit()
 {
   AP_UNITTEST_UNHOOK(WebViewModule, this);
   AP_MSG_REGISTRY_FINISH;

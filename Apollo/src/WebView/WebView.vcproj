@@ -163,7 +163,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\WebView.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\WebViewModule.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\WebViewModuleTester.cpp"
 				>
 			</File>
 		</Filter>
@@ -181,7 +189,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\WebView.h"
+				>
+			</File>
+			<File
 				RelativePath=".\WebViewModule.h"
+				>
+			</File>
+			<File
+				RelativePath=".\WebViewModuleTester.h"
 				>
 			</File>
 		</Filter>
