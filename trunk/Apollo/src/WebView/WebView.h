@@ -48,7 +48,6 @@ public:
     ,hWnd_(NULL)
     ,nRefCount_(0)
     ,pTopLoadingFrame_(0)
-    ,bDocumentLoaded_(0)
     ,pScriptObject_(0)
     #endif // WIN32
   {}
@@ -87,7 +86,6 @@ protected:
   int nRefCount_;
 
   IWebFrame* pTopLoadingFrame_;
-  int bDocumentLoaded_;
   JSObjectRef pScriptObject_;
 #endif // WIN32
 

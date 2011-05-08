@@ -248,12 +248,12 @@ String WebView::CallJSFunction(const String& sFunction, List& lArgs)
   JSValueRef result = 0;
 
   if (lArgs.length() > 0) {
-    AutoPtr<JSValueRef> pJSArgs(new JSValueRef[lArgs.length()]);
+    AutoPtr<JSValueRef> args(new JSValueRef[lArgs.length()]);
     int nCnt = 0;
     for (Elem* e = 0; (e = lArgs.Next(e)) != 0; ) {
-      pJSArgs[nCnt++] = JSValueMakeString (runCtx, JSStringCreateWithCharacters((LPCTSTR) e->getName(), e->getName().chars()));
+      args[nCnt++] = JSValueMakeString (runCtx, JSStringCreateWithCharacters((LPCTSTR) e->getName(), e->getName().chars()));
     }
-    result = JSObjectCallAsFunction (runCtx, function, global, lArgs.length(), pJSArgs.get(), exception);
+    result = JSObjectCallAsFunction (runCtx, function, global, lArgs.length(), args.get(), exception);
     if (exception) goto exit;
   } else {
     result = JSObjectCallAsFunction (runCtx, function, global, 0, 0, exception);
@@ -263,23 +263,23 @@ String WebView::CallJSFunction(const String& sFunction, List& lArgs)
   // Convert the result into a string.
   if (result) {
     if (JSValueIsString(runCtx, result)) {
-      JSStringRef temp = JSValueToStringCopy (runCtx, result, exception);
+      JSStringRef value = JSValueToStringCopy (runCtx, result, exception);
       if (exception) goto exit;
 
-      sResult.set((PWSTR) JSStringGetCharactersPtr(temp), JSStringGetLength(temp));
-      JSStringRelease(temp);
+      sResult.set((PWSTR) JSStringGetCharactersPtr(value), JSStringGetLength(value));
+      JSStringRelease(value);
 
     } else if (JSValueIsNumber(runCtx, result)) {
-      double temp = JSValueToNumber(runCtx, result, exception);
+      double value = JSValueToNumber(runCtx, result, exception);
       if (exception) goto exit;
 
-      sResult.appendf("%g", temp);
+      sResult.appendf("%g", value);
 
     } else if (JSValueIsBoolean(runCtx, result))  {
-      bool temp = JSValueToBoolean(runCtx, result);
+      bool value = JSValueToBoolean(runCtx, result);
       if (exception) goto exit;
 
-      sResult = temp ? "true" : "false";
+      sResult = value ? "true" : "false";
     }
   }
 
@@ -304,8 +304,8 @@ JSClassRef JS_apollo_class()
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
   };
 
-  static JSClassRef pApolloClass = JSClassCreate(&JS_apollo_class);
-  return pApolloClass;
+  static JSClassRef apolloClass = JSClassCreate(&JS_apollo_class);
+  return apolloClass;
 }
 
 static JSValueRef JS_apollo_echo(JSContextRef ctx, JSObjectRef function, JSObjectRef thisObject, size_t argumentCount, const JSValueRef* arguments, JSValueRef* exception)
@@ -317,43 +317,43 @@ static JSValueRef JS_apollo_echo(JSContextRef ctx, JSObjectRef function, JSObjec
   // Convert the result into a string for display.
   if (!JSValueIsString(ctx, arguments[0])) return JSValueMakeUndefined(ctx);
 
-  JSStringRef pArg = JSValueToStringCopy (ctx, arguments[0], exception);
+  JSStringRef arg0 = JSValueToStringCopy (ctx, arguments[0], exception);
   if (exception && *exception) return JSValueMakeUndefined(ctx);
 
   String sText;
-  sText.set((PWSTR) JSStringGetCharactersPtr(pArg), JSStringGetLength(pArg));
+  sText.set((PWSTR) JSStringGetCharactersPtr(arg0), JSStringGetLength(arg0));
   sText += " (JS_apollo_echo)";
 
-  JSStringRelease(pArg);
+  JSStringRelease(arg0);
 
-  JSStringRef pText = JSStringCreateWithUTF8CString(sText);
-  JSValueRef pValue = JSValueMakeString(ctx, pText);
-  JSStringRelease(pText);
+  JSStringRef text = JSStringCreateWithUTF8CString(sText);
+  JSValueRef value = JSValueMakeString(ctx, text);
+  JSStringRelease(text);
 
-  return pValue;
+  return value;
 }
 
 void WebView::MakeScriptObject()
 {
   if (!pWebFrame_) return;
 
-  JSGlobalContextRef pRunCtx = pWebFrame_->globalContext();
-  if (pRunCtx == 0) return;
+  JSGlobalContextRef runCtx = pWebFrame_->globalContext();
+  if (runCtx == 0) return;
 
-  JSObjectRef pGlobal = JSContextGetGlobalObject(pRunCtx);
+  JSObjectRef pGlobal = JSContextGetGlobalObject(runCtx);
   if (pGlobal == 0) return;
 
-  JSClassRef pApolloClass = JS_apollo_class();
-  if (pApolloClass == 0) return;
+  JSClassRef apolloClass = JS_apollo_class();
+  if (apolloClass == 0) return;
 
-  pScriptObject_ = JSObjectMake(pRunCtx, pApolloClass, reinterpret_cast<void*>(this));
+  pScriptObject_ = JSObjectMake(runCtx, apolloClass, reinterpret_cast<void*>(this));
   if (pScriptObject_ == 0) return;
 
-  JSStringRef pApolloName = JSStringCreateWithUTF8CString("apollo");
-  if (pApolloName == 0) return;
+  JSStringRef apolloName = JSStringCreateWithUTF8CString("apollo");
+  if (apolloName == 0) return;
 
-  JSObjectSetProperty(pRunCtx, pGlobal, pApolloName, pScriptObject_, kJSPropertyAttributeNone, 0);
-  JSStringRelease(pApolloName);
+  JSObjectSetProperty(runCtx, pGlobal, apolloName, pScriptObject_, kJSPropertyAttributeNone, 0);
+  JSStringRelease(apolloName);
 }
 
 //------------------------------------
@@ -396,10 +396,6 @@ HRESULT WebView::didStartProvisionalLoadForFrame(IWebView* webView, IWebFrame* f
     pTopLoadingFrame_ = frame;
 
     MakeScriptObject();
-
-    ApAsyncMessage<Msg_WebView_Event_DocumentLoaded> msg;
-    msg->hWebView = apHandle();
-    msg.Post();
   }
 
  return S_OK;
@@ -408,7 +404,9 @@ HRESULT WebView::didStartProvisionalLoadForFrame(IWebView* webView, IWebFrame* f
 HRESULT WebView::didFinishDocumentLoadForFrame(IWebView *sender, IWebFrame *frame)
 {
   if (pTopLoadingFrame_ == frame) {
-    bDocumentLoaded_ = 1;
+    ApAsyncMessage<Msg_WebView_Event_DocumentLoaded> msg;
+    msg->hWebView = apHandle();
+    msg.Post();
   }
 
 #if 0
@@ -441,6 +439,24 @@ HRESULT WebView::didFinishLoadForFrame(IWebView* webView, IWebFrame* frame)
     msg.Post();
   }
 
+#if 0
+  HRESULT hr = S_OK;
+
+  IWebDataSource* dataSource = 0;
+  hr = frame->dataSource(&dataSource);
+  if (FAILED(hr)) goto exit;
+
+  IWebMutableURLRequest* request = 0;
+  hr = dataSource->request(&request);
+  if (FAILED(hr)) goto exit;
+
+  BSTR bstrUrl = 0;
+  hr = request->URL(&bstrUrl);
+  if (FAILED(hr)) goto exit;
+
+  apLog_Debug((LOG_CHANNEL, "WebView::didFinishLoadForFrame", "%s", StringType(StringFromBSTR(bstrUrl))));
+exit:
+#endif
  return S_OK;
 }
 
