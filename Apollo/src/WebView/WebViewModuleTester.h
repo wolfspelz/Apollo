@@ -24,7 +24,6 @@ public:
 
   static void On_LoadHtml_WebView_Event_DocumentComplete(Msg_WebView_Event_DocumentComplete* pMsg);
   static void On_CallJSEcho_WebView_Event_DocumentLoaded(Msg_WebView_Event_DocumentLoaded* pMsg);
-  static void On_CallJSEcho_WebView_Event_DocumentComplete(Msg_WebView_Event_DocumentComplete* pMsg);
 };
 #endif
 

@@ -19,7 +19,7 @@ void WebViewModuleTester::On_LoadHtml_WebView_Event_DocumentComplete(Msg_WebView
 {
   if (pMsg->hWebView != g_LoadHtml_hWebView) { return; }
 
-  //Msg_WebView_Destroy::_(pMsg->hWebView);  
+  Msg_WebView_Destroy::_(pMsg->hWebView);  
   { Msg_WebView_Event_DocumentComplete msg; msg.UnHook(MODULE_NAME, (ApCallback) WebViewModuleTester::On_LoadHtml_WebView_Event_DocumentComplete, 0); }
 }
 
@@ -59,7 +59,7 @@ String WebViewModuleTester::LoadHtml()
     , "file://" + Apollo::getAppBasePath()
     )) { s = "Msg_WebView_LoadHtml failed"; }}
 
-  if (!s) { if (!Msg_WebView_Position::_(hWebView, 200, 200, 400, 300)) { s = "Msg_WebView_Position failed"; }}
+  if (!s) { if (!Msg_WebView_Position::_(hWebView, 100, 200, 400, 300)) { s = "Msg_WebView_Position failed"; }}
   if (!s) { if (!Msg_WebView_Visibility::_(hWebView, 1)) { s = "Msg_WebView_Visibility failed"; }}
 
   if (0) {
@@ -78,10 +78,8 @@ void WebViewModuleTester::On_CallJSEcho_WebView_Event_DocumentLoaded(Msg_WebView
   if (pMsg->hWebView != g_CallJSEcho_hWebView) { return; }
 
   int ok = 0;
-
   String sIn = "Hello World";
   String sOutExpected = "Hello World" " (JS.test_echo)" " (JS_apollo_echo)";
-
   Msg_WebView_CallJavaScriptFunction msg;
   msg.hWebView = pMsg->hWebView;
   msg.sMethod = "test_echo";
@@ -91,19 +89,11 @@ void WebViewModuleTester::On_CallJSEcho_WebView_Event_DocumentLoaded(Msg_WebView
       ok = 1;
     }
   }
-
   String s; if (!ok) { s = "received=" + msg.sResult + " expected=" + sOutExpected; }
   AP_UNITTEST_RESULT(WebViewModuleTester::CallJSEcho_Result, ok, s);
 
+  Msg_WebView_Destroy::_(pMsg->hWebView);  
   { Msg_WebView_Event_DocumentLoaded msg; msg.UnHook(MODULE_NAME, (ApCallback) WebViewModuleTester::On_CallJSEcho_WebView_Event_DocumentLoaded, 0); }
-}
-
-void WebViewModuleTester::On_CallJSEcho_WebView_Event_DocumentComplete(Msg_WebView_Event_DocumentComplete* pMsg)
-{
-  if (pMsg->hWebView != g_CallJSEcho_hWebView) { return; }
-
-  //Msg_WebView_Destroy::_(pMsg->hWebView);  
-  { Msg_WebView_Event_DocumentComplete msg; msg.UnHook(MODULE_NAME, (ApCallback) WebViewModuleTester::On_CallJSEcho_WebView_Event_DocumentComplete, 0); }
 }
 
 String WebViewModuleTester::CallJSEcho()
@@ -114,7 +104,6 @@ String WebViewModuleTester::CallJSEcho()
   g_CallJSEcho_hWebView = hWebView;
 
   { Msg_WebView_Event_DocumentLoaded msg; msg.Hook(MODULE_NAME, (ApCallback) WebViewModuleTester::On_CallJSEcho_WebView_Event_DocumentLoaded, 0, ApCallbackPosNormal); }
-  { Msg_WebView_Event_DocumentComplete msg; msg.Hook(MODULE_NAME, (ApCallback) WebViewModuleTester::On_CallJSEcho_WebView_Event_DocumentComplete, 0, ApCallbackPosNormal); }
 
   if (!s) { if (!Msg_WebView_Create::_(hWebView)) { s = "Msg_WebView_Create failed"; }}
   //if (!s) { if (!Msg_WebView_LoadHtml::_(hWebView, "<script>function test_echo(s) { return apollo.echo(s + ' (JS.test_echo)'); }</script>", "file://" + Apollo::getAppBasePath())) { s = "Msg_WebView_LoadHtml failed"; }}
@@ -141,7 +130,7 @@ String WebViewModuleTester::CallJSEcho()
     , "file://" + Apollo::getAppBasePath()
     )) { s = "Msg_WebView_LoadHtml failed"; }}
 
-  if (!s) { if (!Msg_WebView_Position::_(hWebView, 200, 500, 400, 300)) { s = "Msg_WebView_Position failed"; }}
+  if (!s) { if (!Msg_WebView_Position::_(hWebView, 100, 500, 400, 300)) { s = "Msg_WebView_Position failed"; }}
   if (!s) { if (!Msg_WebView_Visibility::_(hWebView, 1)) { s = "Msg_WebView_Visibility failed"; }}
 
   return s;
