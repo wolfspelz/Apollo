@@ -16,17 +16,13 @@ class Msg_WebView_Create: public ApRequestMessage
 {
 public:
   Msg_WebView_Create() : ApRequestMessage("WebView_Create") {}
-  static int _(const ApHandle& hWebView, const String& sHtml, const String& sBase)
+  static int _(const ApHandle& hWebView)
   {
     Msg_WebView_Create msg;
     msg.hWebView = hWebView;
-    msg.sHtml = sHtml;
-    msg.sBase = sBase;
     return msg.Request();
   }
   ApIN ApHandle hWebView;
-  ApIN String sHtml;
-  ApIN String sBase;
 };
 
 class Msg_WebView_Destroy: public ApRequestMessage
@@ -76,6 +72,67 @@ public:
   }
   ApIN ApHandle hWebView;
   ApIN int bVisible;
+};
+
+class Msg_WebView_LoadHtml: public ApRequestMessage
+{
+public:
+  Msg_WebView_LoadHtml() : ApRequestMessage("WebView_LoadHtml") {}
+  static int _(const ApHandle& hWebView, const String& sHtml, const String& sBase)
+  {
+    Msg_WebView_LoadHtml msg;
+    msg.hWebView = hWebView;
+    msg.sHtml = sHtml;
+    msg.sBase = sBase;
+    return msg.Request();
+  }
+  ApIN ApHandle hWebView;
+  ApIN String sHtml;
+  ApIN String sBase;
+};
+
+class Msg_WebView_Load: public ApRequestMessage
+{
+public:
+  Msg_WebView_Load() : ApRequestMessage("WebView_Load") {}
+  static int _(const ApHandle& hWebView, const String& sUrl)
+  {
+    Msg_WebView_Load msg;
+    msg.hWebView = hWebView;
+    msg.sUrl = sUrl;
+    return msg.Request();
+  }
+  ApIN ApHandle hWebView;
+  ApIN String sUrl;
+};
+
+class Msg_WebView_CallJavaScriptFunction: public ApRequestMessage
+{
+public:
+  Msg_WebView_CallJavaScriptFunction() : ApRequestMessage("WebView_CallJavaScriptFunction") {}
+  ApIN ApHandle hWebView;
+  ApIN String sMethod;
+  ApIN List lArgs;
+  ApOUT String sResult;
+};
+
+//--------------------------
+// Events
+
+// WebView ->
+class Msg_WebView_Event_DocumentLoaded: public ApNotificationMessage
+{
+public:
+  Msg_WebView_Event_DocumentLoaded() : ApNotificationMessage("WebView_Event_DocumentLoaded") {}
+  ApIN ApHandle hWebView;
+};
+
+// WebView ->
+class Msg_WebView_Event_DocumentComplete: public ApNotificationMessage
+{
+public:
+  Msg_WebView_Event_DocumentComplete() : ApNotificationMessage("WebView_Event_DocumentComplete") {}
+  ApIN ApHandle hWebView;
 };
 
 #endif // !defined(MsgWebView_h_INCLUDED)

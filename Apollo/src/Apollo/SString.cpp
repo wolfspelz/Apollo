@@ -21,6 +21,12 @@ String::String(const PWSTR wzBegin)
   init();
   operator=(wzBegin);
 }
+
+String::String(const PWSTR wzBegin, size_t nLen)
+{
+  init();
+  set(wzBegin, nLen);
+}
 #endif
 
 String::String(String const &s)

@@ -10,20 +10,66 @@
 #include <WebKit/WebKit.h>
 #include <WebKit/WebKitCOMAPI.h>
 
-class WebView : public IWebUIDelegate, IWebFrameLoadDelegate
+//template<typename T> class SComPtr
+//{
+//public:
+//  SComPtr() : p_(0) { }
+//  SComPtr(T* p) : p_(p) { if (p_) p_->AddRef(); }
+//  SComPtr(const SComPtr& o) : p_(o.p_) { if (T* p = p_) p->AddRef(); }
+//  ~SComPtr() { if (p_) p_->Release(); }
+//
+//  inline T* get() const { return p_; }
+//  inline T& operator*() const { return *p_; }
+//  inline T* operator->() const { return p_; }
+//  inline T** operator&() { return &p_; }
+//  inline bool operator!() const { return !p_; }
+//  inline bool operator==(const SComPtr<T>& o) { return get() == o.get(); }
+//
+//private:
+//  T* p_;
+//};
+
+//------------------------------------
+
+class WebView : public IWebUIDelegate, IWebFrameLoadDelegate, IWebFrameLoadDelegatePrivate
 {
 public:
-  WebView(const ApHandle& hWebView);
+  WebView::WebView(const ApHandle& hWebView)
+    :hAp_(hWebView)
+    ,bVisible_(0)
+    ,nX_(100)
+    ,nY_(100)
+    ,nW_(600)
+    ,nH_(400)
+    #if defined(WIN32)
+    ,pWebView_(0)
+    ,pWebFrame_(0)
+    ,pWebViewPrivate_(0)
+    ,hWnd_(NULL)
+    ,nRefCount_(0)
+    ,pTopLoadingFrame_(0)
+    ,bDocumentLoaded_(0)
+    ,pScriptObject_(0)
+    #endif // WIN32
+  {}
   virtual ~WebView();
 
   inline ApHandle apHandle() { return hAp_; }
 
-  int Create(const String& sHtml, const String& sBase);
+  int Create();
   void Destroy();
+
   void SetPosition(int nX, int nY, int nW, int nH);
   void SetVisibility(int bVisible);
 
+  int LoadHtml(const String& sHtml, const String& sBase);
+  int Load(const String& sUrl);
+
   String CallJSFunction(const String& sFunction, List& lArgs);
+
+protected:
+  void MakeScriptObject();
+  static String StringFromBSTR(BSTR bStr);
 
 protected:
   ApHandle hAp_;
@@ -33,10 +79,16 @@ protected:
   int nW_;
   int nH_;
 
-  IWebView* pWebKit_;
-  IWebFrame* pWebFrame_;
 #if defined(WIN32)
+  IWebView* pWebView_;
+  IWebFrame* pWebFrame_;
+  IWebViewPrivate* pWebViewPrivate_;
   HWND hWnd_;
+  int nRefCount_;
+
+  IWebFrame* pTopLoadingFrame_;
+  int bDocumentLoaded_;
+  JSObjectRef pScriptObject_;
 #endif // WIN32
 
 #if defined(AP_TEST)
@@ -44,7 +96,6 @@ protected:
 #endif
 
 public:
-  int nRefCount_; 
 
   // IUnknown
   virtual HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid, void** ppvObject);
@@ -117,75 +168,28 @@ public:
   virtual HRESULT STDMETHODCALLTYPE paintCustomScrollCorner(IWebView*, HDC, RECT) { return E_NOTIMPL; }
 
   // IWebFrameLoadDelegate
-  virtual HRESULT STDMETHODCALLTYPE didStartProvisionalLoadForFrame( 
-    /* [in] */ IWebView* webView,
-    /* [in] */ IWebFrame* /*frame*/) { return S_OK; }
+  virtual HRESULT STDMETHODCALLTYPE didStartProvisionalLoadForFrame(IWebView* webView, IWebFrame* frame);
+  virtual HRESULT STDMETHODCALLTYPE didReceiveServerRedirectForProvisionalLoadForFrame(IWebView *webView, IWebFrame *frame) { return S_OK; }
+  virtual HRESULT STDMETHODCALLTYPE didFailProvisionalLoadWithError(IWebView *webView, IWebError *error, IWebFrame *frame) { return S_OK; }
+  virtual HRESULT STDMETHODCALLTYPE didCommitLoadForFrame(IWebView *webView, IWebFrame *frame) { return S_OK; }
+  virtual HRESULT STDMETHODCALLTYPE didReceiveTitle(IWebView *webView, BSTR title, IWebFrame *frame) { return S_OK; }
+  virtual HRESULT STDMETHODCALLTYPE didChangeIcons(IWebView *webView, IWebFrame *frame) { return S_OK; }
+  virtual HRESULT STDMETHODCALLTYPE didReceiveIcon(IWebView *webView, OLE_HANDLE hBitmap, IWebFrame *frame) { return S_OK; }
+  virtual HRESULT STDMETHODCALLTYPE didFinishLoadForFrame(IWebView* webView, IWebFrame* frame);
+  virtual HRESULT STDMETHODCALLTYPE didFailLoadWithError(IWebView *webView, IWebError *error, IWebFrame *forFrame) { return S_OK; }
+  virtual HRESULT STDMETHODCALLTYPE didChangeLocationWithinPageForFrame(IWebView *webView, IWebFrame *frame) { return S_OK; }
+  virtual HRESULT STDMETHODCALLTYPE willPerformClientRedirectToURL(IWebView *webView, BSTR url, double delaySeconds, DATE fireDate, IWebFrame *frame) { return S_OK; }
+  virtual HRESULT STDMETHODCALLTYPE didCancelClientRedirectForFrame(IWebView *webView, IWebFrame *frame) { return S_OK; }
+  virtual HRESULT STDMETHODCALLTYPE willCloseFrame(IWebView *webView, IWebFrame *frame) { return S_OK; }
+  virtual HRESULT STDMETHODCALLTYPE windowScriptObjectAvailable(IWebView *webView, JSContextRef context, JSObjectRef windowScriptObject)  { return S_OK; }
+  virtual HRESULT STDMETHODCALLTYPE didClearWindowObject(IWebView *webView, JSContextRef context, JSObjectRef windowScriptObject, IWebFrame *frame) { return S_OK; }
 
-  virtual HRESULT STDMETHODCALLTYPE didReceiveServerRedirectForProvisionalLoadForFrame( 
-    /* [in] */ IWebView *webView,
-    /* [in] */ IWebFrame *frame) { return S_OK; }
+  // IWebFrameLoadDelegatePrivate
+  virtual HRESULT STDMETHODCALLTYPE didFinishDocumentLoadForFrame(IWebView *sender, IWebFrame *frame);
+  virtual HRESULT STDMETHODCALLTYPE didFirstLayoutInFrame(IWebView *sender, IWebFrame *frame) { return S_OK; }
+  virtual HRESULT STDMETHODCALLTYPE didHandleOnloadEventsForFrame(IWebView *sender, IWebFrame *frame) { return S_OK; }
+  virtual HRESULT STDMETHODCALLTYPE didFirstVisuallyNonEmptyLayoutInFrame(IWebView *sender, IWebFrame *frame) { return S_OK; }
 
-  virtual HRESULT STDMETHODCALLTYPE didFailProvisionalLoadWithError( 
-    /* [in] */ IWebView *webView,
-    /* [in] */ IWebError *error,
-    /* [in] */ IWebFrame *frame) { return S_OK; }
-
-  virtual HRESULT STDMETHODCALLTYPE didCommitLoadForFrame( 
-    /* [in] */ IWebView *webView,
-    /* [in] */ IWebFrame *frame) { return S_OK; }
-
-  virtual HRESULT STDMETHODCALLTYPE didReceiveTitle( 
-    /* [in] */ IWebView *webView,
-    /* [in] */ BSTR title,
-    /* [in] */ IWebFrame *frame) { return S_OK; }
-
-  virtual HRESULT STDMETHODCALLTYPE didChangeIcons(
-    /* [in] */ IWebView *webView,
-    /* [in] */ IWebFrame *frame) { return S_OK; }
-
-  virtual HRESULT STDMETHODCALLTYPE didReceiveIcon( 
-    /* [in] */ IWebView *webView,
-    /* [in] */ OLE_HANDLE hBitmap,
-    /* [in] */ IWebFrame *frame) { return S_OK; }
-
-  virtual HRESULT STDMETHODCALLTYPE didFinishLoadForFrame( 
-    /* [in] */ IWebView* webView,
-    /* [in] */ IWebFrame* /*frame*/) { return S_OK; }
-
-  virtual HRESULT STDMETHODCALLTYPE didFailLoadWithError( 
-    /* [in] */ IWebView *webView,
-    /* [in] */ IWebError *error,
-    /* [in] */ IWebFrame *forFrame) { return S_OK; }
-
-  virtual HRESULT STDMETHODCALLTYPE didChangeLocationWithinPageForFrame( 
-    /* [in] */ IWebView *webView,
-    /* [in] */ IWebFrame *frame) { return S_OK; }
-
-  virtual HRESULT STDMETHODCALLTYPE willPerformClientRedirectToURL( 
-    /* [in] */ IWebView *webView,
-    /* [in] */ BSTR url,
-    /* [in] */ double delaySeconds,
-    /* [in] */ DATE fireDate,
-    /* [in] */ IWebFrame *frame) { return S_OK; }
-
-  virtual HRESULT STDMETHODCALLTYPE didCancelClientRedirectForFrame( 
-    /* [in] */ IWebView *webView,
-    /* [in] */ IWebFrame *frame) { return S_OK; }
-
-  virtual HRESULT STDMETHODCALLTYPE willCloseFrame( 
-    /* [in] */ IWebView *webView,
-    /* [in] */ IWebFrame *frame) { return S_OK; }
-
-  virtual /* [local] */ HRESULT STDMETHODCALLTYPE windowScriptObjectAvailable( 
-    /* [in] */ IWebView *webView,
-    /* [in] */ JSContextRef context,
-    /* [in] */ JSObjectRef windowScriptObject)  { return S_OK; }
-
-  virtual /* [local] */ HRESULT STDMETHODCALLTYPE didClearWindowObject( 
-    /* [in] */ IWebView *webView,
-    /* [in] */ JSContextRef context,
-    /* [in] */ JSObjectRef windowScriptObject,
-    /* [in] */ IWebFrame *frame) { return S_OK; }
 };
 
 #endif // WebView_H_INCLUDED
