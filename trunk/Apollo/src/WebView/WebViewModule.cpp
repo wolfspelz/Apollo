@@ -110,6 +110,20 @@ AP_MSG_HANDLER_METHOD(WebViewModule, WebView_SetScriptAccess)
   pMsg->apStatus = ApMessage::Ok;
 }
 
+AP_MSG_HANDLER_METHOD(WebViewModule, WebView_MoveBy)
+{
+  View* pView = FindView(pMsg->hView);
+  pView->MoveBy(pMsg->nX, pMsg->nY);
+  pMsg->apStatus = ApMessage::Ok;
+}
+
+AP_MSG_HANDLER_METHOD(WebViewModule, WebView_SizeBy)
+{
+  View* pView = FindView(pMsg->hView);
+  pView->SizeBy(pMsg->nW, pMsg->nH, pMsg->nDirection);
+  pMsg->apStatus = ApMessage::Ok;
+}
+
 int g_nCnt = 0;
 AP_MSG_HANDLER_METHOD(WebViewModule, System_3SecTimer)
 {
@@ -130,6 +144,35 @@ AP_MSG_HANDLER_METHOD(WebViewModule, System_3SecTimer)
       //lArgs.AddLast("def");
       //String s = pView->CallJSFunction("Concat", lArgs);
     }
+  }
+}
+
+//----------------------------------------------------------
+
+void SrpcGate_WebView_MoveBy(ApSRPCMessage* pMsg)
+{
+  Msg_WebView_MoveBy msg;
+  msg.hView = Apollo::string2Handle(pMsg->srpc.getString("hView"));
+  msg.nX =pMsg->srpc.getInt("nX");
+  msg.nY =pMsg->srpc.getInt("nY");
+  if (!msg.Request()) {
+    pMsg->response.createError(pMsg->srpc, msg.sComment);
+  } else {
+    pMsg->response.createResponse(pMsg->srpc);
+  }
+}
+
+void SrpcGate_WebView_SizeBy(ApSRPCMessage* pMsg)
+{
+  Msg_WebView_SizeBy msg;
+  msg.hView = Apollo::string2Handle(pMsg->srpc.getString("hView"));
+  msg.nW =pMsg->srpc.getInt("nW");
+  msg.nH =pMsg->srpc.getInt("nH");
+  msg.nDirection =pMsg->srpc.getInt("nDirection");
+  if (!msg.Request()) {
+    pMsg->response.createError(pMsg->srpc, msg.sComment);
+  } else {
+    pMsg->response.createResponse(pMsg->srpc);
   }
 }
 
@@ -183,8 +226,13 @@ int WebViewModule::Init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, WebViewModule, WebView_Load, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, WebViewModule, WebView_CallScriptFunction, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, WebViewModule, WebView_SetScriptAccess, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, WebViewModule, WebView_MoveBy, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, WebViewModule, WebView_SizeBy, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, WebViewModule, System_3SecTimer, this, ApCallbackPosNormal);
   AP_UNITTEST_HOOK(WebViewModule, this);
+
+  srpcGateRegistry_.add("WebView_MoveBy", SrpcGate_WebView_MoveBy);
+  srpcGateRegistry_.add("WebView_SizeBy", SrpcGate_WebView_SizeBy);
 
   return ok;
 }

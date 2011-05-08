@@ -11,6 +11,7 @@
 #include "ApContainer.h"
 #include "MsgUnitTest.h"
 #include "MsgSystem.h"
+#include "SrpcGateHelper.h"
 #include "View.h"
 
 typedef ApHandlePointerTree<View*> ViewList;
@@ -34,6 +35,9 @@ public:
   void On_WebView_Load(Msg_WebView_Load* pMsg);
   void On_WebView_CallScriptFunction(Msg_WebView_CallScriptFunction* pMsg);
   void On_WebView_SetScriptAccess(Msg_WebView_SetScriptAccess* pMsg);
+  void On_WebView_MoveBy(Msg_WebView_MoveBy* pMsg);
+  void On_WebView_SizeBy(Msg_WebView_SizeBy* pMsg);
+
   void On_System_3SecTimer(Msg_System_3SecTimer* pMsg);
 
 #if defined(AP_TEST)
@@ -49,6 +53,8 @@ public:
 
 public:
   ViewList views_;
+
+   Apollo::SrpcGateHandlerRegistry srpcGateRegistry_;
 
   AP_MSG_REGISTRY_DECLARE;
 };

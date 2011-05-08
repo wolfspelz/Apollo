@@ -163,8 +163,8 @@ int View::Load(const String& sUrl)
     ::GetModuleFileName(NULL, szFileName, MAX_PATH);
     ::PathRemoveFileSpec(szFileName);
     ::PathAddBackslash(szFileName);
-    //::PathAppend(szFileName, _T("frame.html"));
-    ::PathAppend(szFileName, _T("overlay.html"));
+    //::PathAppend(szFileName, Apollo::getModuleResourcePath(MODULE_NAME) + "/html/test/frame.html");
+    ::PathAppend(szFileName, Apollo::getModuleResourcePath(MODULE_NAME) + "/html/test/overlay.html");
 
     TCHAR szFileName2[MAX_PATH];
     _stprintf_s(szFileName2, MAX_PATH, _T("file://%s"), szFileName);
@@ -234,6 +234,34 @@ void View::SetJSAccess(const String& sAccess)
   if (sAccess == Msg_WebView_SetScriptAccess_Allowed) {
     bScriptAccess_ = 1;
   }
+}
+
+void View::MoveBy(int nX, int nY)
+{
+  nX_ += nX;
+  nY_ += nY;
+
+#if defined(WIN32)
+  ::MoveWindow(hWnd_, nX_, nY_ - (bVisible_ ? 0 : 10000), nW_, nH_, TRUE);
+#endif // WIN32
+}
+
+void View::SizeBy(int nW, int nH, int nDirection)
+{
+  switch (nDirection) {
+    case Msg_WebView_SizeBy::DirectionLeft:        nX_ -= nW;            nW_ += nW;            break;
+    case Msg_WebView_SizeBy::DirectionTop:                    nY_ -= nH;            nH_ += nH; break;
+    case Msg_WebView_SizeBy::DirectionRight:                             nW_ += nW;            break;
+    case Msg_WebView_SizeBy::DirectionBottom:                                       nH_ += nH; break;
+    case Msg_WebView_SizeBy::DirectionTopLeft:     nX_ -= nW; nY_ -= nH; nW_ += nW; nH_ += nH; break;
+    case Msg_WebView_SizeBy::DirectionTopRight:               nY_ -= nH; nW_ += nW; nH_ += nH; break;
+    case Msg_WebView_SizeBy::DirectionBottomLeft:  nX_ -= nW;            nW_ += nW; nH_ += nH; break;
+    case Msg_WebView_SizeBy::DirectionBottomRight:                       nW_ += nW; nH_ += nH; break;
+  }
+
+#if defined(WIN32)
+  ::MoveWindow(hWnd_, nX_, nY_ - (bVisible_ ? 0 : 10000), nW_, nH_, TRUE);
+#endif // WIN32
 }
 
 //------------------------------------
