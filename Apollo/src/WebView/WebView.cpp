@@ -8,8 +8,10 @@
 #if defined(WIN32)
   #include "MsgMainLoop.h"
 #endif // WIN32
+#include "MsgSrpcGate.h"
 #include "Local.h"
 #include "WebView.h"
+#include "SrpcMessage.h"
 #include "SAutoPtr.h"
 #include <JavaScriptCore/JavaScriptCore.h>
 
@@ -297,11 +299,13 @@ exit:
 // Called by JS
 
 static JSValueRef JS_apollo_echo(JSContextRef ctx, JSObjectRef function, JSObjectRef thisObject, size_t argumentCount, const JSValueRef* arguments, JSValueRef* exception);
+static JSValueRef JS_apollo_send(JSContextRef ctx, JSObjectRef function, JSObjectRef thisObject, size_t argumentCount, const JSValueRef* arguments, JSValueRef* exception);
 
 JSClassRef JS_apollo_class()
 {
   static JSStaticFunction JS_apollo_functions[] = {
     { "echo", JS_apollo_echo, kJSPropertyAttributeNone },
+    { "send", JS_apollo_send, kJSPropertyAttributeNone },
     { 0, 0, 0 }
   };
 
@@ -328,11 +332,41 @@ static JSValueRef JS_apollo_echo(JSContextRef ctx, JSObjectRef function, JSObjec
 
   String sText;
   sText.set((PWSTR) JSStringGetCharactersPtr(arg0), JSStringGetLength(arg0));
-  sText += " (JS_apollo_echo)";
-
   JSStringRelease(arg0);
 
+  sText += " (JS_apollo_echo)";
+
   JSStringRef text = JSStringCreateWithUTF8CString(sText);
+  JSValueRef value = JSValueMakeString(ctx, text);
+  JSStringRelease(text);
+
+  return value;
+}
+
+static JSValueRef JS_apollo_send(JSContextRef ctx, JSObjectRef function, JSObjectRef thisObject, size_t argumentCount, const JSValueRef* arguments, JSValueRef* exception)
+{
+  if (!JSValueIsObjectOfClass(ctx, thisObject, JS_apollo_class())) return JSValueMakeUndefined(ctx);
+
+  if (argumentCount < 1) return JSValueMakeUndefined(ctx);
+
+  // Convert the result into a string for display.
+  if (!JSValueIsString(ctx, arguments[0])) return JSValueMakeUndefined(ctx);
+
+  JSStringRef arg0 = JSValueToStringCopy (ctx, arguments[0], exception);
+  if (exception && *exception) return JSValueMakeUndefined(ctx);
+
+  String sText;
+  sText.set((PWSTR) JSStringGetCharactersPtr(arg0), JSStringGetLength(arg0));
+  JSStringRelease(arg0);
+
+  Apollo::SrpcMessage srpc;
+  srpc.fromString(sText);
+  ApSRPCMessage msg("SrpcGate");
+  srpc >> msg.srpc;
+  (void) msg.Call();
+  String sResponse = msg.response.toString();
+
+  JSStringRef text = JSStringCreateWithUTF8CString(sResponse);
   JSValueRef value = JSValueMakeString(ctx, text);
   JSStringRelease(text);
 
