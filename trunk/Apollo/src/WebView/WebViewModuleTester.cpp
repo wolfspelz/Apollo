@@ -138,17 +138,56 @@ String WebViewModuleTester::CallJSEcho()
 
 //----------------------------------------------------------
 
+String WebViewModuleTester::JSSrpc()
+{
+  String s;
+
+  ApHandle hWebView = Apollo::newHandle();
+
+  if (!s) { if (!Msg_WebView_Create::_(hWebView)) { s = "Msg_WebView_Create failed"; }}
+  //if (!s) { if (!Msg_WebView_LoadHtml::_(hWebView, "<script>function test_echo(s) { return apollo.echo(s + ' (JS.test_echo)'); }</script>", "file://" + Apollo::getAppBasePath())) { s = "Msg_WebView_LoadHtml failed"; }}
+
+  if (!s) { if (!Msg_WebView_LoadHtml::_(hWebView, 
+    "<html>"
+    "<head>"
+    "<style>"
+    "* { margin:0; padding:0; }"
+    "</style>"
+    "<script>"
+    "function StartTimer() { window.setInterval('GetTime()', 1000); }"
+    "function GetTime() { var sResponse = apollo.send('Method=System_GetTime'); document.getElementById('iResponse').innerHTML = sResponse; }"
+    "</script>"
+    "</head>"
+    "<body style=\"overflow:hidden;\" onload=\"StartTimer()\">"
+    "<div style=\"width:100%; height:100%; border:1px solid #000000;\">"
+    "<p id=\"iResponse\" style=\"background-color:#00FF00;\"></p>"
+    "</div>"
+    "</body>"
+    "</html>"
+    , "file://" + Apollo::getAppBasePath() + "JSSrpc"
+    )) { s = "Msg_WebView_LoadHtml failed"; }}
+
+  if (!s) { if (!Msg_WebView_Position::_(hWebView, 100, 200, 400, 300)) { s = "Msg_WebView_Position failed"; }}
+  if (!s) { if (!Msg_WebView_Visibility::_(hWebView, 1)) { s = "Msg_WebView_Visibility failed"; }}
+
+  return s;
+}
+
+//----------------------------------------------------------
+
 void WebViewModuleTester::Begin()
 {
-  AP_UNITTEST_REGISTER(WebViewModuleTester::LoadHtml);
-  AP_UNITTEST_REGISTER(WebViewModuleTester::CallJSEcho);
-  AP_UNITTEST_REGISTER(WebViewModuleTester::CallJSEcho_Result);
+  //AP_UNITTEST_REGISTER(WebViewModuleTester::LoadHtml);
+  //AP_UNITTEST_REGISTER(WebViewModuleTester::CallJSEcho);
+  //AP_UNITTEST_REGISTER(WebViewModuleTester::CallJSEcho_Result);
+  AP_UNITTEST_REGISTER(WebViewModuleTester::JSSrpc);
 }
 
 void WebViewModuleTester::Execute()
 {
-  AP_UNITTEST_EXECUTE(WebViewModuleTester::LoadHtml);
-  AP_UNITTEST_EXECUTE(WebViewModuleTester::CallJSEcho);
+  //AP_UNITTEST_EXECUTE(WebViewModuleTester::LoadHtml);
+  //AP_UNITTEST_EXECUTE(WebViewModuleTester::CallJSEcho);
+  AP_UNITTEST_EXECUTE(WebViewModuleTester::JSSrpc);
 }
 
 void WebViewModuleTester::End()
