@@ -9,17 +9,17 @@
 #include "MsgWebView.h"
 #include "MsgUnitTest.h"
 #include "WebViewModuleTester.h"
-#include "WebView.h"
+#include "View.h"
 
 #if defined(AP_TEST)
 
-static ApHandle g_LoadHtml_hWebView;
+static ApHandle g_LoadHtml_hView;
 
 void WebViewModuleTester::On_LoadHtml_WebView_Event_DocumentComplete(Msg_WebView_Event_DocumentComplete* pMsg)
 {
-  if (pMsg->hWebView != g_LoadHtml_hWebView) { return; }
+  if (pMsg->hView != g_LoadHtml_hView) { return; }
 
-  //Msg_WebView_Destroy::_(pMsg->hWebView);  
+  //Msg_WebView_Destroy::_(pMsg->hView);  
   { Msg_WebView_Event_DocumentComplete msg; msg.UnHook(MODULE_NAME, (ApCallback) WebViewModuleTester::On_LoadHtml_WebView_Event_DocumentComplete, 0); }
 }
 
@@ -27,31 +27,35 @@ String WebViewModuleTester::LoadHtml()
 {
   String s;
 
-  ApHandle hWebView = Apollo::newHandle();
-  g_LoadHtml_hWebView = hWebView;
+  ApHandle hView = Apollo::newHandle();
+  g_LoadHtml_hView = hView;
 
   { Msg_WebView_Event_DocumentComplete msg; msg.Hook(MODULE_NAME, (ApCallback) WebViewModuleTester::On_LoadHtml_WebView_Event_DocumentComplete, 0, ApCallbackPosNormal); }
 
-  //if (!s) { if (!Msg_WebView_Create::_(hWebView, "<p style=\"background-color: #00FF00\">Testing " "\xe9\x87\x91" "</p><img src=\"http://webkit.org/images/icon-gold.png\" alt=\"Face\"><div style=\"border: solid blue; background: white;\" contenteditable=\"true\">div with blue border</div><ul><li>foo<li>bar<li>baz</ul><iframe src=\"http://www.wolfspelz.de\" style=\"width:100%;height:300px\" />")) { s = "Msg_WebView_Create failed"; }}
-  if (!s) { if (!Msg_WebView_Create::_(hWebView)) { s = "Msg_WebView_Create failed"; }}
+  //if (!s) { if (!Msg_WebView_Create::_(hView, "<p style=\"background-color: #00FF00\">Testing " "\xe9\x87\x91" "</p><img src=\"http://webkit.org/images/icon-gold.png\" alt=\"Face\"><div style=\"border: solid blue; background: white;\" contenteditable=\"true\">div with blue border</div><ul><li>foo<li>bar<li>baz</ul><iframe src=\"http://www.wolfspelz.de\" style=\"width:100%;height:300px\" />")) { s = "Msg_WebView_Create failed"; }}
+  if (!s) { if (!Msg_WebView_Create::_(hView)) { s = "Msg_WebView_Create failed"; }}
+  if (!s) { if (!Msg_WebView_SetScriptAccess::Allow(hView)) { s = "Msg_WebView_SetScriptAccess failed"; }}
 
-  //if (!s) { if (!Msg_WebView_Load::_(hWebView, "http://www.wolfspelz.de")) { s = "Msg_WebView_Load failed"; }}
+  //if (!s) { if (!Msg_WebView_Load::_(hView, "http://www.wolfspelz.de")) { s = "Msg_WebView_Load failed"; }}
 
-  if (!s) { if (!Msg_WebView_LoadHtml::_(hWebView, 
+  if (!s) { if (!Msg_WebView_LoadHtml::_(hView, 
     "<html>"
     "<head>"
     "<style>"
     "* { margin:0; padding:0; }"
     "</style>"
     "<script>"
-    "function safsdfad(a, b) { return a + b; }"
+    "function StartTimer() { window.setInterval('GetTime()', 1000); }"
+    "function GetTime() { document.getElementById('iResponse').innerHTML = Apollo.sendMessage('Method=System_GetTime\\nhView=' + Apollo.viewHandle + '\\n'); }"
+    "function Concat(a, b) { return a + b; }"
     "</script>"
     "</head>"
-    "<body style='overflow:hidden;'>"
-    "<div style='width:100%; height:100%; border:1px solid #000000;'>"
-    "<p style='background-color:#00FF00;'>Testing LoadHtml " "\xe9\x87\x91" " <a href='http://blog.wolfspelz.de'>Link</a></p>"
-    "<img src='http://webkit.org/images/icon-gold.png' />"
-    "<img src='test/test1.png' />"
+    "<body style='overflow:hidden;' onload=\"StartTimer()\">"
+    "<div style='width:100%; height:100%; border:1px solid #000000; background-color:rgba(224,224,224,0.8);'>"
+    "  <p style='background-color:rgba(0,255,0,0.8);'>Testing LoadHtml " "\xe9\x87\x91" " <a href='http://blog.wolfspelz.de'>Link</a></p>"
+    "  <p id=\"iResponse\">xx</p>"
+    "  <img src='http://webkit.org/images/icon-gold.png' />"
+    "  <img src='test/test1.png' />"
     //"<iframe src='http://www.wolfspelz.de'></iframe>"
     "</div>"
     "</body>"
@@ -59,11 +63,11 @@ String WebViewModuleTester::LoadHtml()
     , "file://" + Apollo::getAppBasePath() + "LoadHtml"
     )) { s = "Msg_WebView_LoadHtml failed"; }}
 
-  if (!s) { if (!Msg_WebView_Position::_(hWebView, 100, 200, 400, 300)) { s = "Msg_WebView_Position failed"; }}
-  if (!s) { if (!Msg_WebView_Visibility::_(hWebView, 1)) { s = "Msg_WebView_Visibility failed"; }}
+  if (!s) { if (!Msg_WebView_Position::_(hView, 100, 200, 400, 300)) { s = "Msg_WebView_Position failed"; }}
+  if (!s) { if (!Msg_WebView_Visibility::_(hView, 1)) { s = "Msg_WebView_Visibility failed"; }}
 
   if (0) {
-    if (!s) { if (!Msg_WebView_Destroy::_(hWebView)) { s = "Msg_WebView_Destroy failed"; }}
+    if (!s) { if (!Msg_WebView_Destroy::_(hView)) { s = "Msg_WebView_Destroy failed"; }}
   }
 
   return s;
@@ -71,18 +75,18 @@ String WebViewModuleTester::LoadHtml()
 
 //----------------------------------------------------------
 
-static ApHandle g_CallJSEcho_hWebView;
+static ApHandle g_CallJSEcho_hView;
 
 void WebViewModuleTester::On_CallJSEcho_WebView_Event_DocumentLoaded(Msg_WebView_Event_DocumentLoaded* pMsg)
 {
-  if (pMsg->hWebView != g_CallJSEcho_hWebView) { return; }
+  if (pMsg->hView != g_CallJSEcho_hView) { return; }
 
   int ok = 0;
   String sIn = "Hello World";
-  String sOutExpected = "Hello World" " (JS.test_echo)" " (JS_apollo_echo)";
-  Msg_WebView_CallJavaScriptFunction msg;
-  msg.hWebView = pMsg->hWebView;
-  msg.sMethod = "test_echo";
+  String sOutExpected = "Hello World" " (JS.TestEcho)" " (JS_Apollo_echoString)";
+  Msg_WebView_CallScriptFunction msg;
+  msg.hView = pMsg->hView;
+  msg.sMethod = "TestEcho";
   msg.lArgs.AddLast(sIn);
   if (msg.Request()) {
     if (msg.sResult == sOutExpected) {
@@ -92,7 +96,7 @@ void WebViewModuleTester::On_CallJSEcho_WebView_Event_DocumentLoaded(Msg_WebView
   String s; if (!ok) { s = "received=" + msg.sResult + " expected=" + sOutExpected; }
   AP_UNITTEST_RESULT(WebViewModuleTester::CallJSEcho_Result, ok, s);
 
-  Msg_WebView_Destroy::_(pMsg->hWebView);  
+  Msg_WebView_Destroy::_(pMsg->hView);  
   { Msg_WebView_Event_DocumentLoaded msg; msg.UnHook(MODULE_NAME, (ApCallback) WebViewModuleTester::On_CallJSEcho_WebView_Event_DocumentLoaded, 0); }
 }
 
@@ -100,22 +104,22 @@ String WebViewModuleTester::CallJSEcho()
 {
   String s;
 
-  ApHandle hWebView = Apollo::newHandle();
-  g_CallJSEcho_hWebView = hWebView;
+  ApHandle hView = Apollo::newHandle();
+  g_CallJSEcho_hView = hView;
 
   { Msg_WebView_Event_DocumentLoaded msg; msg.Hook(MODULE_NAME, (ApCallback) WebViewModuleTester::On_CallJSEcho_WebView_Event_DocumentLoaded, 0, ApCallbackPosNormal); }
 
-  if (!s) { if (!Msg_WebView_Create::_(hWebView)) { s = "Msg_WebView_Create failed"; }}
-  //if (!s) { if (!Msg_WebView_LoadHtml::_(hWebView, "<script>function test_echo(s) { return apollo.echo(s + ' (JS.test_echo)'); }</script>", "file://" + Apollo::getAppBasePath())) { s = "Msg_WebView_LoadHtml failed"; }}
+  if (!s) { if (!Msg_WebView_Create::_(hView)) { s = "Msg_WebView_Create failed"; }}
+  if (!s) { if (!Msg_WebView_SetScriptAccess::Allow(hView)) { s = "Msg_WebView_SetScriptAccess failed"; }}
 
-  if (!s) { if (!Msg_WebView_LoadHtml::_(hWebView, 
+  if (!s) { if (!Msg_WebView_LoadHtml::_(hView, 
     "<html>"
     "<head>"
     "<style>"
     "* { margin:0; padding:0; }"
     "</style>"
     "<script>"
-    "function test_echo(s) { return apollo.echo(s + ' (JS.test_echo)'); }"
+    "function TestEcho(s) { return Apollo.echoString(s + ' (JS.TestEcho)'); }"
     "</script>"
     "</head>"
     "<body style='overflow:hidden;'>"
@@ -130,45 +134,17 @@ String WebViewModuleTester::CallJSEcho()
     , "file://" + Apollo::getAppBasePath() + "CallJSEcho"
     )) { s = "Msg_WebView_LoadHtml failed"; }}
 
-  if (!s) { if (!Msg_WebView_Position::_(hWebView, 100, 500, 400, 300)) { s = "Msg_WebView_Position failed"; }}
-  if (!s) { if (!Msg_WebView_Visibility::_(hWebView, 1)) { s = "Msg_WebView_Visibility failed"; }}
+  if (!s) { if (!Msg_WebView_Position::_(hView, 100, 500, 400, 300)) { s = "Msg_WebView_Position failed"; }}
+  if (!s) { if (!Msg_WebView_Visibility::_(hView, 1)) { s = "Msg_WebView_Visibility failed"; }}
 
   return s;
 }
 
 //----------------------------------------------------------
 
-String WebViewModuleTester::JSSrpc()
+String WebViewModuleTester::xx()
 {
   String s;
-
-  ApHandle hWebView = Apollo::newHandle();
-
-  if (!s) { if (!Msg_WebView_Create::_(hWebView)) { s = "Msg_WebView_Create failed"; }}
-  //if (!s) { if (!Msg_WebView_LoadHtml::_(hWebView, "<script>function test_echo(s) { return apollo.echo(s + ' (JS.test_echo)'); }</script>", "file://" + Apollo::getAppBasePath())) { s = "Msg_WebView_LoadHtml failed"; }}
-
-  if (!s) { if (!Msg_WebView_LoadHtml::_(hWebView, 
-    "<html>"
-    "<head>"
-    "<style>"
-    "* { margin:0; padding:0; }"
-    "</style>"
-    "<script>"
-    "function StartTimer() { window.setInterval('GetTime()', 1000); }"
-    "function GetTime() { var sResponse = apollo.send('Method=System_GetTime'); document.getElementById('iResponse').innerHTML = sResponse; }"
-    "</script>"
-    "</head>"
-    "<body style=\"overflow:hidden;\" onload=\"StartTimer()\">"
-    "<div style=\"width:100%; height:100%; border:1px solid #000000;\">"
-    "<p id=\"iResponse\" style=\"background-color:#00FF00;\"></p>"
-    "</div>"
-    "</body>"
-    "</html>"
-    , "file://" + Apollo::getAppBasePath() + "JSSrpc"
-    )) { s = "Msg_WebView_LoadHtml failed"; }}
-
-  if (!s) { if (!Msg_WebView_Position::_(hWebView, 100, 200, 400, 300)) { s = "Msg_WebView_Position failed"; }}
-  if (!s) { if (!Msg_WebView_Visibility::_(hWebView, 1)) { s = "Msg_WebView_Visibility failed"; }}
 
   return s;
 }
@@ -177,26 +153,24 @@ String WebViewModuleTester::JSSrpc()
 
 void WebViewModuleTester::Begin()
 {
-  //AP_UNITTEST_REGISTER(WebViewModuleTester::LoadHtml);
-  //AP_UNITTEST_REGISTER(WebViewModuleTester::CallJSEcho);
-  //AP_UNITTEST_REGISTER(WebViewModuleTester::CallJSEcho_Result);
-  AP_UNITTEST_REGISTER(WebViewModuleTester::JSSrpc);
+  AP_UNITTEST_REGISTER(WebViewModuleTester::LoadHtml);
+  AP_UNITTEST_REGISTER(WebViewModuleTester::CallJSEcho);
+  AP_UNITTEST_REGISTER(WebViewModuleTester::CallJSEcho_Result);
 }
 
 void WebViewModuleTester::Execute()
 {
-  //AP_UNITTEST_EXECUTE(WebViewModuleTester::LoadHtml);
-  //AP_UNITTEST_EXECUTE(WebViewModuleTester::CallJSEcho);
-  AP_UNITTEST_EXECUTE(WebViewModuleTester::JSSrpc);
+  AP_UNITTEST_EXECUTE(WebViewModuleTester::LoadHtml);
+  AP_UNITTEST_EXECUTE(WebViewModuleTester::CallJSEcho);
 }
 
 void WebViewModuleTester::End()
 {
   //{ Msg_WebView_MouseEvent msg; msg.UnHook(MODULE_NAME, (ApCallback) WebViewModuleTester::On_WebView_MouseEvent, 0); }
 
-  //if (ApIsHandle(hWebView_)) {
-  //  Msg_WebView_Destroy::_(hWebView_);
-  //  hWebView_ = ApNoHandle;
+  //if (ApIsHandle(hView_)) {
+  //  Msg_WebView_Destroy::_(hView_);
+  //  hView_ = ApNoHandle;
   //}
 }
 

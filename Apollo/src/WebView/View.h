@@ -9,6 +9,7 @@
 
 #include <WebKit/WebKit.h>
 #include <WebKit/WebKitCOMAPI.h>
+#include <JavaScriptCore/JavaScriptCore.h>
 
 //template<typename T> class SComPtr
 //{
@@ -31,16 +32,17 @@
 
 //------------------------------------
 
-class WebView : public IWebUIDelegate, IWebFrameLoadDelegate, IWebFrameLoadDelegatePrivate, IWebResourceLoadDelegate, IWebPolicyDelegate
+class View : public IWebUIDelegate, IWebFrameLoadDelegate, IWebFrameLoadDelegatePrivate, IWebResourceLoadDelegate, IWebPolicyDelegate
 {
 public:
-  WebView::WebView(const ApHandle& hWebView)
-    :hAp_(hWebView)
+  View::View(const ApHandle& hView)
+    :hAp_(hView)
     ,bVisible_(0)
     ,nX_(100)
     ,nY_(100)
     ,nW_(600)
     ,nH_(400)
+    ,bScriptAccess_(0)
     #if defined(WIN32)
     ,pWebView_(0)
     ,pWebFrame_(0)
@@ -51,7 +53,7 @@ public:
     ,pScriptObject_(0)
     #endif // WIN32
   {}
-  virtual ~WebView();
+  virtual ~View();
 
   inline ApHandle apHandle() { return hAp_; }
 
@@ -63,8 +65,13 @@ public:
 
   int LoadHtml(const String& sHtml, const String& sBase);
   int Load(const String& sUrl);
-
+  void SetJSAccess(const String& sAccess);
   String CallJSFunction(const String& sFunction, List& lArgs);
+
+  static JSValueRef JS_Apollo_getSharedValue(JSContextRef ctx, JSObjectRef thisObject, JSStringRef propertyName, JSValueRef* exception);
+  static JSValueRef JS_Apollo_echoString(JSContextRef ctx, JSObjectRef function, JSObjectRef thisObject, size_t argumentCount, const JSValueRef* arguments, JSValueRef* exception);
+  static JSValueRef JS_Apollo_sendMessage(JSContextRef ctx, JSObjectRef function, JSObjectRef thisObject, size_t argumentCount, const JSValueRef* arguments, JSValueRef* exception);
+  int HasScriptAccess() { return bScriptAccess_; }
 
 protected:
   void MakeScriptObject();
@@ -77,6 +84,8 @@ protected:
   int nY_;
   int nW_;
   int nH_;
+
+  int bScriptAccess_;
 
 #if defined(WIN32)
   IWebView* pWebView_;

@@ -11,11 +11,11 @@
 #include "ApContainer.h"
 #include "MsgUnitTest.h"
 #include "MsgSystem.h"
-#include "WebView.h"
+#include "View.h"
 
-typedef ApHandlePointerTree<WebView*> WebViewList;
-typedef ApHandlePointerTreeNode<WebView*> WebViewListNode;
-typedef ApHandlePointerTreeIterator<WebView*> WebViewListIterator;
+typedef ApHandlePointerTree<View*> ViewList;
+typedef ApHandlePointerTreeNode<View*> ViewListNode;
+typedef ApHandlePointerTreeIterator<View*> ViewListIterator;
 
 class WebViewModule
 {
@@ -32,7 +32,8 @@ public:
   void On_WebView_Visibility(Msg_WebView_Visibility* pMsg);
   void On_WebView_LoadHtml(Msg_WebView_LoadHtml* pMsg);
   void On_WebView_Load(Msg_WebView_Load* pMsg);
-  void On_WebView_CallJavaScriptFunction(Msg_WebView_CallJavaScriptFunction* pMsg);
+  void On_WebView_CallScriptFunction(Msg_WebView_CallScriptFunction* pMsg);
+  void On_WebView_SetScriptAccess(Msg_WebView_SetScriptAccess* pMsg);
   void On_System_3SecTimer(Msg_System_3SecTimer* pMsg);
 
 #if defined(AP_TEST)
@@ -42,12 +43,12 @@ public:
 #endif
 
 public:
-  WebView* CreateWebView(const ApHandle& hWebView);
-  void DeleteWebView(const ApHandle& hWebView);
-  WebView* FindWebView(const ApHandle& hWebView);
+  View* CreateView(const ApHandle& hView);
+  void DeleteView(const ApHandle& hView);
+  View* FindView(const ApHandle& hView);
 
 public:
-  WebViewList webviews_;
+  ViewList views_;
 
   AP_MSG_REGISTRY_DECLARE;
 };

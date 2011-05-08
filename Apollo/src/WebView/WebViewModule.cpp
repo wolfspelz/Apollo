@@ -10,118 +10,125 @@
 #include "Local.h"
 #include "WebViewModule.h"
 
-WebView* WebViewModule::CreateWebView(const ApHandle& hWebView)
+View* WebViewModule::CreateView(const ApHandle& hView)
 {
-  WebView* pWebView = new WebView(hWebView);
-  if (pWebView) {
-    int ok = pWebView->Create();
+  View* pView = new View(hView);
+  if (pView) {
+    int ok = pView->Create();
     if (ok) {
-      pWebView->AddRef();
-      webviews_.Set(hWebView, pWebView);
+      pView->AddRef();
+      views_.Set(hView, pView);
     } else {
-      delete pWebView;
-      pWebView = 0;
-      throw ApException("WebViewModule::CreateWebView " ApHandleFormat " Create() failed", ApHandleType(hWebView));
+      delete pView;
+      pView = 0;
+      throw ApException("WebViewModule::CreateView " ApHandleFormat " Create() failed", ApHandleType(hView));
     }
   }
 
-  return pWebView;
+  return pView;
 }
 
-void WebViewModule::DeleteWebView(const ApHandle& hWebView)
+void WebViewModule::DeleteView(const ApHandle& hView)
 {
-  WebView* pWebView = FindWebView(hWebView);
-  if (pWebView) {
-    pWebView->Destroy();
-    webviews_.Unset(hWebView);
-    int nRefCnt = pWebView->Release();
+  View* pView = FindView(hView);
+  if (pView) {
+    pView->Destroy();
+    views_.Unset(hView);
+    int nRefCnt = pView->Release();
     if (nRefCnt > 0) {
-      delete pWebView;
+      delete pView;
     }
-    pWebView = 0;
+    pView = 0;
   }
 }
 
-WebView* WebViewModule::FindWebView(const ApHandle& hWebView)
+View* WebViewModule::FindView(const ApHandle& hView)
 {
-  WebView* pWebView = 0;  
+  View* pView = 0;  
 
-  webviews_.Get(hWebView, pWebView);
-  if (pWebView == 0) { throw ApException("WebViewModule::FindWebView no webview=" ApHandleFormat "", ApHandleType(hWebView)); }
+  views_.Get(hView, pView);
+  if (pView == 0) { throw ApException("WebViewModule::FindView no webview=" ApHandleFormat "", ApHandleType(hView)); }
 
-  return pWebView;
+  return pView;
 }
 
 //---------------------------
 
 AP_MSG_HANDLER_METHOD(WebViewModule, WebView_Create)
 {
-  if (webviews_.Find(pMsg->hWebView) != 0) { throw ApException("WebViewModule::WebView_Create: webview=" ApHandleFormat " already exists", ApHandleType(pMsg->hWebView)); }
-  WebView* pWebView = CreateWebView(pMsg->hWebView);
+  if (views_.Find(pMsg->hView) != 0) { throw ApException("WebViewModule::WebView_Create: webview=" ApHandleFormat " already exists", ApHandleType(pMsg->hView)); }
+  View* pView = CreateView(pMsg->hView);
   pMsg->apStatus = ApMessage::Ok;
 }
 
 AP_MSG_HANDLER_METHOD(WebViewModule, WebView_Destroy)
 {
-  WebView* pWebView = FindWebView(pMsg->hWebView);
-  DeleteWebView(pMsg->hWebView); 
+  View* pView = FindView(pMsg->hView);
+  DeleteView(pMsg->hView); 
   pMsg->apStatus = ApMessage::Ok;
 }
 
 AP_MSG_HANDLER_METHOD(WebViewModule, WebView_Position)
 {
-  WebView* pWebView = FindWebView(pMsg->hWebView);
-  pWebView->SetPosition(pMsg->nX, pMsg->nY, pMsg->nW, pMsg->nH);
+  View* pView = FindView(pMsg->hView);
+  pView->SetPosition(pMsg->nX, pMsg->nY, pMsg->nW, pMsg->nH);
   pMsg->apStatus = ApMessage::Ok;
 }
 
 AP_MSG_HANDLER_METHOD(WebViewModule, WebView_Visibility)
 {
-  WebView* pWebView = FindWebView(pMsg->hWebView);
-  pWebView->SetVisibility(pMsg->bVisible);
+  View* pView = FindView(pMsg->hView);
+  pView->SetVisibility(pMsg->bVisible);
   pMsg->apStatus = ApMessage::Ok;
 }
 
 AP_MSG_HANDLER_METHOD(WebViewModule, WebView_LoadHtml)
 {
-  WebView* pWebView = FindWebView(pMsg->hWebView);
-  pWebView->LoadHtml(pMsg->sHtml, pMsg->sBase);
+  View* pView = FindView(pMsg->hView);
+  pView->LoadHtml(pMsg->sHtml, pMsg->sBase);
   pMsg->apStatus = ApMessage::Ok;
 }
 
 AP_MSG_HANDLER_METHOD(WebViewModule, WebView_Load)
 {
-  WebView* pWebView = FindWebView(pMsg->hWebView);
-  pWebView->Load(pMsg->sUrl);
+  View* pView = FindView(pMsg->hView);
+  pView->Load(pMsg->sUrl);
   pMsg->apStatus = ApMessage::Ok;
 }
 
-AP_MSG_HANDLER_METHOD(WebViewModule, WebView_CallJavaScriptFunction)
+AP_MSG_HANDLER_METHOD(WebViewModule, WebView_CallScriptFunction)
 {
-  WebView* pWebView = FindWebView(pMsg->hWebView);
-  pMsg->sResult = pWebView->CallJSFunction(pMsg->sMethod, pMsg->lArgs);
+  View* pView = FindView(pMsg->hView);
+  pMsg->sResult = pView->CallJSFunction(pMsg->sMethod, pMsg->lArgs);
+  pMsg->apStatus = ApMessage::Ok;
+}
+
+AP_MSG_HANDLER_METHOD(WebViewModule, WebView_SetScriptAccess)
+{
+  View* pView = FindView(pMsg->hView);
+  pView->SetJSAccess(pMsg->sAccess);
   pMsg->apStatus = ApMessage::Ok;
 }
 
 int g_nCnt = 0;
 AP_MSG_HANDLER_METHOD(WebViewModule, System_3SecTimer)
 {
-  WebViewListNode *pNode = webviews_.Next(0);
+  ViewListNode *pNode = views_.Next(0);
   if (pNode) {
-    ApHandle hWebView = pNode->Key();
-    WebView* pWebView = pNode->Value();
+    ApHandle hView = pNode->Key();
+    View* pView = pNode->Value();
 
-    if (pWebView) {
+    if (pView) {
       //if (g_nCnt++ == 3) {
-      //  Msg_WebView_Destroy::_(hWebView);
+      //  Msg_WebView_Destroy::_(hView);
       //}
 
-      //pWebView->SetVisibility(g_nCnt++ % 2 == 0 ? 1 : 0);
+      //pView->SetVisibility(g_nCnt++ % 2 == 0 ? 1 : 0);
 
       //List lArgs;
       //lArgs.AddLast("abc");
       //lArgs.AddLast("def");
-      //String s = pWebView->CallJSFunction("safsdfad", lArgs);
+      //String s = pView->CallJSFunction("Concat", lArgs);
     }
   }
 }
@@ -174,7 +181,8 @@ int WebViewModule::Init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, WebViewModule, WebView_Visibility, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, WebViewModule, WebView_LoadHtml, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, WebViewModule, WebView_Load, this, ApCallbackPosNormal);
-  AP_MSG_REGISTRY_ADD(MODULE_NAME, WebViewModule, WebView_CallJavaScriptFunction, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, WebViewModule, WebView_CallScriptFunction, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, WebViewModule, WebView_SetScriptAccess, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, WebViewModule, System_3SecTimer, this, ApCallbackPosNormal);
   AP_UNITTEST_HOOK(WebViewModule, this);
 

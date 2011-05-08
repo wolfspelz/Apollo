@@ -163,7 +163,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\WebView.cpp"
+				RelativePath=".\View.cpp"
 				>
 			</File>
 			<File
@@ -189,7 +189,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\WebView.h"
+				RelativePath=".\View.h"
 				>
 			</File>
 			<File

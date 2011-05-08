@@ -10,16 +10,15 @@
 #endif // WIN32
 #include "MsgSrpcGate.h"
 #include "Local.h"
-#include "WebView.h"
+#include "View.h"
 #include "SrpcMessage.h"
 #include "SAutoPtr.h"
-#include <JavaScriptCore/JavaScriptCore.h>
 
-WebView::~WebView()
+View::~View()
 {
 }
 
-int WebView::Create()
+int View::Create()
 {
   int ok = 0;
 
@@ -92,7 +91,7 @@ exit:
   return ok;
 }
 
-void WebView::Destroy()
+void View::Destroy()
 {
 #if defined(WIN32)
   if (pWebViewPrivate_) {
@@ -117,7 +116,7 @@ void WebView::Destroy()
 #endif // WIN32
 }
 
-int WebView::LoadHtml(const String& sHtml, const String& sBase)
+int View::LoadHtml(const String& sHtml, const String& sBase)
 {
   int ok = 0;
 
@@ -142,7 +141,7 @@ exit:;
 #include <shlwapi.h>
 #include <wininet.h>
 
-int WebView::Load(const String& sUrl)
+int View::Load(const String& sUrl)
 {
   int ok = 0;
 
@@ -201,7 +200,7 @@ exit:
 
 //------------------------------------
 
-void WebView::SetPosition(int nX, int nY, int nW, int nH)
+void View::SetPosition(int nX, int nY, int nW, int nH)
 {
   nX_ = nX;
   nY_ = nY;
@@ -213,7 +212,7 @@ void WebView::SetPosition(int nX, int nY, int nW, int nH)
 #endif // WIN32
 }
 
-void WebView::SetVisibility(int bVisible)
+void View::SetVisibility(int bVisible)
 {
   int bChanged = (bVisible_ != bVisible);
   bVisible_ = bVisible;
@@ -230,10 +229,17 @@ void WebView::SetVisibility(int bVisible)
   }
 }
 
+void View::SetJSAccess(const String& sAccess)
+{
+  if (sAccess == Msg_WebView_SetScriptAccess_Allowed) {
+    bScriptAccess_ = 1;
+  }
+}
+
 //------------------------------------
 // Call JS
 
-String WebView::CallJSFunction(const String& sFunction, List& lArgs)
+String View::CallJSFunction(const String& sFunction, List& lArgs)
 {
   String sResult;
 
@@ -298,43 +304,87 @@ exit:
 //------------------------------------
 // Called by JS
 
-static JSValueRef JS_apollo_echo(JSContextRef ctx, JSObjectRef function, JSObjectRef thisObject, size_t argumentCount, const JSValueRef* arguments, JSValueRef* exception);
-static JSValueRef JS_apollo_send(JSContextRef ctx, JSObjectRef function, JSObjectRef thisObject, size_t argumentCount, const JSValueRef* arguments, JSValueRef* exception);
-
-JSClassRef JS_apollo_class()
+JSClassRef JS_Apollo_class()
 {
-  static JSStaticFunction JS_apollo_functions[] = {
-    { "echo", JS_apollo_echo, kJSPropertyAttributeNone },
-    { "send", JS_apollo_send, kJSPropertyAttributeNone },
+  static JSStaticValue JS_Apollo_values[] = {
+    { "viewHandle", View::JS_Apollo_getSharedValue, 0, kJSPropertyAttributeNone },
+    { 0, 0, 0, 0 }
+  };
+
+  static JSStaticFunction JS_Apollo_functions[] = {
+    { "echoString", View::JS_Apollo_echoString, kJSPropertyAttributeNone },
+    { "sendMessage", View::JS_Apollo_sendMessage, kJSPropertyAttributeNone },
     { 0, 0, 0 }
   };
 
-  JSClassDefinition JS_apollo_class = {
-    0, kJSClassAttributeNone, "apollo", 0, 0, JS_apollo_functions,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+  JSClassDefinition JS_Apollo_class = {
+    0,                     // int version // current (and only) version is 0
+    kJSClassAttributeNone, // JSClassAttributes attributes
+    "Apollo",              // const char* className
+    0,                     // JSClassRef parentClass
+    JS_Apollo_values,      // const JSStaticValue* staticValues
+    JS_Apollo_functions,   // const JSStaticFunction* staticFunctions
+    0,                     // JSObjectInitializeCallback initialize
+    0,                     // JSObjectFinalizeCallback finalize
+    0,                     // JSObjectHasPropertyCallback hasProperty
+    0,                     // JSObjectGetPropertyCallback getProperty
+    0,                     // JSObjectSetPropertyCallback setProperty
+    0,                     // JSObjectDeletePropertyCallback deleteProperty
+    0,                     // JSObjectGetPropertyNamesCallback getPropertyNames
+    0,                     // JSObjectCallAsFunctionCallback callAsFunction
+    0,                     // JSObjectCallAsConstructorCallback callAsConstructor
+    0,                     // JSObjectHasInstanceCallback hasInstance
+    0                      // JSObjectConvertToTypeCallback convertToType
   };
 
-  static JSClassRef apolloClass = JSClassCreate(&JS_apollo_class);
+  static JSClassRef apolloClass = JSClassCreate(&JS_Apollo_class);
   return apolloClass;
 }
 
-static JSValueRef JS_apollo_echo(JSContextRef ctx, JSObjectRef function, JSObjectRef thisObject, size_t argumentCount, const JSValueRef* arguments, JSValueRef* exception)
+JSValueRef View::JS_Apollo_getSharedValue(JSContextRef ctx, JSObjectRef thisObject, JSStringRef propertyName, JSValueRef* exception)
 {
-  if (!JSValueIsObjectOfClass(ctx, thisObject, JS_apollo_class())) return JSValueMakeUndefined(ctx);
+  if (!JSValueIsObjectOfClass(ctx, thisObject, JS_Apollo_class())) return JSValueMakeUndefined(ctx);
+
+  View* pView = static_cast<View*>(JSObjectGetPrivate(thisObject));
+  if (pView == 0 || !pView->HasScriptAccess()) return JSValueMakeUndefined(ctx);
+
+  String sName;
+  String sValue;
+  sName.set((PWSTR) JSStringGetCharactersPtr(propertyName), JSStringGetLength(propertyName));
+  if (0) {
+  } else if (sName == "viewHandle") {
+    sValue = pView->apHandle().toString();
+  } else {
+    return JSValueMakeUndefined(ctx);
+  }
+
+  JSStringRef text = JSStringCreateWithUTF8CString(sValue);
+  JSValueRef value = JSValueMakeString(ctx, text);
+  JSStringRelease(text);
+
+  return value;
+}
+
+JSValueRef View::JS_Apollo_echoString(JSContextRef ctx, JSObjectRef function, JSObjectRef thisObject, size_t argumentCount, const JSValueRef* arguments, JSValueRef* exception)
+{
+  if (!JSValueIsObjectOfClass(ctx, thisObject, JS_Apollo_class())) return JSValueMakeUndefined(ctx);
+
+  View* pView = static_cast<View*>(JSObjectGetPrivate(thisObject));
+  if (pView == 0 || !pView->HasScriptAccess()) return JSValueMakeUndefined(ctx);
 
   if (argumentCount < 1) return JSValueMakeUndefined(ctx);
 
   // Convert the result into a string for display.
   if (!JSValueIsString(ctx, arguments[0])) return JSValueMakeUndefined(ctx);
 
-  JSStringRef arg0 = JSValueToStringCopy (ctx, arguments[0], exception);
+  JSStringRef arg0 = JSValueToStringCopy(ctx, arguments[0], exception);
   if (exception && *exception) return JSValueMakeUndefined(ctx);
 
   String sText;
   sText.set((PWSTR) JSStringGetCharactersPtr(arg0), JSStringGetLength(arg0));
   JSStringRelease(arg0);
 
-  sText += " (JS_apollo_echo)";
+  sText += " (JS_Apollo_echoString)";
 
   JSStringRef text = JSStringCreateWithUTF8CString(sText);
   JSValueRef value = JSValueMakeString(ctx, text);
@@ -343,9 +393,12 @@ static JSValueRef JS_apollo_echo(JSContextRef ctx, JSObjectRef function, JSObjec
   return value;
 }
 
-static JSValueRef JS_apollo_send(JSContextRef ctx, JSObjectRef function, JSObjectRef thisObject, size_t argumentCount, const JSValueRef* arguments, JSValueRef* exception)
+JSValueRef View::JS_Apollo_sendMessage(JSContextRef ctx, JSObjectRef function, JSObjectRef thisObject, size_t argumentCount, const JSValueRef* arguments, JSValueRef* exception)
 {
-  if (!JSValueIsObjectOfClass(ctx, thisObject, JS_apollo_class())) return JSValueMakeUndefined(ctx);
+  if (!JSValueIsObjectOfClass(ctx, thisObject, JS_Apollo_class())) return JSValueMakeUndefined(ctx);
+
+  View* pView = static_cast<View*>(JSObjectGetPrivate(thisObject));
+  if (pView == 0 || !pView->HasScriptAccess()) return JSValueMakeUndefined(ctx);
 
   if (argumentCount < 1) return JSValueMakeUndefined(ctx);
 
@@ -373,7 +426,7 @@ static JSValueRef JS_apollo_send(JSContextRef ctx, JSObjectRef function, JSObjec
   return value;
 }
 
-void WebView::MakeScriptObject()
+void View::MakeScriptObject()
 {
   if (!pWebFrame_) return;
 
@@ -383,13 +436,13 @@ void WebView::MakeScriptObject()
   JSObjectRef pGlobal = JSContextGetGlobalObject(runCtx);
   if (pGlobal == 0) return;
 
-  JSClassRef apolloClass = JS_apollo_class();
+  JSClassRef apolloClass = JS_Apollo_class();
   if (apolloClass == 0) return;
 
   pScriptObject_ = JSObjectMake(runCtx, apolloClass, reinterpret_cast<void*>(this));
   if (pScriptObject_ == 0) return;
 
-  JSStringRef apolloName = JSStringCreateWithUTF8CString("apollo");
+  JSStringRef apolloName = JSStringCreateWithUTF8CString("Apollo");
   if (apolloName == 0) return;
 
   JSObjectSetProperty(runCtx, pGlobal, apolloName, pScriptObject_, kJSPropertyAttributeNone, 0);
@@ -399,7 +452,7 @@ void WebView::MakeScriptObject()
 //------------------------------------
 // IUnknown
 
-HRESULT WebView::QueryInterface(REFIID riid, void** ppvObject)
+HRESULT View::QueryInterface(REFIID riid, void** ppvObject)
 {
     *ppvObject = 0;
     if (IsEqualIID(riid, IID_IUnknown))  *ppvObject = static_cast<IWebUIDelegate*>(this);
@@ -410,12 +463,12 @@ HRESULT WebView::QueryInterface(REFIID riid, void** ppvObject)
     return S_OK;
 }
 
-ULONG WebView::AddRef(void)
+ULONG View::AddRef(void)
 {
     return ++nRefCount_;
 }
 
-ULONG WebView::Release(void)
+ULONG View::Release(void)
 {
     ULONG newRef = --nRefCount_;
     if (!newRef) delete this;
@@ -425,12 +478,12 @@ ULONG WebView::Release(void)
 
 //------------------------------------
 
-String WebView::StringFromBSTR(BSTR bStr)
+String View::StringFromBSTR(BSTR bStr)
 {
   return String(bStr, ::SysStringLen(bStr));
 }
 
-HRESULT WebView::didStartProvisionalLoadForFrame(IWebView* webView, IWebFrame* frame)
+HRESULT View::didStartProvisionalLoadForFrame(IWebView* webView, IWebFrame* frame)
 {
   if (pTopLoadingFrame_ == 0) {
     pTopLoadingFrame_ = frame;
@@ -441,11 +494,11 @@ HRESULT WebView::didStartProvisionalLoadForFrame(IWebView* webView, IWebFrame* f
   return S_OK;
 }
 
-HRESULT WebView::didFinishDocumentLoadForFrame(IWebView *sender, IWebFrame *frame)
+HRESULT View::didFinishDocumentLoadForFrame(IWebView *sender, IWebFrame *frame)
 {
   if (pTopLoadingFrame_ == frame) {
     ApAsyncMessage<Msg_WebView_Event_DocumentLoaded> msg;
-    msg->hWebView = apHandle();
+    msg->hView = apHandle();
     msg.Post();
   }
 
@@ -464,18 +517,18 @@ HRESULT WebView::didFinishDocumentLoadForFrame(IWebView *sender, IWebFrame *fram
   hr = request->URL(&bstrUrl);
   if (FAILED(hr)) goto exit;
 
-  apLog_Debug((LOG_CHANNEL, "WebView::OnDidFinishDocumentLoadForFrame", "%s", StringType(StringFromBSTR(bstrUrl))));
+  apLog_Debug((LOG_CHANNEL, "View::OnDidFinishDocumentLoadForFrame", "%s", StringType(StringFromBSTR(bstrUrl))));
 exit:
 #endif
 
   return S_OK;
 }
 
-HRESULT WebView::didFinishLoadForFrame(IWebView* webView, IWebFrame* frame)
+HRESULT View::didFinishLoadForFrame(IWebView* webView, IWebFrame* frame)
 {
   if (pTopLoadingFrame_ == frame) {
     ApAsyncMessage<Msg_WebView_Event_DocumentComplete> msg;
-    msg->hWebView = apHandle();
+    msg->hView = apHandle();
     msg.Post();
   }
 
@@ -494,13 +547,13 @@ HRESULT WebView::didFinishLoadForFrame(IWebView* webView, IWebFrame* frame)
   hr = request->URL(&bstrUrl);
   if (FAILED(hr)) goto exit;
 
-  apLog_Debug((LOG_CHANNEL, "WebView::didFinishLoadForFrame", "%s", StringType(StringFromBSTR(bstrUrl))));
+  apLog_Debug((LOG_CHANNEL, "View::didFinishLoadForFrame", "%s", StringType(StringFromBSTR(bstrUrl))));
 exit:
 #endif
   return S_OK;
 }
 
-HRESULT WebView::willSendRequest(IWebView *webView, unsigned long identifier, IWebURLRequest *request, IWebURLResponse *redirectResponse, IWebDataSource *dataSource, IWebURLRequest **newRequest)
+HRESULT View::willSendRequest(IWebView *webView, unsigned long identifier, IWebURLRequest *request, IWebURLResponse *redirectResponse, IWebDataSource *dataSource, IWebURLRequest **newRequest)
 {
   int bChanged = 0;
 
@@ -511,7 +564,7 @@ HRESULT WebView::willSendRequest(IWebView *webView, unsigned long identifier, IW
     request->URL(&bstrUrl);
     String sUrl = StringFromBSTR(bstrUrl);
 
-    msg.hWebView = apHandle();
+    msg.hView = apHandle();
     msg.sUrl = StringFromBSTR(bstrUrl);
     msg.Filter();
 
@@ -537,7 +590,7 @@ HRESULT WebView::willSendRequest(IWebView *webView, unsigned long identifier, IW
   }
 }
 
-HRESULT WebView::decidePolicyForNavigationAction(IWebView *webView, IPropertyBag *actionInformation, IWebURLRequest *request, IWebFrame *frame, IWebPolicyDecisionListener *listener)
+HRESULT View::decidePolicyForNavigationAction(IWebView *webView, IPropertyBag *actionInformation, IWebURLRequest *request, IWebFrame *frame, IWebPolicyDecisionListener *listener)
 {
   int bHandled = 0;
 
@@ -548,14 +601,14 @@ HRESULT WebView::decidePolicyForNavigationAction(IWebView *webView, IPropertyBag
     request->URL(&bstrUrl);
     String sUrl = StringFromBSTR(bstrUrl);
 
-    msg.hWebView = apHandle();
+    msg.hView = apHandle();
     msg.sUrl = StringFromBSTR(bstrUrl);
     msg.Filter();
 
     //if (msg.sUrl == "http://blog.wolfspelz.de/") {
     //  msg.bCancel = 1;
     //  ApAsyncMessage<Msg_WebView_Load> loadMsg;
-    //  loadMsg->hWebView = apHandle();
+    //  loadMsg->hView = apHandle();
     //  loadMsg->sUrl = "http://www.google.com/";
     //  loadMsg.Post();
     //}
