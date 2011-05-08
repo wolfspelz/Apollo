@@ -47,7 +47,7 @@ WebView* WebViewModule::FindWebView(const ApHandle& hWebView)
   WebView* pWebView = 0;  
 
   webviews_.Get(hWebView, pWebView);
-  if (pWebView == 0) { throw ApException("WebViewModule::FindWebView no scene=" ApHandleFormat "", ApHandleType(hWebView)); }
+  if (pWebView == 0) { throw ApException("WebViewModule::FindWebView no webview=" ApHandleFormat "", ApHandleType(hWebView)); }
 
   return pWebView;
 }
@@ -56,7 +56,7 @@ WebView* WebViewModule::FindWebView(const ApHandle& hWebView)
 
 AP_MSG_HANDLER_METHOD(WebViewModule, WebView_Create)
 {
-  if (webviews_.Find(pMsg->hWebView) != 0) { throw ApException("WebViewModule::WebView_Create: scene=" ApHandleFormat " already exists", ApHandleType(pMsg->hWebView)); }
+  if (webviews_.Find(pMsg->hWebView) != 0) { throw ApException("WebViewModule::WebView_Create: webview=" ApHandleFormat " already exists", ApHandleType(pMsg->hWebView)); }
   WebView* pWebView = CreateWebView(pMsg->hWebView);
   pMsg->apStatus = ApMessage::Ok;
 }
