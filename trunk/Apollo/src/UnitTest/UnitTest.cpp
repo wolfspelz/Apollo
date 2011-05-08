@@ -488,7 +488,7 @@ void UnitTest::Evaluate()
 #else
   {
 #endif
-    apLog_Debug((LOG_CHANNEL, "UnitTest", StringType(sText)));
+    apLog_Debug((LOG_CHANNEL, "UnitTest", "%s", StringType(sText)));
   }
   
   { msg.nTotal = lTests_.length(); msg.nFailed = nFail_; msg.nUnknown = nUnknown_; msg.Send(); }

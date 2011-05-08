@@ -18,6 +18,7 @@ public:
   String(const char* szBegin);
 #if defined(WIN32) && defined(UNICODE)
   String(const PWSTR wzBegin);
+  String(const PWSTR wzBegin, size_t nLen);
 #endif
   String(String const &s);
   virtual ~String(void);

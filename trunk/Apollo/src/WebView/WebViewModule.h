@@ -11,7 +11,6 @@
 #include "ApContainer.h"
 #include "MsgUnitTest.h"
 #include "MsgSystem.h"
-#include "MsgWebView.h"
 #include "WebView.h"
 
 typedef ApHandlePointerTree<WebView*> WebViewList;
@@ -31,6 +30,9 @@ public:
   void On_WebView_Destroy(Msg_WebView_Destroy* pMsg);
   void On_WebView_Position(Msg_WebView_Position* pMsg);
   void On_WebView_Visibility(Msg_WebView_Visibility* pMsg);
+  void On_WebView_LoadHtml(Msg_WebView_LoadHtml* pMsg);
+  void On_WebView_Load(Msg_WebView_Load* pMsg);
+  void On_WebView_CallJavaScriptFunction(Msg_WebView_CallJavaScriptFunction* pMsg);
   void On_System_3SecTimer(Msg_System_3SecTimer* pMsg);
 
 #if defined(AP_TEST)
@@ -40,7 +42,7 @@ public:
 #endif
 
 public:
-  WebView* CreateWebView(const ApHandle& hWebView, const String& sHtml, const String& sBase);
+  WebView* CreateWebView(const ApHandle& hWebView);
   void DeleteWebView(const ApHandle& hWebView);
   WebView* FindWebView(const ApHandle& hWebView);
 
