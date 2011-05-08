@@ -133,6 +133,35 @@ public:
   }
 };
 
+class Msg_WebView_MoveBy: public ApRequestMessage
+{
+public:
+  Msg_WebView_MoveBy() : ApRequestMessage("WebView_MoveBy"), nX(0), nY(0) {}
+  ApIN ApHandle hView;
+  ApIN int nX;
+  ApIN int nY;
+};
+
+class Msg_WebView_SizeBy: public ApRequestMessage
+{
+public:
+  enum _Direction { NoDirection = 0
+    ,DirectionLeft
+    ,DirectionTop
+    ,DirectionRight
+    ,DirectionBottom
+    ,DirectionTopLeft
+    ,DirectionTopRight
+    ,DirectionBottomLeft
+    ,DirectionBottomRight
+  };
+  Msg_WebView_SizeBy() : ApRequestMessage("WebView_SizeBy"), nW(0), nH(0), nDirection(DirectionBottomRight) {}
+  ApIN ApHandle hView;
+  ApIN int nW;
+  ApIN int nH;
+  ApIN int nDirection;
+};
+
 //--------------------------
 // Events
 
