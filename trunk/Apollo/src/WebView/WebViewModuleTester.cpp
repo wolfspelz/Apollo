@@ -19,7 +19,7 @@ void WebViewModuleTester::On_LoadHtml_WebView_Event_DocumentComplete(Msg_WebView
 {
   if (pMsg->hWebView != g_LoadHtml_hWebView) { return; }
 
-  Msg_WebView_Destroy::_(pMsg->hWebView);  
+  //Msg_WebView_Destroy::_(pMsg->hWebView);  
   { Msg_WebView_Event_DocumentComplete msg; msg.UnHook(MODULE_NAME, (ApCallback) WebViewModuleTester::On_LoadHtml_WebView_Event_DocumentComplete, 0); }
 }
 
@@ -49,14 +49,14 @@ String WebViewModuleTester::LoadHtml()
     "</head>"
     "<body style='overflow:hidden;'>"
     "<div style='width:100%; height:100%; border:1px solid #000000;'>"
-    "<p style='background-color:#00FF00;'>Testing LoadHtml " "\xe9\x87\x91" "</p>"
+    "<p style='background-color:#00FF00;'>Testing LoadHtml " "\xe9\x87\x91" " <a href='http://blog.wolfspelz.de'>Link</a></p>"
     "<img src='http://webkit.org/images/icon-gold.png' />"
     "<img src='test/test1.png' />"
     //"<iframe src='http://www.wolfspelz.de'></iframe>"
     "</div>"
     "</body>"
     "</html>"
-    , "file://" + Apollo::getAppBasePath()
+    , "file://" + Apollo::getAppBasePath() + "LoadHtml"
     )) { s = "Msg_WebView_LoadHtml failed"; }}
 
   if (!s) { if (!Msg_WebView_Position::_(hWebView, 100, 200, 400, 300)) { s = "Msg_WebView_Position failed"; }}
@@ -127,7 +127,7 @@ String WebViewModuleTester::CallJSEcho()
     "</div>"
     "</body>"
     "</html>"
-    , "file://" + Apollo::getAppBasePath()
+    , "file://" + Apollo::getAppBasePath() + "CallJSEcho"
     )) { s = "Msg_WebView_LoadHtml failed"; }}
 
   if (!s) { if (!Msg_WebView_Position::_(hWebView, 100, 500, 400, 300)) { s = "Msg_WebView_Position failed"; }}

@@ -135,4 +135,23 @@ public:
   ApIN ApHandle hWebView;
 };
 
+// WebView ->
+class Msg_WebView_Event_BeforeNavigate: public ApFilterMessage
+{
+public:
+  Msg_WebView_Event_BeforeNavigate() : ApFilterMessage("WebView_Event_BeforeNavigate"), bCancel(0) {}
+  ApIN ApHandle hWebView;
+  ApIN String sUrl;
+  ApINOUT int bCancel;
+};
+
+// WebView ->
+class Msg_WebView_Event_BeforeRequest: public ApFilterMessage
+{
+public:
+  Msg_WebView_Event_BeforeRequest() : ApFilterMessage("WebView_Event_BeforeRequest") {}
+  ApIN ApHandle hWebView;
+  ApINOUT String sUrl;
+};
+
 #endif // !defined(MsgWebView_h_INCLUDED)

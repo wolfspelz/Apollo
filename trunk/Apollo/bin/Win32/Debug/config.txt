@@ -14,13 +14,10 @@
 #Test/Vpi=1
 #Test/Vp=1
 #Test/Identity=1
-#Test/Fluid=1
 #Test/Gm=1
 #Test/Navigation=1
 #Test/BrowserInfo=1
-#Test/Arena=1
 #Test/Galileo=1
-#Test/Scene=1
 #Test/WebView=1
 
 Update/Url=http://web.avatar.io/update/

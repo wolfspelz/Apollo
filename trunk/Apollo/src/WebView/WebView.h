@@ -31,7 +31,7 @@
 
 //------------------------------------
 
-class WebView : public IWebUIDelegate, IWebFrameLoadDelegate, IWebFrameLoadDelegatePrivate
+class WebView : public IWebUIDelegate, IWebFrameLoadDelegate, IWebFrameLoadDelegatePrivate, IWebResourceLoadDelegate, IWebPolicyDelegate
 {
 public:
   WebView::WebView(const ApHandle& hWebView)
@@ -166,7 +166,7 @@ public:
   virtual HRESULT STDMETHODCALLTYPE paintCustomScrollCorner(IWebView*, HDC, RECT) { return E_NOTIMPL; }
 
   // IWebFrameLoadDelegate
-  virtual HRESULT STDMETHODCALLTYPE didStartProvisionalLoadForFrame(IWebView* webView, IWebFrame* frame);
+  virtual HRESULT STDMETHODCALLTYPE didStartProvisionalLoadForFrame(IWebView* webView, IWebFrame* frame);//{ return S_OK; }
   virtual HRESULT STDMETHODCALLTYPE didReceiveServerRedirectForProvisionalLoadForFrame(IWebView *webView, IWebFrame *frame) { return S_OK; }
   virtual HRESULT STDMETHODCALLTYPE didFailProvisionalLoadWithError(IWebView *webView, IWebError *error, IWebFrame *frame) { return S_OK; }
   virtual HRESULT STDMETHODCALLTYPE didCommitLoadForFrame(IWebView *webView, IWebFrame *frame) { return S_OK; }
@@ -179,15 +179,31 @@ public:
   virtual HRESULT STDMETHODCALLTYPE willPerformClientRedirectToURL(IWebView *webView, BSTR url, double delaySeconds, DATE fireDate, IWebFrame *frame) { return S_OK; }
   virtual HRESULT STDMETHODCALLTYPE didCancelClientRedirectForFrame(IWebView *webView, IWebFrame *frame) { return S_OK; }
   virtual HRESULT STDMETHODCALLTYPE willCloseFrame(IWebView *webView, IWebFrame *frame) { return S_OK; }
-  virtual HRESULT STDMETHODCALLTYPE windowScriptObjectAvailable(IWebView *webView, JSContextRef context, JSObjectRef windowScriptObject)  { return S_OK; }
+  virtual HRESULT STDMETHODCALLTYPE windowScriptObjectAvailable(IWebView *webView, JSContextRef context, JSObjectRef windowScriptObject) { return S_OK; }
   virtual HRESULT STDMETHODCALLTYPE didClearWindowObject(IWebView *webView, JSContextRef context, JSObjectRef windowScriptObject, IWebFrame *frame) { return S_OK; }
 
   // IWebFrameLoadDelegatePrivate
-  virtual HRESULT STDMETHODCALLTYPE didFinishDocumentLoadForFrame(IWebView *sender, IWebFrame *frame);
+  virtual HRESULT STDMETHODCALLTYPE didFinishDocumentLoadForFrame(IWebView *sender, IWebFrame *frame);//{ return S_OK; }
   virtual HRESULT STDMETHODCALLTYPE didFirstLayoutInFrame(IWebView *sender, IWebFrame *frame) { return S_OK; }
   virtual HRESULT STDMETHODCALLTYPE didHandleOnloadEventsForFrame(IWebView *sender, IWebFrame *frame) { return S_OK; }
   virtual HRESULT STDMETHODCALLTYPE didFirstVisuallyNonEmptyLayoutInFrame(IWebView *sender, IWebFrame *frame) { return S_OK; }
 
+  // IWebResourceLoadDelegate
+	virtual HRESULT STDMETHODCALLTYPE identifierForInitialRequest(IWebView *webView, IWebURLRequest *request, IWebDataSource *dataSource, unsigned long identifier) { return S_OK; }
+	virtual HRESULT STDMETHODCALLTYPE willSendRequest(IWebView *webView, unsigned long identifier, IWebURLRequest *request, IWebURLResponse *redirectResponse, IWebDataSource *dataSource, IWebURLRequest **newRequest);//{ return S_OK; }
+	virtual HRESULT STDMETHODCALLTYPE didReceiveAuthenticationChallenge(IWebView *webView, unsigned long identifier, IWebURLAuthenticationChallenge *challenge, IWebDataSource *dataSource) { return S_OK; }
+	virtual HRESULT STDMETHODCALLTYPE didCancelAuthenticationChallenge(IWebView *webView, unsigned long identifier, IWebURLAuthenticationChallenge *challenge, IWebDataSource *dataSource) { return S_OK; }
+	virtual HRESULT STDMETHODCALLTYPE didReceiveResponse(IWebView *webView, unsigned long identifier, IWebURLResponse *response, IWebDataSource *dataSource) { return S_OK; }
+	virtual HRESULT STDMETHODCALLTYPE didReceiveContentLength(IWebView *webView, unsigned long identifier, UINT length, IWebDataSource *dataSource) { return S_OK; }
+	virtual HRESULT STDMETHODCALLTYPE didFinishLoadingFromDataSource(IWebView *webView, unsigned long identifier, IWebDataSource *dataSource) { return S_OK; }
+	virtual HRESULT STDMETHODCALLTYPE didFailLoadingWithError(IWebView *webView, unsigned long identifier, IWebError *error, IWebDataSource *dataSource) { return S_OK; }
+	virtual HRESULT STDMETHODCALLTYPE plugInFailedWithError(IWebView *webView, IWebError *error, IWebDataSource *dataSource) { return S_OK; }
+
+  // IWebPolicyDelegate
+  virtual HRESULT STDMETHODCALLTYPE decidePolicyForNavigationAction(IWebView *webView, IPropertyBag *actionInformation, IWebURLRequest *request, IWebFrame *frame, IWebPolicyDecisionListener *listener);
+  virtual HRESULT STDMETHODCALLTYPE decidePolicyForNewWindowAction(IWebView *webView, IPropertyBag *actionInformation, IWebURLRequest *request, BSTR frameName, IWebPolicyDecisionListener *listener) { return E_NOTIMPL; }
+  virtual HRESULT STDMETHODCALLTYPE decidePolicyForMIMEType(IWebView *webView, BSTR type, IWebURLRequest *request, IWebFrame *frame, IWebPolicyDecisionListener *listener) { return E_NOTIMPL; }
+  virtual HRESULT STDMETHODCALLTYPE unableToImplementPolicyWithError(IWebView *webView, IWebError *error, IWebFrame *frame) { return E_NOTIMPL; }
 };
 
 #endif // WebView_H_INCLUDED

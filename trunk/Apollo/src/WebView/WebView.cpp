@@ -41,6 +41,12 @@ int WebView::Create()
   hr = pWebView_->setFrameLoadDelegate(this);
   if (FAILED(hr)) goto exit;
 
+  hr = pWebView_->setResourceLoadDelegate(this);
+  if (FAILED(hr)) goto exit;
+
+  hr = pWebView_->setPolicyDelegate(this);
+  if (FAILED(hr)) goto exit;
+
   hr = pWebView_->QueryInterface(IID_IWebViewPrivate, reinterpret_cast<void**>(&pWebViewPrivate_));
   if (FAILED(hr)) goto exit;
 
@@ -398,7 +404,7 @@ HRESULT WebView::didStartProvisionalLoadForFrame(IWebView* webView, IWebFrame* f
     MakeScriptObject();
   }
 
- return S_OK;
+  return S_OK;
 }
 
 HRESULT WebView::didFinishDocumentLoadForFrame(IWebView *sender, IWebFrame *frame)
@@ -409,7 +415,7 @@ HRESULT WebView::didFinishDocumentLoadForFrame(IWebView *sender, IWebFrame *fram
     msg.Post();
   }
 
-#if 0
+#if 1
   HRESULT hr = S_OK;
 
   IWebDataSource* dataSource = 0;
@@ -428,7 +434,7 @@ HRESULT WebView::didFinishDocumentLoadForFrame(IWebView *sender, IWebFrame *fram
 exit:
 #endif
 
- return S_OK;
+  return S_OK;
 }
 
 HRESULT WebView::didFinishLoadForFrame(IWebView* webView, IWebFrame* frame)
@@ -439,7 +445,7 @@ HRESULT WebView::didFinishLoadForFrame(IWebView* webView, IWebFrame* frame)
     msg.Post();
   }
 
-#if 0
+#if 1
   HRESULT hr = S_OK;
 
   IWebDataSource* dataSource = 0;
@@ -457,6 +463,82 @@ HRESULT WebView::didFinishLoadForFrame(IWebView* webView, IWebFrame* frame)
   apLog_Debug((LOG_CHANNEL, "WebView::didFinishLoadForFrame", "%s", StringType(StringFromBSTR(bstrUrl))));
 exit:
 #endif
- return S_OK;
+  return S_OK;
 }
 
+HRESULT WebView::willSendRequest(IWebView *webView, unsigned long identifier, IWebURLRequest *request, IWebURLResponse *redirectResponse, IWebDataSource *dataSource, IWebURLRequest **newRequest)
+{
+  int bChanged = 0;
+
+  Msg_WebView_Event_BeforeRequest msg;
+
+  if (pWebView_ == webView) {
+    BSTR bstrUrl = 0;
+    request->URL(&bstrUrl);
+    String sUrl = StringFromBSTR(bstrUrl);
+
+    msg.hWebView = apHandle();
+    msg.sUrl = StringFromBSTR(bstrUrl);
+    msg.Filter();
+
+    //if (msg.sUrl == "http://webkit.org/images/icon-gold.png") {
+    //  msg.sUrl = "http://www.wolfspelz.de/img/wolf2-3d.gif";
+    //}
+
+    if (msg.sUrl != sUrl) {
+      bChanged = 1;
+    }
+  }
+
+  if (bChanged) {
+    IWebMutableURLRequest* requestCopy = 0;
+    request->mutableCopy(&requestCopy);
+
+    requestCopy->setURL(::SysAllocString(msg.sUrl));
+
+    *newRequest = requestCopy;
+    return S_OK;
+  } else {
+    return E_NOTIMPL;
+  }
+}
+
+HRESULT WebView::decidePolicyForNavigationAction(IWebView *webView, IPropertyBag *actionInformation, IWebURLRequest *request, IWebFrame *frame, IWebPolicyDecisionListener *listener)
+{
+  int bHandled = 0;
+
+  Msg_WebView_Event_BeforeNavigate msg;
+
+  if (pWebView_ == webView) {
+    BSTR bstrUrl = 0;
+    request->URL(&bstrUrl);
+    String sUrl = StringFromBSTR(bstrUrl);
+
+    msg.hWebView = apHandle();
+    msg.sUrl = StringFromBSTR(bstrUrl);
+    msg.Filter();
+
+    //if (msg.sUrl == "http://blog.wolfspelz.de/") {
+    //  msg.bCancel = 1;
+    //  ApAsyncMessage<Msg_WebView_Load> loadMsg;
+    //  loadMsg->hWebView = apHandle();
+    //  loadMsg->sUrl = "http://www.google.com/";
+    //  loadMsg.Post();
+    //}
+
+    bHandled = 1;
+  }
+
+  if (bHandled) {
+
+    if (msg.bCancel) {
+      listener->ignore();
+    } else {
+      listener->use();
+    }
+
+    return S_OK;
+  } else {
+    return E_NOTIMPL;
+  }
+}
