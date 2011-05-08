@@ -53,13 +53,16 @@ String WebViewModuleTester::LoadHtml()
     //"<body style='overflow:hidden;' onload=\"StartTimer()\">"
     "<body style='overflow:hidden;'>"
     "<div style='width:100%; height:100%; border:1px solid #000000; background-color:rgba(240,240,255,0.5);'>"
-    "  <p style='background-color:rgba(0,255,0,0.8);'>Testing LoadHtml " "\xe9\x87\x91" " <a href='http://blog.wolfspelz.de'>Link</a></p>"
+    "  <div style='width:100%; height:20px; border-bottom:1px solid #000000; background-color:#00ff00;'>Caption</div>"
+    "  <p>Testing LoadHtml " "\xe9\x87\x91" " <a href='http://blog.wolfspelz.de'>Link</a></p>"
     "  <p id=\"iResponse\">xx</p>"
     "  <img src='http://webkit.org/images/icon-gold.png' />"
     "  <img src='test1.png' />"
-    "  <input type='text' value='10' id='nX' name='nX' /><input type='text' value='10' id='nY' name='nY' /><input type='text' value='8' id='nDirection' name='nDirection' />"
-    "  <input type='button' value='MoveBy' onclick=\"Apollo.sendMessage('Method=WebView_MoveBy\\nhView=' + Apollo.viewHandle + '\\nnX=' + document.getElementById('nX').value + '\\nnY=' + document.getElementById('nY').value + '');\" />"
-    "  <input type='button' value='SizeBy' onclick=\"Apollo.sendMessage('Method=WebView_SizeBy\\nhView=' + Apollo.viewHandle + '\\nnH=' + document.getElementById('nX').value + '\\nnW=' + document.getElementById('nY').value + '\\nnDirection=' + document.getElementById('nDirection').value + '');\" />"
+    "  <p>"
+    "    <input type='text' value='10' id='nX' name='nX' /><input type='text' value='10' id='nY' name='nY' /><input type='text' value='8' id='nDirection' name='nDirection' />"
+    "    <input type='button' value='MoveBy' onclick=\"Apollo.sendMessage('Method=WebView_MoveBy\\nhView=' + Apollo.viewHandle + '\\nnX=' + document.getElementById('nX').value + '\\nnY=' + document.getElementById('nY').value + '');\" />"
+    "    <input type='button' value='SizeBy' onclick=\"Apollo.sendMessage('Method=WebView_SizeBy\\nhView=' + Apollo.viewHandle + '\\nnH=' + document.getElementById('nX').value + '\\nnW=' + document.getElementById('nY').value + '\\nnDirection=' + document.getElementById('nDirection').value + '');\" />"
+    "  </p>"
   //"  <iframe src='http://www.wolfspelz.de'></iframe>"
     "</div>"
     "</body>"
@@ -86,8 +89,8 @@ void WebViewModuleTester::On_CallJSEcho_WebView_Event_DocumentLoaded(Msg_WebView
   if (pMsg->hView != g_CallJSEcho_hView) { return; }
 
   int ok = 0;
-  String sIn = "Hello World";
-  String sOutExpected = "Hello World" " (JS.TestEcho)" " (JS_Apollo_echoString)";
+  String sIn = "Hello World" " \xe9\x87\x91";
+  String sOutExpected = "Hello World" " \xe9\x87\x91" " (JS.TestEcho)" " (JS_Apollo_echoString)";
   Msg_WebView_CallScriptFunction msg;
   msg.hView = pMsg->hView;
   msg.sMethod = "TestEcho";
@@ -115,29 +118,7 @@ String WebViewModuleTester::CallJSEcho()
 
   if (!s) { if (!Msg_WebView_Create::_(hView)) { s = "Msg_WebView_Create failed"; }}
   if (!s) { if (!Msg_WebView_SetScriptAccess::Allow(hView)) { s = "Msg_WebView_SetScriptAccess failed"; }}
-
-  if (!s) { if (!Msg_WebView_LoadHtml::_(hView, 
-    "<html>"
-    "<head>"
-    "<style>"
-    "* { margin:0; padding:0; }"
-    "</style>"
-    "<script>"
-    "function TestEcho(s) { return Apollo.echoString(s + ' (JS.TestEcho)'); }"
-    "</script>"
-    "</head>"
-    "<body style='overflow:hidden;'>"
-    "<div style='width:100%; height:100%; border:1px solid #000000;'>"
-    "  <p style='background-color:#00FF00;'>Testing CallJSEcho " "\xe9\x87\x91" "</p>"
-    "  <img src='http://webkit.org/images/icon-gold.png' />"
-    "  <img src='test1.png' />"
-  //"  <iframe src='http://www.wolfspelz.de'></iframe>"
-    "</div>"
-    "</body>"
-    "</html>"
-    , "file://" + Apollo::getModuleResourcePath(MODULE_NAME) + "html/test/CallJSEcho"
-    )) { s = "Msg_WebView_LoadHtml failed"; }}
-
+  if (!s) { if (!Msg_WebView_LoadHtml::_(hView, "<script>function TestEcho(s) { return Apollo.echoString(s + ' (JS.TestEcho)'); }</script>" , "")) { s = "Msg_WebView_LoadHtml failed"; }}
   if (!s) { if (!Msg_WebView_Position::_(hView, 100, 500, 400, 300)) { s = "Msg_WebView_Position failed"; }}
   if (!s) { if (!Msg_WebView_Visibility::_(hView, 1)) { s = "Msg_WebView_Visibility failed"; }}
 
