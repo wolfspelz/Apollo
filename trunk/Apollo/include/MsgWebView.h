@@ -162,6 +162,39 @@ public:
   ApIN int nDirection;
 };
 
+class Msg_WebView_MouseCapture: public ApRequestMessage
+{
+public:
+  Msg_WebView_MouseCapture() : ApRequestMessage("WebView_MouseCapture") {}
+  ApIN ApHandle hView;
+};
+
+class Msg_WebView_MouseRelease: public ApRequestMessage
+{
+public:
+  Msg_WebView_MouseRelease() : ApRequestMessage("WebView_MouseRelease") {}
+  ApIN ApHandle hView;
+};
+
+class Msg_WebView_GetPosition: public ApRequestMessage
+{
+public:
+  Msg_WebView_GetPosition() : ApRequestMessage("WebView_GetPosition"), nX(0), nY(0), nW(0), nH(0) {}
+  ApIN ApHandle hView;
+  ApOUT int nX;
+  ApOUT int nY;
+  ApOUT int nW;
+  ApOUT int nH;
+};
+
+class Msg_WebView_GetVisibility: public ApRequestMessage
+{
+public:
+  Msg_WebView_GetVisibility() : ApRequestMessage("WebView_GetVisibility"), bVisible(0) {}
+  ApIN ApHandle hView;
+  ApOUT int bVisible;
+};
+
 //--------------------------
 // Events
 

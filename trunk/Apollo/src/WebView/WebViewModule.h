@@ -37,6 +37,10 @@ public:
   void On_WebView_SetScriptAccess(Msg_WebView_SetScriptAccess* pMsg);
   void On_WebView_MoveBy(Msg_WebView_MoveBy* pMsg);
   void On_WebView_SizeBy(Msg_WebView_SizeBy* pMsg);
+  void On_WebView_MouseCapture(Msg_WebView_MouseCapture* pMsg);
+  void On_WebView_MouseRelease(Msg_WebView_MouseRelease* pMsg);
+  void On_WebView_GetPosition(Msg_WebView_GetPosition* pMsg);
+  void On_WebView_GetVisibility(Msg_WebView_GetVisibility* pMsg);
 
   void On_System_3SecTimer(Msg_System_3SecTimer* pMsg);
 
