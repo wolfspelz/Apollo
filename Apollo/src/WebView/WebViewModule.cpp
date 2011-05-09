@@ -124,6 +124,34 @@ AP_MSG_HANDLER_METHOD(WebViewModule, WebView_SizeBy)
   pMsg->apStatus = ApMessage::Ok;
 }
 
+AP_MSG_HANDLER_METHOD(WebViewModule, WebView_MouseCapture)
+{
+  View* pView = FindView(pMsg->hView);
+  pView->MouseCapture();
+  pMsg->apStatus = ApMessage::Ok;
+}
+
+AP_MSG_HANDLER_METHOD(WebViewModule, WebView_MouseRelease)
+{
+  View* pView = FindView(pMsg->hView);
+  pView->MouseRelease();
+  pMsg->apStatus = ApMessage::Ok;
+}
+
+AP_MSG_HANDLER_METHOD(WebViewModule, WebView_GetPosition)
+{
+  View* pView = FindView(pMsg->hView);
+  pView->GetPosition(pMsg->nX, pMsg->nY, pMsg->nW, pMsg->nH);
+  pMsg->apStatus = ApMessage::Ok;
+}
+
+AP_MSG_HANDLER_METHOD(WebViewModule, WebView_GetVisibility)
+{
+  View* pView = FindView(pMsg->hView);
+  pView->GetVisibility(pMsg->bVisible);
+  pMsg->apStatus = ApMessage::Ok;
+}
+
 int g_nCnt = 0;
 AP_MSG_HANDLER_METHOD(WebViewModule, System_3SecTimer)
 {
@@ -173,6 +201,55 @@ void SrpcGate_WebView_SizeBy(ApSRPCMessage* pMsg)
     pMsg->response.createError(pMsg->srpc, msg.sComment);
   } else {
     pMsg->response.createResponse(pMsg->srpc);
+  }
+}
+
+void SrpcGate_WebView_MouseCapture(ApSRPCMessage* pMsg)
+{
+  Msg_WebView_MouseCapture msg;
+  msg.hView = Apollo::string2Handle(pMsg->srpc.getString("hView"));
+  if (!msg.Request()) {
+    pMsg->response.createError(pMsg->srpc, msg.sComment);
+  } else {
+    pMsg->response.createResponse(pMsg->srpc);
+  }
+}
+
+void SrpcGate_WebView_MouseRelease(ApSRPCMessage* pMsg)
+{
+  Msg_WebView_MouseRelease msg;
+  msg.hView = Apollo::string2Handle(pMsg->srpc.getString("hView"));
+  if (!msg.Request()) {
+    pMsg->response.createError(pMsg->srpc, msg.sComment);
+  } else {
+    pMsg->response.createResponse(pMsg->srpc);
+  }
+}
+
+void SrpcGate_WebView_GetPosition(ApSRPCMessage* pMsg)
+{
+  Msg_WebView_GetPosition msg;
+  msg.hView = Apollo::string2Handle(pMsg->srpc.getString("hView"));
+  if (!msg.Request()) {
+    pMsg->response.createError(pMsg->srpc, msg.sComment);
+  } else {
+    pMsg->response.createResponse(pMsg->srpc);
+    pMsg->response.setInt("nX", msg.nX);
+    pMsg->response.setInt("nY", msg.nY);
+    pMsg->response.setInt("nW", msg.nW);
+    pMsg->response.setInt("nH", msg.nH);
+  }
+}
+
+void SrpcGate_WebView_GetVisibility(ApSRPCMessage* pMsg)
+{
+  Msg_WebView_GetVisibility msg;
+  msg.hView = Apollo::string2Handle(pMsg->srpc.getString("hView"));
+  if (!msg.Request()) {
+    pMsg->response.createError(pMsg->srpc, msg.sComment);
+  } else {
+    pMsg->response.createResponse(pMsg->srpc);
+    pMsg->response.setInt("bVisible", msg.bVisible);
   }
 }
 
@@ -228,11 +305,21 @@ int WebViewModule::Init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, WebViewModule, WebView_SetScriptAccess, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, WebViewModule, WebView_MoveBy, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, WebViewModule, WebView_SizeBy, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, WebViewModule, WebView_MouseCapture, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, WebViewModule, WebView_MouseRelease, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, WebViewModule, WebView_GetPosition, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, WebViewModule, WebView_GetVisibility, this, ApCallbackPosNormal);
+
   AP_MSG_REGISTRY_ADD(MODULE_NAME, WebViewModule, System_3SecTimer, this, ApCallbackPosNormal);
+
   AP_UNITTEST_HOOK(WebViewModule, this);
 
   srpcGateRegistry_.add("WebView_MoveBy", SrpcGate_WebView_MoveBy);
   srpcGateRegistry_.add("WebView_SizeBy", SrpcGate_WebView_SizeBy);
+  srpcGateRegistry_.add("WebView_MouseCapture", SrpcGate_WebView_MouseCapture);
+  srpcGateRegistry_.add("WebView_MouseRelease", SrpcGate_WebView_MouseRelease);
+  srpcGateRegistry_.add("WebView_GetPosition", SrpcGate_WebView_GetPosition);
+  srpcGateRegistry_.add("WebView_GetVisibility", SrpcGate_WebView_GetVisibility);
 
   return ok;
 }

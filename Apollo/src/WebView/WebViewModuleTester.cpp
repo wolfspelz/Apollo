@@ -39,34 +39,27 @@ String WebViewModuleTester::LoadHtml()
   //if (!s) { if (!Msg_WebView_Load::_(hView, "http://www.wolfspelz.de")) { s = "Msg_WebView_Load failed"; }}
 
   if (!s) { if (!Msg_WebView_LoadHtml::_(hView, 
-    "<html>"
-    "<head>"
-    "<style>"
-    "* { margin:0; padding:0; }"
-    "</style>"
-    "<script>"
-    "function StartTimer() { window.setInterval('GetTime()', 1000); }"
-    "function GetTime() { document.getElementById('iResponse').innerHTML = Apollo.sendMessage('Method=System_GetTime\\nhView=' + Apollo.viewHandle + '\\n'); }"
-    "function Concat(a, b) { return a + b; }"
-    "</script>"
-    "</head>"
-    //"<body style='overflow:hidden;' onload=\"StartTimer()\">"
-    "<body style='overflow:hidden;'>"
-    "<div style='width:100%; height:100%; border:1px solid #000000; background-color:rgba(240,240,255,0.5);'>"
-    "  <div style='width:100%; height:20px; border-bottom:1px solid #000000; background-color:#00ff00;'>Caption</div>"
-    "  <p>Testing LoadHtml " "\xe9\x87\x91" " <a href='http://blog.wolfspelz.de'>Link</a></p>"
-    "  <p id=\"iResponse\">xx</p>"
-    "  <img src='http://webkit.org/images/icon-gold.png' />"
-    "  <img src='test1.png' />"
-    "  <p>"
-    "    <input type='text' value='10' id='nX' name='nX' /><input type='text' value='10' id='nY' name='nY' /><input type='text' value='8' id='nDirection' name='nDirection' />"
-    "    <input type='button' value='MoveBy' onclick=\"Apollo.sendMessage('Method=WebView_MoveBy\\nhView=' + Apollo.viewHandle + '\\nnX=' + document.getElementById('nX').value + '\\nnY=' + document.getElementById('nY').value + '');\" />"
-    "    <input type='button' value='SizeBy' onclick=\"Apollo.sendMessage('Method=WebView_SizeBy\\nhView=' + Apollo.viewHandle + '\\nnH=' + document.getElementById('nX').value + '\\nnW=' + document.getElementById('nY').value + '\\nnDirection=' + document.getElementById('nDirection').value + '');\" />"
-    "  </p>"
-  //"  <iframe src='http://www.wolfspelz.de'></iframe>"
-    "</div>"
-    "</body>"
-    "</html>"
+    "<html>\n"
+    "<head>\n"
+    "<style>\n"
+    "* { margin:0; padding:0; }\n"
+    "</style>\n"
+    "<script>\n"
+    "  function StartTimer() { window.setInterval('GetTime()', 1000); }\n"
+    "  function GetTime() { var sResponse = apollo.sendMessage('Method=System_GetTime\\nhView=' + apollo.viewHandle + '\\n'); document.getElementById('iLog').innerHTML = sResponse; }\n"
+    "  function Concat(a, b) { return a + b; }\n"
+    "</script>\n"
+    "</head>\n"
+    "<body style='overflow:hidden;' onload=\"StartTimer()\">\n"
+    "<div style='width:100%; height:100%; border:1px solid #000000; background-color:rgba(240,240,255,0.7);'>\n"
+    "  <p style='width:100%; height:20px; border-bottom:1px solid #000000; background-color:#00ff00;'>Testing LoadHtml " "\xe9\x87\x91" " <a href='http://blog.wolfspelz.de'>Link</a></p>\n"
+    "  <p id=\"iLog\">--</p>\n"
+    "  <img src='http://webkit.org/images/icon-gold.png' />\n"
+    "  <img src='test1.png' />\n"
+  //"  <iframe src='http://www.wolfspelz.de'></iframe>\n"
+    "</div>\n"
+    "</body>\n"
+    "</html>\n"
     , "file://" + Apollo::getModuleResourcePath(MODULE_NAME) + "html/test/LoadHtml"
     )) { s = "Msg_WebView_LoadHtml failed"; }}
 
@@ -118,7 +111,7 @@ String WebViewModuleTester::CallJSEcho()
 
   if (!s) { if (!Msg_WebView_Create::_(hView)) { s = "Msg_WebView_Create failed"; }}
   if (!s) { if (!Msg_WebView_SetScriptAccess::Allow(hView)) { s = "Msg_WebView_SetScriptAccess failed"; }}
-  if (!s) { if (!Msg_WebView_LoadHtml::_(hView, "<script>function TestEcho(s) { return Apollo.echoString(s + ' (JS.TestEcho)'); }</script>" , "")) { s = "Msg_WebView_LoadHtml failed"; }}
+  if (!s) { if (!Msg_WebView_LoadHtml::_(hView, "<script>function TestEcho(s) { return apollo.echoString(s + ' (JS.TestEcho)'); }</script>" , "")) { s = "Msg_WebView_LoadHtml failed"; }}
   if (!s) { if (!Msg_WebView_Position::_(hView, 100, 500, 400, 300)) { s = "Msg_WebView_Position failed"; }}
   if (!s) { if (!Msg_WebView_Visibility::_(hView, 1)) { s = "Msg_WebView_Visibility failed"; }}
 
@@ -127,9 +120,29 @@ String WebViewModuleTester::CallJSEcho()
 
 //----------------------------------------------------------
 
-String WebViewModuleTester::xx()
+String WebViewModuleTester::Dev()
 {
   String s;
+
+  ApHandle hView = Apollo::newHandle();
+
+  { Msg_WebView_Event_DocumentComplete msg; msg.Hook(MODULE_NAME, (ApCallback) WebViewModuleTester::On_LoadHtml_WebView_Event_DocumentComplete, 0, ApCallbackPosNormal); }
+
+  if (!s) { if (!Msg_WebView_Create::_(hView)) { s = "Msg_WebView_Create failed"; }}
+  if (!s) { if (!Msg_WebView_SetScriptAccess::Allow(hView)) { s = "Msg_WebView_SetScriptAccess failed"; }}
+  //if (!s) { if (!Msg_WebView_Load::_(hView, "http://www.wolfspelz.de")) { s = "Msg_WebView_Load failed"; }}
+
+  String sFile = Apollo::getModuleResourcePath(MODULE_NAME) + "html/test/dev.html";
+  String sHtml;
+  Apollo::loadFile(sFile, sHtml);
+  if (!s) { if (!Msg_WebView_LoadHtml::_(hView, sHtml, "file://" + sFile)) { s = "Msg_WebView_LoadHtml failed"; }}
+
+  if (!s) { if (!Msg_WebView_Position::_(hView, 500, 200, 400, 300)) { s = "Msg_WebView_Position failed"; }}
+  if (!s) { if (!Msg_WebView_Visibility::_(hView, 1)) { s = "Msg_WebView_Visibility failed"; }}
+
+  if (0) {
+    if (!s) { if (!Msg_WebView_Destroy::_(hView)) { s = "Msg_WebView_Destroy failed"; }}
+  }
 
   return s;
 }
@@ -147,6 +160,7 @@ void WebViewModuleTester::Execute()
 {
   AP_UNITTEST_EXECUTE(WebViewModuleTester::LoadHtml);
   AP_UNITTEST_EXECUTE(WebViewModuleTester::CallJSEcho);
+  (void) WebViewModuleTester::Dev();
 }
 
 void WebViewModuleTester::End()

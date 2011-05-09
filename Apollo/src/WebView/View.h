@@ -43,7 +43,7 @@ public:
     ,nW_(600)
     ,nH_(400)
     ,bScriptAccess_(0)
-    #if defined(WIN32)
+#if defined(WIN32)
     ,pWebView_(0)
     ,pWebFrame_(0)
     ,pWebViewPrivate_(0)
@@ -51,7 +51,7 @@ public:
     ,nRefCount_(0)
     ,pTopLoadingFrame_(0)
     ,pScriptObject_(0)
-    #endif // WIN32
+#endif // WIN32
   {}
   virtual ~View();
 
@@ -68,6 +68,10 @@ public:
   String CallJSFunction(const String& sFunction, List& lArgs);
   void MoveBy(int nX, int nY);
   void SizeBy(int nW, int nH, int nDirection);
+  void MouseCapture();
+  void MouseRelease();
+  void GetPosition(int& nX, int& nY, int& nW, int& nH);
+  void GetVisibility(int& bVisible);
 
   static JSValueRef JS_Apollo_getSharedValue(JSContextRef ctx, JSObjectRef thisObject, JSStringRef propertyName, JSValueRef* exception);
   static JSValueRef JS_Apollo_echoString(JSContextRef ctx, JSObjectRef function, JSObjectRef thisObject, size_t argumentCount, const JSValueRef* arguments, JSValueRef* exception);
@@ -142,7 +146,7 @@ public:
   virtual HRESULT STDMETHODCALLTYPE dragDestinationActionMaskForDraggingInfo(IWebView*, IDataObject*, WebDragDestinationAction*) { return E_NOTIMPL; }
   virtual HRESULT STDMETHODCALLTYPE willPerformDragDestinationAction(IWebView*, WebDragDestinationAction, IDataObject*) { return E_NOTIMPL; }
   virtual HRESULT STDMETHODCALLTYPE dragSourceActionMaskForPoint(IWebView*, LPPOINT, WebDragSourceAction*) { return E_NOTIMPL; };
-  virtual HRESULT STDMETHODCALLTYPE willPerformDragSourceAction(IWebView*, WebDragSourceAction, LPPOINT, IDataObject*, IDataObject**) { return E_NOTIMPL; }
+  virtual HRESULT STDMETHODCALLTYPE willPerformDragSourceAction(IWebView*, WebDragSourceAction, LPPOINT, IDataObject*, IDataObject**);// { return E_NOTIMPL; }
   virtual HRESULT STDMETHODCALLTYPE contextMenuItemSelected(IWebView*, void*, IPropertyBag*) { return E_NOTIMPL; }
   virtual HRESULT STDMETHODCALLTYPE hasCustomMenuImplementation(BOOL*) { return E_NOTIMPL; }
   virtual HRESULT STDMETHODCALLTYPE trackCustomPopupMenu(IWebView*, OLE_HANDLE, LPPOINT) { return E_NOTIMPL; }
@@ -199,15 +203,15 @@ public:
   virtual HRESULT STDMETHODCALLTYPE didFirstVisuallyNonEmptyLayoutInFrame(IWebView *sender, IWebFrame *frame) { return S_OK; }
 
   // IWebResourceLoadDelegate
-	virtual HRESULT STDMETHODCALLTYPE identifierForInitialRequest(IWebView *webView, IWebURLRequest *request, IWebDataSource *dataSource, unsigned long identifier) { return S_OK; }
-	virtual HRESULT STDMETHODCALLTYPE willSendRequest(IWebView *webView, unsigned long identifier, IWebURLRequest *request, IWebURLResponse *redirectResponse, IWebDataSource *dataSource, IWebURLRequest **newRequest);//{ return S_OK; }
-	virtual HRESULT STDMETHODCALLTYPE didReceiveAuthenticationChallenge(IWebView *webView, unsigned long identifier, IWebURLAuthenticationChallenge *challenge, IWebDataSource *dataSource) { return S_OK; }
-	virtual HRESULT STDMETHODCALLTYPE didCancelAuthenticationChallenge(IWebView *webView, unsigned long identifier, IWebURLAuthenticationChallenge *challenge, IWebDataSource *dataSource) { return S_OK; }
-	virtual HRESULT STDMETHODCALLTYPE didReceiveResponse(IWebView *webView, unsigned long identifier, IWebURLResponse *response, IWebDataSource *dataSource) { return S_OK; }
-	virtual HRESULT STDMETHODCALLTYPE didReceiveContentLength(IWebView *webView, unsigned long identifier, UINT length, IWebDataSource *dataSource) { return S_OK; }
-	virtual HRESULT STDMETHODCALLTYPE didFinishLoadingFromDataSource(IWebView *webView, unsigned long identifier, IWebDataSource *dataSource) { return S_OK; }
-	virtual HRESULT STDMETHODCALLTYPE didFailLoadingWithError(IWebView *webView, unsigned long identifier, IWebError *error, IWebDataSource *dataSource) { return S_OK; }
-	virtual HRESULT STDMETHODCALLTYPE plugInFailedWithError(IWebView *webView, IWebError *error, IWebDataSource *dataSource) { return S_OK; }
+  virtual HRESULT STDMETHODCALLTYPE identifierForInitialRequest(IWebView *webView, IWebURLRequest *request, IWebDataSource *dataSource, unsigned long identifier) { return S_OK; }
+  virtual HRESULT STDMETHODCALLTYPE willSendRequest(IWebView *webView, unsigned long identifier, IWebURLRequest *request, IWebURLResponse *redirectResponse, IWebDataSource *dataSource, IWebURLRequest **newRequest);//{ return S_OK; }
+  virtual HRESULT STDMETHODCALLTYPE didReceiveAuthenticationChallenge(IWebView *webView, unsigned long identifier, IWebURLAuthenticationChallenge *challenge, IWebDataSource *dataSource) { return S_OK; }
+  virtual HRESULT STDMETHODCALLTYPE didCancelAuthenticationChallenge(IWebView *webView, unsigned long identifier, IWebURLAuthenticationChallenge *challenge, IWebDataSource *dataSource) { return S_OK; }
+  virtual HRESULT STDMETHODCALLTYPE didReceiveResponse(IWebView *webView, unsigned long identifier, IWebURLResponse *response, IWebDataSource *dataSource) { return S_OK; }
+  virtual HRESULT STDMETHODCALLTYPE didReceiveContentLength(IWebView *webView, unsigned long identifier, UINT length, IWebDataSource *dataSource) { return S_OK; }
+  virtual HRESULT STDMETHODCALLTYPE didFinishLoadingFromDataSource(IWebView *webView, unsigned long identifier, IWebDataSource *dataSource) { return S_OK; }
+  virtual HRESULT STDMETHODCALLTYPE didFailLoadingWithError(IWebView *webView, unsigned long identifier, IWebError *error, IWebDataSource *dataSource) { return S_OK; }
+  virtual HRESULT STDMETHODCALLTYPE plugInFailedWithError(IWebView *webView, IWebError *error, IWebDataSource *dataSource) { return S_OK; }
 
   // IWebPolicyDelegate
   virtual HRESULT STDMETHODCALLTYPE decidePolicyForNavigationAction(IWebView *webView, IPropertyBag *actionInformation, IWebURLRequest *request, IWebFrame *frame, IWebPolicyDecisionListener *listener);
@@ -216,72 +220,23 @@ public:
   virtual HRESULT STDMETHODCALLTYPE unableToImplementPolicyWithError(IWebView *webView, IWebError *error, IWebFrame *frame) { return E_NOTIMPL; }
 
   // IWebUIDelegatePrivate
-    virtual HRESULT STDMETHODCALLTYPE unused1() { return E_NOTIMPL; }
-
-    virtual HRESULT STDMETHODCALLTYPE unused2() { return E_NOTIMPL; }
-    
-    virtual HRESULT STDMETHODCALLTYPE unused3() { return E_NOTIMPL; }
-    
-    virtual HRESULT STDMETHODCALLTYPE webViewScrolled( 
-        /* [in] */ IWebView *sender) { return E_NOTIMPL; }
-    
-    virtual HRESULT STDMETHODCALLTYPE webViewAddMessageToConsole( 
-        /* [in] */ IWebView *sender,
-        /* [in] */ BSTR message,
-        /* [in] */ int lineNumber,
-        /* [in] */ BSTR url,
-        /* [in] */ BOOL isError) { return E_NOTIMPL; }
-    
-    virtual HRESULT STDMETHODCALLTYPE webViewShouldInterruptJavaScript( 
-        /* [in] */ IWebView *sender,
-        /* [retval][out] */ BOOL *result) { return E_NOTIMPL; }
-    
-    virtual HRESULT STDMETHODCALLTYPE webViewReceivedFocus( 
-        /* [in] */ IWebView *sender) { return E_NOTIMPL; }
-    
-    virtual HRESULT STDMETHODCALLTYPE webViewLostFocus( 
-        /* [in] */ IWebView *sender,
-        /* [in] */ OLE_HANDLE loseFocusTo) { return E_NOTIMPL; }
-
-    virtual HRESULT STDMETHODCALLTYPE doDragDrop( 
-        /* [in] */ IWebView *sender,
-        /* [in] */ IDataObject *dataObject,
-        /* [in] */ IDropSource *dropSource,
-        /* [in] */ DWORD okEffect,
-        /* [retval][out] */ DWORD *performedEffect) { return E_NOTIMPL; }
-
-    virtual HRESULT STDMETHODCALLTYPE webViewGetDlgCode( 
-        /* [in] */ IWebView *sender,
-        /* [in] */ UINT keyCode,
-        /* [retval][out] */ LONG_PTR *code) { return E_NOTIMPL; }
-
-    virtual HRESULT STDMETHODCALLTYPE webViewPainted( 
-        /* [in] */ IWebView *sender) { return E_NOTIMPL; }
-
-    virtual HRESULT STDMETHODCALLTYPE exceededDatabaseQuota( 
-        /* [in] */ IWebView *sender,
-        /* [in] */ IWebFrame *frame,
-        /* [in] */ IWebSecurityOrigin *origin,
-        /* [in] */ BSTR databaseIdentifier) { return E_NOTIMPL; }
-
-    virtual HRESULT STDMETHODCALLTYPE embeddedViewWithArguments( 
-        /* [in] */ IWebView *sender,
-        /* [in] */ IWebFrame *frame,
-        /* [in] */ IPropertyBag *arguments,
-        /* [retval][out] */ IWebEmbeddedView **view) { return E_NOTIMPL; }
-        
-    virtual HRESULT STDMETHODCALLTYPE webViewClosing( 
-        /* [in] */ IWebView *sender) { return E_NOTIMPL; }
-    
-    virtual HRESULT STDMETHODCALLTYPE webViewSetCursor( 
-        /* [in] */ IWebView *sender,
-        /* [in] */ OLE_HANDLE cursor) { return E_NOTIMPL; }
-    
-    virtual HRESULT STDMETHODCALLTYPE webViewDidInvalidate( 
-        /* [in] */ IWebView *sender) { return E_NOTIMPL; }
-
-    virtual HRESULT STDMETHODCALLTYPE desktopNotificationsDelegate(
-        /* [out] */ IWebDesktopNotificationsDelegate** result) { return E_NOTIMPL; }
+  virtual HRESULT STDMETHODCALLTYPE unused1() { return E_NOTIMPL; }
+  virtual HRESULT STDMETHODCALLTYPE unused2() { return E_NOTIMPL; }
+  virtual HRESULT STDMETHODCALLTYPE unused3() { return E_NOTIMPL; }
+  virtual HRESULT STDMETHODCALLTYPE webViewScrolled( /* [in] */ IWebView *sender) { return E_NOTIMPL; }
+  virtual HRESULT STDMETHODCALLTYPE webViewAddMessageToConsole(/* [in] */ IWebView *sender, /* [in] */ BSTR message, /* [in] */ int lineNumber, /* [in] */ BSTR url, /* [in] */ BOOL isError) { return E_NOTIMPL; }
+  virtual HRESULT STDMETHODCALLTYPE webViewShouldInterruptJavaScript(/* [in] */ IWebView *sender, /* [retval][out] */ BOOL *result) { return E_NOTIMPL; }
+  virtual HRESULT STDMETHODCALLTYPE webViewReceivedFocus(/* [in] */ IWebView *sender) { return E_NOTIMPL; }
+  virtual HRESULT STDMETHODCALLTYPE webViewLostFocus(/* [in] */ IWebView *sender, /* [in] */ OLE_HANDLE loseFocusTo) { return E_NOTIMPL; }
+  virtual HRESULT STDMETHODCALLTYPE doDragDrop(/* [in] */ IWebView *sender, /* [in] */ IDataObject *dataObject, /* [in] */ IDropSource *dropSource, /* [in] */ DWORD okEffect, /* [retval][out] */ DWORD *performedEffect) { return E_NOTIMPL; }
+  virtual HRESULT STDMETHODCALLTYPE webViewGetDlgCode(/* [in] */ IWebView *sender, /* [in] */ UINT keyCode, /* [retval][out] */ LONG_PTR *code) { return E_NOTIMPL; }
+  virtual HRESULT STDMETHODCALLTYPE webViewPainted(/* [in] */ IWebView *sender) { return E_NOTIMPL; }
+  virtual HRESULT STDMETHODCALLTYPE exceededDatabaseQuota(/* [in] */ IWebView *sender, /* [in] */ IWebFrame *frame, /* [in] */ IWebSecurityOrigin *origin, /* [in] */ BSTR databaseIdentifier) { return E_NOTIMPL; }
+  virtual HRESULT STDMETHODCALLTYPE embeddedViewWithArguments(/* [in] */ IWebView *sender, /* [in] */ IWebFrame *frame, /* [in] */ IPropertyBag *arguments, /* [retval][out] */ IWebEmbeddedView **view) { return E_NOTIMPL; }
+  virtual HRESULT STDMETHODCALLTYPE webViewClosing(/* [in] */ IWebView *sender) { return E_NOTIMPL; }
+  virtual HRESULT STDMETHODCALLTYPE webViewSetCursor(/* [in] */ IWebView *sender, /* [in] */ OLE_HANDLE cursor) { return E_NOTIMPL; }
+  virtual HRESULT STDMETHODCALLTYPE webViewDidInvalidate(/* [in] */ IWebView *sender) { return E_NOTIMPL; }
+  virtual HRESULT STDMETHODCALLTYPE desktopNotificationsDelegate(/* [out] */ IWebDesktopNotificationsDelegate** result) { return E_NOTIMPL; }
 
 };
 

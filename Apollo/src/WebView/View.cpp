@@ -208,7 +208,7 @@ void View::SetPosition(int nX, int nY, int nW, int nH)
   nH_ = nH;
 
 #if defined(WIN32)
-  ::MoveWindow(hWnd_, nX_, nY_ - (bVisible_ ? 0 : 10000), nW_, nH_, TRUE);
+  ::MoveWindow(hWnd_, nX_, nY_ - (bVisible_ ? 0 : 10000), nW_, nH_, FALSE);
 #endif // WIN32
 }
 
@@ -219,7 +219,7 @@ void View::SetVisibility(int bVisible)
 
   if (bChanged) {
 #if defined(WIN32)
-    ::MoveWindow(hWnd_, nX_, nY_ - (bVisible_ ? 0 : 10000), nW_, nH_, TRUE);
+    ::MoveWindow(hWnd_, nX_, nY_ - (bVisible_ ? 0 : 10000), nW_, nH_, FALSE);
 
     //::ShowWindow(hWnd_, bVisible_ ? SW_SHOW : SW_HIDE);
     //if (bVisible_) {
@@ -242,10 +242,10 @@ void View::MoveBy(int nX, int nY)
   nY_ += nY;
 
 #if defined(WIN32)
-  ::MoveWindow(hWnd_, nX_, nY_ - (bVisible_ ? 0 : 10000), nW_, nH_, TRUE);
+  ::MoveWindow(hWnd_, nX_, nY_ - (bVisible_ ? 0 : 10000), nW_, nH_, FALSE);
 #endif // WIN32
 }
-
+  
 void View::SizeBy(int nW, int nH, int nDirection)
 {
   switch (nDirection) {
@@ -260,8 +260,35 @@ void View::SizeBy(int nW, int nH, int nDirection)
   }
 
 #if defined(WIN32)
-  ::MoveWindow(hWnd_, nX_, nY_ - (bVisible_ ? 0 : 10000), nW_, nH_, TRUE);
+  ::MoveWindow(hWnd_, nX_, nY_ - (bVisible_ ? 0 : 10000), nW_, nH_, FALSE);
 #endif // WIN32
+}
+
+void View::MouseCapture()
+{
+#if defined(WIN32)
+  ::SetCapture(hWnd_);
+#endif // WIN32
+}
+
+void View::MouseRelease()
+{
+#if defined(WIN32)
+  ::ReleaseCapture();
+#endif // WIN32
+}
+
+void View::GetPosition(int& nX, int& nY, int& nW, int& nH)
+{
+  nX = nX_;
+  nY = nY_;
+  nW = nW_;
+  nH = nH_;
+}
+
+void View::GetVisibility(int& bVisible)
+{
+  bVisible = bVisible_;
 }
 
 //------------------------------------
@@ -348,7 +375,7 @@ JSClassRef JS_Apollo_class()
   JSClassDefinition JS_Apollo_class = {
     0,                     // int version // current (and only) version is 0
     kJSClassAttributeNone, // JSClassAttributes attributes
-    "Apollo",              // const char* className
+    "apollo",              // const char* className
     0,                     // JSClassRef parentClass
     JS_Apollo_values,      // const JSStaticValue* staticValues
     JS_Apollo_functions,   // const JSStaticFunction* staticFunctions
@@ -470,7 +497,7 @@ void View::MakeScriptObject()
   pScriptObject_ = JSObjectMake(runCtx, apolloClass, reinterpret_cast<void*>(this));
   if (pScriptObject_ == 0) return;
 
-  JSStringRef apolloName = JSStringCreateWithUTF8CString("Apollo");
+  JSStringRef apolloName = JSStringCreateWithUTF8CString("apollo");
   if (apolloName == 0) return;
 
   JSObjectSetProperty(runCtx, pGlobal, apolloName, pScriptObject_, kJSPropertyAttributeNone, 0);
@@ -656,4 +683,10 @@ HRESULT View::decidePolicyForNavigationAction(IWebView *webView, IPropertyBag *a
   } else {
     return E_NOTIMPL;
   }
+}
+
+HRESULT View::willPerformDragSourceAction(IWebView*, WebDragSourceAction, LPPOINT, IDataObject*, IDataObject**)
+{
+  // Disable drag
+  return S_OK;
 }
