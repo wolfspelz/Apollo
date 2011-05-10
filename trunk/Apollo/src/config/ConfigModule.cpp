@@ -16,7 +16,11 @@ int ConfigModule::setValue(ConfigPlane* pPlane, const String& sKey, const String
     String sTrimmed = sKey;
     sTrimmed.trimWSP();
     if (!sTrimmed.empty()) {
-      apLog_Verbose((LOG_CHANNEL, "setValue", "%s:%s=%s", StringType(pPlane->getName()), StringType(sKey), StringType(sValue)));
+      if (sKey.startsWith("#")) {
+        apLog_Verbose((LOG_CHANNEL, "setValue", "%s:%s=%s", StringType(pPlane->getName()), StringType(sKey), StringType(sValue)));
+      } else {
+        apLog_Info((LOG_CHANNEL, "setValue", "%s:%s=%s", StringType(pPlane->getName()), StringType(sKey), StringType(sValue)));
+      }
       return pPlane->stData_.Set(sKey, sValue);
     }
   }

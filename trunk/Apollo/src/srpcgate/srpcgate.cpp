@@ -315,25 +315,6 @@ void SrpcGate_System_GetHandle(ApSRPCMessage* pMsg)
 }
 
 //--------------------------
-#include "MsgLog.h"
-
-void SrpcGate_Log_SetMask(ApSRPCMessage* pMsg)
-{
-  int ok = 1;
-
-  Msg_Log_SetMask msg;
-  msg.nMask = pMsg->srpc.getInt("nMask");
-  (void) msg.Send();
-
-  if (!ok) {
-    pMsg->response.createError(pMsg->srpc, "Msg_Log_SetMask failed");
-  } else {
-    pMsg->response.createResponse(pMsg->srpc);
-    pMsg->response.setInt("nOldMask", msg.nOldMask);
-  }
-}
-
-//--------------------------
 #include "MsgConfig.h"
 
 void SrpcGate_Config_SetValue(ApSRPCMessage* pMsg)
@@ -387,7 +368,6 @@ SRPCGATE_API int Load(AP_MODULE_CALL* pModuleData)
   { Msg_SrpcGate_Register msg; msg.sCallName = "Fluid_Destroy"; msg.fnHandler = SrpcGate_Fluid_Destroy; msg.Request(); }
   { Msg_SrpcGate_Register msg; msg.sCallName = "System_GetTime"; msg.fnHandler = SrpcGate_System_GetTime; msg.Request(); }
   { Msg_SrpcGate_Register msg; msg.sCallName = "System_GetHandle"; msg.fnHandler = SrpcGate_System_GetHandle; msg.Request(); }
-  { Msg_SrpcGate_Register msg; msg.sCallName = "Log_SetMask"; msg.fnHandler = SrpcGate_Log_SetMask; msg.Request(); }
   { Msg_SrpcGate_Register msg; msg.sCallName = "Config_SetValue"; msg.fnHandler = SrpcGate_Config_SetValue; msg.Request(); }
   { Msg_SrpcGate_Register msg; msg.sCallName = "Config_GetValue"; msg.fnHandler = SrpcGate_Config_GetValue; msg.Request(); }
 
@@ -406,7 +386,6 @@ SRPCGATE_API int UnLoad(AP_MODULE_CALL* pModuleData)
   { Msg_SrpcGate_Unregister msg; msg.sCallName = "Fluid_Destroy"; msg.Request(); }
   { Msg_SrpcGate_Unregister msg; msg.sCallName = "System_GetTime"; msg.Request(); }
   { Msg_SrpcGate_Unregister msg; msg.sCallName = "System_GetHandle"; msg.Request(); }
-  { Msg_SrpcGate_Unregister msg; msg.sCallName = "Log_SetMask"; msg.Request(); }
   { Msg_SrpcGate_Unregister msg; msg.sCallName = "Config_SetValue"; msg.Request(); }
   { Msg_SrpcGate_Unregister msg; msg.sCallName = "Config_GetValue"; msg.Request(); }
 

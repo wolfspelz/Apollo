@@ -26,8 +26,8 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
   //apLog_SetMask(apLog_MaskSilent);
   //apLog_SetMask(apLog_MaskNoTrace);
-  //apLog_SetMask(apLog_MaskMaxInfo);
-  apLog_SetMask(apLog_MaskMaxVerbose);
+  apLog_SetMask(apLog_MaskMaxInfo);
+  //apLog_SetMask(apLog_MaskMaxVerbose);
   
   if (!Apollo::Init(__argc, __argv)) {
     apLog_Alert(("Main", "WinMain", "Apollo::Init() failed"));
@@ -62,6 +62,9 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
       apLog_Alert(("Main", "WinMain", "%s/%s not found. Maybe wrong working directory?", StringType(msg.sDir), StringType(msg.sName)));
     }
   }
+
+  int nLogMask = Apollo::getConfig("LogMask", -1);
+  if (nLogMask != -1) { Msg_Log_SetMask msg; msg.nMask = nLogMask; msg.Send(); }
 
   //Apollo::loadModulesFromDir("./");
   Apollo::loadModulesFromConfig("Core/Modules/");
