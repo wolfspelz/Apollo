@@ -55,6 +55,7 @@ static const char* szLevelNames[apLog_NLogLevels] = {
   ,"Fatal...."
   ,"Error...."
   ,"Warning.."
+  ,"User....."
   ,"Debug...."
   ,"Info....."
   ,"Verbose.."

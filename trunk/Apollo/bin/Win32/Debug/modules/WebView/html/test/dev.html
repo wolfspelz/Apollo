@@ -213,20 +213,28 @@ var ui =
   // ------------------------------------------------
   // Log
   
-  log: function(nMask, sContext, sMessage)
+  log: function(nMask, sChannel, sContext, sMessage)
   {
     return new SrpcMessage('Log_Line')
       .setInt('nMask', nMask)
-      .setString('sChannel', this.moduleName)
+      .setString('sChannel', sChannel)
       .setString('sContext', sContext)
       .setString('sMessage', sMessage)
       .send();
   },
 
-  logInfo: function(sContext, sText)
-  {
-    this.log(32, sContext, sText);
-  },
+  LogLevelFatal      : 2  ,
+  LogLevelError      : 4  ,
+  LogLevelWarning    : 8  ,
+  LogLevelUser       : 16 ,
+  LogLevelDebug      : 32 ,
+  LogLevelInfo       : 64 ,
+  LogLevelVerbose    : 128,
+  LogLevelTrace      : 256,
+  LogLevelVeryVerbose: 512,
+
+  logInfo: function(sContext, sMessage) { this.log(this.LogLevelInfo, this.moduleName, sContext, sMessage); },
+  logUser: function(sMessage) { this.log(this.LogLevelUser, '', '', sMessage); },
 
   // ------------------------------------------------
   // Babelfish
@@ -364,7 +372,7 @@ var ui =
 </style>
 
 </head>
-<body style="overflow:hidden;" onload="ui.logInfo('onload', '#################################################')">
+<body style="overflow:hidden;" onload="ui.logUser('body.onload')" onunload="ui.logUser('body.onunload')">
 <div style="width:100%; height:100%; border:1px solid #000000; background-color:rgba(240,240,255,0.7);">
   <div class="Move" style="cursor:default; width:100%; height:20px; border-bottom:1px solid #000000; background-color:#00ff00;">Caption</div>
   <p id="iLog">--</p>
