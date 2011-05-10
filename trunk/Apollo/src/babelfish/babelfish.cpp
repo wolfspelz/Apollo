@@ -10,6 +10,7 @@
 #include "MsgTranslation.h"
 #include "MsgCore.h"
 #include "STree.h"
+#include "SrpcGateHelper.h"
 
 #if defined(WIN32)
 BOOL APIENTRY DllMain(HANDLE hModule, DWORD dwReason, LPVOID lpReserved)
@@ -107,6 +108,8 @@ protected:
 
   String sCurrentPlane_;
   ListT<TranslationPlane, Elem> lPlanes_;
+
+  Apollo::SrpcGateHandlerRegistry srpcGateRegistry_;
 };
 
 typedef ApModuleSingleton<BabelfishModule> BabelfishModuleInstance;
@@ -128,16 +131,36 @@ Language::~Language()
 
 //----------------------------------------------------------
 
+void SrpcGate_Translation_Get(ApSRPCMessage* pMsg)
+{
+  Msg_Translation_Get msg;
+  msg.sModule = pMsg->srpc.getString("sModule");
+  msg.sContext = pMsg->srpc.getString("sContext");
+  msg.sText = pMsg->srpc.getString("sText");
+  if (!msg.Request()) {
+    pMsg->response.createError(pMsg->srpc, msg.sComment);
+  } else {
+    pMsg->response.createResponse(pMsg->srpc);
+    pMsg->response.setString("sTranslated", msg.sTranslated);
+  }
+}
+
+//----------------------------------------------------------
+
 int BabelfishModule::init()
 {
   sContextSeparator_ = Apollo::getModuleConfig(MODULE_NAME, "ContextSeparator", ".");
   sDefaultLanguage_ = Apollo::getModuleConfig(MODULE_NAME, "DefaultLanguage", "en");
   sCurrentLanguage_ = sDefaultLanguage_;
+
+  srpcGateRegistry_.add("Translation_Get", SrpcGate_Translation_Get);
+
   return 1;
 }
 
 int BabelfishModule::exit()
 {
+  srpcGateRegistry_.finish();
   return 1;
 }
 

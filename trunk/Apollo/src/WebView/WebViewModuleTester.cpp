@@ -151,15 +151,15 @@ String WebViewModuleTester::Dev()
 
 void WebViewModuleTester::Begin()
 {
-  AP_UNITTEST_REGISTER(WebViewModuleTester::LoadHtml);
-  AP_UNITTEST_REGISTER(WebViewModuleTester::CallJSEcho);
-  AP_UNITTEST_REGISTER(WebViewModuleTester::CallJSEcho_Result);
+  //AP_UNITTEST_REGISTER(WebViewModuleTester::LoadHtml);
+  //AP_UNITTEST_REGISTER(WebViewModuleTester::CallJSEcho);
+  //AP_UNITTEST_REGISTER(WebViewModuleTester::CallJSEcho_Result);
 }
 
 void WebViewModuleTester::Execute()
 {
-  AP_UNITTEST_EXECUTE(WebViewModuleTester::LoadHtml);
-  AP_UNITTEST_EXECUTE(WebViewModuleTester::CallJSEcho);
+  //AP_UNITTEST_EXECUTE(WebViewModuleTester::LoadHtml);
+  //AP_UNITTEST_EXECUTE(WebViewModuleTester::CallJSEcho);
   (void) WebViewModuleTester::Dev();
 }
 

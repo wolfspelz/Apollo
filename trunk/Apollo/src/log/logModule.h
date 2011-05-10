@@ -8,6 +8,7 @@
 #define logModule_H_INCLUDED
 
 #include "Apollo.h"
+#include "SrpcGateHelper.h"
 #include "logFile.h"
 
 #define LOG_CHANNEL "log"
@@ -39,6 +40,7 @@ protected:
 
 protected:
   int bInShutdown_;
+  Apollo::SrpcGateHandlerRegistry srpcGateRegistry_;
 };
 
 typedef ApModuleSingleton<LogModule> LogModuleInstance;

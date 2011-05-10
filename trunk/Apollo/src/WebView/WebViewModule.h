@@ -58,8 +58,7 @@ public:
 public:
   ViewList views_;
 
-   Apollo::SrpcGateHandlerRegistry srpcGateRegistry_;
-
+  Apollo::SrpcGateHandlerRegistry srpcGateRegistry_;
   AP_MSG_REGISTRY_DECLARE;
 };
 
