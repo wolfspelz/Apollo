@@ -557,7 +557,7 @@ HRESULT View::didFinishDocumentLoadForFrame(IWebView *sender, IWebFrame *frame)
     msg.Post();
   }
 
-#if 1
+#if 0
   HRESULT hr = S_OK;
 
   IWebDataSource* dataSource = 0;
@@ -587,7 +587,7 @@ HRESULT View::didFinishLoadForFrame(IWebView* webView, IWebFrame* frame)
     msg.Post();
   }
 
-#if 1
+#if 0
   HRESULT hr = S_OK;
 
   IWebDataSource* dataSource = 0;
