@@ -442,6 +442,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\include\MsgWebView.h"
+					>
+				</File>
+				<File
 					RelativePath="..\..\include\MsgXmpp.h"
 					>
 				</File>

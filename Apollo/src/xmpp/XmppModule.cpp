@@ -284,7 +284,7 @@ AP_MSG_HANDLER_METHOD(XmppModule, Xmpp_GetRoomHandle)
   FORWARD_TO_CLIENT_PRE("XmppModule::On_Xmpp_PublicChat");
   pMsg->hRoom = pClient->getRoomHandle(pMsg->sRoomJid);
   if (!ApIsHandle(pMsg->hRoom)) {
-    ok= 0;
+    ok = 0;
   }
   FORWARD_TO_CLIENT_POST("XmppModule::On_Xmpp_PublicChat");
 

@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8,00"
-	Name="WebView"
-	ProjectGUID="{4AC6E41F-A2DF-44E6-A354-D29727770396}"
-	RootNamespace="WebView"
+	Name="WebArena"
+	ProjectGUID="{A43A7CB4-A368-4AA0-8999-12E13DF300D2}"
+	RootNamespace="WebArena"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -38,8 +38,8 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="C:\cygwin\home\wolf\WebKit\WebKitBuild\Debug_Cairo_CFLite\include\"
-				PreprocessorDefinitions="WEBVIEW_EXPORTS"
+				AdditionalIncludeDirectories=""
+				PreprocessorDefinitions="WEBARENA_EXPORTS"
 				DebugInformationFormat="4"
 			/>
 			<Tool
@@ -53,9 +53,8 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="Shlwapi.lib Apollo.lib WebKitGUID_debug.lib WebKit_debug.lib"
-				AdditionalLibraryDirectories="C:\cygwin\home\wolf\WebKit\WebKitBuild\Debug_Cairo_CFLite\lib"
-				IgnoreDefaultLibraryNames="MSVCRT"
+				AdditionalDependencies="Apollo.lib"
+				AdditionalLibraryDirectories=""
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -106,8 +105,8 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="C:\cygwin\home\wolf\WebKit\WebKitBuild\Release_Cairo_CFLite\include"
-				PreprocessorDefinitions="WEBVIEW_EXPORTS"
+				AdditionalIncludeDirectories=""
+				PreprocessorDefinitions="WEBARENA_EXPORTS"
 				DebugInformationFormat="3"
 			/>
 			<Tool
@@ -121,8 +120,8 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="Shlwapi.lib Apollo.lib WebKitGUID.lib WebKit.lib"
-				AdditionalLibraryDirectories="C:\cygwin\home\wolf\WebKit\WebKitBuild\Release_Cairo_CFLite\lib"
+				AdditionalDependencies="Apollo.lib"
+				AdditionalLibraryDirectories=""
 				GenerateDebugInformation="true"
 			/>
 			<Tool
@@ -157,30 +156,38 @@
 		<Filter
 			Name="Source Files"
 			Filter="cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx"
-			UniqueIdentifier="{3310C060-F3C7-4623-B9E9-E8468B07DAF9}"
+			UniqueIdentifier="{C0292BEB-CAB7-472d-AE79-14232C0D3BF5}"
 			>
+			<File
+				RelativePath=".\Avatar.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Display.cpp"
+				>
+			</File>
 			<File
 				RelativePath=".\dll.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\View.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\WebViewModule.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\WebViewModuleTester.cpp"
+				RelativePath=".\WebArenaModule.cpp"
 				>
 			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
-			UniqueIdentifier="{52D90B4D-6A02-429d-AD6E-0151273E5B70}"
+			UniqueIdentifier="{05CE6F93-2DB3-4c95-820E-475A38C422D4}"
 			>
+			<File
+				RelativePath=".\Avatar.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Display.h"
+				>
+			</File>
 			<File
 				RelativePath=".\dll.h"
 				>
@@ -190,26 +197,22 @@
 				>
 			</File>
 			<File
-				RelativePath=".\View.h"
-				>
-			</File>
-			<File
-				RelativePath=".\WebViewModule.h"
-				>
-			</File>
-			<File
-				RelativePath=".\WebViewModuleTester.h"
+				RelativePath=".\WebArenaModule.h"
 				>
 			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"
 			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
-			UniqueIdentifier="{7A559A34-CD76-49a8-A212-11216CC3CC9F}"
+			UniqueIdentifier="{50200952-F8D0-433e-A3A5-3951C5C54E47}"
 			>
 		</Filter>
 		<File
-			RelativePath="..\..\bin\Win32\Debug\modules\WebView\config.txt"
+			RelativePath="..\..\bin\Win32\Debug\modules\WebArena\config.txt"
+			>
+		</File>
+		<File
+			RelativePath="..\..\bin\Win32\Debug\modules\WebArena\index.html"
 			>
 		</File>
 	</Files>

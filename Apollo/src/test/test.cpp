@@ -58,6 +58,7 @@ int On_UnitTest_Begin(Msg_UnitTest_Begin* pMsg)
   if (Apollo::getConfig("Test/Vp", 0)) { Test_Vp_Register(); }
   if (Apollo::getConfig("Test/Threads", 0)) { Test_Threads_Register(); }
   if (Apollo::getConfig("Test/Galileo", 0)) { Test_Galileo_Register(); }
+  if (Apollo::getConfig("Test/Arena", 0)) { Test_Arena_Register(); }
 
   return 1;
 }
@@ -76,6 +77,7 @@ int On_UnitTest_Execute(Msg_UnitTest_Begin* pMsg)
   if (Apollo::getConfig("Test/Vp", 0)) { Test_Vp_Begin(); }
   if (Apollo::getConfig("Test/Threads", 0)) { Test_Threads_Begin(); }
   if (Apollo::getConfig("Test/Galileo", 0)) { Test_Galileo_Begin(); }
+  if (Apollo::getConfig("Test/Arena", 0)) { Test_Arena_Begin(); }
 
   apLog_SetMask(nMask);
 
@@ -93,6 +95,7 @@ int On_UnitTest_End(Msg_UnitTest_End* pMsg)
   if (Apollo::getConfig("Test/Vp", 0)) { Test_Vp_End(); }
   if (Apollo::getConfig("Test/Threads", 0)) { Test_Threads_End(); }
   if (Apollo::getConfig("Test/Galileo", 0)) { Test_Galileo_End(); }
+  if (Apollo::getConfig("Test/Arena", 0)) { Test_Arena_End(); }
 
   return 1;
 }

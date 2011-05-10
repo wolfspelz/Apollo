@@ -31,7 +31,7 @@ int Connection::OnDataIn(unsigned char* pData, size_t nLen)
       *pMessage >> msg.srpc;
       int ok = msg.Request();
       if (!ok) {
-        apLog_Error((LOG_CHANNEL, "Connection::OnDataIn", "Msg_Fluid_Receive() failed"));
+        apLog_Error((LOG_CHANNEL, "Connection::OnDataIn", "Msg_Navigation_Receive() failed"));
       }
 
       delete pMessage;

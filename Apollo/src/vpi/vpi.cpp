@@ -216,7 +216,7 @@ int VpiModule::LibVpiComposeLocationCallback(vpi_callback_ref ref, const char* p
       } else {
         if (*url_len > msg.sLocationUrl.bytes()) {
           memcpy(url, msg.sLocationUrl.c_str(), msg.sLocationUrl.bytes() + 1);
-          ok= 1;
+          ok = 1;
         }
       }
     }
@@ -411,7 +411,7 @@ int VpiModule::RequestFile(const String& sUrl)
 
 void VpiModule::On_Vpi_Clear(Msg_Vpi_Clear* pMsg)
 {
-  int ok= vpi_cache_clear(pVpi_);
+  int ok = vpi_cache_clear(pVpi_);
   { int ok = vpi_set_suffix(pVpi_, "");}
 
   pMsg->apStatus = ok ? ApMessage::Ok : ApMessage::Error;

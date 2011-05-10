@@ -161,6 +161,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\testArena.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\testBuiltin.cpp"
 				>
 			</File>

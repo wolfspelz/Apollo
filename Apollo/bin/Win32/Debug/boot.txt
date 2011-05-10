@@ -19,6 +19,7 @@ Core/Modules/02100/Navigation/Path=navigation
 Core/Modules/02200/Gm/Path=gm
 Core/Modules/02300/Galileo/Path=Galileo
 Core/Modules/02700/WebView/Path=WebView
+Core/Modules/02800/WebArena/Path=WebArena
 
 Core/ModulesDirectory=modules
 

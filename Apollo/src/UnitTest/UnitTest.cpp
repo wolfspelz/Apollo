@@ -202,7 +202,11 @@ BOOL CALLBACK UnitTestDialog::DlgProc(HWND hDlg, UINT message, WPARAM wParam, LP
           cy = ::GetSystemMetrics(SM_CYSCREEN);
         }
         if (cx !=0 && cy != 0) {
-          ::SetWindowPos(hDlg, NULL, (cx - (rDialog.right - rDialog.left)) / 3, (cy - (rDialog.bottom - rDialog.top)) / 3, 0, 0, SWP_NOSIZE|SWP_NOZORDER);
+          // Center
+          //::SetWindowPos(hDlg, NULL, (cx - (rDialog.right - rDialog.left)) / 3, (cy - (rDialog.bottom - rDialog.top)) / 3, 0, 0, SWP_NOSIZE|SWP_NOZORDER);
+
+          // TopRight
+          ::SetWindowPos(hDlg, NULL, cx - (rDialog.right - rDialog.left), 0, 0, 0, SWP_NOSIZE|SWP_NOZORDER);
         }
 
         ::SetWindowText(::GetDlgItem(hDlg, IDC_SUMMARY), pController_->Summary());

@@ -275,20 +275,6 @@ void SrpcGate_Vp_CloseContext(ApSRPCMessage* pMsg)
 }
 
 //--------------------------
-#include "MsgFluid.h"
-
-void SrpcGate_Fluid_Destroy(ApSRPCMessage* pMsg)
-{
-  Msg_Fluid_Destroy msg;
-  msg.hDisplay = Apollo::string2Handle(pMsg->srpc.getString("hDisplay"));
-  if (!msg.Request()) {
-    pMsg->response.createError(pMsg->srpc, msg.sComment);
-  } else {
-    pMsg->response.createResponse(pMsg->srpc);
-  }
-}
-
-//--------------------------
 #include "MsgSystem.h"
 
 void SrpcGate_System_GetTime(ApSRPCMessage* pMsg)
@@ -365,7 +351,6 @@ SRPCGATE_API int Load(AP_MODULE_CALL* pModuleData)
   { Msg_SrpcGate_Register msg; msg.sCallName = "Xmpp_Disconnect"; msg.fnHandler = SrpcGate_Xmpp_Disconnect; msg.Request(); }
   { Msg_SrpcGate_Register msg; msg.sCallName = "Vp_NavigateContext"; msg.fnHandler = SrpcGate_Vp_NavigateContext; msg.Request(); }
   { Msg_SrpcGate_Register msg; msg.sCallName = "Vp_CloseContext"; msg.fnHandler = SrpcGate_Vp_CloseContext; msg.Request(); }
-  { Msg_SrpcGate_Register msg; msg.sCallName = "Fluid_Destroy"; msg.fnHandler = SrpcGate_Fluid_Destroy; msg.Request(); }
   { Msg_SrpcGate_Register msg; msg.sCallName = "System_GetTime"; msg.fnHandler = SrpcGate_System_GetTime; msg.Request(); }
   { Msg_SrpcGate_Register msg; msg.sCallName = "System_GetHandle"; msg.fnHandler = SrpcGate_System_GetHandle; msg.Request(); }
   { Msg_SrpcGate_Register msg; msg.sCallName = "Config_SetValue"; msg.fnHandler = SrpcGate_Config_SetValue; msg.Request(); }
@@ -383,7 +368,6 @@ SRPCGATE_API int UnLoad(AP_MODULE_CALL* pModuleData)
   { Msg_SrpcGate_Unregister msg; msg.sCallName = "Xmpp_Disconnect"; msg.Request(); }
   { Msg_SrpcGate_Unregister msg; msg.sCallName = "Vp_NavigateContext"; msg.Request(); }
   { Msg_SrpcGate_Unregister msg; msg.sCallName = "Vp_CloseContext"; msg.Request(); }
-  { Msg_SrpcGate_Unregister msg; msg.sCallName = "Fluid_Destroy"; msg.Request(); }
   { Msg_SrpcGate_Unregister msg; msg.sCallName = "System_GetTime"; msg.Request(); }
   { Msg_SrpcGate_Unregister msg; msg.sCallName = "System_GetHandle"; msg.Request(); }
   { Msg_SrpcGate_Unregister msg; msg.sCallName = "Config_SetValue"; msg.Request(); }

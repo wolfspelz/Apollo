@@ -236,7 +236,7 @@ public:
   virtual HRESULT STDMETHODCALLTYPE unused2() { return E_NOTIMPL; }
   virtual HRESULT STDMETHODCALLTYPE unused3() { return E_NOTIMPL; }
   virtual HRESULT STDMETHODCALLTYPE webViewScrolled( /* [in] */ IWebView *sender) { return E_NOTIMPL; }
-  virtual HRESULT STDMETHODCALLTYPE webViewAddMessageToConsole(/* [in] */ IWebView *sender, /* [in] */ BSTR message, /* [in] */ int lineNumber, /* [in] */ BSTR url, /* [in] */ BOOL isError) { return E_NOTIMPL; }
+  virtual HRESULT STDMETHODCALLTYPE webViewAddMessageToConsole(/* [in] */ IWebView *sender, /* [in] */ BSTR message, /* [in] */ int lineNumber, /* [in] */ BSTR url, /* [in] */ BOOL isError);// { return E_NOTIMPL; }
   virtual HRESULT STDMETHODCALLTYPE webViewShouldInterruptJavaScript(/* [in] */ IWebView *sender, /* [retval][out] */ BOOL *result) { return E_NOTIMPL; }
   virtual HRESULT STDMETHODCALLTYPE webViewReceivedFocus(/* [in] */ IWebView *sender) { return E_NOTIMPL; }
   virtual HRESULT STDMETHODCALLTYPE webViewLostFocus(/* [in] */ IWebView *sender, /* [in] */ OLE_HANDLE loseFocusTo) { return E_NOTIMPL; }
