@@ -210,6 +210,7 @@ int apLog_Mask2Level(int _nMask)
     case apLog_MaskFatal: return apLog_LevelFatal;
     case apLog_MaskError: return apLog_LevelError;
     case apLog_MaskWarning: return apLog_LevelWarning;
+    case apLog_MaskUser: return apLog_LevelUser;
     case apLog_MaskDebug: return apLog_LevelDebug;
     case apLog_MaskInfo: return apLog_LevelInfo;
     case apLog_MaskVerbose: return apLog_LevelVerbose;
@@ -289,6 +290,20 @@ void apLog_WarningI(const char* _szChannel, const char* _szContext, const char* 
       apLog_OS::vsnprintf(szMessage, apLog_Const_MAXMESSAGE, szFmt, argp);
       va_end(argp);
       apLog_LogMessage(apLog_MaskWarning, _szChannel, _szContext, (const char*)szMessage);
+    }
+  }
+}
+
+void apLog_UserI(const char* szFmt, ...)
+{
+  if (apLog_IsMask(apLog_MaskUser)) {
+    if (szFmt != 0) {
+      char szMessage[apLog_Const_MAXMESSAGE]; szMessage[0] = '\0';
+      va_list argp;
+      va_start(argp, szFmt);
+      apLog_OS::vsnprintf(szMessage, apLog_Const_MAXMESSAGE, szFmt, argp);
+      va_end(argp);
+      apLog_LogMessage(apLog_MaskUser, "", "", (const char*)szMessage);
     }
   }
 }

@@ -30,14 +30,4 @@ Core/ModuleConfig/AppPathToken=[[APP_PATH]]
 System/UserProfileFolder=Avatar
 
 #Dun/OnLoad/DeleteDbFiles=Identity
-
-# Fatal       3
-# Error       7
-# Warning     15
-# Debug       31
-# Info        63
-# Verbose     127
-# Trace       255
-# VeryVerbose 511
-# Alert       512
-#LogMask=127
+#LogMask=31

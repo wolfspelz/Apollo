@@ -202,6 +202,7 @@ extern "C" {
   APOLLO_API void apLog_FatalI(const char* _szChannel, const char* _szContext, const char* _szFmt, ...);
   APOLLO_API void apLog_ErrorI(const char* _szChannel, const char* _szContext, const char* _szFmt, ...);
   APOLLO_API void apLog_WarningI(const char* _szChannel, const char* _szContext, const char* _szFmt, ...);
+  APOLLO_API void apLog_UserI(const char* _szFmt, ...);
   APOLLO_API void apLog_DebugI(const char* _szChannel, const char* _szContext, const char* _szFmt, ...);
   APOLLO_API void apLog_InfoI(const char* _szChannel, const char* _szContext, const char* _szFmt, ...);
   APOLLO_API void apLog_VerboseI(const char* _szChannel, const char* _szContext, const char* _szFmt, ...);

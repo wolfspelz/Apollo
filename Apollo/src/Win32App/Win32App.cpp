@@ -26,7 +26,8 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
   //apLog_SetMask(apLog_MaskSilent);
   //apLog_SetMask(apLog_MaskNoTrace);
-  apLog_SetMask(apLog_MaskMaxInfo);
+  apLog_SetMask(apLog_MaskMaxUser);
+  //apLog_SetMask(apLog_MaskMaxInfo);
   //apLog_SetMask(apLog_MaskMaxVerbose);
   
   if (!Apollo::Init(__argc, __argv)) {
@@ -41,6 +42,8 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
   { Msg_MainLoop_ConsoleInput msg; msg.Hook("Win32App", (ApCallback) On_MainLoop_ConsoleInput, 0, ApCallbackPosNormal); }
 
   { Msg_System_RunLevel msg; msg.sLevel = Msg_System_RunLevel_PreBoot; msg.Send(); }
+
+  apLog_User("Loading");
 
   {
     String sModule = "config";
@@ -83,6 +86,8 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
   { Msg_System_AfterLoadModules msg; msg.Send(); }
   { Msg_System_BeforeEventLoop msg; msg.Send(); }
 
+  apLog_User("Running");
+
   int nResult = 0;
   {
     Msg_MainLoop_Win32Loop msg;
@@ -93,6 +98,8 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     Apollo::callMsg(&msg, Apollo::CF_UNSYNCHRONIZED); // no sync, because other threads may start inside the main loop
     nResult = msg.wParam;
   }
+
+  apLog_User("Shutdown");
 
   { Msg_System_AfterEventLoop msg; msg.Send(); }
   { Msg_System_BeforeUnloadModules msg; msg.Send(); }
