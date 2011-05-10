@@ -1,10 +1,11 @@
 ﻿<html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+
 <script type="text/javascript">
 // ------------------------------------------
 
-function SrpcMessage(sMethod)
+function ApMessage(sMethod)
 {
 	this.aParams_ = new Array();
   if (sMethod != null) {
@@ -15,7 +16,7 @@ function SrpcMessage(sMethod)
 // ---------------------
 // Setter
 
-SrpcMessage.prototype.fromString = function(sMsg)
+ApMessage.prototype.fromString = function(sMsg)
 {
 	var aLines = sMsg.split("\n");
 	if (aLines.length > 0) {
@@ -32,7 +33,7 @@ SrpcMessage.prototype.fromString = function(sMsg)
 	}
 }
 
-SrpcMessage.prototype.encodeCString = function(sValue)
+ApMessage.prototype.encodeCString = function(sValue)
 {
 	var sResult = '';
 	for (var i = 0; i < sValue.length; i++) {
@@ -46,20 +47,20 @@ SrpcMessage.prototype.encodeCString = function(sValue)
 	return sResult;
 }
 
-SrpcMessage.prototype.setString = function(sKey, sValue)
+ApMessage.prototype.setString = function(sKey, sValue)
 {
 	sValue = this.encodeCString(sValue);
 	this.aParams_[sKey] = sValue;
 	return this;
 }
 
-SrpcMessage.prototype.setInt = function(sKey, nValue)
+ApMessage.prototype.setInt = function(sKey, nValue)
 {
 	this.aParams_[sKey] = String(nValue);
 	return this;
 }
 
-SrpcMessage.prototype.setKeyValueList = function(sKey, kvList)
+ApMessage.prototype.setKeyValueList = function(sKey, kvList)
 {
   var s = '';
   for (var i in kvList) { 
@@ -72,7 +73,7 @@ SrpcMessage.prototype.setKeyValueList = function(sKey, kvList)
 // ---------------------
 // Getter
 
-SrpcMessage.prototype.decodeCString = function(sValue)
+ApMessage.prototype.decodeCString = function(sValue)
 {
 	var sResult = '';
 	var bEscape = false;
@@ -98,7 +99,7 @@ SrpcMessage.prototype.decodeCString = function(sValue)
 	return sResult;
 }
 
-SrpcMessage.prototype.getString = function(sKey)
+ApMessage.prototype.getString = function(sKey)
 {
 	var sValue = '';
 	if (this.aParams_[sKey]) {
@@ -108,15 +109,15 @@ SrpcMessage.prototype.getString = function(sKey)
 	return sValue;
 }
 
-SrpcMessage.prototype.getInt = function(sKey)
+ApMessage.prototype.getInt = function(sKey)
 {
 	return parseInt(this.getString(sKey));
 }
 
-SrpcMessage.prototype.getKeyValueList = function(sKey)
+ApMessage.prototype.getKeyValueList = function(sKey)
 {
   var kvList = new Object();
-  var srpc = new SrpcMessage();
+  var srpc = new ApMessage();
   srpc.fromString(this.getString(sKey));
   for (var i in srpc.aParams_) {
     kvList[i] = srpc.aParams_[i];
@@ -127,9 +128,7 @@ SrpcMessage.prototype.getKeyValueList = function(sKey)
 // ---------------------
 // IO
 
-SrpcMessage.prototype.aRequests_ = new Array();
-
-SrpcMessage.prototype.send = function()
+ApMessage.prototype.send = function()
 {
   if (apollo) {
     var sMsg = '';
@@ -138,7 +137,7 @@ SrpcMessage.prototype.send = function()
 
     var sRespose = apollo.sendMessage(sMsg);
     
-    var resp = new SrpcMessage();
+    var resp = new ApMessage();
     resp.fromString(sRespose);
     
     return resp;
@@ -148,12 +147,12 @@ SrpcMessage.prototype.send = function()
 // ---------------------
 // Unittest
 
-SrpcMessage.prototype.unitTest = function()
+ApMessage.prototype.unitTest = function()
 {
 	var s = '';
 
 	if (!s) {
-		var msg = new SrpcMessage();
+		var msg = new ApMessage();
 		msg.fromString('Method=Test\na=b\nc=d\n');
 		if (!s) { if (msg.aParams_['Method'] != 'Test') { s = 'Missing Method'; } }
 		if (!s) { if (msg.aParams_['a'] != 'b') { s = 'Missing a=b'; } }
@@ -161,7 +160,7 @@ SrpcMessage.prototype.unitTest = function()
 	}
 
 	if (!s) {
-		var msg = new SrpcMessage();
+		var msg = new ApMessage();
 		msg.fromString('Method=Test\na=w=x\\ny=z\\n\nc=d\n');
 		if (!s) { if (msg.aParams_['Method'] != 'Test') { s = 'Missing Method'; } }
 		if (!s) { if (msg.aParams_['a'] != 'w=x\\ny=z\\n') { s = 'Missing a=w=x\\ny=z\\n'; } }
@@ -173,11 +172,11 @@ SrpcMessage.prototype.unitTest = function()
 
 // ------------------------------------------
 
-//ApMessage.prototype = new SrpcMessage;
+//ApMessage.prototype = new ApMessage;
 
 //function ApMessage(sType)
 //{
-//	this.inheritFrom = SrpcMessage;
+//	this.inheritFrom = ApMessage;
 //  this.inheritFrom();
 
 //	if (sType != null) {
@@ -190,20 +189,19 @@ SrpcMessage.prototype.unitTest = function()
 
 //function onLoad(e)
 //{
-//	new SrpcMessage().setString('Method', 'Display.Loaded').send();
+//	new ApMessage().setString('Method', 'Display.Loaded').send();
 //	window.removeEventListener('load', onLoad, false);
 //}
 
 //function onUnload(e)
 //{
-//	new SrpcMessage().setString('Method', 'Display.BeforeUnload').send();
+//	new ApMessage().setString('Method', 'Display.BeforeUnload').send();
 //	window.removeEventListener('unload', onUnload, false);
 //}
 
 //window.addEventListener('load', onLoad, false);
 //window.addEventListener('unload', onUnload, false);
 </script>
-
 
 <script type="text/javascript">
 var ui =
@@ -215,7 +213,7 @@ var ui =
   
   log: function(nMask, sChannel, sContext, sMessage)
   {
-    return new SrpcMessage('Log_Line')
+    return new ApMessage('Log_Line')
       .setInt('nMask', nMask)
       .setString('sChannel', sChannel)
       .setString('sContext', sContext)
@@ -223,18 +221,17 @@ var ui =
       .send();
   },
 
-  LogLevelFatal      : 2  ,
-  LogLevelError      : 4  ,
-  LogLevelWarning    : 8  ,
-  LogLevelUser       : 16 ,
-  LogLevelDebug      : 32 ,
-  LogLevelInfo       : 64 ,
+  LogLevelFatal      :   2,
+  LogLevelError      :   4,
+  LogLevelWarning    :   8,
+  LogLevelUser       :  16,
+  LogLevelDebug      :  32,
+  LogLevelInfo       :  64,
   LogLevelVerbose    : 128,
-  LogLevelTrace      : 256,
-  LogLevelVeryVerbose: 512,
 
-  logInfo: function(sContext, sMessage) { this.log(this.LogLevelInfo, this.moduleName, sContext, sMessage); },
   logUser: function(sMessage) { this.log(this.LogLevelUser, '', '', sMessage); },
+  logInfo: function(sContext, sMessage) { this.log(this.LogLevelInfo, this.moduleName, sContext, sMessage); },
+  logWarning: function(sContext, sMessage) { this.log(this.LogLevelWarning, this.moduleName, sContext, sMessage); },
 
   // ------------------------------------------------
   // Babelfish
@@ -250,7 +247,7 @@ var ui =
       sText = sArg2;
     }
     
-    return new SrpcMessage('Translation_Get')
+    return new ApMessage('Translation_Get')
       .setString('sModule', this.moduleName)
       .setString('sContext', sContext)
       .setString('sText', sText)
@@ -269,66 +266,66 @@ var ui =
   nStartX: 0,
   nStartY: 0,
   bMouseActive: false,
-  bMouseDown: false,
+  bMouseCaptured: false,
   bIsMove: false,
   bIsSize: false,
   nSizeDirection: 8,
-  nMinWidth: 150,
-  nMinHeight: 22,
+  nMinWidth: 100,
+  nMinHeight: 100,
   
   onMouseDown: function(ev)
   {
-    new SrpcMessage('WebView_MouseCapture').setString('hView', apollo.viewHandle).send();
-    this.nStartX = ev.x;
-    this.nStartY = ev.y;
-    this.bMouseActive = false;
-    this.bMouseDown = true;
+    new ApMessage('WebView_MouseCapture').setString('hView', apollo.viewHandle).send();
+    self.nStartX = ev.x;
+    self.nStartY = ev.y;
+    self.bMouseActive = false;
+    self.bMouseCaptured = true;
 
     if (ev.target.className =='Move') {
-      this.bIsMove = true; 
-      this.bIsSize = false; 
+      self.bIsMove = true; 
+      self.bIsSize = false; 
     }
     if (ev.target.className =='SizeBottomRight') {
-      this.bIsMove = false; 
-      this.bIsSize = true; 
-      this.nSizeDirection = 8; 
+      self.bIsMove = false; 
+      self.bIsSize = true; 
+      self.nSizeDirection = 8; 
     }
   },
 
   onMouseMove: function(ev)
   {
-    if (this.bMouseDown) {
-      var dx = ev.x - this.nStartX;
-      var dy = ev.y - this.nStartY;
-      if (!this.bMouseActive) {
+    if (self.bMouseCaptured) {
+      var dx = ev.x - self.nStartX;
+      var dy = ev.y - self.nStartY;
+      if (!self.bMouseActive) {
         if (dx > 4 || dx < -4 || dy > 4 || dy < -4) {
-          this.bMouseActive = true;
+          self.bMouseActive = true;
         }
       }
-      if (this.bMouseActive) {
-        if (this.bIsMove) {
-          new SrpcMessage('WebView_MoveBy').setString('hView', apollo.viewHandle).setInt('nX', dx).setInt('nY', dy).send();
+      if (self.bMouseActive) {
+        if (self.bIsMove) {
+          new ApMessage('WebView_MoveBy').setString('hView', apollo.viewHandle).setInt('nX', dx).setInt('nY', dy).send();
         }
-        if (this.bIsSize) {
+        if (self.bIsSize) {
           if (dx < 0 || dy < 0) {
-            var pos = new SrpcMessage('WebView_GetPosition').setString('hView', apollo.viewHandle).send();
+            var pos = new ApMessage('WebView_GetPosition').setString('hView', apollo.viewHandle).send();
             var nW = pos.getInt('nW');
             var nH = pos.getInt('nH');
             var nNewW = nW + dx;
             var nNewH = nH + dy;
-            if (nNewW < this.nMinWidth) { dx = this.nMinWidth - nW; }
-            if (nNewH < this.nMinHeight) { dy = this.nMinHeight - nH; }
+            if (nNewW < self.nMinWidth) { dx = self.nMinWidth - nW; }
+            if (nNewH < self.nMinHeight) { dy = self.nMinHeight - nH; }
           }
 
-          new SrpcMessage('WebView_SizeBy')
+          new ApMessage('WebView_SizeBy')
             .setString('hView', apollo.viewHandle)
             .setInt('nW', dx)
             .setInt('nH', dy)
-            .setInt('nDirection', this.nSizeDirection)
+            .setInt('nDirection', self.nSizeDirection)
             .send();
 
-          this.nStartX += dx;
-          this.nStartY += dy;
+          self.nStartX += dx;
+          self.nStartY += dy;
         }
       }
     }
@@ -336,23 +333,24 @@ var ui =
 
   onMouseUp: function()
   {
-    this.bMouseDown = false;
-    this.bMouseActive = false;
-    this.bIsMove = false;
-    this.bIsSize = false;
-    new SrpcMessage('WebView_MouseRelease').setString('hView', apollo.viewHandle);
+    self.bMouseCaptured = false;
+    self.bMouseActive = false;
+    self.bIsMove = false;
+    self.bIsSize = false;
+    new ApMessage('WebView_MouseRelease').setString('hView', apollo.viewHandle);
   },
 
   // ------------------------------------------------
   
   init: function()
   {
+    self = ui;
     document.onmousedown = this.onMouseDown; 
     document.onmousemove = this.onMouseMove; 
     document.onmouseup = this.onMouseUp;
   },
 
-  dummy: function () {}
+  dummy: 1
 }
 </script>
 
@@ -365,26 +363,35 @@ var ui =
   ui.nMinHeight = 22;
   ui.init();
 
+function Show()
+{
+  new ApMessage('WebView_Visibility').setString('hView', apollo.viewHandle).setInt('bVisible', 1).send();
+}
+
+function Hide()
+{
+  new ApMessage('WebView_Visibility').setString('hView', apollo.viewHandle).setInt('bVisible', 0).send();
+}
+
 </script>
 
 <style type="text/css">
-* { margin:0; padding:0; -webkit-user-select:none; }
+* { margin:0; padding:0; }
 </style>
 
 </head>
-<body style="overflow:hidden;" onload="ui.logUser('body.onload')" onunload="ui.logUser('body.onunload')">
+<body style="overflow:hidden;" onload="ui.logUser('onload')" onunload="ui.logUser('onunload')">
 <div style="width:100%; height:100%; border:1px solid #000000; background-color:rgba(240,240,255,0.7);">
   <div class="Move" style="cursor:default; width:100%; height:20px; border-bottom:1px solid #000000; background-color:#00ff00;">Caption</div>
-  <p id="iLog">--</p>
+  <p id="iLog" style="border:1px solid #0000ff; background:white;" contenteditable="true">--</p>
   <p><script>ui.text('Hello World')</script></p>
   <img alt="" src="http://webkit.org/images/icon-gold.png" />
   <img alt="" src="test1.png" />
   <p>
-    <input type="text" value="10" id="nX" name="nX" />
-    <input type="text" value="10" id="nY" name="nY" />
-    <input type="text" value="8" id="nDirection" name="nDirection" />
     <input type="button" value="Translate" onclick="Log(ui.translate('Hello World'))"/>
-    <input type="button" value="Quit" onclick="new SrpcMessage('MainLoop_EndLoop').send();"/>
+    <input type="button" value="Quit" onclick="new ApMessage('MainLoop_EndLoop').send();"/>
+    <input type="button" value="Reload" onclick="new ApMessage('WebView_Reload').setString('hView', apollo.viewHandle).send();"/>
+    <input type="button" value="Hide" onclick="Hide(); setTimeout('Show()', 1000);"/>
   </p>
   <div class="SizeBottomRight" style="cursor:se-resize; width:20px; height:20px; background-image:url(sizer-se.png); position:absolute; right:1px; bottom:1px;" />
 </div>

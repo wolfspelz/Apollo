@@ -56,6 +56,7 @@ String WebViewModuleTester::LoadHtml()
     "  <p id=\"iLog\">--</p>\n"
     "  <img src='http://webkit.org/images/icon-gold.png' />\n"
     "  <img src='test1.png' />\n"
+    "  <div style=\"border: solid blue; background: white;\" contenteditable=\"true\">div with blue border</div>"
   //"  <iframe src='http://www.wolfspelz.de'></iframe>\n"
     "</div>\n"
     "</body>\n"
@@ -120,23 +121,20 @@ String WebViewModuleTester::CallJSEcho()
 
 //----------------------------------------------------------
 
+ApHandle hView_;
 String WebViewModuleTester::Dev()
 {
   String s;
 
   ApHandle hView = Apollo::newHandle();
+  hView_ = hView;
 
   { Msg_WebView_Event_DocumentComplete msg; msg.Hook(MODULE_NAME, (ApCallback) WebViewModuleTester::On_LoadHtml_WebView_Event_DocumentComplete, 0, ApCallbackPosNormal); }
 
   if (!s) { if (!Msg_WebView_Create::_(hView)) { s = "Msg_WebView_Create failed"; }}
   if (!s) { if (!Msg_WebView_SetScriptAccess::Allow(hView)) { s = "Msg_WebView_SetScriptAccess failed"; }}
   //if (!s) { if (!Msg_WebView_Load::_(hView, "http://www.wolfspelz.de")) { s = "Msg_WebView_Load failed"; }}
-
-  String sFile = Apollo::getModuleResourcePath(MODULE_NAME) + "html/test/dev.html";
-  String sHtml;
-  Apollo::loadFile(sFile, sHtml);
-  if (!s) { if (!Msg_WebView_LoadHtml::_(hView, sHtml, "file://" + sFile)) { s = "Msg_WebView_LoadHtml failed"; }}
-
+  if (!s) { if (!Msg_WebView_Load::_(hView, "file://" + Apollo::getModuleResourcePath(MODULE_NAME) + "html/test/dev.html")) { s = "Msg_WebView_LoadHtml failed"; }}
   if (!s) { if (!Msg_WebView_Position::_(hView, 500, 200, 400, 300)) { s = "Msg_WebView_Position failed"; }}
   if (!s) { if (!Msg_WebView_Visibility::_(hView, 1)) { s = "Msg_WebView_Visibility failed"; }}
 
@@ -151,26 +149,24 @@ String WebViewModuleTester::Dev()
 
 void WebViewModuleTester::Begin()
 {
-  //AP_UNITTEST_REGISTER(WebViewModuleTester::LoadHtml);
-  //AP_UNITTEST_REGISTER(WebViewModuleTester::CallJSEcho);
-  //AP_UNITTEST_REGISTER(WebViewModuleTester::CallJSEcho_Result);
+  AP_UNITTEST_REGISTER(WebViewModuleTester::LoadHtml);
+  AP_UNITTEST_REGISTER(WebViewModuleTester::CallJSEcho);
+  AP_UNITTEST_REGISTER(WebViewModuleTester::CallJSEcho_Result);
 }
 
 void WebViewModuleTester::Execute()
 {
-  //AP_UNITTEST_EXECUTE(WebViewModuleTester::LoadHtml);
-  //AP_UNITTEST_EXECUTE(WebViewModuleTester::CallJSEcho);
+  AP_UNITTEST_EXECUTE(WebViewModuleTester::LoadHtml);
+  AP_UNITTEST_EXECUTE(WebViewModuleTester::CallJSEcho);
   (void) WebViewModuleTester::Dev();
 }
 
 void WebViewModuleTester::End()
 {
-  //{ Msg_WebView_MouseEvent msg; msg.UnHook(MODULE_NAME, (ApCallback) WebViewModuleTester::On_WebView_MouseEvent, 0); }
-
-  //if (ApIsHandle(hView_)) {
-  //  Msg_WebView_Destroy::_(hView_);
-  //  hView_ = ApNoHandle;
-  //}
+  if (ApIsHandle(hView_)) {
+    Msg_WebView_Destroy::_(hView_);
+    hView_ = ApNoHandle;
+  }
 }
 
 #endif // #if defined(AP_TEST)

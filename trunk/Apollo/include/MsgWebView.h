@@ -106,6 +106,13 @@ public:
   ApIN String sUrl;
 };
 
+class Msg_WebView_Reload: public ApRequestMessage
+{
+public:
+  Msg_WebView_Reload() : ApRequestMessage("WebView_Reload") {}
+  ApIN ApHandle hView;
+};
+
 class Msg_WebView_CallScriptFunction: public ApRequestMessage
 {
 public:
