@@ -10,6 +10,18 @@
 
 // ------------------------------------------------
 
+void SrpcGate_Log_Line(ApSRPCMessage* pMsg)
+{
+  Msg_Log_Line msg;
+  msg.nMask = pMsg->srpc.getInt("nMask");
+  msg.sChannel = pMsg->srpc.getString("sChannel");
+  msg.sContext = pMsg->srpc.getString("sContext");
+  msg.sMessage = pMsg->srpc.getString("sMessage");
+  msg.Send();
+}
+
+// ------------------------------------------------
+
 AP_REFINSTANCE_MSG_HANDLER(LogModule, Log_Line)
 
 // ------------------------------------------------
@@ -17,10 +29,14 @@ AP_REFINSTANCE_MSG_HANDLER(LogModule, Log_Line)
 void LogModule::Init()
 {
   { Msg_Log_Line msg; msg.Hook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(LogModule, Log_Line), this, Apollo::modulePos(ApCallbackPosNormal, MODULE_NAME)); }
+
+  srpcGateRegistry_.add("Log_Line", SrpcGate_Log_Line);
 }
 
 void LogModule::Exit()
 {
+  srpcGateRegistry_.finish();
+
   { Msg_Log_Line msg; msg.UnHook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(LogModule, Log_Line), this); }
 }
 

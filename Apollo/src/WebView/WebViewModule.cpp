@@ -326,6 +326,7 @@ int WebViewModule::Init()
 
 void WebViewModule::Exit()
 {
+  srpcGateRegistry_.finish();
   AP_UNITTEST_UNHOOK(WebViewModule, this);
   AP_MSG_REGISTRY_FINISH;
 

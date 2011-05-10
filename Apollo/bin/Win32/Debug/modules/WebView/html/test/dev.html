@@ -4,9 +4,12 @@
 <script type="text/javascript">
 // ------------------------------------------
 
-function SrpcMessage()
+function SrpcMessage(sMethod)
 {
 	this.aParams_ = new Array();
+  if (sMethod != null) {
+    this.setString('Method', sMethod);
+  }
 }
 
 // ---------------------
@@ -201,118 +204,158 @@ SrpcMessage.prototype.unitTest = function()
 //window.addEventListener('unload', onUnload, false);
 </script>
 
+
 <script type="text/javascript">
-  function Elem(sId) { return document.getElementById(sId); }
-
-  function Log(sText) { Elem('iLog').innerHTML = sText; }
-
-  var gStartX = 0; 
-  var gStartY = 0; 
-  var gMouseActive = false; 
-  var gMouseDown = false; 
-  var gIsMove = false; 
-  var gIsSize = false; 
-  var gSizeDirection = 0; 
-  var gMinWidth = 150; 
-  var gMinHeight = 22; 
+var ui =
+{
+  moduleName: 'Unknown',
   
-  function OnMouseDown(ev)
+  // ------------------------------------------------
+  // Log
+  
+  log: function(nMask, sContext, sMessage)
   {
-    new SrpcMessage().setString('Method', 'WebView_MouseCapture').setString('hView', apollo.viewHandle).send();
-    gMouseDown = true;
-    gStartX = ev.x;
-    gStartY = ev.y;
-    gMouseActive = false;
+    return new SrpcMessage('Log_Line')
+      .setInt('nMask', nMask)
+      .setString('sChannel', this.moduleName)
+      .setString('sContext', sContext)
+      .setString('sMessage', sMessage)
+      .send();
+  },
+
+  logInfo: function(sContext, sText)
+  {
+    this.log(32, sContext, sText);
+  },
+
+  // ------------------------------------------------
+  // Babelfish
+  
+  translate: function(sArg1, sArg2)
+  {
+    var sContext = '';
+    var sText = '';
+    if (sArg2 == null) {
+      sText = sArg1;
+    } else {
+      sContext = sArg1;
+      sText = sArg2;
+    }
+    
+    return new SrpcMessage('Translation_Get')
+      .setString('sModule', this.moduleName)
+      .setString('sContext', sContext)
+      .setString('sText', sText)
+      .send()
+      .getString('sTranslated');
+  },
+
+  text: function(sContext, sText)
+  {
+    document.write(this.translate(sContext, sText));
+  },
+
+  // ------------------------------------------------
+  // Move and size
+  
+  nStartX: 0,
+  nStartY: 0,
+  bMouseActive: false,
+  bMouseDown: false,
+  bIsMove: false,
+  bIsSize: false,
+  nSizeDirection: 8,
+  nMinWidth: 150,
+  nMinHeight: 22,
+  
+  onMouseDown: function(ev)
+  {
+    new SrpcMessage('WebView_MouseCapture').setString('hView', apollo.viewHandle).send();
+    this.nStartX = ev.x;
+    this.nStartY = ev.y;
+    this.bMouseActive = false;
+    this.bMouseDown = true;
 
     if (ev.target.className =='Move') {
-      gIsMove = true; 
-      gIsSize = false; 
+      this.bIsMove = true; 
+      this.bIsSize = false; 
     }
     if (ev.target.className =='SizeBottomRight') {
-      gIsMove = false; 
-      gIsSize = true; 
-      gSizeDirection = 8; 
+      this.bIsMove = false; 
+      this.bIsSize = true; 
+      this.nSizeDirection = 8; 
     }
+  },
 
-    Log('MoveMouseDown ' + ev.x + ' ' + ev.y);
-  }
-
-  function OnMouseMove(ev)
+  onMouseMove: function(ev)
   {
-    if (gMouseDown) {
-      var dx = ev.x - gStartX;
-      var dy = ev.y - gStartY;
-      if (!gMouseActive) {
+    if (this.bMouseDown) {
+      var dx = ev.x - this.nStartX;
+      var dy = ev.y - this.nStartY;
+      if (!this.bMouseActive) {
         if (dx > 4 || dx < -4 || dy > 4 || dy < -4) {
-          gMouseActive = true;
+          this.bMouseActive = true;
         }
       }
-      if (gMouseActive) {
-        if (gIsMove) {
-          new SrpcMessage().setString('Method', 'WebView_MoveBy').setString('hView', apollo.viewHandle).setInt('nX', dx).setInt('nY', dy).send();
-          Log('WebView_MoveBy ' + dx + ' ' + dy);
+      if (this.bMouseActive) {
+        if (this.bIsMove) {
+          new SrpcMessage('WebView_MoveBy').setString('hView', apollo.viewHandle).setInt('nX', dx).setInt('nY', dy).send();
         }
-        if (gIsSize) {
+        if (this.bIsSize) {
           if (dx < 0 || dy < 0) {
-            var pos = new SrpcMessage().setString('Method', 'WebView_GetPosition').setString('hView', apollo.viewHandle).send();
+            var pos = new SrpcMessage('WebView_GetPosition').setString('hView', apollo.viewHandle).send();
             var nW = pos.getInt('nW');
             var nH = pos.getInt('nH');
             var nNewW = nW + dx;
             var nNewH = nH + dy;
-            if (nNewW < gMinWidth) { dx = gMinWidth - nW; }
-            if (nNewH < gMinHeight) { dy = gMinHeight - nH; }
+            if (nNewW < this.nMinWidth) { dx = this.nMinWidth - nW; }
+            if (nNewH < this.nMinHeight) { dy = this.nMinHeight - nH; }
           }
 
-          new SrpcMessage()
-            .setString('Method', 'WebView_SizeBy')
+          new SrpcMessage('WebView_SizeBy')
             .setString('hView', apollo.viewHandle)
             .setInt('nW', dx)
             .setInt('nH', dy)
-            .setInt('nDirection', gSizeDirection)
+            .setInt('nDirection', this.nSizeDirection)
             .send();
 
-          Log('WebView_SizeBy ' + dx + ' ' + dy);
-          gStartX += dx;
-          gStartY += dy;
+          this.nStartX += dx;
+          this.nStartY += dy;
         }
       }
     }
-  }
+  },
 
-  function OnMouseUp()
+  onMouseUp: function()
   {
-    gMouseDown = false;
-    gMouseActive = false;
-    gIsMove = false;
-    gIsSize = false;
-    new SrpcMessage().setString('Method', 'WebView_MouseRelease').setString('hView', apollo.viewHandle);
-    Log('MoveMouseUp');
-  }
+    this.bMouseDown = false;
+    this.bMouseActive = false;
+    this.bIsMove = false;
+    this.bIsSize = false;
+    new SrpcMessage('WebView_MouseRelease').setString('hView', apollo.viewHandle);
+  },
 
-  document.onmousedown = OnMouseDown; 
-  document.onmousemove = OnMouseMove; 
-  document.onmouseup = OnMouseUp;
-
-  function MoveBy()
+  // ------------------------------------------------
+  
+  init: function()
   {
-    new SrpcMessage()
-      .setString('Method', 'WebView_MoveBy')
-      .setString('hView', apollo.viewHandle)
-      .setInt('nX', Elem('nX').value)
-      .setInt('nY', Elem('nY').value)
-      .send();
-  }
+    document.onmousedown = this.onMouseDown; 
+    document.onmousemove = this.onMouseMove; 
+    document.onmouseup = this.onMouseUp;
+  },
 
-  function SizeBy()
-  {
-    var msg = new SrpcMessage();
-    msg.setString('Method', 'WebView_SizeBy');
-    msg.setString('hView', apollo.viewHandle);
-    msg.setInt('nH', Elem('nX').value);
-    msg.setInt('nW', Elem('nY').value);
-    msg.setInt('nDirection', Elem('nDirection').value);
-    msg.send();
-  }
+  dummy: function () {}
+}
+</script>
+
+<script type="text/javascript">
+  function Elem(sId) { return document.getElementById(sId); }
+  function Log(sText) { Elem('iLog').innerHTML = sText; }
+
+  ui.moduleName = 'WebView';
+  ui.nMinWidth = 150;
+  ui.nMinHeight = 22;
+  ui.init();
 
 </script>
 
@@ -321,18 +364,19 @@ SrpcMessage.prototype.unitTest = function()
 </style>
 
 </head>
-<body style="overflow:hidden;">
+<body style="overflow:hidden;" onload="ui.logInfo('onload', '#################################################')">
 <div style="width:100%; height:100%; border:1px solid #000000; background-color:rgba(240,240,255,0.7);">
   <div class="Move" style="cursor:default; width:100%; height:20px; border-bottom:1px solid #000000; background-color:#00ff00;">Caption</div>
   <p id="iLog">--</p>
+  <p><script>ui.text('Hello World')</script></p>
   <img alt="" src="http://webkit.org/images/icon-gold.png" />
   <img alt="" src="test1.png" />
   <p>
     <input type="text" value="10" id="nX" name="nX" />
     <input type="text" value="10" id="nY" name="nY" />
     <input type="text" value="8" id="nDirection" name="nDirection" />
-    <input type="button" value="MoveBy" onclick="MoveBy()"/>
-    <input type="button" value="SizeBy" onclick="SizeBy()"/>
+    <input type="button" value="Translate" onclick="Log(ui.translate('Hello World'))"/>
+    <input type="button" value="Quit" onclick="new SrpcMessage('MainLoop_EndLoop').send();"/>
   </p>
   <div class="SizeBottomRight" style="cursor:se-resize; width:20px; height:20px; background-image:url(sizer-se.png); position:absolute; right:1px; bottom:1px;" />
 </div>

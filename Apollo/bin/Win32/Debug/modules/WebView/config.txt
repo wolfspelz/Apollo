@@ -18,3 +18,7 @@ LoadDLL/1500=C:\cygwin\home\wolf\WebKit\WebKitBuild\Debug_Cairo_CFLite\bin/JavaS
 LoadDLL/1600=C:\cygwin\home\wolf\WebKit\WebKitBuild\Debug_Cairo_CFLite\bin/CFLite_Debug.dll
 LoadDLL/1700=C:\cygwin\home\wolf\WebKit\WebKitBuild\Debug_Cairo_CFLite\bin/CFLite.dll
 LoadDLL/1800=C:\cygwin\home\wolf\WebKit\WebKitBuild\Debug_Cairo_CFLite\bin/WebKit_debug.dll
+
+Language/en=[[MODULE_RESOURCE_PATH]]/en.txt
+Language/de=[[MODULE_RESOURCE_PATH]]/de.txt
+Language/zh=[[MODULE_RESOURCE_PATH]]/zh.txt
