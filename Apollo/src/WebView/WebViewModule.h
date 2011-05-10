@@ -33,6 +33,7 @@ public:
   void On_WebView_Visibility(Msg_WebView_Visibility* pMsg);
   void On_WebView_LoadHtml(Msg_WebView_LoadHtml* pMsg);
   void On_WebView_Load(Msg_WebView_Load* pMsg);
+  void On_WebView_Reload(Msg_WebView_Reload* pMsg);
   void On_WebView_CallScriptFunction(Msg_WebView_CallScriptFunction* pMsg);
   void On_WebView_SetScriptAccess(Msg_WebView_SetScriptAccess* pMsg);
   void On_WebView_MoveBy(Msg_WebView_MoveBy* pMsg);

@@ -5,9 +5,7 @@
 // ============================================================================
 
 #include "Apollo.h"
-#if defined(WIN32)
-  #include "MsgMainLoop.h"
-#endif // WIN32
+#include "MsgMainLoop.h"
 #include "MsgSrpcGate.h"
 #include "Local.h"
 #include "View.h"
@@ -18,82 +16,46 @@ View::~View()
 {
 }
 
-int View::Create()
+void View::Create()
 {
-  int ok = 0;
-
-#if defined(WIN32)
-  HRESULT hr = S_OK;
-
-  IWebPreferences* tmpPreferences = 0;
-  IWebPreferences* standardPreferences = 0;
-  if (FAILED(WebKitCreateInstance(CLSID_WebPreferences, 0, IID_IWebPreferences, reinterpret_cast<void**>(&tmpPreferences)))) goto exit;
-
-  if (FAILED(tmpPreferences->standardPreferences(&standardPreferences))) goto exit;
-
-  standardPreferences->setAcceleratedCompositingEnabled(TRUE);
-
-  hr = WebKitCreateInstance(CLSID_WebView, 0, IID_IWebView, reinterpret_cast<void**>(&pWebView_));
-  if (FAILED(hr)) goto exit;
-
-  hr = pWebView_->setUIDelegate(this);
-  if (FAILED(hr)) goto exit;
-
-  hr = pWebView_->setFrameLoadDelegate(this);
-  if (FAILED(hr)) goto exit;
-
-  hr = pWebView_->setResourceLoadDelegate(this);
-  if (FAILED(hr)) goto exit;
-
-  hr = pWebView_->setPolicyDelegate(this);
-  if (FAILED(hr)) goto exit;
-
-  hr = pWebView_->QueryInterface(IID_IWebViewPrivate, reinterpret_cast<void**>(&pWebViewPrivate_));
-  if (FAILED(hr)) goto exit;
-
-  {
-    RECT r = { nX_, nY_, nW_, nH_ };
-    hr = pWebView_->initWithFrame(r, 0, 0);
-    if (FAILED(hr)) goto exit;
-  }
+  AutoComPtr<IWebPreferences> tmpPreferences;
+  AutoComPtr<IWebPreferences> standardPreferences;
+  if (FAILED( WebKitCreateInstance(CLSID_WebPreferences, 0, IID_IWebPreferences, tmpPreferences) )) { throw ApException("View::Create WebKitCreateInstance(CLSID_WebPreferences) failed"); }
+  if (FAILED( tmpPreferences->standardPreferences(standardPreferences) )) { throw ApException("View::Create tmpPreferences->standardPreferences() failed"); }
+  if (FAILED( standardPreferences->setAcceleratedCompositingEnabled(TRUE) )) { throw ApException("View::Create standardPreferences->setAcceleratedCompositingEnabled() failed"); }
 
   // -----------------------------
 
-  hr = pWebViewPrivate_->setFrameLoadDelegatePrivate(this);
-  if (FAILED(hr)) goto exit;
+  if (FAILED( WebKitCreateInstance(CLSID_WebView, 0, IID_IWebView, reinterpret_cast<void**>(&pWebView_)) )) { throw ApException("View::Create WebKitCreateInstance(CLSID_WebView) failed"); }
+  if (FAILED( pWebView_->setUIDelegate(this) )) { throw ApException("View::Create pWebView_->setUIDelegate() failed"); }
+  if (FAILED( pWebView_->setFrameLoadDelegate(this) )) { throw ApException("View::Create pWebView_->setFrameLoadDelegate() failed"); }
+  if (FAILED( pWebView_->setResourceLoadDelegate(this) )) { throw ApException("View::Create pWebView_->setResourceLoadDelegate() failed"); }
+  if (FAILED( pWebView_->setPolicyDelegate(this) )) { throw ApException("View::Create pWebView_->setPolicyDelegate() failed"); }
+  if (FAILED( pWebView_->QueryInterface(IID_IWebViewPrivate, reinterpret_cast<void**>(&pWebViewPrivate_)) )) { throw ApException("View::Create QueryInterface(IID_IWebViewPrivate) failed"); }
 
-  hr = pWebViewPrivate_->setTransparent(TRUE);
-  if (FAILED(hr)) goto exit;
+  RECT r = { nX_, nY_, nW_, nH_ };
+  if (FAILED( pWebView_->initWithFrame(r, 0, 0) )) { throw ApException("View::Create pWebView_->initWithFrame() failed"); }
 
-  hr = pWebViewPrivate_->setUsesLayeredWindow(TRUE);
-  if (FAILED(hr)) goto exit;
+  // -----------------------------
 
-  hr = pWebViewPrivate_->viewWindow(reinterpret_cast<OLE_HANDLE*>(&hWnd_));
-  if (FAILED(hr) || !hWnd_) goto exit;
+  if (FAILED( pWebViewPrivate_->setFrameLoadDelegatePrivate(this) )) { throw ApException("View::Create pWebViewPrivate_->setFrameLoadDelegatePrivate() failed"); }
+  if (FAILED( pWebViewPrivate_->setTransparent(TRUE) )) { throw ApException("View::Create pWebViewPrivate_->setTransparent() failed"); }
+  if (FAILED( pWebViewPrivate_->setUsesLayeredWindow(TRUE) )) { throw ApException("View::Create pWebViewPrivate_->setUsesLayeredWindow() failed"); }
+  if (FAILED( pWebViewPrivate_->viewWindow(reinterpret_cast<OLE_HANDLE*>(&hWnd_))) ) { throw ApException("View::Create pWebViewPrivate_->viewWindow() failed"); }
+  if (hWnd_ == NULL) { throw ApException("View::Create pWebViewPrivate_->viewWindow() did not return hWnd"); }
 
   ::ShowWindow(hWnd_, SW_SHOW);
   ::UpdateWindow(hWnd_);
 
   // -----------------------------
 
-  hr = pWebView_->mainFrame(&pWebFrame_);
-  if (FAILED(hr)) goto exit;
+  if (FAILED( pWebView_->mainFrame(&pWebFrame_) )) { throw ApException("View::Create pWebView_->mainFrame() failed"); }
 
   ::MoveWindow(hWnd_, nX_, nY_ - 10000, nW_, nH_, TRUE);
-  ok = 1;
-
-exit:
-  if (standardPreferences) standardPreferences->Release();
-  if (tmpPreferences) tmpPreferences->Release();
-
-#endif // WIN32
-
-  return ok;
 }
 
 void View::Destroy()
 {
-#if defined(WIN32)
   if (pWebViewPrivate_) {
     pWebViewPrivate_->Release();
     pWebViewPrivate_ = 0;
@@ -113,89 +75,73 @@ void View::Destroy()
     ::DestroyWindow(hWnd_);
     hWnd_ = NULL;
   }
-#endif // WIN32
 }
 
-int View::LoadHtml(const String& sHtml, const String& sBase)
+void View::LoadHtml(const String& sHtml, const String& sBase)
 {
-  int ok = 0;
+  if (!pWebFrame_) { throw ApException("View::LoadHtml pWebFrame_== 0"); }
 
-#if defined(WIN32)
-  IWebMutableURLRequest* request = 0;
+  if (1){
+    if (FAILED( pWebFrame_->loadHTMLString(::SysAllocString(sHtml), ::SysAllocString(sBase)) )) { throw ApException("View::Load pWebFrame_->loadRequest() failed"); }
+  } else {
+    BSTR bstrHTML = SysAllocString(TEXT("<p style=\"background-color: #00FF00\">Testing</p><img src=\"http://webkit.org/images/icon-gold.png\" alt=\"Face\"><div style=\"border: solid blue; background: white;\" contenteditable=\"true\">div with blue border</div><ul><li>foo<li>bar<li>baz</ul><iframe src=\"http://www.wolfspelz.de\" style=\"width:100%;height:300px\" />"));
+    pWebFrame_->loadHTMLString(bstrHTML, 0);
+  }
 
-#if 1
-  pWebFrame_->loadHTMLString(::SysAllocString(sHtml), ::SysAllocString(sBase));
-#else
-  BSTR bstrHTML = SysAllocString(TEXT("<p style=\"background-color: #00FF00\">Testing</p><img src=\"http://webkit.org/images/icon-gold.png\" alt=\"Face\"><div style=\"border: solid blue; background: white;\" contenteditable=\"true\">div with blue border</div><ul><li>foo<li>bar<li>baz</ul><iframe src=\"http://www.wolfspelz.de\" style=\"width:100%;height:300px\" />"));
-  pWebFrame_->loadHTMLString(bstrHTML, 0);
-#endif
-
-  ok = 1;
-
-exit:;
-#endif // WIN32
-
-  return ok;
+  MakeScriptObject();
 }
 
 #include <shlwapi.h>
 #include <wininet.h>
 
-int View::Load(const String& sUrl)
+void View::Load(const String& sUrl)
 {
-  int ok = 0;
+  sUrl_ = sUrl;
 
-#if defined(WIN32)
-  HRESULT hr = S_OK;
+  AutoComPtr<IWebMutableURLRequest> request;
+  if (FAILED( WebKitCreateInstance(CLSID_WebMutableURLRequest, 0, IID_IWebMutableURLRequest, request) )) { throw ApException("View::Load WebKitCreateInstance(CLSID_WebMutableURLRequest) failed"); }
 
-  IWebMutableURLRequest* request = 0;
-  hr = WebKitCreateInstance(CLSID_WebMutableURLRequest, 0, IID_IWebMutableURLRequest, (void**) &request);
-  if (FAILED(hr)) goto exit;
+  if (1) {
+    if (FAILED( request->initWithURL(::SysAllocString(sUrl), WebURLRequestUseProtocolCachePolicy, 60) )) { throw ApException("View::Load request->initWithURL() failed"); }
+  } else {
+    BSTR bstrUrl = 0;
+    //BSTR bstrUrl = SysAllocString(_T("http://www.wolfspelz.de"));
+    if (!bstrUrl) {
+      TCHAR szFileName[MAX_PATH];
+      ::GetModuleFileName(NULL, szFileName, MAX_PATH);
+      ::PathRemoveFileSpec(szFileName);
+      ::PathAddBackslash(szFileName);
+      //::PathAppend(szFileName, Apollo::getModuleResourcePath(MODULE_NAME) + "/html/test/frame.html");
+      ::PathAppend(szFileName, Apollo::getModuleResourcePath(MODULE_NAME) + "/html/test/overlay.html");
 
-#if 1
-  hr = request->initWithURL(::SysAllocString(sUrl), WebURLRequestUseProtocolCachePolicy, 60);
-  if (FAILED(hr)) goto exit;
-#else
-  BSTR bstrUrl = 0;
-  //BSTR bstrUrl = SysAllocString(_T("http://www.wolfspelz.de"));
-  if (!bstrUrl) {
-    TCHAR szFileName[MAX_PATH];
-    ::GetModuleFileName(NULL, szFileName, MAX_PATH);
-    ::PathRemoveFileSpec(szFileName);
-    ::PathAddBackslash(szFileName);
-    //::PathAppend(szFileName, Apollo::getModuleResourcePath(MODULE_NAME) + "/html/test/frame.html");
-    ::PathAppend(szFileName, Apollo::getModuleResourcePath(MODULE_NAME) + "/html/test/overlay.html");
-
-    TCHAR szFileName2[MAX_PATH];
-    _stprintf_s(szFileName2, MAX_PATH, _T("file://%s"), szFileName);
-    bstrUrl = SysAllocString(szFileName2);
-  }
-
-  if ((PathFileExists(bstrUrl) || PathIsUNC(bstrUrl))) {
-    TCHAR fileURL[INTERNET_MAX_URL_LENGTH];
-    DWORD fileURLLength = sizeof(fileURL)/sizeof(fileURL[0]);
-    if (SUCCEEDED(UrlCreateFromPath(bstrUrl, fileURL, &fileURLLength, 0))) {
-      bstrUrl = fileURL;
+      TCHAR szFileName2[MAX_PATH];
+      _stprintf_s(szFileName2, MAX_PATH, _T("file://%s"), szFileName);
+      bstrUrl = SysAllocString(szFileName2);
     }
+
+    if ((PathFileExists(bstrUrl) || PathIsUNC(bstrUrl))) {
+      TCHAR fileURL[INTERNET_MAX_URL_LENGTH];
+      DWORD fileURLLength = sizeof(fileURL)/sizeof(fileURL[0]);
+      if (SUCCEEDED(UrlCreateFromPath(bstrUrl, fileURL, &fileURLLength, 0))) {
+        bstrUrl = fileURL;
+      }
+    }
+
+    if (FAILED( request->initWithURL(bstrUrl, WebURLRequestUseProtocolCachePolicy, 60) )) { throw ApException("View::Load request->initWithURL() failed"); }
   }
 
-  hr = request->initWithURL(bstrUrl, WebURLRequestUseProtocolCachePolicy, 60);
-  if (FAILED(hr)) goto exit;
-#endif
+  //if (FAILED( pWebFrame_->setAllowsScrolling(FALSE) )) { throw ApException("View::Load pWebFrame_->setAllowsScrolling() failed"); }
 
-  //hr = pWebFrame_->setAllowsScrolling(FALSE);
-  //if (FAILED(hr)) goto exit;
+  if (FAILED( pWebFrame_->loadRequest(request) )) { throw ApException("View::Load pWebFrame_->loadRequest() failed"); }
 
-  hr = pWebFrame_->loadRequest(request);
-  if (FAILED(hr)) goto exit;
+  MakeScriptObject();
+}
 
-  ok = 1;
+void View::Reload()
+{
+  if (FAILED( pWebFrame_->reloadFromOrigin() )) { throw ApException("View::Reload pWebFrame_->reload() failed"); }
 
-exit:
-  if (request) request->Release();
-#endif // WIN32
-
-  return ok;
+  MakeScriptObject();
 }
 
 //------------------------------------
@@ -300,8 +246,7 @@ String View::CallJSFunction(const String& sFunction, List& lArgs)
 
   JSGlobalContextRef runCtx = pWebFrame_->globalContext();
 
-  static JSStringRef methodName = 0;
-  if (!methodName) methodName = JSStringCreateWithUTF8CString(sFunction);
+  AutoJSStringRef methodName = JSStringCreateWithUTF8CString(sFunction);
 
   JSObjectRef global = JSContextGetGlobalObject(runCtx);
 
@@ -332,11 +277,10 @@ String View::CallJSFunction(const String& sFunction, List& lArgs)
   // Convert the result into a string.
   if (result) {
     if (JSValueIsString(runCtx, result)) {
-      JSStringRef value = JSValueToStringCopy (runCtx, result, exception);
+      AutoJSStringRef value = JSValueToStringCopy (runCtx, result, exception);
       if (exception) goto exit;
 
       sResult.set((PWSTR) JSStringGetCharactersPtr(value), JSStringGetLength(value));
-      JSStringRelease(value);
 
     } else if (JSValueIsNumber(runCtx, result)) {
       double value = JSValueToNumber(runCtx, result, exception);
@@ -413,9 +357,8 @@ JSValueRef View::JS_Apollo_getSharedValue(JSContextRef ctx, JSObjectRef thisObje
     return JSValueMakeUndefined(ctx);
   }
 
-  JSStringRef text = JSStringCreateWithUTF8CString(sValue);
+  AutoJSStringRef text = JSStringCreateWithUTF8CString(sValue);
   JSValueRef value = JSValueMakeString(ctx, text);
-  JSStringRelease(text);
 
   return value;
 }
@@ -432,18 +375,16 @@ JSValueRef View::JS_Apollo_echoString(JSContextRef ctx, JSObjectRef function, JS
   // Convert the result into a string for display.
   if (!JSValueIsString(ctx, arguments[0])) return JSValueMakeUndefined(ctx);
 
-  JSStringRef arg0 = JSValueToStringCopy(ctx, arguments[0], exception);
+  AutoJSStringRef arg0 = JSValueToStringCopy(ctx, arguments[0], exception);
   if (exception && *exception) return JSValueMakeUndefined(ctx);
 
   String sText;
   sText.set((PWSTR) JSStringGetCharactersPtr(arg0), JSStringGetLength(arg0));
-  JSStringRelease(arg0);
 
   sText += " (JS_Apollo_echoString)";
 
-  JSStringRef text = JSStringCreateWithUTF8CString(sText);
+  AutoJSStringRef text = JSStringCreateWithUTF8CString(sText);
   JSValueRef value = JSValueMakeString(ctx, text);
-  JSStringRelease(text);
 
   return value;
 }
@@ -460,12 +401,11 @@ JSValueRef View::JS_Apollo_sendMessage(JSContextRef ctx, JSObjectRef function, J
   // Convert the result into a string for display.
   if (!JSValueIsString(ctx, arguments[0])) return JSValueMakeUndefined(ctx);
 
-  JSStringRef arg0 = JSValueToStringCopy (ctx, arguments[0], exception);
+  AutoJSStringRef arg0 = JSValueToStringCopy (ctx, arguments[0], exception);
   if (exception && *exception) return JSValueMakeUndefined(ctx);
 
   String sText;
   sText.set((PWSTR) JSStringGetCharactersPtr(arg0), JSStringGetLength(arg0));
-  JSStringRelease(arg0);
 
   Apollo::SrpcMessage srpc;
   srpc.fromString(sText);
@@ -474,34 +414,32 @@ JSValueRef View::JS_Apollo_sendMessage(JSContextRef ctx, JSObjectRef function, J
   (void) msg.Call();
   String sResponse = msg.response.toString();
 
-  JSStringRef text = JSStringCreateWithUTF8CString(sResponse);
+  AutoJSStringRef text = JSStringCreateWithUTF8CString(sResponse);
   JSValueRef value = JSValueMakeString(ctx, text);
-  JSStringRelease(text);
 
   return value;
 }
 
 void View::MakeScriptObject()
 {
-  if (!pWebFrame_) return;
+  if (!pWebFrame_) { throw ApException("View::MakeScriptObject pWebFrame_== 0"); }
 
   JSGlobalContextRef runCtx = pWebFrame_->globalContext();
-  if (runCtx == 0) return;
+  if (runCtx == 0) { throw ApException("View::MakeScriptObject pWebFrame_->globalContext() failed"); }
 
   JSObjectRef pGlobal = JSContextGetGlobalObject(runCtx);
-  if (pGlobal == 0) return;
+  if (pGlobal == 0) { throw ApException("View::MakeScriptObject JSContextGetGlobalObject() failed"); }
 
   JSClassRef apolloClass = JS_Apollo_class();
-  if (apolloClass == 0) return;
+  if (apolloClass == 0) { throw ApException("View::MakeScriptObject JS_Apollo_class() failed"); }
 
   pScriptObject_ = JSObjectMake(runCtx, apolloClass, reinterpret_cast<void*>(this));
-  if (pScriptObject_ == 0) return;
+  if (pScriptObject_ == 0) { throw ApException("View::MakeScriptObject JSObjectMake() failed"); }
 
-  JSStringRef apolloName = JSStringCreateWithUTF8CString("apollo");
-  if (apolloName == 0) return;
+  AutoJSStringRef apolloName = JSStringCreateWithUTF8CString("apollo");
+  if (!apolloName) { throw ApException("View::MakeScriptObject JSStringCreateWithUTF8CString() failed"); }
 
   JSObjectSetProperty(runCtx, pGlobal, apolloName, pScriptObject_, kJSPropertyAttributeNone, 0);
-  JSStringRelease(apolloName);
 }
 
 //------------------------------------
@@ -542,8 +480,6 @@ HRESULT View::didStartProvisionalLoadForFrame(IWebView* webView, IWebFrame* fram
 {
   if (pTopLoadingFrame_ == 0) {
     pTopLoadingFrame_ = frame;
-
-    MakeScriptObject();
   }
 
   return S_OK;

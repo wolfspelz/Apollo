@@ -594,6 +594,7 @@ int UnitTest::Start()
   }
 
   apLog_Info((LOG_CHANNEL, "UnitTest::Start", "Execute synchronous tests"));
+  apLog_User("Testing");
 
   { // Execute synchronous tests
     Msg_UnitTest_Execute msg;
@@ -638,6 +639,7 @@ AP_MSG_HANDLER_METHOD(UnitTest, UnitTest_Token)
   // So, we assume that everyone who registered for token got ist already
 
   apLog_Info((LOG_CHANNEL, "UnitTest::UnitTest_Token", "Finished asynchronous test sequence"));
+  apLog_User("Test finished");
 
   bInSendRunLevelNormal_ = 1;
   Msg_System_RunLevel msg; msg.sLevel = Msg_System_RunLevel_Normal; msg.Send();

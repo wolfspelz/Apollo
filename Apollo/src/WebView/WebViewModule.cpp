@@ -14,14 +14,14 @@ View* WebViewModule::CreateView(const ApHandle& hView)
 {
   View* pView = new View(hView);
   if (pView) {
-    int ok = pView->Create();
-    if (ok) {
+    try {
+      pView->Create();
       pView->AddRef();
       views_.Set(hView, pView);
-    } else {
+    } catch (ApException& ex) {
       delete pView;
       pView = 0;
-      throw ApException("WebViewModule::CreateView " ApHandleFormat " Create() failed", ApHandleType(hView));
+      throw ex;
     }
   }
 
@@ -93,6 +93,13 @@ AP_MSG_HANDLER_METHOD(WebViewModule, WebView_Load)
 {
   View* pView = FindView(pMsg->hView);
   pView->Load(pMsg->sUrl);
+  pMsg->apStatus = ApMessage::Ok;
+}
+
+AP_MSG_HANDLER_METHOD(WebViewModule, WebView_Reload)
+{
+  View* pView = FindView(pMsg->hView);
+  pView->Reload();
   pMsg->apStatus = ApMessage::Ok;
 }
 
@@ -177,80 +184,99 @@ AP_MSG_HANDLER_METHOD(WebViewModule, System_3SecTimer)
 
 //----------------------------------------------------------
 
+void SrpcGate_WebView_Position(ApSRPCMessage* pMsg)
+{
+  Msg_WebView_Position msg;
+  msg.hView = Apollo::string2Handle(pMsg->srpc.getString("hView"));
+  msg.nX = pMsg->srpc.getInt("nX");
+  msg.nY = pMsg->srpc.getInt("nY");
+  msg.nW = pMsg->srpc.getInt("nW");
+  msg.nH = pMsg->srpc.getInt("nH");
+  SRPCGATE_HANDLER_NATIVE_REQUEST(pMsg, msg);
+}
+
+void SrpcGate_WebView_Visibility(ApSRPCMessage* pMsg)
+{
+  Msg_WebView_Visibility msg;
+  msg.hView = Apollo::string2Handle(pMsg->srpc.getString("hView"));
+  msg.bVisible = pMsg->srpc.getInt("bVisible");
+  SRPCGATE_HANDLER_NATIVE_REQUEST(pMsg, msg);
+}
+
+void SrpcGate_WebView_Load(ApSRPCMessage* pMsg)
+{
+  Msg_WebView_Load msg;
+  msg.hView = Apollo::string2Handle(pMsg->srpc.getString("hView"));
+  msg.sUrl = pMsg->srpc.getString("sUrl");
+  SRPCGATE_HANDLER_NATIVE_REQUEST(pMsg, msg);
+}
+
+void SrpcGate_WebView_LoadHtml(ApSRPCMessage* pMsg)
+{
+  Msg_WebView_LoadHtml msg;
+  msg.hView = Apollo::string2Handle(pMsg->srpc.getString("hView"));
+  msg.sHtml = pMsg->srpc.getString("sHtml");
+  msg.sBase = pMsg->srpc.getString("sBase");
+  SRPCGATE_HANDLER_NATIVE_REQUEST(pMsg, msg);
+}
+
+void SrpcGate_WebView_Reload(ApSRPCMessage* pMsg)
+{
+  Msg_WebView_Reload msg;
+  msg.hView = Apollo::string2Handle(pMsg->srpc.getString("hView"));
+  SRPCGATE_HANDLER_NATIVE_REQUEST(pMsg, msg);
+}
+
 void SrpcGate_WebView_MoveBy(ApSRPCMessage* pMsg)
 {
   Msg_WebView_MoveBy msg;
   msg.hView = Apollo::string2Handle(pMsg->srpc.getString("hView"));
-  msg.nX =pMsg->srpc.getInt("nX");
-  msg.nY =pMsg->srpc.getInt("nY");
-  if (!msg.Request()) {
-    pMsg->response.createError(pMsg->srpc, msg.sComment);
-  } else {
-    pMsg->response.createResponse(pMsg->srpc);
-  }
+  msg.nX = pMsg->srpc.getInt("nX");
+  msg.nY = pMsg->srpc.getInt("nY");
+  SRPCGATE_HANDLER_NATIVE_REQUEST(pMsg, msg);
 }
 
 void SrpcGate_WebView_SizeBy(ApSRPCMessage* pMsg)
 {
   Msg_WebView_SizeBy msg;
   msg.hView = Apollo::string2Handle(pMsg->srpc.getString("hView"));
-  msg.nW =pMsg->srpc.getInt("nW");
-  msg.nH =pMsg->srpc.getInt("nH");
-  msg.nDirection =pMsg->srpc.getInt("nDirection");
-  if (!msg.Request()) {
-    pMsg->response.createError(pMsg->srpc, msg.sComment);
-  } else {
-    pMsg->response.createResponse(pMsg->srpc);
-  }
+  msg.nW = pMsg->srpc.getInt("nW");
+  msg.nH = pMsg->srpc.getInt("nH");
+  msg.nDirection = pMsg->srpc.getInt("nDirection");
+  SRPCGATE_HANDLER_NATIVE_REQUEST(pMsg, msg);
 }
 
 void SrpcGate_WebView_MouseCapture(ApSRPCMessage* pMsg)
 {
   Msg_WebView_MouseCapture msg;
   msg.hView = Apollo::string2Handle(pMsg->srpc.getString("hView"));
-  if (!msg.Request()) {
-    pMsg->response.createError(pMsg->srpc, msg.sComment);
-  } else {
-    pMsg->response.createResponse(pMsg->srpc);
-  }
+  SRPCGATE_HANDLER_NATIVE_REQUEST(pMsg, msg);
 }
 
 void SrpcGate_WebView_MouseRelease(ApSRPCMessage* pMsg)
 {
   Msg_WebView_MouseRelease msg;
   msg.hView = Apollo::string2Handle(pMsg->srpc.getString("hView"));
-  if (!msg.Request()) {
-    pMsg->response.createError(pMsg->srpc, msg.sComment);
-  } else {
-    pMsg->response.createResponse(pMsg->srpc);
-  }
+  SRPCGATE_HANDLER_NATIVE_REQUEST(pMsg, msg);
 }
 
 void SrpcGate_WebView_GetPosition(ApSRPCMessage* pMsg)
 {
   Msg_WebView_GetPosition msg;
   msg.hView = Apollo::string2Handle(pMsg->srpc.getString("hView"));
-  if (!msg.Request()) {
-    pMsg->response.createError(pMsg->srpc, msg.sComment);
-  } else {
-    pMsg->response.createResponse(pMsg->srpc);
-    pMsg->response.setInt("nX", msg.nX);
-    pMsg->response.setInt("nY", msg.nY);
-    pMsg->response.setInt("nW", msg.nW);
-    pMsg->response.setInt("nH", msg.nH);
-  }
+  SRPCGATE_HANDLER_NATIVE_REQUEST(pMsg, msg);
+  pMsg->response.setInt("nX", msg.nX);
+  pMsg->response.setInt("nY", msg.nY);
+  pMsg->response.setInt("nW", msg.nW);
+  pMsg->response.setInt("nH", msg.nH);
 }
 
 void SrpcGate_WebView_GetVisibility(ApSRPCMessage* pMsg)
 {
   Msg_WebView_GetVisibility msg;
   msg.hView = Apollo::string2Handle(pMsg->srpc.getString("hView"));
-  if (!msg.Request()) {
-    pMsg->response.createError(pMsg->srpc, msg.sComment);
-  } else {
-    pMsg->response.createResponse(pMsg->srpc);
-    pMsg->response.setInt("bVisible", msg.bVisible);
-  }
+  SRPCGATE_HANDLER_NATIVE_REQUEST(pMsg, msg);
+  pMsg->response.setInt("bVisible", msg.bVisible);
 }
 
 //----------------------------------------------------------
@@ -301,6 +327,7 @@ int WebViewModule::Init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, WebViewModule, WebView_Visibility, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, WebViewModule, WebView_LoadHtml, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, WebViewModule, WebView_Load, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, WebViewModule, WebView_Reload, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, WebViewModule, WebView_CallScriptFunction, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, WebViewModule, WebView_SetScriptAccess, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, WebViewModule, WebView_MoveBy, this, ApCallbackPosNormal);
@@ -314,6 +341,11 @@ int WebViewModule::Init()
 
   AP_UNITTEST_HOOK(WebViewModule, this);
 
+  srpcGateRegistry_.add("WebView_Position", SrpcGate_WebView_Position);
+  srpcGateRegistry_.add("WebView_Visibility", SrpcGate_WebView_Visibility);
+  srpcGateRegistry_.add("WebView_Load", SrpcGate_WebView_Load);
+  srpcGateRegistry_.add("WebView_LoadHtml", SrpcGate_WebView_LoadHtml);
+  srpcGateRegistry_.add("WebView_Reload", SrpcGate_WebView_Reload);
   srpcGateRegistry_.add("WebView_MoveBy", SrpcGate_WebView_MoveBy);
   srpcGateRegistry_.add("WebView_SizeBy", SrpcGate_WebView_SizeBy);
   srpcGateRegistry_.add("WebView_MouseCapture", SrpcGate_WebView_MouseCapture);
