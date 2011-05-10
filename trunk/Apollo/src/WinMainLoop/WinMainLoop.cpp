@@ -518,7 +518,7 @@ int MainLoopModule::InsertTimer(TimerListElem* eTimer)
     // no timer active
     lTimer_.Add(eTimer);
     bReSchedule = 1;
-    ok= 1;
+    ok = 1;
   } else {
     TimerListElem* ePrev = 0;
     TimerListElem* eNext = 0;

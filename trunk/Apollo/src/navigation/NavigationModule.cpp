@@ -385,7 +385,7 @@ AP_MSG_HANDLER_METHOD(NavigationModule, Navigation_Send)
       sMsg += "\n";
 
       if (apLog_IsVerbose) {
-        apLog_Verbose((LOG_CHANNEL, "FluidModule::Navigation_Send", "" ApHandleFormat " %s", ApHandleType(pMsg->hConnection), StringType(sMsg)));
+        apLog_Verbose((LOG_CHANNEL, "NavigationModule::Navigation_Send", "" ApHandleFormat " %s", ApHandleType(pMsg->hConnection), StringType(sMsg)));
       }
 
       ok = pConnection->DataOut((unsigned char*) sMsg.c_str(), sMsg.bytes());

@@ -407,10 +407,8 @@ JSValueRef View::JS_Apollo_sendMessage(JSContextRef ctx, JSObjectRef function, J
   String sText;
   sText.set((PWSTR) JSStringGetCharactersPtr(arg0), JSStringGetLength(arg0));
 
-  Apollo::SrpcMessage srpc;
-  srpc.fromString(sText);
   ApSRPCMessage msg("SrpcGate");
-  srpc >> msg.srpc;
+  msg.srpc.fromString(sText);
   (void) msg.Call();
   String sResponse = msg.response.toString();
 
@@ -447,26 +445,34 @@ void View::MakeScriptObject()
 
 HRESULT View::QueryInterface(REFIID riid, void** ppvObject)
 {
-    *ppvObject = 0;
-    if (IsEqualIID(riid, IID_IUnknown))  *ppvObject = static_cast<IWebUIDelegate*>(this);
-    else if (IsEqualIID(riid, IID_IWebUIDelegate)) *ppvObject = static_cast<IWebUIDelegate*>(this);
-    else return E_NOINTERFACE;
+  *ppvObject = 0;
 
-    AddRef();
-    return S_OK;
+  if (0) {}
+  else if (IsEqualIID(riid, IID_IUnknown)) *ppvObject = static_cast<IWebUIDelegate*>(this);
+  else if (IsEqualIID(riid, IID_IWebUIDelegate)) *ppvObject = static_cast<IWebUIDelegate*>(this);
+  else if (IsEqualIID(riid, IID_IWebUIDelegatePrivate)) *ppvObject = static_cast<IWebUIDelegatePrivate*>(this);
+  else if (IsEqualIID(riid, IID_IWebFrameLoadDelegate)) *ppvObject = static_cast<IWebFrameLoadDelegate*>(this);
+  else if (IsEqualIID(riid, IID_IWebFrameLoadDelegatePrivate)) *ppvObject = static_cast<IWebFrameLoadDelegatePrivate*>(this);
+  else if (IsEqualIID(riid, IID_IWebResourceLoadDelegate)) *ppvObject = static_cast<IWebResourceLoadDelegate*>(this);
+  else if (IsEqualIID(riid, IID_IWebPolicyDelegate)) *ppvObject = static_cast<IWebPolicyDelegate*>(this);
+  else return E_NOINTERFACE;
+
+  AddRef();
+
+  return S_OK;
 }
 
 ULONG View::AddRef(void)
 {
-    return ++nRefCount_;
+  return ++nRefCount_;
 }
 
 ULONG View::Release(void)
 {
-    ULONG newRef = --nRefCount_;
-    if (!newRef) delete this;
+  ULONG newRef = --nRefCount_;
+  if (!newRef) delete this;
 
-    return newRef;
+  return newRef;
 }
 
 //------------------------------------
@@ -624,5 +630,19 @@ HRESULT View::decidePolicyForNavigationAction(IWebView *webView, IPropertyBag *a
 HRESULT View::willPerformDragSourceAction(IWebView*, WebDragSourceAction, LPPOINT, IDataObject*, IDataObject**)
 {
   // Disable drag
+  return S_OK;
+}
+
+HRESULT View::webViewAddMessageToConsole(IWebView *sender, BSTR message, int lineNumber, BSTR url, BOOL isError)
+{
+  String sUrl = StringFromBSTR(url);
+  String sMessage = StringFromBSTR(message);
+
+  if (isError) {
+    apLog_Error((LOG_CHANNEL, "JS:", "%s(%d): %s", StringType(sUrl), lineNumber, StringType(sMessage)));
+  } else {
+    apLog_Warning((LOG_CHANNEL, "JS:", "%s(%d): %s", StringType(sUrl), lineNumber, StringType(sMessage)));
+  }
+
   return S_OK;
 }

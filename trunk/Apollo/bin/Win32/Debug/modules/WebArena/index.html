@@ -1,0 +1,295 @@
+﻿<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+
+<script type="text/javascript">
+// ------------------------------------------
+
+function ApMessage(sMethod)
+{
+	this.aParams_ = new Array();
+  if (sMethod != null) {
+    this.setString('Method', sMethod);
+  }
+}
+
+// ---------------------
+// Setter
+
+ApMessage.prototype.fromString = function(sMsg)
+{
+	var aLines = sMsg.split("\n");
+	if (aLines.length > 0) {
+    for (var i = 0; i < aLines.length; i++) {
+      var nIndex = aLines[i].indexOf('=');
+			if (nIndex > 0) {
+				var sKey = aLines[i].substr(0, nIndex);
+				var sValue = aLines[i].substr(nIndex + 1);
+				if (sKey != '') {
+					this.aParams_[sKey] = sValue;
+				}
+			}
+		}
+	}
+}
+
+ApMessage.prototype.encodeCString = function(sValue)
+{
+	var sResult = '';
+	for (var i = 0; i < sValue.length; i++) {
+		switch (sValue.charAt(i)) {
+			case '\\': sResult += '\\\\'; break;
+			case '\r': sResult += '\\r'; break;
+			case '\n': sResult += '\\n'; break;
+			default: sResult += sValue.charAt(i);
+		}
+	}
+	return sResult;
+}
+
+ApMessage.prototype.setString = function(sKey, sValue)
+{
+	sValue = this.encodeCString(sValue);
+	this.aParams_[sKey] = sValue;
+	return this;
+}
+
+ApMessage.prototype.setInt = function(sKey, nValue)
+{
+	this.aParams_[sKey] = String(nValue);
+	return this;
+}
+
+ApMessage.prototype.setKeyValueList = function(sKey, kvList)
+{
+  var s = '';
+  for (var i in kvList) { 
+    s += i + '=' + this.encodeCString(kvList[i]) + '\n';
+  }
+	this.setString(sKey, s);
+	return this;
+}
+
+// ---------------------
+// Getter
+
+ApMessage.prototype.decodeCString = function(sValue)
+{
+	var sResult = '';
+	var bEscape = false;
+	for (var i = 0; i < sValue.length; i++) {
+		var sChar = sValue.charAt(i);
+		if (!bEscape) {
+			if (sChar == '\\') {
+				bEscape = true;
+			} else {
+				sResult += sChar;
+			}
+		} else {
+			switch (sChar) {
+				case '\\': sChar = '\\'; break;
+				case 'r': sChar = '\r'; break;
+				case 'n': sChar = '\n'; break;
+				default:;
+			}
+			sResult += sChar;
+			bEscape = false;
+		}
+	}
+	return sResult;
+}
+
+ApMessage.prototype.getString = function(sKey)
+{
+	var sValue = '';
+	if (this.aParams_[sKey]) {
+		sValue = this.aParams_[sKey];
+		sValue = this.decodeCString(sValue);
+	}
+	return sValue;
+}
+
+ApMessage.prototype.getInt = function(sKey)
+{
+	return parseInt(this.getString(sKey));
+}
+
+ApMessage.prototype.getKeyValueList = function(sKey)
+{
+  var kvList = new Object();
+  var srpc = new ApMessage();
+  srpc.fromString(this.getString(sKey));
+  for (var i in srpc.aParams_) {
+    kvList[i] = srpc.aParams_[i];
+  }
+	return kvList;
+}
+
+// ---------------------
+// IO
+
+ApMessage.prototype.send = function()
+{
+  if (apollo) {
+    var sMsg = '';
+    for (var i in this.aParams_) { sMsg += i + '=' + this.aParams_[i] + '\n'; }
+    if (typeof(onLog) == 'function') { onLog(sMsg); }
+
+    var sRespose = apollo.sendMessage(sMsg);
+    
+    var resp = new ApMessage();
+    resp.fromString(sRespose);
+    
+    return resp;
+  }
+}
+
+// ---------------------
+// Unittest
+
+ApMessage.prototype.unitTest = function()
+{
+	var s = '';
+
+	if (!s) {
+		var msg = new ApMessage();
+		msg.fromString('Method=Test\na=b\nc=d\n');
+		if (!s) { if (msg.aParams_['Method'] != 'Test') { s = 'Missing Method'; } }
+		if (!s) { if (msg.aParams_['a'] != 'b') { s = 'Missing a=b'; } }
+		if (!s) { if (msg.aParams_['c'] != 'd') { s = 'Missing c=d'; } }
+	}
+
+	if (!s) {
+		var msg = new ApMessage();
+		msg.fromString('Method=Test\na=w=x\\ny=z\\n\nc=d\n');
+		if (!s) { if (msg.aParams_['Method'] != 'Test') { s = 'Missing Method'; } }
+		if (!s) { if (msg.aParams_['a'] != 'w=x\\ny=z\\n') { s = 'Missing a=w=x\\ny=z\\n'; } }
+		if (!s) { if (msg.aParams_['c'] != 'd') { s = 'Missing c=d'; } }
+	}
+
+	return s;
+}
+
+// ------------------------------------------
+
+//ApMessage.prototype = new ApMessage;
+
+//function ApMessage(sType)
+//{
+//	this.inheritFrom = ApMessage;
+//  this.inheritFrom();
+
+//	if (sType != null) {
+//		this.aParams_['Method'] = 'Host.Call';
+//		this.aParams_['ApType'] = sType;
+//	}
+//}
+
+// ---------------------
+
+//function onLoad(e)
+//{
+//	new ApMessage().setString('Method', 'Display.Loaded').send();
+//	window.removeEventListener('load', onLoad, false);
+//}
+
+//function onUnload(e)
+//{
+//	new ApMessage().setString('Method', 'Display.BeforeUnload').send();
+//	window.removeEventListener('unload', onUnload, false);
+//}
+
+//window.addEventListener('load', onLoad, false);
+//window.addEventListener('unload', onUnload, false);
+</script>
+
+<script type="text/javascript">
+var ui =
+{
+  moduleName: 'Unknown',
+  
+  // ------------------------------------------------
+  // Log
+  
+  log: function(nMask, sChannel, sContext, sMessage)
+  {
+    return new ApMessage('Log_Line')
+      .setInt('nMask', nMask)
+      .setString('sChannel', sChannel)
+      .setString('sContext', sContext)
+      .setString('sMessage', sMessage)
+      .send();
+  },
+
+  LogLevelFatal      :   2,
+  LogLevelError      :   4,
+  LogLevelWarning    :   8,
+  LogLevelUser       :  16,
+  LogLevelDebug      :  32,
+  LogLevelInfo       :  64,
+  LogLevelVerbose    : 128,
+
+  logUser: function(sMessage) { this.log(this.LogLevelUser, '', '', sMessage); },
+  logInfo: function(sContext, sMessage) { this.log(this.LogLevelInfo, this.moduleName, sContext, sMessage); },
+  logWarning: function(sContext, sMessage) { this.log(this.LogLevelWarning, this.moduleName, sContext, sMessage); },
+
+  // ------------------------------------------------
+  // Babelfish
+  
+  translate: function(sArg1, sArg2)
+  {
+    var sContext = '';
+    var sText = '';
+    if (sArg2 == null) {
+      sText = sArg1;
+    } else {
+      sContext = sArg1;
+      sText = sArg2;
+    }
+    
+    return new ApMessage('Translation_Get')
+      .setString('sModule', this.moduleName)
+      .setString('sContext', sContext)
+      .setString('sText', sText)
+      .send()
+      .getString('sTranslated');
+  },
+
+  text: function(sContext, sText)
+  {
+    document.write(this.translate(sContext, sText));
+  },
+
+  // ------------------------------------------------
+  
+  init: function()
+  {
+    self = ui;
+  },
+
+  dummy: 1
+}
+</script>
+
+<script type="text/javascript">
+  function Elem(sId) { return document.getElementById(sId); }
+  function Log(sText) { Elem('iLog').innerHTML = sText; }
+  function Eval(sText) { eval(sText); }
+  function Test(arg) { Log(arg); }
+
+  ui.moduleName = 'WebArena';
+  ui.init();
+
+</script>
+
+<style type="text/css">
+* { margin:0; padding:0; }
+</style>
+
+</head>
+<body style="overflow:hidden;">
+<div style="width:100%; height:100%; background-color:rgba(240,240,255,0.7);">
+  <p id="iLog">--</p>
+</div>
+</body>
+</html>

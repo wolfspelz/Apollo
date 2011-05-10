@@ -48,6 +48,7 @@ extern "C" {
   #define AP_TEST_Vpi
   #define AP_TEST_Vp
   #define AP_TEST_Galileo
+  #define AP_TEST_Arena
   #if defined (AP_TEST_Net)
     #define AP_TEST_Net_TCP
     #define AP_TEST_Net_TCP_Advanced
@@ -86,4 +87,8 @@ void Test_Vp_End();
 void Test_Galileo_Register();
 void Test_Galileo_Begin();
 void Test_Galileo_End();
+
+void Test_Arena_Register();
+void Test_Arena_Begin();
+void Test_Arena_End();
 
