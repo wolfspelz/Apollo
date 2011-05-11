@@ -123,19 +123,36 @@ public:
   ApOUT String sResult;
 };
 
-class Msg_WebView_SetScriptAccess: public ApRequestMessage
+class Msg_WebView_SetScriptAccessPolicy: public ApRequestMessage
 {
-  #define Msg_WebView_SetScriptAccess_Denied "Denied"
-  #define Msg_WebView_SetScriptAccess_Allowed "Allowed"
+  #define Msg_WebView_SetScriptAccessPolicy_Denied "Denied"
+  #define Msg_WebView_SetScriptAccessPolicy_Allowed "Allowed"
 public:
-  Msg_WebView_SetScriptAccess() : ApRequestMessage("WebView_SetScriptAccess") {}
+  Msg_WebView_SetScriptAccessPolicy() : ApRequestMessage("WebView_SetScriptAccessPolicy") {}
   ApIN ApHandle hView;
-  ApIN String sAccess;
+  ApIN String sPolicy;
   static int Allow(const ApHandle& hView)
   {
-    Msg_WebView_SetScriptAccess msg;
+    Msg_WebView_SetScriptAccessPolicy msg;
     msg.hView = hView;
-    msg.sAccess = Msg_WebView_SetScriptAccess_Allowed;
+    msg.sPolicy = Msg_WebView_SetScriptAccessPolicy_Allowed;
+    return msg.Request();
+  }
+};
+
+class Msg_WebView_SetNavigationPolicy: public ApRequestMessage
+{
+  #define Msg_WebView_SetNavigationPolicy_Denied "Denied"
+  #define Msg_WebView_SetNavigationPolicy_Allowed "Allowed"
+public:
+  Msg_WebView_SetNavigationPolicy() : ApRequestMessage("WebView_SetNavigationPolicy") {}
+  ApIN ApHandle hView;
+  ApIN String sPolicy;
+  static int Deny(const ApHandle& hView)
+  {
+    Msg_WebView_SetNavigationPolicy msg;
+    msg.hView = hView;
+    msg.sPolicy = Msg_WebView_SetNavigationPolicy_Denied;
     return msg.Request();
   }
 };

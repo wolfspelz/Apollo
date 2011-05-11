@@ -137,12 +137,8 @@ void SrpcGate_Translation_Get(ApSRPCMessage* pMsg)
   msg.sModule = pMsg->srpc.getString("sModule");
   msg.sContext = pMsg->srpc.getString("sContext");
   msg.sText = pMsg->srpc.getString("sText");
-  if (!msg.Request()) {
-    pMsg->response.createError(pMsg->srpc, msg.sComment);
-  } else {
-    pMsg->response.createResponse(pMsg->srpc);
-    pMsg->response.setString("sTranslated", msg.sTranslated);
-  }
+  SRPCGATE_HANDLER_NATIVE_REQUEST(pMsg, msg);
+  pMsg->response.setString("sTranslated", msg.sTranslated);
 }
 
 //----------------------------------------------------------

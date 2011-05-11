@@ -237,7 +237,7 @@ String Test_String_SimpleChinese()
 
   if (!err) {
     String s = "\xe9\x87\x91";
-    ::MessageBox(NULL, (PTSTR) s, _T("Test"), MB_OK);
+    //::MessageBox(NULL, (PTSTR) s, _T("Test"), MB_OK);
   }
   return err;
 }

@@ -16,10 +16,10 @@ Display::Display(WebArenaModule* pModule, const ApHandle& hContext)
 :pModule_(pModule)
 ,hContext_(hContext)
 ,bVisible_(0)
-,nX_(0)
-,nY_(0)
-,nW_(0)
-,nH_(0)
+,nLeft_(0)
+,nBottom_(0)
+,nWidth_(0)
+,nHeight_(0)
 {
 }
 
@@ -34,22 +34,21 @@ int Display::Create()
   ApHandle hView = Apollo::newHandle();
 
   ok = Msg_WebView_Create::_(hView);
-  if (!ok) {
-    apLog_Error((LOG_CHANNEL, "Display::Create", "Msg_WebView_Create(" ApHandleFormat ") failed", ApHandleType(hView)));
+  if (!ok) { apLog_Error((LOG_CHANNEL, "Display::Create", "Msg_WebView_Create(" ApHandleFormat ") failed", ApHandleType(hView))); }
+
+  if (ok) {
+    ok = Msg_WebView_SetScriptAccessPolicy::Allow(hView);
+    if (!ok) { apLog_Error((LOG_CHANNEL, "Display::Create", "Msg_WebView_SetScriptAccessPolicy::Allow(" ApHandleFormat ") failed", ApHandleType(hView))); }
   }
 
   if (ok) {
-    ok = Msg_WebView_SetScriptAccess::Allow(hView);
-    if (!ok) {
-      apLog_Error((LOG_CHANNEL, "Display::Create", "Msg_WebView_SetScriptAccess::Allow(" ApHandleFormat ") failed", ApHandleType(hView)));
-    }
+    ok = Msg_WebView_Load::_(hView, Apollo::getModuleConfig(MODULE_NAME, "DisplayHtml", "file://" + Apollo::getModuleResourcePath(MODULE_NAME) + "arena.html"));
+    if (!ok) { apLog_Error((LOG_CHANNEL, "Display::Create", "Msg_WebView_Load(" ApHandleFormat ") failed", ApHandleType(hView))); }
   }
 
   if (ok) {
-    ok = Msg_WebView_Load::_(hView, "file://" + Apollo::getModuleResourcePath(MODULE_NAME) + "index.html");
-    if (!ok) {
-      apLog_Error((LOG_CHANNEL, "Display::Create", "Msg_WebView_Load(" ApHandleFormat ") failed", ApHandleType(hView)));
-    }
+    ok = Msg_WebView_SetNavigationPolicy::Deny(hView);
+    if (!ok) { apLog_Error((LOG_CHANNEL, "Display::Create", "Msg_WebView_SetNavigationPolicy::Deny(" ApHandleFormat ") failed", ApHandleType(hView))); }
   }
 
   if (ok) {
@@ -91,33 +90,30 @@ void Display::SetVisibility(int bVisible)
 
 void Display::SetPosition(int nX, int nY)
 {
-  nX_ = nX;
-  nY_ = nY;
+  nLeft_ = nX;
+  nBottom_ = nY;
 
-  Msg_WebView_Position msg;
-  msg.hView = hView_;
-  msg.nX = nX_;
-  msg.nY = nY_;
-  msg.nW = nW_;
-  msg.nH = nH_;
-  if (!msg.Request()) {
-    apLog_Error((LOG_CHANNEL, "Display::SetPosition", "Msg_WebView_Position(" ApHandleFormat ") failed", ApHandleType(msg.hView)));
-  }
+  SendPosition();
 }
 
 void Display::SetSize(int nW, int nH)
 {
-  nW_ = nW;
-  nH_ = nH;
+  nWidth_ = nW;
+  nHeight_ = nH;
 
+  SendPosition();
+}
+
+void Display::SendPosition()
+{
   Msg_WebView_Position msg;
   msg.hView = hView_;
-  msg.nX = nX_;
-  msg.nY = nY_;
-  msg.nW = nW_;
-  msg.nH = nH_;
+  msg.nX = nLeft_;
+  msg.nY = nBottom_ - nHeight_;
+  msg.nW = nWidth_;
+  msg.nH = nHeight_;
   if (!msg.Request()) {
-    apLog_Error((LOG_CHANNEL, "Display::SetSize", "Msg_WebView_Position(" ApHandleFormat ") failed", ApHandleType(msg.hView)));
+    apLog_Error((LOG_CHANNEL, "Display::SendPosition", "Msg_WebView_Position(" ApHandleFormat ") failed", ApHandleType(msg.hView)));
   }
 }
 
@@ -394,6 +390,16 @@ String Display::Call(const String& sMethod, const String& sArg1, const String& s
   l.AddLast(sArg1);
   l.AddLast(sArg2);
   l.AddLast(sArg3);
+  return Call(sMethod, l);
+}
+
+String Display::Call(const String& sMethod, const String& sArg1, const String& sArg2, const String& sArg3, const String& sArg4)
+{
+  List l;
+  l.AddLast(sArg1);
+  l.AddLast(sArg2);
+  l.AddLast(sArg3);
+  l.AddLast(sArg4);
   return Call(sMethod, l);
 }
 

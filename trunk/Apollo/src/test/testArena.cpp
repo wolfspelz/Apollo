@@ -794,9 +794,9 @@ void Test_InChangeOut::Begin()
   hLocation1_ = Apollo::newHandle();
   hLocation2_ = Apollo::newHandle();
   nLeft_ = 100;
-  nBottom_ = 400;
-  nWidth_ = 600;
-  nHeight_ = 200;
+  nBottom_ = 600;
+  nWidth_ = 1200;
+  nHeight_ = 400;
   nPhase_ = 0;
 
   {

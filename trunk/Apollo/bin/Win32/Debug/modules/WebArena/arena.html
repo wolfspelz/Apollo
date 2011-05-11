@@ -1,0 +1,57 @@
+﻿<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<script type="text/javascript" src="jquery-1.4.2.min.js"></script>
+<script type="text/javascript" src="utils.js"></script>
+<script type="text/javascript" src="apollo.js"></script>
+<script type="text/javascript" src="arena.js"></script>
+<link rel='stylesheet' href='arena.css' type='text/css' media='all' />
+
+<script type="text/javascript">
+function Eval(sText) { eval(sText); }
+
+var api = new ApolloApi();
+api.moduleName = 'WebArena';
+api.init();
+
+var logger = Log.GetInstance('iOut', 'iLogCheck');
+Log.instance.SetLevel(Log.Level.VERBOSE);
+Log.instance.Clear();
+
+ApMessage.prototype.onLog = Log.IO;
+
+$(document).ready(function () {
+  Log.Debug('ready');
+  api.logError('ready');
+});
+
+</script>
+
+<style type="text/css">
+#iContent { background-color:rgba(255,255,221,0.5); }
+#iControl { background-color:rgba(255,255,204,0.7); }
+#iControl * { font-family:Verdana; font-size:11px; }
+#iOut { background-color:rgba(240,240,240,0.9); }
+#iOut p { font-family:Lucida Console; font-size:10px; }
+</style>
+
+</head>
+<body style="overflow:hidden;">
+<div id="iWrapper" style="width:100%; height:100%">
+  <div id="iContent" style="position:absolute; left:0; top:0; width:40%; height:100%; overflow:auto;">iContent</div>
+  <div id="iControl" style="position:absolute; left:40%; top:0; width:20%; height:100%; overflow:auto;">
+    <p>
+    <input type="button" value="WebView_Reload" onclick="api.msg('WebView_Reload').setString('hView', apollo.viewHandle).send();" />
+    <input type="button" value="reload()" onclick="document.location.reload();" />
+    <input type="button" value="Quit" onclick="api.msg('MainLoop_EndLoop').send();"/>
+    <br/>
+    <input type="checkbox" id="iLogCheck" checked="checked"/><label for="iLogCheck">Logging</label>
+    <input type="button" value="Clear" onclick="Log.instance.Clear();" />
+    <input type="button" value="Translate" onclick="Log.Info(api.translate('ParamTest', 'Click me!'));" />
+    <br/>
+    </p>
+  </div>
+  <div id="iOut" style="position:absolute; left:60%; top:0; width:40%; height:100%; overflow:auto; white-space: nowrap;"></div>
+</div>
+</body>
+</html>

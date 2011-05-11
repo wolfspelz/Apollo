@@ -12,76 +12,6 @@
 #include "Avatar.h"
 #include "WebArenaModule.h"
 
-#if defined(AP_TEST)
-
-String Avatar::Test_TruncateElementText1(const ApHandle& hView, const String& sNickname, const String& sFont, int nSize, int nFlags, int nWidth, const String& sExpected)
-{
-  String s;
-
-  String sTruncated = TruncateElementText(hView, sNickname, sFont, nSize, nFlags, nWidth);
-  if (sTruncated != sExpected) {
-    s.appendf("Expected=%s got=%s for font=%s size=%d flags=%d width=%d", StringType(sExpected), StringType(sTruncated), StringType(sFont), nSize, nFlags, nWidth);
-  }
-
-  return s;
-}
-
-String Avatar::Test_TruncateElementText()
-{
-  String s;
-
-  //if (!s) { s = Test_TruncateElementText1(hView, "123456789 123456789 123456789 123456789 123456789 ", "Courier New", 14, Msg_Scene_FontFlags::Normal, 10, "1"); }
-  //if (!s) { s = Test_TruncateElementText1(hView, "123456789 123456789 123456789 123456789 123456789 ", "Courier New", 14, Msg_Scene_FontFlags::Normal, 30, "1234"); }
-  //if (!s) { s = Test_TruncateElementText1(hView, "123456789 123456789 123456789 123456789 123456789 ", "Courier New", 9, Msg_Scene_FontFlags::Normal, 30, "123456"); }
-  //if (!s) { s = Test_TruncateElementText1(hView, "123456789 123456789 123456789 123456789 123456789 ", "Courier New", 14, Msg_Scene_FontFlags::Normal, 80, "123456789 "); }
-  //if (!s) { s = Test_TruncateElementText1(hView, "123456789 123456789 123456789 123456789 123456789 ", "Arial Narrow", 14, Msg_Scene_FontFlags::Normal, 80, "123456789 1234"); }
-  //if (!s) { s = Test_TruncateElementText1(hView, "123456789 123456789 123456789 123456789 123456789 ", "Verdana", 12, Msg_Scene_FontFlags::Normal, 80, "123456789 "); }
-  //if (!s) { s = Test_TruncateElementText1(hView, "123456789 123456789 123456789 123456789 123456789 ", "Verdana", 10, Msg_Scene_FontFlags::Normal, 80, "123456789 123"); }
-  //if (!s) { s = Test_TruncateElementText1(hView, "123456789", "Verdana", 10, Msg_Scene_FontFlags::Normal, 80, "123456789"); }
-  //if (!s) { s = Test_TruncateElementText1(hView, "1", "Verdana", 10, Msg_Scene_FontFlags::Normal, 80, "1"); }
-  //if (!s) { s = Test_TruncateElementText1(hView, "\xE9\xA0\x81" "\xE9\xA6\x96", "Verdana", 10, Msg_Scene_FontFlags::Normal, 80, "\xE9\xA0\x81" "\xE9\xA6\x96"); }
-  //if (!s) { s = Test_TruncateElementText1(hView, "\xE9\xA0\x81" "\xE9\xA6\x96" "\xE9\xA0\x81" "\xE9\xA6\x96" "\xE9\xA0\x81" "\xE9\xA6\x96" "\xE9\xA0\x81" "\xE9\xA6\x96" "\xE9\xA0\x81" "\xE9\xA6\x96" "\xE9\xA0\x81" "\xE9\xA6\x96", "Verdana", 10, Msg_Scene_FontFlags::Normal, 80, "\xE9\xA0\x81" "\xE9\xA6\x96" "\xE9\xA0\x81" "\xE9\xA6\x96" "\xE9\xA0\x81" "\xE9\xA6\x96" "\xE9\xA0\x81" "\xE9\xA6\x96"); }
-
-  return s;
-}
-
-#endif // #if defined(AP_TEST)
-
-String Avatar::TruncateElementText(const ApHandle& hView, const String& sText, const String& sFont, int nSize, int nFlags, int nWidth)
-{
-  String sResult = sText;
-
-  //int nCnt = 0;
-  //int bDone = 0;
-  //while (!bDone) {
-  //  nCnt++;
-  //  if (nCnt == 20) {
-  //    bDone = 1;
-  //    sResult = String::truncate(sText, 8, "...");
-  //  } else {
-  //    double fTextBearingX, fTextBearingY, fTextW, fTextH, fTextAdvanceX, fTextAdvanceY;
-  //    Msg_Scene_GetTextExtents::_(hView, sWork, sFont, nSize, nFlags, fTextBearingX, fTextBearingY, fTextW, fTextH, fTextAdvanceX, fTextAdvanceY);
-  //    if (fTextW <= nWidth) {
-  //      bDone = 1;
-  //      sResult = sWork;
-  //    } else {
-  //      int nLength = sWork.chars();
-  //      double fFraction = ((double) nWidth) / fTextW;
-  //      int nNextLength = ((double) nLength) * (fFraction * 1.5);
-  //      int nDeduce = nLength - nNextLength;
-  //      if (nDeduce < 1) {
-  //        nDeduce = 1;
-  //      }
-  //      sWork = sWork.subString(0, nLength - nDeduce);
-  //    }
-  //  }
-  //}
-
-  return sResult;
-}
-
-//----------------------------------------------------------
-
 Avatar::Avatar(WebArenaModule* pModule, Display* pDisplay, const ApHandle& hParticipant)
 :pModule_(pModule)
 ,pDisplay_(pDisplay)
@@ -264,12 +194,22 @@ void Avatar::Show()
   nMinW_ = Apollo::getModuleConfig(MODULE_NAME, "Avatar/MinWidth", 20);
   nMinH_ = Apollo::getModuleConfig(MODULE_NAME, "Avatar/MinHeight", 20);
 
-  Msg_VpView_GetParticipantDetailString msg;
-  msg.hParticipant = hParticipant_;
-  msg.sKey = Msg_VpView_ParticipantDetail_Nickname;
-  msg.Request();
+  {
+    Msg_VpView_GetParticipantDetailString msg;
+    msg.hParticipant = hParticipant_;
+    msg.sKey = Msg_VpView_ParticipantDetail_Nickname;
+    msg.Request();
+    sNickname_ = msg.sValue;
+  }
 
-  pDisplay_->Call("Eval", "Log('" + msg.sValue + "')");
+  SetUnknownPosition();
+
+  pDisplay_->Call("ShowAvatar"
+    , hParticipant_.toString()
+    , Apollo::getModuleResourcePath(MODULE_NAME) + Apollo::getModuleConfig(MODULE_NAME, "Avatar/Image/Default", "DefaultAvatar.png")
+    , sNickname_
+    , String().from(nX_)
+    );
 
   //Msg_Scene_CreateElement::_(hView_, ElementPath());
   //SetUnknownPosition();
@@ -466,3 +406,75 @@ void Avatar::SetPosition(int nX)
   nPositionConfirmed_ = 1;
   //Msg_Scene_TranslateElement::_(hView_, ElementPath(), nX, 0);
 }
+
+//----------------------------------------------------------
+
+String Avatar::TruncateElementText(const ApHandle& hView, const String& sText, const String& sFont, int nSize, int nFlags, int nWidth)
+{
+  String sResult = sText;
+
+  //int nCnt = 0;
+  //int bDone = 0;
+  //while (!bDone) {
+  //  nCnt++;
+  //  if (nCnt == 20) {
+  //    bDone = 1;
+  //    sResult = String::truncate(sText, 8, "...");
+  //  } else {
+  //    double fTextBearingX, fTextBearingY, fTextW, fTextH, fTextAdvanceX, fTextAdvanceY;
+  //    Msg_Scene_GetTextExtents::_(hView, sWork, sFont, nSize, nFlags, fTextBearingX, fTextBearingY, fTextW, fTextH, fTextAdvanceX, fTextAdvanceY);
+  //    if (fTextW <= nWidth) {
+  //      bDone = 1;
+  //      sResult = sWork;
+  //    } else {
+  //      int nLength = sWork.chars();
+  //      double fFraction = ((double) nWidth) / fTextW;
+  //      int nNextLength = ((double) nLength) * (fFraction * 1.5);
+  //      int nDeduce = nLength - nNextLength;
+  //      if (nDeduce < 1) {
+  //        nDeduce = 1;
+  //      }
+  //      sWork = sWork.subString(0, nLength - nDeduce);
+  //    }
+  //  }
+  //}
+
+  return sResult;
+}
+
+//----------------------------------------------------------
+
+#if defined(AP_TEST)
+
+String Avatar::Test_TruncateElementText1(const ApHandle& hView, const String& sNickname, const String& sFont, int nSize, int nFlags, int nWidth, const String& sExpected)
+{
+  String s;
+
+  String sTruncated = TruncateElementText(hView, sNickname, sFont, nSize, nFlags, nWidth);
+  if (sTruncated != sExpected) {
+    s.appendf("Expected=%s got=%s for font=%s size=%d flags=%d width=%d", StringType(sExpected), StringType(sTruncated), StringType(sFont), nSize, nFlags, nWidth);
+  }
+
+  return s;
+}
+
+String Avatar::Test_TruncateElementText()
+{
+  String s;
+
+  //if (!s) { s = Test_TruncateElementText1(hView, "123456789 123456789 123456789 123456789 123456789 ", "Courier New", 14, Msg_Scene_FontFlags::Normal, 10, "1"); }
+  //if (!s) { s = Test_TruncateElementText1(hView, "123456789 123456789 123456789 123456789 123456789 ", "Courier New", 14, Msg_Scene_FontFlags::Normal, 30, "1234"); }
+  //if (!s) { s = Test_TruncateElementText1(hView, "123456789 123456789 123456789 123456789 123456789 ", "Courier New", 9, Msg_Scene_FontFlags::Normal, 30, "123456"); }
+  //if (!s) { s = Test_TruncateElementText1(hView, "123456789 123456789 123456789 123456789 123456789 ", "Courier New", 14, Msg_Scene_FontFlags::Normal, 80, "123456789 "); }
+  //if (!s) { s = Test_TruncateElementText1(hView, "123456789 123456789 123456789 123456789 123456789 ", "Arial Narrow", 14, Msg_Scene_FontFlags::Normal, 80, "123456789 1234"); }
+  //if (!s) { s = Test_TruncateElementText1(hView, "123456789 123456789 123456789 123456789 123456789 ", "Verdana", 12, Msg_Scene_FontFlags::Normal, 80, "123456789 "); }
+  //if (!s) { s = Test_TruncateElementText1(hView, "123456789 123456789 123456789 123456789 123456789 ", "Verdana", 10, Msg_Scene_FontFlags::Normal, 80, "123456789 123"); }
+  //if (!s) { s = Test_TruncateElementText1(hView, "123456789", "Verdana", 10, Msg_Scene_FontFlags::Normal, 80, "123456789"); }
+  //if (!s) { s = Test_TruncateElementText1(hView, "1", "Verdana", 10, Msg_Scene_FontFlags::Normal, 80, "1"); }
+  //if (!s) { s = Test_TruncateElementText1(hView, "\xE9\xA0\x81" "\xE9\xA6\x96", "Verdana", 10, Msg_Scene_FontFlags::Normal, 80, "\xE9\xA0\x81" "\xE9\xA6\x96"); }
+  //if (!s) { s = Test_TruncateElementText1(hView, "\xE9\xA0\x81" "\xE9\xA6\x96" "\xE9\xA0\x81" "\xE9\xA6\x96" "\xE9\xA0\x81" "\xE9\xA6\x96" "\xE9\xA0\x81" "\xE9\xA6\x96" "\xE9\xA0\x81" "\xE9\xA6\x96" "\xE9\xA0\x81" "\xE9\xA6\x96", "Verdana", 10, Msg_Scene_FontFlags::Normal, 80, "\xE9\xA0\x81" "\xE9\xA6\x96" "\xE9\xA0\x81" "\xE9\xA6\x96" "\xE9\xA0\x81" "\xE9\xA6\x96" "\xE9\xA0\x81" "\xE9\xA6\x96"); }
+
+  return s;
+}
+
+#endif // #if defined(AP_TEST)
