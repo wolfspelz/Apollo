@@ -16,14 +16,6 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
   ::OutputDebugString(_T("############################## Startup #######################################\r\n"));
 #endif
 
-#if defined(_DEBUG)
-  if (::AllocConsole()) {
-    ::freopen("conout$", "w", stdout);
-    ::freopen("conout$", "w", stderr);
-  }
-  ::SetConsoleOutputCP(CP_UTF8);
-#endif
-
   //apLog_SetMask(apLog_MaskSilent);
   //apLog_SetMask(apLog_MaskNoTrace);
   apLog_SetMask(apLog_MaskMaxUser);
@@ -65,6 +57,16 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
       apLog_Alert(("Main", "WinMain", "%s/%s not found. Maybe wrong working directory?", StringType(msg.sDir), StringType(msg.sName)));
     }
   }
+
+#if defined(_DEBUG)
+  if (Apollo::getConfig("Debug/ShowConsole", 1)) {
+    if (::AllocConsole()) {
+      ::freopen("conout$", "w", stdout);
+      ::freopen("conout$", "w", stderr);
+    }
+    ::SetConsoleOutputCP(CP_UTF8);
+  }
+#endif
 
   int nLogMask = Apollo::getConfig("LogMask", -1);
   if (nLogMask != -1) { Msg_Log_SetMask msg; msg.nMask = nLogMask; msg.Send(); }

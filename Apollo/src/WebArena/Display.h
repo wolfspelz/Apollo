@@ -47,8 +47,8 @@ public:
   void OnReceivePublicChat(const ApHandle& hParticipant, const ApHandle& hChat, const String& sNickname, const String& sText, const Apollo::TimeValue& tv);
   void OnContextDetailsChanged(Apollo::ValueList& vlKeys);
 
-  inline int GetWidth() { return nW_; }
-  inline int GetHeight() { return nH_; }
+  inline int GetWidth() { return nWidth_; }
+  inline int GetHeight() { return nHeight_; }
   inline ApHandle GetView() { return hView_; }
   inline WebArenaModule* GetModule() { return pModule_; }
   inline ApHandle GetContext() { return hContext_; }
@@ -58,6 +58,7 @@ public:
   String Call(const String& sMethod, const String& sArg1);
   String Call(const String& sMethod, const String& sArg1, const String& sArg2);
   String Call(const String& sMethod, const String& sArg1, const String& sArg2, const String& sArg3);
+  String Call(const String& sMethod, const String& sArg1, const String& sArg2, const String& sArg3, const String& sArg4);
 
 protected:
   void ProcessAvatarList(Apollo::ValueList& vlParticipants);
@@ -73,16 +74,18 @@ protected:
   void RemoveAllObjects();
   void ResetLocationInfo();
 
+  void SendPosition();
+
 protected:
   WebArenaModule* pModule_;
   ApHandle hContext_;
   ApHandle hLocation_;
 
   int bVisible_;
-  int nX_;
-  int nY_;
-  int nW_;
-  int nH_;
+  int nLeft_;
+  int nBottom_;
+  int nWidth_;
+  int nHeight_;
 
   ApHandle hView_;
 

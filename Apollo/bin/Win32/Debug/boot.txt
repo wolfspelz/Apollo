@@ -32,3 +32,4 @@ System/UserProfileFolder=Avatar
 
 #Dun/OnLoad/DeleteDbFiles=Identity
 #LogMask=31
+#Debug/ShowConsole=1

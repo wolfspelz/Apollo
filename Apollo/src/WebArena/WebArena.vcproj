@@ -208,11 +208,11 @@
 			>
 		</Filter>
 		<File
-			RelativePath="..\..\bin\Win32\Debug\modules\WebArena\config.txt"
+			RelativePath="..\..\bin\Win32\Debug\modules\WebArena\arena.html"
 			>
 		</File>
 		<File
-			RelativePath="..\..\bin\Win32\Debug\modules\WebArena\index.html"
+			RelativePath="..\..\bin\Win32\Debug\modules\WebArena\config.txt"
 			>
 		</File>
 	</Files>

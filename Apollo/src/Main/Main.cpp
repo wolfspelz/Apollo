@@ -12,7 +12,7 @@
   static int bConsole = 1;
 #endif
 
-static const char* szLevelNames[apLog_NLogLevels] = {
+static String sLevelNames[apLog_NLogLevels] = {
    "None....."
   ,"Fatal...."
   ,"Error...."
@@ -37,25 +37,23 @@ static String getTimestamp()
   return s;
 }
 
-static String g_sBlank = "        ";
 void On_Log_Line(Msg_Log_Line* pMsg)
 {
   int nLevel = apLog_Mask2Level(pMsg->nMask);
-  String sChannel = pMsg->sChannel;
-  int nBlanks = g_sBlank.chars() - sChannel.chars();
-  if (nBlanks > 0) {
-    sChannel += g_sBlank.subString(0, nBlanks);
-  }
 
   String sOut = getTimestamp();
-  sOut += " ";
-  sOut += szLevelNames[nLevel];
-  sOut += " ";
-  sOut += sChannel;
-  sOut += " ";
-  sOut += pMsg->sContext;
-  sOut += " ";
-  sOut += pMsg->sMessage;
+  if (sLevelNames[nLevel].chars() > 0) {
+    sOut += " " + sLevelNames[nLevel];
+  }
+  if (pMsg->sChannel.chars() > 0) {
+    sOut += " " + pMsg->sChannel;
+  }
+  if (pMsg->sContext.chars() > 0) {
+    sOut += " " + pMsg->sContext;
+  }
+  if (pMsg->sMessage.chars() > 0) {
+    sOut += " " + pMsg->sMessage;
+  }
 
   sOut.escape(String::EscapeLogLine);
 
@@ -66,7 +64,7 @@ void On_Log_Line(Msg_Log_Line* pMsg)
     ::MessageBox(NULL, sOut, _T("On_Log_Line"), MB_OK);
   } else {
     if (bConsole) {
-      ::fprintf(stderr, sOut);
+      ::fprintf(stderr, "%s", sOut.c_str());
     } else {
       ::OutputDebugString(sOut);
     }

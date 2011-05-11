@@ -52,11 +52,12 @@ public:
   View::View(const ApHandle& hView)
     :hAp_(hView)
     ,bVisible_(0)
-    ,nX_(100)
-    ,nY_(100)
-    ,nW_(600)
-    ,nH_(400)
-    ,bScriptAccess_(0)
+    ,nLeft_(100)
+    ,nTop_(100)
+    ,nWidth_(600)
+    ,nHeight_(400)
+    ,bScriptAccessEnabled_(0)
+    ,bNavigationEnabled_(1)
     ,pWebView_(0)
     ,pWebFrame_(0)
     ,pWebViewPrivate_(0)
@@ -77,7 +78,8 @@ public:
   void LoadHtml(const String& sHtml, const String& sBase);
   void Load(const String& sUrl);
   void Reload();
-  void SetJSAccess(const String& sAccess);
+  void SetScriptAccessPolicy(const String& sPolicy);
+  void SetNavigationPolicy(const String& sPolicy);
   String CallJSFunction(const String& sFunction, List& lArgs);
   void MoveBy(int nX, int nY);
   void SizeBy(int nW, int nH, int nDirection);
@@ -89,22 +91,26 @@ public:
   static JSValueRef JS_Apollo_getSharedValue(JSContextRef ctx, JSObjectRef thisObject, JSStringRef propertyName, JSValueRef* exception);
   static JSValueRef JS_Apollo_echoString(JSContextRef ctx, JSObjectRef function, JSObjectRef thisObject, size_t argumentCount, const JSValueRef* arguments, JSValueRef* exception);
   static JSValueRef JS_Apollo_sendMessage(JSContextRef ctx, JSObjectRef function, JSObjectRef thisObject, size_t argumentCount, const JSValueRef* arguments, JSValueRef* exception);
-  int HasScriptAccess() { return bScriptAccess_; }
+  int HasScriptAccess() { return bScriptAccessEnabled_; }
+  int HasNavigation() { return bNavigationEnabled_; }
 
 protected:
   void MakeScriptObject();
   static String StringFromBSTR(BSTR bStr);
+  static String GetUrlFrom(IWebFrame *frame);
+  static String GetUrlFrom(IWebURLRequest *request);
 
 protected:
   ApHandle hAp_;
   int bVisible_;
-  int nX_;
-  int nY_;
-  int nW_;
-  int nH_;
+  int nLeft_;
+  int nTop_;
+  int nWidth_;
+  int nHeight_;
 
   String sUrl_;
-  int bScriptAccess_;
+  int bScriptAccessEnabled_;
+  int bNavigationEnabled_;
 
   IWebView* pWebView_;
   IWebFrame* pWebFrame_;

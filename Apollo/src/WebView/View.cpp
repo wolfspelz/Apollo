@@ -33,7 +33,7 @@ void View::Create()
   if (FAILED( pWebView_->setPolicyDelegate(this) )) { throw ApException("View::Create pWebView_->setPolicyDelegate() failed"); }
   if (FAILED( pWebView_->QueryInterface(IID_IWebViewPrivate, reinterpret_cast<void**>(&pWebViewPrivate_)) )) { throw ApException("View::Create QueryInterface(IID_IWebViewPrivate) failed"); }
 
-  RECT r = { nX_, nY_, nW_, nH_ };
+  RECT r = { nLeft_, nTop_, nWidth_, nHeight_ };
   if (FAILED( pWebView_->initWithFrame(r, 0, 0) )) { throw ApException("View::Create pWebView_->initWithFrame() failed"); }
 
   // -----------------------------
@@ -51,7 +51,7 @@ void View::Create()
 
   if (FAILED( pWebView_->mainFrame(&pWebFrame_) )) { throw ApException("View::Create pWebView_->mainFrame() failed"); }
 
-  ::MoveWindow(hWnd_, nX_, nY_ - 10000, nW_, nH_, TRUE);
+  ::MoveWindow(hWnd_, nLeft_, nTop_ - 10000, nWidth_, nHeight_, TRUE);
 }
 
 void View::Destroy()
@@ -148,13 +148,13 @@ void View::Reload()
 
 void View::SetPosition(int nX, int nY, int nW, int nH)
 {
-  nX_ = nX;
-  nY_ = nY;
-  nW_ = nW;
-  nH_ = nH;
+  nLeft_ = nX;
+  nTop_ = nY;
+  nWidth_ = nW;
+  nHeight_ = nH;
 
 #if defined(WIN32)
-  ::MoveWindow(hWnd_, nX_, nY_ - (bVisible_ ? 0 : 10000), nW_, nH_, FALSE);
+  ::MoveWindow(hWnd_, nLeft_, nTop_ - (bVisible_ ? 0 : 10000), nWidth_, nHeight_, FALSE);
 #endif // WIN32
 }
 
@@ -165,7 +165,7 @@ void View::SetVisibility(int bVisible)
 
   if (bChanged) {
 #if defined(WIN32)
-    ::MoveWindow(hWnd_, nX_, nY_ - (bVisible_ ? 0 : 10000), nW_, nH_, FALSE);
+    ::MoveWindow(hWnd_, nLeft_, nTop_ - (bVisible_ ? 0 : 10000), nWidth_, nHeight_, FALSE);
 
     //::ShowWindow(hWnd_, bVisible_ ? SW_SHOW : SW_HIDE);
     //if (bVisible_) {
@@ -175,38 +175,52 @@ void View::SetVisibility(int bVisible)
   }
 }
 
-void View::SetJSAccess(const String& sAccess)
+void View::SetScriptAccessPolicy(const String& sPolicy)
 {
-  if (sAccess == Msg_WebView_SetScriptAccess_Allowed) {
-    bScriptAccess_ = 1;
+  if (sPolicy == Msg_WebView_SetScriptAccessPolicy_Allowed) {
+    bScriptAccessEnabled_ = 1;
+  }
+}
+
+void View::SetNavigationPolicy(const String& sPolicy)
+{
+  if (sPolicy == Msg_WebView_SetNavigationPolicy_Denied) {
+    bNavigationEnabled_ = 0;
   }
 }
 
 void View::MoveBy(int nX, int nY)
 {
-  nX_ += nX;
-  nY_ += nY;
+  nLeft_ += nX;
+  nTop_ += nY;
 
 #if defined(WIN32)
-  ::MoveWindow(hWnd_, nX_, nY_ - (bVisible_ ? 0 : 10000), nW_, nH_, FALSE);
+  ::MoveWindow(hWnd_, nLeft_, nTop_ - (bVisible_ ? 0 : 10000), nWidth_, nHeight_, FALSE);
 #endif // WIN32
 }
   
 void View::SizeBy(int nW, int nH, int nDirection)
 {
   switch (nDirection) {
-    case Msg_WebView_SizeBy::DirectionLeft:        nX_ -= nW;            nW_ += nW;            break;
-    case Msg_WebView_SizeBy::DirectionTop:                    nY_ -= nH;            nH_ += nH; break;
-    case Msg_WebView_SizeBy::DirectionRight:                             nW_ += nW;            break;
-    case Msg_WebView_SizeBy::DirectionBottom:                                       nH_ += nH; break;
-    case Msg_WebView_SizeBy::DirectionTopLeft:     nX_ -= nW; nY_ -= nH; nW_ += nW; nH_ += nH; break;
-    case Msg_WebView_SizeBy::DirectionTopRight:               nY_ -= nH; nW_ += nW; nH_ += nH; break;
-    case Msg_WebView_SizeBy::DirectionBottomLeft:  nX_ -= nW;            nW_ += nW; nH_ += nH; break;
-    case Msg_WebView_SizeBy::DirectionBottomRight:                       nW_ += nW; nH_ += nH; break;
+    case Msg_WebView_SizeBy::DirectionLeft:          nLeft_ -= nW;               nWidth_ += nW;                 break;
+    case Msg_WebView_SizeBy::DirectionTop:                         nTop_  -= nH;                nHeight_ += nH; break;
+    case Msg_WebView_SizeBy::DirectionRight:                                     nWidth_ += nW;                 break;
+    case Msg_WebView_SizeBy::DirectionBottom:                                                   nHeight_ += nH; break;
+    case Msg_WebView_SizeBy::DirectionTopLeft:       nLeft_ -= nW;  nTop_ -= nH; nWidth_ += nW; nHeight_ += nH; break;
+    case Msg_WebView_SizeBy::DirectionTopRight:                     nTop_ -= nH; nWidth_ += nW; nHeight_ += nH; break;
+    case Msg_WebView_SizeBy::DirectionBottomLeft:    nLeft_ -= nW;               nWidth_ += nW; nHeight_ += nH; break;
+    case Msg_WebView_SizeBy::DirectionBottomRight:                               nWidth_ += nW; nHeight_ += nH; break;
   }
 
+  //if (nWidth_ < 0) { nWidth_ = 0; }
+  //if (nHeight_ < 0) { nHeight_ = 0; }
+
+  // Prevent from hitting https://bugs.webkit.org/show_bug.cgi?id=60618
+  if (nWidth_ < 1) { nWidth_ = 1; }
+  if (nHeight_ < 1) { nHeight_ = 1; }
+
 #if defined(WIN32)
-  ::MoveWindow(hWnd_, nX_, nY_ - (bVisible_ ? 0 : 10000), nW_, nH_, FALSE);
+  ::MoveWindow(hWnd_, nLeft_, nTop_ - (bVisible_ ? 0 : 10000), nWidth_, nHeight_, FALSE);
 #endif // WIN32
 }
 
@@ -226,10 +240,10 @@ void View::MouseRelease()
 
 void View::GetPosition(int& nX, int& nY, int& nW, int& nH)
 {
-  nX = nX_;
-  nY = nY_;
-  nW = nW_;
-  nH = nH_;
+  nX = nLeft_;
+  nY = nTop_;
+  nW = nWidth_;
+  nH = nHeight_;
 }
 
 void View::GetVisibility(int& bVisible)
@@ -491,32 +505,55 @@ HRESULT View::didStartProvisionalLoadForFrame(IWebView* webView, IWebFrame* fram
   return S_OK;
 }
 
-HRESULT View::didFinishDocumentLoadForFrame(IWebView *sender, IWebFrame *frame)
+String View::GetUrlFrom(IWebFrame *frame)
+{
+  String sUrl;
+
+  AutoComPtr<IWebDataSource> dataSource;
+  AutoComPtr<IWebMutableURLRequest> request;
+
+  if (FAILED( frame->dataSource(dataSource) )) goto exit;
+  if (FAILED( dataSource->request(request) )) goto exit;
+
+  BSTR bstrUrl = 0;
+  if (FAILED( request->URL(&bstrUrl) )) goto exit;
+
+  sUrl = StringFromBSTR(bstrUrl);
+
+exit:
+  return sUrl;
+}
+
+String View::GetUrlFrom(IWebURLRequest *request)
+{
+  String sUrl;
+
+  BSTR bstrUrl = 0;
+  if (FAILED( request->URL(&bstrUrl) )) goto exit;
+
+  sUrl = StringFromBSTR(bstrUrl);
+
+exit:
+  return sUrl;
+}
+
+HRESULT View::didFinishDocumentLoadForFrame(IWebView *webView, IWebFrame *frame)
 {
   if (pTopLoadingFrame_ == frame) {
     ApAsyncMessage<Msg_WebView_Event_DocumentLoaded> msg;
     msg->hView = apHandle();
     msg.Post();
+
+    try {
+      MakeScriptObject();
+    } catch (ApException& ex) {
+      apLog_Error((LOG_CHANNEL, "View::didFinishDocumentLoadForFrame", "MakeScriptObject() %s", StringType(ex.getText())));
+    }
+
+    if (apLog_IsVerbose) {
+      apLog_Verbose((LOG_CHANNEL, "View::didFinishDocumentLoadForFrame", "%s", StringType(GetUrlFrom(frame))));
+    }
   }
-
-#if 0
-  HRESULT hr = S_OK;
-
-  IWebDataSource* dataSource = 0;
-  hr = frame->dataSource(&dataSource);
-  if (FAILED(hr)) goto exit;
-
-  IWebMutableURLRequest* request = 0;
-  hr = dataSource->request(&request);
-  if (FAILED(hr)) goto exit;
-
-  BSTR bstrUrl = 0;
-  hr = request->URL(&bstrUrl);
-  if (FAILED(hr)) goto exit;
-
-  apLog_Debug((LOG_CHANNEL, "View::OnDidFinishDocumentLoadForFrame", "%s", StringType(StringFromBSTR(bstrUrl))));
-exit:
-#endif
 
   return S_OK;
 }
@@ -527,26 +564,12 @@ HRESULT View::didFinishLoadForFrame(IWebView* webView, IWebFrame* frame)
     ApAsyncMessage<Msg_WebView_Event_DocumentComplete> msg;
     msg->hView = apHandle();
     msg.Post();
+
+    if (apLog_IsVerbose) {
+      apLog_Verbose((LOG_CHANNEL, "View::didFinishLoadForFrame", "%s", StringType(GetUrlFrom(frame))));
+    }
   }
 
-#if 0
-  HRESULT hr = S_OK;
-
-  IWebDataSource* dataSource = 0;
-  hr = frame->dataSource(&dataSource);
-  if (FAILED(hr)) goto exit;
-
-  IWebMutableURLRequest* request = 0;
-  hr = dataSource->request(&request);
-  if (FAILED(hr)) goto exit;
-
-  BSTR bstrUrl = 0;
-  hr = request->URL(&bstrUrl);
-  if (FAILED(hr)) goto exit;
-
-  apLog_Debug((LOG_CHANNEL, "View::didFinishLoadForFrame", "%s", StringType(StringFromBSTR(bstrUrl))));
-exit:
-#endif
   return S_OK;
 }
 
@@ -557,12 +580,16 @@ HRESULT View::willSendRequest(IWebView *webView, unsigned long identifier, IWebU
   Msg_WebView_Event_BeforeRequest msg;
 
   if (pWebView_ == webView) {
+    if (apLog_IsVerbose) {
+      apLog_Verbose((LOG_CHANNEL, "View::willSendRequest", "%s", StringType(GetUrlFrom(request))));
+    }
+
     BSTR bstrUrl = 0;
     request->URL(&bstrUrl);
     String sUrl = StringFromBSTR(bstrUrl);
 
     msg.hView = apHandle();
-    msg.sUrl = StringFromBSTR(bstrUrl);
+    msg.sUrl = sUrl;
     msg.Filter();
 
     //if (msg.sUrl == "http://webkit.org/images/icon-gold.png") {
@@ -590,35 +617,43 @@ HRESULT View::willSendRequest(IWebView *webView, unsigned long identifier, IWebU
 HRESULT View::decidePolicyForNavigationAction(IWebView *webView, IPropertyBag *actionInformation, IWebURLRequest *request, IWebFrame *frame, IWebPolicyDecisionListener *listener)
 {
   int bHandled = 0;
-
-  Msg_WebView_Event_BeforeNavigate msg;
+  int bNavigate = 1;
 
   if (pWebView_ == webView) {
-    BSTR bstrUrl = 0;
-    request->URL(&bstrUrl);
-    String sUrl = StringFromBSTR(bstrUrl);
-
-    msg.hView = apHandle();
-    msg.sUrl = StringFromBSTR(bstrUrl);
-    msg.Filter();
-
-    //if (msg.sUrl == "http://blog.wolfspelz.de/") {
-    //  msg.bCancel = 1;
-    //  ApAsyncMessage<Msg_WebView_Load> loadMsg;
-    //  loadMsg->hView = apHandle();
-    //  loadMsg->sUrl = "http://www.google.com/";
-    //  loadMsg.Post();
-    //}
-
     bHandled = 1;
+
+    bNavigate = HasNavigation() || (GetUrlFrom(request) == GetUrlFrom(frame));
+
+    if (bNavigate) {
+      Msg_WebView_Event_BeforeNavigate msg;
+
+      BSTR bstrUrl = 0;
+      request->URL(&bstrUrl);
+      String sUrl = StringFromBSTR(bstrUrl);
+
+      msg.hView = apHandle();
+      msg.sUrl = StringFromBSTR(bstrUrl);
+      msg.Filter();
+
+      //if (msg.sUrl == "http://blog.wolfspelz.de/") {
+      //  msg.bCancel = 1;
+      //  ApAsyncMessage<Msg_WebView_Load> loadMsg;
+      //  loadMsg->hView = apHandle();
+      //  loadMsg->sUrl = "http://www.google.com/";
+      //  loadMsg.Post();
+      //}
+
+      bNavigate = !msg.bCancel;
+      bHandled = 1;
+    }
   }
 
   if (bHandled) {
 
-    if (msg.bCancel) {
-      listener->ignore();
-    } else {
+    if (bNavigate) {
       listener->use();
+    } else {
+      listener->ignore();
     }
 
     return S_OK;

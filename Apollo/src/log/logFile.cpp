@@ -36,6 +36,7 @@ void FileLogger::appendLog(const String& sLevel, const String& sChannel, const S
     }
 
     sFile_ = sFile;
+    Apollo::appendFile(sFile_, "--------------------------------------------------\n");
   }
 
   if (!sFile_.empty()) {
