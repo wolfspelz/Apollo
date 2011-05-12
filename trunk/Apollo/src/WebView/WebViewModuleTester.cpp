@@ -88,7 +88,7 @@ void WebViewModuleTester::On_CallJSEcho_WebView_Event_DocumentLoaded(Msg_WebView
   String sOutExpected = "Hello World" " \xe9\x87\x91" " (JS.TestEcho)" " (JS_Apollo_echoString)";
   Msg_WebView_CallScriptFunction msg;
   msg.hView = pMsg->hView;
-  msg.sMethod = "TestEcho";
+  msg.sFunction = "TestEcho";
   msg.lArgs.AddLast(sIn);
   if (msg.Request()) {
     if (msg.sResult == sOutExpected) {
@@ -122,13 +122,13 @@ String WebViewModuleTester::CallJSEcho()
 
 //----------------------------------------------------------
 
-ApHandle hView_;
+//ApHandle hView_;
 String WebViewModuleTester::Dev()
 {
   String s;
 
   ApHandle hView = Apollo::newHandle();
-  hView_ = hView;
+  //hView_ = hView;
 
   { Msg_WebView_Event_DocumentComplete msg; msg.Hook(MODULE_NAME, (ApCallback) WebViewModuleTester::On_LoadHtml_WebView_Event_DocumentComplete, 0, ApCallbackPosNormal); }
 
@@ -164,10 +164,10 @@ void WebViewModuleTester::Execute()
 
 void WebViewModuleTester::End()
 {
-  if (ApIsHandle(hView_)) {
-    Msg_WebView_Destroy::_(hView_);
-    hView_ = ApNoHandle;
-  }
+  //if (ApIsHandle(hView_)) {
+  //  Msg_WebView_Destroy::_(hView_);
+  //  hView_ = ApNoHandle;
+  //}
 }
 
 #endif // #if defined(AP_TEST)

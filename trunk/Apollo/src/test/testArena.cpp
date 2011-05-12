@@ -21,6 +21,7 @@ public:
 
   Buffer sbAvatar;
   String sAvatarMimetype;
+  String sAvatarUrl;
   String sAvatarSource;
   String sOnlineStatus;
   String sMessage;
@@ -247,6 +248,22 @@ static void Test_VpView_GetParticipantDetailData(Msg_VpView_GetParticipantDetail
       pMsg->sbData = p->sbAvatar;
       pMsg->sMimeType = p->sAvatarMimetype;
       pMsg->sSource = p->sAvatarSource;
+    }
+  }
+}
+
+static void Test_VpView_GetParticipantDetailRef(Msg_VpView_GetParticipantDetailRef* pMsg)
+{
+  Test_InChangeOut* t = (Test_InChangeOut*) pMsg->Ref();
+  Test_Participant* p = 0;
+  t->lParticipants_.Get(pMsg->hParticipant, p);
+
+  if (p) {
+    String sKey = pMsg->sKey;
+    if (0) {
+    } else if (sKey == Msg_VpView_ParticipantDetail_avatar) {
+      pMsg->sUrl = p->sAvatarUrl;
+      pMsg->sMimeType = p->sAvatarMimetype;
     }
   }
 }
@@ -806,9 +823,10 @@ void Test_InChangeOut::Begin()
       Apollo::loadFile(Apollo::getAppResourcePath() + "test/tassadar/" + "config.xml", p->sbAvatar);
       p->sAvatarMimetype = "avatar/gif";
       p->sAvatarSource = "IdentityItemUrl=http://ydentiti.org/test/Tassadar/config.xml";
+      p->sAvatarUrl = "http://ydentiti.org/test/Tassadar/4d88f6caa9715126e261ed43d63873a9.gif";
       p->sOnlineStatus = "";
       p->sMessage = "Hallo";
-      p->sPosition = "x=456\ny=0\nz=0";
+      p->sPosition = "x=333\ny=0\nz=0";
       p->sCondition;
       p->sProfileUrl;
       p->slChats.AddLast("2 Hello World Hello World Hello World Hello World", 2);
@@ -821,6 +839,7 @@ void Test_InChangeOut::Begin()
   { Msg_VpView_SubscribeParticipantDetail msg; msg.Hook(MODULE_NAME, (ApCallback) Test_VpView_SubscribeParticipantDetail, this, ApCallbackPosEarly); }
   { Msg_VpView_GetParticipantDetailString msg; msg.Hook(MODULE_NAME, (ApCallback) Test_VpView_GetParticipantDetailString, this, ApCallbackPosEarly); }
   { Msg_VpView_GetParticipantDetailData msg; msg.Hook(MODULE_NAME, (ApCallback) Test_VpView_GetParticipantDetailData, this, ApCallbackPosEarly); }
+  { Msg_VpView_GetParticipantDetailRef msg; msg.Hook(MODULE_NAME, (ApCallback) Test_VpView_GetParticipantDetailRef, this, ApCallbackPosEarly); }
   { Msg_VpView_ReplayLocationPublicChat msg; msg.Hook(MODULE_NAME, (ApCallback) Test_VpView_ReplayLocationPublicChat, this, ApCallbackPosEarly); }
   { Msg_Galileo_IsAnimationDataInStorage msg; msg.Hook(MODULE_NAME, (ApCallback) Test_Galileo_IsAnimationDataInStorage, this, ApCallbackPosEarly); }
   { Msg_Galileo_LoadAnimationDataFromStorage msg; msg.Hook(MODULE_NAME, (ApCallback) Test_Galileo_LoadAnimationDataFromStorage, this, ApCallbackPosEarly); }
@@ -841,23 +860,23 @@ void Test_InChangeOut::Begin()
   AddLast(new Test_InChangeOut_ParticipantsChanged1());
   AddLast(new Test_InChangeOut_EnterLocationComplete1());
 
-  //AddLast(new Test_InChangeOut_Wait(500));
-  //AddLast(new Test_InChangeOut_LeaveLocationRequested1());
-  //AddLast(new Test_InChangeOut_ContextDetailsChanged_LocationUrl());
-  //AddLast(new Test_InChangeOut_LocationContextsChanged1b());
-  //AddLast(new Test_InChangeOut_ContextLocationUnassigned1());
-  //AddLast(new Test_InChangeOut_ContextDetailsChanged_DocumentUrl());
-  //AddLast(new Test_InChangeOut_ContextLocationAssigned2());
-  //AddLast(new Test_InChangeOut_ContextDetailsChanged_DocumentUrl());
-  //AddLast(new Test_InChangeOut_EnterLocationRequested2());
-  //AddLast(new Test_InChangeOut_ContextDetailsChanged_LocationUrl());
-  //AddLast(new Test_InChangeOut_LocationContextsChanged2a());
-  //AddLast(new Test_InChangeOut_ParticipantsChanged());
-  //AddLast(new Test_InChangeOut_LeaveLocationComplete1());
-  //AddLast(new Test_InChangeOut_ParticipantsChanged2a());
-  //AddLast(new Test_InChangeOut_EnterLocationComplete2());
-  //AddLast(new Test_InChangeOut_Wait(500));
-  //AddLast(new Test_InChangeOut_Chat2a());
+  AddLast(new Test_InChangeOut_Wait(500));
+  AddLast(new Test_InChangeOut_LeaveLocationRequested1());
+  AddLast(new Test_InChangeOut_ContextDetailsChanged_LocationUrl());
+  AddLast(new Test_InChangeOut_LocationContextsChanged1b());
+  AddLast(new Test_InChangeOut_ContextLocationUnassigned1());
+  AddLast(new Test_InChangeOut_ContextDetailsChanged_DocumentUrl());
+  AddLast(new Test_InChangeOut_ContextLocationAssigned2());
+  AddLast(new Test_InChangeOut_ContextDetailsChanged_DocumentUrl());
+  AddLast(new Test_InChangeOut_EnterLocationRequested2());
+  AddLast(new Test_InChangeOut_ContextDetailsChanged_LocationUrl());
+  AddLast(new Test_InChangeOut_LocationContextsChanged2a());
+  AddLast(new Test_InChangeOut_ParticipantsChanged());
+  AddLast(new Test_InChangeOut_LeaveLocationComplete1());
+  AddLast(new Test_InChangeOut_ParticipantsChanged2a());
+  AddLast(new Test_InChangeOut_EnterLocationComplete2());
+  AddLast(new Test_InChangeOut_Wait(500));
+  AddLast(new Test_InChangeOut_Chat2a());
   //AddLast(new Test_InChangeOut_Wait(500));
   //AddLast(new Test_InChangeOut_Chat2b());
   //AddLast(new Test_InChangeOut_Wait(500));
@@ -882,6 +901,7 @@ void Test_InChangeOut::End()
   { Msg_VpView_SubscribeParticipantDetail msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_VpView_SubscribeParticipantDetail, this); }
   { Msg_VpView_GetParticipantDetailString msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_VpView_GetParticipantDetailString, this); }
   { Msg_VpView_GetParticipantDetailData msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_VpView_GetParticipantDetailData, this); }
+  { Msg_VpView_GetParticipantDetailRef msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_VpView_GetParticipantDetailRef, this); }
   { Msg_VpView_ReplayLocationPublicChat msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_VpView_ReplayLocationPublicChat, this); }
   { Msg_Galileo_IsAnimationDataInStorage msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_Galileo_IsAnimationDataInStorage, this); }
   { Msg_Galileo_LoadAnimationDataFromStorage msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_Galileo_LoadAnimationDataFromStorage, this); }

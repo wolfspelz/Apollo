@@ -106,7 +106,15 @@ AP_MSG_HANDLER_METHOD(WebViewModule, WebView_Reload)
 AP_MSG_HANDLER_METHOD(WebViewModule, WebView_CallScriptFunction)
 {
   View* pView = FindView(pMsg->hView);
-  pMsg->sResult = pView->CallJSFunction(pMsg->sMethod, pMsg->lArgs);
+  pMsg->sResult = pView->CallJsFunction(pMsg->sFunction, pMsg->lArgs);
+  pMsg->apStatus = ApMessage::Ok;
+}
+
+AP_MSG_HANDLER_METHOD(WebViewModule, WebView_CallScriptSrpc)
+{
+  View* pView = FindView(pMsg->hView);
+  Apollo::SrpcMessage response;
+  pView->CallJsSrpc(pMsg->sFunction, pMsg->srpc, response);
   pMsg->apStatus = ApMessage::Ok;
 }
 
@@ -184,7 +192,7 @@ AP_MSG_HANDLER_METHOD(WebViewModule, System_3SecTimer)
       //List lArgs;
       //lArgs.AddLast("abc");
       //lArgs.AddLast("def");
-      //String s = pView->CallJSFunction("Concat", lArgs);
+      //String s = pView->CallJsFunction("Concat", lArgs);
     }
   }
 }
@@ -336,6 +344,7 @@ int WebViewModule::Init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, WebViewModule, WebView_Load, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, WebViewModule, WebView_Reload, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, WebViewModule, WebView_CallScriptFunction, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, WebViewModule, WebView_CallScriptSrpc, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, WebViewModule, WebView_SetScriptAccessPolicy, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, WebViewModule, WebView_SetNavigationPolicy, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, WebViewModule, WebView_MoveBy, this, ApCallbackPosNormal);

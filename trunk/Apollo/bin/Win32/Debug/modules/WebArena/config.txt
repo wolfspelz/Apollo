@@ -1,4 +1,5 @@
 DisplayHtml=file://[[MODULE_RESOURCE_PATH]]/arena.html
+CallScriptSrpcFunctionName=ReceiveMessage
 
 Language/en=[[MODULE_RESOURCE_PATH]]/en.txt
 Language/de=[[MODULE_RESOURCE_PATH]]/de.txt

@@ -17,7 +17,28 @@ String FileLogger::getTime()
 void FileLogger::appendLog(const String& sLevel, const String& sChannel, const String& sContext, const String& sMessage)
 {
   String sLine;
-  sLine.appendf("[%s] %s %s %s %s", StringType(getTime()), StringType(sLevel), StringType(sChannel), StringType(sContext), StringType(sMessage));
+  sLine += getTime();
+
+  if (sLevel) {
+    sLine += " ";
+    sLine += sLevel;
+  }
+
+  if (sChannel) {
+    sLine += " ";
+    sLine += sChannel;
+  }
+
+  if (sContext) {
+    sLine += " ";
+    sLine += sContext;
+  }
+
+  if (sMessage) {
+    sLine += " ";
+    sLine += sMessage;
+  }
+
   sLine.escape(String::EscapeLogLine);
   sLine += "\n";
 
@@ -36,7 +57,7 @@ void FileLogger::appendLog(const String& sLevel, const String& sChannel, const S
     }
 
     sFile_ = sFile;
-    Apollo::appendFile(sFile_, "--------------------------------------------------\n");
+    Apollo::appendFile(sFile_, "-----------------------------------------------------------------------------\n");
   }
 
   if (!sFile_.empty()) {

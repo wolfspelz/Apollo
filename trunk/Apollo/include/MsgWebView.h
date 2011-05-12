@@ -118,9 +118,19 @@ class Msg_WebView_CallScriptFunction: public ApRequestMessage
 public:
   Msg_WebView_CallScriptFunction() : ApRequestMessage("WebView_CallScriptFunction") {}
   ApIN ApHandle hView;
-  ApIN String sMethod;
+  ApIN String sFunction;
   ApIN List lArgs;
   ApOUT String sResult;
+};
+
+class Msg_WebView_CallScriptSrpc: public ApRequestMessage
+{
+public:
+  Msg_WebView_CallScriptSrpc() : ApRequestMessage("WebView_CallScriptSrpc") {}
+  ApIN ApHandle hView;
+  ApIN String sFunction;
+  ApIN Apollo::SrpcMessage srpc;
+  ApOUT Apollo::SrpcMessage response;
 };
 
 class Msg_WebView_SetScriptAccessPolicy: public ApRequestMessage

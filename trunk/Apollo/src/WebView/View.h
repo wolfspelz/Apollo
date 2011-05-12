@@ -73,14 +73,16 @@ public:
   void Create();
   void Destroy();
 
+  void LoadHtml(const String& sHtml, const String& sBase) throw(ApException);
+  void Load(const String& sUrl) throw(ApException);
+  void Reload() throw(ApException);
+  String CallJsFunction(const String& sFunction, List& lArgs) throw(ApException);
+  void CallJsSrpc(const String& sFunction, Apollo::SrpcMessage& srpc, Apollo::SrpcMessage& response) throw(ApException);
+
   void SetPosition(int nX, int nY, int nW, int nH);
   void SetVisibility(int bVisible);
-  void LoadHtml(const String& sHtml, const String& sBase);
-  void Load(const String& sUrl);
-  void Reload();
   void SetScriptAccessPolicy(const String& sPolicy);
   void SetNavigationPolicy(const String& sPolicy);
-  String CallJSFunction(const String& sFunction, List& lArgs);
   void MoveBy(int nX, int nY);
   void SizeBy(int nW, int nH, int nDirection);
   void MouseCapture();
@@ -95,7 +97,7 @@ public:
   int HasNavigation() { return bNavigationEnabled_; }
 
 protected:
-  void MakeScriptObject();
+  void MakeScriptObject() throw(ApException);
   static String StringFromBSTR(BSTR bStr);
   static String GetUrlFrom(IWebFrame *frame);
   static String GetUrlFrom(IWebURLRequest *request);

@@ -254,7 +254,7 @@ void View::GetVisibility(int& bVisible)
 //------------------------------------
 // Call JS
 
-String View::CallJSFunction(const String& sFunction, List& lArgs)
+String View::CallJsFunction(const String& sFunction, List& lArgs)
 {
   String sResult;
 
@@ -266,12 +266,12 @@ String View::CallJSFunction(const String& sFunction, List& lArgs)
 
   JSValueRef* exception = 0;
   JSValueRef sampleFunction = JSObjectGetProperty(runCtx, global, methodName, exception);
-  if (exception) goto exit;
+  if (exception) { throw ApException("View::CallJsFunction JSObjectGetProperty(methodName) returned exception"); }
 
-  if (!JSValueIsObject(runCtx, sampleFunction)) goto exit;
+  if (!JSValueIsObject(runCtx, sampleFunction)) { throw ApException("View::CallJsFunction no such function: %s", StringType(sFunction)); }
 
   JSObjectRef function = JSValueToObject(runCtx, sampleFunction, exception);
-  if (exception) goto exit;
+  if (exception) { throw ApException("View::CallJsFunction JSValueToObject(sampleFunction) returned exception"); }
 
   JSValueRef result = 0;
 
@@ -282,36 +282,52 @@ String View::CallJSFunction(const String& sFunction, List& lArgs)
       args[nCnt++] = JSValueMakeString (runCtx, JSStringCreateWithCharacters((LPCTSTR) e->getName(), e->getName().chars()));
     }
     result = JSObjectCallAsFunction (runCtx, function, global, lArgs.length(), args.get(), exception);
-    if (exception) goto exit;
+    if (exception) { throw ApException("View::CallJsFunction JSObjectCallAsFunction() returned exception"); }
   } else {
     result = JSObjectCallAsFunction (runCtx, function, global, 0, 0, exception);
-    if (exception) goto exit;
+    if (exception) { throw ApException("View::CallJsFunction JSObjectCallAsFunction() returned exception"); }
   }
 
   // Convert the result into a string.
   if (result) {
     if (JSValueIsString(runCtx, result)) {
       AutoJSStringRef value = JSValueToStringCopy (runCtx, result, exception);
-      if (exception) goto exit;
+      if (exception) { throw ApException("View::CallJsFunction JSValueToStringCopy() returned exception"); }
 
       sResult.set((PWSTR) JSStringGetCharactersPtr(value), JSStringGetLength(value));
 
     } else if (JSValueIsNumber(runCtx, result)) {
       double value = JSValueToNumber(runCtx, result, exception);
-      if (exception) goto exit;
+      if (exception) { throw ApException("View::CallJsFunction JSValueToNumber() returned exception"); }
 
       sResult.appendf("%g", value);
 
     } else if (JSValueIsBoolean(runCtx, result))  {
       bool value = JSValueToBoolean(runCtx, result);
-      if (exception) goto exit;
+      if (exception) { throw ApException("View::CallJsFunction JSValueToBoolean() returned exception"); }
 
       sResult = value ? "true" : "false";
     }
   }
 
-exit:
   return sResult;
+}
+
+void View::CallJsSrpc(const String& sFunction, Apollo::SrpcMessage& srpc, Apollo::SrpcMessage& response)
+{
+  Msg_WebView_CallScriptFunction msg;
+  msg.hView = apHandle();
+  msg.sFunction = sFunction;
+  msg.lArgs.AddLast(srpc.toString());
+  if (!msg.Request()) { throw ApException("View::CallJsSrpc Msg_WebView_CallScriptFunction: %s", StringType(msg.sComment)); }
+
+  response.fromString(msg.sResult);
+  if (response.length() > 0) {
+    int nStatus = response.getInt("Status");
+    if (nStatus != 1) {
+      throw ApException("View::CallJsSrpc Status=%d Message=%s", nStatus, StringType(response.getString("Message")));
+    }
+  }
 }
 
 //------------------------------------
