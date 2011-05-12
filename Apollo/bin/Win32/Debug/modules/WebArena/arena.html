@@ -10,8 +10,31 @@
 <script type="text/javascript">
 function Eval(sText) { eval(sText); }
 
+function ReceiveMessage(sMsg)
+{
+  return api.receiveMessage(sMsg);
+}
+
+function DispatchMessage(msg)
+{
+  var sMethod = msg.getString('Method');
+  switch (sMethod) {
+    case 'ShowAvatar': return arena.ShowAvatar(msg.getString('hParticipant'), msg.getString('sNickname'), msg.getString('sImageUrl'), msg.getInt('nX')); break;
+    case 'HideAvatar': return arena.HideAvatar(msg.getString('hParticipant')); break;
+    case 'SetAvatarPosition': return arena.SetAvatarPosition(msg.getString('hParticipant'), msg.getInt('nX')); break;
+    case 'SetAvatarNickname': return arena.SetAvatarNickname(msg.getString('hParticipant'), msg.getString('sNickname')); break;
+    case 'SetAvatarImage': return arena.SetAvatarImage(msg.getString('hParticipant'), msg.getString('sUrl')); break;
+    case 'SetDocumentUrl': return arena.SetDocumentUrl(msg.getString('sUrl')); break;
+    case 'SetLocationUrl': return arena.SetLocationUrl(msg.getString('sUrl')); break;
+    case 'SetLocationState': return arena.SetLocationState(msg.getString('sState')); break;
+
+    default: throw 'Unknown method: ' + sMethod;
+  }
+}
+
 var api = new ApolloApi();
 api.moduleName = 'WebArena';
+api.onDispatchMessage = DispatchMessage;
 api.init();
 
 var logger = Log.GetInstance('iOut', 'iLogCheck');
@@ -21,14 +44,14 @@ Log.instance.Clear();
 ApMessage.prototype.onLog = Log.IO;
 
 $(document).ready(function () {
-  Log.Debug('ready');
-  api.logError('ready');
+  arena = new Arena('iContent');
+  arena.Startup();
+  
 });
-
 </script>
 
 <style type="text/css">
-#iContent { background-color:rgba(255,255,221,0.5); }
+#iContent { background-color:rgba(255,255,221,0.5); border:1px solid #000000}
 #iControl { background-color:rgba(255,255,204,0.7); }
 #iControl * { font-family:Verdana; font-size:11px; }
 #iOut { background-color:rgba(240,240,240,0.9); }
@@ -41,9 +64,9 @@ $(document).ready(function () {
   <div id="iContent" style="position:absolute; left:0; top:0; width:40%; height:100%; overflow:auto;">iContent</div>
   <div id="iControl" style="position:absolute; left:40%; top:0; width:20%; height:100%; overflow:auto;">
     <p>
-    <input type="button" value="WebView_Reload" onclick="api.msg('WebView_Reload').setString('hView', apollo.viewHandle).send();" />
+    <input type="button" value="WebView_Reload" onclick="api.newMessage('WebView_Reload').send();" />
     <input type="button" value="reload()" onclick="document.location.reload();" />
-    <input type="button" value="Quit" onclick="api.msg('MainLoop_EndLoop').send();"/>
+    <input type="button" value="Quit" onclick="api.newMessage('MainLoop_EndLoop').send();"/>
     <br/>
     <input type="checkbox" id="iLogCheck" checked="checked"/><label for="iLogCheck">Logging</label>
     <input type="button" value="Clear" onclick="Log.instance.Clear();" />

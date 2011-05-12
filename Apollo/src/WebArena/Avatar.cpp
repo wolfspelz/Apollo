@@ -55,7 +55,7 @@ void Avatar::GetDetail(const String& sKey)
 {
   if (0) {
   } else if (sKey == Msg_VpView_ParticipantDetail_avatar) {
-    GetDetailData(sKey, avatarMimeTypes_);
+    GetDetailRef(sKey, avatarMimeTypes_);
   } else {
     GetDetailString(sKey, noMimeTypes_);
   }
@@ -98,9 +98,9 @@ void Avatar::GetDetailString(const String& sKey, Apollo::ValueList& vlMimeTypes)
   }
 }
 
-void Avatar::GetDetailData(const String& sKey, Apollo::ValueList& vlMimeTypes)
+void Avatar::GetDetailRef(const String& sKey, Apollo::ValueList& vlMimeTypes)
 {
-  Msg_VpView_GetParticipantDetailData msg;
+  Msg_VpView_GetParticipantDetailRef msg;
   msg.hParticipant = hParticipant_;
   msg.sKey = sKey;
   msg.vlMimeTypes = vlMimeTypes;
@@ -108,61 +108,7 @@ void Avatar::GetDetailData(const String& sKey, Apollo::ValueList& vlMimeTypes)
 
     if (0) {
     } else if (sKey == Msg_VpView_ParticipantDetail_avatar) {
-      HandleImageData(msg.sMimeType, msg.sSource, msg.sbData);
-    }
-  }
-}
-
-void Avatar::HandleImageData(const String& sMimeType, const String& sSource, Buffer& sbData)
-{
-  if (!ApIsHandle(hAnimatedItem_)) {
-    Msg_Animation_Create msgAC;
-    msgAC.hItem = Apollo::newHandle();
-    msgAC.sMimeType = sMimeType;
-    if (!msgAC.Request()) {
-      apLog_Error((LOG_CHANNEL, "Avatar::HandleImageData", "Msg_Animation_Create failed: participant=" ApHandleFormat "", ApHandleType(hParticipant_)));
-    } else {
-      hAnimatedItem_ = msgAC.hItem;
-    }
-  }
-
-  if (ApIsHandle(hAnimatedItem_)) {
-    Msg_Animation_SetRate msgASR;
-    msgASR.hItem = hAnimatedItem_;
-    msgASR.nMaxRate = 10;
-    if (!msgASR.Request()) {
-      apLog_Error((LOG_CHANNEL, "Avatar::HandleImageData", "Msg_Animation_SetRate failed: participant=" ApHandleFormat "", ApHandleType(hParticipant_)));
-    }
-  }
-
-  if (ApIsHandle(hAnimatedItem_)) {
-    Msg_Animation_SetData msgASD;
-    msgASD.hItem = hAnimatedItem_;
-    msgASD.sbData = sbData;
-
-    String sSourceTokenizer = sSource;
-    String sSourceType;
-    sSourceTokenizer.nextToken(Msg_VpView_ParticipantDetail_SourceSeparator, sSourceType);
-    if (sSourceType == Msg_VpView_ParticipantDetail_SourcePrefix_IdentityItemUrl) {
-      String sUrl = sSourceTokenizer;
-      msgASD.sSourceUrl = sUrl;
-    }
-
-    if (!msgASD.Request()) {
-      apLog_Error((LOG_CHANNEL, "Avatar::HandleImageData", "Msg_Animation_SetData failed: participant=" ApHandleFormat " data:%d bytes, source=%s", ApHandleType(hParticipant_), sbData.Length(), StringType(sSource)));
-    }
-  }
-
-  if (ApIsHandle(hAnimatedItem_)) {
-    if (pModule_) {
-      pModule_->SetContextOfHandle(hAnimatedItem_, pDisplay_->GetContext());
-      pModule_->SetParticipantOfAnimation(hAnimatedItem_, hParticipant_);
-    }
-
-    Msg_Animation_Start msgAS;
-    msgAS.hItem = hAnimatedItem_;
-    if (!msgAS.Request()) {
-      apLog_Error((LOG_CHANNEL, "Avatar::HandleImageData", "Msg_Animation_Start failed: participant=" ApHandleFormat "", ApHandleType(hParticipant_)));
+      SetImage(msg.sUrl);
     }
   }
 }
@@ -183,10 +129,9 @@ void Avatar::UnSubscribeDetail(const String& sKey)
   (void) msg.Request();
 }
 
+
 void Avatar::Show()
 {
-  hView_ = pDisplay_->GetView();
-
   nMaxW_ = Apollo::getModuleConfig(MODULE_NAME, "Avatar/MaxWidth", 100);
   nMaxH_ = Apollo::getModuleConfig(MODULE_NAME, "Avatar/MaxHeight", 100);
   nW_ = nMaxW_;
@@ -202,25 +147,12 @@ void Avatar::Show()
     sNickname_ = msg.sValue;
   }
 
-  SetUnknownPosition();
-
-  pDisplay_->Call("ShowAvatar"
-    , hParticipant_.toString()
-    , Apollo::getModuleResourcePath(MODULE_NAME) + Apollo::getModuleConfig(MODULE_NAME, "Avatar/Image/Default", "DefaultAvatar.png")
-    , sNickname_
-    , String().from(nX_)
-    );
-
-  //Msg_Scene_CreateElement::_(hView_, ElementPath());
-  //SetUnknownPosition();
-
-  //Msg_Scene_CreateImage::_(hView_, ImagePath(), 0, 0);
-  //String sDefaultImage = Apollo::getModuleResourcePath(MODULE_NAME) + Apollo::getModuleConfig(MODULE_NAME, "Avatar/Image/Default", "DefaultAvatar.png");
-  //double fImageW, fImageH;
-  //if (Msg_Scene_GetImageSizeFromFile::_(hView_, sDefaultImage, fImageW, fImageH)) {
-  //  Msg_Scene_TranslateElement::_(hView_, ImagePath(), - fImageW / 2.0, 0);
-  //}
-  //Msg_Scene_SetImageFile::_(hView_, ImagePath(), sDefaultImage);
+  DisplaySrpcMessage dsm(pDisplay_, "ShowAvatar");
+  dsm.srpc.setString("hParticipant", hParticipant_.toString());
+  dsm.srpc.setString("sNickname", "noname");
+  dsm.srpc.setString("sImageUrl", "file://" + Apollo::getModuleResourcePath(MODULE_NAME) + Apollo::getModuleConfig(MODULE_NAME, "Avatar/Image/Default", "DefaultAvatar.png"));
+  dsm.srpc.setInt("nX", nX_);
+  dsm.Request();
 
   SubscribeAndGetDetail(Msg_VpView_ParticipantDetail_Nickname);
   SubscribeAndGetDetail(Msg_VpView_ParticipantDetail_avatar);
@@ -241,28 +173,9 @@ void Avatar::Hide()
   UnSubscribeDetail(Msg_VpView_ParticipantDetail_Condition);
   UnSubscribeDetail(Msg_VpView_ParticipantDetail_ProfileUrl);
 
-  //if (ApIsHandle(hAnimatedItem_)) {
-  //  if (pModule_) {
-  //    pModule_->DeleteContextOfHandle(hAnimatedItem_, pDisplay_->GetContext());
-  //    pModule_->DeleteParticipantOfAnimation(hAnimatedItem_, hParticipant_);
-  //  }
-
-  //  Msg_Animation_Stop msgAS;
-  //  msgAS.hItem = hAnimatedItem_;
-  //  if (!msgAS.Request()) {
-  //    apLog_Error((LOG_CHANNEL, "Avatar::Hide", "Msg_Animation_Stop failed: participant=" ApHandleFormat "", ApHandleType(hParticipant_)));
-  //  }
-  //}
-
-  //if (ApIsHandle(hAnimatedItem_)) {
-  //  Msg_Animation_Destroy msg;
-  //  msg.hItem = hAnimatedItem_;
-  //  if (!msg.Request()) {
-  //    apLog_Error((LOG_CHANNEL, "Avatar::Hide", "Msg_Animation_Destroy failed: participant=" ApHandleFormat "", ApHandleType(hParticipant_)));
-  //  }
-  //}
-
-  //Msg_Scene_DeleteElement::_(hView_, ElementPath());
+  DisplaySrpcMessage dsm(pDisplay_, "HideAvatar");
+  dsm.srpc.setString("hParticipant", hParticipant_.toString());
+  dsm.Request();
 }
 
 void Avatar::DetailsChanged(Apollo::ValueList& vlKeys)
@@ -302,42 +215,18 @@ void Avatar::SetNickname(const String& sNickname)
 {
   sNickname_ = sNickname;
 
-  //String sNicknamePath = NicknamePath();
+  DisplaySrpcMessage dsm(pDisplay_, "SetAvatarNickname");
+  dsm.srpc.setString("hParticipant", hParticipant_.toString());
+  dsm.srpc.setString("sNickname", sNickname_);
+  dsm.Request();
+}
 
-  //if (Msg_Scene_ElementExists::_(hView_, sNicknamePath)) {
-  //  Msg_Scene_DeleteElement::_(hView_, sNicknamePath);
-  //}
-
-  //String sFont = Apollo::getModuleConfig(MODULE_NAME, "Nickname/Text/Font", "Arial");
-  //int nSize = Apollo::getModuleConfig(MODULE_NAME, "Nickname/Text/Size", 12);
-  //int nFlags = Apollo::getModuleConfig(MODULE_NAME, "Nickname/Text/Weight", Msg_Scene_FontFlags::Normal);
-  //Apollo::ColorString cText = Apollo::getModuleConfig(MODULE_NAME, "Nickname/Text/Color", "#000000");
-  //Apollo::ColorString cBackground = Apollo::getModuleConfig(MODULE_NAME, "Nickname/Background/Color", "#ffffff");
-  //Apollo::ColorString cBorder = Apollo::getModuleConfig(MODULE_NAME, "Nickname/Border/Color", "#000000");
-  //int nWidth = Apollo::getModuleConfig(MODULE_NAME, "Nickname/Text/Width", 80);
-  //int nLeft = Apollo::getModuleConfig(MODULE_NAME, "Nickname/Text/Left", 20);
-  //int nBottom = Apollo::getModuleConfig(MODULE_NAME, "Nickname/Text/Bottom", 10);
-  //double fBorderWidth = Apollo::getModuleConfig(MODULE_NAME, "Nickname/Border/Width", 1.0);
-  //double fTextPadding = Apollo::getModuleConfig(MODULE_NAME, "Nickname/Text/Padding", 2.5);
-
-  //String sTruncatedNickname = TruncateElementText(hView_, sNickname, sFont, nSize, nFlags, nWidth);
-  //if (sTruncatedNickname != sNickname_) {
-  //  sTruncatedNickname += Apollo::getModuleConfig(MODULE_NAME, "Nickname/Ellipsis", "...");
-  //}
-
-  //double fTextBearingX, fTextBearingY, fTextW, fTextH, fTextAdvanceX, fTextAdvanceY;
-  //Msg_Scene_GetTextExtents::_(hView_, sTruncatedNickname, sFont, nSize, nFlags, fTextBearingX, fTextBearingY, fTextW, fTextH, fTextAdvanceX, fTextAdvanceY);
-
-  //Msg_Scene_CreateElement::_(hView_, sNicknamePath);
-  //Msg_Scene_TranslateElement::_(hView_, sNicknamePath, nLeft, nBottom);
-
-  //Msg_Scene_CreateRectangle::_(hView_, sNicknamePath + "/" ELEMENT_NICKNAME_BOX, -fTextPadding, -fTextPadding, fTextAdvanceX + 2 * fTextPadding + 1, fTextH + 2 * fTextPadding);
-  //Msg_Scene_SetFillColor::_(hView_, sNicknamePath + "/" ELEMENT_NICKNAME_BOX, cBackground.r, cBackground.g, cBackground.b, cBackground.a);
-  //Msg_Scene_SetStrokeColor::_(hView_, sNicknamePath + "/" ELEMENT_NICKNAME_BOX, cBorder.r, cBorder.g, cBorder.b, cBorder.a);
-  //Msg_Scene_SetStrokeWidth::_(hView_, sNicknamePath + "/" ELEMENT_NICKNAME_BOX, fBorderWidth);
-
-  //Msg_Scene_CreateText::_(hView_, sNicknamePath + "/" ELEMENT_NICKNAME_TEXT, 0, 0, sTruncatedNickname, sFont, nSize, nFlags);
-  //Msg_Scene_SetFillColor::_(hView_, sNicknamePath + "/" ELEMENT_NICKNAME_TEXT, cText.r, cText.g, cText.b, cText.a);
+void Avatar::SetImage(const String& sUrl)
+{
+  DisplaySrpcMessage dsm(pDisplay_, "SetAvatarImage");
+  dsm.srpc.setString("hParticipant", hParticipant_.toString());
+  dsm.srpc.setString("sUrl", sUrl);
+  dsm.Request();
 }
 
 void Avatar::CreateChatContainer(const String& sContainer)
@@ -397,14 +286,22 @@ void Avatar::SetUnknownPosition()
   nX = nMin + Apollo::getRandom(nMax - nMin);
 
   nPositionConfirmed_ = 0;
-  //Msg_Scene_TranslateElement::_(hView_, ElementPath(), nX, 0);
+
+  DisplaySrpcMessage dsm(pDisplay_, "SetAvatarPosition");
+  dsm.srpc.setString("hParticipant", hParticipant_.toString());
+  dsm.srpc.setInt("nX", nX);
+  dsm.Request();
 }
 
 void Avatar::SetPosition(int nX)
 {
   nX_ = nX;
   nPositionConfirmed_ = 1;
-  //Msg_Scene_TranslateElement::_(hView_, ElementPath(), nX, 0);
+
+  DisplaySrpcMessage dsm(pDisplay_, "SetAvatarPosition");
+  dsm.srpc.setString("hParticipant", hParticipant_.toString());
+  dsm.srpc.setInt("nX", nX);
+  dsm.Request();
 }
 
 //----------------------------------------------------------

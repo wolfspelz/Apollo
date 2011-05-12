@@ -56,11 +56,11 @@ protected:
   void SubscribeAndGetDetail(const String& sKey);
   void GetDetail(const String& sKey);
   void GetDetailString(const String& sKey, Apollo::ValueList& vlMimeTypes);
-  void GetDetailData(const String& sKey, Apollo::ValueList& vlMimeTypes);
+  void GetDetailRef(const String& sKey, Apollo::ValueList& vlMimeTypes);
   void UnSubscribeDetail(const String& sKey);
-  void HandleImageData(const String& sMimeType, const String& sSource, Buffer& sbData);
 
   void SetNickname(const String& sNickname);
+  void SetImage(const String& sUrl);
   void SetChatline(const ApHandle& hChat, const String& sText);
   void SetPosition(int nX);
   void SetUnknownPosition();

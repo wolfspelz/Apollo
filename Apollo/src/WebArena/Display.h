@@ -54,12 +54,6 @@ public:
   inline ApHandle GetContext() { return hContext_; }
   inline ApHandle GetLocation() { return hLocation_; }
 
-  String Call(const String& sMethod, List& lArgs);
-  String Call(const String& sMethod, const String& sArg1);
-  String Call(const String& sMethod, const String& sArg1, const String& sArg2);
-  String Call(const String& sMethod, const String& sArg1, const String& sArg2, const String& sArg3);
-  String Call(const String& sMethod, const String& sArg1, const String& sArg2, const String& sArg3, const String& sArg4);
-
 protected:
   void ProcessAvatarList(Apollo::ValueList& vlParticipants);
   void InitRemovedParticipants(ParticipantFlags& removedParticipants);
@@ -95,6 +89,14 @@ protected:
   Apollo::TimeValue tvLeaveBegin_;
 
   AvatarList avatars_;
+};
+
+//---------------------------------------------------
+
+class DisplaySrpcMessage: public Msg_WebView_CallScriptSrpc
+{
+public:
+  DisplaySrpcMessage(Display* pDisplay, const String& sMethod);
 };
 
 #endif // Display_H_INCLUDED

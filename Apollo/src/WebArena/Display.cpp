@@ -154,6 +154,10 @@ void Display::OnEnterRequested()
   apLog_Verbose((LOG_CHANNEL, "Display::OnEnterRequested", "ctxt=" ApHandleFormat " loc=" ApHandleFormat "", ApHandleType(hContext_), ApHandleType(hLocation_)));
 
   tvEnterRequested_ = Apollo::TimeValue::getTime();
+
+  DisplaySrpcMessage dsm(this, "SetLocationState");
+  dsm.srpc.setString("sState", "EnterRequested");
+  dsm.Request();
 }
 
 void Display::OnEnterBegin()
@@ -161,6 +165,10 @@ void Display::OnEnterBegin()
   apLog_Verbose((LOG_CHANNEL, "Display::OnEnterBegin", "ctxt=" ApHandleFormat " loc=" ApHandleFormat "", ApHandleType(hContext_), ApHandleType(hLocation_)));
 
   tvEnterBegin_ = Apollo::TimeValue::getTime();
+
+  DisplaySrpcMessage dsm(this, "SetLocationState");
+  dsm.srpc.setString("sState", "EnterBegin");
+  dsm.Request();
 }
 
 void Display::OnEnterComplete()
@@ -175,6 +183,10 @@ void Display::OnEnterComplete()
     //msg->nMaxData;
     msg->PostAsync();
   }
+
+  DisplaySrpcMessage dsm(this, "SetLocationState");
+  dsm.srpc.setString("sState", "EnterComplete");
+  dsm.Request();
 }
 
 void Display::OnLeaveRequested()
@@ -182,6 +194,10 @@ void Display::OnLeaveRequested()
   apLog_Verbose((LOG_CHANNEL, "Display::OnLeaveRequested", "ctxt=" ApHandleFormat " loc=" ApHandleFormat "", ApHandleType(hContext_), ApHandleType(hLocation_)));
 
   tvLeaveRequested_ = Apollo::TimeValue::getTime();
+
+  DisplaySrpcMessage msg(this, "SetLocationState");
+  msg.srpc.setString("sState", "LeaveRequested");
+  msg.Request();
 }
 
 void Display::OnLeaveBegin()
@@ -189,11 +205,19 @@ void Display::OnLeaveBegin()
   apLog_Verbose((LOG_CHANNEL, "Display::OnLeaveBegin", "ctxt=" ApHandleFormat " loc=" ApHandleFormat "", ApHandleType(hContext_), ApHandleType(hLocation_)));
 
   tvLeaveBegin_ = Apollo::TimeValue::getTime();
+
+  DisplaySrpcMessage dsm(this, "SetLocationState");
+  dsm.srpc.setString("sState", "LeaveBegin");
+  dsm.Request();
 }
 
 void Display::OnLeaveComplete()
 {
   apLog_Verbose((LOG_CHANNEL, "Display::OnLeaveComplete", "ctxt=" ApHandleFormat " loc=" ApHandleFormat "", ApHandleType(hContext_), ApHandleType(hLocation_)));
+
+  DisplaySrpcMessage dsm(this, "SetLocationState");
+  dsm.srpc.setString("sState", "LeaveComplete");
+  dsm.Request();
 }
 
 //---------------------------------------------------
@@ -345,11 +369,15 @@ void Display::OnContextDetailsChanged(Apollo::ValueList& vlKeys)
     if (0) {
     } else if (e->getString() == Msg_VpView_ContextDetail_DocumentUrl) {
       if (msg.Request()) {
-        //{ Meta* p = GetMeta(); if (p) { p->OnDocumentUrl(msg.sValue); }}
+        DisplaySrpcMessage dsm(this, "SetDocumentUrl");
+        dsm.srpc.setString("sUrl", msg.sValue);
+        dsm.Request();
       }
     } else if (e->getString() == Msg_VpView_ContextDetail_LocationUrl) {
       if (msg.Request()) {
-        //{ Meta* p = GetMeta(); if (p) { p->OnLocationUrl(msg.sValue); }}
+        DisplaySrpcMessage dsm(this, "SetLocationUrl");
+        dsm.srpc.setString("sUrl", msg.sValue);
+        dsm.Request();
       }
     }
   }
@@ -357,49 +385,10 @@ void Display::OnContextDetailsChanged(Apollo::ValueList& vlKeys)
 
 //---------------------------------------------------
 
-String Display::Call(const String& sMethod, List& lArgs)
+DisplaySrpcMessage::DisplaySrpcMessage(Display* pDisplay, const String& sMethod)
 {
-  Msg_WebView_CallScriptFunction msg;
-  msg.hView = hView_;
-  msg.sMethod = sMethod;
-  msg.lArgs = lArgs;
-  if (msg.Request()) {
-    return msg.sResult;
-  }
-  return String();
-}
-
-String Display::Call(const String& sMethod, const String& sArg1)
-{
-  List l;
-  l.AddLast(sArg1);
-  return Call(sMethod, l);
-}
-
-String Display::Call(const String& sMethod, const String& sArg1, const String& sArg2)
-{
-  List l;
-  l.AddLast(sArg1);
-  l.AddLast(sArg2);
-  return Call(sMethod, l);
-}
-
-String Display::Call(const String& sMethod, const String& sArg1, const String& sArg2, const String& sArg3)
-{
-  List l;
-  l.AddLast(sArg1);
-  l.AddLast(sArg2);
-  l.AddLast(sArg3);
-  return Call(sMethod, l);
-}
-
-String Display::Call(const String& sMethod, const String& sArg1, const String& sArg2, const String& sArg3, const String& sArg4)
-{
-  List l;
-  l.AddLast(sArg1);
-  l.AddLast(sArg2);
-  l.AddLast(sArg3);
-  l.AddLast(sArg4);
-  return Call(sMethod, l);
+  srpc.setString("Method", sMethod);
+  hView = pDisplay->GetView();
+  sFunction = Apollo::getModuleConfig(MODULE_NAME, "CallScriptSrpcFunctionName", "receiveSrpcMessageAsString");
 }
 

@@ -1,2 +1,48 @@
 
 * { margin:0; padding:0; }
+
+#iContent *
+{
+  font-family: Verdana, Arial, Sans-Serif;
+  font-size: 9px;
+}
+
+#iMeta
+{
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  padding: 2px;
+  background-color: #FFFFFF;
+}
+
+#iMeta p
+{
+  text-align: right;
+}
+
+.Participant 
+{
+  position: absolute;
+  bottom: 0px;
+  border: 1px solid #000000;
+  width: 100px;
+  height: 100px;
+}
+
+.Participant .Nickname
+{
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  padding: 1px;
+  border: 1px solid #7CC100;
+  background-color: #F5F5F5;
+}
+
+.Participant .Avatar
+{
+  position: absolute;
+  bottom: 0px;
+  left: -50px;
+}
