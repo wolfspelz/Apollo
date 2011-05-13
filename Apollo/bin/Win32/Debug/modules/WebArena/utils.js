@@ -36,13 +36,17 @@ String.prototype.toDomCompatible = function()
 	return s;
 }
 
-//var String_Tester = {
-//  toDomCompatible: function() {
-//    var s = 'a1_2@b-c.d';
-//    var t = s.toDomCompatible();
-//    Log.Debug(t);
-//  },
-//}
+var String_Tester = {
+  toDomCompatible1: function(sString, sExpected) {
+    var sDomCompatible = sString.toDomCompatible();
+    if (sDomCompatible != sExpected) return sDomCompatible + '!=' + sExpected;
+  },
+  toDomCompatible: function() { var s = null;
+    if (s==null) s = String_Tester.toDomCompatible1('a1_2@b-c.d', 'a1__2_64b_45c_46d');
+    if (s==null) s = String_Tester.toDomCompatible1('[5]', '_915_93');
+    return s;
+  }
+}
 
 Object.extend = function(baseClass, derivedClass)
 {

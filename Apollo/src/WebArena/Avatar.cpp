@@ -147,7 +147,7 @@ void Avatar::Show()
     sNickname_ = msg.sValue;
   }
 
-  DisplaySrpcMessage dsm(pDisplay_, "ShowAvatar");
+  DisplaySrpcMessage dsm(pDisplay_, "AddAvatar");
   dsm.srpc.setString("hParticipant", hParticipant_.toString());
   dsm.srpc.setString("sNickname", "noname");
   dsm.srpc.setString("sImageUrl", "file://" + Apollo::getModuleResourcePath(MODULE_NAME) + Apollo::getModuleConfig(MODULE_NAME, "Avatar/Image/Default", "DefaultAvatar.png"));
@@ -173,7 +173,7 @@ void Avatar::Hide()
   UnSubscribeDetail(Msg_VpView_ParticipantDetail_Condition);
   UnSubscribeDetail(Msg_VpView_ParticipantDetail_ProfileUrl);
 
-  DisplaySrpcMessage dsm(pDisplay_, "HideAvatar");
+  DisplaySrpcMessage dsm(pDisplay_, "RemoveAvatar");
   dsm.srpc.setString("hParticipant", hParticipant_.toString());
   dsm.Request();
 }
@@ -239,38 +239,10 @@ void Avatar::DeleteAllChatBubbles(const String& sContainer)
 
 void Avatar::SetChatline(const ApHandle& hChat, const String& sText)
 {
-  //CreateChatContainer(sContainerPath);
-  //DeleteAllChatBubbles(sContainerPath);
-
-  //String sFont = Apollo::getModuleConfig(MODULE_NAME, "Chat/Text/Font", "Arial");
-  //int nSize = Apollo::getModuleConfig(MODULE_NAME, "Chat/Text/Size", 12);
-  //int nFlags = Apollo::getModuleConfig(MODULE_NAME, "Chat/Text/Weight", Msg_Scene_FontFlags::Normal);
-  //Apollo::ColorString cText = Apollo::getModuleConfig(MODULE_NAME, "Chat/Text/Color", "#000000");
-  //Apollo::ColorString cBackground = Apollo::getModuleConfig(MODULE_NAME, "Chat/Background/Color", "#ffffff");
-  //Apollo::ColorString cBorder = Apollo::getModuleConfig(MODULE_NAME, "Chat/Border/Color", "#000000");
-  //int nWidth = Apollo::getModuleConfig(MODULE_NAME, "Chat/Text/Width", 150);
-  //double fBorderWidth = Apollo::getModuleConfig(MODULE_NAME, "Chat/Border/Width", 1.0);
-  //double fTextPadding = Apollo::getModuleConfig(MODULE_NAME, "Chat/Text/Padding", 2.5);
-
-  //String sTruncatedChat = TruncateElementText(hView_, sText, sFont, nSize, nFlags, nWidth);
-  //if (sTruncatedChat != sText) {
-  //  sTruncatedChat += Apollo::getModuleConfig(MODULE_NAME, "Chat/Ellipsis", "...");
-  //}
-
-  //double fTextBearingX, fTextBearingY, fTextW, fTextH, fTextAdvanceX, fTextAdvanceY;
-  //Msg_Scene_GetTextExtents::_(hView_, sTruncatedChat, sFont, nSize, nFlags, fTextBearingX, fTextBearingY, fTextW, fTextH, fTextAdvanceX, fTextAdvanceY);
-
-  //Msg_Scene_CreateElement::_(hView_, sChatPath);
-  //Msg_Scene_TranslateElement::_(hView_, sChatPath, -fTextAdvanceX / 2.0, 0);
-
-  //Msg_Scene_CreateRectangle::_(hView_, sChatPath + "/" ELEMENT_CHAT_BOX, -fTextPadding, -fTextPadding, fTextAdvanceX + 2 * fTextPadding, fTextH + 2 * fTextPadding);
-  //Msg_Scene_SetFillColor::_(hView_, sChatPath + "/" ELEMENT_CHAT_BOX, cBackground.r, cBackground.g, cBackground.b, cBackground.a);
-  //Msg_Scene_SetStrokeColor::_(hView_, sChatPath + "/" ELEMENT_CHAT_BOX, cBorder.r, cBorder.g, cBorder.b, cBorder.a);
-  //Msg_Scene_SetStrokeWidth::_(hView_, sChatPath + "/" ELEMENT_CHAT_BOX, fBorderWidth);
-  //Msg_Scene_SetRoundedRectangle::_(hView_, sChatPath + "/" ELEMENT_CHAT_BOX, 0);
-
-  //Msg_Scene_CreateText::_(hView_, sChatPath + "/" ELEMENT_CHAT_TEXT, 0, 0, sTruncatedChat, sFont, nSize, nFlags);
-  //Msg_Scene_SetFillColor::_(hView_, sChatPath + "/" ELEMENT_CHAT_TEXT, cText.r, cText.g, cText.b, cText.a);
+  DisplaySrpcMessage dsm(pDisplay_, "SetAvatarChat");
+  dsm.srpc.setString("hParticipant", hParticipant_.toString());
+  dsm.srpc.setString("sText", sText);
+  dsm.Request();
 }
 
 void Avatar::SetUnknownPosition()

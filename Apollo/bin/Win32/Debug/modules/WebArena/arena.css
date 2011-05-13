@@ -14,6 +14,8 @@
   right: 0px;
   padding: 2px;
   background-color: #FFFFFF;
+  border-left: 1px solid #000000;
+  border-bottom: 1px solid #000000;
 }
 
 #iMeta p
@@ -21,28 +23,63 @@
   text-align: right;
 }
 
-.Participant 
+.cParticipant
 {
   position: absolute;
   bottom: 0px;
-  border: 1px solid #000000;
+}
+
+.cParticipant .cImageWrapper
+{
+  position: absolute;
+  left: -50px;
+  bottom: 0px;
+  xborder: 1px solid #000000;
   width: 100px;
   height: 100px;
 }
 
-.Participant .Nickname
+.cParticipant .cNickname
 {
   position: absolute;
-  bottom: 10px;
-  left: 10px;
+  bottom: 12px;
+  left: 70px;
   padding: 1px;
   border: 1px solid #7CC100;
   background-color: #F5F5F5;
 }
 
-.Participant .Avatar
+.cParticipant .cAvatar
 {
   position: absolute;
+  width: 100px;
+  height: 100px;
   bottom: 0px;
-  left: -50px;
+  background-image:url('DefaultAvatar.png');
+  background-repeat:no-repeat;
+  background-position-x:center; 
+  background-position-y:bottom; 
+}
+
+.cParticipant .cChatWrapper
+{
+  position: absolute;
+  left: -75px;
+  bottom: 102px;
+  xborder: 1px solid #000000;
+  width: 150px;
+  height: 100px;
+}
+
+.cParticipant .cChat
+{
+  position: absolute;
+  width: 150px;
+  bottom: 0px;
+  text-align:center;
+  background-color: #FFFFFF;
+  border: 1px solid #777777;
+  padding: 4px;
+  -webkit-border-radius:10px;
+  -webkit-box-shadow: 0 0 5px #888;
 }
