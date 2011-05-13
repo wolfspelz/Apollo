@@ -35,7 +35,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
   { Msg_System_RunLevel msg; msg.sLevel = Msg_System_RunLevel_PreBoot; msg.Send(); }
 
-  apLog_User("Loading");
+  apLog_User(("Loading"));
 
   {
     String sModule = "config";
@@ -88,7 +88,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
   { Msg_System_AfterLoadModules msg; msg.Send(); }
   { Msg_System_BeforeEventLoop msg; msg.Send(); }
 
-  apLog_User("Running");
+  apLog_User(("Running"));
 
   int nResult = 0;
   {
@@ -101,7 +101,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     nResult = msg.wParam;
   }
 
-  apLog_User("Shutdown");
+  apLog_User(("Shutdown"));
 
   { Msg_System_AfterEventLoop msg; msg.Send(); }
   { Msg_System_BeforeUnloadModules msg; msg.Send(); }

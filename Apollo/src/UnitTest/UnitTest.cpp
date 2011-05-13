@@ -598,7 +598,7 @@ int UnitTest::Start()
   }
 
   apLog_Info((LOG_CHANNEL, "UnitTest::Start", "Execute synchronous tests"));
-  apLog_User("Testing");
+  apLog_User(("Testing"));
 
   { // Execute synchronous tests
     Msg_UnitTest_Execute msg;
@@ -643,7 +643,25 @@ AP_MSG_HANDLER_METHOD(UnitTest, UnitTest_Token)
   // So, we assume that everyone who registered for token got ist already
 
   apLog_Info((LOG_CHANNEL, "UnitTest::UnitTest_Token", "Finished asynchronous test sequence"));
-  apLog_User("Test finished");
+
+  if (bSuccess_) {
+    apLog_User(("Test successful"));
+  } else {
+    String sText;
+    sText.appendf("Did %d tests", lTests_.length());
+    
+    int nFailed = nComplete_ - nSuccess_;
+    if (nFailed > 0) {
+      sText.appendf(" / %d test(s) failed", nFailed);
+    }
+    
+    int nMissing = lTests_.length() - nComplete_;
+    if (nMissing > 0) {
+      sText.appendf(" / %d result(s) missing", nMissing);
+    }
+    
+    apLog_User(("%s", StringType(sText)));
+  }
 
   bInSendRunLevelNormal_ = 1;
   Msg_System_RunLevel msg; msg.sLevel = Msg_System_RunLevel_Normal; msg.Send();
