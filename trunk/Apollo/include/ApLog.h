@@ -49,13 +49,19 @@ enum apLog_LogMask { apLog_MaskNone = 0
 #define apLog_Fatal(_args_) apLog_FatalI _args_
 #define apLog_Error(_args_) apLog_ErrorI _args_
 #define apLog_Warning(_args_) apLog_WarningI _args_
-#define apLog_User(_args_) apLog_UserI(_args_)
+#define apLog_User(_args_) apLog_UserI _args_
 #define apLog_Debug(_args_) apLog_DebugI _args_
 #define apLog_Info(_args_) apLog_InfoI _args_
 #define apLog_Verbose(_args_) apLog_VerboseI _args_
+#if defined(_DEBUG)
 #define apLog_Trace(_args_) apLog_TraceObject apLog_TraceObject_Instance _args_
 #define apLog_VeryVerbose(_args_) if (apLog_IsVeryVerbose) { apLog_VeryVerboseI _args_; }
 #define apLog_Alert(_args_) apLog_AlertI _args_
+#else
+#define apLog_Trace(_args_) 
+#define apLog_VeryVerbose(_args_) 
+#define apLog_Alert(_args_) 
+#endif
 
 #define apLog_IsVerbose apLog_IsMask(apLog_MaskVerbose)
 #define apLog_IsTrace apLog_IsMask(apLog_MaskTrace)

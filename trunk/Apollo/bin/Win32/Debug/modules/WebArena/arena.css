@@ -3,58 +3,62 @@
 
 #iContent *
 {
-  font-family: Verdana, Arial, Sans-Serif;
-  font-size: 9px;
+  font-family:Verdana, Arial, Sans-Serif;
+  font-size:9px;
 }
 
 #iMeta
 {
-  position: absolute;
-  top: 0px;
-  right: 0px;
-  padding: 2px;
-  background-color: #FFFFFF;
-  border-left: 1px solid #000000;
-  border-bottom: 1px solid #000000;
+  position:absolute;
+  top:0px;
+  right:0px;
+  padding:2px;
+  background-color:#FFFFFF;
+  border-left:1px solid #000000;
+  border-bottom:1px solid #000000;
 }
 
 #iMeta p
 {
-  text-align: right;
+  text-align:right;
 }
 
 .cParticipant
 {
-  position: absolute;
-  bottom: 0px;
+  position:absolute;
+  bottom:0px;
 }
 
 .cParticipant .cImageWrapper
 {
-  position: absolute;
-  left: -50px;
-  bottom: 0px;
-  xborder: 1px solid #000000;
-  width: 100px;
-  height: 100px;
+  position:absolute;
+  left:-50px;
+  bottom:0px;
+  xborder:1px solid #000000;
+  width:100px;
+  height:100px;
 }
 
 .cParticipant .cNickname
 {
-  position: absolute;
-  bottom: 12px;
-  left: 70px;
-  padding: 1px;
-  border: 1px solid #7CC100;
-  background-color: #F5F5F5;
+  position:absolute;
+  bottom:12px;
+  left:70px;
+  padding:1px;
+  border:1px solid #7CC100;
+  background-color:#F5F5F5;
+  max-width:60px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
 }
 
 .cParticipant .cAvatar
 {
-  position: absolute;
-  width: 100px;
-  height: 100px;
-  bottom: 0px;
+  position:absolute;
+  width:100px;
+  height:100px;
+  bottom:0px;
   background-image:url('DefaultAvatar.png');
   background-repeat:no-repeat;
   background-position-x:center; 
@@ -63,23 +67,23 @@
 
 .cParticipant .cChatWrapper
 {
-  position: absolute;
-  left: -75px;
-  bottom: 102px;
-  xborder: 1px solid #000000;
-  width: 150px;
-  height: 100px;
+  position:absolute;
+  left:-75px;
+  bottom:102px;
+  xborder:1px solid #000000;
+  width:150px;
+  height:100px;
 }
 
 .cParticipant .cChat
 {
-  position: absolute;
-  width: 150px;
-  bottom: 0px;
+  position:absolute;
+  width:150px;
+  bottom:0px;
   text-align:center;
-  background-color: #FFFFFF;
-  border: 1px solid #777777;
-  padding: 4px;
+  background-color:#FFFFFF;
+  border:1px solid #777777;
+  padding:4px;
   -webkit-border-radius:10px;
-  -webkit-box-shadow: 0 0 5px #888;
+  -webkit-box-shadow:0 0 5px #888;
 }
