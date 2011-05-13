@@ -129,11 +129,11 @@ void ActionList::On_Timer_Event(Msg_Timer_Event* pMsg)
 
 // ------------------------------------------------------
 
-class Test_InChangeOut: public ActionList
+class Test_InNavigateChatOut: public ActionList
 {
 public:
-  Test_InChangeOut()
-    :ActionList("Test_InChangeOut")
+  Test_InNavigateChatOut()
+    :ActionList("Test_InNavigateChatOut")
   {}
 
   void Begin();
@@ -152,16 +152,16 @@ public:
   Test_ParticipantList lParticipants_;
 };
 
-class Test_InChangeOut_Action: public Action
+class Test_InNavigateChatOut_Action: public Action
 {
 public:
-  Test_InChangeOut_Action()
+  Test_InNavigateChatOut_Action()
     :t(0)
   {}
 
-  void SetList(ActionList* pList) { t = (Test_InChangeOut*) pList; }
+  void SetList(ActionList* pList) { t = (Test_InNavigateChatOut*) pList; }
 
-  Test_InChangeOut* t;
+  Test_InNavigateChatOut* t;
 };
 
 // ------------------------------------------------------
@@ -176,7 +176,7 @@ static void Test_Arena_UnitTest_TokenEnd()
 
 static void Test_VpView_GetParticipants(Msg_VpView_GetParticipants* pMsg)
 {
-  Test_InChangeOut* t = (Test_InChangeOut*) pMsg->Ref();
+  Test_InNavigateChatOut* t = (Test_InNavigateChatOut*) pMsg->Ref();
   Test_ParticipantListIterator iter(t->lParticipants_);
   for (Test_ParticipantListNode* pNode = 0; (pNode = iter.Next()) != 0; ) {
     pMsg->vlParticipants.add(pNode->Key());
@@ -185,7 +185,7 @@ static void Test_VpView_GetParticipants(Msg_VpView_GetParticipants* pMsg)
 
 static void Test_VpView_SubscribeParticipantDetail(Msg_VpView_SubscribeParticipantDetail* pMsg)
 {
-  Test_InChangeOut* t = (Test_InChangeOut*) pMsg->Ref();
+  Test_InNavigateChatOut* t = (Test_InNavigateChatOut*) pMsg->Ref();
   Test_Participant* p = 0;
   t->lParticipants_.Get(pMsg->hParticipant, p);
 
@@ -212,7 +212,7 @@ static void Test_VpView_SubscribeParticipantDetail(Msg_VpView_SubscribeParticipa
 
 static void Test_VpView_GetParticipantDetailString(Msg_VpView_GetParticipantDetailString* pMsg)
 {
-  Test_InChangeOut* t = (Test_InChangeOut*) pMsg->Ref();
+  Test_InNavigateChatOut* t = (Test_InNavigateChatOut*) pMsg->Ref();
   Test_Participant* p = 0;
   t->lParticipants_.Get(pMsg->hParticipant, p);
 
@@ -237,7 +237,7 @@ static void Test_VpView_GetParticipantDetailString(Msg_VpView_GetParticipantDeta
 
 static void Test_VpView_GetParticipantDetailData(Msg_VpView_GetParticipantDetailData* pMsg)
 {
-  Test_InChangeOut* t = (Test_InChangeOut*) pMsg->Ref();
+  Test_InNavigateChatOut* t = (Test_InNavigateChatOut*) pMsg->Ref();
   Test_Participant* p = 0;
   t->lParticipants_.Get(pMsg->hParticipant, p);
 
@@ -254,7 +254,7 @@ static void Test_VpView_GetParticipantDetailData(Msg_VpView_GetParticipantDetail
 
 static void Test_VpView_GetParticipantDetailRef(Msg_VpView_GetParticipantDetailRef* pMsg)
 {
-  Test_InChangeOut* t = (Test_InChangeOut*) pMsg->Ref();
+  Test_InNavigateChatOut* t = (Test_InNavigateChatOut*) pMsg->Ref();
   Test_Participant* p = 0;
   t->lParticipants_.Get(pMsg->hParticipant, p);
 
@@ -270,7 +270,7 @@ static void Test_VpView_GetParticipantDetailRef(Msg_VpView_GetParticipantDetailR
 
 static void Test_VpView_ReplayLocationPublicChat(Msg_VpView_ReplayLocationPublicChat* pMsg)
 {
-  Test_InChangeOut* t = (Test_InChangeOut*) pMsg->Ref();
+  Test_InNavigateChatOut* t = (Test_InNavigateChatOut*) pMsg->Ref();
 
   Apollo::TimeValue tNow = Apollo::getNow();
 
@@ -304,7 +304,7 @@ static void Test_VpView_ReplayLocationPublicChat(Msg_VpView_ReplayLocationPublic
 
 static void Test_Galileo_IsAnimationDataInStorage(Msg_Galileo_IsAnimationDataInStorage* pMsg)
 {
-  Test_InChangeOut* t = (Test_InChangeOut*) pMsg->Ref();
+  Test_InNavigateChatOut* t = (Test_InNavigateChatOut*) pMsg->Ref();
 
   pMsg->bAvailable = 1;
 
@@ -313,7 +313,7 @@ static void Test_Galileo_IsAnimationDataInStorage(Msg_Galileo_IsAnimationDataInS
 
 static void Test_Galileo_LoadAnimationDataFromStorage(Msg_Galileo_LoadAnimationDataFromStorage* pMsg)
 {
-  Test_InChangeOut* t = (Test_InChangeOut*) pMsg->Ref();
+  Test_InNavigateChatOut* t = (Test_InNavigateChatOut*) pMsg->Ref();
 
   String sFile = String::filenameFile(pMsg->sUrl);
   Apollo::loadFile(Apollo::getAppResourcePath() + "test/tassadar/" + sFile, pMsg->sbData);
@@ -336,7 +336,7 @@ static void Test_VpView_SubscribeLocationDetail(Msg_VpView_SubscribeLocationDeta
 
 static void Test_VpView_GetContextDetail(Msg_VpView_GetContextDetail* pMsg)
 {
-  Test_InChangeOut* t = (Test_InChangeOut*) pMsg->Ref();
+  Test_InNavigateChatOut* t = (Test_InNavigateChatOut*) pMsg->Ref();
 
   String sKey = pMsg->sKey;
   String sValue;
@@ -368,16 +368,16 @@ static void Test_VpView_GetLocationDetail(Msg_VpView_GetLocationDetail* pMsg)
 
 // ------------------------------------------------------
 
-class Test_InChangeOut_Wait: public Test_InChangeOut_Action
+class Test_InNavigateChatOut_Wait: public Test_InNavigateChatOut_Action
 {
 public:
-  Test_InChangeOut_Wait(int nMSec)
+  Test_InNavigateChatOut_Wait(int nMSec)
   {
     nDelayMSec_ = nMSec;
   }
 };
 
-class Test_InChangeOut_CreateAndConfigureContext: public Test_InChangeOut_Action
+class Test_InNavigateChatOut_CreateAndConfigureContext: public Test_InNavigateChatOut_Action
 {
 public:
   void Execute()
@@ -420,7 +420,7 @@ public:
   }
 };
 
-class Test_InChangeOut_ContextLocationAssigned1: public Test_InChangeOut_Action
+class Test_InNavigateChatOut_ContextLocationAssigned1: public Test_InNavigateChatOut_Action
 {
 public:
   void Execute()
@@ -434,7 +434,7 @@ public:
   }
 };
 
-class Test_InChangeOut_ContextDetailsChanged_DocumentUrl: public Test_InChangeOut_Action
+class Test_InNavigateChatOut_ContextDetailsChanged_DocumentUrl: public Test_InNavigateChatOut_Action
 {
 public:
   void Execute()
@@ -446,7 +446,7 @@ public:
   }
 };
 
-class Test_InChangeOut_ContextDetailsChanged_LocationUrl: public Test_InChangeOut_Action
+class Test_InNavigateChatOut_ContextDetailsChanged_LocationUrl: public Test_InNavigateChatOut_Action
 {
 public:
   void Execute()
@@ -458,7 +458,7 @@ public:
   }
 };
 
-class Test_InChangeOut_EnterLocationRequested1: public Test_InChangeOut_Action
+class Test_InNavigateChatOut_EnterLocationRequested1: public Test_InNavigateChatOut_Action
 {
 public:
   void Execute()
@@ -469,7 +469,7 @@ public:
   }
 };
 
-class Test_InChangeOut_LocationContextsChanged1a: public Test_InChangeOut_Action
+class Test_InNavigateChatOut_LocationContextsChanged1a: public Test_InNavigateChatOut_Action
 {
 public:
   void Execute()
@@ -486,7 +486,7 @@ public:
 // VpView_GetContextDetail
 // VpView_GetLocationDetail
 
-class Test_InChangeOut_EnterLocationBegin1: public Test_InChangeOut_Action
+class Test_InNavigateChatOut_EnterLocationBegin1: public Test_InNavigateChatOut_Action
 {
 public:
   void Execute()
@@ -497,7 +497,7 @@ public:
   }
 };
 
-class Test_InChangeOut_ParticipantsChanged1: public Test_InChangeOut_Action
+class Test_InNavigateChatOut_ParticipantsChanged1: public Test_InNavigateChatOut_Action
 {
 public:
   void Execute()
@@ -516,7 +516,7 @@ public:
 // Galileo_IsAnimationDataInStorage
 // Galileo_LoadAnimationDataFromStorage
 
-class Test_InChangeOut_EnterLocationComplete1: public Test_InChangeOut_Action
+class Test_InNavigateChatOut_EnterLocationComplete1: public Test_InNavigateChatOut_Action
 {
 public:
   void Execute()
@@ -530,7 +530,7 @@ public:
 // VpView_ReplayLocationPublicChat
 
 // CHANGE: Navigate
-class Test_InChangeOut_LeaveLocationRequested1: public Test_InChangeOut_Action
+class Test_InNavigateChatOut_LeaveLocationRequested1: public Test_InNavigateChatOut_Action
 {
 public:
   void Execute()
@@ -541,7 +541,7 @@ public:
   }
 };
 
-class Test_InChangeOut_LocationContextsChanged1b: public Test_InChangeOut_Action
+class Test_InNavigateChatOut_LocationContextsChanged1b: public Test_InNavigateChatOut_Action
 {
 public:
   void Execute()
@@ -552,7 +552,7 @@ public:
   }
 };
 
-class Test_InChangeOut_ContextLocationUnassigned1: public Test_InChangeOut_Action
+class Test_InNavigateChatOut_ContextLocationUnassigned1: public Test_InNavigateChatOut_Action
 {
 public:
   void Execute()
@@ -566,7 +566,7 @@ public:
   }
 };
 
-class Test_InChangeOut_ContextLocationAssigned2: public Test_InChangeOut_Action
+class Test_InNavigateChatOut_ContextLocationAssigned2: public Test_InNavigateChatOut_Action
 {
 public:
   void Execute()
@@ -580,7 +580,7 @@ public:
   }
 };
 
-class Test_InChangeOut_EnterLocationRequested2: public Test_InChangeOut_Action
+class Test_InNavigateChatOut_EnterLocationRequested2: public Test_InNavigateChatOut_Action
 {
 public:
   void Execute()
@@ -591,7 +591,7 @@ public:
   }
 };
 
-class Test_InChangeOut_LocationContextsChanged2a: public Test_InChangeOut_Action
+class Test_InNavigateChatOut_LocationContextsChanged2a: public Test_InNavigateChatOut_Action
 {
 public:
   void Execute()
@@ -602,7 +602,7 @@ public:
   }
 };
 
-class Test_InChangeOut_VpView_LeaveLocationBegin1: public Test_InChangeOut_Action
+class Test_InNavigateChatOut_VpView_LeaveLocationBegin1: public Test_InNavigateChatOut_Action
 {
 public:
   void Execute()
@@ -613,7 +613,7 @@ public:
   }
 };
 
-class Test_InChangeOut_ParticipantsChanged: public Test_InChangeOut_Action
+class Test_InNavigateChatOut_ParticipantsChanged: public Test_InNavigateChatOut_Action
 {
 public:
   void Execute()
@@ -625,7 +625,7 @@ public:
   }
 };
 
-class Test_InChangeOut_LeaveLocationComplete1: public Test_InChangeOut_Action
+class Test_InNavigateChatOut_LeaveLocationComplete1: public Test_InNavigateChatOut_Action
 {
 public:
   void Execute()
@@ -636,7 +636,7 @@ public:
   }
 };
 
-class Test_InChangeOut_EnterLocationBegin2: public Test_InChangeOut_Action
+class Test_InNavigateChatOut_EnterLocationBegin2: public Test_InNavigateChatOut_Action
 {
 public:
   void Execute()
@@ -647,7 +647,7 @@ public:
   }
 };
 
-class Test_InChangeOut_ParticipantsChanged2a: public Test_InChangeOut_Action
+class Test_InNavigateChatOut_ParticipantsChanged2a: public Test_InNavigateChatOut_Action
 {
 public:
   void Execute()
@@ -659,7 +659,7 @@ public:
   }
 };
 
-class Test_InChangeOut_EnterLocationComplete2: public Test_InChangeOut_Action
+class Test_InNavigateChatOut_EnterLocationComplete2: public Test_InNavigateChatOut_Action
 {
 public:
   void Execute()
@@ -670,7 +670,7 @@ public:
   }
 };
 
-class Test_InChangeOut_Chat2a: public Test_InChangeOut_Action
+class Test_InNavigateChatOut_Chat2a: public Test_InNavigateChatOut_Action
 {
 public:
   void Execute()
@@ -680,14 +680,14 @@ public:
     msg.hParticipant = t->lParticipants_.Next(0)->Key();
     msg.hChat = Apollo::newHandle();
     msg.sNickname = t->lParticipants_.Next(0)->Value()->sNickname;
-    msg.sText = "Test_InChangeOut_Chat2a";
+    msg.sText = "2a Lorem ";
     msg.nSec = Apollo::TimeValue::getTime().Sec();
     msg.nMicroSec = Apollo::TimeValue::getTime().MicroSec();
     msg.Send();
   }
 };
 
-class Test_InChangeOut_Chat2b: public Test_InChangeOut_Action
+class Test_InNavigateChatOut_Chat2b: public Test_InNavigateChatOut_Action
 {
 public:
   void Execute()
@@ -697,14 +697,14 @@ public:
     msg.hParticipant = t->lParticipants_.Next(0)->Key();
     msg.hChat = Apollo::newHandle();
     msg.sNickname = t->lParticipants_.Next(0)->Value()->sNickname;
-    msg.sText = "Test_InChangeOut_Chat2b Test_InChangeOut_Chat2b";
+    msg.sText = "2b adipisicing elit, sed do eiusmod tempor incididunt ut";
     msg.nSec = Apollo::TimeValue::getTime().Sec();
     msg.nMicroSec = Apollo::TimeValue::getTime().MicroSec();
     msg.Send();
   }
 };
 
-class Test_InChangeOut_Chat2c: public Test_InChangeOut_Action
+class Test_InNavigateChatOut_Chat2c: public Test_InNavigateChatOut_Action
 {
 public:
   void Execute()
@@ -714,7 +714,7 @@ public:
     msg.hParticipant = t->lParticipants_.Next(0)->Key();
     msg.hChat = Apollo::newHandle();
     msg.sNickname = t->lParticipants_.Next(0)->Value()->sNickname;
-    msg.sText = "Test_InChangeOut_Chat2c Test_InChangeOut_Chat2c Test_InChangeOut_Chat2c";
+    msg.sText = "2c labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
     msg.nSec = Apollo::TimeValue::getTime().Sec();
     msg.nMicroSec = Apollo::TimeValue::getTime().MicroSec();
     msg.Send();
@@ -722,7 +722,7 @@ public:
 };
 
 // OUT: CloseContext
-class Test_InChangeOut_LeaveLocationRequested2: public Test_InChangeOut_Action
+class Test_InNavigateChatOut_LeaveLocationRequested2: public Test_InNavigateChatOut_Action
 {
 public:
   void Execute()
@@ -733,7 +733,7 @@ public:
   }
 };
 
-class Test_InChangeOut_LocationContextsChanged2b: public Test_InChangeOut_Action
+class Test_InNavigateChatOut_LocationContextsChanged2b: public Test_InNavigateChatOut_Action
 {
 public:
   void Execute()
@@ -744,7 +744,7 @@ public:
   }
 };
 
-class Test_InChangeOut_ContextLocationUnassigned2: public Test_InChangeOut_Action
+class Test_InNavigateChatOut_ContextLocationUnassigned2: public Test_InNavigateChatOut_Action
 {
 public:
   void Execute()
@@ -758,7 +758,7 @@ public:
   }
 };
 
-class Test_InChangeOut_ContextDestroyed: public Test_InChangeOut_Action
+class Test_InNavigateChatOut_ContextDestroyed: public Test_InNavigateChatOut_Action
 {
 public:
   void Execute()
@@ -769,7 +769,7 @@ public:
   }
 };
 
-class Test_InChangeOut_LeaveLocationBegin2: public Test_InChangeOut_Action
+class Test_InNavigateChatOut_LeaveLocationBegin2: public Test_InNavigateChatOut_Action
 {
 public:
   void Execute()
@@ -780,7 +780,7 @@ public:
   }
 };
 
-class Test_InChangeOut_ParticipantsChanged2b: public Test_InChangeOut_Action
+class Test_InNavigateChatOut_ParticipantsChanged2b: public Test_InNavigateChatOut_Action
 {
 public:
   void Execute()
@@ -792,7 +792,7 @@ public:
   }
 };
 
-class Test_InChangeOut_LeaveLocationComplete2: public Test_InChangeOut_Action
+class Test_InNavigateChatOut_LeaveLocationComplete2: public Test_InNavigateChatOut_Action
 {
 public:
   void Execute()
@@ -805,7 +805,7 @@ public:
 
 // ------------------------------------------------------
 
-void Test_InChangeOut::Begin()
+void Test_InNavigateChatOut::Begin()
 {
   hContext_ = Apollo::newHandle();
   hLocation1_ = Apollo::newHandle();
@@ -823,7 +823,7 @@ void Test_InChangeOut::Begin()
       Apollo::loadFile(Apollo::getAppResourcePath() + "test/tassadar/" + "config.xml", p->sbAvatar);
       p->sAvatarMimetype = "avatar/gif";
       p->sAvatarSource = "IdentityItemUrl=http://ydentiti.org/test/Tassadar/config.xml";
-      p->sAvatarUrl = "http://ydentiti.org/test/Tassadar/4d88f6caa9715126e261ed43d63873a9.gif";
+      p->sAvatarUrl = "http://ydentiti.org/test/Tassadar/walk-l.gif";
       p->sOnlineStatus = "";
       p->sMessage = "Hallo";
       p->sPosition = "x=333\ny=0\nz=0";
@@ -850,52 +850,54 @@ void Test_InChangeOut::Begin()
   { Msg_VpView_GetLocationDetail msg; msg.Hook(MODULE_NAME, (ApCallback) Test_VpView_GetLocationDetail, this, ApCallbackPosEarly); }
 
   // IN: Open Context, Navigate
-  AddLast(new Test_InChangeOut_CreateAndConfigureContext());
-  AddLast(new Test_InChangeOut_ContextLocationAssigned1());
-  AddLast(new Test_InChangeOut_ContextDetailsChanged_DocumentUrl());
-  AddLast(new Test_InChangeOut_EnterLocationRequested1());
-  AddLast(new Test_InChangeOut_ContextDetailsChanged_LocationUrl());
-  AddLast(new Test_InChangeOut_LocationContextsChanged1a());
-  AddLast(new Test_InChangeOut_EnterLocationBegin1());
-  AddLast(new Test_InChangeOut_ParticipantsChanged1());
-  AddLast(new Test_InChangeOut_EnterLocationComplete1());
+  AddLast(new Test_InNavigateChatOut_CreateAndConfigureContext());
+  AddLast(new Test_InNavigateChatOut_ContextLocationAssigned1());
+  AddLast(new Test_InNavigateChatOut_ContextDetailsChanged_DocumentUrl());
+  AddLast(new Test_InNavigateChatOut_EnterLocationRequested1());
+  AddLast(new Test_InNavigateChatOut_ContextDetailsChanged_LocationUrl());
+  AddLast(new Test_InNavigateChatOut_LocationContextsChanged1a());
+  AddLast(new Test_InNavigateChatOut_EnterLocationBegin1());
+  AddLast(new Test_InNavigateChatOut_ParticipantsChanged1());
+  AddLast(new Test_InNavigateChatOut_EnterLocationComplete1());
 
-  AddLast(new Test_InChangeOut_Wait(500));
-  AddLast(new Test_InChangeOut_LeaveLocationRequested1());
-  AddLast(new Test_InChangeOut_ContextDetailsChanged_LocationUrl());
-  AddLast(new Test_InChangeOut_LocationContextsChanged1b());
-  AddLast(new Test_InChangeOut_ContextLocationUnassigned1());
-  AddLast(new Test_InChangeOut_ContextDetailsChanged_DocumentUrl());
-  AddLast(new Test_InChangeOut_ContextLocationAssigned2());
-  AddLast(new Test_InChangeOut_ContextDetailsChanged_DocumentUrl());
-  AddLast(new Test_InChangeOut_EnterLocationRequested2());
-  AddLast(new Test_InChangeOut_ContextDetailsChanged_LocationUrl());
-  AddLast(new Test_InChangeOut_LocationContextsChanged2a());
-  AddLast(new Test_InChangeOut_ParticipantsChanged());
-  AddLast(new Test_InChangeOut_LeaveLocationComplete1());
-  AddLast(new Test_InChangeOut_ParticipantsChanged2a());
-  AddLast(new Test_InChangeOut_EnterLocationComplete2());
-  AddLast(new Test_InChangeOut_Wait(500));
-  AddLast(new Test_InChangeOut_Chat2a());
-  //AddLast(new Test_InChangeOut_Wait(500));
-  //AddLast(new Test_InChangeOut_Chat2b());
-  //AddLast(new Test_InChangeOut_Wait(500));
-  //AddLast(new Test_InChangeOut_Chat2c());
-  //AddLast(new Test_InChangeOut_LeaveLocationRequested2());
-  //AddLast(new Test_InChangeOut_ContextDetailsChanged_LocationUrl());
-  //AddLast(new Test_InChangeOut_LocationContextsChanged2b());
+  AddLast(new Test_InNavigateChatOut_Wait(1000));
+  AddLast(new Test_InNavigateChatOut_LeaveLocationRequested1());
+  AddLast(new Test_InNavigateChatOut_ContextDetailsChanged_LocationUrl());
+  AddLast(new Test_InNavigateChatOut_LocationContextsChanged1b());
+  AddLast(new Test_InNavigateChatOut_ContextLocationUnassigned1());
+  AddLast(new Test_InNavigateChatOut_ContextDetailsChanged_DocumentUrl());
+  AddLast(new Test_InNavigateChatOut_ContextLocationAssigned2());
+  AddLast(new Test_InNavigateChatOut_ContextDetailsChanged_DocumentUrl());
+  AddLast(new Test_InNavigateChatOut_EnterLocationRequested2());
+  AddLast(new Test_InNavigateChatOut_ContextDetailsChanged_LocationUrl());
+  AddLast(new Test_InNavigateChatOut_LocationContextsChanged2a());
+  AddLast(new Test_InNavigateChatOut_ParticipantsChanged());
+  AddLast(new Test_InNavigateChatOut_LeaveLocationComplete1());
+  AddLast(new Test_InNavigateChatOut_ParticipantsChanged2a());
+  AddLast(new Test_InNavigateChatOut_EnterLocationComplete2());
+  AddLast(new Test_InNavigateChatOut_Wait(1000));
+  AddLast(new Test_InNavigateChatOut_Chat2a());
 
-  //AddLast(new Test_InChangeOut_ContextLocationUnassigned2());
-  //AddLast(new Test_InChangeOut_ContextDetailsChanged_DocumentUrl());
-  //AddLast(new Test_InChangeOut_ContextDestroyed());
-  //AddLast(new Test_InChangeOut_LeaveLocationBegin2());
-  //AddLast(new Test_InChangeOut_ParticipantsChanged2b());
-  //AddLast(new Test_InChangeOut_LeaveLocationComplete2());
+  AddLast(new Test_InNavigateChatOut_Wait(1000));
+  AddLast(new Test_InNavigateChatOut_Chat2b());
+  AddLast(new Test_InNavigateChatOut_Wait(1000));
+  AddLast(new Test_InNavigateChatOut_Chat2c());
+  AddLast(new Test_InNavigateChatOut_Wait(1000));
+  AddLast(new Test_InNavigateChatOut_LeaveLocationRequested2());
+  AddLast(new Test_InNavigateChatOut_ContextDetailsChanged_LocationUrl());
+  AddLast(new Test_InNavigateChatOut_LocationContextsChanged2b());
+
+  AddLast(new Test_InNavigateChatOut_ContextLocationUnassigned2());
+  AddLast(new Test_InNavigateChatOut_ContextDetailsChanged_DocumentUrl());
+  AddLast(new Test_InNavigateChatOut_ContextDestroyed());
+  AddLast(new Test_InNavigateChatOut_LeaveLocationBegin2());
+  AddLast(new Test_InNavigateChatOut_ParticipantsChanged2b());
+  AddLast(new Test_InNavigateChatOut_LeaveLocationComplete2());
 
   ActionList::Begin();
 }
 
-void Test_InChangeOut::End()
+void Test_InNavigateChatOut::End()
 {
   { Msg_VpView_GetParticipants msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_VpView_GetParticipants, this); }
   { Msg_VpView_SubscribeParticipantDetail msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_VpView_SubscribeParticipantDetail, this); }
@@ -918,7 +920,7 @@ void Test_InChangeOut::End()
 
 // ------------------------------------------------------
 
-Test_InChangeOut* gTest_InChangeOut = 0;
+Test_InNavigateChatOut* gTest_InNavigateChatOut = 0;
 
 static void Test_Arena_UnitTest_Token(Msg_UnitTest_Token* pMsg)
 {
@@ -927,7 +929,7 @@ static void Test_Arena_UnitTest_Token(Msg_UnitTest_Token* pMsg)
   apLog_Info((LOG_CHANNEL, "Test_Arena_UnitTest_Token", "Starting Test/WebArena"));
   int bTokenEndNow = 0;
 
-  gTest_InChangeOut->Begin();
+  gTest_InNavigateChatOut->Begin();
 
   if (bTokenEndNow) { Test_Arena_UnitTest_TokenEnd(); }
 }
@@ -941,7 +943,7 @@ void Test_Arena_Register()
 #if defined(AP_TEST_Arena)
   if (Apollo::isLoadedModule("WebArena")) {
 
-    { gTest_InChangeOut = new Test_InChangeOut(); Msg_UnitTest_Register msg; msg.sName = gTest_InChangeOut->getName(); msg.Send(); }
+    { gTest_InNavigateChatOut = new Test_InNavigateChatOut(); Msg_UnitTest_Register msg; msg.sName = gTest_InNavigateChatOut->getName(); msg.Send(); }
   
     { Msg_UnitTest_Token msg; msg.Hook(MODULE_NAME, (ApCallback) Test_Arena_UnitTest_Token, 0, ApCallbackPosNormal); }  
   }
