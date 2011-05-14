@@ -329,16 +329,17 @@ AP_MSG_HANDLER_METHOD(WebArenaModule, Animation_SequenceBegin)
 
 AP_SRPC_HANDLER_METHOD(WebArenaModule, WebArena_CallModuleSrpc, ApSRPCMessage)
 {
-  String sMethod = pMsg->srpc.getString("Method");
+  String sView = pMsg->srpc.getString("hView");
+  if (!sView) { throw ApException("Missing hView"); }
 
-  if (0){
-  } else if (sMethod == "SendPublicChat") {
+  ApHandle hView;
+  hView.fromString(sView);
+  if (!ApIsHandle(hView)) { throw ApException("Not a handle: %s", StringType(sView)); }
 
-
-  } else {
-    throw ApException("Unknown Method=%s", StringType(sMethod));
+  Display* pDisplay = GetDisplayOfHandle(hView);
+  if (pDisplay) {
+    pDisplay->OnCallModuleSrpc(pMsg->srpc, pMsg->response);
   }
-
   pMsg->apStatus = ApMessage::Ok;
 }
 
