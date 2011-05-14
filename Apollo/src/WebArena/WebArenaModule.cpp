@@ -332,8 +332,7 @@ AP_SRPC_HANDLER_METHOD(WebArenaModule, WebArena_CallModuleSrpc, ApSRPCMessage)
   String sView = pMsg->srpc.getString("hView");
   if (!sView) { throw ApException("Missing hView"); }
 
-  ApHandle hView;
-  hView.fromString(sView);
+  ApHandle hView = Apollo::string2Handle(sView);
   if (!ApIsHandle(hView)) { throw ApException("Not a handle: %s", StringType(sView)); }
 
   Display* pDisplay = GetDisplayOfHandle(hView);
@@ -347,17 +346,57 @@ AP_SRPC_HANDLER_METHOD(WebArenaModule, WebArena_CallModuleSrpc, ApSRPCMessage)
 
 #if defined(AP_TEST)
 
+ApHandle Test_Avatar_RemoveOldChats_hRemovedChat_;
+
+void Test_Avatar_RemoveOldChats_DisplaySrpcMessage(DisplaySrpcMessage* pMsg)
+{
+  if (pMsg->srpc.getString("Method") == "RemoveAvatarChat") {
+    Test_Avatar_RemoveOldChats_hRemovedChat_ = Apollo::string2Handle(pMsg->srpc.getString("hChat"));
+  }
+}
+
+static String Test_Avatar_RemoveOldChats()
+{
+  String s;
+
+  WebArenaModule m;
+  Display d(&m, Apollo::newHandle());
+  Avatar a(&m, &d, Apollo::newHandle());
+
+  { DisplaySrpcMessage msg(&d, "Dummy"); msg.Hook(MODULE_NAME, (ApCallback) Test_Avatar_RemoveOldChats_DisplaySrpcMessage, 0, ApCallbackPosEarly); }  
+
+  ApHandle hChat2 = Apollo::newHandle();
+  ApHandle hChat1 = Apollo::newHandle();
+  ApHandle hChat4 = Apollo::newHandle();
+  ApHandle hChat3 = Apollo::newHandle();
+
+  a.OnReceivePublicChat(hChat4, "Nickname4", "Text4", Apollo::TimeValue(4, 0));
+  a.OnReceivePublicChat(hChat3, "Nickname3", "Text3", Apollo::TimeValue(3, 0));
+  a.OnReceivePublicChat(hChat1, "Nickname1", "Text1", Apollo::TimeValue(1, 0));
+  a.OnReceivePublicChat(hChat2, "Nickname2", "Text2", Apollo::TimeValue(2, 0));
+
+  if (Test_Avatar_RemoveOldChats_hRemovedChat_ != hChat1) {
+    s = "Did not remove oldest chat";
+  }
+
+  { DisplaySrpcMessage msg(&d, "Dummy"); msg.UnHook(MODULE_NAME, (ApCallback) Test_Avatar_RemoveOldChats_DisplaySrpcMessage, 0); }  
+
+  return s;
+}
+
 AP_MSG_HANDLER_METHOD(WebArenaModule, UnitTest_Begin)
 {
   AP_UNUSED_ARG(pMsg);
-  if (Apollo::getConfig("Test/WebArena", 0)) {
+  if (Apollo::getConfig("Test/Arena", 0)) {
+    AP_UNITTEST_REGISTER(Test_Avatar_RemoveOldChats);
   }
 }
 
 AP_MSG_HANDLER_METHOD(WebArenaModule, UnitTest_Execute)
 {
   AP_UNUSED_ARG(pMsg);
-  if (Apollo::getConfig("Test/WebArena", 0)) {
+  if (Apollo::getConfig("Test/Arena", 0)) {
+    AP_UNITTEST_EXECUTE(Test_Avatar_RemoveOldChats);
   }
 }
 

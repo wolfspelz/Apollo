@@ -35,7 +35,7 @@ class Avatar
 public:
   Avatar(WebArenaModule* pModule, Display* pDisplay, const ApHandle& hParticipant);
 
-  void Create();
+  void Create(int bSelf);
   void Destroy();
 
   void OnDetailsChanged(Apollo::ValueList& vlKeys);
@@ -50,9 +50,13 @@ protected:
   void GetDetailRef(const String& sKey, Apollo::ValueList& vlMimeTypes);
   void UnSubscribeDetail(const String& sKey);
 
+  void RemoveOldChats(int nMax);
+  
   void SetNickname(const String& sNickname);
   void SetImage(const String& sUrl);
+  void AddChatline(const ApHandle& hChat, const String& sText);
   void SetChatline(const ApHandle& hChat, const String& sText);
+  void RemoveChatline(const ApHandle& hChat);
   void SetPosition(int nX);
   void SetUnknownPosition();
   void HandleImageData(const String& sMimeType, const String& sSource, Buffer& sbData);

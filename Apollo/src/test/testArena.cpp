@@ -150,6 +150,7 @@ public:
   int nPhase_;
 
   Test_ParticipantList lParticipants_;
+  ApHandle hSelf_;
 };
 
 class Test_InNavigateChatOut_Action: public Action
@@ -181,6 +182,7 @@ static void Test_VpView_GetParticipants(Msg_VpView_GetParticipants* pMsg)
   for (Test_ParticipantListNode* pNode = 0; (pNode = iter.Next()) != 0; ) {
     pMsg->vlParticipants.add(pNode->Key());
   }
+  pMsg->hSelf = t->hSelf_;
 }
 
 static void Test_VpView_SubscribeParticipantDetail(Msg_VpView_SubscribeParticipantDetail* pMsg)
@@ -831,7 +833,27 @@ void Test_InNavigateChatOut::Begin()
       p->sProfileUrl;
       p->slChats.AddLast("2 Hello World Hello World Hello World Hello World", 2);
       p->slChats.AddLast("10 Hello World Hello World Hello World Hello World", 10);
-      lParticipants_.Set(Apollo::newHandle(), p);
+      ApHandle h = Apollo::newHandle();
+      lParticipants_.Set(h, p);
+      hSelf_ = h;
+    }
+  }
+
+  {
+    Test_Participant* p = new Test_Participant();
+    if (p) {
+      p->sNickname = "Planta";
+      Apollo::loadFile(Apollo::getAppResourcePath() + "test/planta/" + "avatar.xml", p->sbAvatar);
+      p->sAvatarMimetype = "avatar/gif";
+      p->sAvatarSource = "IdentityItemUrl=http://ydentiti.org/test/Planta/avatar.xml";
+      p->sAvatarUrl = "http://ydentiti.org/test/Planta/wave.gif";
+      p->sOnlineStatus = "";
+      p->sMessage = "No news is good news";
+      p->sPosition = "x=110\ny=0\nz=0";
+      p->sCondition;
+      p->sProfileUrl;
+      ApHandle h = Apollo::newHandle();
+      lParticipants_.Set(h, p);
     }
   }
 

@@ -194,20 +194,11 @@ void Avatar::UnSubscribeDetail(const String& sKey)
 }
 
 
-void Avatar::Create()
+void Avatar::Create(int bSelf)
 {
-  {
-    Msg_VpView_GetParticipantDetailString msg;
-    msg.hParticipant = hParticipant_;
-    msg.sKey = Msg_VpView_ParticipantDetail_Nickname;
-    msg.Request();
-    sNickname_ = msg.sValue;
-  }
-
   DisplaySrpcMessage dsm(pDisplay_, "AddAvatar");
   dsm.srpc.setString("hParticipant", hParticipant_.toString());
-  dsm.srpc.setString("sNickname", "noname");
-  dsm.srpc.setString("sImageUrl", "file://" + Apollo::getModuleResourcePath(MODULE_NAME) + Apollo::getModuleConfig(MODULE_NAME, "Avatar/Image/Default", "DefaultAvatar.png"));
+  dsm.srpc.setInt("bSelf", bSelf);
   dsm.srpc.setInt("nX", nX_);
   dsm.Request();
 
@@ -280,9 +271,11 @@ void Avatar::OnReceivePublicChat(const ApHandle& hChat, const String& sNickname,
     pChat = new Chatline(sText, tv);
     chats_.Set(hChat, pChat);
 
+    RemoveOldChats(3);
+
     if (tvNewestChat_ < tv) {
       tvNewestChat_ = tv;
-      SetChatline(hChat, sText);
+      AddChatline(hChat, sText);
     }
   }
 }
@@ -292,6 +285,31 @@ void Avatar::OnAnimationBegin(const String& sUrl)
   if (sUrl != sImage_) {
     SetImage(sUrl);
     sImage_ = sUrl;
+  }
+}
+
+//----------------------------------------------------------
+
+void Avatar::RemoveOldChats(int nMax)
+{
+  while (chats_.Count() > nMax) {
+    Apollo::TimeValue tvOldestChat;
+    ApHandle hOldestChat;
+    ChatlineListNode* node = 0;
+    for (ChatlineListIterator iter(chats_); (node = iter.Next()); ) {
+      if (tvOldestChat.isNull() || node->Value()->tv_ < tvOldestChat) {
+        tvOldestChat = node->Value()->tv_;
+        hOldestChat = node->Key();
+      }
+    }
+    if (ApIsHandle(hOldestChat)) {
+      Chatline* pOldestChat = 0;
+      chats_.Get(hOldestChat, pOldestChat);
+      chats_.Unset(hOldestChat);
+      delete pOldestChat;
+      pOldestChat = 0;
+      RemoveChatline(hOldestChat);
+    }
   }
 }
 
@@ -323,12 +341,29 @@ void Avatar::DeleteAllChatBubbles(const String& sContainer)
 {
 }
 
+void Avatar::AddChatline(const ApHandle& hChat, const String& sText)
+{
+  DisplaySrpcMessage dsm(pDisplay_, "AddAvatarChat");
+  dsm.srpc.setString("hParticipant", hParticipant_.toString());
+  dsm.srpc.setString("hChat", hChat.toString());
+  dsm.srpc.setString("sText", sText);
+  dsm.Request();
+}
+
 void Avatar::SetChatline(const ApHandle& hChat, const String& sText)
 {
   DisplaySrpcMessage dsm(pDisplay_, "SetAvatarChat");
   dsm.srpc.setString("hParticipant", hParticipant_.toString());
   dsm.srpc.setString("hChat", hChat.toString());
   dsm.srpc.setString("sText", sText);
+  dsm.Request();
+}
+
+void Avatar::RemoveChatline(const ApHandle& hChat)
+{
+  DisplaySrpcMessage dsm(pDisplay_, "RemoveAvatarChat");
+  dsm.srpc.setString("hParticipant", hParticipant_.toString());
+  dsm.srpc.setString("hChat", hChat.toString());
   dsm.Request();
 }
 
