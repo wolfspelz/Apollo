@@ -208,11 +208,27 @@
 			>
 		</Filter>
 		<File
+			RelativePath="..\..\bin\Win32\Debug\modules\WebArena\apollo.js"
+			>
+		</File>
+		<File
+			RelativePath="..\..\bin\Win32\Debug\modules\WebArena\arena.css"
+			>
+		</File>
+		<File
 			RelativePath="..\..\bin\Win32\Debug\modules\WebArena\arena.html"
 			>
 		</File>
 		<File
+			RelativePath="..\..\bin\Win32\Debug\modules\WebArena\arena.js"
+			>
+		</File>
+		<File
 			RelativePath="..\..\bin\Win32\Debug\modules\WebArena\config.txt"
+			>
+		</File>
+		<File
+			RelativePath="..\..\bin\Win32\Debug\modules\WebArena\utils.js"
 			>
 		</File>
 	</Files>

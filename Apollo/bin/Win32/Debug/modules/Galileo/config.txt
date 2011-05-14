@@ -4,3 +4,4 @@ DefaultAnimationDuration=1000
 MaxAnimationFileSize=200000
 MinSuspendRequestSec=5
 MaxSuspendRequestSec=1800
+HTTP/Enabled=1

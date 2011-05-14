@@ -69,6 +69,7 @@ public:
   void On_System_GetRunLevel(Msg_System_GetRunLevel* pMsg);
   void On_System_GetTime(Msg_System_GetTime* pMsg);
   void On_System_GetHandle(Msg_System_GetHandle* pMsg);
+  void On_System_Echo(Msg_System_Echo* pMsg);
   void On_System_SecTimer(Msg_System_SecTimer* pMsg);
   void On_System_GetCmdLineArgs(Msg_System_GetCmdLineArgs* pMsg);
   void On_MainLoop_EventLoopBegin(Msg_MainLoop_EventLoopBegin* pMsg);

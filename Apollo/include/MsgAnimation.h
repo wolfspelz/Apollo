@@ -132,6 +132,8 @@ public:
   ApIN ApHandle hItem;
   ApIN String sName;
   ApIN String sGroup;
+  ApIN String sSrc; // Original source URL
+  ApIN String sUrl; // Use this URL. May point to internal pre-processed data
 };
 
 // Animation ->

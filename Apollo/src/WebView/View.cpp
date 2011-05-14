@@ -437,8 +437,15 @@ JSValueRef View::JS_Apollo_sendMessage(JSContextRef ctx, JSObjectRef function, J
   String sText;
   sText.set((PWSTR) JSStringGetCharactersPtr(arg0), JSStringGetLength(arg0));
 
-  ApSRPCMessage msg("SrpcGate");
-  msg.srpc.fromString(sText);
+  Apollo::SrpcMessage srpc;
+  srpc.fromString(sText);
+  String sType = srpc.getString("ApType");
+  if (!sType) {
+    sType = "SrpcGate";
+  }
+
+  ApSRPCMessage msg(sType);
+  srpc >> msg.srpc;
   (void) msg.Call();
   String sResponse = msg.response.toString();
 

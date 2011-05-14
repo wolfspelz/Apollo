@@ -4,7 +4,7 @@
 function ApMessage(sMethod)
 {
 	this.aParams_ = new Array();
-  if (sMethod != null) {
+  if (sMethod) {
     this.setString('Method', sMethod);
   }
 }
@@ -29,18 +29,21 @@ ApMessage.prototype =
 			  }
 		  }
 	  }
+	  return this;
   },
 
   encodeCString: function(sValue)
   {
 	  var sResult = '';
-	  for (var i = 0; i < sValue.length; i++) {
-		  switch (sValue.charAt(i)) {
-			  case '\\': sResult += '\\\\'; break;
-			  case '\r': sResult += '\\r'; break;
-			  case '\n': sResult += '\\n'; break;
-			  default: sResult += sValue.charAt(i);
-		  }
+	  if (sValue) {
+	    for (var i = 0; i < sValue.length; i++) {
+		    switch (sValue.charAt(i)) {
+			    case '\\': sResult += '\\\\'; break;
+			    case '\r': sResult += '\\r'; break;
+			    case '\n': sResult += '\\n'; break;
+			    default: sResult += sValue.charAt(i);
+		    }
+	    }
 	  }
 	  return sResult;
   },
@@ -70,6 +73,15 @@ ApMessage.prototype =
 
   // ---------------------
   // Getter
+
+  toString: function()
+  {
+    var sMsg = '';
+    for (var i in this.aParams_) {
+      sMsg += i + '=' + this.aParams_[i] + '\n';
+    }
+	  return sMsg;
+  },
 
   decodeCString: function(sValue)
   {
@@ -128,17 +140,14 @@ ApMessage.prototype =
 
   send: function()
   {
-    if (apollo) {
-      var sMsg = '';
-      for (var i in this.aParams_) { sMsg += i + '=' + this.aParams_[i] + '\n'; }
-      if (typeof(onLog) == 'function') { onLog(sMsg); }
+    if (typeof(apollo) != 'undefined') {
+      var sMsg = this.toString();
+      if (typeof(this.onLog) == 'function') { this.onLog('&gt; ' + sMsg); }
 
       var sRespose = apollo.sendMessage(sMsg);
+      if (typeof(this.onLog) == 'function') { this.onLog('&nbsp;&nbsp;&lt; ' + sRespose); }
       
-      var resp = new ApMessage();
-      resp.fromString(sRespose);
-      
-      return resp;
+      return new ApMessage().fromString(sRespose);
     }
   },
 
@@ -182,7 +191,9 @@ Function.prototype.bind = function(fn)
   }
 }
 
-function ApolloApi() {}
+function ApolloApi()
+{
+}
 
 ApolloApi.prototype = 
 {
@@ -190,10 +201,42 @@ ApolloApi.prototype =
   
   // ------------------------------------------------
   // SRPC
+
+  onDispatchMessage: function(msg) {},
   
-  msg: function(sType)
+  receiveMessage: function (sMsg)
   {
-    return new ApMessage(sType);
+    Log.IO('&lt; ' + sMsg);
+
+    var msg = new ApMessage().fromString(sMsg);
+    var resp = null;
+
+    try {
+      if (typeof(this.onDispatchMessage) == 'function') {
+        resp = this.onDispatchMessage(msg);
+      }
+    } catch (ex) {
+      resp = new ApMessage().setInt('Status', 0).setString('Message', String(ex));
+    }
+    
+  //  if (resp == null) {
+  //    resp = new ApMessage().setInt('Status', 1);
+  //  }
+    
+    if (resp != null) {
+      var sResponse = resp.toString();
+      Log.IO('&nbsp;&nbsp;&gt; ' + sResponse);
+      return sResponse;
+    }
+  },
+  
+  newMessage: function(sType)
+  {
+    var msg = new ApMessage(sType);
+    if (sType) {
+      msg.setString('hView', apollo.viewHandle);
+    }
+    return msg;
   },
 
   // ------------------------------------------------
@@ -201,7 +244,7 @@ ApolloApi.prototype =
   
   log: function(nMask, sChannel, sContext, sMessage)
   {
-    return this.msg('Log_Line')
+    return this.newMessage('Log_Line')
       .setInt('nMask', nMask)
       .setString('sChannel', sChannel)
       .setString('sContext', sContext)
@@ -217,9 +260,11 @@ ApolloApi.prototype =
   LogLevelInfo       :  64,
   LogLevelVerbose    : 128,
 
-  logUser: function(sMessage) { this.log(this.LogLevelUser, '', '', sMessage); },
-  logInfo: function(sContext, sMessage) { this.log(this.LogLevelInfo, this.moduleName, sContext, sMessage); },
-  logWarning: function(sContext, sMessage) { this.log(this.LogLevelWarning, this.moduleName, sContext, sMessage); },
+  logError: function(sMessage) { this.log(this.LogLevelError, this.moduleName, 'JS:', sMessage); },
+  logWarning: function(sMessage) { this.log(this.LogLevelWarning, this.moduleName, 'JS:', sMessage); },
+  logUser: function(sMessage) { this.log(this.LogLevelUser, this.moduleName, 'JS:', sMessage); },
+  logDebug: function(sMessage) { this.log(this.LogLevelDebug, this.moduleName, 'JS:', sMessage); },
+  logInfo: function(sMessage) { this.log(this.LogLevelInfo, this.moduleName, 'JS:', sMessage); },
 
   // ------------------------------------------------
   // Babelfish
@@ -231,12 +276,18 @@ ApolloApi.prototype =
       sContext = '';
     }
     
-    return this.msg('Translation_Get')
+    var sTranslated = this.newMessage('Translation_Get')
       .setString('sModule', this.moduleName)
       .setString('sContext', sContext)
       .setString('sText', sText)
       .send()
       .getString('sTranslated');
+      
+      if (sTranslated == '') {
+        return sText;
+      } else {
+        return sTranslated;
+      }
   },
 
   // ------------------------------------------------
@@ -254,7 +305,7 @@ ApolloApi.prototype =
   
   onMouseDown: function(ev)
   {
-    this.msg('WebView_MouseCapture').setString('hView', apollo.viewHandle).send();
+    this.newMessage('WebView_MouseCapture').send();
     this.nStartX = ev.x;
     this.nStartY = ev.y;
     this.bMouseActive = false;
@@ -283,11 +334,11 @@ ApolloApi.prototype =
       }
       if (this.bMouseActive) {
         if (this.bIsMove) {
-          this.msg('WebView_MoveBy').setString('hView', apollo.viewHandle).setInt('nX', dx).setInt('nY', dy).send();
+          this.newMessage('WebView_MoveBy').setInt('nX', dx).setInt('nY', dy).send();
         }
         if (this.bIsSize) {
           if (dx < 0 || dy < 0) {
-            var pos = this.msg('WebView_GetPosition').setString('hView', apollo.viewHandle).send();
+            var pos = this.newMessage('WebView_GetPosition').send();
             var nW = pos.getInt('nW');
             var nH = pos.getInt('nH');
             var nNewW = nW + dx;
@@ -296,8 +347,7 @@ ApolloApi.prototype =
             if (nNewH < this.nMinHeight) { dy = this.nMinHeight - nH; }
           }
 
-          this.msg('WebView_SizeBy')
-            .setString('hView', apollo.viewHandle)
+          this.newMessage('WebView_SizeBy')
             .setInt('nW', dx)
             .setInt('nH', dy)
             .setInt('nDirection', this.nSizeDirection)
@@ -316,7 +366,7 @@ ApolloApi.prototype =
     this.bMouseActive = false;
     this.bIsMove = false;
     this.bIsSize = false;
-    this.msg('WebView_MouseRelease').setString('hView', apollo.viewHandle);
+    this.newMessage('WebView_MouseRelease').send();
   },
 
   initMoveSize: function()

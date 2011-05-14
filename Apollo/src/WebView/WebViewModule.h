@@ -22,6 +22,7 @@ class WebViewModule
 {
 public:
   WebViewModule()
+    :bWebKitUsed_(0)
     {}
 
   int Init();
@@ -60,6 +61,7 @@ public:
 
 public:
   ViewList views_;
+  int bWebKitUsed_;
 
   Apollo::SrpcGateHandlerRegistry srpcGateRegistry_;
   AP_MSG_REGISTRY_DECLARE;

@@ -12,59 +12,78 @@ Arena.prototype = {
     $('#' + this.sDomId).append('<div id="iMeta"><p id="iDocumentUrl"></p><p id="iLocationUrl"></p><p id="iLocationState"></p></div>');
   },
 
-  AddAvatar: function (sId, sNickname, sImageUrl, nX)
+  AddAvatar: function (hParticipant, sNickname, sImageUrl, nX)
   {
-    $('#' + this.sDomId).append(
-  '<div id="iParticipant_' + sId.toDomCompatible() + '" class="cParticipant" style="display:none">'
-+ '  <div class="cChatWrapper">'
-+ '    <div class="cChat"></div>'
-+ '  </div>'
-+ '  <div class="cImageWrapper">'
-+ '    <div class="cAvatar"></div>'
-+ '    <div class="cNickname"></div>'
-+ '  </div>'
-+ '</div>'
+    $('#' + this.sDomId).append(''
+//  + '<div id="iParticipant_' + hParticipant.toDomCompatible() + '" class="cParticipant" style="display:none">'
+//  + '  <div class="cChatWrapper">'
+//  + '    <div class="cChat"></div>'
+//  + '  </div>'
+//  + '  <div class="cImageWrapper">'
+//  + '    <div class="cAvatar"></div>'
+//  + '    <div class="cNickname"></div>'
+//  + '  </div>'
+//  + '</div>'
+
+    + '<div class="cParticipant" id="iParticipant_' + hParticipant.toDomCompatible() + '" style="display:none;">'
+    + '  <div class="cCenter">'
+    + '    <div class="cChatWrapper">'
+    + '      <div class="cChatContainer">'
+    + '        <div class="cChat"></div>'
+    + '      </div>'
+    + '    </div>'
+    + '    <div class="cImageWrapper">'
+    + '      <div class="cImage"></div>'
+    + '      <div class="cNickname">Long Nickname</div>'
+    + '    </div>'
+    + '  </div>'
+    + '</div>'
+
     );
 
-    this.SetAvatarPosition(sId, nX);
-    this.SetAvatarNickname(sId, sNickname);
-    this.SetAvatarImage(sId, sImageUrl);
-    this.ShowAvatar(sId);
+    this.SetAvatarPosition(hParticipant, nX);
+    this.SetAvatarNickname(hParticipant, sNickname);
+    this.SetAvatarImage(hParticipant, sImageUrl);
+    this.ShowAvatar(hParticipant);
   },
 
-  RemoveAvatar: function (sId)
+  RemoveAvatar: function (hParticipant)
   {
-    $('#iParticipant_' + sId.toDomCompatible()).remove();
+    $('#iParticipant_' + hParticipant.toDomCompatible()).remove();
   },
 
-  ShowAvatar: function (sId)
+  ShowAvatar: function (hParticipant)
   {
-    $('#iParticipant_' + sId.toDomCompatible()).css('display', '');
+    $('#iParticipant_' + hParticipant.toDomCompatible()).css('display', '');
   },
 
-  HideAvatar: function (sId)
+  HideAvatar: function (hParticipant)
   {
-    $('#iParticipant_' + sId.toDomCompatible()).css('display', 'none');
+    $('#iParticipant_' + hParticipant.toDomCompatible()).css('display', 'none');
   },
 
-  SetAvatarPosition: function (sId, nX)
+  SetAvatarPosition: function (hParticipant, nX)
   {
-    $('#iParticipant_' + sId.toDomCompatible()).css('left', nX + 'px');
+    $('#iParticipant_' + hParticipant.toDomCompatible()).css('left', nX + 'px');
   },
 
-  SetAvatarNickname: function (sId, sNickname)
+  SetAvatarNickname: function (hParticipant, sNickname)
   {
-    $('#iParticipant_' + sId.toDomCompatible() + ' .cNickname').html(sNickname);
+    $('#iParticipant_' + hParticipant.toDomCompatible() + ' .cNickname').html(sNickname);
   },
 
-  SetAvatarImage: function (sId, sUrl)
+  SetAvatarImage: function (hParticipant, sUrl)
   {
-    $('#iParticipant_' + sId.toDomCompatible() + ' .cAvatar').css('background-image', 'url(' + sUrl + ')');
+    var img = new Image()
+    img.onload = function() {
+      $('#iParticipant_' + hParticipant.toDomCompatible() + ' .cImage').css('background-image', 'url(' + sUrl + ')');
+    }
+    img.src = sUrl;
   },
 
-  SetAvatarChat: function (sId, sText)
+  SetAvatarChat: function (hParticipant, hChat, sText)
   {
-    $('#iParticipant_' + sId.toDomCompatible() + ' .cChat').html(sText);
+    $('#iParticipant_' + hParticipant.toDomCompatible() + ' .cChat').html(sText);
   },
 
   SetDocumentUrl: function (sUrl)

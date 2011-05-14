@@ -513,7 +513,13 @@ AP_MSG_HANDLER_METHOD(ApLib, System_GetTime)
 AP_MSG_HANDLER_METHOD(ApLib, System_GetHandle)
 {
   Apollo::TimeValue tv = Apollo::getNow();
-  pMsg->h= Apollo::newHandle();
+  pMsg->h = Apollo::newHandle();
+  pMsg->apStatus = ApMessage::Ok;
+}
+
+AP_MSG_HANDLER_METHOD(ApLib, System_Echo)
+{
+  pMsg->nOut = pMsg->nIn;
   pMsg->apStatus = ApMessage::Ok;
 }
 
@@ -917,6 +923,7 @@ int ApLib::Init(int nArgc, char** pszArgv)
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ApLib, System_GetRunLevel, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ApLib, System_GetTime, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ApLib, System_GetHandle, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, ApLib, System_Echo, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ApLib, MainLoop_EventLoopBegin, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ApLib, MainLoop_EventLoopEnd, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ApLib, System_SecTimer, this, ApCallbackPosNormal);

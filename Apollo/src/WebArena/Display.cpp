@@ -226,7 +226,10 @@ void Display::OnReceivePublicChat(const ApHandle& hParticipant, const ApHandle& 
 {
   AvatarListNode* pNode = avatars_.Find(hParticipant);
   if (pNode) {
-    pNode->Value()->ReceivePublicChat(hChat, sNickname, sText, tv);
+    Avatar* pAvatar = pNode->Value();
+    if (pAvatar) {
+      pAvatar->OnReceivePublicChat(hChat, sNickname, sText, tv);
+    }
   }
 }
 
@@ -234,7 +237,21 @@ void Display::OnParticipantDetailsChanged(const ApHandle& hParticipant, Apollo::
 {
   AvatarListNode* pNode = avatars_.Find(hParticipant);
   if (pNode) {
-    pNode->Value()->DetailsChanged(vlKeys);
+    Avatar* pAvatar = pNode->Value();
+    if (pAvatar) {
+      pAvatar->OnDetailsChanged(vlKeys);
+    }
+  }
+}
+
+void Display::OnAvatarAnimationBegin(const ApHandle& hParticipant, const String& sUrl)
+{
+  AvatarListNode* pNode = avatars_.Find(hParticipant);
+  if (pNode) {
+    Avatar* pAvatar = pNode->Value();
+    if (pAvatar) {
+      pAvatar->OnAnimationBegin(sUrl);
+    }
   }
 }
 
@@ -317,7 +334,7 @@ void Display::ProcessAddedParticipants(ParticipantFlags& addedParticipants)
     Avatar* pAvatar = new Avatar(pModule_, this, hParticipant);
     if (pAvatar) {
       avatars_.Set(hParticipant, pAvatar);
-      pAvatar->Show();
+      pAvatar->Create();
     }
   }
 }
@@ -330,7 +347,7 @@ void Display::ProcessRemovedParticipants(ParticipantFlags& removedParticipants)
     Avatar* pAvatar = 0;
     avatars_.Get(hParticipant, pAvatar);
     if (pAvatar) {
-      pAvatar->Hide();
+      pAvatar->Destroy();
       avatars_.Unset(hParticipant);
       delete pAvatar;
       pAvatar = 0;

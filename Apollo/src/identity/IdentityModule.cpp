@@ -1158,6 +1158,7 @@ AP_MSG_HANDLER_METHOD(IdentityModule, Server_HttpRequest)
   #define IdentityModule_Server_HttpRequest_sUriPrefix "/" MODULE_NAME
 
   if (Apollo::getModuleConfig(MODULE_NAME, "HTTP/Enabled", 1) && pMsg->sUri.startsWith(IdentityModule_Server_HttpRequest_sUriPrefix)) {
+
     String sUriPrefix = IdentityModule_Server_HttpRequest_sUriPrefix;
     try {
       String sQuery = pMsg->sUri;
@@ -1261,6 +1262,8 @@ AP_MSG_HANDLER_METHOD(IdentityModule, Server_HttpRequest)
       pMsg->apStatus = ApMessage::Ok;
 
     } catch (ApException& ex) {
+
+      apLog_Warning((LOG_CHANNEL, "IdentityModule::Server_HttpRequest", "%s", StringType(ex.getText())));
 
       Msg_Server_HttpResponse msgSHR;
       msgSHR.hConnection = pMsg->hConnection;

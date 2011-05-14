@@ -5,10 +5,12 @@
 // ============================================================================
 
 #include "Apollo.h"
+#include "ApLog.h"
 #include "srpcgate.h"
 #include "MsgMainLoop.h"
 #include "MsgSrpcGate.h"
 #include "MsgServer.h"
+#include "SrpcGateHelper.h"
 
 #if defined(WIN32)
 BOOL APIENTRY DllMain(HANDLE hModule, DWORD dwReason, LPVOID lpReserved)
@@ -79,6 +81,8 @@ public:
 
   void On_Server_HttpRequest(Msg_Server_HttpRequest* pMsg);
 
+  Apollo::SrpcGateHandlerRegistry srpcGateRegistry_;
+
 protected:
   HandlerList handlers_;
 };
@@ -139,6 +143,7 @@ void SrpcGateModule::On_Server_HttpRequest(Msg_Server_HttpRequest* pMsg)
   #define SrpcGateModule_Server_HttpRequest_sUriPrefix "/" MODULE_NAME
 
   if (Apollo::getModuleConfig(MODULE_NAME, "HTTP/Enabled", 1) && pMsg->sUri.startsWith(SrpcGateModule_Server_HttpRequest_sUriPrefix)) {
+
     String sUriPrefix = SrpcGateModule_Server_HttpRequest_sUriPrefix;
     try {
       Apollo::SrpcMessage request;
@@ -190,6 +195,8 @@ void SrpcGateModule::On_Server_HttpRequest(Msg_Server_HttpRequest* pMsg)
       pMsg->apStatus = ApMessage::Ok;
 
     } catch (ApException& ex) {
+
+      apLog_Warning((LOG_CHANNEL, "SrpcGateModule::Server_HttpRequest", "%s", StringType(ex.getText())));
 
       Msg_Server_HttpResponse msgSHR;
       msgSHR.hConnection = pMsg->hConnection;
@@ -280,24 +287,25 @@ void SrpcGate_Vp_CloseContext(ApSRPCMessage* pMsg)
 void SrpcGate_System_GetTime(ApSRPCMessage* pMsg)
 {
   Msg_System_GetTime msg;
-  if (!msg.Request()) {
-    pMsg->response.createError(pMsg->srpc, msg.sComment);
-  } else {
-    pMsg->response.createResponse(pMsg->srpc);
-    pMsg->response.setInt("nSec", msg.nSec);
-    pMsg->response.setInt("nMicroSec", msg.nMicroSec);
-  }
+  SRPCGATE_HANDLER_NATIVE_REQUEST(pMsg, msg);
+  pMsg->response.createResponse(pMsg->srpc);
+  pMsg->response.setInt("nSec", msg.nSec);
+  pMsg->response.setInt("nMicroSec", msg.nMicroSec);
 }
 
 void SrpcGate_System_GetHandle(ApSRPCMessage* pMsg)
 {
   Msg_System_GetHandle msg;
-  if (!msg.Request()) {
-    pMsg->response.createError(pMsg->srpc, msg.sComment);
-  } else {
-    pMsg->response.createResponse(pMsg->srpc);
-    pMsg->response.setString("h", msg.h.toString());
-  }
+  SRPCGATE_HANDLER_NATIVE_REQUEST(pMsg, msg);
+  pMsg->response.setString("h", msg.h.toString());
+}
+
+void SrpcGate_System_Echo(ApSRPCMessage* pMsg)
+{
+  Msg_System_Echo msg;
+  msg.nIn = pMsg->srpc.getInt("nIn");
+  SRPCGATE_HANDLER_NATIVE_REQUEST(pMsg, msg);
+  pMsg->response.setInt("nOut", msg.nOut);
 }
 
 //--------------------------
@@ -346,32 +354,31 @@ SRPCGATE_API int Load(AP_MODULE_CALL* pModuleData)
 
   { Msg_Server_HttpRequest msg; msg.Hook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(SrpcGateModule, Server_HttpRequest), SrpcGateModuleInstance::Get(), Apollo::modulePos(ApCallbackPosEarly, MODULE_NAME)); }
 
-  { Msg_SrpcGate_Register msg; msg.sCallName = "MainLoop_EndLoop"; msg.fnHandler = SrpcGate_MainLoop_EndLoop; msg.Request(); }
-  { Msg_SrpcGate_Register msg; msg.sCallName = "Xmpp_Connect"; msg.fnHandler = SrpcGate_Xmpp_Connect; msg.Request(); }
-  { Msg_SrpcGate_Register msg; msg.sCallName = "Xmpp_Disconnect"; msg.fnHandler = SrpcGate_Xmpp_Disconnect; msg.Request(); }
-  { Msg_SrpcGate_Register msg; msg.sCallName = "Vp_NavigateContext"; msg.fnHandler = SrpcGate_Vp_NavigateContext; msg.Request(); }
-  { Msg_SrpcGate_Register msg; msg.sCallName = "Vp_CloseContext"; msg.fnHandler = SrpcGate_Vp_CloseContext; msg.Request(); }
-  { Msg_SrpcGate_Register msg; msg.sCallName = "System_GetTime"; msg.fnHandler = SrpcGate_System_GetTime; msg.Request(); }
-  { Msg_SrpcGate_Register msg; msg.sCallName = "System_GetHandle"; msg.fnHandler = SrpcGate_System_GetHandle; msg.Request(); }
-  { Msg_SrpcGate_Register msg; msg.sCallName = "Config_SetValue"; msg.fnHandler = SrpcGate_Config_SetValue; msg.Request(); }
-  { Msg_SrpcGate_Register msg; msg.sCallName = "Config_GetValue"; msg.fnHandler = SrpcGate_Config_GetValue; msg.Request(); }
+  SrpcGateModule* pModule = SrpcGateModuleInstance::Get();
+  if (pModule) {
+    pModule->srpcGateRegistry_.add("MainLoop_EndLoop", SrpcGate_MainLoop_EndLoop);
+    pModule->srpcGateRegistry_.add("Xmpp_Connect", SrpcGate_Xmpp_Connect);
+    pModule->srpcGateRegistry_.add("Xmpp_Disconnect", SrpcGate_Xmpp_Disconnect);
+    pModule->srpcGateRegistry_.add("Vp_NavigateContext", SrpcGate_Vp_NavigateContext);
+    pModule->srpcGateRegistry_.add("Vp_CloseContext", SrpcGate_Vp_CloseContext);
+    pModule->srpcGateRegistry_.add("System_GetTime", SrpcGate_System_GetTime);
+    pModule->srpcGateRegistry_.add("System_GetHandle", SrpcGate_System_GetHandle);
+    pModule->srpcGateRegistry_.add("System_Echo", SrpcGate_System_Echo);
+    pModule->srpcGateRegistry_.add("Config_SetValue", SrpcGate_Config_SetValue);
+    pModule->srpcGateRegistry_.add("Config_GetValue", SrpcGate_Config_GetValue);
+  }
 
-  return SrpcGateModuleInstance::Get() != 0;
+  return pModule != 0;
 }
 
 SRPCGATE_API int UnLoad(AP_MODULE_CALL* pModuleData)
 {
   AP_UNUSED_ARG(pModuleData);
 
-  { Msg_SrpcGate_Unregister msg; msg.sCallName = "MainLoop_EndLoop"; msg.Request(); }
-  { Msg_SrpcGate_Unregister msg; msg.sCallName = "Xmpp_Connect"; msg.Request(); }
-  { Msg_SrpcGate_Unregister msg; msg.sCallName = "Xmpp_Disconnect"; msg.Request(); }
-  { Msg_SrpcGate_Unregister msg; msg.sCallName = "Vp_NavigateContext"; msg.Request(); }
-  { Msg_SrpcGate_Unregister msg; msg.sCallName = "Vp_CloseContext"; msg.Request(); }
-  { Msg_SrpcGate_Unregister msg; msg.sCallName = "System_GetTime"; msg.Request(); }
-  { Msg_SrpcGate_Unregister msg; msg.sCallName = "System_GetHandle"; msg.Request(); }
-  { Msg_SrpcGate_Unregister msg; msg.sCallName = "Config_SetValue"; msg.Request(); }
-  { Msg_SrpcGate_Unregister msg; msg.sCallName = "Config_GetValue"; msg.Request(); }
+  SrpcGateModule* pModule = SrpcGateModuleInstance::Get();
+  if (pModule) {
+    pModule->srpcGateRegistry_.finish();
+  }
 
   { Msg_SrpcGate_Register msg; msg.UnHook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(SrpcGateModule, SrpcGate_Register), SrpcGateModuleInstance::Get()); }
   { Msg_SrpcGate_Unregister msg; msg.UnHook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(SrpcGateModule, SrpcGate_Unregister), SrpcGateModuleInstance::Get()); }

@@ -58,6 +58,7 @@ AP_MSG_HANDLER_METHOD(WebViewModule, WebView_Create)
 {
   if (views_.Find(pMsg->hView) != 0) { throw ApException("WebViewModule::WebView_Create: webview=" ApHandleFormat " already exists", ApHandleType(pMsg->hView)); }
   View* pView = CreateView(pMsg->hView);
+  bWebKitUsed_ = 1;
   pMsg->apStatus = ApMessage::Ok;
 }
 
@@ -379,7 +380,10 @@ void WebViewModule::Exit()
   AP_UNITTEST_UNHOOK(WebViewModule, this);
   AP_MSG_REGISTRY_FINISH;
 
-  shutDownWebKit();
+  if (bWebKitUsed_) {
+    // Otherwise this crashes in iconDatabase() because mainThreadIdentifier was never initialized and hence isMainThread() fails
+    shutDownWebKit();
+  }
 
 #if defined(WIN32)
   ::OleUninitialize();

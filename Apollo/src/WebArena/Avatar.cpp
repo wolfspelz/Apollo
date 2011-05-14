@@ -17,12 +17,6 @@ Avatar::Avatar(WebArenaModule* pModule, Display* pDisplay, const ApHandle& hPart
 ,pDisplay_(pDisplay)
 ,hParticipant_(hParticipant)
 ,hAnimatedItem_(ApNoHandle)
-,nMaxW_(100)
-,nMaxH_(100)
-,nW_(100)
-,nH_(100)
-,nMinW_(20)
-,nMinH_(20)
 ,nX_(300)
 ,nPositionConfirmed_(0)
 {
@@ -55,7 +49,8 @@ void Avatar::GetDetail(const String& sKey)
 {
   if (0) {
   } else if (sKey == Msg_VpView_ParticipantDetail_avatar) {
-    GetDetailRef(sKey, avatarMimeTypes_);
+    GetDetailData(sKey, avatarMimeTypes_);
+//Ref    GetDetailRef(sKey, avatarMimeTypes_);
   } else {
     GetDetailString(sKey, noMimeTypes_);
   }
@@ -113,6 +108,75 @@ void Avatar::GetDetailRef(const String& sKey, Apollo::ValueList& vlMimeTypes)
   }
 }
 
+void Avatar::GetDetailData(const String& sKey, Apollo::ValueList& vlMimeTypes)
+{
+  Msg_VpView_GetParticipantDetailData msg;
+  msg.hParticipant = hParticipant_;
+  msg.sKey = sKey;
+  msg.vlMimeTypes = vlMimeTypes;
+  if (msg.Request()) {
+
+    if (0) {
+    } else if (sKey == Msg_VpView_ParticipantDetail_avatar) {
+      HandleImageData(msg.sMimeType, msg.sSource, msg.sbData);
+    }
+  }
+}
+
+void Avatar::HandleImageData(const String& sMimeType, const String& sSource, Buffer& sbData)
+{
+  if (!ApIsHandle(hAnimatedItem_)) {
+    Msg_Animation_Create msgAC;
+    msgAC.hItem = Apollo::newHandle();
+    msgAC.sMimeType = sMimeType;
+    if (!msgAC.Request()) {
+      apLog_Error((LOG_CHANNEL, "Avatar::HandleImageData", "Msg_Animation_Create failed: participant=" ApHandleFormat "", ApHandleType(hParticipant_)));
+    } else {
+      hAnimatedItem_ = msgAC.hItem;
+    }
+  }
+
+  if (ApIsHandle(hAnimatedItem_)) {
+    Msg_Animation_SetRate msgASR;
+    msgASR.hItem = hAnimatedItem_;
+    msgASR.nMaxRate = 10;
+    if (!msgASR.Request()) {
+      apLog_Error((LOG_CHANNEL, "Avatar::HandleImageData", "Msg_Animation_SetRate failed: participant=" ApHandleFormat "", ApHandleType(hParticipant_)));
+    }
+  }
+
+  if (ApIsHandle(hAnimatedItem_)) {
+    Msg_Animation_SetData msgASD;
+    msgASD.hItem = hAnimatedItem_;
+    msgASD.sbData = sbData;
+
+    String sSourceTokenizer = sSource;
+    String sSourceType;
+    sSourceTokenizer.nextToken(Msg_VpView_ParticipantDetail_SourceSeparator, sSourceType);
+    if (sSourceType == Msg_VpView_ParticipantDetail_SourcePrefix_IdentityItemUrl) {
+      String sUrl = sSourceTokenizer;
+      msgASD.sSourceUrl = sUrl;
+    }
+
+    if (!msgASD.Request()) {
+      apLog_Error((LOG_CHANNEL, "Avatar::HandleImageData", "Msg_Animation_SetData failed: participant=" ApHandleFormat " data:%d bytes, source=%s", ApHandleType(hParticipant_), sbData.Length(), StringType(sSource)));
+    }
+  }
+
+  if (ApIsHandle(hAnimatedItem_)) {
+    if (pModule_) {
+      pModule_->SetContextOfHandle(hAnimatedItem_, pDisplay_->GetContext());
+      pModule_->SetParticipantOfAnimation(hAnimatedItem_, hParticipant_);
+    }
+
+    Msg_Animation_Start msgAS;
+    msgAS.hItem = hAnimatedItem_;
+    if (!msgAS.Request()) {
+      apLog_Error((LOG_CHANNEL, "Avatar::HandleImageData", "Msg_Animation_Start failed: participant=" ApHandleFormat "", ApHandleType(hParticipant_)));
+    }
+  }
+}
+
 void Avatar::UnSubscribeDetail(const String& sKey)
 {
   Msg_VpView_UnsubscribeParticipantDetail msg;
@@ -130,15 +194,8 @@ void Avatar::UnSubscribeDetail(const String& sKey)
 }
 
 
-void Avatar::Show()
+void Avatar::Create()
 {
-  nMaxW_ = Apollo::getModuleConfig(MODULE_NAME, "Avatar/MaxWidth", 100);
-  nMaxH_ = Apollo::getModuleConfig(MODULE_NAME, "Avatar/MaxHeight", 100);
-  nW_ = nMaxW_;
-  nH_ = nMaxH_;
-  nMinW_ = Apollo::getModuleConfig(MODULE_NAME, "Avatar/MinWidth", 20);
-  nMinH_ = Apollo::getModuleConfig(MODULE_NAME, "Avatar/MinHeight", 20);
-
   {
     Msg_VpView_GetParticipantDetailString msg;
     msg.hParticipant = hParticipant_;
@@ -163,7 +220,7 @@ void Avatar::Show()
   SubscribeAndGetDetail(Msg_VpView_ParticipantDetail_ProfileUrl);
 }
 
-void Avatar::Hide()
+void Avatar::Destroy()
 {
   UnSubscribeDetail(Msg_VpView_ParticipantDetail_Nickname);
   UnSubscribeDetail(Msg_VpView_ParticipantDetail_avatar);
@@ -173,12 +230,33 @@ void Avatar::Hide()
   UnSubscribeDetail(Msg_VpView_ParticipantDetail_Condition);
   UnSubscribeDetail(Msg_VpView_ParticipantDetail_ProfileUrl);
 
+  if (ApIsHandle(hAnimatedItem_)) {
+    if (pModule_) {
+      pModule_->DeleteContextOfHandle(hAnimatedItem_, pDisplay_->GetContext());
+      pModule_->DeleteParticipantOfAnimation(hAnimatedItem_, hParticipant_);
+    }
+
+    Msg_Animation_Stop msgAS;
+    msgAS.hItem = hAnimatedItem_;
+    if (!msgAS.Request()) {
+      apLog_Error((LOG_CHANNEL, "Avatar::Hide", "Msg_Animation_Stop failed: participant=" ApHandleFormat "", ApHandleType(hParticipant_)));
+    }
+  }
+
+  if (ApIsHandle(hAnimatedItem_)) {
+    Msg_Animation_Destroy msg;
+    msg.hItem = hAnimatedItem_;
+    if (!msg.Request()) {
+      apLog_Error((LOG_CHANNEL, "Avatar::Hide", "Msg_Animation_Destroy failed: participant=" ApHandleFormat "", ApHandleType(hParticipant_)));
+    }
+  }
+
   DisplaySrpcMessage dsm(pDisplay_, "RemoveAvatar");
   dsm.srpc.setString("hParticipant", hParticipant_.toString());
   dsm.Request();
 }
 
-void Avatar::DetailsChanged(Apollo::ValueList& vlKeys)
+void Avatar::OnDetailsChanged(Apollo::ValueList& vlKeys)
 {
   for (Apollo::ValueElem* e = 0; e = vlKeys.nextElem(e); ) {
     String sKey = e->getString();
@@ -186,7 +264,7 @@ void Avatar::DetailsChanged(Apollo::ValueList& vlKeys)
   }
 }
 
-void Avatar::ReceivePublicChat(const ApHandle& hChat, const String& sNickname, const String& sText, const Apollo::TimeValue& tv)
+void Avatar::OnReceivePublicChat(const ApHandle& hChat, const String& sNickname, const String& sText, const Apollo::TimeValue& tv)
 {
   Chatline* pChat = 0;
   chats_.Get(hChat, pChat);
@@ -206,6 +284,14 @@ void Avatar::ReceivePublicChat(const ApHandle& hChat, const String& sNickname, c
       tvNewestChat_ = tv;
       SetChatline(hChat, sText);
     }
+  }
+}
+
+void Avatar::OnAnimationBegin(const String& sUrl)
+{
+  if (sUrl != sImage_) {
+    SetImage(sUrl);
+    sImage_ = sUrl;
   }
 }
 
@@ -241,6 +327,7 @@ void Avatar::SetChatline(const ApHandle& hChat, const String& sText)
 {
   DisplaySrpcMessage dsm(pDisplay_, "SetAvatarChat");
   dsm.srpc.setString("hParticipant", hParticipant_.toString());
+  dsm.srpc.setString("hChat", hChat.toString());
   dsm.srpc.setString("sText", sText);
   dsm.Request();
 }
@@ -275,75 +362,3 @@ void Avatar::SetPosition(int nX)
   dsm.srpc.setInt("nX", nX);
   dsm.Request();
 }
-
-//----------------------------------------------------------
-
-String Avatar::TruncateElementText(const ApHandle& hView, const String& sText, const String& sFont, int nSize, int nFlags, int nWidth)
-{
-  String sResult = sText;
-
-  //int nCnt = 0;
-  //int bDone = 0;
-  //while (!bDone) {
-  //  nCnt++;
-  //  if (nCnt == 20) {
-  //    bDone = 1;
-  //    sResult = String::truncate(sText, 8, "...");
-  //  } else {
-  //    double fTextBearingX, fTextBearingY, fTextW, fTextH, fTextAdvanceX, fTextAdvanceY;
-  //    Msg_Scene_GetTextExtents::_(hView, sWork, sFont, nSize, nFlags, fTextBearingX, fTextBearingY, fTextW, fTextH, fTextAdvanceX, fTextAdvanceY);
-  //    if (fTextW <= nWidth) {
-  //      bDone = 1;
-  //      sResult = sWork;
-  //    } else {
-  //      int nLength = sWork.chars();
-  //      double fFraction = ((double) nWidth) / fTextW;
-  //      int nNextLength = ((double) nLength) * (fFraction * 1.5);
-  //      int nDeduce = nLength - nNextLength;
-  //      if (nDeduce < 1) {
-  //        nDeduce = 1;
-  //      }
-  //      sWork = sWork.subString(0, nLength - nDeduce);
-  //    }
-  //  }
-  //}
-
-  return sResult;
-}
-
-//----------------------------------------------------------
-
-#if defined(AP_TEST)
-
-String Avatar::Test_TruncateElementText1(const ApHandle& hView, const String& sNickname, const String& sFont, int nSize, int nFlags, int nWidth, const String& sExpected)
-{
-  String s;
-
-  String sTruncated = TruncateElementText(hView, sNickname, sFont, nSize, nFlags, nWidth);
-  if (sTruncated != sExpected) {
-    s.appendf("Expected=%s got=%s for font=%s size=%d flags=%d width=%d", StringType(sExpected), StringType(sTruncated), StringType(sFont), nSize, nFlags, nWidth);
-  }
-
-  return s;
-}
-
-String Avatar::Test_TruncateElementText()
-{
-  String s;
-
-  //if (!s) { s = Test_TruncateElementText1(hView, "123456789 123456789 123456789 123456789 123456789 ", "Courier New", 14, Msg_Scene_FontFlags::Normal, 10, "1"); }
-  //if (!s) { s = Test_TruncateElementText1(hView, "123456789 123456789 123456789 123456789 123456789 ", "Courier New", 14, Msg_Scene_FontFlags::Normal, 30, "1234"); }
-  //if (!s) { s = Test_TruncateElementText1(hView, "123456789 123456789 123456789 123456789 123456789 ", "Courier New", 9, Msg_Scene_FontFlags::Normal, 30, "123456"); }
-  //if (!s) { s = Test_TruncateElementText1(hView, "123456789 123456789 123456789 123456789 123456789 ", "Courier New", 14, Msg_Scene_FontFlags::Normal, 80, "123456789 "); }
-  //if (!s) { s = Test_TruncateElementText1(hView, "123456789 123456789 123456789 123456789 123456789 ", "Arial Narrow", 14, Msg_Scene_FontFlags::Normal, 80, "123456789 1234"); }
-  //if (!s) { s = Test_TruncateElementText1(hView, "123456789 123456789 123456789 123456789 123456789 ", "Verdana", 12, Msg_Scene_FontFlags::Normal, 80, "123456789 "); }
-  //if (!s) { s = Test_TruncateElementText1(hView, "123456789 123456789 123456789 123456789 123456789 ", "Verdana", 10, Msg_Scene_FontFlags::Normal, 80, "123456789 123"); }
-  //if (!s) { s = Test_TruncateElementText1(hView, "123456789", "Verdana", 10, Msg_Scene_FontFlags::Normal, 80, "123456789"); }
-  //if (!s) { s = Test_TruncateElementText1(hView, "1", "Verdana", 10, Msg_Scene_FontFlags::Normal, 80, "1"); }
-  //if (!s) { s = Test_TruncateElementText1(hView, "\xE9\xA0\x81" "\xE9\xA6\x96", "Verdana", 10, Msg_Scene_FontFlags::Normal, 80, "\xE9\xA0\x81" "\xE9\xA6\x96"); }
-  //if (!s) { s = Test_TruncateElementText1(hView, "\xE9\xA0\x81" "\xE9\xA6\x96" "\xE9\xA0\x81" "\xE9\xA6\x96" "\xE9\xA0\x81" "\xE9\xA6\x96" "\xE9\xA0\x81" "\xE9\xA6\x96" "\xE9\xA0\x81" "\xE9\xA6\x96" "\xE9\xA0\x81" "\xE9\xA6\x96", "Verdana", 10, Msg_Scene_FontFlags::Normal, 80, "\xE9\xA0\x81" "\xE9\xA6\x96" "\xE9\xA0\x81" "\xE9\xA6\x96" "\xE9\xA0\x81" "\xE9\xA6\x96" "\xE9\xA0\x81" "\xE9\xA6\x96"); }
-
-  return s;
-}
-
-#endif // #if defined(AP_TEST)

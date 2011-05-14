@@ -9,12 +9,15 @@
 #include "MsgConfig.h"
 #include "MsgDB.h"
 #include "Local.h"
+#include "URL.h"
 #include "GalileoModule.h"
 #include "GalileoModuleTester.h"
 #include "AnimationClient.h"
 
 GalileoModule::GalileoModule()
 :bInShutdown_(false)
+,nLocalHttpServerPort_(23761)
+,bLocalHttpServerActive_(0)
 ,sDb_(DB_NAME)
 {
 }
@@ -198,14 +201,6 @@ Item* GalileoModule::GetItemByTimer(const ApHandle& hTimer)
   return pResult;
 }
 
-AP_MSG_HANDLER_METHOD(GalileoModule, Timer_Event)
-{
-  Item* pItem = GetItemByTimer(pMsg->hTimer);
-  if (pItem == 0) { return; }
-
-  pItem->OnTimer();
-}
-
 AP_MSG_HANDLER_METHOD(GalileoModule, Galileo_RequestAnimation)
 {
   int ok = 0;
@@ -248,32 +243,6 @@ AP_MSG_HANDLER_METHOD(GalileoModule, Galileo_RequestAnimationComplete)
         }
       }
     }
-  }
-}
-
-AP_MSG_HANDLER_METHOD(GalileoModule, System_AfterLoadModules)
-{
-  AP_UNUSED_ARG(pMsg);
-
-  Msg_DB_Open msg;
-  msg.sName = sDb_;
-  int ok = msg.Request();
-  if (!ok) {
-    apLog_Error((LOG_CHANNEL, "GalileoModule::System_AfterLoadModules", "Msg_DB_Open %s failed", StringType(msg.sName)));
-  }
-}
-
-AP_MSG_HANDLER_METHOD(GalileoModule, System_BeforeUnloadModules)
-{
-  AP_UNUSED_ARG(pMsg);
-
-  bInShutdown_ = true;
-
-  Msg_DB_Close msg;
-  msg.sName = sDb_;
-  int ok = msg.Request();
-  if (!ok) {
-    apLog_Error((LOG_CHANNEL, "GalileoModule::System_BeforeUnloadModules", "Msg_DB_Close %s failed", StringType(msg.sName)));
   }
 }
 
@@ -381,6 +350,230 @@ AP_MSG_HANDLER_METHOD(GalileoModule, Galileo_ExpireAllStorage)
   pMsg->apStatus = ApMessage::Ok;
 }
 
+AP_MSG_HANDLER_METHOD(GalileoModule, Timer_Event)
+{
+  Item* pItem = GetItemByTimer(pMsg->hTimer);
+  if (pItem == 0) { return; }
+
+  pItem->OnTimer();
+}
+
+AP_MSG_HANDLER_METHOD(GalileoModule, System_AfterLoadModules)
+{
+  AP_UNUSED_ARG(pMsg);
+
+  Msg_DB_Open msg;
+  msg.sName = sDb_;
+  int ok = msg.Request();
+  if (!ok) {
+    apLog_Error((LOG_CHANNEL, "GalileoModule::System_AfterLoadModules", "Msg_DB_Open %s failed", StringType(msg.sName)));
+  }
+}
+
+AP_MSG_HANDLER_METHOD(GalileoModule, System_BeforeUnloadModules)
+{
+  AP_UNUSED_ARG(pMsg);
+
+  bInShutdown_ = true;
+
+  Msg_DB_Close msg;
+  msg.sName = sDb_;
+  int ok = msg.Request();
+  if (!ok) {
+    apLog_Error((LOG_CHANNEL, "GalileoModule::System_BeforeUnloadModules", "Msg_DB_Close %s failed", StringType(msg.sName)));
+  }
+}
+
+AP_MSG_HANDLER_METHOD(GalileoModule, System_RunLevel)
+{
+  if (0) {
+  } else if (pMsg->sLevel == Msg_System_RunLevel_Normal) {
+    sLocalHttpServerAddress_ = Apollo::getConfig("Server/HTTP/Address", "localhost");
+    nLocalHttpServerPort_ = Apollo::getConfig("Server/HTTP/Port", 23761);
+    bLocalHttpServerActive_ = 1;
+  }
+}
+
+String GalileoModule::GetSequenceDataCacheUrl(ApHandle& hItem, const String& sGroup, const String& sName)
+{
+  if (bLocalHttpServerActive_) {
+    Apollo::UrlBuilder url;
+    url.setHost(sLocalHttpServerAddress_);
+    url.setPort(nLocalHttpServerPort_);
+    url.setPath("/");
+    url.setFile(MODULE_NAME);
+    url.setQueryParam("cmd", "data");
+    url.setQueryParam("id", hItem.toString());
+    url.setQueryParam("group", sGroup);
+    url.setQueryParam("name", sName);
+    return url();
+  } else {
+    return "";
+  }
+}
+
+AP_MSG_HANDLER_METHOD(GalileoModule, Server_HttpRequest)
+{
+  #define GalileoModule_Server_HttpRequest_sUriPrefix "/" MODULE_NAME
+
+  if (Apollo::getModuleConfig(MODULE_NAME, "HTTP/Enabled", 1) && pMsg->sUri.startsWith(GalileoModule_Server_HttpRequest_sUriPrefix)) {
+
+    String sUriPrefix = GalileoModule_Server_HttpRequest_sUriPrefix;
+    try {
+      String sQuery = pMsg->sUri;
+      String sBase; sQuery.nextToken("?", sBase);
+
+      String sCmd;
+      List lQuery;
+      KeyValueBlob2List(sQuery, lQuery, "&", "=", "");
+      for (Elem* e = 0; (e = lQuery.Next(e)) != 0; ) {
+        String sKey = e->getName();
+        String sValue = e->getString();
+        sKey.unescape(String::EscapeURL);
+        sValue.unescape(String::EscapeURL);
+        e->setName(sKey);
+        e->setString(sValue);
+      }
+      sCmd = lQuery["cmd"].getString();
+      if (sCmd.empty()) { sCmd = "menu"; }
+
+      Msg_Server_HttpResponse msgSHR;
+
+      String sHtml;
+      Apollo::UriBuilder baseUri;
+      baseUri.setPath("/");
+      baseUri.setFile(MODULE_NAME);
+
+      if (0) {
+      } else if (sCmd == "menu") {
+        Apollo::UriBuilder uri = baseUri;
+        uri.setQueryParam("cmd", "cache");
+        sHtml.appendf("<a href=\"%s\">List cache</a>", StringType(uri()));
+
+      } else if (sCmd == "cache") {
+        ItemListIterator iter(items_);
+        for (ItemListNode* pNode = 0; (pNode = iter.Next()) != 0; ) {
+          Item* pItem = pNode->Value();
+          if (pItem) {
+            sHtml.appendf("%s <a href=\"%s\">%s</a>\n", StringType(pItem->apHandle().toString()), StringType(pItem->Src()), StringType(pItem->Src()));
+            for (Group* pGroup = 0; (pGroup = pItem->Groups().Next(pGroup)) != 0; ) {
+              for (Sequence* pSequence = 0; (pSequence = pGroup->Next(pSequence)) != 0; ) {
+
+                Apollo::UriBuilder sequenceUri = baseUri;
+                sequenceUri.setQueryParam("cmd", "data");
+                sequenceUri.setQueryParam("id", pItem->apHandle().toString());
+                sequenceUri.setQueryParam("group", pGroup->getName());
+                sequenceUri.setQueryParam("name", pSequence->getName());
+        
+                Animation* pAnimation = pSequence->First();
+                if (pAnimation) {
+                  sHtml.appendf("  <a href=\"%s\">%s</a> %s %s <a href=\"%s\">%s</a>\n" 
+                    , StringType(sequenceUri())
+                    , StringType(pSequence->getName())
+                    , pAnimation->HasData() ? "mem" : ""
+                    , pAnimation->HasDataInCache() ? "storage" : ""
+                    , StringType(pSequence->Src())
+                    , StringType(pSequence->Src())
+                    );
+                } else {
+                  sHtml.appendf("  tsnh: no animation\n");
+                }
+
+              }
+           }
+          }
+        }
+
+      } else if (sCmd == "data") {
+        String sId = lQuery["id"].getString();
+        String sGroup = lQuery["group"].getString();
+        String sName = lQuery["name"].getString();
+
+        ApHandle hItem; hItem.fromString(sId);
+        if (!ApIsHandle(hItem)) { throw ApException("No handle: id=%s", StringType(sId)); }
+        if (!sGroup) { throw ApException("No group"); }
+        if (!sName) { throw ApException("No name"); }
+
+        ItemListNode* pItemNode = items_.Find(hItem);
+        if (pItemNode == 0) { throw ApException("No item for " ApHandleFormat "", ApHandleType(hItem)); }
+
+        Item* pItem = pItemNode->Value();
+        if (pItem == 0) { throw ApException("pItem == 0"); }
+
+        Group* pGroup = pItem->Groups().FindByName(sGroup);
+        if (pGroup == 0) { throw ApException("No group for group=%s", StringType(sGroup)); }
+
+        Sequence* pSequence = pGroup->FindByName(sName);
+        if (pSequence == 0) { throw ApException("No group for sequence name=%s", StringType(sName)); }
+
+        Animation* pAnimation = pSequence->First();
+        if (pAnimation == 0) { throw ApException("No first animation for sequence"); }
+
+        int bLoadedForServer = 0;
+        if (!pAnimation->HasData()) { 
+          if (pAnimation->HasDataInCache()) {
+            pAnimation->GetDataFromCache();
+            if (pAnimation->HasData()) {
+              bLoadedForServer = 1;
+            }
+          }
+        }
+
+        if (!pAnimation->HasData()) { throw ApException("Data not in memory"); }
+
+        String sMimeType;
+        pAnimation->GetAnimationData(msgSHR.sbBody, sMimeType);
+        msgSHR.kvHeader.add("Content-type", sMimeType);
+
+        if (bLoadedForServer) {
+          pAnimation->FlushData();
+        }
+
+      } else {
+         throw ApException("Unknown cmd=%s", StringType(sCmd));
+      }
+
+      if (!sHtml.empty()) {
+        String sData = "<html><head><title>Galileo</title></head><body><pre>" + sHtml + "</pre></body></html>";
+        msgSHR.sbBody.SetData(sData);
+        msgSHR.kvHeader.add("Content-type", "text/html");
+      }
+
+      msgSHR.hConnection = pMsg->hConnection;
+      //msgSHR.kvHeader.add("Pragma", "no-cache");
+      //msgSHR.kvHeader.add("Cache-Control", "no-store, no-cache, must-revalidate, post-check=0, pre-check=0");
+      //msgSHR.kvHeader.add("Expires", "Thu, 19 Nov 1981 08:52:00 GMT");
+      msgSHR.kvHeader.add("Expires", Apollo::getNow().operator+=(Apollo::TimeValue(3600, 0)).toRFC2822());
+      if (!msgSHR.Request()) { throw ApException("Msg_Server_HttpResponse failed: conn=" ApHandleFormat "", ApHandleType(msgSHR.hConnection)); }
+
+      pMsg->Stop();
+      pMsg->apStatus = ApMessage::Ok;
+
+    } catch (ApException& ex) {
+
+      apLog_Warning((LOG_CHANNEL, "GalileoModule::Server_HttpRequest", "%s", StringType(ex.getText())));
+
+      Msg_Server_HttpResponse msgSHR;
+      msgSHR.hConnection = pMsg->hConnection;
+      msgSHR.nStatus = 404;
+      msgSHR.sMessage = "Not Found";
+      msgSHR.kvHeader.add("Content-type", "text/plain");
+      msgSHR.kvHeader.add("Pragma", "no-cache");
+      msgSHR.kvHeader.add("Cache-Control", "no-store, no-cache, must-revalidate, post-check=0, pre-check=0");
+      msgSHR.kvHeader.add("Expires", "Thu, 19 Nov 1981 08:52:00 GMT");
+      String sBody = ex.getText();
+      msgSHR.sbBody.SetData(sBody);
+      if (!msgSHR.Request()) {
+        { throw ApException("Msg_Server_HttpResponse (for error message) failed: conn=" ApHandleFormat "", ApHandleType(msgSHR.hConnection)); }
+      } else {
+        pMsg->Stop();
+        pMsg->apStatus = ApMessage::Ok;
+      }
+    }
+
+  } // sUriPrefix
+}
+
 //----------------------------------------------------------
 
 #if defined(AP_TEST)
@@ -441,17 +634,21 @@ int GalileoModule::Init()
   //AP_MSG_REGISTRY_ADD(MODULE_NAME, GalileoModule, Animation_SetPosition, this, ApCallbackPosNormal);
   //AP_MSG_REGISTRY_ADD(MODULE_NAME, GalileoModule, Animation_MoveTo, this, ApCallbackPosNormal);
   //AP_MSG_REGISTRY_ADD(MODULE_NAME, GalileoModule, Animation_GetPosition, this, ApCallbackPosNormal);
-  AP_MSG_REGISTRY_ADD(MODULE_NAME, GalileoModule, Timer_Event, this, ApCallbackPosNormal);
+
   AP_MSG_REGISTRY_ADD(MODULE_NAME, GalileoModule, Galileo_RequestAnimation, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, GalileoModule, Galileo_RequestAnimationComplete, this, ApCallbackPosNormal);
-  AP_MSG_REGISTRY_ADD(MODULE_NAME, GalileoModule, System_AfterLoadModules, this, ApCallbackPosNormal);
-  AP_MSG_REGISTRY_ADD(MODULE_NAME, GalileoModule, System_BeforeUnloadModules, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, GalileoModule, Galileo_SetStorageName, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, GalileoModule, Galileo_SaveAnimationDataToStorage, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, GalileoModule, Galileo_IsAnimationDataInStorage, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, GalileoModule, Galileo_LoadAnimationDataFromStorage, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, GalileoModule, Galileo_ClearAllStorage, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, GalileoModule, Galileo_ExpireAllStorage, this, ApCallbackPosNormal);
+
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, GalileoModule, Timer_Event, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, GalileoModule, System_AfterLoadModules, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, GalileoModule, System_BeforeUnloadModules, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, GalileoModule, System_RunLevel, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, GalileoModule, Server_HttpRequest, this, ApCallbackPosNormal);
 
   AP_UNITTEST_HOOK(GalileoModule, this);
 

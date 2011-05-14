@@ -244,6 +244,7 @@ public:
   inline unsigned MilliSec() { return nSec_ * 1000 + nMicroSec_ / 1000; }
 
   String toString();
+  String toRFC2822();
 
 protected:
   time_t nSec_;
