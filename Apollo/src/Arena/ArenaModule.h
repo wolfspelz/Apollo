@@ -4,8 +4,8 @@
 //
 // ============================================================================
 
-#if !defined(WebArenaModule_H_INCLUDED)
-#define WebArenaModule_H_INCLUDED
+#if !defined(ArenaModule_H_INCLUDED)
+#define ArenaModule_H_INCLUDED
 
 #include "ApModule.h"
 #include "ApContainer.h"
@@ -37,10 +37,10 @@ typedef ApHandlePointerTreeIterator<Display*> DisplayListIterator;
 //  ApHandle hPartcipant_;
 //};
 
-class WebArenaModule
+class ArenaModule
 {
 public:
-  WebArenaModule()
+  ArenaModule()
   {}
 
   int Init();
@@ -71,7 +71,7 @@ public:
   void On_Animation_SequenceBegin(Msg_Animation_SequenceBegin* pMsg);
   //void On_Animation_Frame(Msg_Animation_Frame* pMsg);
   //void On_Animation_SequenceEnd(Msg_Animation_SequenceEnd* pMsg);
-  void On_WebArena_CallModuleSrpc(ApSRPCMessage* pMsg);
+  void On_Arena_CallModuleSrpc(ApSRPCMessage* pMsg);
 
 #if defined(AP_TEST)
   void On_UnitTest_Begin(Msg_UnitTest_Begin* pMsg);
@@ -102,6 +102,6 @@ public:
   AP_MSG_REGISTRY_DECLARE;
 };
 
-typedef ApModuleSingleton<WebArenaModule> WebArenaModuleInstance;
+typedef ApModuleSingleton<ArenaModule> ArenaModuleInstance;
 
-#endif // WebArenaModule_H_INCLUDED
+#endif // ArenaModule_H_INCLUDED

@@ -169,7 +169,7 @@ public:
 
 static void Test_Arena_UnitTest_TokenEnd()
 {
-  apLog_Info((LOG_CHANNEL, "Test_Arena_UnitTest_TokenEnd", "Finished Test/WebArena"));
+  apLog_Info((LOG_CHANNEL, "Test_Arena_UnitTest_TokenEnd", "Finished Test/Arena"));
   { ApAsyncMessage<Msg_UnitTest_Token> msg; msg.Post(); }
 }
 
@@ -948,7 +948,7 @@ static void Test_Arena_UnitTest_Token(Msg_UnitTest_Token* pMsg)
 {
   AP_UNUSED_ARG(pMsg);
   { Msg_UnitTest_Token msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_Arena_UnitTest_Token, 0); }
-  apLog_Info((LOG_CHANNEL, "Test_Arena_UnitTest_Token", "Starting Test/WebArena"));
+  apLog_Info((LOG_CHANNEL, "Test_Arena_UnitTest_Token", "Starting Test/Arena"));
   int bTokenEndNow = 0;
 
   gTest_InNavigateChatOut->Begin();
@@ -963,7 +963,7 @@ static void Test_Arena_UnitTest_Token(Msg_UnitTest_Token* pMsg)
 void Test_Arena_Register()
 {
 #if defined(AP_TEST_Arena)
-  if (Apollo::isLoadedModule("WebArena")) {
+  if (Apollo::isLoadedModule("Arena")) {
 
     { gTest_InNavigateChatOut = new Test_InNavigateChatOut(); Msg_UnitTest_Register msg; msg.sName = gTest_InNavigateChatOut->getName(); msg.Send(); }
   
@@ -975,7 +975,7 @@ void Test_Arena_Register()
 void Test_Arena_Begin()
 {
 #if defined(AP_TEST_Arena)
-  if (Apollo::isLoadedModule("WebArena")) {
+  if (Apollo::isLoadedModule("Arena")) {
   }
 #endif // AP_TEST_Arena
 }
@@ -983,7 +983,7 @@ void Test_Arena_Begin()
 void Test_Arena_End()
 {
 #if defined(AP_TEST_Arena)
-  if (Apollo::isLoadedModule("WebArena")) {
+  if (Apollo::isLoadedModule("Arena")) {
   }
 #endif // AP_TEST_Arena
 }

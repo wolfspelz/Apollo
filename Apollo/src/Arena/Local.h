@@ -7,7 +7,7 @@
 #if !defined(Local_H_INCLUDED)
 #define Local_H_INCLUDED
 
-#define MODULE_NAME "WebArena"
+#define MODULE_NAME "Arena"
 #define LOG_CHANNEL MODULE_NAME
 
 #include "ApLog.h"

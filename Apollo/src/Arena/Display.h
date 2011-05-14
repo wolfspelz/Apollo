@@ -17,12 +17,12 @@ typedef ApHandlePointerTreeIterator<Avatar*> AvatarListIterator;
 
 typedef ApHandleTree<int> ParticipantFlags;
 
-class WebArenaModule;
+class ArenaModule;
 
 class Display
 {
 public:
-  Display(WebArenaModule* pModule, const ApHandle& hContext);
+  Display(ArenaModule* pModule, const ApHandle& hContext);
   virtual ~Display();
 
   int Create();
@@ -52,7 +52,7 @@ public:
   inline int GetWidth() { return nWidth_; }
   inline int GetHeight() { return nHeight_; }
   inline ApHandle GetView() { return hView_; }
-  inline WebArenaModule* GetModule() { return pModule_; }
+  inline ArenaModule* GetModule() { return pModule_; }
   inline ApHandle GetContext() { return hContext_; }
   inline ApHandle GetLocation() { return hLocation_; }
 
@@ -73,7 +73,7 @@ protected:
   void SendPosition();
 
 protected:
-  WebArenaModule* pModule_;
+  ArenaModule* pModule_;
   ApHandle hContext_;
   ApHandle hLocation_;
 

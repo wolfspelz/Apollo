@@ -8,7 +8,7 @@
 #include "dll.h"
 #include "MsgUnitTest.h"
 #include "Local.h"
-#include "WebArenaModule.h"
+#include "ArenaModule.h"
 
 #if defined(WIN32)
 BOOL APIENTRY DllMain(HANDLE hModule, DWORD dwReason, LPVOID lpReserved)
@@ -36,7 +36,7 @@ static AP_MODULE_INFO g_info = {
   PROJECT_HomepageUrl
 };
 
-WEBARENA_API AP_MODULE_INFO* Info(AP_MODULE_CALL* pModuleData)
+ARENA_API AP_MODULE_INFO* Info(AP_MODULE_CALL* pModuleData)
 {
   AP_UNUSED_ARG(pModuleData);
   return &g_info;
@@ -44,27 +44,27 @@ WEBARENA_API AP_MODULE_INFO* Info(AP_MODULE_CALL* pModuleData)
 
 //----------------------------------------------------------
 
-WEBARENA_API int Load(AP_MODULE_CALL* pModuleData)
+ARENA_API int Load(AP_MODULE_CALL* pModuleData)
 {
   AP_UNUSED_ARG(pModuleData);
 
   int ok = 0;
 
-  WebArenaModuleInstance::Delete();
-  if (WebArenaModuleInstance::Get() != 0) { ok = WebArenaModuleInstance::Get()->Init(); }
+  ArenaModuleInstance::Delete();
+  if (ArenaModuleInstance::Get() != 0) { ok = ArenaModuleInstance::Get()->Init(); }
 
   return ok;
 }
 
-WEBARENA_API int UnLoad(AP_MODULE_CALL* pModuleData)
+ARENA_API int UnLoad(AP_MODULE_CALL* pModuleData)
 {
   AP_UNUSED_ARG(pModuleData);
 
   int ok = 1;
 
-  if (WebArenaModuleInstance::Get() != 0) {
-    WebArenaModuleInstance::Get()->Exit();
-    WebArenaModuleInstance::Delete();
+  if (ArenaModuleInstance::Get() != 0) {
+    ArenaModuleInstance::Get()->Exit();
+    ArenaModuleInstance::Delete();
   }
 
   return ok;
