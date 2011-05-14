@@ -20,7 +20,7 @@ function DispatchMessage(msg)
 {
   var sMethod = msg.getString('Method');
   switch (sMethod) {
-    case 'AddAvatar': return arena.AddAvatar(msg.getString('hParticipant'), msg.getString('sNickname'), msg.getString('sImageUrl'), msg.getInt('nX')); break;
+    case 'AddAvatar': return arena.AddAvatar(msg.getString('hParticipant'), msg.getInt('bSelf'), msg.getInt('nX')); break;
     case 'RemoveAvatar': return arena.RemoveAvatar(msg.getString('hParticipant')); break;
     case 'ShowAvatar': return arena.ShowAvatar(msg.getString('hParticipant')); break;
     case 'HideAvatar': return arena.HideAvatar(msg.getString('hParticipant')); break;
@@ -28,7 +28,9 @@ function DispatchMessage(msg)
     case 'SetAvatarPosition': return arena.SetAvatarPosition(msg.getString('hParticipant'), msg.getInt('nX')); break;
     case 'SetAvatarNickname': return arena.SetAvatarNickname(msg.getString('hParticipant'), msg.getString('sNickname')); break;
     case 'SetAvatarImage': return arena.SetAvatarImage(msg.getString('hParticipant'), msg.getString('sUrl')); break;
+    case 'AddAvatarChat': return arena.AddAvatarChat(msg.getString('hParticipant'), msg.getString('hChat'), msg.getString('sText')); break;
     case 'SetAvatarChat': return arena.SetAvatarChat(msg.getString('hParticipant'), msg.getString('hChat'), msg.getString('sText')); break;
+    case 'RemoveAvatarChat': return arena.RemoveAvatarChat(msg.getString('hParticipant'), msg.getString('hChat')); break;
 
     case 'SetDocumentUrl': return arena.SetDocumentUrl(msg.getString('sUrl')); break;
     case 'SetLocationUrl': return arena.SetLocationUrl(msg.getString('sUrl')); break;
@@ -95,36 +97,7 @@ function RunUnittest()
 <div id="iWrapper" style="width:100%; height:100%">
 
   <div id="iContent" class="cContent" style="position:absolute; left:0; top:0; width:40%; height:100%; overflow:auto;">
-    <div style="position:absolute; left:0px; bottom:0px; height:20px; width:60px; -webkit-box-shadow:inset 0 0 1px 1px #000000;"></div>
 
-    <div class="cParticipant" id="iParticipant" style="left:110px;">
-      <div class="cCenter">
-        <div class="cChatWrapper">
-          <div class="cChatContainer">
-            <div class="cChat" id="iChat1">hasjd haksjd haksd sdjfasdjf </div>
-            <div class="cChat" id="iChat2">ajhd</div>
-            <div class="cChat" id="iChat3"> hasjd haksjd haksd fajhdgf ajhd 
-            gajshdgf ajshdg fajshd hasjd haksjd haksd fajhdgf ajhd gajshdgf 
-            ajshdg fajshdaskjdhfakjdhalskjdfsdfqeowrfhafjghdfjh hasjd haksjd
-             haksd fajhdgf ajhd gajshdgf</div>
-          </div>
-        </div>
-        <div class="cImageWrapper">
-          <div class="cImage" style="z-index:40;"></div>
-          <div class="cNickname" style="z-index:50;">Long Nickname</div>
-          <div class="cImageSensor">
-            <div class="cMenu" style="display:none; z-index:80;"><img class="cBubble" src="Bubble.png" /></div>
-            <div class="cChatIn" style="display:none; z-index:100;">
-              <table border="0" cellpadding="0" cellspacing="0"><tr>
-                <td><input type="text" class="cText" size="30" /></td>
-                <td><input type="submit" class="cSend cTranslate" value="Send" /></td>
-                <td><img src="CloseButton.png" class="cCloseButton" /></td>
-              </tr></table>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
 
   </div>
   <div id="iControl" style="position:absolute; left:40%; top:0; width:10%; height:100%; overflow:auto;">
@@ -142,65 +115,6 @@ function RunUnittest()
 </body>
 
 <script type="text/javascript">
-
-$('.cImageSensor').hover(
-  function () {
-    $('.cMenu').stop(true).fadeTo('fast',1);
-  }, 
-  function () {
-    $('.cMenu').fadeTo('fast',0);
-  }
-);
-
-$('.cBubble').click(
-  function () {
-    $('.cMenu').fadeTo('fast', 0);
-    $('.cChatIn').fadeIn('fast', 
-      function() {
-        $('.cChatIn .cText').focus();
-      }
-    );
-  }
-);
-
-$('.cCloseButton').hover(
-  function () {
-    $(this).attr('src', 'CloseButtonHover.png');
-  }, 
-  function () {
-    $(this).attr('src', 'CloseButton.png');
-  }
-).click(
-  function () {
-    $('.cChatIn').fadeOut('fast');
-  }
-);
-
-$('.cChatIn .cText').bind("keydown", 
-  function(event) {
-    var keycode = (event.keyCode ? event.keyCode : (event.which ? event.which : event.charCode));
-    switch (keycode) {
-    case 13:
-      api.Message('SendPublicChat').setString('ApType', 'WebArena_CallModuleSrpc').setString('sText', this.value).send();
-      this.value = '';
-      return false; break;
-
-    case 27:
-      $('.cChatIn').fadeOut('fast');
-      return false; break;
-
-    default:
-      return true;
-    }
-  }
-);
-
-$('.cChatIn .cSend').click(
-  function() {
-    api.Message('SendPublicChat').setString('ApType', 'WebArena_CallModuleSrpc').setString('sText', $('.cChatIn .cText').val()).send();
-    $('.cChatIn .cText').val('').focus();
-  }
-);
 
 </script>
 

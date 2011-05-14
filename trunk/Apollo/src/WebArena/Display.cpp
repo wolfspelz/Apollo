@@ -281,12 +281,14 @@ void Display::OnParticipantsChanged()
   Msg_VpView_GetParticipants msg;
   msg.hLocation = hLocation_;
   if (msg.Request()) {
-    ProcessAvatarList(msg.vlParticipants);
+    ProcessAvatarList(msg.vlParticipants, msg.hSelf);
   }
 }
 
-void Display::ProcessAvatarList(Apollo::ValueList& vlParticipants)
+void Display::ProcessAvatarList(Apollo::ValueList& vlParticipants, ApHandle& hSelf)
 {
+  hSelf_ = hSelf;
+
   ParticipantFlags addedParticipants;
   ParticipantFlags removedParticipants;
 
@@ -353,7 +355,7 @@ void Display::ProcessAddedParticipants(ParticipantFlags& addedParticipants)
     Avatar* pAvatar = new Avatar(pModule_, this, hParticipant);
     if (pAvatar) {
       avatars_.Set(hParticipant, pAvatar);
-      pAvatar->Create();
+      pAvatar->Create(hParticipant == hSelf_);
     }
   }
 }

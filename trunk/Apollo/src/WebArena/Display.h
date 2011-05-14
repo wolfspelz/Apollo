@@ -57,7 +57,7 @@ public:
   inline ApHandle GetLocation() { return hLocation_; }
 
 protected:
-  void ProcessAvatarList(Apollo::ValueList& vlParticipants);
+  void ProcessAvatarList(Apollo::ValueList& vlParticipants, ApHandle& hSelf);
   void InitRemovedParticipants(ParticipantFlags& removedParticipants);
   void InitAddedParticipants(ParticipantFlags& addedParticipants);
   void RemoveFromRemovedParticipants(const ApHandle& h, ParticipantFlags& removedParticipants);
@@ -84,6 +84,7 @@ protected:
   int nHeight_;
 
   ApHandle hView_;
+  ApHandle hSelf_; // Self Participant
 
   Apollo::TimeValue tvEnterRequested_;
   Apollo::TimeValue tvEnterBegin_;

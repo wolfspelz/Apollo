@@ -489,7 +489,7 @@ AP_MSG_HANDLER_METHOD(GalileoModule, Server_HttpRequest)
         String sGroup = lQuery["group"].getString();
         String sName = lQuery["name"].getString();
 
-        ApHandle hItem; hItem.fromString(sId);
+        ApHandle hItem = Apollo::string2Handle(sId);
         if (!ApIsHandle(hItem)) { throw ApException("No handle: id=%s", StringType(sId)); }
         if (!sGroup) { throw ApException("No group"); }
         if (!sName) { throw ApException("No name"); }
