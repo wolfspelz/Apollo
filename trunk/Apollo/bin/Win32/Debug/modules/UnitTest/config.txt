@@ -1,6 +1,6 @@
 Test=0
 
 # Delay before initial dialog show [seconds]
-ShowTimeout=3
+ShowTimeout=0
 # Close dialog on success [seconds] (disable close: -1)
-SuccessCloseTimeout=1
+SuccessCloseTimeout=0
