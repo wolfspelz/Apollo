@@ -202,9 +202,9 @@ ApolloApi.prototype =
   // ------------------------------------------------
   // SRPC
 
-  onDispatchMessage: function(msg) {},
+  OnDispatchMessage: function(msg) {},
   
-  receiveMessage: function (sMsg)
+  OnReceiveMessage: function (sMsg)
   {
     Log.IO('&lt; ' + sMsg);
 
@@ -212,8 +212,8 @@ ApolloApi.prototype =
     var resp = null;
 
     try {
-      if (typeof(this.onDispatchMessage) == 'function') {
-        resp = this.onDispatchMessage(msg);
+      if (typeof(this.OnDispatchMessage) == 'function') {
+        resp = this.OnDispatchMessage(msg);
       }
     } catch (ex) {
       resp = new ApMessage().setInt('Status', 0).setString('Message', String(ex));
@@ -230,7 +230,7 @@ ApolloApi.prototype =
     }
   },
   
-  newMessage: function(sType)
+  Message: function(sType)
   {
     var msg = new ApMessage(sType);
     if (sType) {
@@ -242,9 +242,9 @@ ApolloApi.prototype =
   // ------------------------------------------------
   // Log
   
-  log: function(nMask, sChannel, sContext, sMessage)
+  Log: function(nMask, sChannel, sContext, sMessage)
   {
-    return this.newMessage('Log_Line')
+    return this.Message('Log_Line')
       .setInt('nMask', nMask)
       .setString('sChannel', sChannel)
       .setString('sContext', sContext)
@@ -260,23 +260,23 @@ ApolloApi.prototype =
   LogLevelInfo       :  64,
   LogLevelVerbose    : 128,
 
-  logError: function(sMessage) { this.log(this.LogLevelError, this.moduleName, 'JS:', sMessage); },
-  logWarning: function(sMessage) { this.log(this.LogLevelWarning, this.moduleName, 'JS:', sMessage); },
-  logUser: function(sMessage) { this.log(this.LogLevelUser, this.moduleName, 'JS:', sMessage); },
-  logDebug: function(sMessage) { this.log(this.LogLevelDebug, this.moduleName, 'JS:', sMessage); },
-  logInfo: function(sMessage) { this.log(this.LogLevelInfo, this.moduleName, 'JS:', sMessage); },
+  LogError: function(sMessage) { this.Log(this.LogLevelError, this.moduleName, 'JS:', sMessage); },
+  LogWarning: function(sMessage) { this.Log(this.LogLevelWarning, this.moduleName, 'JS:', sMessage); },
+  LogUser: function(sMessage) { this.Log(this.LogLevelUser, this.moduleName, 'JS:', sMessage); },
+  LogDebug: function(sMessage) { this.Log(this.LogLevelDebug, this.moduleName, 'JS:', sMessage); },
+  LogInfo: function(sMessage) { this.Log(this.LogLevelInfo, this.moduleName, 'JS:', sMessage); },
 
   // ------------------------------------------------
   // Babelfish
   
-  translate: function(sContext, sText)
+  Translate: function(sContext, sText)
   {
     if (sText == null) {
       sText = sContext;
       sContext = '';
     }
     
-    var sTranslated = this.newMessage('Translation_Get')
+    var sTranslated = this.Message('Translation_Get')
       .setString('sModule', this.moduleName)
       .setString('sContext', sContext)
       .setString('sText', sText)
@@ -303,9 +303,9 @@ ApolloApi.prototype =
   nMinWidth: 100,
   nMinHeight: 100,
   
-  onMouseDown: function(ev)
+  OnMouseDown: function(ev)
   {
-    this.newMessage('WebView_MouseCapture').send();
+    this.Message('WebView_MouseCapture').send();
     this.nStartX = ev.x;
     this.nStartY = ev.y;
     this.bMouseActive = false;
@@ -322,7 +322,7 @@ ApolloApi.prototype =
     }
   },
 
-  onMouseMove: function(ev)
+  OnMouseMove: function(ev)
   {
     if (this.bMouseCaptured) {
       var dx = ev.x - this.nStartX;
@@ -334,11 +334,11 @@ ApolloApi.prototype =
       }
       if (this.bMouseActive) {
         if (this.bIsMove) {
-          this.newMessage('WebView_MoveBy').setInt('nX', dx).setInt('nY', dy).send();
+          this.Message('WebView_MoveBy').setInt('nX', dx).setInt('nY', dy).send();
         }
         if (this.bIsSize) {
           if (dx < 0 || dy < 0) {
-            var pos = this.newMessage('WebView_GetPosition').send();
+            var pos = this.Message('WebView_GetPosition').send();
             var nW = pos.getInt('nW');
             var nH = pos.getInt('nH');
             var nNewW = nW + dx;
@@ -347,7 +347,7 @@ ApolloApi.prototype =
             if (nNewH < this.nMinHeight) { dy = this.nMinHeight - nH; }
           }
 
-          this.newMessage('WebView_SizeBy')
+          this.Message('WebView_SizeBy')
             .setInt('nW', dx)
             .setInt('nH', dy)
             .setInt('nDirection', this.nSizeDirection)
@@ -360,25 +360,25 @@ ApolloApi.prototype =
     }
   },
 
-  onMouseUp: function()
+  OnMouseUp: function()
   {
     this.bMouseCaptured = false;
     this.bMouseActive = false;
     this.bIsMove = false;
     this.bIsSize = false;
-    this.newMessage('WebView_MouseRelease');
+    this.Message('WebView_MouseRelease').send();
   },
 
-  initMoveSize: function()
+  InitMoveSize: function()
   {
-    document.onmousedown = this.onMouseDown.bind(this); 
-    document.onmousemove = this.onMouseMove.bind(this); 
-    document.onmouseup = this.onMouseUp.bind(this);
+    document.onmousedown = this.OnMouseDown.bind(this); 
+    document.onmousemove = this.OnMouseMove.bind(this); 
+    document.onmouseup = this.OnMouseUp.bind(this);
   },
 
   // ------------------------------------------------
   
-  init: function()
+  Init: function()
   {
   },
 
