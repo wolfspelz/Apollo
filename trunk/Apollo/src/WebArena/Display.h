@@ -45,6 +45,7 @@ public:
   void OnParticipantsChanged();
   void OnParticipantDetailsChanged(const ApHandle& hParticipant, Apollo::ValueList& vlKeys);
   void OnReceivePublicChat(const ApHandle& hParticipant, const ApHandle& hChat, const String& sNickname, const String& sText, const Apollo::TimeValue& tv);
+  void OnAvatarAnimationBegin(const ApHandle& hParticipant, const String& sUrl);
   void OnContextDetailsChanged(Apollo::ValueList& vlKeys);
 
   inline int GetWidth() { return nWidth_; }

@@ -44,13 +44,18 @@ public:
   void AppendFrame(Frame* pFrame);
   int Duration() { return nDurationMSec_; }
   void Src(const String& sSrc) { sSrc_ = sSrc;}
+  String Src() { return sSrc_;}
   void SetAnimationData(const String& sUrl, Buffer& sbData, const String& sMimeType);
+  void GetAnimationData(Buffer& sbData, String& sMimeType);
+
+  // public for Server_HttpRequest
+  int HasDataInCache();
+  int GetDataFromCache();
+  void FlushData();
 
 protected:
   int LoadData();
   int RequestData();
-  int HasDataInCache();
-  int GetDataFromCache();
   int SaveDataToCache();
 
   int RequestSuspended();
@@ -98,6 +103,7 @@ public:
   int Probability() { return nProbability_; }
   int Duration() { return nDurationMSec_; }
   String& Group() { return sGroup_; }
+  String Src();
   void Load();
   int IsLoaded() { return bLoaded_; }
 
@@ -156,6 +162,7 @@ public:
 
   virtual ~Item();
 
+
   int Start();
   void Stop();
   void SetDelay(int nDelayMSec);
@@ -169,6 +176,11 @@ public:
 
   int HasTimer(const ApHandle& hTimer) { return ApIsHandle(hTimer) && hTimer_ == hTimer; }
   void OnTimer();
+
+  // For Server_HttpRequest
+  ListT<Group, Elem>& Groups() { return lGroups_; }
+  inline ApHandle apHandle() { return hAp_; }
+  String Src() { return sSrc_; }
 
 protected:
   void ResetAnimations();
@@ -195,6 +207,7 @@ protected:
   int bStarted_;
   int nDelayMSec_; // msec
   ApHandle hTimer_;
+  String sSrc_;
   String sBaseUrl_;
   String sDefaultSequence_;
   String sDefaultStatus_;

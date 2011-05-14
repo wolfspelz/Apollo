@@ -68,7 +68,7 @@ public:
   void On_VpView_LeaveLocationComplete(Msg_VpView_LeaveLocationComplete* pMsg);
   void On_VpView_ParticipantAdded(Msg_VpView_ParticipantAdded* pMsg);
   void On_VpView_ParticipantRemoved(Msg_VpView_ParticipantRemoved* pMsg);
-  //void On_Animation_SequenceBegin(Msg_Animation_SequenceBegin* pMsg);
+  void On_Animation_SequenceBegin(Msg_Animation_SequenceBegin* pMsg);
   //void On_Animation_Frame(Msg_Animation_Frame* pMsg);
   //void On_Animation_SequenceEnd(Msg_Animation_SequenceEnd* pMsg);
 

@@ -1204,23 +1204,23 @@ AP_MSG_HANDLER_METHOD(VpModule, Vp_SendCondition)
 
 String VpModule::getItemDataExternUrl(const String& sIdentityUrl, const String& sItemId)
 {
-  //String sUrl;
-  //sUrl.appendf("http://%s:%d" VpModule_Server_HttpRequest_sUriPrefix "?%s|%s|%s", StringType(sExternUrlAddress_), nExternUrlPort_, StringType(sIdentityUrl), StringType(sItemId), StringType(Apollo::getUniqueId()));
-  //return sUrl;
-
   Apollo::UrlBuilder url;
   url.setHost(sExternUrlAddress_);
   url.setPort(nExternUrlPort_);
   url.setPath("/");
   url.setFile(MODULE_NAME);
-  String sQuery; sQuery.appendf("%s|%s|%s", StringType(sIdentityUrl), StringType(sItemId), StringType(Apollo::getUniqueId()));
+  
+  String sQuery;
+  sQuery.appendf("%s|%s|%s", StringType(sIdentityUrl), StringType(sItemId), StringType(Apollo::getUniqueId()));
   url.setQuery(sQuery);
+
   return url();
 }
 
 AP_MSG_HANDLER_METHOD(VpModule, Server_HttpRequest)
 {
   if (Apollo::getModuleConfig(MODULE_NAME, "HTTP/Enabled", 1) && pMsg->sUri.startsWith(VpModule_Server_HttpRequest_sUriPrefix)) {
+
     try {
       String sQuery = pMsg->sUri;
       String sBase; sQuery.nextToken("?", sBase);
@@ -1276,6 +1276,8 @@ AP_MSG_HANDLER_METHOD(VpModule, Server_HttpRequest)
 
     } catch (ApException& ex) {
 
+      apLog_Warning((LOG_CHANNEL, "VpModule::Server_HttpRequest", "%s", StringType(ex.getText())));
+  
       Msg_Server_HttpResponse msgSHR;
       msgSHR.hConnection = pMsg->hConnection;
       msgSHR.nStatus = 404;

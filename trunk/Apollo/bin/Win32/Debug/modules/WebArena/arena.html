@@ -27,7 +27,7 @@ function DispatchMessage(msg)
     case 'SetAvatarPosition': return arena.SetAvatarPosition(msg.getString('hParticipant'), msg.getInt('nX')); break;
     case 'SetAvatarNickname': return arena.SetAvatarNickname(msg.getString('hParticipant'), msg.getString('sNickname')); break;
     case 'SetAvatarImage': return arena.SetAvatarImage(msg.getString('hParticipant'), msg.getString('sUrl')); break;
-    case 'SetAvatarChat': return arena.SetAvatarChat(msg.getString('hParticipant'), msg.getString('sText')); break;
+    case 'SetAvatarChat': return arena.SetAvatarChat(msg.getString('hParticipant'), msg.getString('hChat'), msg.getString('sText')); break;
 
     case 'SetDocumentUrl': return arena.SetDocumentUrl(msg.getString('sUrl')); break;
     case 'SetLocationUrl': return arena.SetLocationUrl(msg.getString('sUrl')); break;
@@ -65,12 +65,11 @@ function RunUnittest()
   $(document).ready(function () {
     arena = new Arena('iContent');
     arena.Startup();
-    
   });
 </script>
 
 <style type="text/css">
-#iContent { border:1px solid #000000}
+#iContent { -webkit-box-shadow:inset 0 0 1px 1px #505050; }
 #iControl { background-color:rgba(255,255,204,0.7); }
 #iControl * { font-family:Verdana; font-size:11px; }
 #iOut { background-color:rgba(240,240,240,0.9); }
@@ -81,34 +80,107 @@ function RunUnittest()
 <body style="overflow:hidden;">
 <div id="iWrapper" style="width:100%; height:100%">
 
-  <div id="iContent" style="position:absolute; left:0; top:0; width:50%; height:100%; overflow:auto;">
-    <div style="position:absolute; left:0px; bottom:1px; height:20px; width:58px; border: 1px solid #000000;"></div>
-    
+  <div id="iContent" style="position:absolute; left:0; top:0; width:40%; height:100%; overflow:auto;">
+    <div style="position:absolute; left:0px; bottom:0px; height:20px; width:60px; -webkit-box-shadow:inset 0 0 1px 1px#000000;
+;"></div>
+
     <div class="cParticipant" id="iParticipant" style="left:110px;">
-      <div class="cChatWrapper">
-        <div class="cChat">askjdhfak jdhalskjdf hasjd haksjd haksd fajhdgf ajhd gajshdgf ajshdg fajshd</div>
-      </div>
-      <div class="cImageWrapper">
-        <div class="cAvatar"></div>
-        <div class="cNickname">Long Nickname</div>
+      <div class="cCenter">
+        <div class="cChatWrapper">
+          <div class="cChatContainer">
+            <div class="cChat" id="iChat1">hasjd haksjd haksd sdjfasdjf </div>
+            <div class="cChat" id="iChat2">ajhd</div>
+            <div class="cChat" id="iChat3"> hasjd haksjd haksd fajhdgf ajhd 
+            gajshdgf ajshdg fajshd hasjd haksjd haksd fajhdgf ajhd gajshdgf 
+            ajshdg fajshdaskjdhfakjdhalskjdfsdfqeowrfhafjghdfjh hasjd haksjd
+             haksd fajhdgf ajhd gajshdgf</div>
+          </div>
+        </div>
+        <div class="cImageWrapper">
+          <div class="cImage"></div>
+          <div class="cNickname">Long Nickname</div>
+          <div class="cImageSensor">
+            <div class="cMenu" style="display:none"><img class="cBubble" src="Bubble.png" /></div>
+            <div class="cChatIn" style="display:none; white-space:nowrap">
+              <table border="0" cellpadding="0" cellspacing="0"><tr>
+                <td><input type="text" class="cText" size="30" /></td>
+                <td><img src="CloseButton.png" class="cCloseButton" /></td>
+                </tr></table>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
   </div>
-  <div id="iControl" style="position:absolute; left:50%; top:0; width:15%; height:100%; overflow:auto;">
-    <p>
+  <div id="iControl" style="position:absolute; left:40%; top:0; width:10%; height:100%; overflow:auto;">
     <input type="button" value="WebView_Reload" onclick="api.newMessage('WebView_Reload').send();" />
     <input type="button" value="reload()" onclick="document.location.reload();" />
     <input type="button" value="Quit" onclick="api.newMessage('MainLoop_EndLoop').send();"/>
     <input type="button" value="Unittest" onclick="RunUnittest();"/>
-    <br/>
     <input type="checkbox" id="iLogCheck" checked="checked"/><label for="iLogCheck">Logging</label>
     <input type="button" value="Clear" onclick="Log.instance.Clear();" />
     <input type="button" value="Translate" onclick="Log.Info(api.translate('ParamTest', 'Click me!'));" />
-    <br/>
-    </p>
   </div>
-  <div id="iOut" style="position:absolute; left:65%; top:0; width:35%; height:100%; overflow:auto; white-space: nowrap;"></div>
+  <div id="iOut" style="position:absolute; left:50%; top:0; width:50%; height:100%; overflow:auto; white-space: nowrap;"></div>
 </div>
 </body>
+
+<script type="text/javascript">
+
+$('.cImageSensor').hover(
+  function ()
+  {
+    $('.cMenu').stop(true).fadeTo('fast',1);
+  }, 
+  function ()
+  {
+    $('.cMenu').fadeTo('fast',0);
+  }
+);
+
+$('.cBubble').click(
+  function ()
+  {
+    $('.cMenu').fadeTo('fast', 0);
+    $('.cChatIn').fadeIn('fast', 
+      function()
+      {
+        $('.cChatIn .cText').focus();
+      }
+    );
+  }
+);
+
+$('.cCloseButton').hover(
+  function ()
+  {
+    $(this).attr('src', 'CloseButtonHover.png');
+  }, 
+  function ()
+  {
+    $(this).attr('src', 'CloseButton.png');
+  }
+).click(
+  function ()
+  {
+    $('.cChatIn').fadeOut('fast');
+  }
+);
+
+$('.cChatIn .cText').bind("keydown", 
+  function(event)
+  {
+    var keycode = (event.keyCode ? event.keyCode : (event.which ? event.which : event.charCode));
+    if (keycode == 13) {
+      //api.newMessage('SendPublicChat').setString('ApType', 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX').send();
+      return false;
+    } else {
+      return true;
+    }
+  }
+);
+
+</script>
+
 </html>

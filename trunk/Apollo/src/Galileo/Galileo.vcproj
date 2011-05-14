@@ -161,11 +161,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Item.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\galileo.cpp"
+				RelativePath=".\dll.cpp"
 				>
 			</File>
 			<File
@@ -174,6 +170,10 @@
 			</File>
 			<File
 				RelativePath=".\GalileoModuleTester.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Item.cpp"
 				>
 			</File>
 		</Filter>
@@ -187,15 +187,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Item.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Local.h"
-				>
-			</File>
-			<File
-				RelativePath=".\galileo.h"
+				RelativePath=".\dll.h"
 				>
 			</File>
 			<File
@@ -206,6 +198,14 @@
 				RelativePath=".\GalileoModuleTester.h"
 				>
 			</File>
+			<File
+				RelativePath=".\Item.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Local.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"
@@ -213,6 +213,10 @@
 			UniqueIdentifier="{D0E550D2-8108-4ada-A7E0-D67F3AD19970}"
 			>
 		</Filter>
+		<File
+			RelativePath="..\..\bin\Win32\Debug\modules\Galileo\config.txt"
+			>
+		</File>
 	</Files>
 	<Globals>
 	</Globals>

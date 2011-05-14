@@ -5,7 +5,7 @@
 // ============================================================================
 
 #include "Apollo.h"
-#include "galileo.h"
+#include "dll.h"
 #include "MsgAnimation.h"
 #include "MsgUnitTest.h"
 #include "Local.h"
@@ -27,10 +27,10 @@ static AP_MODULE_INFO g_info = {
   AP_MODULE_INTERFACE_FLAGS_CPP | AP_MODULE_INTERFACE_FLAGS_UTF8
   ,
   MODULE_NAME,
-  "Galileo",
+  "Animation",
   "Galileo Module",
   "1",
-  "Provides animations for various avatar types, specifically the famous config.xml, maybe more.",
+  "Provides animations for various avatar types, specifically the famous config.xml, maybe more later.",
   PROJECT_Author,
   PROJECT_Email,
   PROJECT_Copyright,

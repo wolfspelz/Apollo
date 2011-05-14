@@ -25,6 +25,12 @@ void Animation::SetAnimationData(const String& sUrl, Buffer& sbData, const Strin
   }
 }
 
+void Animation::GetAnimationData(Buffer& sbData, String& sMimeType)
+{
+  sbData = sbData_;
+  sMimeType = sMimeType_;
+}
+
 void Animation::Load()
 {
   if (IsLoaded()) {
@@ -49,6 +55,11 @@ void Animation::Load()
       }
     }
   }
+}
+
+void Animation::FlushData()
+{
+  sbData_.Empty();
 }
 
 int Animation::RequestSuspended()
@@ -202,8 +213,9 @@ int Animation::LoadData()
         SaveDataToCache();
       }
 
-      sbData_.Empty();
+      FlushData();
       bDataBroken_ = 0;
+
       if (nDurationMSec_ == 0) {
         nDurationMSec_ = Apollo::getModuleConfig(MODULE_NAME, "DefaultAnimationDuration", 1000);
       }
@@ -286,6 +298,20 @@ void Sequence::Load()
       nDurationMSec_ = nDuration;
     }
   }
+}
+
+String Sequence::Src()
+{
+  String sUrl;
+
+  if (length() > 0) {
+    Animation* pAnimation = First();
+    if (pAnimation) {
+      sUrl = pAnimation->Src();
+    }
+  }
+
+  return sUrl;
 }
 
 // ------------------------------------------------------------
@@ -383,6 +409,7 @@ void Item::SetData(Buffer& sbData, const String& sUrl)
 
   ResetAnimations();
 
+  sSrc_ = sUrl;
   sBaseUrl_ = String::filenameBasePath(sUrl);
 
   for (Apollo::XMLNode* pChild = 0; (pChild = pRoot->nextChild(pChild)) != 0; ) {
@@ -583,7 +610,7 @@ void Item::Step(Apollo::TimeValue& tvCurrent)
   tvLastTimer_ = tvCurrent;
 
   if (pPreviousSequence) {
-    // Async, because Msg_Animation_SequenceEnd may delete this
+    // Async, because Msg_Animation_SequenceEnd may delete "this"
     ApAsyncMessage<Msg_Animation_SequenceEnd> msg;
     msg->hItem = hAp_;
     msg->sName = pPreviousSequence->getName();
@@ -592,12 +619,14 @@ void Item::Step(Apollo::TimeValue& tvCurrent)
   }
 
   if (pNextSequence) {
-    // Async, because Msg_Animation_SequenceBegin may delete this
+    // Also async, because Msg_Animation_SequenceBegin may delete "this"
     // and Msg_Animation_SequenceBegin should be after Msg_Animation_SequenceEnd
     ApAsyncMessage<Msg_Animation_SequenceBegin> msg;
     msg->hItem = hAp_;
     msg->sName = pNextSequence->getName();
     msg->sGroup = pNextSequence->Group();
+    msg->sSrc = pNextSequence->Src();
+    msg->sUrl = pModule_ ? pModule_->GetSequenceDataCacheUrl(hAp_, pNextSequence->Group(), pNextSequence->getName()) : "";
     msg.Post();
 
     pCurrentSequence_ = pNextSequence;

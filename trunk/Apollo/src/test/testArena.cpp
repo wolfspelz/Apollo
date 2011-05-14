@@ -860,7 +860,7 @@ void Test_InNavigateChatOut::Begin()
   AddLast(new Test_InNavigateChatOut_ParticipantsChanged1());
   AddLast(new Test_InNavigateChatOut_EnterLocationComplete1());
 
-  AddLast(new Test_InNavigateChatOut_Wait(300));
+  AddLast(new Test_InNavigateChatOut_Wait(500));
   AddLast(new Test_InNavigateChatOut_LeaveLocationRequested1());
   AddLast(new Test_InNavigateChatOut_ContextDetailsChanged_LocationUrl());
   AddLast(new Test_InNavigateChatOut_LocationContextsChanged1b());
@@ -875,14 +875,14 @@ void Test_InNavigateChatOut::Begin()
   AddLast(new Test_InNavigateChatOut_LeaveLocationComplete1());
   AddLast(new Test_InNavigateChatOut_ParticipantsChanged2a());
   AddLast(new Test_InNavigateChatOut_EnterLocationComplete2());
-  AddLast(new Test_InNavigateChatOut_Wait(300));
+  AddLast(new Test_InNavigateChatOut_Wait(500));
   AddLast(new Test_InNavigateChatOut_Chat2a());
 
-  AddLast(new Test_InNavigateChatOut_Wait(300));
+  AddLast(new Test_InNavigateChatOut_Wait(500));
   AddLast(new Test_InNavigateChatOut_Chat2b());
-  AddLast(new Test_InNavigateChatOut_Wait(300));
+  AddLast(new Test_InNavigateChatOut_Wait(500));
   AddLast(new Test_InNavigateChatOut_Chat2c());
-  AddLast(new Test_InNavigateChatOut_Wait(300));
+  AddLast(new Test_InNavigateChatOut_Wait(500));
   AddLast(new Test_InNavigateChatOut_LeaveLocationRequested2());
   AddLast(new Test_InNavigateChatOut_ContextDetailsChanged_LocationUrl());
   AddLast(new Test_InNavigateChatOut_LocationContextsChanged2b());

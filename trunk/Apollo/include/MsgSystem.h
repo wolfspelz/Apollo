@@ -155,4 +155,14 @@ public:
   ApOUT ApHandle h;
 };
 
+// -> system
+class APOLLO_API Msg_System_Echo : public ApRequestMessage
+{
+public:
+  Msg_System_Echo() : ApRequestMessage("System_Echo") {}
+public:
+  ApIN int nIn;
+  ApOUT int nOut;
+};
+
 #endif // !defined(MsgSystem_h_INCLUDED)

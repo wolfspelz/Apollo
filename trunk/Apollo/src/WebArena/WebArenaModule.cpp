@@ -294,8 +294,19 @@ AP_MSG_HANDLER_METHOD(WebArenaModule, VpView_ParticipantRemoved){}
 
 //----------------------------
 
-//AP_MSG_HANDLER_METHOD(WebArenaModule, Animation_SequenceBegin){}
-//
+AP_MSG_HANDLER_METHOD(WebArenaModule, Animation_SequenceBegin)
+{
+  Display* pDisplay = GetDisplayOfHandle(pMsg->hItem);
+  if (pDisplay) {
+    ApHandle hParticipant = GetParticipantOfAnimation(pMsg->hItem);
+    String sUrl = pMsg->sUrl;
+    if (!sUrl) {
+      sUrl = pMsg->sSrc;
+    }
+    pDisplay->OnAvatarAnimationBegin(hParticipant, sUrl);
+  }
+}
+
 //AP_MSG_HANDLER_METHOD(WebArenaModule, Animation_Frame)
 //{
 //  Display* pDisplay = GetDisplayOfHandle(pMsg->hItem);
@@ -305,7 +316,14 @@ AP_MSG_HANDLER_METHOD(WebArenaModule, VpView_ParticipantRemoved){}
 //  }
 //}
 //
-//AP_MSG_HANDLER_METHOD(WebArenaModule, Animation_SequenceEnd){}
+//AP_MSG_HANDLER_METHOD(WebArenaModule, Animation_SequenceEnd)
+//{
+//  Display* pDisplay = GetDisplayOfHandle(pMsg->hItem);
+//  if (pDisplay) {
+//    ApHandle hParticipant = GetParticipantOfAnimation(pMsg->hItem);
+//    pDisplay->OnAvatarAnimationEnd(hParticipant);
+//  }
+//}
 
 //----------------------------------------------------------
 
@@ -315,7 +333,6 @@ AP_MSG_HANDLER_METHOD(WebArenaModule, UnitTest_Begin)
 {
   AP_UNUSED_ARG(pMsg);
   if (Apollo::getConfig("Test/WebArena", 0)) {
-    AP_UNITTEST_REGISTER(Avatar::Test_TruncateElementText);
   }
 }
 
@@ -323,7 +340,6 @@ AP_MSG_HANDLER_METHOD(WebArenaModule, UnitTest_Execute)
 {
   AP_UNUSED_ARG(pMsg);
   if (Apollo::getConfig("Test/WebArena", 0)) {
-    AP_UNITTEST_EXECUTE(Avatar::Test_TruncateElementText);
   }
 }
 
@@ -362,7 +378,7 @@ int WebArenaModule::Init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, WebArenaModule, VpView_LeaveLocationComplete, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, WebArenaModule, VpView_ParticipantAdded, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, WebArenaModule, VpView_ParticipantRemoved, this, ApCallbackPosNormal);
-  //AP_MSG_REGISTRY_ADD(MODULE_NAME, WebArenaModule, Animation_SequenceBegin, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, WebArenaModule, Animation_SequenceBegin, this, ApCallbackPosNormal);
   //AP_MSG_REGISTRY_ADD(MODULE_NAME, WebArenaModule, Animation_Frame, this, ApCallbackPosNormal);
   //AP_MSG_REGISTRY_ADD(MODULE_NAME, WebArenaModule, Animation_SequenceEnd, this, ApCallbackPosNormal);
 

@@ -209,7 +209,15 @@
 			>
 		</Filter>
 		<File
+			RelativePath="..\..\bin\Win32\Debug\modules\WebView\html\test\apollo.js"
+			>
+		</File>
+		<File
 			RelativePath="..\..\bin\Win32\Debug\modules\WebView\config.txt"
+			>
+		</File>
+		<File
+			RelativePath="..\..\bin\Win32\Debug\modules\WebView\html\test\dev.html"
 			>
 		</File>
 	</Files>

@@ -16,12 +16,12 @@ api.initMoveSize();
 
 function Show()
 {
-  api.msg('WebView_Visibility').setString('hView', apollo.viewHandle).setInt('bVisible', 1).send();
+  api.newMessage('WebView_Visibility').setInt('bVisible', 1).send();
 }
 
 function Hide()
 {
-  api.msg('WebView_Visibility').setString('hView', apollo.viewHandle).setInt('bVisible', 0).send();
+  api.newMessage('WebView_Visibility').setInt('bVisible', 0).send();
 }
 
 </script>
@@ -39,10 +39,12 @@ function Hide()
   <img alt="" src="test1.png" />
   <p>
     <input type="button" value="Translate" onclick="SetText(api.translate('Hello World'))"/>
-    <input type="button" value="Quit" onclick="api.msg('MainLoop_EndLoop').send();"/>
-    <input type="button" value="WebView_Reload" onclick="api.msg('WebView_Reload').setString('hView', apollo.viewHandle).send();"/>
+    <input type="button" value="Quit" onclick="api.newMessage('MainLoop_EndLoop').send();"/>
+    <input type="button" value="WebView_Reload" onclick="api.newMessage('WebView_Reload').send();"/>
     <input type="button" value="document.location.reload" onclick="document.location.reload();"/>
     <input type="button" value="Hide" onclick="Hide(); setTimeout('Show()', 1000);"/>
+    <input type="button" value="System_Echo" onclick="SetText(api.newMessage('System_Echo').setInt('nIn', 42).send().toString());"/>
+    <input type="button" value="CustomType" onclick="api.newMessage('Method1').setString('ApType', 'CustomType').setInt('nParam', 42).send();"/>
   </p>
   <div class="SizeBottomRight" style="cursor:se-resize; width:20px; height:20px; background-image:url(sizer-se.png); position:absolute; right:1px; bottom:1px;" />
 </div>
