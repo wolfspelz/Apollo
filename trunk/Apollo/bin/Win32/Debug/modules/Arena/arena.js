@@ -198,7 +198,7 @@ Arena.prototype = {
 
   SendPublicChat: function (sText)
   {
-    api.Message('SendPublicChat').setString('ApType', 'WebArena_CallModuleSrpc').setString('sText', sText).send();
+    api.Message('SendPublicChat').setString('ApType', 'Arena_CallModuleSrpc').setString('sText', sText).send();
   },
 
   CloseChat: function ()
