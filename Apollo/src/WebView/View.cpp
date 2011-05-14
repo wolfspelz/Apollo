@@ -440,14 +440,38 @@ JSValueRef View::JS_Apollo_sendMessage(JSContextRef ctx, JSObjectRef function, J
   Apollo::SrpcMessage srpc;
   srpc.fromString(sText);
   String sType = srpc.getString("ApType");
-  if (!sType) {
-    sType = "SrpcGate";
-  }
+  String sResponse;
 
-  ApSRPCMessage msg(sType);
-  srpc >> msg.srpc;
-  (void) msg.Call();
-  String sResponse = msg.response.toString();
+  if (sType) {
+    // Supplied message type -> send SRPC with custom type
+
+    ApSRPCMessage msg(sType);
+    srpc >> msg.srpc;
+
+    // Custom message handlers just do the apStatus thing.
+    // They rely on someone else (us here) to fill msg.response.
+    if (msg.Call()) {
+      msg.response.setInt("Status", 1);
+    } else {
+      msg.response.setInt("Status", 0);
+      msg.response.setString("Message", msg.sComment);
+    }
+
+    sResponse = msg.response.toString();
+
+  } else {
+    // Handle SRPC message via SrpcGate with "SrpcGate" type
+
+    ApSRPCMessage msg("SrpcGate");
+    srpc >> msg.srpc;
+
+    // SrpcGate handlers are supposed to do their own Status handling.
+    // They already fill msg.response if they like.
+    (void) msg.Call();
+
+    sResponse = msg.response.toString();
+
+  }
 
   AutoJSStringRef text = JSStringCreateWithUTF8CString(sResponse);
   JSValueRef value = JSValueMakeString(ctx, text);

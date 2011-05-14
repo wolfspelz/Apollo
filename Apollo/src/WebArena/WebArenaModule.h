@@ -71,6 +71,7 @@ public:
   void On_Animation_SequenceBegin(Msg_Animation_SequenceBegin* pMsg);
   //void On_Animation_Frame(Msg_Animation_Frame* pMsg);
   //void On_Animation_SequenceEnd(Msg_Animation_SequenceEnd* pMsg);
+  void On_WebArena_CallModuleSrpc(ApSRPCMessage* pMsg);
 
 #if defined(AP_TEST)
   void On_UnitTest_Begin(Msg_UnitTest_Begin* pMsg);

@@ -11,17 +11,17 @@ var api = new ApolloApi();
 api.moduleName = 'WebView';
 api.nMinWidth = 150;
 api.nMinHeight = 22;
-api.init();
-api.initMoveSize();
+api.Init();
+api.InitMoveSize();
 
 function Show()
 {
-  api.newMessage('WebView_Visibility').setInt('bVisible', 1).send();
+  api.Message('WebView_Visibility').setInt('bVisible', 1).send();
 }
 
 function Hide()
 {
-  api.newMessage('WebView_Visibility').setInt('bVisible', 0).send();
+  api.Message('WebView_Visibility').setInt('bVisible', 0).send();
 }
 
 </script>
@@ -31,20 +31,20 @@ function Hide()
 </style>
 
 </head>
-<body style="overflow:hidden;" onload="api.logUser('Developer HTML loading')" onunload="api.logUser('Developer HTML unloading')">
+<body style="overflow:hidden;" onload="api.LogUser('Developer HTML loading')" onunload="api.LogUser('Developer HTML unloading')">
 <div style="width:100%; height:100%; border:1px solid #000000; background-color:rgba(240,240,255,0.7);">
   <div class="Move" style="cursor:default; width:100%; height:20px; border-bottom:1px solid #000000; background-color:#00ff00;">Caption</div>
   <p id="iText" style="border:1px solid #0000ff; background:white;" contenteditable="true">--</p>
   <img alt="" src="http://webkit.org/images/icon-gold.png" />
   <img alt="" src="test1.png" />
   <p>
-    <input type="button" value="Translate" onclick="SetText(api.translate('Hello World'))"/>
-    <input type="button" value="Quit" onclick="api.newMessage('MainLoop_EndLoop').send();"/>
-    <input type="button" value="WebView_Reload" onclick="api.newMessage('WebView_Reload').send();"/>
+    <input type="button" value="Translate" onclick="SetText(api.Translate('Hello World'))"/>
+    <input type="button" value="Quit" onclick="api.Message('MainLoop_EndLoop').send();"/>
+    <input type="button" value="WebView_Reload" onclick="api.Message('WebView_Reload').send();"/>
     <input type="button" value="document.location.reload" onclick="document.location.reload();"/>
     <input type="button" value="Hide" onclick="Hide(); setTimeout('Show()', 1000);"/>
-    <input type="button" value="System_Echo" onclick="SetText(api.newMessage('System_Echo').setInt('nIn', 42).send().toString());"/>
-    <input type="button" value="CustomType" onclick="api.newMessage('Method1').setString('ApType', 'CustomType').setInt('nParam', 42).send();"/>
+    <input type="button" value="System_Echo" onclick="SetText(api.Message('System_Echo').setInt('nIn', 42).send().toString());"/>
+    <input type="button" value="CustomType" onclick="SetText(api.Message('Method1').setString('ApType', 'CustomType').setInt('nParam', 42).send().toString());"/>
   </p>
   <div class="SizeBottomRight" style="cursor:se-resize; width:20px; height:20px; background-image:url(sizer-se.png); position:absolute; right:1px; bottom:1px;" />
 </div>

@@ -461,7 +461,7 @@ int ApCore::Call(ApMessage* pMsg)
     ApCallQueue* pQueue = (ApCallQueue*) lMessageMap_.FindByName(pMsg->Type());
     if (pQueue == 0) {
       pMsg->apStatus = ApMessage::Error;
-      pMsg->sComment = "No handlers";
+      pMsg->sComment.appendf("No handler for message type=%s", StringType(pMsg->Type()));
     } else {
 
       bool bContinue = true;

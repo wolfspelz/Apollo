@@ -325,6 +325,23 @@ AP_MSG_HANDLER_METHOD(WebArenaModule, Animation_SequenceBegin)
 //  }
 //}
 
+//----------------------------
+
+AP_SRPC_HANDLER_METHOD(WebArenaModule, WebArena_CallModuleSrpc, ApSRPCMessage)
+{
+  String sMethod = pMsg->srpc.getString("Method");
+
+  if (0){
+  } else if (sMethod == "SendPublicChat") {
+
+
+  } else {
+    throw ApException("Unknown Method=%s", StringType(sMethod));
+  }
+
+  pMsg->apStatus = ApMessage::Ok;
+}
+
 //----------------------------------------------------------
 
 #if defined(AP_TEST)
@@ -381,6 +398,7 @@ int WebArenaModule::Init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, WebArenaModule, Animation_SequenceBegin, this, ApCallbackPosNormal);
   //AP_MSG_REGISTRY_ADD(MODULE_NAME, WebArenaModule, Animation_Frame, this, ApCallbackPosNormal);
   //AP_MSG_REGISTRY_ADD(MODULE_NAME, WebArenaModule, Animation_SequenceEnd, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, WebArenaModule, WebArena_CallModuleSrpc, this, ApCallbackPosNormal);
 
   AP_UNITTEST_HOOK(WebArenaModule, this);
 
@@ -390,5 +408,6 @@ int WebArenaModule::Init()
 void WebArenaModule::Exit()
 {
   AP_UNITTEST_UNHOOK(WebArenaModule, this);
+
   AP_MSG_REGISTRY_FINISH;
 }
