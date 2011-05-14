@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8,00"
-	Name="WebArena"
+	Name="Arena"
 	ProjectGUID="{A43A7CB4-A368-4AA0-8999-12E13DF300D2}"
-	RootNamespace="WebArena"
+	RootNamespace="Arena"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -39,7 +39,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalIncludeDirectories=""
-				PreprocessorDefinitions="WEBARENA_EXPORTS"
+				PreprocessorDefinitions="ARENA_EXPORTS"
 				DebugInformationFormat="4"
 			/>
 			<Tool
@@ -106,7 +106,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalIncludeDirectories=""
-				PreprocessorDefinitions="WEBARENA_EXPORTS"
+				PreprocessorDefinitions="ARENA_EXPORTS"
 				DebugInformationFormat="3"
 			/>
 			<Tool
@@ -171,7 +171,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\WebArenaModule.cpp"
+				RelativePath=".\ArenaModule.cpp"
 				>
 			</File>
 		</Filter>
@@ -197,7 +197,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\WebArenaModule.h"
+				RelativePath=".\ArenaModule.h"
 				>
 			</File>
 		</Filter>
@@ -208,27 +208,27 @@
 			>
 		</Filter>
 		<File
-			RelativePath="..\..\bin\Win32\Debug\modules\WebArena\apollo.js"
+			RelativePath="..\..\bin\Win32\Debug\modules\Arena\apollo.js"
 			>
 		</File>
 		<File
-			RelativePath="..\..\bin\Win32\Debug\modules\WebArena\arena.css"
+			RelativePath="..\..\bin\Win32\Debug\modules\Arena\arena.css"
 			>
 		</File>
 		<File
-			RelativePath="..\..\bin\Win32\Debug\modules\WebArena\arena.html"
+			RelativePath="..\..\bin\Win32\Debug\modules\Arena\arena.html"
 			>
 		</File>
 		<File
-			RelativePath="..\..\bin\Win32\Debug\modules\WebArena\arena.js"
+			RelativePath="..\..\bin\Win32\Debug\modules\Arena\arena.js"
 			>
 		</File>
 		<File
-			RelativePath="..\..\bin\Win32\Debug\modules\WebArena\config.txt"
+			RelativePath="..\..\bin\Win32\Debug\modules\Arena\config.txt"
 			>
 		</File>
 		<File
-			RelativePath="..\..\bin\Win32\Debug\modules\WebArena\utils.js"
+			RelativePath="..\..\bin\Win32\Debug\modules\Arena\utils.js"
 			>
 		</File>
 	</Files>

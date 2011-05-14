@@ -27,13 +27,13 @@ typedef ApHandlePointerTree<Chatline*> ChatlineList;
 typedef ApHandlePointerTreeIterator<Chatline*> ChatlineListIterator;
 typedef ApHandlePointerTreeNode<Chatline*> ChatlineListNode;
 
-class WebArenaModule;
+class ArenaModule;
 class Display;
 
 class Avatar
 {
 public:
-  Avatar(WebArenaModule* pModule, Display* pDisplay, const ApHandle& hParticipant);
+  Avatar(ArenaModule* pModule, Display* pDisplay, const ApHandle& hParticipant);
 
   void Create(int bSelf);
   void Destroy();
@@ -51,7 +51,7 @@ protected:
   void UnSubscribeDetail(const String& sKey);
 
   void RemoveOldChats(int nMax);
-  
+
   void SetNickname(const String& sNickname);
   void SetImage(const String& sUrl);
   void AddChatline(const ApHandle& hChat, const String& sText);
@@ -65,7 +65,7 @@ protected:
   void DeleteAllChatBubbles(const String& sContainer);
 
 protected:
-  WebArenaModule* pModule_;
+  ArenaModule* pModule_;
   Display* pDisplay_;
   ApHandle hParticipant_;
 

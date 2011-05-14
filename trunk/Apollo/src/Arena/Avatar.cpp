@@ -10,9 +10,9 @@
 #include "ColorString.h"
 #include "Local.h"
 #include "Avatar.h"
-#include "WebArenaModule.h"
+#include "ArenaModule.h"
 
-Avatar::Avatar(WebArenaModule* pModule, Display* pDisplay, const ApHandle& hParticipant)
+Avatar::Avatar(ArenaModule* pModule, Display* pDisplay, const ApHandle& hParticipant)
 :pModule_(pModule)
 ,pDisplay_(pDisplay)
 ,hParticipant_(hParticipant)

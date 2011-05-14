@@ -350,7 +350,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vld", "..\..\src\vld\vld.vc
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WebView", "..\..\src\WebView\WebView.vcproj", "{4AC6E41F-A2DF-44E6-A354-D29727770396}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WebArena", "..\..\src\WebArena\WebArena.vcproj", "{A43A7CB4-A368-4AA0-8999-12E13DF300D2}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Arena", "..\..\src\Arena\Arena.vcproj", "{A43A7CB4-A368-4AA0-8999-12E13DF300D2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

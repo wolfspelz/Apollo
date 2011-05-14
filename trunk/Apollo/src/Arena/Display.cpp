@@ -8,11 +8,11 @@
 #include "MsgVpView.h"
 #include "ColorString.h"
 #include "Local.h"
-#include "WebArenaModule.h"
+#include "ArenaModule.h"
 #include "Display.h"
 #include "Avatar.h"
 
-Display::Display(WebArenaModule* pModule, const ApHandle& hContext)
+Display::Display(ArenaModule* pModule, const ApHandle& hContext)
 :pModule_(pModule)
 ,hContext_(hContext)
 ,bVisible_(0)
