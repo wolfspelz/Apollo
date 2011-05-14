@@ -255,6 +255,25 @@ void Display::OnAvatarAnimationBegin(const ApHandle& hParticipant, const String&
   }
 }
 
+void Display::OnCallModuleSrpc(Apollo::SrpcMessage& request, Apollo::SrpcMessage& response)
+{
+  String sMethod = request.getString("Method");
+
+  if (0){
+  } else if (sMethod == "SendPublicChat") {
+    String sText = request.getString("sText");
+    if (sText){
+      Msg_Vp_SendPublicChat msg;
+      msg.hLocation = hLocation_;
+      msg.sText = sText;
+      if (!msg.Request()) { throw ApException("Msg_Vp_SendPublicChat failed  loc=" ApHandleFormat "", ApHandleType(hLocation_)); }
+    }
+
+  } else {
+    throw ApException("Unknown Method=%s", StringType(sMethod));
+  }
+}
+
 //---------------------------------------------------
 
 void Display::OnParticipantsChanged()

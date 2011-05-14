@@ -41,8 +41,7 @@ function DispatchMessage(msg)
 function TranslateAll()
 {
   $('.cTranslate').each(
-    function ()
-    {
+    function () {
       Log.Debug(this);
     }
   );
@@ -74,8 +73,7 @@ function RunUnittest()
   ApMessage.prototype.onLog = Log.IO;
 
   $(document).ready(
-    function ()
-    {
+    function () {
       arena = new Arena('iContent');
       arena.Startup();
       
@@ -96,7 +94,7 @@ function RunUnittest()
 <body style="overflow:hidden;">
 <div id="iWrapper" style="width:100%; height:100%">
 
-  <div id="iContent" style="position:absolute; left:0; top:0; width:40%; height:100%; overflow:auto;">
+  <div id="iContent" class="cContent" style="position:absolute; left:0; top:0; width:40%; height:100%; overflow:auto;">
     <div style="position:absolute; left:0px; bottom:0px; height:20px; width:60px; -webkit-box-shadow:inset 0 0 1px 1px #000000;"></div>
 
     <div class="cParticipant" id="iParticipant" style="left:110px;">
@@ -112,16 +110,16 @@ function RunUnittest()
           </div>
         </div>
         <div class="cImageWrapper">
-          <div class="cImage"></div>
-          <div class="cNickname">Long Nickname</div>
+          <div class="cImage style="z-index:40;"></div>
+          <div class="cNickname" style="z-index:50;">Long Nickname</div>
           <div class="cImageSensor">
-            <div class="cMenu" style="display:none"><img class="cBubble" src="Bubble.png" /></div>
-            <div class="cChatIn" style="display:none; white-space:nowrap">
+            <div class="cMenu" style="display:none; z-index:80;"><img class="cBubble" src="Bubble.png" /></div>
+            <div class="cChatIn" style="display:none; z-index:100;">
               <table border="0" cellpadding="0" cellspacing="0"><tr>
                 <td><input type="text" class="cText" size="30" /></td>
                 <td><input type="submit" class="cSend cTranslate" value="Send" /></td>
                 <td><img src="CloseButton.png" class="cCloseButton" /></td>
-                </tr></table>
+              </tr></table>
             </div>
           </div>
         </div>
@@ -146,23 +144,19 @@ function RunUnittest()
 <script type="text/javascript">
 
 $('.cImageSensor').hover(
-  function ()
-  {
+  function () {
     $('.cMenu').stop(true).fadeTo('fast',1);
   }, 
-  function ()
-  {
+  function () {
     $('.cMenu').fadeTo('fast',0);
   }
 );
 
 $('.cBubble').click(
-  function ()
-  {
+  function () {
     $('.cMenu').fadeTo('fast', 0);
     $('.cChatIn').fadeIn('fast', 
-      function()
-      {
+      function() {
         $('.cChatIn .cText').focus();
       }
     );
@@ -170,40 +164,41 @@ $('.cBubble').click(
 );
 
 $('.cCloseButton').hover(
-  function ()
-  {
+  function () {
     $(this).attr('src', 'CloseButtonHover.png');
   }, 
-  function ()
-  {
+  function () {
     $(this).attr('src', 'CloseButton.png');
   }
 ).click(
-  function ()
-  {
+  function () {
     $('.cChatIn').fadeOut('fast');
   }
 );
 
 $('.cChatIn .cText').bind("keydown", 
-  function(event)
-  {
+  function(event) {
     var keycode = (event.keyCode ? event.keyCode : (event.which ? event.which : event.charCode));
-    if (keycode == 13) {
+    switch (keycode) {
+    case 13:
       api.Message('SendPublicChat').setString('ApType', 'WebArena_CallModuleSrpc').setString('sText', this.value).send();
       this.value = '';
-      return false;
-    } else {
+      return false; break;
+
+    case 27:
+      $('.cChatIn').fadeOut('fast');
+      return false; break;
+
+    default:
       return true;
     }
   }
 );
 
 $('.cChatIn .cSend').click(
-  function()
-  {
+  function() {
     api.Message('SendPublicChat').setString('ApType', 'WebArena_CallModuleSrpc').setString('sText', $('.cChatIn .cText').val()).send();
-    $('.cChatIn .cText').val('');
+    $('.cChatIn .cText').val('').focus();
   }
 );
 

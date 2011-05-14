@@ -1180,21 +1180,24 @@ AP_MSG_HANDLER_METHOD(VpModule, VpView_Profile_Delete)
 AP_MSG_HANDLER_METHOD(VpModule, Vp_SendPublicChat)
 {
   Location* pLocation = findLocation(pMsg->hLocation);
-  if (pLocation) { pLocation->sendPublicChat(pMsg->sText); }
+  if (pLocation == 0)  { throw ApException("findLocation failed loc=" ApHandleFormat "", ApHandleType(pMsg->hLocation)); }
+  pLocation->sendPublicChat(pMsg->sText);
   pMsg->apStatus = ApMessage::Ok;
 }
 
 AP_MSG_HANDLER_METHOD(VpModule, Vp_SendPosition)
 {
   Location* pLocation = findLocation(pMsg->hLocation);
-  if (pLocation) { pLocation->setPosition(pMsg->kvParams); }
+  if (pLocation == 0)  { throw ApException("findLocation failed loc=" ApHandleFormat "", ApHandleType(pMsg->hLocation)); }
+  pLocation->setPosition(pMsg->kvParams);
   pMsg->apStatus = ApMessage::Ok;
 }
 
 AP_MSG_HANDLER_METHOD(VpModule, Vp_SendCondition)
 {
   Location* pLocation = findLocation(pMsg->hLocation);
-  if (pLocation) { pLocation->setCondition(pMsg->kvParams); }
+  if (pLocation == 0)  { throw ApException("findLocation failed loc=" ApHandleFormat "", ApHandleType(pMsg->hLocation)); }
+  pLocation->setCondition(pMsg->kvParams);
   pMsg->apStatus = ApMessage::Ok;
 }
 
