@@ -909,12 +909,12 @@ void Test_InNavigateChatOut::Begin()
   AddLast(new Test_InNavigateChatOut_ContextDetailsChanged_LocationUrl());
   AddLast(new Test_InNavigateChatOut_LocationContextsChanged2b());
 
-  //AddLast(new Test_InNavigateChatOut_ContextLocationUnassigned2());
-  //AddLast(new Test_InNavigateChatOut_ContextDetailsChanged_DocumentUrl());
-  //AddLast(new Test_InNavigateChatOut_ContextDestroyed());
-  //AddLast(new Test_InNavigateChatOut_LeaveLocationBegin2());
-  //AddLast(new Test_InNavigateChatOut_ParticipantsChanged2b());
-  //AddLast(new Test_InNavigateChatOut_LeaveLocationComplete2());
+  AddLast(new Test_InNavigateChatOut_ContextLocationUnassigned2());
+  AddLast(new Test_InNavigateChatOut_ContextDetailsChanged_DocumentUrl());
+  AddLast(new Test_InNavigateChatOut_ContextDestroyed());
+  AddLast(new Test_InNavigateChatOut_LeaveLocationBegin2());
+  AddLast(new Test_InNavigateChatOut_ParticipantsChanged2b());
+  AddLast(new Test_InNavigateChatOut_LeaveLocationComplete2());
 
   ActionList::Begin();
 }

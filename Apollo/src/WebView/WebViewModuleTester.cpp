@@ -19,7 +19,7 @@ void WebViewModuleTester_LoadHtml_On_WebView_Event_DocumentComplete(Msg_WebView_
 {
   if (pMsg->hView != g_LoadHtml_hView) { return; }
 
-  //Msg_WebView_Destroy::_(pMsg->hView);  
+  Msg_WebView_Destroy::_(pMsg->hView);  
   { Msg_WebView_Event_DocumentComplete msg; msg.UnHook(MODULE_NAME, (ApCallback) WebViewModuleTester_LoadHtml_On_WebView_Event_DocumentComplete, 0); }
 }
 
