@@ -55,7 +55,7 @@ int ApMessage::Hook(const char* szModuleName, ApCallback fnHandler, ApCallbackRe
   return Apollo::hookMsg(Type(), szModuleName, fnHandler, nRef, nPosition);
 }
 
-int ApMessage::UnHook(const char* szModuleName, ApCallback fnHandler, ApCallbackRef nRef)
+int ApMessage::Unhook(const char* szModuleName, ApCallback fnHandler, ApCallbackRef nRef)
 {
   return Apollo::unhookMsg(Type(), szModuleName, fnHandler, nRef);
 }

@@ -595,7 +595,7 @@ void Test_Db_UnitTest_TokenEnd()
 AP_MSG_HANDLER_METHOD(DbModule, UnitTest_Token)
 {
   AP_UNUSED_ARG(pMsg);
-  { Msg_UnitTest_Token msg; msg.UnHook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(DbModule, UnitTest_Token), this); }
+  { Msg_UnitTest_Token msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(DbModule, UnitTest_Token), this); }
   apLog_Info((LOG_CHANNEL, "DbModule::UnitTest_Token", "Starting Test/Db"));
   int bTokenEndNow = 1;
 

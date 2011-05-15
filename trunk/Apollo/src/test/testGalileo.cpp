@@ -547,14 +547,14 @@ String Test_Galileo_Display_Controller::End()
 {
   String s;
 
-  { Msg_Animation_SequenceBegin msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_Galileo_Display_Animation_SequenceBegin, this); }
-  { Msg_Animation_Frame msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_Galileo_Display_Animation_Frame, this); }
-  { Msg_Animation_SequenceEnd msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_Galileo_Display_Animation_SequenceEnd, this); }
-  { Msg_Galileo_RequestAnimation msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_Galileo_Display_Galileo_RequestAnimation, this); }
-  //{ Msg_Galileo_RequestAnimationComplete msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_Galileo_Display_Galileo_RequestAnimationComplete, this); }
-  { Msg_Galileo_SaveAnimationDataToStorage msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_Galileo_Display_Galileo_SaveAnimationDataToStorage, this); }
-  { Msg_Galileo_IsAnimationDataInStorage msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_Galileo_Display_Galileo_IsAnimationDataInStorage, this); }
-  { Msg_Galileo_LoadAnimationDataFromStorage msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_Galileo_Display_Galileo_LoadAnimationDataFromStorage, this); }
+  { Msg_Animation_SequenceBegin msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_Galileo_Display_Animation_SequenceBegin, this); }
+  { Msg_Animation_Frame msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_Galileo_Display_Animation_Frame, this); }
+  { Msg_Animation_SequenceEnd msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_Galileo_Display_Animation_SequenceEnd, this); }
+  { Msg_Galileo_RequestAnimation msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_Galileo_Display_Galileo_RequestAnimation, this); }
+  //{ Msg_Galileo_RequestAnimationComplete msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_Galileo_Display_Galileo_RequestAnimationComplete, this); }
+  { Msg_Galileo_SaveAnimationDataToStorage msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_Galileo_Display_Galileo_SaveAnimationDataToStorage, this); }
+  { Msg_Galileo_IsAnimationDataInStorage msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_Galileo_Display_Galileo_IsAnimationDataInStorage, this); }
+  { Msg_Galileo_LoadAnimationDataFromStorage msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_Galileo_Display_Galileo_LoadAnimationDataFromStorage, this); }
 
   {
     Msg_Animation_Stop msg;
@@ -586,7 +586,7 @@ String Test_Galileo_Display_Controller::End()
 static void Test_Galileo_UnitTest_Token(Msg_UnitTest_Token* pMsg)
 {
   AP_UNUSED_ARG(pMsg);
-  { Msg_UnitTest_Token msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_Galileo_UnitTest_Token, 0); }
+  { Msg_UnitTest_Token msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_Galileo_UnitTest_Token, 0); }
   apLog_Info((LOG_CHANNEL, "Test_Galileo_UnitTest_Token", "Starting Test/Galileo"));
   int bTokenEndNow = 1;
   

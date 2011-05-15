@@ -410,14 +410,14 @@ BABELFISH_API int UnLoad(AP_MODULE_CALL* pModuleData)
 {
   AP_UNUSED_ARG(pModuleData);
 
-  { Msg_Translation_Get msg; msg.UnHook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(BabelfishModule, Translation_Get), BabelfishModuleInstance::Get()); }
-  { Msg_Translation_SetLanguage msg; msg.UnHook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(BabelfishModule, Translation_SetLanguage), BabelfishModuleInstance::Get()); }
-  { Msg_Translation_GetLanguage msg; msg.UnHook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(BabelfishModule, Translation_GetLanguage), BabelfishModuleInstance::Get()); }
-  { Msg_Translation_Clear msg; msg.UnHook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(BabelfishModule, Translation_Clear), BabelfishModuleInstance::Get()); }
-  { Msg_Translation_LoadModuleLanguageFile msg; msg.UnHook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(BabelfishModule, Translation_LoadModuleLanguageFile), BabelfishModuleInstance::Get()); }
-  { Msg_Translation_UnloadLanguage msg; msg.UnHook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(BabelfishModule, Translation_UnloadLanguage), BabelfishModuleInstance::Get()); }
-  { Msg_Translation_Plane msg; msg.UnHook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(BabelfishModule, Translation_Plane), BabelfishModuleInstance::Get()); }
-  { Msg_Core_ModuleLoaded msg; msg.UnHook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(BabelfishModule, Core_ModuleLoaded), BabelfishModuleInstance::Get()); }
+  { Msg_Translation_Get msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(BabelfishModule, Translation_Get), BabelfishModuleInstance::Get()); }
+  { Msg_Translation_SetLanguage msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(BabelfishModule, Translation_SetLanguage), BabelfishModuleInstance::Get()); }
+  { Msg_Translation_GetLanguage msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(BabelfishModule, Translation_GetLanguage), BabelfishModuleInstance::Get()); }
+  { Msg_Translation_Clear msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(BabelfishModule, Translation_Clear), BabelfishModuleInstance::Get()); }
+  { Msg_Translation_LoadModuleLanguageFile msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(BabelfishModule, Translation_LoadModuleLanguageFile), BabelfishModuleInstance::Get()); }
+  { Msg_Translation_UnloadLanguage msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(BabelfishModule, Translation_UnloadLanguage), BabelfishModuleInstance::Get()); }
+  { Msg_Translation_Plane msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(BabelfishModule, Translation_Plane), BabelfishModuleInstance::Get()); }
+  { Msg_Core_ModuleLoaded msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(BabelfishModule, Core_ModuleLoaded), BabelfishModuleInstance::Get()); }
 
   (void) BabelfishModuleInstance::Get()->exit();
 

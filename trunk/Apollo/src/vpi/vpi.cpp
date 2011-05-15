@@ -773,23 +773,23 @@ VPI_API int Load(AP_MODULE_CALL* pModuleData)
 VPI_API int UnLoad(AP_MODULE_CALL* pModuleData)
 {
   AP_UNUSED_ARG(pModuleData);
-  { Msg_Vpi_Clear msg; msg.UnHook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(VpiModule, Vpi_Clear), VpiModuleInstance::Get()); }
-  { Msg_Vpi_GetStatus msg; msg.UnHook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(VpiModule, Vpi_GetStatus), VpiModuleInstance::Get()); }
-  { Msg_Vpi_GetTraversedFiles msg; msg.UnHook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(VpiModule, Vpi_GetTraversedFiles), VpiModuleInstance::Get()); }
-  { Msg_Vpi_LocationXmlRequest msg; msg.UnHook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(VpiModule, Vpi_LocationXmlRequest), VpiModuleInstance::Get()); }
-  { Msg_Vpi_GetLocationXml msg; msg.UnHook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(VpiModule, Vpi_GetLocationXml), VpiModuleInstance::Get()); }
-  { Msg_Vpi_ReceiveFile msg; msg.UnHook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(VpiModule, Vpi_ReceiveFile), VpiModuleInstance::Get()); }
-  { Msg_Vpi_GetDetailXml msg; msg.UnHook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(VpiModule, Vpi_GetDetailXml), VpiModuleInstance::Get()); }
-  { Msg_Vpi_GetLocationUrl msg; msg.UnHook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(VpiModule, Vpi_GetLocationUrl), VpiModuleInstance::Get()); }
-  { Msg_Vpi_SetSuffix msg; msg.UnHook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(VpiModule, Vpi_SetSuffix), VpiModuleInstance::Get()); }
-  { Msg_Vpi_GetSuffix msg; msg.UnHook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(VpiModule, Vpi_GetSuffix), VpiModuleInstance::Get()); }
-  { Msg_Vpi_GetSelectOptions msg; msg.UnHook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(VpiModule, Vpi_GetSelectOptions), VpiModuleInstance::Get()); }
-  { Msg_Vpi_GetSelectOptionProperties msg; msg.UnHook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(VpiModule, Vpi_GetSelectOptionProperties), VpiModuleInstance::Get()); }
-  { Msg_Vpi_ComposeLocation msg; msg.UnHook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(VpiModule, Vpi_ComposeLocation), VpiModuleInstance::Get()); }
+  { Msg_Vpi_Clear msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(VpiModule, Vpi_Clear), VpiModuleInstance::Get()); }
+  { Msg_Vpi_GetStatus msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(VpiModule, Vpi_GetStatus), VpiModuleInstance::Get()); }
+  { Msg_Vpi_GetTraversedFiles msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(VpiModule, Vpi_GetTraversedFiles), VpiModuleInstance::Get()); }
+  { Msg_Vpi_LocationXmlRequest msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(VpiModule, Vpi_LocationXmlRequest), VpiModuleInstance::Get()); }
+  { Msg_Vpi_GetLocationXml msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(VpiModule, Vpi_GetLocationXml), VpiModuleInstance::Get()); }
+  { Msg_Vpi_ReceiveFile msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(VpiModule, Vpi_ReceiveFile), VpiModuleInstance::Get()); }
+  { Msg_Vpi_GetDetailXml msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(VpiModule, Vpi_GetDetailXml), VpiModuleInstance::Get()); }
+  { Msg_Vpi_GetLocationUrl msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(VpiModule, Vpi_GetLocationUrl), VpiModuleInstance::Get()); }
+  { Msg_Vpi_SetSuffix msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(VpiModule, Vpi_SetSuffix), VpiModuleInstance::Get()); }
+  { Msg_Vpi_GetSuffix msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(VpiModule, Vpi_GetSuffix), VpiModuleInstance::Get()); }
+  { Msg_Vpi_GetSelectOptions msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(VpiModule, Vpi_GetSelectOptions), VpiModuleInstance::Get()); }
+  { Msg_Vpi_GetSelectOptionProperties msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(VpiModule, Vpi_GetSelectOptionProperties), VpiModuleInstance::Get()); }
+  { Msg_Vpi_ComposeLocation msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(VpiModule, Vpi_ComposeLocation), VpiModuleInstance::Get()); }
 #if defined(AP_TEST)
-  { Msg_UnitTest_Begin msg; msg.UnHook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(VpiModule, UnitTest_Begin), VpiModuleInstance::Get()); }
-  { Msg_UnitTest_Execute msg; msg.UnHook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(VpiModule, UnitTest_Execute), VpiModuleInstance::Get()); }
-  { Msg_UnitTest_End msg; msg.UnHook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(VpiModule, UnitTest_End), VpiModuleInstance::Get()); }
+  { Msg_UnitTest_Begin msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(VpiModule, UnitTest_Begin), VpiModuleInstance::Get()); }
+  { Msg_UnitTest_Execute msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(VpiModule, UnitTest_Execute), VpiModuleInstance::Get()); }
+  { Msg_UnitTest_End msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(VpiModule, UnitTest_End), VpiModuleInstance::Get()); }
 #endif
 
   VpiModuleInstance::Get()->Exit();

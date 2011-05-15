@@ -169,9 +169,9 @@ int Test_End_Net_TCP()
     delete d;
   }
 
-  { Msg_Net_TCP_Connected msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_Net_TCP_On_TCP_Connected, 0); }
-  { Msg_Net_TCP_DataIn msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_Net_TCP_On_TCP_DataIn, 0); }
-  { Msg_Net_TCP_Closed msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_Net_TCP_On_TCP_Closed, 0); }
+  { Msg_Net_TCP_Connected msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_Net_TCP_On_TCP_Connected, 0); }
+  { Msg_Net_TCP_DataIn msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_Net_TCP_On_TCP_DataIn, 0); }
+  { Msg_Net_TCP_Closed msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_Net_TCP_On_TCP_Closed, 0); }
 
   return ok;
 }
@@ -338,12 +338,12 @@ int Test_End_Net_TCP_ClientServer_Simple()
     { Msg_Net_TCP_ListenStop msg; msg.hServer = g_Test_Net_TCP_ClientServer_Simple_hServer; msg.Request(); }
   }
 
-  { Msg_Net_TCP_Listening msg; msg.UnHook("Test_Net_TCP_ClientServer_Simple", (ApCallback) Test_Net_TCP_ClientServer_Simple_ServerStarted, 0); }
-  { Msg_Net_TCP_Connected msg; msg.UnHook("Test_Net_TCP_ClientServer_Simple", (ApCallback) Test_Net_TCP_ClientServer_Simple_Connected, 0); }
-  { Msg_Net_TCP_ConnectionAccepted msg; msg.UnHook("Test_Net_TCP_ClientServer_Simple", (ApCallback) Test_Net_TCP_ClientServer_Simple_ConnectionAccepted, 0); }
-  { Msg_Net_TCP_DataIn msg; msg.UnHook("Test_Net_TCP_ClientServer_Simple", (ApCallback) Test_Net_TCP_ClientServer_Simple_DataIn, 0); }
-  { Msg_Net_TCP_Closed msg; msg.UnHook("Test_Net_TCP_ClientServer_Simple", (ApCallback) Test_Net_TCP_ClientServer_Simple_Disconnected, 0); }
-  { Msg_Net_TCP_ListenStopped msg; msg.UnHook("Test_Net_TCP_ClientServer_Simple", (ApCallback) Test_Net_TCP_ClientServer_Simple_ServerStopped, 0); }
+  { Msg_Net_TCP_Listening msg; msg.Unhook("Test_Net_TCP_ClientServer_Simple", (ApCallback) Test_Net_TCP_ClientServer_Simple_ServerStarted, 0); }
+  { Msg_Net_TCP_Connected msg; msg.Unhook("Test_Net_TCP_ClientServer_Simple", (ApCallback) Test_Net_TCP_ClientServer_Simple_Connected, 0); }
+  { Msg_Net_TCP_ConnectionAccepted msg; msg.Unhook("Test_Net_TCP_ClientServer_Simple", (ApCallback) Test_Net_TCP_ClientServer_Simple_ConnectionAccepted, 0); }
+  { Msg_Net_TCP_DataIn msg; msg.Unhook("Test_Net_TCP_ClientServer_Simple", (ApCallback) Test_Net_TCP_ClientServer_Simple_DataIn, 0); }
+  { Msg_Net_TCP_Closed msg; msg.Unhook("Test_Net_TCP_ClientServer_Simple", (ApCallback) Test_Net_TCP_ClientServer_Simple_Disconnected, 0); }
+  { Msg_Net_TCP_ListenStopped msg; msg.Unhook("Test_Net_TCP_ClientServer_Simple", (ApCallback) Test_Net_TCP_ClientServer_Simple_ServerStopped, 0); }
 
   return ok;
 }
@@ -711,9 +711,9 @@ int Test_End_Net_TCP_Simple()
 {
   int ok = 1;
 
-  { Msg_Net_TCP_Connected msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_Net_TCP_Simple_On_TCP_Connected, 0); }
-  { Msg_Net_TCP_DataIn msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_Net_TCP_Simple_On_TCP_DataIn, 0); }
-  { Msg_Net_TCP_Closed msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_Net_TCP_Simple_On_TCP_Closed, 0); }
+  { Msg_Net_TCP_Connected msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_Net_TCP_Simple_On_TCP_Connected, 0); }
+  { Msg_Net_TCP_DataIn msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_Net_TCP_Simple_On_TCP_DataIn, 0); }
+  { Msg_Net_TCP_Closed msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_Net_TCP_Simple_On_TCP_Closed, 0); }
 
   return ok;
 }
@@ -1147,11 +1147,11 @@ int Test_End_Net_HTTP()
     delete d;
   }
 
-  { Msg_Net_HTTP_Connected msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_Net_HTTP_OnConnected, 0); }
-  { Msg_Net_HTTP_Header msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_Net_HTTP_OnHeader, 0); }
-  { Msg_Net_HTTP_DataIn msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_Net_HTTP_OnDataIn, 0); }
-  { Msg_Net_HTTP_Failed msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_Net_HTTP_OnFailed, 0); }
-  { Msg_Net_HTTP_Closed msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_Net_HTTP_OnClosed, 0); }
+  { Msg_Net_HTTP_Connected msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_Net_HTTP_OnConnected, 0); }
+  { Msg_Net_HTTP_Header msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_Net_HTTP_OnHeader, 0); }
+  { Msg_Net_HTTP_DataIn msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_Net_HTTP_OnDataIn, 0); }
+  { Msg_Net_HTTP_Failed msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_Net_HTTP_OnFailed, 0); }
+  { Msg_Net_HTTP_Closed msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_Net_HTTP_OnClosed, 0); }
 
   return ok;
 }

@@ -20,7 +20,7 @@ void WebViewModuleTester_LoadHtml_On_WebView_Event_DocumentComplete(Msg_WebView_
   if (pMsg->hView != g_LoadHtml_hView) { return; }
 
   Msg_WebView_Destroy::_(pMsg->hView);  
-  { Msg_WebView_Event_DocumentComplete msg; msg.UnHook(MODULE_NAME, (ApCallback) WebViewModuleTester_LoadHtml_On_WebView_Event_DocumentComplete, 0); }
+  { Msg_WebView_Event_DocumentComplete msg; msg.Unhook(MODULE_NAME, (ApCallback) WebViewModuleTester_LoadHtml_On_WebView_Event_DocumentComplete, 0); }
 }
 
 String WebViewModuleTester::LoadHtml()
@@ -100,7 +100,7 @@ void WebViewModuleTester_CallJSEcho_On_WebView_Event_DocumentLoaded(Msg_WebView_
   AP_UNITTEST_RESULT(WebViewModuleTester::CallJSEcho_Result, ok, s);
 
   Msg_WebView_Destroy::_(pMsg->hView);  
-  { Msg_WebView_Event_DocumentLoaded msg; msg.UnHook(MODULE_NAME, (ApCallback) WebViewModuleTester_CallJSEcho_On_WebView_Event_DocumentLoaded, 0); }
+  { Msg_WebView_Event_DocumentLoaded msg; msg.Unhook(MODULE_NAME, (ApCallback) WebViewModuleTester_CallJSEcho_On_WebView_Event_DocumentLoaded, 0); }
 }
 
 String WebViewModuleTester::CallJSEcho()
@@ -146,7 +146,7 @@ void WebViewModuleTester_CallSystemEcho_On_WebView_Event_DocumentLoaded(Msg_WebV
   AP_UNITTEST_RESULT(WebViewModuleTester::CallSystemEcho_Result, ok, s);
 
   Msg_WebView_Destroy::_(pMsg->hView);  
-  { Msg_WebView_Event_DocumentLoaded msg; msg.UnHook(MODULE_NAME, (ApCallback) WebViewModuleTester_CallSystemEcho_On_WebView_Event_DocumentLoaded, 0); }
+  { Msg_WebView_Event_DocumentLoaded msg; msg.Unhook(MODULE_NAME, (ApCallback) WebViewModuleTester_CallSystemEcho_On_WebView_Event_DocumentLoaded, 0); }
 }
 
 String WebViewModuleTester::CallSystemEcho()
@@ -204,8 +204,8 @@ void WebViewModuleTester_CallCustomEcho_On_WebView_Event_DocumentLoaded(Msg_WebV
   AP_UNITTEST_RESULT(WebViewModuleTester::CallCustomEcho_Result, ok, s);
 
   Msg_WebView_Destroy::_(pMsg->hView);  
-  { Msg_WebView_Event_DocumentLoaded msg; msg.UnHook(MODULE_NAME, (ApCallback) WebViewModuleTester_CallCustomEcho_On_WebView_Event_DocumentLoaded, 0); }
-  { ApSRPCMessage msg("CustomEchoType"); msg.UnHook(MODULE_NAME, (ApCallback) WebViewModuleTester_CallCustomEcho_On_CustomEchoType, 0); }
+  { Msg_WebView_Event_DocumentLoaded msg; msg.Unhook(MODULE_NAME, (ApCallback) WebViewModuleTester_CallCustomEcho_On_WebView_Event_DocumentLoaded, 0); }
+  { ApSRPCMessage msg("CustomEchoType"); msg.Unhook(MODULE_NAME, (ApCallback) WebViewModuleTester_CallCustomEcho_On_CustomEchoType, 0); }
 }
 
 String WebViewModuleTester::CallCustomEcho()

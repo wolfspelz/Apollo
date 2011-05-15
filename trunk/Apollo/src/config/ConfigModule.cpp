@@ -572,7 +572,7 @@ void Test_Config_UnitTest_TokenEnd()
 AP_MSG_HANDLER_METHOD(ConfigModule, UnitTest_Token)
 {
   AP_UNUSED_ARG(pMsg);
-  { Msg_UnitTest_Token msg; msg.UnHook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(ConfigModule, UnitTest_Token), this); }
+  { Msg_UnitTest_Token msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(ConfigModule, UnitTest_Token), this); }
   apLog_Info((LOG_CHANNEL, "ConfigModule::UnitTest_Token", "Starting Test/Config"));
   int bTokenEndNow = 1;
 

@@ -56,7 +56,7 @@ static int Test_Vpi_WithExistingData_Vpi_LocationXmlResponse(Msg_Vpi_LocationXml
       s.appendf("Location request failed for url:%s", StringType(pMsg->sDocumentUrl));
     }
 
-    { Msg_Vpi_LocationXmlResponse msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_Vpi_WithExistingData_Vpi_LocationXmlResponse, 0); }
+    { Msg_Vpi_LocationXmlResponse msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_Vpi_WithExistingData_Vpi_LocationXmlResponse, 0); }
   }
 
   if (s.empty()) {
@@ -264,7 +264,7 @@ static int Test_Vpi_DetailedMap_Vpi_ReceiveFile(Msg_Vpi_ReceiveFile* pMsg)
   }
 
   if (pMsg->sUrl == g_sTest_Vpi_DetailedMap_Vpi_VpiURL) {
-    { Msg_Vpi_ReceiveFile msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_Vpi_DetailedMap_Vpi_ReceiveFile, 0); }
+    { Msg_Vpi_ReceiveFile msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_Vpi_DetailedMap_Vpi_ReceiveFile, 0); }
   }
 
   return 1;
@@ -278,7 +278,7 @@ static int Test_Vpi_DetailedMap_Vpi_RequestFile(Msg_Vpi_RequestFile* pMsg)
   }
 
   if (pMsg->sUrl == g_sTest_Vpi_DetailedMap_Vpi_VpiURL) {
-    { Msg_Vpi_RequestFile msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_Vpi_DetailedMap_Vpi_RequestFile, 0); }
+    { Msg_Vpi_RequestFile msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_Vpi_DetailedMap_Vpi_RequestFile, 0); }
   }
 
   return 1;
@@ -313,7 +313,7 @@ static int Test_Vpi_DetailedMap_Vpi_LocationXmlResponse(Msg_Vpi_LocationXmlRespo
       s.appendf("response=%d request=%d receive=%d", g_bTest_Vpi_DetailedMap, g_bTest_Vpi_DetailedMap_Vpi_RequestFile, g_bTest_Vpi_DetailedMap_Vpi_ReceiveFile);
     }
 
-    { Msg_Vpi_LocationXmlResponse msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_Vpi_DetailedMap_Vpi_LocationXmlResponse, 0); }
+    { Msg_Vpi_LocationXmlResponse msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_Vpi_DetailedMap_Vpi_LocationXmlResponse, 0); }
   }
 
   if (s.empty()) {
@@ -456,7 +456,7 @@ static int Test_Vpi_Map_Vpi_LocationXmlResponse(Msg_Vpi_LocationXmlResponse* pMs
 
   if (bDone) {
     { Msg_Vpi_Clear msg; msg.Request(); }
-    { Msg_Vpi_LocationXmlResponse msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_Vpi_Map_Vpi_LocationXmlResponse, 0); }
+    { Msg_Vpi_LocationXmlResponse msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_Vpi_Map_Vpi_LocationXmlResponse, 0); }
     Test_Vpi_UnitTest_TokenEnd();
   }
 
@@ -501,7 +501,7 @@ static String Test_Vpi_Map_Start()
 static void Test_Vpi_UnitTest_Token(Msg_UnitTest_Token* pMsg)
 {
   AP_UNUSED_ARG(pMsg);
-  { Msg_UnitTest_Token msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_Vpi_UnitTest_Token, 0); }
+  { Msg_UnitTest_Token msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_Vpi_UnitTest_Token, 0); }
   apLog_Info((LOG_CHANNEL, "Test_Vpi_UnitTest_Token", "Starting Test/Vpi"));
   int bTokenEndNow = 1;
 

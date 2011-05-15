@@ -380,7 +380,7 @@ static String Test_Avatar_RemoveOldChats()
     s = "Did not remove oldest chat";
   }
 
-  { DisplaySrpcMessage msg(&d, "Dummy"); msg.UnHook(MODULE_NAME, (ApCallback) Test_Avatar_RemoveOldChats_DisplaySrpcMessage, 0); }
+  { DisplaySrpcMessage msg(&d, "Dummy"); msg.Unhook(MODULE_NAME, (ApCallback) Test_Avatar_RemoveOldChats_DisplaySrpcMessage, 0); }
 
   return s;
 }

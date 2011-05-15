@@ -408,7 +408,7 @@ int ApCore::unhookMsg(const char* szMsgType, const char* szModuleName, ApCallbac
       ok = 1;
     } else {
       // not found
-      apLog_Verbose((LOG_CHANNEL, "ApCore::unhookMsg", "UnHook failed szMsgType=%s, szModuleName=%s, pRef=&p"
+      apLog_Verbose((LOG_CHANNEL, "ApCore::unhookMsg", "Unhook failed szMsgType=%s, szModuleName=%s, pRef=&p"
                                                 , szMsgType
                                                 , szModuleName
                                                 , pRef));

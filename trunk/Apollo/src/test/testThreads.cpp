@@ -124,8 +124,8 @@ void Test_Threads_ThreadPool_Begin()
 
 void Test_Threads_ThreadPool_End()
 {
-  { Msg_ThreadPool_Test_Threads_JobFinished msg; msg.UnHook("testThreads", (ApCallback) Test_Threads_ThreadPool_On_Job_Finished, 0); }
-  { Msg_ThreadPool_Finished msg; msg.UnHook("testThreads", (ApCallback) Test_Threads_ThreadPool_On_Pool_Finished, 0); }
+  { Msg_ThreadPool_Test_Threads_JobFinished msg; msg.Unhook("testThreads", (ApCallback) Test_Threads_ThreadPool_On_Job_Finished, 0); }
+  { Msg_ThreadPool_Finished msg; msg.Unhook("testThreads", (ApCallback) Test_Threads_ThreadPool_On_Pool_Finished, 0); }
   
   g_Test_Threads_ThreadPool_lJobs.Empty();
 
