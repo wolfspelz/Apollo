@@ -13,7 +13,7 @@
 void Win32FirefoxBrowser::SecTimer()
 {
   HWND hWnd = win_;
-  
+
   if (hWnd != NULL) {
     HWND hContent = NULL;
     ChildClassPathFinder ccpf(hWnd, "MozillaWindowClass/MozillaWindowClass/MozillaWindowClass/MozillaContentWindowClass");
@@ -37,16 +37,16 @@ void Win32FirefoxBrowser::SecTimer()
     ::GetWindowRect(hContent, &rect);
 
     int bVisible = 1;
-    int nX = rect.left;
-    int nY = rect.bottom - 1;
-    int nW = rect.right - rect.left;
-    int nH = rect.bottom - rect.top;
+    int nLeft = rect.left;
+    int nBottom = rect.bottom - 1;
+    int nWidth = rect.right - rect.left;
+    int nHeight = rect.bottom - rect.top;
 
     if (rect.top < -30000) {
       bVisible = 0;
     }
 
-    Evaluate(bVisible, nX, nY, nW, nH);
+    Evaluate(bVisible, nLeft, nBottom, nWidth, nHeight);
 
   } // hWnd != NULL
 }

@@ -106,7 +106,7 @@ void FirefoxFinder::OnWindow(HWND hWnd)
   }
 }
 
-Apollo::WindowHandle FirefoxFinder::GetFirefoxToplevelWindow(const String& sTitle, int nX, int nY, int nWidth, int nHeight)
+Apollo::WindowHandle FirefoxFinder::GetFirefoxToplevelWindow(const String& sTitle, int nLeft, int nTop, int nWidth, int nHeight)
 {
   HWND hWnd = NULL;
 
@@ -141,7 +141,7 @@ Apollo::WindowHandle FirefoxFinder::GetFirefoxToplevelWindow(const String& sTitl
     } // sTitle
 
     // Filter by coordinates
-    if (nX != IgnoreCoordinate || nY != IgnoreCoordinate || nWidth != IgnoreCoordinate || nHeight != IgnoreCoordinate) {
+    if (nLeft != IgnoreCoordinate || nTop != IgnoreCoordinate || nWidth != IgnoreCoordinate || nHeight != IgnoreCoordinate) {
     }
   }
 

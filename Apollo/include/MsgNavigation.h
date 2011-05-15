@@ -53,8 +53,8 @@ public:
   #define Navigation_SrpcMethod_NativeWindow_Type_InternetExplorer "InternetExplorer"
 // in: kvSignature
   #define Navigation_SrpcMethod_NativeWindow_Signature_Title "sTitle"
-  #define Navigation_SrpcMethod_NativeWindow_Signature_X "nX"
-  #define Navigation_SrpcMethod_NativeWindow_Signature_Y "nY"
+  #define Navigation_SrpcMethod_NativeWindow_Signature_Left "nLeft"
+  #define Navigation_SrpcMethod_NativeWindow_Signature_Top "nTop"
   #define Navigation_SrpcMethod_NativeWindow_Signature_Width "nWidth"
   #define Navigation_SrpcMethod_NativeWindow_Signature_Height "nHeight"
 
@@ -66,8 +66,8 @@ public:
 
 #define Navigation_SrpcMethod_Position "Context.Position"
 // in: hContext
-// in: nX
-// in: nY
+// in: nLeft
+// in: nBottom
 
 #define Navigation_SrpcMethod_Size "Context.Size"
 // in: hContext

@@ -339,8 +339,8 @@ ApolloApi.prototype =
         if (this.bIsSize) {
           if (dx < 0 || dy < 0) {
             var pos = this.Message('WebView_GetPosition').send();
-            var nW = pos.getInt('nW');
-            var nH = pos.getInt('nH');
+            var nW = pos.getInt('nWidth');
+            var nH = pos.getInt('nHeight');
             var nNewW = nW + dx;
             var nNewH = nH + dy;
             if (nNewW < this.nMinWidth) { dx = this.nMinWidth - nW; }
@@ -348,8 +348,8 @@ ApolloApi.prototype =
           }
 
           this.Message('WebView_SizeBy')
-            .setInt('nW', dx)
-            .setInt('nH', dy)
+            .setInt('nX', dx)
+            .setInt('nY', dy)
             .setInt('nDirection', this.nSizeDirection)
             .send();
 

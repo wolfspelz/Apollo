@@ -83,12 +83,12 @@ void Context::hide() // throws ApException
   msg.Send();
 }
 
-void Context::position(int nX, int nY) // throws ApException
+void Context::position(int nLeft, int nBottom) // throws ApException
 {
   Msg_VpView_ContextPosition msg;
   msg.hContext = apHandle();
-  msg.nX = nX;
-  msg.nY = nY;
+  msg.nLeft = nLeft;
+  msg.nBottom = nBottom;
   msg.Send();
 }
 

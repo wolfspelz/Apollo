@@ -109,6 +109,8 @@ function RunUnittest()
     <input type="button" value="Clear" onclick="Log.instance.Clear();" />
     <input type="button" value="Translate" onclick="Log.Info(api.Translate('ParamTest', 'Click me!'));" />
     <input type="button" value="TranslateAll" onclick="TranslateAll();" />
+    <input type="button" value="Connect" onclick="api.Message('Xmpp_Connect').send();" />
+    <input type="button" value="Disconnect" onclick="api.Message('Xmpp_Disconnect').send();" />
   </div>
   <div id="iOut" style="position:absolute; left:50%; top:0; width:50%; height:100%; overflow:auto; white-space: nowrap;"></div>
 </div>

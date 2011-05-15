@@ -46,7 +46,7 @@ Context* Browser::GetContext(const ApHandle& hContext)
   return pContext;
 }
 
-void Browser::Evaluate(int bVisible, int nX, int nY, int nW, int nH)
+void Browser::Evaluate(int bVisible, int nLeft, int nBottom, int nWidth, int nHeight)
 {
   int bPosChanged = 0;
   int bSizeChanged = 0;
@@ -58,35 +58,35 @@ void Browser::Evaluate(int bVisible, int nX, int nY, int nW, int nH)
   }
 
   if (bVisible) {
-    if (nX != nX_ || nY != nY_) {
+    if (nLeft != nLeft_ || nBottom != nBottom_) {
       bPosChanged = 1;
-      nX_ = nX;
-      nY_ = nY;
+      nLeft_ = nLeft;
+      nBottom_ = nBottom;
     }
 
-    if (nW != nW_ || nH != nH_) {
+    if (nWidth != nWidth_ || nHeight != nHeight_) {
       bSizeChanged = 1;
-      nW_ = nW;
-      nH_ = nH;
+      nWidth_ = nWidth;
+      nHeight_ = nHeight;
     }
   }
-  //apLog_Debug((LOG_CHANNEL, "Win32FirefoxBrowser::SecTimer", "%08x %d,%d,%d,%d", (int) hWnd, nX, nY, nW, nH));
+  //apLog_Debug((LOG_CHANNEL, "Win32FirefoxBrowser::SecTimer", "%08x %d,%d,%d,%d", (int) hWnd, nLeft, nBottom, nWidth, nHeight));
 
   for (ContextNode* pNode = 0; (pNode = contexts_.Next(pNode)) != 0; ) {
 
     if (bPosChanged) {
       Msg_VpView_ContextPosition msg;
       msg.hContext = pNode->Key();
-      msg.nX = nX;
-      msg.nY = nY;
+      msg.nLeft = nLeft;
+      msg.nBottom = nBottom;
       LocalCallGuard g; msg.Send();
     }
 
     if (bSizeChanged) {
       Msg_VpView_ContextSize msg;
       msg.hContext = pNode->Key();
-      msg.nWidth = nW;
-      msg.nHeight = nH;
+      msg.nWidth = nWidth;
+      msg.nHeight = nHeight;
       LocalCallGuard g; msg.Send();
     }
 

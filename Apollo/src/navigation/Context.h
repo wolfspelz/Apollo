@@ -26,7 +26,7 @@ public:
   void nativeWindow(const String& sType, Apollo::KeyValueList& kvSignature); // throws ApException
   void show(); // throws ApException
   void hide(); // throws ApException
-  void position(int nX, int nY); // throws ApException
+  void position(int nLeft, int nBottom); // throws ApException
   void size(int nWidth, int nHeight); // throws ApException
 
 protected:

@@ -17,28 +17,28 @@ public:
   Context(const ApHandle& hContext)
     :hAp_(hContext)
     ,bVisible_(0)
-    ,nX_(0)
-    ,nY_(0)
-    ,nW_(0)
-    ,nH_(0)
+    ,nLeft_(0)
+    ,nBottom_(0)
+    ,nWidth_(0)
+    ,nHeight_(0)
   {}
 
   ApHandle hAp_;
 
   void SetVisibility(int bVisible) { bVisible_ = bVisible; }
-  void SetPosition(int nX, int nY) { nX_ = nX; nY_ = nY; }
-  void SetSize(int nW, int nH) { nW_ = nW; nH_ = nH; }
+  void SetPosition(int nLeft, int nBottom) { nLeft_ = nLeft; nBottom_ = nBottom; }
+  void SetSize(int nWidth, int nHeight) { nWidth_ = nWidth; nHeight_ = nHeight; }
 
   int IsVisible() { return bVisible_; }
-  void GetPosition(int& nX, int& nY) { nX = nX_; nY = nY_; }
-  void GetSize(int& nW, int& nH) { nW = nW_; nH = nH_; }
+  void GetPosition(int& nLeft, int& nBottom) { nLeft = nLeft_; nBottom = nBottom_; }
+  void GetSize(int& nWidth, int& nHeight) { nWidth = nWidth_; nHeight = nHeight_; }
 
 protected:
   int bVisible_;
-  int nX_;
-  int nY_;
-  int nW_;
-  int nH_;
+  int nLeft_;
+  int nBottom_;
+  int nWidth_;
+  int nHeight_;
 };
 
 typedef ApHandlePointerTree<Context*> ContextList;
@@ -50,10 +50,10 @@ public:
   Browser(Apollo::WindowHandle& win)
     :win_(win)
     ,bVisible_(0)
-    ,nX_(0)
-    ,nY_(0)
-    ,nW_(0)
-    ,nH_(0)
+    ,nLeft_(0)
+    ,nBottom_(0)
+    ,nWidth_(0)
+    ,nHeight_(0)
   {}
   virtual ~Browser() {}
 
@@ -65,7 +65,7 @@ public:
   Apollo::WindowHandle GetWindow() { return win_; }
 
   virtual void SecTimer() {}
-  virtual void Browser::Evaluate(int bVisible, int nX, int nY, int nW, int nH);
+  virtual void Browser::Evaluate(int bVisible, int nLeft, int nBottom, int nWidth, int nHeight);
 
   int IsVisible() { return bVisible_; }
 
@@ -78,10 +78,10 @@ protected:
   ContextList contexts_;
 
   int bVisible_;
-  int nX_;
-  int nY_;
-  int nW_;
-  int nH_;
+  int nLeft_;
+  int nBottom_;
+  int nWidth_;
+  int nHeight_;
 };
 
 #endif // !defined(Browser_h_INCLUDED)

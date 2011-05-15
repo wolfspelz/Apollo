@@ -76,7 +76,7 @@ public:
 
   void OnWindow(HWND hWnd);
 
-  static Apollo::WindowHandle GetFirefoxToplevelWindow(const String& sTitle, int nX, int nY, int nWidth, int nHeight);
+  static Apollo::WindowHandle GetFirefoxToplevelWindow(const String& sTitle, int nLeft, int nTop, int nWidth, int nHeight);
 
   String sToplevelClass_;
   String sChildClassPath_;

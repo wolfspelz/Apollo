@@ -41,10 +41,10 @@ public:
 class Msg_VpView_ContextPosition: public ApNotificationMessage
 {
 public:
-  Msg_VpView_ContextPosition() : ApNotificationMessage("VpView_ContextPosition"), nX(0), nY(0) {}
+  Msg_VpView_ContextPosition() : ApNotificationMessage("VpView_ContextPosition"), nLeft(0), nBottom(0) {}
   ApIN ApHandle hContext;
-  ApIN int nX;
-  ApIN int nY;
+  ApIN int nLeft;
+  ApIN int nBottom;
 };
 
 // input -> VP/Arena
@@ -72,10 +72,10 @@ public:
 class Msg_VpView_GetContextPosition: public ApRequestMessage
 {
 public:
-  Msg_VpView_GetContextPosition() : ApRequestMessage("VpView_GetContextPosition"), nX(0), nY(0) {}
+  Msg_VpView_GetContextPosition() : ApRequestMessage("VpView_GetContextPosition"), nLeft(0), nBottom(0) {}
   ApIN ApHandle hContext;
-  ApOUT int nX;
-  ApOUT int nY;
+  ApOUT int nLeft;
+  ApOUT int nBottom;
 };
 
 // -> input
@@ -215,8 +215,8 @@ public:
 #define Msg_VpView_ContextDetail_LocationUrl "LocationUrl"
 #define Msg_VpView_ContextDetail_Visibility "Visibility"
 #define Msg_VpView_ContextDetail_Position "Position"
-  #define Msg_VpView_ContextDetail_Position_X "nX"
-  #define Msg_VpView_ContextDetail_Position_Y "nY"
+  #define Msg_VpView_ContextDetail_Position_Left "nLeft"
+  #define Msg_VpView_ContextDetail_Position_Bottom "nBottom"
 #define Msg_VpView_ContextDetail_Size "Size"
   #define Msg_VpView_ContextDetail_Size_Width "nWidth"
   #define Msg_VpView_ContextDetail_Size_Height "nHeight"

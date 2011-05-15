@@ -41,22 +41,22 @@ public:
 class Msg_WebView_Position: public ApRequestMessage
 {
 public:
-  Msg_WebView_Position() : ApRequestMessage("WebView_Position"), nX(0), nY(0), nW(0), nH(0) {}
-  static int _(const ApHandle& hView, int nX, int nY, int nW, int nH)
+  Msg_WebView_Position() : ApRequestMessage("WebView_Position"), nLeft(0), nTop(0), nWidth(0), nHeight(0) {}
+  static int _(const ApHandle& hView, int nLeft, int nTop, int nWidth, int nHeight)
   {
     Msg_WebView_Position msg;
     msg.hView = hView;
-    msg.nX = nX;
-    msg.nY = nY;
-    msg.nW = nW;
-    msg.nH = nH;
+    msg.nLeft = nLeft;
+    msg.nTop = nTop;
+    msg.nWidth = nWidth;
+    msg.nHeight = nHeight;
     return msg.Request();
   }
   ApIN ApHandle hView;
-  ApIN int nX;
-  ApIN int nY;
-  ApIN int nW;
-  ApIN int nH;
+  ApIN int nLeft;
+  ApIN int nTop;
+  ApIN int nWidth;
+  ApIN int nHeight;
 };
 
 class Msg_WebView_Visibility: public ApRequestMessage
@@ -189,10 +189,10 @@ public:
     ,DirectionBottomLeft
     ,DirectionBottomRight
   };
-  Msg_WebView_SizeBy() : ApRequestMessage("WebView_SizeBy"), nW(0), nH(0), nDirection(DirectionBottomRight) {}
+  Msg_WebView_SizeBy() : ApRequestMessage("WebView_SizeBy"), nX(0), nY(0), nDirection(DirectionBottomRight) {}
   ApIN ApHandle hView;
-  ApIN int nW;
-  ApIN int nH;
+  ApIN int nX;
+  ApIN int nY;
   ApIN int nDirection;
 };
 
@@ -213,12 +213,12 @@ public:
 class Msg_WebView_GetPosition: public ApRequestMessage
 {
 public:
-  Msg_WebView_GetPosition() : ApRequestMessage("WebView_GetPosition"), nX(0), nY(0), nW(0), nH(0) {}
+  Msg_WebView_GetPosition() : ApRequestMessage("WebView_GetPosition"), nLeft(0), nTop(0), nWidth(0), nHeight(0) {}
   ApIN ApHandle hView;
-  ApOUT int nX;
-  ApOUT int nY;
-  ApOUT int nW;
-  ApOUT int nH;
+  ApOUT int nLeft;
+  ApOUT int nTop;
+  ApOUT int nWidth;
+  ApOUT int nHeight;
 };
 
 class Msg_WebView_GetVisibility: public ApRequestMessage

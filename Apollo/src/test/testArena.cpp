@@ -400,8 +400,8 @@ public:
     {
       Msg_VpView_ContextPosition msg;
       msg.hContext = t->hContext_;
-      msg.nX = t->nLeft_;
-      msg.nY = t->nBottom_;
+      msg.nLeft = t->nLeft_;
+      msg.nBottom = t->nBottom_;
       msg.Send();
     }
 

@@ -146,12 +146,12 @@ void View::Reload()
 
 //------------------------------------
 
-void View::SetPosition(int nX, int nY, int nW, int nH)
+void View::SetPosition(int nLeft, int nTop, int nWidth, int nHeight)
 {
-  nLeft_ = nX;
-  nTop_ = nY;
-  nWidth_ = nW;
-  nHeight_ = nH;
+  nLeft_ = nLeft;
+  nTop_ = nTop;
+  nWidth_ = nWidth;
+  nHeight_ = nHeight;
 
 #if defined(WIN32)
   ::MoveWindow(hWnd_, nLeft_, nTop_ - (bVisible_ ? 0 : 10000), nWidth_, nHeight_, FALSE);
@@ -199,17 +199,17 @@ void View::MoveBy(int nX, int nY)
 #endif // WIN32
 }
   
-void View::SizeBy(int nW, int nH, int nDirection)
+void View::SizeBy(int nX, int nY, int nDirection)
 {
   switch (nDirection) {
-    case Msg_WebView_SizeBy::DirectionLeft:          nLeft_ -= nW;               nWidth_ += nW;                 break;
-    case Msg_WebView_SizeBy::DirectionTop:                         nTop_  -= nH;                nHeight_ += nH; break;
-    case Msg_WebView_SizeBy::DirectionRight:                                     nWidth_ += nW;                 break;
-    case Msg_WebView_SizeBy::DirectionBottom:                                                   nHeight_ += nH; break;
-    case Msg_WebView_SizeBy::DirectionTopLeft:       nLeft_ -= nW;  nTop_ -= nH; nWidth_ += nW; nHeight_ += nH; break;
-    case Msg_WebView_SizeBy::DirectionTopRight:                     nTop_ -= nH; nWidth_ += nW; nHeight_ += nH; break;
-    case Msg_WebView_SizeBy::DirectionBottomLeft:    nLeft_ -= nW;               nWidth_ += nW; nHeight_ += nH; break;
-    case Msg_WebView_SizeBy::DirectionBottomRight:                               nWidth_ += nW; nHeight_ += nH; break;
+    case Msg_WebView_SizeBy::DirectionLeft:          nLeft_ -= nX;               nWidth_ += nX;                 break;
+    case Msg_WebView_SizeBy::DirectionTop:                         nTop_  -= nY;                nHeight_ += nY; break;
+    case Msg_WebView_SizeBy::DirectionRight:                                     nWidth_ += nX;                 break;
+    case Msg_WebView_SizeBy::DirectionBottom:                                                   nHeight_ += nY; break;
+    case Msg_WebView_SizeBy::DirectionTopLeft:       nLeft_ -= nX;  nTop_ -= nY; nWidth_ += nX; nHeight_ += nY; break;
+    case Msg_WebView_SizeBy::DirectionTopRight:                     nTop_ -= nY; nWidth_ += nX; nHeight_ += nY; break;
+    case Msg_WebView_SizeBy::DirectionBottomLeft:    nLeft_ -= nX;               nWidth_ += nX; nHeight_ += nY; break;
+    case Msg_WebView_SizeBy::DirectionBottomRight:                               nWidth_ += nX; nHeight_ += nY; break;
   }
 
   //if (nWidth_ < 0) { nWidth_ = 0; }
@@ -238,12 +238,12 @@ void View::MouseRelease()
 #endif // WIN32
 }
 
-void View::GetPosition(int& nX, int& nY, int& nW, int& nH)
+void View::GetPosition(int& nLeft, int& nTop, int& nWidth, int& nHeight)
 {
-  nX = nLeft_;
-  nY = nTop_;
-  nW = nWidth_;
-  nH = nHeight_;
+  nLeft = nLeft_;
+  nTop = nTop_;
+  nWidth = nWidth_;
+  nHeight = nHeight_;
 }
 
 void View::GetVisibility(int& bVisible)

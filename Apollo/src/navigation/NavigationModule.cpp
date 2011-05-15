@@ -15,26 +15,26 @@
 
 Context* NavigationModule::findContext(const ApHandle& h)
 {
-  Context* pContext = 0; 
+  Context* pContext = 0;
 
   ContextNode* pNode = contexts_.Find(h);
   if (pNode != 0) {
     pContext = pNode->Value();
   }
 
-  return pContext; 
+  return pContext;
 }
 
 Connection* NavigationModule::findConnection(const ApHandle& h)
 {
-  Connection* pConnection = 0; 
+  Connection* pConnection = 0;
 
   ConnectionNode* pNode = connections_.Find(h);
   if (pNode) {
     pConnection = pNode->Value();
   }
 
-  return pConnection; 
+  return pConnection;
 }
 
 int NavigationModule::addConnection(const ApHandle& hConnection, Connection* pConnection)
@@ -52,7 +52,7 @@ int NavigationModule::removeConnection(const ApHandle& hConnection)
 
   ok = connections_.Unset(hConnection);
 
-  // Connection lost: 
+  // Connection lost:
   if (ok) {
 
     // Construct lust of contexts to be closed
@@ -92,7 +92,7 @@ void NavigationModule::associateContextWithConnection(const ApHandle& hContext, 
   if (hCurrentlyAssociatedConnection != hConnection) {
     if (ApIsHandle(hCurrentlyAssociatedConnection)) {
       removeContextFromConnection(hContext, hCurrentlyAssociatedConnection);
-    } 
+    }
     addContextToConnection(hContext, hConnection);
   }
 }
@@ -323,10 +323,10 @@ AP_MSG_HANDLER_METHOD(NavigationModule, Navigation_Receive)
           }
 
         } else if (sMethod == Navigation_SrpcMethod_Position) {
-          String sX = pMsg->srpc.getString("nX");
-          String sY = pMsg->srpc.getString("nY");
+          String sLeft = pMsg->srpc.getString("nLeft");
+          String sBottom = pMsg->srpc.getString("nBottom");
           try {
-            pContext->position(String::atoi(sX), String::atoi(sY));
+            pContext->position(String::atoi(sLeft), String::atoi(sBottom));
             response.createResponse(pMsg->srpc);
           } catch (ApException ex) {
             response.createError(pMsg->srpc, ex.getText());
