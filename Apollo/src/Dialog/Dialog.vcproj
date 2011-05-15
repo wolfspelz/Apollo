@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="8,00"
 	Name="Dialog"
-  ProjectGUID="{10449FC8-D791-4099-8867-4991059DE871}"
+	ProjectGUID="{10449FC8-D791-4099-8867-4991059DE871}"
 	RootNamespace="Dialog"
 	Keyword="Win32Proj"
 	>
@@ -154,22 +154,34 @@
 		<Filter
 			Name="Source Files"
 			Filter="cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx"
-      UniqueIdentifier="{3911584C-D8BC-4c43-B032-6A5ABA6363E0}"
+			UniqueIdentifier="{3911584C-D8BC-4c43-B032-6A5ABA6363E0}"
 			>
 			<File
-				RelativePath=".\dll.cpp"
+				RelativePath=".\Dialog.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\DialogModule.cpp"
 				>
 			</File>
+			<File
+				RelativePath=".\dll.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
-      UniqueIdentifier="{D4E50E4E-68BC-4253-B2CC-216C5CF881A9}"
+			UniqueIdentifier="{D4E50E4E-68BC-4253-B2CC-216C5CF881A9}"
 			>
+			<File
+				RelativePath=".\Dialog.h"
+				>
+			</File>
+			<File
+				RelativePath=".\DialogModule.h"
+				>
+			</File>
 			<File
 				RelativePath=".\dll.h"
 				>
@@ -178,15 +190,11 @@
 				RelativePath=".\Local.h"
 				>
 			</File>
-			<File
-				RelativePath=".\DialogModule.h"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"
 			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
-      UniqueIdentifier="{3328E564-2C57-4e03-ABD3-9766EC03B42C}"
+			UniqueIdentifier="{3328E564-2C57-4e03-ABD3-9766EC03B42C}"
 			>
 		</Filter>
 	</Files>

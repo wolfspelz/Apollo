@@ -8,21 +8,28 @@
 #define DialogModule_H_INCLUDED
 
 #include "ApModule.h"
+#include "ApContainer.h"
 #include "MsgUnitTest.h"
 #include "MsgDialog.h"
-//#include "SrpcGateHelper.h"
+#include "SrpcGateHelper.h"
+#include "Dialog.h"
+
+typedef ApHandlePointerTree<Dialog*> DialogList;
+typedef ApHandlePointerTreeNode<Dialog*> DialogListNode;
+typedef ApHandlePointerTreeIterator<Dialog*> DialogListIterator;
 
 class DialogModule
 {
 public:
   DialogModule()
-    :nTheAnswer_(42)
-    {}
+  {}
 
   int Init();
   void Exit();
 
-  void On_Dialog_XX(Msg_Dialog_XX* pMsg);
+  void On_Dialog_Create(Msg_Dialog_Create* pMsg);
+  void On_Dialog_Destroy(Msg_Dialog_Destroy* pMsg);
+  void On_Dialog_GetView(Msg_Dialog_GetView* pMsg);
 
 #if defined(AP_TEST)
   void On_UnitTest_Begin(Msg_UnitTest_Begin* pMsg);
@@ -31,10 +38,15 @@ public:
   friend class DialogModuleTester;
 #endif
 
-public:
-  int nTheAnswer_;
+protected:
+  Dialog* NewDialog(const ApHandle& hDialog, int nLeft, int nTop, int nWidth, int nHeight, int bVisible, const String& sContentUrl);
+  void DeleteDialog(const ApHandle& hDialog);
+  Dialog* FindDialog(const ApHandle& hDialog);
 
-  //Apollo::SrpcGateHandlerRegistry srpcGateRegistry_;
+protected:
+  DialogList dialogs_;
+
+  Apollo::SrpcGateHandlerRegistry srpcGateRegistry_;
   AP_MSG_REGISTRY_DECLARE;
 };
 

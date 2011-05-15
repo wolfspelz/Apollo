@@ -178,7 +178,7 @@ AP_MSG_HANDLER_METHOD(ConfigModule, Config_Load)
 
         String sData;
         if (!Apollo::loadFile(sFile, sData)) {
-          apLog_Error((LOG_CHANNEL, "On_Config_Load", "fConfig.Load failed(%s)", StringType(sFile)));
+          apLog_Info((LOG_CHANNEL, "On_Config_Load", "fConfig.Load failed(%s)", StringType(sFile)));
         } else {
           ok = 1;
           pPlane->vlPathNames_.add(sFile);
