@@ -11,6 +11,7 @@
 #define LOG_CHANNEL MODULE_NAME
 
 #include "ApLog.h"
+#include "MsgSample.h"
 #include "SampleModule.h"
 
 #endif // Local_H_INCLUDED

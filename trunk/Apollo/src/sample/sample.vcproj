@@ -161,6 +161,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Sample.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\SampleModule.cpp"
 				>
 			</File>
@@ -176,6 +180,10 @@
 			</File>
 			<File
 				RelativePath=".\Local.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Sample.h"
 				>
 			</File>
 			<File

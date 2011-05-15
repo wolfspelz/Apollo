@@ -60,7 +60,7 @@ void ArenaModuleTester::Begin()
 void ArenaModuleTester::Execute()
 {
   //AP_UNITTEST_EXECUTE(ArenaModuleTester::LoadHtml);
-  (void) ArenaModuleTester::Dev();
+  //(void) ArenaModuleTester::Dev();
 }
 
 void ArenaModuleTester::End()

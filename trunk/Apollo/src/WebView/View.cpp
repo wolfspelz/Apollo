@@ -111,8 +111,8 @@ void View::Load(const String& sUrl)
       ::GetModuleFileName(NULL, szFileName, MAX_PATH);
       ::PathRemoveFileSpec(szFileName);
       ::PathAddBackslash(szFileName);
-      //::PathAppend(szFileName, Apollo::getModuleResourcePath(MODULE_NAME) + "/html/test/frame.html");
-      ::PathAppend(szFileName, Apollo::getModuleResourcePath(MODULE_NAME) + "/html/test/overlay.html");
+      //::PathAppend(szFileName, Apollo::getModuleResourcePath(MODULE_NAME) + "/test/frame.html");
+      ::PathAppend(szFileName, Apollo::getModuleResourcePath(MODULE_NAME) + "/test/overlay.html");
 
       TCHAR szFileName2[MAX_PATH];
       _stprintf_s(szFileName2, MAX_PATH, _T("file://%s"), szFileName);
@@ -202,13 +202,13 @@ void View::MoveBy(int nX, int nY)
 void View::SizeBy(int nX, int nY, int nDirection)
 {
   switch (nDirection) {
-    case Msg_WebView_SizeBy::DirectionLeft:          nLeft_ -= nX;               nWidth_ += nX;                 break;
-    case Msg_WebView_SizeBy::DirectionTop:                         nTop_  -= nY;                nHeight_ += nY; break;
+    case Msg_WebView_SizeBy::DirectionLeft:          nLeft_ += nX;               nWidth_ -= nX;                 break;
+    case Msg_WebView_SizeBy::DirectionTop:                         nTop_ += nY;                 nHeight_ -= nY; break;
     case Msg_WebView_SizeBy::DirectionRight:                                     nWidth_ += nX;                 break;
     case Msg_WebView_SizeBy::DirectionBottom:                                                   nHeight_ += nY; break;
-    case Msg_WebView_SizeBy::DirectionTopLeft:       nLeft_ -= nX;  nTop_ -= nY; nWidth_ += nX; nHeight_ += nY; break;
-    case Msg_WebView_SizeBy::DirectionTopRight:                     nTop_ -= nY; nWidth_ += nX; nHeight_ += nY; break;
-    case Msg_WebView_SizeBy::DirectionBottomLeft:    nLeft_ -= nX;               nWidth_ += nX; nHeight_ += nY; break;
+    case Msg_WebView_SizeBy::DirectionTopLeft:       nLeft_ += nX; nTop_ += nY;  nWidth_ -= nX; nHeight_ -= nY; break;
+    case Msg_WebView_SizeBy::DirectionTopRight:                    nTop_ += nY;  nWidth_ += nX; nHeight_ -= nY; break;
+    case Msg_WebView_SizeBy::DirectionBottomLeft:    nLeft_ += nX;               nWidth_ -= nX; nHeight_ += nY; break;
     case Msg_WebView_SizeBy::DirectionBottomRight:                               nWidth_ += nX; nHeight_ += nY; break;
   }
 

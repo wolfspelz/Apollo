@@ -28,7 +28,9 @@ int Test_Core_ModuleLoad()
     ok= 0;
   }
 
-  Msg_Sample_Get msg; msg.Request();
+  Msg_Sample_Get msg; 
+  msg.sKey = "TestKeyUsedByLoadModuleTest";
+  msg.Request();
   if (msg.nValue != 42) {
     ok = 0;
   }
