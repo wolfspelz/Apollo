@@ -11,6 +11,7 @@ LoadDLL/0900=C:\cygwin\home\wolf\WebKit\WebKitBuild\Release_Cairo_CFLite\bin\lib
 LoadDLL/1000=C:\cygwin\home\wolf\WebKit\WebKitBuild\Release_Cairo_CFLite\bin\objc.dll
 LoadDLL/1100=C:\cygwin\home\wolf\WebKit\WebKitBuild\Release_Cairo_CFLite\bin\pthreadVC2.dll
 LoadDLL/1200=C:\cygwin\home\wolf\WebKit\WebKitBuild\Release_Cairo_CFLite\bin\ssleay32.dll
-LoadDLL/1500=C:\cygwin\home\wolf\WebKit\WebKitBuild\Release_Cairo_CFLite\bin\JavaScriptCore.dll
-LoadDLL/1700=C:\cygwin\home\wolf\WebKit\WebKitBuild\Release_Cairo_CFLite\bin\CFLite.dll
+  # These 2 do not want to load from the original folder. They have been added to the app base folder
+  LoadDLL/1500=C:\cygwin\home\wolf\WebKit\WebKitBuild\Release_Cairo_CFLite\bin\JavaScriptCore.dll
+  LoadDLL/1700=C:\cygwin\home\wolf\WebKit\WebKitBuild\Release_Cairo_CFLite\bin\CFLite.dll
 LoadDLL/1800=C:\cygwin\home\wolf\WebKit\WebKitBuild\Release_Cairo_CFLite\bin\WebKit.dll
