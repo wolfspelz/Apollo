@@ -79,15 +79,15 @@ public:
   String CallJsFunction(const String& sFunction, List& lArgs) throw(ApException);
   void CallJsSrpc(const String& sFunction, Apollo::SrpcMessage& srpc, Apollo::SrpcMessage& response) throw(ApException);
 
-  void SetPosition(int nX, int nY, int nW, int nH);
+  void SetPosition(int nLeft, int nTop, int nWidth, int nHeight);
   void SetVisibility(int bVisible);
   void SetScriptAccessPolicy(const String& sPolicy);
   void SetNavigationPolicy(const String& sPolicy);
   void MoveBy(int nX, int nY);
-  void SizeBy(int nW, int nH, int nDirection);
+  void SizeBy(int nX, int nY, int nDirection);
   void MouseCapture();
   void MouseRelease();
-  void GetPosition(int& nX, int& nY, int& nW, int& nH);
+  void GetPosition(int& nLeft, int& nTop, int& nWidth, int& nHeight);
   void GetVisibility(int& bVisible);
 
   static JSValueRef JS_Apollo_getSharedValue(JSContextRef ctx, JSObjectRef thisObject, JSStringRef propertyName, JSValueRef* exception);

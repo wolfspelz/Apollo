@@ -29,8 +29,8 @@ public:
   void Destroy();
 
   void SetVisibility(int bVisible);
-  void SetPosition(int nX, int nY);
-  void SetSize(int nW, int nH);
+  void SetPosition(int nLeft, int nBottom);
+  void SetSize(int nWidth, int nHeight);
 
   void AttachLocation(const ApHandle& hLocation);
   void DetachLocation(const ApHandle& hLocation);

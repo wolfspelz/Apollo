@@ -118,7 +118,7 @@ public:
   inline ApHandle getMapping() { return hMapping_; }
 
   void setVisibility(int bVisible);
-  void setPosition(int nX, int nY);
+  void setPosition(int nLeft, int nBottom);
   void setSize(int nWidth, int nHeight);
 
   void getDetailString(const String& sKey, String& sValue, String& sMimeType);

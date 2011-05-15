@@ -210,7 +210,7 @@ void Context::setVisibility(int bVisible)
   lThingys_.endChanges();
 }
 
-void Context::setPosition(int nX, int nY)
+void Context::setPosition(int nLeft, int nBottom)
 {
   lThingys_.beginChanges();
 
@@ -219,8 +219,8 @@ void Context::setPosition(int nX, int nY)
     KeyValueContextThingyProvider* pProvider = (KeyValueContextThingyProvider*) pThingy->getProvider();
     if (pProvider) {
       Apollo::KeyValueList kvData;
-      kvData.add(Msg_VpView_ContextDetail_Position_X, nX);
-      kvData.add(Msg_VpView_ContextDetail_Position_Y, nY);
+      kvData.add(Msg_VpView_ContextDetail_Position_Left, nLeft);
+      kvData.add(Msg_VpView_ContextDetail_Position_Bottom, nBottom);
       pProvider->setData(kvData);
     }
   }

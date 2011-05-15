@@ -88,18 +88,18 @@ void Display::SetVisibility(int bVisible)
   }
 }
 
-void Display::SetPosition(int nX, int nY)
+void Display::SetPosition(int nLeft, int nBottom)
 {
-  nLeft_ = nX;
-  nBottom_ = nY;
+  nLeft_ = nLeft;
+  nBottom_ = nBottom;
 
   SendPosition();
 }
 
-void Display::SetSize(int nW, int nH)
+void Display::SetSize(int nWidth, int nHeight)
 {
-  nWidth_ = nW;
-  nHeight_ = nH;
+  nWidth_ = nWidth;
+  nHeight_ = nHeight;
 
   SendPosition();
 }
@@ -108,10 +108,10 @@ void Display::SendPosition()
 {
   Msg_WebView_Position msg;
   msg.hView = hView_;
-  msg.nX = nLeft_;
-  msg.nY = nBottom_ - nHeight_;
-  msg.nW = nWidth_;
-  msg.nH = nHeight_;
+  msg.nLeft = nLeft_;
+  msg.nTop = nBottom_ - nHeight_;
+  msg.nWidth = nWidth_;
+  msg.nHeight = nHeight_;
   if (!msg.Request()) {
     apLog_Error((LOG_CHANNEL, "Display::SendPosition", "Msg_WebView_Position(" ApHandleFormat ") failed", ApHandleType(msg.hView)));
   }

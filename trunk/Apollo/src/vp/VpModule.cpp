@@ -453,7 +453,7 @@ AP_MSG_HANDLER_METHOD(VpModule, VpView_ContextPosition)
 
   Context* pContext = 0;
   if (contexts_.Get(pMsg->hContext, pContext)) {
-    pContext->setPosition(pMsg->nX, pMsg->nY);
+    pContext->setPosition(pMsg->nLeft, pMsg->nBottom);
   }
 
   pMsg->apStatus = ok ? ApMessage::Ok : ApMessage::Error;

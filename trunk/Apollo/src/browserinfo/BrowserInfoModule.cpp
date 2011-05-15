@@ -50,20 +50,20 @@ AP_MSG_HANDLER_METHOD(BrowserInfoModule, BrowserInfo_BeginTrackCoordinates)
   ApHandle hContext = pMsg->hContext;
 
   String sTitle = pMsg->kvSignature[Msg_BrowserInfo_BeginTrackCoordinates_Signature_Title].getString();
-  String sX = pMsg->kvSignature[Msg_BrowserInfo_BeginTrackCoordinates_Signature_X].getString();
-  String sY = pMsg->kvSignature[Msg_BrowserInfo_BeginTrackCoordinates_Signature_Y].getString();
+  String sLeft = pMsg->kvSignature[Msg_BrowserInfo_BeginTrackCoordinates_Signature_Left].getString();
+  String sTop = pMsg->kvSignature[Msg_BrowserInfo_BeginTrackCoordinates_Signature_Top].getString();
   String sWidth = pMsg->kvSignature[Msg_BrowserInfo_BeginTrackCoordinates_Signature_Width].getString();
   String sHeight = pMsg->kvSignature[Msg_BrowserInfo_BeginTrackCoordinates_Signature_Height].getString();
 
-  int nX = IgnoreCoordinate; if (!sX.empty()) { nX = String::atoi(sX); }
-  int nY = IgnoreCoordinate; if (!sY.empty()) { nY = String::atoi(sY); }
+  int nLeft = IgnoreCoordinate; if (!sLeft.empty()) { nLeft = String::atoi(sLeft); }
+  int nTop = IgnoreCoordinate; if (!sTop.empty()) { nTop = String::atoi(sTop); }
   int nWidth = IgnoreCoordinate; if (!sWidth.empty()) { nWidth = String::atoi(sWidth); }
   int nHeight = IgnoreCoordinate; if (!sHeight.empty()) { nHeight = String::atoi(sHeight); }
 
   Apollo::WindowHandle win;
   if (0) {
   } else if (pMsg->sType == Msg_BrowserInfo_BeginTrackCoordinates_Type_Firefox) {
-    win = FirefoxFinder::GetFirefoxToplevelWindow(sTitle, nX, nY, nWidth, nHeight);
+    win = FirefoxFinder::GetFirefoxToplevelWindow(sTitle, nLeft, nTop, nWidth, nHeight);
   }
 
   if (!win.isValid()) {
@@ -140,7 +140,7 @@ AP_MSG_HANDLER_METHOD(BrowserInfoModule, VpView_ContextPosition)
   if (pBrowser) {
     Context* pContext = pBrowser->GetContext(pMsg->hContext);
     if (pContext) {
-      pContext->SetPosition(pMsg->nX, pMsg->nY);
+      pContext->SetPosition(pMsg->nLeft, pMsg->nBottom);
     }
   }
 
@@ -179,7 +179,7 @@ AP_MSG_HANDLER_METHOD(BrowserInfoModule, VpView_GetContextPosition)
   if (pBrowser) {
     Context* pContext = pBrowser->GetContext(pMsg->hContext);
     if (pContext) {
-      pContext->GetPosition(pMsg->nX, pMsg->nY);
+      pContext->GetPosition(pMsg->nLeft, pMsg->nBottom);
     }
   }
 

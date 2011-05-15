@@ -8,6 +8,7 @@
 #include "MsgConfig.h"
 #include "Local.h"
 #include "ArenaModule.h"
+#include "ArenaModuleTester.h"
 #include "Avatar.h"
 
 Display* ArenaModule::CreateDisplay(const ApHandle& hContext)
@@ -173,7 +174,7 @@ AP_MSG_HANDLER_METHOD(ArenaModule, VpView_ContextPosition)
 {
   Display* pDisplay = FindDisplay(pMsg->hContext);
   if (pDisplay) {
-    pDisplay->SetPosition(pMsg->nX, pMsg->nY);
+    pDisplay->SetPosition(pMsg->nLeft, pMsg->nBottom);
   }
 }
 
@@ -388,6 +389,7 @@ AP_MSG_HANDLER_METHOD(ArenaModule, UnitTest_Begin)
 {
   AP_UNUSED_ARG(pMsg);
   if (Apollo::getConfig("Test/Arena", 0)) {
+    ArenaModuleTester::Begin();
     AP_UNITTEST_REGISTER(Test_Avatar_RemoveOldChats);
   }
 }
@@ -396,6 +398,7 @@ AP_MSG_HANDLER_METHOD(ArenaModule, UnitTest_Execute)
 {
   AP_UNUSED_ARG(pMsg);
   if (Apollo::getConfig("Test/Arena", 0)) {
+    ArenaModuleTester::Execute();
     AP_UNITTEST_EXECUTE(Test_Avatar_RemoveOldChats);
   }
 }
@@ -403,6 +406,9 @@ AP_MSG_HANDLER_METHOD(ArenaModule, UnitTest_Execute)
 AP_MSG_HANDLER_METHOD(ArenaModule, UnitTest_End)
 {
   AP_UNUSED_ARG(pMsg);
+  if (Apollo::getConfig("Test/Arena", 0)) {
+    ArenaModuleTester::End();
+  }
 }
 
 #endif // #if defined(AP_TEST)

@@ -22,8 +22,8 @@ public:
   #define Msg_BrowserInfo_BeginTrackCoordinates_Type_InternetExplorer Navigation_SrpcMethod_NativeWindow_Type_InternetExplorer
   ApIN Apollo::KeyValueList kvSignature;
   #define Msg_BrowserInfo_BeginTrackCoordinates_Signature_Title Navigation_SrpcMethod_NativeWindow_Signature_Title
-  #define Msg_BrowserInfo_BeginTrackCoordinates_Signature_X Navigation_SrpcMethod_NativeWindow_Signature_X
-  #define Msg_BrowserInfo_BeginTrackCoordinates_Signature_Y Navigation_SrpcMethod_NativeWindow_Signature_Y
+  #define Msg_BrowserInfo_BeginTrackCoordinates_Signature_Left Navigation_SrpcMethod_NativeWindow_Signature_Left
+  #define Msg_BrowserInfo_BeginTrackCoordinates_Signature_Top Navigation_SrpcMethod_NativeWindow_Signature_Top
   #define Msg_BrowserInfo_BeginTrackCoordinates_Signature_Width Navigation_SrpcMethod_NativeWindow_Signature_Width
   #define Msg_BrowserInfo_BeginTrackCoordinates_Signature_Height Navigation_SrpcMethod_NativeWindow_Signature_Height
 };
@@ -49,10 +49,10 @@ public:
 class Msg_BrowserInfo_Position: public ApRequestMessage
 {
 public:
-  Msg_BrowserInfo_Position() : ApRequestMessage("BrowserInfo_Position"), nX(0), nY(0) {}
+  Msg_BrowserInfo_Position() : ApRequestMessage("BrowserInfo_Position"), nLeft(0), nBottom(0) {}
   ApIN ApHandle hContext;
-  ApIN int nX;
-  ApIN int nY;
+  ApIN int nLeft;
+  ApIN int nBottom;
 };
 
 // browser window tracker module -> 
