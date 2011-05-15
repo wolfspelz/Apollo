@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<config xmlns="http://schema.bluehands.de/character-config" version="1.0">
+<param name="defaultsequence" value="idle"/>
+<sequence group="chat" name="chat1" probability="1000" type="basic" in="standard" out="standard"><animation src="chat.gif"/></sequence>
+<sequence group="idle" name="idle1" probability="1000" type="status" in="standard" out="standard"><animation src="still.gif"/></sequence>
+<sequence group="idle" name="idle2" probability="5" type="status" in="standard" out="standard"><animation src="idle.gif"/></sequence>
+<sequence group="moveleft" name="moveleft1" probability="1000" type="basic" in="moveleft" out="moveleft"><animation dx="-300" src="left.gif"/></sequence>
+<sequence group="moveright" name="moveright1" probability="1000" type="basic" in="moveright" out="moveright"><animation dx="300" src="right.gif"/></sequence>
+<sequence group="sleep" name="sleep1" probability="1000" type="status" in="standard" out="standard"><animation src="sleep.gif"/></sequence>
+<sequence group="wave" name="wave1" probability="1000" type="emote" in="standard" out="standard"><animation src="wave.gif"/></sequence>
+</config>
+

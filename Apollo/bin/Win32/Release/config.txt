@@ -1,29 +1,6 @@
 # Module independent config
 # Each module has its own config and optional local config
 
-#Test/Builtin=1
-#Test/Core=1
-#Test/Config=1
-#Test/Translation=1
-#Test/Threads=1
-#Test/Timer=1
-#Test/Db=1
-#Test/Xmpp=1
-#Test/Server=1
-#Test/Net=1
-#Test/Vpi=1
-#Test/Vp=1
-#Test/Identity=1
-#Test/Gm=1
-#Test/Navigation=1
-#Test/BrowserInfo=1
-#Test/Galileo=1
-#Test/WebView=1
-#Test/Arena=1
-#Test/Dialog=1
-
-# ---------------------------------------------
-
 Update/Url=http://web.avatar.io/update/
 Update/Version=3.0.4
 
