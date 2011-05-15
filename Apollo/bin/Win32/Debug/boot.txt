@@ -11,6 +11,7 @@ Core/Modules/00900/Net/Path=net
 Core/Modules/01000/NetAPI/Path=netapi
 Core/Modules/01200/Vpi/Path=vpi
 Core/Modules/01300/Xmpp/Path=xmpp
+#Core/Modules/01400/NetSim/Path=netsim
 Core/Modules/01500/Vp/Path=vp
 Core/Modules/01600/Identity/Path=identity
 Core/Modules/01700/Server/Path=server
@@ -20,6 +21,7 @@ Core/Modules/02200/Gm/Path=gm
 Core/Modules/02300/Galileo/Path=Galileo
 Core/Modules/02700/WebView/Path=WebView
 Core/Modules/02800/Arena/Path=Arena
+Core/Modules/02900/Dialog/Path=Dialog
 
 Core/ModulesDirectory=modules
 
@@ -32,4 +34,3 @@ System/UserProfileFolder=Avatar
 
 #Dun/OnLoad/DeleteDbFiles=Identity
 #LogMask=31
-#Debug/ShowConsole=1

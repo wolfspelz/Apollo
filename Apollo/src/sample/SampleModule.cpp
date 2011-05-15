@@ -5,23 +5,28 @@
 // ============================================================================
 
 #include "Apollo.h"
-#include "ApLog.h"
-#include "MsgConfig.h"
 #include "Local.h"
-#include "SampleModule.h"
 
 // Replace regex: 
 // \(Msg_[a-zA-Z]+_[^ *]+\* pMsg\)
 
+// This only for the "Msg_Config_GetValue" sending message example below
+#include "MsgConfig.h"
+
 AP_MSG_HANDLER_METHOD(SampleModule, Sample_Get)
 {
+  // Example of requesting a value by sending a message
   String sSomeConfigValue;
   Msg_Config_GetValue msg;
   msg.sPath = "path";
   msg.Request();
   sSomeConfigValue = msg.sValue;
 
+  // Example of using the Apollo wrapper method for the same as above
   sSomeConfigValue = Apollo::getConfig("path", "default");
+
+  // Logging example
+  apLog_Info((MODULE_NAME, "Context is the current function", "Format string %d", nTheAnswer_));
 
   pMsg->nValue = nTheAnswer_;
   pMsg->apStatus = ApMessage::Ok;
@@ -54,7 +59,7 @@ AP_MSG_HANDLER_METHOD(SampleModule, UnitTest_End)
 
 //----------------------------------------------------------
 
-int SampleModule::init()
+int SampleModule::Init()
 {
   int ok = 1;
 
@@ -64,8 +69,39 @@ int SampleModule::init()
   return ok;
 }
 
-void SampleModule::exit()
+void SampleModule::Exit()
 {
   AP_UNITTEST_UNHOOK(SampleModule, this);
   AP_MSG_REGISTRY_FINISH;
 }
+
+//----------------------------------------------------------
+
+#if defined(AP_TEST)
+
+void SampleModuleTester::Begin()
+{
+  AP_UNITTEST_REGISTER(SampleModuleTester::Test1);
+}
+
+void SampleModuleTester::Execute()
+{
+  AP_UNITTEST_EXECUTE(SampleModuleTester::Test1);
+}
+
+void SampleModuleTester::End()
+{
+}
+
+//----------------------------
+
+String SampleModuleTester::Test1()
+{
+  String s;
+
+  return s;
+}
+
+//----------------------------
+
+#endif // #if defined(AP_TEST)
