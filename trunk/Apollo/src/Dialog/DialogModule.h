@@ -4,25 +4,25 @@
 //
 // ============================================================================
 
-#if !defined(SampleModule_H_INCLUDED)
-#define SampleModule_H_INCLUDED
+#if !defined(DialogModule_H_INCLUDED)
+#define DialogModule_H_INCLUDED
 
 #include "ApModule.h"
 #include "MsgUnitTest.h"
-#include "MsgSample.h"
+#include "MsgDialog.h"
 //#include "SrpcGateHelper.h"
 
-class SampleModule
+class DialogModule
 {
 public:
-  SampleModule()
+  DialogModule()
     :nTheAnswer_(42)
     {}
 
   int Init();
   void Exit();
 
-  void On_Sample_Get(Msg_Sample_Get* pMsg);
+  void On_Dialog_XX(Msg_Dialog_XX* pMsg);
 
 #if defined(AP_TEST)
   void On_UnitTest_Begin(Msg_UnitTest_Begin* pMsg);
@@ -38,13 +38,13 @@ public:
   AP_MSG_REGISTRY_DECLARE;
 };
 
-typedef ApModuleSingleton<SampleModule> SampleModuleInstance;
+typedef ApModuleSingleton<DialogModule> DialogModuleInstance;
 
 //----------------------------------------------------------
 
 #if defined(AP_TEST)
 
-class SampleModuleTester
+class DialogModuleTester
 {
 public:
   static void Begin();
@@ -56,4 +56,4 @@ public:
 
 #endif
 
-#endif // SampleModule_H_INCLUDED
+#endif // DialogModule_H_INCLUDED
