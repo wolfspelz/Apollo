@@ -736,7 +736,7 @@ static void Test_Timer_Basic_On_Timer_Event(Msg_Timer_Event* pMsg)
       err = "Apollo::cancelTimeout() failed";
     }
     AP_UNITTEST_RESULT(MainLoopModule::Test_Timer_Basic_Complete, err.empty(), err);
-    { Msg_Timer_Event msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_Timer_Basic_On_Timer_Event, 0); }  
+    { Msg_Timer_Event msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_Timer_Basic_On_Timer_Event, 0); }  
     AP_UNITTEST_EXECUTE(MainLoopModule::Test_Timer_Interval);
   }
 }
@@ -774,7 +774,7 @@ static void Test_Timer_Interval_On_Timer_Event(Msg_Timer_Event* pMsg)
         err = "Apollo::cancelInterval() failed";
       }
       AP_UNITTEST_RESULT(MainLoopModule::Test_Timer_Interval_Complete, err.empty(), err);
-      { Msg_Timer_Event msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_Timer_Interval_On_Timer_Event, 0); }  
+      { Msg_Timer_Event msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_Timer_Interval_On_Timer_Event, 0); }  
       MainLoopModule::UnitTest_TokenEnd();
     }
   }
@@ -807,7 +807,7 @@ void MainLoopModule::UnitTest_TokenEnd()
 void MainLoopModule::UnitTest_Token(Msg_UnitTest_Token* pMsg)
 {
   AP_UNUSED_ARG(pMsg);
-  { Msg_UnitTest_Token msg; msg.UnHook(MODULE_NAME, (ApCallback) MainLoopModule::UnitTest_Token, 0); }
+  { Msg_UnitTest_Token msg; msg.Unhook(MODULE_NAME, (ApCallback) MainLoopModule::UnitTest_Token, 0); }
   apLog_Info((LOG_CHANNEL, "MainLoopModule::UnitTest_Token", "Starting Test/Timer"));
   int bTokenEndNow = 0;
 
@@ -893,19 +893,19 @@ WINMAINLOOP_API int Load(AP_MODULE_CALL* pModuleData)
 WINMAINLOOP_API int UnLoad(AP_MODULE_CALL* pModuleData)
 {
   AP_UNUSED_ARG(pModuleData);
-  { Msg_MainLoop_Win32Loop msg; msg.UnHook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(MainLoopModule, MainLoop_Win32Loop), MainLoopModuleInstance::Get()); }
-  { Msg_MainLoop_EndLoop msg; msg.UnHook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(MainLoopModule, MainLoop_EndLoop), MainLoopModuleInstance::Get()); }
-  { Msg_MainLoop_ModuleFinished msg; msg.UnHook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(MainLoopModule, MainLoop_ModuleFinished), MainLoopModuleInstance::Get()); }
-  { Msg_Win32_GetInstance msg; msg.UnHook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(MainLoopModule, Win32_GetInstance), MainLoopModuleInstance::Get()); }
-  { Msg_Win32_GetMainWindow msg; msg.UnHook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(MainLoopModule, Win32_GetMainWindow), MainLoopModuleInstance::Get()); }
-  { Msg_System_ThreadMessage msg; msg.UnHook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(MainLoopModule, System_ThreadMessage), MainLoopModuleInstance::Get()); }
-  { Msg_Timer_ClearAll msg; msg.UnHook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(MainLoopModule, Timer_ClearAll), MainLoopModuleInstance::Get()); }
-  { Msg_Timer_Start msg; msg.UnHook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(MainLoopModule, Timer_Start), MainLoopModuleInstance::Get()); }
-  { Msg_Timer_Cancel msg; msg.UnHook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(MainLoopModule, Timer_Cancel), MainLoopModuleInstance::Get()); }
+  { Msg_MainLoop_Win32Loop msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(MainLoopModule, MainLoop_Win32Loop), MainLoopModuleInstance::Get()); }
+  { Msg_MainLoop_EndLoop msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(MainLoopModule, MainLoop_EndLoop), MainLoopModuleInstance::Get()); }
+  { Msg_MainLoop_ModuleFinished msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(MainLoopModule, MainLoop_ModuleFinished), MainLoopModuleInstance::Get()); }
+  { Msg_Win32_GetInstance msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(MainLoopModule, Win32_GetInstance), MainLoopModuleInstance::Get()); }
+  { Msg_Win32_GetMainWindow msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(MainLoopModule, Win32_GetMainWindow), MainLoopModuleInstance::Get()); }
+  { Msg_System_ThreadMessage msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(MainLoopModule, System_ThreadMessage), MainLoopModuleInstance::Get()); }
+  { Msg_Timer_ClearAll msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(MainLoopModule, Timer_ClearAll), MainLoopModuleInstance::Get()); }
+  { Msg_Timer_Start msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(MainLoopModule, Timer_Start), MainLoopModuleInstance::Get()); }
+  { Msg_Timer_Cancel msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(MainLoopModule, Timer_Cancel), MainLoopModuleInstance::Get()); }
 #if defined(AP_TEST)
-  { Msg_UnitTest_Begin msg; msg.UnHook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(MainLoopModule, UnitTest_Begin), MainLoopModuleInstance::Get()); }
-  { Msg_UnitTest_Execute msg; msg.UnHook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(MainLoopModule, UnitTest_Execute), MainLoopModuleInstance::Get()); }
-  { Msg_UnitTest_End msg; msg.UnHook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(MainLoopModule, UnitTest_End), MainLoopModuleInstance::Get()); }
+  { Msg_UnitTest_Begin msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(MainLoopModule, UnitTest_Begin), MainLoopModuleInstance::Get()); }
+  { Msg_UnitTest_Execute msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(MainLoopModule, UnitTest_Execute), MainLoopModuleInstance::Get()); }
+  { Msg_UnitTest_End msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(MainLoopModule, UnitTest_End), MainLoopModuleInstance::Get()); }
 #endif
 
   MainLoopModuleInstance::Delete();

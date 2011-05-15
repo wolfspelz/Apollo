@@ -25,11 +25,11 @@ static AP_MODULE_INFO g_info = {
   sizeof(AP_MODULE_INFO),
   AP_MODULE_INTERFACE_FLAGS_CPP | AP_MODULE_INTERFACE_FLAGS_UTF8
   ,
-  MODULE_NAME,
-  "Sample",
-  "Sample Module",
-  "1",
-  "Used as sample and for module load/unload unit tests.",
+  MODULE_NAME, // szName
+  "Sample", // szServices
+  "Sample Module", // szLongName
+  "1", // szVersion
+  "Used as sample and for module load/unload unit tests.", // szDescription
   PROJECT_Author,
   PROJECT_Email,
   PROJECT_Copyright,

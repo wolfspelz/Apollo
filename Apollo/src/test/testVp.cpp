@@ -32,7 +32,7 @@ static void Test_Vp_UnitTest_TokenEnd()
 static void Test_Vp_UnitTest_Token(Msg_UnitTest_Token* pMsg)
 {
   AP_UNUSED_ARG(pMsg);
-  { Msg_UnitTest_Token msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_Vp_UnitTest_Token, 0); }
+  { Msg_UnitTest_Token msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_Vp_UnitTest_Token, 0); }
   apLog_Info((LOG_CHANNEL, "Test_Vp_UnitTest_Token", "Starting Test/Vp"));
   int bTokenEndNow = 1;
 

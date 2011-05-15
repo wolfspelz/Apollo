@@ -108,9 +108,9 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
   Apollo::unloadModules();
 
-  { Msg_MainLoop_ConsoleInput msg; msg.UnHook("Win32App", (ApCallback) On_MainLoop_ConsoleInput, 0); }
-  { Msg_Log_SetMask msg; msg.UnHook("Win32App", (ApCallback) On_Log_SetMask, 0); }
-  { Msg_Log_Line msg; msg.UnHook("Win32App", (ApCallback) On_Log_Line, 0); }
+  { Msg_MainLoop_ConsoleInput msg; msg.Unhook("Win32App", (ApCallback) On_MainLoop_ConsoleInput, 0); }
+  { Msg_Log_SetMask msg; msg.Unhook("Win32App", (ApCallback) On_Log_SetMask, 0); }
+  { Msg_Log_Line msg; msg.Unhook("Win32App", (ApCallback) On_Log_Line, 0); }
 
   Apollo::Exit();
 

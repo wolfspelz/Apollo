@@ -120,9 +120,9 @@ TEST_API int UnLoad(AP_MODULE_CALL* pModuleData)
 {
   AP_UNUSED_ARG(pModuleData);
 #if defined(AP_TEST)
-  { Msg_UnitTest_Begin msg; msg.UnHook(MODULE_NAME, (ApCallback) On_UnitTest_Begin, 0); }
-  { Msg_UnitTest_Execute msg; msg.UnHook(MODULE_NAME, (ApCallback) On_UnitTest_Execute, 0); }
-  { Msg_UnitTest_End msg; msg.UnHook(MODULE_NAME, (ApCallback) On_UnitTest_End, 0); }
+  { Msg_UnitTest_Begin msg; msg.Unhook(MODULE_NAME, (ApCallback) On_UnitTest_Begin, 0); }
+  { Msg_UnitTest_Execute msg; msg.Unhook(MODULE_NAME, (ApCallback) On_UnitTest_Execute, 0); }
+  { Msg_UnitTest_End msg; msg.Unhook(MODULE_NAME, (ApCallback) On_UnitTest_End, 0); }
 #endif // defined(AP_TEST)
 
   return 1;

@@ -25,7 +25,7 @@ static void Test_Identity_UnitTest_TokenEnd()
 static void Test_Identity_UnitTest_Token(Msg_UnitTest_Token* pMsg)
 {
   AP_UNUSED_ARG(pMsg);
-  { Msg_UnitTest_Token msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_Identity_UnitTest_Token, 0); }
+  { Msg_UnitTest_Token msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_Identity_UnitTest_Token, 0); }
   apLog_Info((LOG_CHANNEL, "Test_Identity_UnitTest_Token", "Starting Test/Identity"));
   int bTokenEndNow = 1;
 
@@ -706,11 +706,11 @@ static int Test_Identity_Change_ContainerEnd(Msg_Identity_ContainerEnd* pMsg)
     if (g_nTest_Identity_Change_SequenceNum == 2) {
       AP_UNITTEST_RESULT(IdentityModuleTester::test_Change_Sequence, g_sTest_Identity_Change_SequenceErr.empty(), g_sTest_Identity_Change_SequenceErr);
 
-      { Msg_Identity_ContainerBegin msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_Identity_Change_ContainerBegin, 0); }
-      { Msg_Identity_ItemAdded msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_Identity_Change_ItemAdded, 0); }
-      { Msg_Identity_ItemChanged msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_Identity_Change_ItemChanged, 0); }
-      { Msg_Identity_ItemRemoved msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_Identity_Change_ItemRemoved, 0); }
-      { Msg_Identity_ContainerEnd msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_Identity_Change_ContainerEnd, 0); }
+      { Msg_Identity_ContainerBegin msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_Identity_Change_ContainerBegin, 0); }
+      { Msg_Identity_ItemAdded msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_Identity_Change_ItemAdded, 0); }
+      { Msg_Identity_ItemChanged msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_Identity_Change_ItemChanged, 0); }
+      { Msg_Identity_ItemRemoved msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_Identity_Change_ItemRemoved, 0); }
+      { Msg_Identity_ContainerEnd msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_Identity_Change_ContainerEnd, 0); }
     }
 
   } // sUrl == Test_Identity_Change_URL
@@ -1149,7 +1149,7 @@ static int Test_Identity_RequestItemComplete(Msg_Identity_RequestContainerComple
     AP_UNITTEST_FAILED(IdentityModuleTester::test_RequestItem_End, s);
   } else {
     if (g_nTest_Identity_RequestItemCount == 2) {
-      { Msg_Identity_RequestItemComplete msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_Identity_RequestItemComplete, 0); }
+      { Msg_Identity_RequestItemComplete msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_Identity_RequestItemComplete, 0); }
       AP_UNITTEST_SUCCESS(IdentityModuleTester::test_RequestItem_End);
 
       Test_Identity_UnitTest_TokenEnd();
@@ -1265,7 +1265,7 @@ static int Test_Identity_RequestContainerComplete(Msg_Identity_RequestContainerC
     AP_UNITTEST_FAILED(IdentityModuleTester::test_RequestContainer_End, s);
   } else {
     if (g_nTest_Identity_RequestContainerCount == 2) {
-      { Msg_Identity_RequestContainerComplete msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_Identity_RequestContainerComplete, 0); }
+      { Msg_Identity_RequestContainerComplete msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_Identity_RequestContainerComplete, 0); }
       AP_UNITTEST_SUCCESS(IdentityModuleTester::test_RequestContainer_End);
       AP_UNITTEST_EXECUTE(IdentityModuleTester::test_RequestItem_Start);
     }

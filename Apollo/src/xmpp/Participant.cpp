@@ -433,10 +433,10 @@ String Test_Participant_presence_Simple::begin()
 
 String Test_Participant_presence_Simple::end()
 {
-  { Msg_Xmpp_Participant_Begin msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_Participant_presence_Simple::on_Xmpp_Participant_Begin, this); }
-  { Msg_Xmpp_Participant_Status msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_Participant_presence_Simple::on_Xmpp_Participant_Status, this); }
-  { Msg_Xmpp_Participant_StatusMessage msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_Participant_presence_Simple::on_Xmpp_Participant_StatusMessage, this); }
-  { Msg_Xmpp_Participant_End msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_Participant_presence_Simple::on_Xmpp_Participant_End, this); }
+  { Msg_Xmpp_Participant_Begin msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_Participant_presence_Simple::on_Xmpp_Participant_Begin, this); }
+  { Msg_Xmpp_Participant_Status msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_Participant_presence_Simple::on_Xmpp_Participant_Status, this); }
+  { Msg_Xmpp_Participant_StatusMessage msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_Participant_presence_Simple::on_Xmpp_Participant_StatusMessage, this); }
+  { Msg_Xmpp_Participant_End msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_Participant_presence_Simple::on_Xmpp_Participant_End, this); }
   return "";
 }
 
@@ -598,16 +598,16 @@ String Test_Participant_presence_FirebatDetail::begin()
 
 String Test_Participant_presence_FirebatDetail::end()
 {
-  { Msg_Xmpp_Participant_Begin msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_Participant_presence_FirebatDetail::on_Xmpp_Participant_Begin, this); }
-  { Msg_Xmpp_Participant_End msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_Participant_presence_FirebatDetail::on_Xmpp_Participant_End, this); }
-  { Msg_Xmpp_Participant_Status msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_Participant_presence_FirebatDetail::on_Xmpp_Participant_Status, this); }
-  { Msg_Xmpp_Participant_StatusMessage msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_Participant_presence_FirebatDetail::on_Xmpp_Participant_StatusMessage, this); }
-  { Msg_Xmpp_Participant_JabberId msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_Participant_presence_FirebatDetail::on_Xmpp_Participant_JabberId, this); }
-  { Msg_Xmpp_Participant_MucUser msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_Participant_presence_FirebatDetail::on_Xmpp_Participant_MucUser, this); }
-  { Msg_Protocol_Participant_VpIdentity msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_Participant_presence_FirebatDetail::on_Protocol_Participant_VpIdentity, this); }
-  { Msg_Protocol_Participant_Position msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_Participant_presence_FirebatDetail::on_Protocol_Participant_Position, this); }
-  { Msg_Protocol_Participant_Condition msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_Participant_presence_FirebatDetail::on_Protocol_Participant_Condition, this); }
-  { Msg_Xmpp_Participant_FirebatFeatures msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_Participant_presence_FirebatDetail::on_Xmpp_Participant_FirebatFeatures, this); }
+  { Msg_Xmpp_Participant_Begin msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_Participant_presence_FirebatDetail::on_Xmpp_Participant_Begin, this); }
+  { Msg_Xmpp_Participant_End msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_Participant_presence_FirebatDetail::on_Xmpp_Participant_End, this); }
+  { Msg_Xmpp_Participant_Status msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_Participant_presence_FirebatDetail::on_Xmpp_Participant_Status, this); }
+  { Msg_Xmpp_Participant_StatusMessage msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_Participant_presence_FirebatDetail::on_Xmpp_Participant_StatusMessage, this); }
+  { Msg_Xmpp_Participant_JabberId msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_Participant_presence_FirebatDetail::on_Xmpp_Participant_JabberId, this); }
+  { Msg_Xmpp_Participant_MucUser msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_Participant_presence_FirebatDetail::on_Xmpp_Participant_MucUser, this); }
+  { Msg_Protocol_Participant_VpIdentity msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_Participant_presence_FirebatDetail::on_Protocol_Participant_VpIdentity, this); }
+  { Msg_Protocol_Participant_Position msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_Participant_presence_FirebatDetail::on_Protocol_Participant_Position, this); }
+  { Msg_Protocol_Participant_Condition msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_Participant_presence_FirebatDetail::on_Protocol_Participant_Condition, this); }
+  { Msg_Xmpp_Participant_FirebatFeatures msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_Participant_presence_FirebatDetail::on_Xmpp_Participant_FirebatFeatures, this); }
   return "";
 }
 

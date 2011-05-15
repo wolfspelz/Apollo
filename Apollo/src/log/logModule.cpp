@@ -47,7 +47,7 @@ void LogModule::Exit()
 {
   srpcGateRegistry_.finish();
 
-  { Msg_Log_Line msg; msg.UnHook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(LogModule, Log_Line), this); }
+  { Msg_Log_Line msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(LogModule, Log_Line), this); }
 }
 
 static const char* szLevelNames[apLog_NLogLevels] = {

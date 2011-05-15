@@ -84,7 +84,7 @@ int Apollo::unhookMsg(const char* szCallName, const char* szModuleName, ApCallba
   msg.fnHandler = fnHandler;
   msg.nRef = nRef;
   if (!msg.Request()) {
-    apLog_Error((APOLLO_NAME, "Apollo::unhookMsg", "Failed to UnHook %s %s", StringType(szCallName), StringType(szModuleName)));
+    apLog_Error((APOLLO_NAME, "Apollo::unhookMsg", "Failed to Unhook %s %s", StringType(szCallName), StringType(szModuleName)));
   } else {
     ok = msg.apStatus == ApMessage::Ok;
   }

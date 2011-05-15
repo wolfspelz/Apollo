@@ -84,7 +84,7 @@ void ActionList::Begin()
 
 void ActionList::End()
 {
-  { Msg_Timer_Event msg; msg.UnHook(MODULE_NAME, (ApCallback) On_Timer_Event, this); }
+  { Msg_Timer_Event msg; msg.Unhook(MODULE_NAME, (ApCallback) On_Timer_Event, this); }
 
   { Msg_UnitTest_Complete msg; msg.sName = getName(); msg.bSuccess = sError_.empty(); msg.sMessage = sError_; msg.Send(); }
 
@@ -921,19 +921,19 @@ void Test_InNavigateChatOut::Begin()
 
 void Test_InNavigateChatOut::End()
 {
-  { Msg_VpView_GetParticipants msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_VpView_GetParticipants, this); }
-  { Msg_VpView_SubscribeParticipantDetail msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_VpView_SubscribeParticipantDetail, this); }
-  { Msg_VpView_GetParticipantDetailString msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_VpView_GetParticipantDetailString, this); }
-  { Msg_VpView_GetParticipantDetailData msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_VpView_GetParticipantDetailData, this); }
-  { Msg_VpView_GetParticipantDetailRef msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_VpView_GetParticipantDetailRef, this); }
-  { Msg_VpView_ReplayLocationPublicChat msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_VpView_ReplayLocationPublicChat, this); }
-  { Msg_Galileo_IsAnimationDataInStorage msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_Galileo_IsAnimationDataInStorage, this); }
-  { Msg_Galileo_LoadAnimationDataFromStorage msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_Galileo_LoadAnimationDataFromStorage, this); }
-  { Msg_VpView_GetLocationContexts msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_VpView_GetLocationContexts, this); }
-  { Msg_VpView_SubscribeContextDetail msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_VpView_SubscribeContextDetail, this); }
-  { Msg_VpView_SubscribeLocationDetail msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_VpView_SubscribeLocationDetail, this); }
-  { Msg_VpView_GetContextDetail msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_VpView_GetContextDetail, this); }
-  { Msg_VpView_GetLocationDetail msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_VpView_GetLocationDetail, this); }
+  { Msg_VpView_GetParticipants msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_VpView_GetParticipants, this); }
+  { Msg_VpView_SubscribeParticipantDetail msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_VpView_SubscribeParticipantDetail, this); }
+  { Msg_VpView_GetParticipantDetailString msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_VpView_GetParticipantDetailString, this); }
+  { Msg_VpView_GetParticipantDetailData msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_VpView_GetParticipantDetailData, this); }
+  { Msg_VpView_GetParticipantDetailRef msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_VpView_GetParticipantDetailRef, this); }
+  { Msg_VpView_ReplayLocationPublicChat msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_VpView_ReplayLocationPublicChat, this); }
+  { Msg_Galileo_IsAnimationDataInStorage msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_Galileo_IsAnimationDataInStorage, this); }
+  { Msg_Galileo_LoadAnimationDataFromStorage msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_Galileo_LoadAnimationDataFromStorage, this); }
+  { Msg_VpView_GetLocationContexts msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_VpView_GetLocationContexts, this); }
+  { Msg_VpView_SubscribeContextDetail msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_VpView_SubscribeContextDetail, this); }
+  { Msg_VpView_SubscribeLocationDetail msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_VpView_SubscribeLocationDetail, this); }
+  { Msg_VpView_GetContextDetail msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_VpView_GetContextDetail, this); }
+  { Msg_VpView_GetLocationDetail msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_VpView_GetLocationDetail, this); }
 
   ActionList::End();
 
@@ -947,7 +947,7 @@ Test_InNavigateChatOut* gTest_InNavigateChatOut = 0;
 static void Test_Arena_UnitTest_Token(Msg_UnitTest_Token* pMsg)
 {
   AP_UNUSED_ARG(pMsg);
-  { Msg_UnitTest_Token msg; msg.UnHook(MODULE_NAME, (ApCallback) Test_Arena_UnitTest_Token, 0); }
+  { Msg_UnitTest_Token msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_Arena_UnitTest_Token, 0); }
   apLog_Info((LOG_CHANNEL, "Test_Arena_UnitTest_Token", "Starting Test/Arena"));
   int bTokenEndNow = 0;
 

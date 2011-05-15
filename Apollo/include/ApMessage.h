@@ -46,7 +46,7 @@ public:
   inline bool Once() { return bOnce_; }
 
   int Hook(const char* szModuleName, ApCallback fnHandler, ApCallbackRef nRef, ApCallbackPos nPosition);
-  int UnHook(const char* szModuleName, ApCallback fnHandler, ApCallbackRef nRef);
+  int Unhook(const char* szModuleName, ApCallback fnHandler, ApCallbackRef nRef);
 
   // Never use this on local variables. Only on new-ed messages
   int PostAsync();

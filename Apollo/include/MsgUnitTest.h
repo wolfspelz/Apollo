@@ -128,9 +128,9 @@ public:
     { Msg_UnitTest_End msg; msg.Hook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(class_, UnitTest_End), instance_, ApCallbackPosNormal); }
 
   #define AP_UNITTEST_UNHOOK(class_, instance_) \
-    { Msg_UnitTest_Begin msg; msg.UnHook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(class_, UnitTest_Begin), instance_); }\
-    { Msg_UnitTest_Execute msg; msg.UnHook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(class_, UnitTest_Execute), instance_); }\
-    { Msg_UnitTest_End msg; msg.UnHook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(class_, UnitTest_End), instance_); }
+    { Msg_UnitTest_Begin msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(class_, UnitTest_Begin), instance_); }\
+    { Msg_UnitTest_Execute msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(class_, UnitTest_Execute), instance_); }\
+    { Msg_UnitTest_End msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(class_, UnitTest_End), instance_); }
 
   #define AP_UNITTEST_DECLAREHOOK() \
     void On_UnitTest_Begin(Msg_UnitTest_Begin* pMsg);\

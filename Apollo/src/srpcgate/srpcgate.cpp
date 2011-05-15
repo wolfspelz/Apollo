@@ -380,11 +380,11 @@ SRPCGATE_API int UnLoad(AP_MODULE_CALL* pModuleData)
     pModule->srpcGateRegistry_.finish();
   }
 
-  { Msg_SrpcGate_Register msg; msg.UnHook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(SrpcGateModule, SrpcGate_Register), SrpcGateModuleInstance::Get()); }
-  { Msg_SrpcGate_Unregister msg; msg.UnHook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(SrpcGateModule, SrpcGate_Unregister), SrpcGateModuleInstance::Get()); }
-  { ApSRPCMessage msg("SrpcGate"); msg.UnHook(MODULE_NAME, AP_REFINSTANCE_SRPC_CALLBACK(SrpcGateModule, SrpcGate), SrpcGateModuleInstance::Get()); }
+  { Msg_SrpcGate_Register msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(SrpcGateModule, SrpcGate_Register), SrpcGateModuleInstance::Get()); }
+  { Msg_SrpcGate_Unregister msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(SrpcGateModule, SrpcGate_Unregister), SrpcGateModuleInstance::Get()); }
+  { ApSRPCMessage msg("SrpcGate"); msg.Unhook(MODULE_NAME, AP_REFINSTANCE_SRPC_CALLBACK(SrpcGateModule, SrpcGate), SrpcGateModuleInstance::Get()); }
 
-  { Msg_Server_HttpRequest msg; msg.UnHook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(SrpcGateModule, Server_HttpRequest), SrpcGateModuleInstance::Get()); }
+  { Msg_Server_HttpRequest msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(SrpcGateModule, Server_HttpRequest), SrpcGateModuleInstance::Get()); }
 
   SrpcGateModuleInstance::Delete();
 
