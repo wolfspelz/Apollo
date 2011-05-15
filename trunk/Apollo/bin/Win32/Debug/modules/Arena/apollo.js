@@ -252,13 +252,13 @@ ApolloApi.prototype =
       .send();
   },
 
-  LogLevelFatal      :   2,
-  LogLevelError      :   4,
-  LogLevelWarning    :   8,
-  LogLevelUser       :  16,
-  LogLevelDebug      :  32,
-  LogLevelInfo       :  64,
-  LogLevelVerbose    : 128,
+  LogLevelFatal  :   2,
+  LogLevelError  :   4,
+  LogLevelWarning:   8,
+  LogLevelUser   :  16,
+  LogLevelDebug  :  32,
+  LogLevelInfo   :  64,
+  LogLevelVerbose: 128,
 
   LogError: function(sMessage) { this.Log(this.LogLevelError, this.moduleName, 'JS:', sMessage); },
   LogWarning: function(sMessage) { this.Log(this.LogLevelWarning, this.moduleName, 'JS:', sMessage); },
