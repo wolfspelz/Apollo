@@ -33,5 +33,6 @@ Core/ModuleConfig/AppPathToken=[[APP_PATH]]
 System/UserProfileFolder=Avatar
 
 #Dun/OnLoad/DeleteDbFiles=Identity
+LogMask=255
 #LogMask=31
 #Debug/ShowConsole=1
