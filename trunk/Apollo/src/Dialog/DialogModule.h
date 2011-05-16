@@ -10,6 +10,7 @@
 #include "ApModule.h"
 #include "ApContainer.h"
 #include "MsgUnitTest.h"
+#include "MsgWebView.h"
 #include "MsgDialog.h"
 #include "SrpcGateHelper.h"
 #include "Dialog.h"
@@ -31,6 +32,10 @@ public:
   void On_Dialog_Destroy(Msg_Dialog_Destroy* pMsg);
   void On_Dialog_GetView(Msg_Dialog_GetView* pMsg);
 
+  void On_WebView_Event_DocumentLoaded(Msg_WebView_Event_DocumentLoaded* pMsg);
+  void On_WebView_Event_ReceivedFocus(Msg_WebView_Event_ReceivedFocus* pMsg);
+  void On_WebView_Event_LostFocus(Msg_WebView_Event_LostFocus* pMsg);
+
 #if defined(AP_TEST)
   void On_UnitTest_Begin(Msg_UnitTest_Begin* pMsg);
   void On_UnitTest_Execute(Msg_UnitTest_Execute* pMsg);
@@ -39,9 +44,11 @@ public:
 #endif
 
 protected:
-  Dialog* NewDialog(const ApHandle& hDialog, int nLeft, int nTop, int nWidth, int nHeight, int bVisible, const String& sContentUrl);
+  Dialog* NewDialog(const ApHandle& hDialog, int nLeft, int nTop, int nWidth, int nHeight, int bVisible, const String& sCaption, const String& sIconUrl, const String& sContentUrl);
   void DeleteDialog(const ApHandle& hDialog);
-  Dialog* FindDialog(const ApHandle& hDialog);
+  Dialog* FindDialog(const ApHandle& hDialog); // return 0 if !found
+  Dialog* GetDialog(const ApHandle& hDialog) throw (ApException); // ApException if !found
+  Dialog* FindDialogByView(const ApHandle& hView);
 
 protected:
   DialogList dialogs_;
@@ -63,7 +70,7 @@ public:
   static void Execute();
   static void End();
 
-  static String Test1();
+  static String CreateWaitCloseByContent();
 };
 
 #endif

@@ -22,6 +22,7 @@ Core/Modules/02300/Galileo/Path=Galileo
 Core/Modules/02700/WebView/Path=WebView
 Core/Modules/02800/Arena/Path=Arena
 Core/Modules/02900/Dialog/Path=Dialog
+Core/Modules/03000/TestDialog/Path=TestDialog
 
 Core/ModulesDirectory=modules
 

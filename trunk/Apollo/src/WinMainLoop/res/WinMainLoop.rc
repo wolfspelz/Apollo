@@ -48,7 +48,7 @@ BEGIN
     BEGIN
         MENUITEM "Options",                     ID_TOOLS_OPTIONS, GRAYED
         MENUITEM "Test",                        ID_TOOLS_TEST
-        MENUITEM "Display",                     ID_TOOLS_DISPLAY
+        MENUITEM "Display",                     ID_TOOLS_DISPLAY, INACTIVE
     END
 END
 

@@ -198,6 +198,11 @@ function ApolloApi()
 ApolloApi.prototype = 
 {
   moduleName: 'Unknown',
+
+  GetViewHandle: function()
+  {
+    return apollo.viewHandle; 
+  },
   
   // ------------------------------------------------
   // SRPC
@@ -212,8 +217,8 @@ ApolloApi.prototype =
     var resp = null;
 
     try {
-      if (typeof(this.OnDispatchMessage) == 'function') {
-        resp = this.OnDispatchMessage(msg);
+      if (typeof(api.OnDispatchMessage) == 'function') {
+        resp = api.OnDispatchMessage(msg);
       }
     } catch (ex) {
       resp = new ApMessage().setInt('Status', 0).setString('Message', String(ex));
@@ -234,6 +239,7 @@ ApolloApi.prototype =
   {
     var msg = new ApMessage(sType);
     if (sType) {
+      //if (msg.getString('Method') != 'Log_Line') { api.Log.Debug(sType + ' ' + apollo.viewHandle); }
       msg.setString('hView', apollo.viewHandle);
     }
     return msg;
@@ -242,30 +248,37 @@ ApolloApi.prototype =
   // ------------------------------------------------
   // Log
   
-  Log: function(nMask, sChannel, sContext, sMessage)
-  {
-    return this.Message('Log_Line')
-      .setInt('nMask', nMask)
-      .setString('sChannel', sChannel)
-      .setString('sContext', sContext)
-      .setString('sMessage', sMessage)
-      .send();
+  Log: {
+
+    channelName: 'Unknown',
+  
+    Send: function(nMask, sChannel, sContext, sMessage)
+    {
+      return api.Message('Log_Line')
+        .setInt('nMask', nMask)
+        .setString('sChannel', sChannel)
+        .setString('sContext', sContext)
+        .setString('sMessage', sMessage)
+        .send();
+    },
+
+    LevelFatal  :   2,
+    LevelError  :   4,
+    LevelWarning:   8,
+    LevelUser   :  16,
+    LevelDebug  :  32,
+    LevelInfo   :  64,
+    LevelVerbose: 128,
+
+    Error: function(sMessage) { api.Log.Send(api.Log.LevelError, api.Log.moduleName, 'JS:', String(sMessage)); },
+    Warning: function(sMessage) { api.Log.Send(api.Log.LevelWarning, api.Log.moduleName, 'JS:', String(sMessage)); },
+    User: function(sMessage) { api.Log.Send(api.Log.LevelUser, api.Log.moduleName, 'JS:', String(sMessage)); },
+    Debug: function(sMessage) { api.Log.Send(api.Log.LevelDebug, api.Log.moduleName, 'JS:', String(sMessage)); },
+    Info: function(sMessage) { api.Log.Send(api.Log.LevelInfo, api.Log.moduleName, 'JS:', String(sMessage)); },
+
+    _:0
   },
-
-  LogLevelFatal  :   2,
-  LogLevelError  :   4,
-  LogLevelWarning:   8,
-  LogLevelUser   :  16,
-  LogLevelDebug  :  32,
-  LogLevelInfo   :  64,
-  LogLevelVerbose: 128,
-
-  LogError: function(sMessage) { this.Log(this.LogLevelError, this.moduleName, 'JS:', sMessage); },
-  LogWarning: function(sMessage) { this.Log(this.LogLevelWarning, this.moduleName, 'JS:', sMessage); },
-  LogUser: function(sMessage) { this.Log(this.LogLevelUser, this.moduleName, 'JS:', sMessage); },
-  LogDebug: function(sMessage) { this.Log(this.LogLevelDebug, this.moduleName, 'JS:', sMessage); },
-  LogInfo: function(sMessage) { this.Log(this.LogLevelInfo, this.moduleName, 'JS:', sMessage); },
-
+  
   // ------------------------------------------------
   // Babelfish
   
@@ -276,8 +289,8 @@ ApolloApi.prototype =
       sContext = '';
     }
     
-    var sTranslated = this.Message('Translation_Get')
-      .setString('sModule', this.moduleName)
+    var sTranslated = api.Message('Translation_Get')
+      .setString('sModule', api.moduleName)
       .setString('sContext', sContext)
       .setString('sText', sText)
       .send()
@@ -305,60 +318,69 @@ ApolloApi.prototype =
   
   OnMouseDown: function(ev)
   {
-    this.Message('WebView_MouseCapture').send();
-    this.nStartX = ev.x;
-    this.nStartY = ev.y;
-    this.bMouseActive = false;
-    this.bMouseCaptured = true;
-    this.bIsMove = false; 
-    this.bIsSize = false; 
+    api.bIsMove = false; 
+    api.bIsSize = false; 
 
-    switch (ev.target.className) {
-      case 'Move': this.bIsMove = true; break;
-      case 'SizeLeft': this.bIsSize = true; this.nSizeDirection = 1; break;
-      case 'SizeTop': this.bIsSize = true; this.nSizeDirection = 2; break;
-      case 'SizeRight': this.bIsSize = true; this.nSizeDirection = 3; break;
-      case 'SizeBottom': this.bIsSize = true; this.nSizeDirection = 4; break;
-      case 'SizeTopLeft': this.bIsSize = true; this.nSizeDirection = 5; break;
-      case 'SizeTopRight': this.bIsSize = true; this.nSizeDirection = 6; break;
-      case 'SizeBottomLeft': this.bIsSize = true; this.nSizeDirection = 7; break;
-      case 'SizeBottomRight': this.bIsSize = true; this.nSizeDirection = 8; break;
+    var aClasses = ev.target.className.split(' ');
+    if (aClasses != null) {
+      for (var i = 0; i < aClasses.length; i++) {
+        switch (aClasses[i]) {
+          case 'cApMove': api.bIsMove = true; break;
+//          case 'cApSizeLeft': api.bIsSize = true; api.nSizeDirection = 1; break;
+//          case 'cApSizeTop': api.bIsSize = true; api.nSizeDirection = 2; break;
+//          case 'cApSizeRight': api.bIsSize = true; api.nSizeDirection = 3; break;
+//          case 'cApSizeBottom': api.bIsSize = true; api.nSizeDirection = 4; break;
+//          case 'cApSizeTopLeft': api.bIsSize = true; api.nSizeDirection = 5; break;
+//          case 'cApSizeTopRight': api.bIsSize = true; api.nSizeDirection = 6; break;
+//          case 'cApSizeBottomLeft': api.bIsSize = true; api.nSizeDirection = 7; break;
+          case 'cApSizeBottomRight': api.bIsSize = true; api.nSizeDirection = 8; break;
+        }
+      }
     }
+    
+    if (api.bIsMove || api.bIsSize) {
+      api.Message('WebView_MouseCapture').send();
+      api.nStartX = ev.x;
+      api.nStartY = ev.y;
+      api.bMouseActive = false;
+      api.bMouseCaptured = true;
+    }
+
   },
 
   OnMouseMove: function(ev)
   {
-    if (this.bMouseCaptured) {
-      var dx = ev.x - this.nStartX;
-      var dy = ev.y - this.nStartY;
-      if (!this.bMouseActive) {
+    if (api.bMouseCaptured) {
+      var dx = ev.x - api.nStartX;
+      var dy = ev.y - api.nStartY;
+      if (!api.bMouseActive) {
         if (dx > 4 || dx < -4 || dy > 4 || dy < -4) {
-          this.bMouseActive = true;
+          api.bMouseActive = true;
         }
       }
-      if (this.bMouseActive) {
-        if (this.bIsMove) {
-          this.Message('WebView_MoveBy').setInt('nX', dx).setInt('nY', dy).send();
+      if (api.bMouseActive) {
+        if (api.bIsMove) {
+          api.Message('WebView_MoveBy').setInt('nX', dx).setInt('nY', dy).send();
         }
-        if (this.bIsSize) {
+        if (api.bIsSize) {
           if (dx < 0 || dy < 0) {
-            var pos = this.Message('WebView_GetPosition').send();
+            var pos = api.Message('WebView_GetPosition').send();
             var nW = pos.getInt('nWidth');
             var nH = pos.getInt('nHeight');
             var nNewW = nW + dx;
             var nNewH = nH + dy;
-            if (nNewW < this.nMinWidth) { dx = this.nMinWidth - nW; }
-            if (nNewH < this.nMinHeight) { dy = this.nMinHeight - nH; }
+            if (nNewW < api.nMinWidth) { dx = api.nMinWidth - nW; }
+            if (nNewH < api.nMinHeight) { dy = api.nMinHeight - nH; }
           }
 
-          this.Message('WebView_SizeBy')
+          api.Message('WebView_SizeBy')
             .setInt('nX', dx)
             .setInt('nY', dy)
-            .setInt('nDirection', this.nSizeDirection)
+            .setInt('nDirection', api.nSizeDirection)
             .send();
 
-          this.nStartX += dx;
-          this.nStartY += dy;
+          api.nStartX += dx;
+          api.nStartY += dy;
         }
       }
     }
@@ -366,18 +388,18 @@ ApolloApi.prototype =
 
   OnMouseUp: function()
   {
-    this.bMouseCaptured = false;
-    this.bMouseActive = false;
-    this.bIsMove = false;
-    this.bIsSize = false;
-    this.Message('WebView_MouseRelease').send();
+    api.bMouseCaptured = false;
+    api.bMouseActive = false;
+    api.bIsMove = false;
+    api.bIsSize = false;
+    api.Message('WebView_MouseRelease').send();
   },
 
   InitMoveSize: function()
   {
-    document.onmousedown = this.OnMouseDown.bind(this); 
-    document.onmousemove = this.OnMouseMove.bind(this); 
-    document.onmouseup = this.OnMouseUp.bind(this);
+    document.onmousedown = api.OnMouseDown.bind(this); 
+    document.onmousemove = api.OnMouseMove.bind(this); 
+    document.onmouseup = api.OnMouseUp.bind(this);
   },
 
   // ------------------------------------------------

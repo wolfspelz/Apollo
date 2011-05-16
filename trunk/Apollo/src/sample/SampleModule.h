@@ -41,7 +41,8 @@ public:
 protected:
   Sample* NewSample(const ApHandle& hSample);
   void DeleteSample(const ApHandle& hSample);
-  Sample* FindSample(const ApHandle& hSample);
+  Sample* FindSample(const ApHandle& hSample); // return 0 if !found
+  Sample* GetSample(const ApHandle& hSample) throw (ApException); // ApException if !found
 
 protected:
   int nTheAnswer_;

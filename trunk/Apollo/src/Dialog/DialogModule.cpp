@@ -7,12 +7,12 @@
 #include "Apollo.h"
 #include "Local.h"
 
-Dialog* DialogModule::NewDialog(const ApHandle& hDialog, int nLeft, int nTop, int nWidth, int nHeight, int bVisible, const String& sContentUrl)
+Dialog* DialogModule::NewDialog(const ApHandle& hDialog, int nLeft, int nTop, int nWidth, int nHeight, int bVisible, const String& sCaption, const String& sIconUrl, const String& sContentUrl)
 {
   Dialog* pDialog = new Dialog(hDialog);
   if (pDialog) {
     try {
-      pDialog->Create(nLeft, nTop, nWidth, nHeight, bVisible, sContentUrl);
+      pDialog->Create(nLeft, nTop, nWidth, nHeight, bVisible, sCaption, sIconUrl, sContentUrl);
       dialogs_.Set(hDialog, pDialog);
     } catch (ApException& ex) {
       delete pDialog;
@@ -26,7 +26,7 @@ Dialog* DialogModule::NewDialog(const ApHandle& hDialog, int nLeft, int nTop, in
 
 void DialogModule::DeleteDialog(const ApHandle& hDialog)
 {
-  Dialog* pDialog = FindDialog(hDialog);
+  Dialog* pDialog = GetDialog(hDialog);
   if (pDialog) {
     pDialog->Destroy();
     dialogs_.Unset(hDialog);
@@ -37,11 +37,23 @@ void DialogModule::DeleteDialog(const ApHandle& hDialog)
 
 Dialog* DialogModule::FindDialog(const ApHandle& hDialog)
 {
-  Dialog* pDialog = 0;  
-
+  Dialog* pDialog = 0;
   dialogs_.Get(hDialog, pDialog);
-  if (pDialog == 0) { throw ApException("DialogModule::FindDialog no dialog=" ApHandleFormat "", ApHandleType(hDialog)); }
+  return pDialog;
+}
 
+Dialog* DialogModule::GetDialog(const ApHandle& hDialog)
+{
+  Dialog* pDialog = FindDialog(hDialog);  
+  if (pDialog == 0) { throw ApException("DialogModule::FindDialog no Dialog=" ApHandleFormat "", ApHandleType(hDialog)); }
+  return pDialog;
+}
+
+Dialog* DialogModule::FindDialogByView(const ApHandle& hView)
+{
+  Dialog* pDialog = 0;
+  // hView == hDialog
+  dialogs_.Get(hView, pDialog);
   return pDialog;
 }
 
@@ -50,22 +62,46 @@ Dialog* DialogModule::FindDialog(const ApHandle& hDialog)
 AP_MSG_HANDLER_METHOD(DialogModule, Dialog_Create)
 {
   if (dialogs_.Find(pMsg->hDialog) != 0) { throw ApException("DialogModule::Dialog_Create: Dialog=" ApHandleFormat " already exists", ApHandleType(pMsg->hDialog)); }
-  Dialog* pDialog = NewDialog(pMsg->hDialog, pMsg->nLeft, pMsg->nTop, pMsg->nWidth, pMsg->nHeight, pMsg->bVisible, pMsg->sContentUrl);
+  Dialog* pDialog = NewDialog(pMsg->hDialog, pMsg->nLeft, pMsg->nTop, pMsg->nWidth, pMsg->nHeight, pMsg->bVisible, pMsg->sCaption, pMsg->sIconUrl, pMsg->sContentUrl);
   pMsg->apStatus = ApMessage::Ok;
 }
 
 AP_MSG_HANDLER_METHOD(DialogModule, Dialog_Destroy)
 {
-  Dialog* pDialog = FindDialog(pMsg->hDialog);
+  Dialog* pDialog = GetDialog(pMsg->hDialog);
   DeleteDialog(pMsg->hDialog);
   pMsg->apStatus = ApMessage::Ok;
 }
 
 AP_MSG_HANDLER_METHOD(DialogModule, Dialog_GetView)
 {
-  Dialog* pDialog = FindDialog(pMsg->hDialog);
+  Dialog* pDialog = GetDialog(pMsg->hDialog);
   pMsg->hView = pDialog->GetView();
   pMsg->apStatus = ApMessage::Ok;
+}
+
+AP_MSG_HANDLER_METHOD(DialogModule, WebView_Event_DocumentLoaded)
+{
+  Dialog* pDialog = FindDialogByView(pMsg->hView);
+  if (pDialog) {
+    pDialog->OnDocumentLoaded();
+  }
+}
+
+AP_MSG_HANDLER_METHOD(DialogModule, WebView_Event_ReceivedFocus)
+{
+  Dialog* pDialog = FindDialogByView(pMsg->hView);
+  if (pDialog) {
+    pDialog->OnReceivedFocus();
+  }
+}
+
+AP_MSG_HANDLER_METHOD(DialogModule, WebView_Event_LostFocus)
+{
+  Dialog* pDialog = FindDialogByView(pMsg->hView);
+  if (pDialog) {
+    pDialog->OnLostFocus();
+  }
 }
 
 //----------------------------
@@ -74,6 +110,14 @@ void SrpcGate_Dialog_Create(ApSRPCMessage* pMsg)
 {
   Msg_Dialog_Create msg;
   msg.hDialog = Apollo::string2Handle(pMsg->srpc.getString("hDialog"));
+  msg.nLeft = pMsg->srpc.getInt("nLeft");
+  msg.nTop = pMsg->srpc.getInt("nTop");
+  msg.nWidth = pMsg->srpc.getInt("nWidth");
+  msg.nHeight = pMsg->srpc.getInt("nHeight");
+  msg.bVisible = pMsg->srpc.getInt("bVisible");
+  msg.sCaption = pMsg->srpc.getString("sCaption");
+  msg.sIconUrl = pMsg->srpc.getString("sIconUrl");
+  msg.sContentUrl = pMsg->srpc.getString("sContentUrl");
   SRPCGATE_HANDLER_NATIVE_REQUEST(pMsg, msg);
 }
 
@@ -132,6 +176,8 @@ int DialogModule::Init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, DialogModule, Dialog_Destroy, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, DialogModule, Dialog_GetView, this, ApCallbackPosNormal);
 
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, DialogModule, WebView_Event_DocumentLoaded, this, ApCallbackPosNormal);
+
   srpcGateRegistry_.add("Dialog_Create", SrpcGate_Dialog_Create);
   srpcGateRegistry_.add("Dialog_Destroy", SrpcGate_Dialog_Destroy);
   srpcGateRegistry_.add("Dialog_GetView", SrpcGate_Dialog_GetView);
@@ -154,12 +200,12 @@ void DialogModule::Exit()
 
 void DialogModuleTester::Begin()
 {
-  AP_UNITTEST_REGISTER(DialogModuleTester::Test1);
+  AP_UNITTEST_REGISTER(DialogModuleTester::CreateWaitCloseByContent);
 }
 
 void DialogModuleTester::Execute()
 {
-  AP_UNITTEST_EXECUTE(DialogModuleTester::Test1);
+  DialogModuleTester::CreateWaitCloseByContent();
 }
 
 void DialogModuleTester::End()
@@ -168,22 +214,36 @@ void DialogModuleTester::End()
 
 //----------------------------
 
-String DialogModuleTester::Test1()
+static ApHandle DialogModuleTester_CreateWaitClose_hDialog;
+
+void DialogModuleTester_CreateWaitClose_WebView_Event_DocumentUnload(Msg_WebView_Event_DocumentUnload* pMsg)
+{
+  if (pMsg->hView != DialogModuleTester_CreateWaitClose_hDialog) { return; }
+
+  AP_UNITTEST_SUCCESS(DialogModuleTester::CreateWaitCloseByContent);
+
+  { Msg_WebView_Event_DocumentUnload msg; msg.Unhook(MODULE_NAME, (ApCallback) DialogModuleTester_CreateWaitClose_WebView_Event_DocumentUnload, 0); }
+}
+
+String DialogModuleTester::CreateWaitCloseByContent()
 {
   String s;
 
+  { Msg_WebView_Event_DocumentUnload msg; msg.Hook(MODULE_NAME, (ApCallback) DialogModuleTester_CreateWaitClose_WebView_Event_DocumentUnload, 0, ApCallbackPosNormal); }
+
   ApHandle hDialog = Apollo::newHandle();
+  DialogModuleTester_CreateWaitClose_hDialog = hDialog;
 
   Msg_Dialog_Create msg;
   msg.hDialog = hDialog;
-  msg.nLeft = 200;
-  msg.nTop = 200;
-  msg.nWidth = 500;
-  msg.nHeight = 300;
+  msg.nLeft = 500;
+  msg.nTop = 100;
+  msg.nWidth = 300;
+  msg.nHeight = 200;
   msg.bVisible = 1;
+  msg.sCaption = "Very Long Window Caption";
   msg.sContentUrl = "file://" + Apollo::getModuleResourcePath(MODULE_NAME) + "test/Content.html";
   if (!s) { if (!msg.Request()) { s = "Msg_Dialog_Create failed"; }}
-
 
   return s;
 }

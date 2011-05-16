@@ -246,8 +246,8 @@ public:
   virtual HRESULT STDMETHODCALLTYPE webViewScrolled( /* [in] */ IWebView *sender) { return E_NOTIMPL; }
   virtual HRESULT STDMETHODCALLTYPE webViewAddMessageToConsole(/* [in] */ IWebView *sender, /* [in] */ BSTR message, /* [in] */ int lineNumber, /* [in] */ BSTR url, /* [in] */ BOOL isError);// { return E_NOTIMPL; }
   virtual HRESULT STDMETHODCALLTYPE webViewShouldInterruptJavaScript(/* [in] */ IWebView *sender, /* [retval][out] */ BOOL *result) { return E_NOTIMPL; }
-  virtual HRESULT STDMETHODCALLTYPE webViewReceivedFocus(/* [in] */ IWebView *sender) { return E_NOTIMPL; }
-  virtual HRESULT STDMETHODCALLTYPE webViewLostFocus(/* [in] */ IWebView *sender, /* [in] */ OLE_HANDLE loseFocusTo) { return E_NOTIMPL; }
+  virtual HRESULT STDMETHODCALLTYPE webViewReceivedFocus(/* [in] */ IWebView *sender);// { return E_NOTIMPL; }
+  virtual HRESULT STDMETHODCALLTYPE webViewLostFocus(/* [in] */ IWebView *sender, /* [in] */ OLE_HANDLE loseFocusTo);// { return E_NOTIMPL; }
   virtual HRESULT STDMETHODCALLTYPE doDragDrop(/* [in] */ IWebView *sender, /* [in] */ IDataObject *dataObject, /* [in] */ IDropSource *dropSource, /* [in] */ DWORD okEffect, /* [retval][out] */ DWORD *performedEffect) { return E_NOTIMPL; }
   virtual HRESULT STDMETHODCALLTYPE webViewGetDlgCode(/* [in] */ IWebView *sender, /* [in] */ UINT keyCode, /* [retval][out] */ LONG_PTR *code) { return E_NOTIMPL; }
   virtual HRESULT STDMETHODCALLTYPE webViewPainted(/* [in] */ IWebView *sender) { return E_NOTIMPL; }

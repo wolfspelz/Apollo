@@ -23,8 +23,12 @@ public:
   inline ApHandle apHandle() { return hAp_; }
   inline ApHandle GetView() { return hView_; }
 
-  void Create(int nLeft, int nTop, int nWidth, int nHeight, int bVisible, const String& sContentUrl);
+  void Create(int nLeft, int nTop, int nWidth, int nHeight, int bVisible, const String& sCaption, const String& sIconUrl, const String& sContentUrl);
   void Destroy();
+
+  void OnDocumentLoaded();
+  void OnReceivedFocus();
+  void OnLostFocus();
 
 protected:
   ApHandle hAp_;
@@ -34,6 +38,9 @@ protected:
   int nTop_;
   int nWidth_;
   int nHeight_;
+  String sCaption_;
+  String sIconUrl_;
+  String sContentUrl_;
 };
 
 #endif // Dialog_H_INCLUDED
