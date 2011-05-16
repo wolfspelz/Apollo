@@ -267,4 +267,28 @@ public:
   ApINOUT String sUrl;
 };
 
+// WebView ->
+class Msg_WebView_Event_DocumentUnload: public ApNotificationMessage
+{
+public:
+  Msg_WebView_Event_DocumentUnload() : ApNotificationMessage("WebView_Event_DocumentUnload") {}
+  ApIN ApHandle hView;
+};
+
+// WebView ->
+class Msg_WebView_Event_ReceivedFocus: public ApNotificationMessage
+{
+public:
+  Msg_WebView_Event_ReceivedFocus() : ApNotificationMessage("WebView_Event_ReceivedFocus") {}
+  ApIN ApHandle hView;
+};
+
+// WebView ->
+class Msg_WebView_Event_LostFocus: public ApNotificationMessage
+{
+public:
+  Msg_WebView_Event_LostFocus() : ApNotificationMessage("WebView_Event_LostFocus") {}
+  ApIN ApHandle hView;
+};
+
 #endif // !defined(MsgWebView_h_INCLUDED)

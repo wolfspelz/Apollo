@@ -56,6 +56,12 @@ void View::Create()
 
 void View::Destroy()
 {
+  {
+    Msg_WebView_Event_DocumentUnload msg;
+    msg.hView = apHandle();
+    msg.Send();
+  }
+
   if (pWebViewPrivate_) {
     pWebViewPrivate_->Release();
     pWebViewPrivate_ = 0;
@@ -715,7 +721,7 @@ HRESULT View::willPerformDragSourceAction(IWebView*, WebDragSourceAction, LPPOIN
   return S_OK;
 }
 
-HRESULT View::webViewAddMessageToConsole(IWebView *sender, BSTR message, int lineNumber, BSTR url, BOOL isError)
+HRESULT View::webViewAddMessageToConsole(IWebView *webView, BSTR message, int lineNumber, BSTR url, BOOL isError)
 {
   String sUrl = StringFromBSTR(url);
   String sMessage = StringFromBSTR(message);
@@ -728,3 +734,41 @@ HRESULT View::webViewAddMessageToConsole(IWebView *sender, BSTR message, int lin
 
   return S_OK;
 }
+
+HRESULT View::webViewReceivedFocus(IWebView *webView)
+{
+  if (pWebView_ == webView) {
+    Msg_WebView_Event_ReceivedFocus msg;
+    msg.hView = apHandle();
+    msg.Send();
+  }
+
+  return E_NOTIMPL;
+}
+
+HRESULT View::webViewLostFocus(IWebView *webView, OLE_HANDLE loseFocusTo)
+{
+  if (pWebView_ == webView) {
+    Msg_WebView_Event_LostFocus msg;
+    msg.hView = apHandle();
+    msg.Send();
+  }
+
+  return E_NOTIMPL;
+}
+
+//HRESULT View::willCloseFrame(IWebView* webView, IWebFrame* frame)
+//{
+//  if (pTopLoadingFrame_ == frame) {
+//    Msg_WebView_Event_DocumentUnload msg;
+//    msg.hView = apHandle();
+//    msg.Send();
+//
+//    if (apLog_IsVerbose) {
+//      apLog_Verbose((LOG_CHANNEL, "View::willCloseFrame", "%s", StringType(GetUrlFrom(frame))));
+//    }
+//  }
+//
+//  return S_OK;
+//}
+

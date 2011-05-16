@@ -1,37 +1,129 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-<script type="text/javascript" src="utils.js"></script>
+<script type="text/javascript" src="jquery-1.4.2.min.js"></script>
 <script type="text/javascript" src="apollo.js"></script>
-<style type="text/css">* { margin:0; padding:0; }</style>
+<style type="text/css">
+* { margin:0; padding:0; }
+
+.Wrapper
+{
+  position:absolute;left:8px;top:8px;right:8px;bottom:8px;
+  border-radius:5px;
+  -webkit-box-shadow:0 0 12px #333333;
+}
+
+.WindowTop { position:absolute;left:8px;top:0;right:8px;height:8px; }
+.WindowLeft { position:absolute;left:0;top:24px;width:8px;bottom:8px; }
+.WindowRight { position:absolute;right:0;top:24px;width:8px;bottom:8px; }
+.WindowBottom { position:absolute;left:8px;bottom:0;right:8px;height:8px; }
+.WindowTopLeft { position:absolute;left:0;top:0;width:8px;height:24px;border-top-left-radius:5px; }
+.WindowTopRight { position:absolute;right:0;top:0;width:8px;height:24px;border-top-right-radius:5px; }
+.WindowBottomLeft { position:absolute;left:0;bottom:0;width:8px;height:8px;border-bottom-left-radius:5px; }
+.WindowBottomRight { position:absolute;right:0;bottom:0;width:8px;height:8px;border-bottom-right-radius:5px; }
+.WindowTitle { position:absolute;left:8px;top:2px;right:50px;height:22px; }
+.WindowSystem { position:absolute;top:0px;right:8px;width:42px;height:24px; }
+
+.WindowTop,
+.WindowLeft,
+.WindowRight,
+.WindowBottom,
+.WindowTopLeft,
+.WindowTopRight,
+.WindowBottomLeft,
+.WindowBottomRight,
+.WindowTitle,
+.WindowSystem
+{
+  background-color:rgba(255, 255, 255 ,0.85);
+}
+
+.WindowTitle { white-space:nowrap;overflow:hidden;text-overflow:ellipsis; font-family:Arial, sans-serif;font-size:14px;font-weight:bold; }
+.TitleIcon { padding-right:4px; }
+.TitleText {}
+.CloseButton { position:absolute;right:0;top:0; }
+
+.cApMove { cursor:default; }
+.cApSizeTop { cursor:n-resize; }
+.cApSizeLeft { cursor:w-resize; }
+.cApSizeRight { cursor:e-resize; }
+.cApSizeBottom { cursor:s-resize; }
+.cApSizeTopLeft { cursor:nw-resize; }
+.cApSizeTopRight { cursor:ne-resize; }
+.cApSizeBottomLeft { cursor:sw-resize }
+.cApSizeBottomRight { cursor:se-resize; }
+
+</style>
 <script type="text/javascript">
+  function SetContent(sUrl)
+  {
+    $('#Content').attr('src', sUrl);
+    $('#Content').css('display', '');
+    $('#Center').css('background-color', '');
+  }
+  
+  function SetCaption(sCaption)
+  {
+    $('#Caption').html(sCaption);
+  }
+  
+  function SetIcon(sUrl)
+  {
+    $('#Icon').attr('src', sUrl);
+  }
+
   var api = new ApolloApi();
   api.moduleName = 'Dialog';
   api.nMinWidth = 150;
   api.nMinHeight = 52;
   api.Init();
   api.InitMoveSize();
+
+  $(document).ready(
+    function () {
+
+      $('.CloseButton').hover(
+        function () {
+          $(this).attr('src', 'CloseButtonHover.png');
+          $(this).css('-webkit-box-shadow', '0 0 12px #FF0000');
+        }, 
+        function () {
+          $(this).attr('src', 'CloseButton.png');
+          $(this).css('-webkit-box-shadow', '');
+        }
+      ).click(
+        function () {
+          api.Message('Dialog_Destroy').setString('hDialog', api.GetViewHandle()).send();
+        }
+      );
+
+    }
+  );
+
 </script>
 </head>
 <body style="overflow:hidden; margin:0; padding:0;">
-<div style="position:absolute;left:10px;top:10px;right:10px;bottom:10px;border-radius:10px;-webkit-box-shadow:0 0 10px #555555;">
+<div class="Wrapper">
 
-  <div class="SizeTopLeft" style="position:absolute;left:0;top:0;width:8px;height:24px;background-color:rgba(255,255,255,0.9);;border-top-left-radius:10px;"></div>
-  <div class="Move" style="position:absolute;left:8px;top:0;right:8px;height:24px;background-color:rgba(255,255,255,0.9);">
-    <table style="margin-top:2px;"><tr><td><img src="Rocket-16.png" /></td><td class="Move" style="font-family:Arial;font-size:14px;padding-left:8px;">Window Title</td></tr></table>
-    <input type="button" onclick="document.location.reload();" value="reload" style="position:absolute;right:0;top:0;font-family:Verdana; font-size:10px;"/>
+  <div class="WindowTopLeft"></div>
+  <div class="WindowTop"></div>
+  <div class="WindowTitle cApMove">
+    <img id="Icon" class="TitleIcon" src="Rocket-16.png" style="vertical-align:middle;" alt="icon" />
+    <span id="Caption" class="cApMove TitleText" style="vertical-align:middle;">Apollo</span>
+    <input type="button" onclick="document.location.reload();" value="reload" style="position:absolute;right:80px;top:2px;font-family:Verdana;font-size:9px;"/>
   </div>
-  <div class="SizeTopRight" style="position:absolute;right:0;top:0;width:8px;height:24px;background-color:rgba(255,255,255,0.9);;border-top-right-radius:10px;"></div>
+  <div class="WindowSystem"><img class="CloseButton" src="CloseButton.png" /></div>
+  <div class="WindowTopRight"></div>
 
-  <div class="SizeLeft" style="position:absolute;left:0;top:24px;width:8px;bottom:8px;background-color:rgba(255,255,255,0.8);"></div>
-  <div style="position:absolute;left:8px;top:24px;right:8px;bottom:8px;">
-    <iframe style="width:100%;height:100%;-webkit-box-shadow:inset 0 0 5px #000000;" src="file://C:\Heiner\Apollo\bin\Win32\Debug\modules\Dialog\test\Content.html" frameborder="0"></iframe>
+  <div class="WindowLeft"></div>
+  <div id="Center" style="position:absolute;left:8px;top:24px;right:8px;bottom:8px;background-color:#FFFFFF">
+    <iframe id="Content" style="display:none;width:100%;height:100%;-webkit-box-shadow:inset 0 0 5px #000000;" src="Blank.html" frameborder="0"></iframe>
   </div>
-  <div class="SizeRight" style="position:absolute;right:0;top:24px;width:8px;bottom:8px;background-color:rgba(255,255,255,0.9);;"></div>
+  <div class="WindowRight"></div>
 
-  <div class="SizeBottomLeft" style="position:absolute;left:0;bottom:0;width:8px;height:8px;background-color:rgba(255,255,255,0.9);;border-bottom-left-radius:10px;"></div>
-  <div class="SizeBottom" style="position:absolute;left:8px;bottom:0;right:8px;height:8px;background-color:rgba(255,255,255,0.9);;"></div>
-  <div class="SizeBottomRight" style="position:absolute;right:0;bottom:0;width:8px;height:8px;background-color:rgba(255,255,255,0.9);;border-bottom-right-radius:10px;background-image:url(SizeBottomRight-8.png);"></div>
+  <div class="WindowBottomLeft"></div>
+  <div class="WindowBottom"></div>
+  <div class="WindowBottomRight cApSizeBottomRight" style="background-image:url(SizeBottomRight-8.png);"></div>
 
 </div>
 </body>

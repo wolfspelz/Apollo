@@ -40,11 +40,15 @@ void SampleModule::DeleteSample(const ApHandle& hSample)
 
 Sample* SampleModule::FindSample(const ApHandle& hSample)
 {
-  Sample* pSample = 0;  
-
+  Sample* pSample = 0;
   samples_.Get(hSample, pSample);
-  if (pSample == 0) { throw ApException("SampleModule::FindSample no Sample=" ApHandleFormat "", ApHandleType(hSample)); }
+  return pSample;
+}
 
+Sample* SampleModule::GetSample(const ApHandle& hSample)
+{
+  Sample* pSample = FindSample(hSample);  
+  if (pSample == 0) { throw ApException("SampleModule::FindSample no Sample=" ApHandleFormat "", ApHandleType(hSample)); }
   return pSample;
 }
 

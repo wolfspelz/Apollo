@@ -19,6 +19,8 @@ public:
   ApIN int nWidth;
   ApIN int nHeight;
   ApIN int bVisible;
+  ApIN String sCaption;
+  ApIN String sIconUrl;
   ApIN String sContentUrl;
 };
 

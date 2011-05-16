@@ -200,6 +200,20 @@ AP_MSG_HANDLER_METHOD(WebViewModule, System_3SecTimer)
 
 //----------------------------------------------------------
 
+void SrpcGate_WebView_Create(ApSRPCMessage* pMsg)
+{
+  Msg_WebView_Create msg;
+  msg.hView = Apollo::string2Handle(pMsg->srpc.getString("hView"));
+  SRPCGATE_HANDLER_NATIVE_REQUEST(pMsg, msg);
+}
+
+void SrpcGate_WebView_Destroy(ApSRPCMessage* pMsg)
+{
+  Msg_WebView_Destroy msg;
+  msg.hView = Apollo::string2Handle(pMsg->srpc.getString("hView"));
+  SRPCGATE_HANDLER_NATIVE_REQUEST(pMsg, msg);
+}
+
 void SrpcGate_WebView_Position(ApSRPCMessage* pMsg)
 {
   Msg_WebView_Position msg;
@@ -359,6 +373,8 @@ int WebViewModule::Init()
 
   AP_UNITTEST_HOOK(WebViewModule, this);
 
+  srpcGateRegistry_.add("WebView_Create", SrpcGate_WebView_Create);
+  srpcGateRegistry_.add("WebView_Destroy", SrpcGate_WebView_Destroy);
   srpcGateRegistry_.add("WebView_Position", SrpcGate_WebView_Position);
   srpcGateRegistry_.add("WebView_Visibility", SrpcGate_WebView_Visibility);
   srpcGateRegistry_.add("WebView_Load", SrpcGate_WebView_Load);
