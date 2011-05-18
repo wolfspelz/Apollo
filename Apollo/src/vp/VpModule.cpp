@@ -384,6 +384,24 @@ AP_MSG_HANDLER_METHOD(VpModule, Vpi_LocationXmlResponse)
   } // pContext
 }
 
+AP_MSG_HANDLER_METHOD(VpModule, Vp_OpenContext)
+{
+  int ok = 1;
+  apLog_Verbose((LOG_CHANNEL, "VpModule::Vp_OpenContext", "ctxt=" ApHandleFormat "", ApHandleType(pMsg->hContext)));
+
+  Context* pContext = 0;
+  if (!contexts_.Get(pMsg->hContext, pContext)) {
+    Msg_Vp_CreateContext msg;
+    msg.hContext = pMsg->hContext;
+    ok = msg.Request();
+    if (!ok) {
+      apLog_Error((LOG_CHANNEL, "VpModule::Vp_OpenContext", "Msg_Vp_CreateContext failed for ctxt=" ApHandleFormat "", ApHandleType(pMsg->hContext)));
+    }
+  }
+
+  pMsg->apStatus = ok ? ApMessage::Ok : ApMessage::Error;
+}
+
 AP_MSG_HANDLER_METHOD(VpModule, Vp_NavigateContext)
 {
   int ok = 1;
@@ -391,7 +409,7 @@ AP_MSG_HANDLER_METHOD(VpModule, Vp_NavigateContext)
 
   Context* pContext = 0;
   if (contexts_.Get(pMsg->hContext, pContext)) {
-    // xists
+    // already xists
   } else {
     Msg_Vp_CreateContext msg;
     msg.hContext = pMsg->hContext;
@@ -1675,6 +1693,7 @@ int VpModule::init()
 
   AP_MSG_REGISTRY_ADD(MODULE_NAME, VpModule, Vpi_LocationXmlResponse, this, ApCallbackPosNormal);
 
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, VpModule, Vp_OpenContext, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, VpModule, Vp_NavigateContext, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, VpModule, Vp_CloseContext, this, ApCallbackPosNormal);
 

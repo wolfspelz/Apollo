@@ -108,6 +108,7 @@ class Context
 {
 public:
   Context(const ApHandle& hContext);
+  virtual ~Context();
 
   int navigate(const String& sUrl);
   int setLocationXml(const String& sLocationXml);

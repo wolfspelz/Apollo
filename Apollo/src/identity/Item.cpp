@@ -71,9 +71,9 @@ String Item::getAttribute(const String& sKey)
     if (sValue.empty()) {
       sValue = lAttributes_["contenttype"].getString();
     }
-    if (sValue == "avatar2") {
-      sValue = "avatar";
-    }
+    //if (sValue == "avatar2") {
+    //  sValue = "avatar";
+    //}
   } else {
     sValue = lAttributes_[sKey].getString();
   }

@@ -14,6 +14,7 @@ class Context
 public:
   Context(const ApHandle& hContext)
     :hAp_(hContext)
+    ,bTrackingCoordinates_(0)
   {}
   virtual ~Context() {}
 
@@ -31,6 +32,7 @@ public:
 
 protected:
   ApHandle hAp_;
+  int bTrackingCoordinates_;
 };
 
 #endif // !defined(Context_h_INCLUDED)

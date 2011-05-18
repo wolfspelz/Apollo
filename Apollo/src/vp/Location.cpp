@@ -338,22 +338,32 @@ int Location::addParticipant(const ApHandle& hParticipant)
     ok = participants_.Set(hParticipant, pParticipant);
   }
 
+  // ---------------
+  // These two asyc because:
+  // in AP_MSG_HANDLER_METHOD(VpModule, Protocol_ParticipantEntered)
+  //   setParticipantLocationMapping() 
+  // must be executed before 
+  //   pLocation->addParticipant()
+  // because in addParticipant() the avatars are created by displays, 
+  // which need an active participant with data and location association
+
   if (ok) {
-    Msg_VpView_ParticipantAdded msg;
-    msg.hLocation = apHandle();
-    msg.hParticipant = hParticipant;
+    ApAsyncMessage<Msg_VpView_ParticipantAdded> msg;
+    msg->hLocation = apHandle();
+    msg->hParticipant = hParticipant;
     if (getSelfParticipant() == hParticipant) {
-      msg.bSelf = 1;
+      msg->bSelf = 1;
     }
-    msg.Send();
+    msg.Post();
   }
 
   if (ok) {
-    Msg_VpView_ParticipantsChanged msg;
-    msg.hLocation = apHandle();
-    msg.nCount = participants_.Count();
-    msg.Send();
+    ApAsyncMessage<Msg_VpView_ParticipantsChanged> msg;
+    msg->hLocation = apHandle();
+    msg->nCount = participants_.Count();
+    msg.Post();
   }
+  // ---------------
 
   return ok;
 }

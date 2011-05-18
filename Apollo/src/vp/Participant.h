@@ -19,7 +19,7 @@ class ParticipantThingy: public Thingy
 {
 public:
   ParticipantThingyProvider* getProvider() { return (ParticipantThingyProvider*) pProvider_; }
-  void setProvider(ParticipantThingyProvider* pProvider) { pProvider_ = (ThingyProvider*) pProvider; }
+  void setProvider(ParticipantThingyProvider* pProvider) { pProvider_ = (ThingyProvider*) pProvider; pProvider_->setOwner(this); }
 };
 
 //------------------------------

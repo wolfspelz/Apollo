@@ -656,7 +656,6 @@ void Item::Step(Apollo::TimeValue& tvCurrent)
 
 Sequence* Item::SelectNextSequence()
 {
-  Sequence * pSequence = 0;
   String sSequence;
   int bFinal = 0;
 
@@ -700,13 +699,15 @@ Sequence* Item::SelectNextSequence()
 
   if (!bFinal) {
     if (pCurrentSequence_) {
-      if (pCurrentSequence_->Group() != sSequence) {
-        String sTransitionSequence = pCurrentSequence_->Group() + "2" + sSequence;
-        Sequence* pTransitionSequence = GetSequenceByGroupOrName(sTransitionSequence);
-        if (pTransitionSequence) {
-          sNextSequence_ = sSequence;
-          sSequence = sTransitionSequence;
-          apLog_Verbose((LOG_CHANNEL, "Item::SelectNextSequence", "item=" ApHandleFormat " selecting transition seq=%s", ApHandleType(hAp_), StringType(sSequence)));
+      if (sSequence) {
+        if (pCurrentSequence_->Group() != sSequence) {
+          String sTransitionSequence = pCurrentSequence_->Group() + "2" + sSequence;
+          Sequence* pTransitionSequence = GetSequenceByGroupOrName(sTransitionSequence);
+          if (pTransitionSequence) {
+            sNextSequence_ = sSequence;
+            sSequence = sTransitionSequence;
+            apLog_Verbose((LOG_CHANNEL, "Item::SelectNextSequence", "item=" ApHandleFormat " selecting transition seq=%s", ApHandleType(hAp_), StringType(sSequence)));
+          }
         }
       }
     }
@@ -748,37 +749,26 @@ Sequence* Item::SelectNextSequence()
     }
   }
 
-  if (!sSequence) {
-    sSequence = GetDefaultSequence();
-    apLog_VeryVerbose((LOG_CHANNEL, "Item::SelectNextSequence", "item=" ApHandleFormat " selecting default seq=%s", ApHandleType(hAp_), StringType(sSequence)));
-  }
+  //if (!sSequence) {
+  //  sSequence = GetDefaultSequenceName();
+  //  apLog_VeryVerbose((LOG_CHANNEL, "Item::SelectNextSequence", "item=" ApHandleFormat " selecting default seq=%s", ApHandleType(hAp_), StringType(sSequence)));
+  //}
 
-  pSequence = GetSequenceByGroupOrName(sSequence);
-  if (pSequence == 0) {
-    pSequence = GetSequenceByName(sDefaultSequence_);
-  }
+  // Prepare return value, assert that there is one by all possible means
+  Sequence* pSequence = 0;
 
-  if (pSequence) {
-    if (!pSequence->IsLoaded()) {
-      pSequence->Load();
-    }
-  }
-
-  return pSequence;
-}
-
-String Item::GetDefaultSequence()
-{
-  String s = sDefaultSequence_;
-
-  Sequence* pSequence = GetSequenceByName(s);
-
-  if (pSequence == 0) {
-    pSequence = GetSequenceByGroup(s);
+  if (sSequence) {
+    pSequence = GetSequenceByGroupOrName(sSequence);
   }
 
   if (pSequence == 0) {
     pSequence = GetSequenceByGroup(Item_Group_Standard);
+  }
+
+  if (pSequence == 0) {
+    if (sDefaultSequence_){
+      Sequence* pSequence = GetSequenceByName(sDefaultSequence_);
+    }
   }
 
   if (pSequence == 0) {
@@ -788,24 +778,9 @@ String Item::GetDefaultSequence()
     }
   }
 
-  return s;
-}
-
-Sequence* Item::GetSequenceByName(const String& sSequence)
-{
-  Sequence* pSequence = 0;
-
-  int bDone = 0;
-  Group* pGroup = 0;
-  while (!bDone) {
-    pGroup = lGroups_.Next(pGroup);
-    if (pGroup) {
-      pSequence = pGroup->FindByName(sSequence);
-      if (pSequence) {
-        bDone = 1;
-      }
-    } else {
-      bDone = 1;
+  if (pSequence) {
+    if (!pSequence->IsLoaded()) {
+      pSequence->Load();
     }
   }
 
@@ -829,11 +804,32 @@ Sequence* Item::GetSequenceByGroup(const String& sGroup)
   return pSequence;
 }
 
-Sequence* Item::GetSequenceByGroupOrName(const String& sDesignation)
+Sequence* Item::GetSequenceByName(const String& sName)
 {
-  Sequence* pSequence = GetSequenceByGroup(sDesignation);
+  Sequence* pSequence = 0;
+
+  int bDone = 0;
+  Group* pGroup = 0;
+  while (!bDone) {
+    pGroup = lGroups_.Next(pGroup);
+    if (pGroup) {
+      pSequence = pGroup->FindByName(sName);
+      if (pSequence) {
+        bDone = 1;
+      }
+    } else {
+      bDone = 1;
+    }
+  }
+
+  return pSequence;
+}
+
+Sequence* Item::GetSequenceByGroupOrName(const String& sGroupOrName)
+{
+  Sequence* pSequence = GetSequenceByGroup(sGroupOrName);
   if (pSequence == 0) {
-    pSequence = GetSequenceByName(sDesignation);
+    pSequence = GetSequenceByName(sGroupOrName);
   }
 
   return pSequence;

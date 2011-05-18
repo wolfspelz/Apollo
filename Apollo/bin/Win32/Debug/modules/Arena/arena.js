@@ -1,4 +1,36 @@
 
+function EscapeHTML(s)
+{
+  return s.replace(/&/ig, '&amp;').replace(/</ig, '&lt;').replace(/>/ig, '&gt;');
+}
+
+function StringApHandleBrackets(sValue)
+{
+  var sResult = '';
+  if (sValue) {
+    for (var i = 0; i < sValue.length; i++) {
+	    switch (sValue.charAt(i)) {
+		    case '[': break;
+		    case ']': break;
+		    default: sResult += sValue.charAt(i);
+	    }
+    }
+  }
+  return sResult;
+}
+
+function GetParticipantDomId(hParticipant)
+{
+  return 'iP' + StringApHandleBrackets(hParticipant);
+}
+
+function GetChatDomId(hParticipant, hChat)
+{
+  return 'iP' + StringApHandleBrackets(hParticipant) + 'C' + StringApHandleBrackets(hChat);
+}
+
+// -------------------------------------------
+
 function Arena(sDomId)
 {
   this.sDomId = sDomId;
@@ -9,14 +41,24 @@ Arena.prototype = {
   Startup: function()
   {
     //$('#' + arena.sDomId).html('<b>Arena</b>');
-    $('#' + arena.sDomId).append('<div id="iMeta"><p id="iDocumentUrl"></p><p id="iLocationUrl"></p><p id="iLocationState"></p></div>');
+    $('#' + arena.sDomId).append(''
+      + '<div id="iMeta">'
+      + '  <div class="cTranslate">Hello World</div>'
+      + '  <div id="iDocumentUrl"></div>'
+      + '  <div id="iLocationUrl"></div>'
+      + '  <div id="iLocationState"></div>'
+      + '</div>'
+    );
   },
+
+  // --------------------------------------
+  // Messages from module
 
   AddAvatar: function (hParticipant, bSelf, nX)
   {
     $('#' + arena.sDomId).append(''
 
-    + '<div class="cParticipant" id="' + arena.GetParticipantDomId(hParticipant) + '" style="display:none;">'
+    + '<div class="cParticipant" id="' + GetParticipantDomId(hParticipant) + '" style="display:none;">'
     + '  <div class="cCenter">'
     + '    <div class="cChatWrapper" style="z-index:30;">'
     + '      <div class="cChatContainer"></div>'
@@ -32,14 +74,14 @@ Arena.prototype = {
       + '        <table border="0" cellpadding="0" cellspacing="0"><tr>'
       + '          <td><input type="text" class="cText" size="30" /></td>'
       + '          <td><input type="submit" class="cSend cTranslate" value="Send" /></td>'
-      + '          <td><img src="CloseButton.png" class="cCloseButton" /></td>'
+      + '          <td><img src="CloseChatInButton.png" class="cCloseButton" /></td>'
       + '        </tr></table>'
       + '      </div>'
       + '    </div>'
       :
       ''
       )
-    
+
     + '    </div>'
     + '  </div>'
     + '</div>'
@@ -56,89 +98,132 @@ Arena.prototype = {
 
   RemoveAvatar: function (hParticipant)
   {
-    $('#' + arena.GetParticipantDomId(hParticipant)).remove();
+    $('#' + GetParticipantDomId(hParticipant)).remove();
   },
 
   ShowAvatar: function (hParticipant)
   {
-    $('#' + arena.GetParticipantDomId(hParticipant)).css('display', '');
+    $('#' + GetParticipantDomId(hParticipant)).css('display', '');
   },
 
   HideAvatar: function (hParticipant)
   {
-    $('#' + arena.GetParticipantDomId(hParticipant)).css('display', 'none');
+    $('#' + GetParticipantDomId(hParticipant)).css('display', 'none');
   },
 
   SetAvatarPosition: function (hParticipant, nX)
   {
-    $('#' + arena.GetParticipantDomId(hParticipant)).css('left', nX + 'px');
+    $('#' + GetParticipantDomId(hParticipant)).css('left', (50 + nX) + 'px');
   },
 
   SetAvatarNickname: function (hParticipant, sNickname)
   {
-    $('#' + arena.GetParticipantDomId(hParticipant) + ' .cNickname').html(sNickname);
+    $('#' + GetParticipantDomId(hParticipant) + ' .cNickname').html(EscapeHTML(sNickname));
   },
 
   SetAvatarImage: function (hParticipant, sUrl)
   {
     var img = new Image()
     img.onload = function() {
-      $('#' + arena.GetParticipantDomId(hParticipant) + ' .cImage').css('background-image', 'url(' + sUrl + ')');
+      $('#' + GetParticipantDomId(hParticipant) + ' .cImage').css('background-image', 'url(' + sUrl + ')');
     }
     img.src = sUrl;
   },
 
   AddAvatarChat: function (hParticipant, hChat, sText)
   {
-    $('#' + arena.GetParticipantDomId(hParticipant) + ' .cChatContainer').append('<div id="' + arena.GetChatDomId(hParticipant, hChat) + '" class="cChat">' + sText + '</div>');
+    $('#' + GetParticipantDomId(hParticipant) + ' .cChatContainer').append(''
+      + '<div id="' + GetChatDomId(hParticipant, hChat) + '" class="cChatBubble">' 
+      + '<span class="cText">'
+      + EscapeHTML(sText)
+      + '</span>'
+      + '<img src="CloseChatBubbleButton.png" class="cCloseButton" />'
+      + '</div>'
+    );
+    
+    $('#' + GetChatDomId(hParticipant, hChat))
+      .click(
+        function () {
+          $('#' + GetChatDomId(hParticipant, hChat)).stop(true).fadeTo('fast', 1);
+        }
+      )
+      .delay(10000)
+      .fadeOut(20000, 
+        function () {
+          arena.OnPublicChatTimedOut(hParticipant, hChat);
+        }
+      );
+
+    $('#' + GetChatDomId(hParticipant, hChat) + ' .cCloseButton').hover(
+      function () {
+        $(this).attr('src', 'CloseChatBubbleButtonHover.png');
+      }, 
+      function () {
+        $(this).attr('src', 'CloseChatBubbleButton.png');
+      }
+    ).click(
+      function () {
+        arena.OnPublicChatClosed(hParticipant, hChat);
+      }
+    );
+
   },
 
   SetAvatarChat: function (hParticipant, hChat, sText)
   {
-    $('#' + arena.GetChatDomId(hParticipant, hChat)).html(sText);
+    $('#' + GetChatDomId(hParticipant, hChat) + ' .cText').html(EscapeHTML(sText));
   },
 
   RemoveAvatarChat: function (hParticipant, hChat)
   {
-    $('#' + arena.GetChatDomId(hParticipant, hChat)).remove();
+    $('#' + GetChatDomId(hParticipant, hChat)).remove();
   },
 
   SetDocumentUrl: function (sUrl)
   {
-    $('#iDocumentUrl').html(sUrl);
+    $('#iDocumentUrl').html(EscapeHTML(sUrl));
   },
 
   SetLocationUrl: function (sUrl)
   {
-    $('#iLocationUrl').html(sUrl);
+    $('#iLocationUrl').html(EscapeHTML(sUrl));
   },
 
   SetLocationState: function (sState)
   {
-    $('#iLocationState').html(sState);
+    $('#iLocationState').html(EscapeHTML(sState));
     $('#iLocationState').removeClass().addClass("sState");
   },
 
   // --------------------------------------
-
-  GetParticipantDomId: function (hParticipant)
+  // Messages to module
+  
+  OnPublicChatTimedOut: function (hParticipant, hChat)
   {
-    return 'iP' + hParticipant.toDomCompatible();
+    api.Message('OnPublicChatTimedOut').setString('ApType', 'Arena_CallModuleSrpc').setString('hParticipant', hParticipant).setString('hChat', hChat).send();
   },
 
-  GetChatDomId: function (hParticipant, hChat)
+  OnPublicChatClosed: function (hParticipant, hChat)
   {
-    return 'iP' + hParticipant.toDomCompatible() + 'C' + hChat.toDomCompatible();
+    api.Message('OnPublicChatClosed').setString('ApType', 'Arena_CallModuleSrpc').setString('hParticipant', hParticipant).setString('hChat', hChat).send();
   },
 
+  SendPublicChat: function (sText)
+  {
+    api.Message('SendPublicChat').setString('ApType', 'Arena_CallModuleSrpc').setString('sText', sText).send();
+  },
+
+  // --------------------------------------
+  // protected
+  
   ActivateSelfAvatarElements: function (hParticipant)
   {
     $('.cImageSensor').hover(
       function () {
-        $('.cMenu').stop(true).fadeTo('fast',1);
+        $('.cMenu').stop(true).fadeTo('fast', 1);
       }, 
       function () {
-        $('.cMenu').fadeTo('fast',0);
+        $('.cMenu').fadeTo('fast', 0);
       }
     );
 
@@ -155,10 +240,10 @@ Arena.prototype = {
 
     $('.cCloseButton').hover(
       function () {
-        $(this).attr('src', 'CloseButtonHover.png');
+        $(this).attr('src', 'CloseChatInButtonHover.png');
       }, 
       function () {
-        $(this).attr('src', 'CloseButton.png');
+        $(this).attr('src', 'CloseChatInButton.png');
       }
     ).click(
       function () {
@@ -194,18 +279,13 @@ Arena.prototype = {
 
   },
 
-  // --------------------------------------
-
-  SendPublicChat: function (sText)
-  {
-    api.Message('SendPublicChat').setString('ApType', 'Arena_CallModuleSrpc').setString('sText', sText).send();
-  },
-
   CloseChat: function ()
   {
     $('.cChatIn .cText').val('');
     $('.cChatIn').fadeOut('fast');
   },
+
+  // --------------------------------------
 
   dummy: 1
 }

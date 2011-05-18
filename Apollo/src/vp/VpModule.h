@@ -87,6 +87,7 @@ public:
 
   void On_Vpi_LocationXmlResponse(Msg_Vpi_LocationXmlResponse* pMsg);
 
+  void On_Vp_OpenContext(Msg_Vp_OpenContext* pMsg);
   void On_Vp_NavigateContext(Msg_Vp_NavigateContext* pMsg);
   void On_Vp_CloseContext(Msg_Vp_CloseContext* pMsg);
 

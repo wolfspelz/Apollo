@@ -43,6 +43,10 @@ int NavigationModule::addConnection(const ApHandle& hConnection, Connection* pCo
 
   ok = connections_.Set(hConnection, pConnection);
 
+  Msg_Navigation_Connected msg;
+  msg.hConnection = hConnection;
+  msg.Send();
+
   return ok;
 }
 
@@ -53,35 +57,9 @@ int NavigationModule::removeConnection(const ApHandle& hConnection)
   ok = connections_.Unset(hConnection);
 
   // Connection lost:
-  if (ok) {
-
-    // Construct lust of contexts to be closed
-    ContextHandleList closeContexts;
-    ConnectionContextListNode* pConnectionContextListNode = 0;
-    for (ConnectionContextListIterator connectionContextListIterator(connectionContexts_); (pConnectionContextListNode = connectionContextListIterator.Next()) != 0; ) {
-      if (pConnectionContextListNode->Key() == hConnection) {
-        closeContexts = pConnectionContextListNode->Value();
-        break;
-      }
-    }
-
-    if (closeContexts.Count() == 0) {
-      apLog_Verbose((LOG_CHANNEL, "NavigationModule::removeConnection", "conn=" ApHandleFormat " no associated contexts", ApHandleType(hConnection)));
-    } else {
-      apLog_Verbose((LOG_CHANNEL, "NavigationModule::removeConnection", "Closing %d associated contexts of conn=" ApHandleFormat "", closeContexts.Count(), ApHandleType(hConnection)));
-    }
-
-    // Send Vp_CloseContext for all associated contexts
-    ContextHandleListNode* pContextHandleListNode = 0;
-    for (ContextHandleListIterator contextHandleListIterator(closeContexts); (pContextHandleListNode = contextHandleListIterator.Next()) != 0; ) {
-      ApHandle hContext = pContextHandleListNode->Key();
-      destroyContext(hContext);
-    } // for all Contexts
-
-    // Cleanup, should do nothing, because destroyContext does removeContextFromConnection
-    // and the last context also removes the connection in connectionContexts_
-    (void) connectionContexts_.Unset(hConnection);
-  }
+  Msg_Navigation_Disconnected msg;
+  msg.hConnection = hConnection;
+  msg.Send();
 
   return ok;
 }
@@ -209,6 +187,44 @@ AP_MSG_HANDLER_METHOD(NavigationModule, MainLoop_EventLoopBeforeEnd)
   }
 }
 
+AP_MSG_HANDLER_METHOD(NavigationModule, Navigation_Connected)
+{
+  // do nothing
+}
+
+AP_MSG_HANDLER_METHOD(NavigationModule, Navigation_Disconnected)
+{
+  // Lost connection -> cleanup associated contexts
+  ApHandle hConnection = pMsg->hConnection;
+
+  // Construct list of contexts to be closed
+  ContextHandleList closeContexts;
+  ConnectionContextListNode* pConnectionContextListNode = 0;
+  for (ConnectionContextListIterator connectionContextListIterator(connectionContexts_); (pConnectionContextListNode = connectionContextListIterator.Next()) != 0; ) {
+    if (pConnectionContextListNode->Key() == hConnection) {
+      closeContexts = pConnectionContextListNode->Value();
+      break;
+    }
+  }
+
+  if (closeContexts.Count() == 0) {
+    apLog_Verbose((LOG_CHANNEL, "NavigationModule::removeConnection", "conn=" ApHandleFormat " no associated contexts", ApHandleType(hConnection)));
+  } else {
+    apLog_Verbose((LOG_CHANNEL, "NavigationModule::removeConnection", "Closing %d associated contexts of conn=" ApHandleFormat "", closeContexts.Count(), ApHandleType(hConnection)));
+  }
+
+  // Send Vp_CloseContext for all associated contexts
+  ContextHandleListNode* pContextHandleListNode = 0;
+  for (ContextHandleListIterator contextHandleListIterator(closeContexts); (pContextHandleListNode = contextHandleListIterator.Next()) != 0; ) {
+    ApHandle hContext = pContextHandleListNode->Key();
+    destroyContext(hContext);
+  } // for all Contexts
+
+  // Cleanup, should do nothing, because destroyContext does removeContextFromConnection
+  // and the last context also removes the connection in connectionContexts_
+  (void) connectionContexts_.Unset(hConnection);
+}
+
 AP_MSG_HANDLER_METHOD(NavigationModule, Navigation_Receive)
 {
   int ok = 1;
@@ -240,7 +256,7 @@ AP_MSG_HANDLER_METHOD(NavigationModule, Navigation_Receive)
       response.setString("h", msg.h.toString());
     }
 
-  } else if (sMethod == Navigation_SrpcMethod_Navigate) {
+  } else if (sMethod == Navigation_SrpcMethod_Navigate || sMethod == Navigation_SrpcMethod_Open) {
     ApHandle hContext = pMsg->srpc.getHandle("hContext");
     Context* pContext = findContext(hContext);
     if (pContext == 0) {
@@ -336,7 +352,7 @@ AP_MSG_HANDLER_METHOD(NavigationModule, Navigation_Receive)
           String sWidth = pMsg->srpc.getString("nWidth");
           String sHeight = pMsg->srpc.getString("nHeight");
           try {
-            pContext->position(String::atoi(sWidth), String::atoi(sHeight));
+            pContext->size(String::atoi(sWidth), String::atoi(sHeight));
             response.createResponse(pMsg->srpc);
           } catch (ApException ex) {
             response.createError(pMsg->srpc, ex.getText());
@@ -517,6 +533,8 @@ int NavigationModule::init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, NavigationModule, MainLoop_EventLoopBegin, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, NavigationModule, MainLoop_EventLoopBeforeEnd, this, ApCallbackPosNormal);
 
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, NavigationModule, Navigation_Connected, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, NavigationModule, Navigation_Disconnected, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, NavigationModule, Navigation_Receive, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, NavigationModule, Navigation_Send, this, ApCallbackPosNormal);
 

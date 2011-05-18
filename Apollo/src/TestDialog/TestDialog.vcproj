@@ -177,6 +177,14 @@
 			UniqueIdentifier="{6D918651-64FA-43ef-953C-31C6A72A00E6}"
 			>
 		</Filter>
+		<File
+			RelativePath="..\..\bin\Win32\Debug\modules\TestDialog\config.txt"
+			>
+		</File>
+		<File
+			RelativePath="..\..\bin\Win32\Debug\modules\TestDialog\index.html"
+			>
+		</File>
 	</Files>
 	<Globals>
 	</Globals>

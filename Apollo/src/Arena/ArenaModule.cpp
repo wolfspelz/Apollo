@@ -347,16 +347,16 @@ AP_SRPC_HANDLER_METHOD(ArenaModule, Arena_CallModuleSrpc, ApSRPCMessage)
 
 #if defined(AP_TEST)
 
-ApHandle Test_Avatar_RemoveOldChats_hRemovedChat_;
+ApHandle Test_Avatar_RemoveOldPublicChats_hRemovedChat_;
 
-void Test_Avatar_RemoveOldChats_DisplaySrpcMessage(DisplaySrpcMessage* pMsg)
+void Test_Avatar_RemoveOldPublicChats_DisplaySrpcMessage(DisplaySrpcMessage* pMsg)
 {
   if (pMsg->srpc.getString("Method") == "RemoveAvatarChat") {
-    Test_Avatar_RemoveOldChats_hRemovedChat_ = Apollo::string2Handle(pMsg->srpc.getString("hChat"));
+    Test_Avatar_RemoveOldPublicChats_hRemovedChat_ = Apollo::string2Handle(pMsg->srpc.getString("hChat"));
   }
 }
 
-static String Test_Avatar_RemoveOldChats()
+static String Test_Avatar_RemoveOldPublicChats()
 {
   String s;
 
@@ -364,7 +364,7 @@ static String Test_Avatar_RemoveOldChats()
   Display d(&m, Apollo::newHandle());
   Avatar a(&m, &d, Apollo::newHandle());
 
-  { DisplaySrpcMessage msg(&d, "Dummy"); msg.Hook(MODULE_NAME, (ApCallback) Test_Avatar_RemoveOldChats_DisplaySrpcMessage, 0, ApCallbackPosEarly); }
+  { DisplaySrpcMessage msg(&d, "Dummy"); msg.Hook(MODULE_NAME, (ApCallback) Test_Avatar_RemoveOldPublicChats_DisplaySrpcMessage, 0, ApCallbackPosEarly); }
 
   ApHandle hChat2 = Apollo::newHandle();
   ApHandle hChat1 = Apollo::newHandle();
@@ -376,11 +376,11 @@ static String Test_Avatar_RemoveOldChats()
   a.OnReceivePublicChat(hChat1, "Nickname1", "Text1", Apollo::TimeValue(1, 0));
   a.OnReceivePublicChat(hChat2, "Nickname2", "Text2", Apollo::TimeValue(2, 0));
 
-  if (Test_Avatar_RemoveOldChats_hRemovedChat_ != hChat1) {
+  if (Test_Avatar_RemoveOldPublicChats_hRemovedChat_ != hChat1) {
     s = "Did not remove oldest chat";
   }
 
-  { DisplaySrpcMessage msg(&d, "Dummy"); msg.Unhook(MODULE_NAME, (ApCallback) Test_Avatar_RemoveOldChats_DisplaySrpcMessage, 0); }
+  { DisplaySrpcMessage msg(&d, "Dummy"); msg.Unhook(MODULE_NAME, (ApCallback) Test_Avatar_RemoveOldPublicChats_DisplaySrpcMessage, 0); }
 
   return s;
 }
@@ -390,7 +390,7 @@ AP_MSG_HANDLER_METHOD(ArenaModule, UnitTest_Begin)
   AP_UNUSED_ARG(pMsg);
   if (Apollo::getConfig("Test/Arena", 0)) {
     ArenaModuleTester::Begin();
-    AP_UNITTEST_REGISTER(Test_Avatar_RemoveOldChats);
+    AP_UNITTEST_REGISTER(Test_Avatar_RemoveOldPublicChats);
   }
 }
 
@@ -399,7 +399,7 @@ AP_MSG_HANDLER_METHOD(ArenaModule, UnitTest_Execute)
   AP_UNUSED_ARG(pMsg);
   if (Apollo::getConfig("Test/Arena", 0)) {
     ArenaModuleTester::Execute();
-    AP_UNITTEST_EXECUTE(Test_Avatar_RemoveOldChats);
+    AP_UNITTEST_EXECUTE(Test_Avatar_RemoveOldPublicChats);
   }
 }
 

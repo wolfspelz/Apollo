@@ -9,9 +9,17 @@
 #include "Local.h"
 #include "Thingy.h"
 
+void ThingyProvider::setOwner(Thingy* pThingy)
+{
+  pThingy_ = pThingy;
+}
+
+// ---------------------------------------------------------------
+
 Thingy::~Thingy()
 {
   if (pProvider_) {
+    pProvider_->setOwner(0);
     delete pProvider_;
     pProvider_ = 0;
   }

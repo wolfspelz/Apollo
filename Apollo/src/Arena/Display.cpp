@@ -226,10 +226,7 @@ void Display::OnReceivePublicChat(const ApHandle& hParticipant, const ApHandle& 
 {
   AvatarListNode* pNode = avatars_.Find(hParticipant);
   if (pNode) {
-    Avatar* pAvatar = pNode->Value();
-    if (pAvatar) {
-      pAvatar->OnReceivePublicChat(hChat, sNickname, sText, tv);
-    }
+    pNode->Value()->OnReceivePublicChat(hChat, sNickname, sText, tv);
   }
 }
 
@@ -237,10 +234,7 @@ void Display::OnParticipantDetailsChanged(const ApHandle& hParticipant, Apollo::
 {
   AvatarListNode* pNode = avatars_.Find(hParticipant);
   if (pNode) {
-    Avatar* pAvatar = pNode->Value();
-    if (pAvatar) {
-      pAvatar->OnDetailsChanged(vlKeys);
-    }
+    pNode->Value()->OnDetailsChanged(vlKeys);
   }
 }
 
@@ -248,10 +242,7 @@ void Display::OnAvatarAnimationBegin(const ApHandle& hParticipant, const String&
 {
   AvatarListNode* pNode = avatars_.Find(hParticipant);
   if (pNode) {
-    Avatar* pAvatar = pNode->Value();
-    if (pAvatar) {
-      pAvatar->OnAnimationBegin(sUrl);
-    }
+    pNode->Value()->OnAnimationBegin(sUrl);
   }
 }
 
@@ -269,8 +260,45 @@ void Display::OnCallModuleSrpc(Apollo::SrpcMessage& request, Apollo::SrpcMessage
       if (!msg.Request()) { throw ApException("Msg_Vp_SendPublicChat failed  loc=" ApHandleFormat "", ApHandleType(hLocation_)); }
     }
 
+  } else if (sMethod == "OnPublicChatTimedOut" || sMethod == "OnPublicChatClosed") {
+    ApHandle hParticipant = Apollo::string2Handle(request.getString("hParticipant"));
+    ApHandle hChat = Apollo::string2Handle(request.getString("hChat"));
+    if (ApIsHandle(hParticipant) && ApIsHandle(hChat)){
+      AvatarListNode* pNode = avatars_.Find(hParticipant);
+      if (pNode) {
+        pNode->Value()->OnPublicChatClosed(hChat);
+      }
+    }
+
   } else {
     throw ApException("Unknown Method=%s", StringType(sMethod));
+  }
+}
+
+//---------------------------------------------------
+
+void Display::OnContextDetailsChanged(Apollo::ValueList& vlKeys)
+{
+  Msg_VpView_GetContextDetail msg;
+  msg.hContext = hContext_;
+
+  for (Apollo::ValueElem* e = 0; e = vlKeys.nextElem(e); ) {
+    msg.sKey = e->getString();
+
+    if (0) {
+    } else if (e->getString() == Msg_VpView_ContextDetail_DocumentUrl) {
+      if (msg.Request()) {
+        DisplaySrpcMessage dsm(this, "SetDocumentUrl");
+        dsm.srpc.setString("sUrl", msg.sValue);
+        dsm.Request();
+      }
+    } else if (e->getString() == Msg_VpView_ContextDetail_LocationUrl) {
+      if (msg.Request()) {
+        DisplaySrpcMessage dsm(this, "SetLocationUrl");
+        dsm.srpc.setString("sUrl", msg.sValue);
+        dsm.Request();
+      }
+    }
   }
 }
 
@@ -396,37 +424,9 @@ void Display::ResetLocationInfo()
 
 //---------------------------------------------------
 
-void Display::OnContextDetailsChanged(Apollo::ValueList& vlKeys)
-{
-  Msg_VpView_GetContextDetail msg;
-  msg.hContext = hContext_;
-
-  for (Apollo::ValueElem* e = 0; e = vlKeys.nextElem(e); ) {
-    msg.sKey = e->getString();
-
-    if (0) {
-    } else if (e->getString() == Msg_VpView_ContextDetail_DocumentUrl) {
-      if (msg.Request()) {
-        DisplaySrpcMessage dsm(this, "SetDocumentUrl");
-        dsm.srpc.setString("sUrl", msg.sValue);
-        dsm.Request();
-      }
-    } else if (e->getString() == Msg_VpView_ContextDetail_LocationUrl) {
-      if (msg.Request()) {
-        DisplaySrpcMessage dsm(this, "SetLocationUrl");
-        dsm.srpc.setString("sUrl", msg.sValue);
-        dsm.Request();
-      }
-    }
-  }
-}
-
-//---------------------------------------------------
-
 DisplaySrpcMessage::DisplaySrpcMessage(Display* pDisplay, const String& sMethod)
 {
   srpc.setString("Method", sMethod);
   hView = pDisplay->GetView();
   sFunction = Apollo::getModuleConfig(MODULE_NAME, "CallScriptSrpcFunctionName", "receiveSrpcMessageAsString");
 }
-

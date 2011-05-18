@@ -27,6 +27,22 @@ public:
   ApIN Apollo::SrpcMessage srpc;
 };
 
+// navigation module -> navigation module
+class Msg_Navigation_Connected: public ApNotificationMessage
+{
+public:
+  Msg_Navigation_Connected() : ApNotificationMessage("Navigation_Connected") {}
+  ApIN ApHandle hConnection;
+};
+
+// navigation module -> navigation module
+class Msg_Navigation_Disconnected: public ApNotificationMessage
+{
+public:
+  Msg_Navigation_Disconnected() : ApNotificationMessage("Navigation_Disconnected") {}
+  ApIN ApHandle hConnection;
+};
+
 // -------------------------------
 
 // SRPC via TCP navigator protocol
@@ -41,6 +57,9 @@ public:
 // in: sUrl;
 
 #define Navigation_SrpcMethod_Attach "Context.Attach"
+// in: hContext
+
+#define Navigation_SrpcMethod_Open "Context.Open"
 // in: hContext
 
 #define Navigation_SrpcMethod_Close "Context.Close"

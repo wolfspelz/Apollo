@@ -9,6 +9,14 @@
 
 #include "ApMessage.h"
 
+// input -> VP module
+class Msg_Vp_OpenContext: public ApRequestMessage
+{
+public:
+  Msg_Vp_OpenContext() : ApRequestMessage("Vp_OpenContext") {}
+  ApIN ApHandle hContext;
+};
+
 // -> VP module
 class Msg_Vp_NavigateContext: public ApRequestMessage
 {

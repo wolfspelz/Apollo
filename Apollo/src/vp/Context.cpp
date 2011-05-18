@@ -27,7 +27,11 @@ Context::Context(const ApHandle& hContext)
   (void) lThingys_.getOrCreate(Msg_VpView_ContextDetail_Size);
 }
 
-//----------------------------------------------------------
+Context::~Context()
+{
+}
+
+//---------------------------
 
 int Context::navigate(const String& sUrl)
 {

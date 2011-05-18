@@ -14,7 +14,7 @@ class ThingyProvider
 public:
   ThingyProvider(): pThingy_(0) {}
   virtual ~ThingyProvider() {}
-  void setOwner(Thingy* pThingy) { pThingy_ = pThingy; }
+  void setOwner(Thingy* pThingy);
 
   virtual void getString(String& sValue, String& sMimeType) = 0;
   virtual void getData(Buffer& sbData, String& sMimeType, String& sSource) = 0;
