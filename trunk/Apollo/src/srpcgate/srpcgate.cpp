@@ -225,11 +225,7 @@ void SrpcGateModule::On_Server_HttpRequest(Msg_Server_HttpRequest* pMsg)
 void SrpcGate_MainLoop_EndLoop(ApSRPCMessage* pMsg)
 {
   Msg_MainLoop_EndLoop msg;
-  if (!msg.Request()) {
-    pMsg->response.createError(pMsg->srpc, msg.sComment);
-  } else {
-    pMsg->response.createResponse(pMsg->srpc);
-  }
+  SRPCGATE_HANDLER_NATIVE_REQUEST(pMsg, msg);
 }
 
 //--------------------------
@@ -238,47 +234,38 @@ void SrpcGate_MainLoop_EndLoop(ApSRPCMessage* pMsg)
 void SrpcGate_Xmpp_Connect(ApSRPCMessage* pMsg)
 {
   Msg_Xmpp_Connect msg;
-  if (!msg.Request()) {
-    pMsg->response.createError(pMsg->srpc, msg.sComment);
-  } else {
-    pMsg->response.createResponse(pMsg->srpc);
-  }
+  SRPCGATE_HANDLER_NATIVE_REQUEST(pMsg, msg);
 }
 
 void SrpcGate_Xmpp_Disconnect(ApSRPCMessage* pMsg)
 {
   Msg_Xmpp_Disconnect msg;
-  if (!msg.Request()) {
-    pMsg->response.createError(pMsg->srpc, msg.sComment);
-  } else {
-    pMsg->response.createResponse(pMsg->srpc);
-  }
+  SRPCGATE_HANDLER_NATIVE_REQUEST(pMsg, msg);
 }
 
 //--------------------------
 #include "MsgVp.h"
+
+void SrpcGate_Vp_OpenContext(ApSRPCMessage* pMsg)
+{
+  Msg_Vp_OpenContext msg;
+  msg.hContext = Apollo::string2Handle(pMsg->srpc.getString("hContext"));
+  SRPCGATE_HANDLER_NATIVE_REQUEST(pMsg, msg);
+}
 
 void SrpcGate_Vp_NavigateContext(ApSRPCMessage* pMsg)
 {
   Msg_Vp_NavigateContext msg;
   msg.hContext = Apollo::string2Handle(pMsg->srpc.getString("hContext"));
   msg.sUrl = pMsg->srpc.getString("sUrl");
-  if (!msg.Request()) {
-    pMsg->response.createError(pMsg->srpc, msg.sComment);
-  } else {
-    pMsg->response.createResponse(pMsg->srpc);
-  }
+  SRPCGATE_HANDLER_NATIVE_REQUEST(pMsg, msg);
 }
 
 void SrpcGate_Vp_CloseContext(ApSRPCMessage* pMsg)
 {
   Msg_Vp_CloseContext msg;
   msg.hContext = Apollo::string2Handle(pMsg->srpc.getString("hContext"));
-  if (!msg.Request()) {
-    pMsg->response.createError(pMsg->srpc, msg.sComment);
-  } else {
-    pMsg->response.createResponse(pMsg->srpc);
-  }
+  SRPCGATE_HANDLER_NATIVE_REQUEST(pMsg, msg);
 }
 
 //--------------------------
@@ -316,23 +303,15 @@ void SrpcGate_Config_SetValue(ApSRPCMessage* pMsg)
   Msg_Config_SetValue msg;
   msg.sPath = pMsg->srpc.getString("sPath");
   msg.sValue = pMsg->srpc.getString("sValue");
-  if (!msg.Request()) {
-    pMsg->response.createError(pMsg->srpc, "Msg_Config_SetValue failed");
-  } else {
-    pMsg->response.createResponse(pMsg->srpc);
-  }
+  SRPCGATE_HANDLER_NATIVE_REQUEST(pMsg, msg);
 }
 
 void SrpcGate_Config_GetValue(ApSRPCMessage* pMsg)
 {
   Msg_Config_GetValue msg;
   msg.sPath = pMsg->srpc.getString("sPath");
-  if (!msg.Request()) {
-    pMsg->response.createError(pMsg->srpc, "Msg_Config_GetValue failed");
-  } else {
-    pMsg->response.createResponse(pMsg->srpc);
-    pMsg->response.setString("sValue", msg.sValue);
-  }
+  SRPCGATE_HANDLER_NATIVE_REQUEST(pMsg, msg);
+  pMsg->response.setString("sValue", msg.sValue);
 }
 
 //----------------------------------------------------------
@@ -359,6 +338,7 @@ SRPCGATE_API int Load(AP_MODULE_CALL* pModuleData)
     pModule->srpcGateRegistry_.add("MainLoop_EndLoop", SrpcGate_MainLoop_EndLoop);
     pModule->srpcGateRegistry_.add("Xmpp_Connect", SrpcGate_Xmpp_Connect);
     pModule->srpcGateRegistry_.add("Xmpp_Disconnect", SrpcGate_Xmpp_Disconnect);
+    pModule->srpcGateRegistry_.add("Vp_OpenContext", SrpcGate_Vp_OpenContext);
     pModule->srpcGateRegistry_.add("Vp_NavigateContext", SrpcGate_Vp_NavigateContext);
     pModule->srpcGateRegistry_.add("Vp_CloseContext", SrpcGate_Vp_CloseContext);
     pModule->srpcGateRegistry_.add("System_GetTime", SrpcGate_System_GetTime);

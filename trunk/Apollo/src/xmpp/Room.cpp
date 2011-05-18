@@ -528,9 +528,6 @@ int Room::timeFromDelayNode(Apollo::XMLNode& delay, Apollo::TimeValue& tvStamp)
 
   } else if (delay.getAttribute("xmlns").getValue() == JABBER_NS_DELAY) {
     String sStamp = delay.getAttribute("stamp").getValue();
-    if (sStamp == "20090925T13:33:30") {
-      int x = 1;
-    }
     ok = parseXEP0091DateTime(sStamp, tvStamp);
 
   }

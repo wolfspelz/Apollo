@@ -896,14 +896,14 @@ String operator+(const char* a, const String& b)
 // ------------------------------------
 // escape
 
-static String::StringPair gString_EscapeTable_Empty[] = { {0, 0} };
+static String::StringPair gString_Table_EscapeEmpty[] = { {0, 0} };
 
-static String::StringPair gString_EscapeTable_AMP[] = {
+static String::StringPair gString_Table_EscapeAMP[] = {
                                                     {"&", "&amp;"},
                                                     {0, 0}
                                                  };
 
-static String::StringPair gString_EscapeTable_XML[] = {
+static String::StringPair gString_Table_EscapeXML[] = {
                                                     {"&", "&amp;"},
                                                     {"<", "&lt;"},
                                                     {">", "&gt;"},
@@ -912,37 +912,37 @@ static String::StringPair gString_EscapeTable_XML[] = {
                                                     {0, 0}
                                                  };
 
-static String::StringPair gString_EscapeTable_DoubleQuotes[] = {
+static String::StringPair gString_Table_EscapeDoubleQuotes[] = {
                                                     {"'", "''"},
                                                     {0, 0}
                                                  };
 
-static String::StringPair gString_EscapeTable_CRLF[] = {
+static String::StringPair gString_Table_EscapeCRLF[] = {
                                                     {"\n", "\\n"},
                                                     {"\r", "\\r"},
                                                     {"\\", "\\\\"},
                                                     {0, 0}
                                                  };
 
-static String::StringPair gString_EscapeTable_LogLine[] = {
+static String::StringPair gString_Table_EscapeLogLine[] = {
                                                     {"\n", "\\n"},
                                                     {"\r", "\\r"},
                                                     {0, 0}
                                                  };
 
-static String::StringPair gString_EscapeTable_Slash[] = {
+static String::StringPair gString_Table_EscapeSlash[] = {
                                                     {"/", "\\/"},
                                                     {"\\", "\\\\"},
                                                     {0, 0}
                                                  };
 
-static String::StringPair gString_EscapeTable_Space[] = {
+static String::StringPair gString_Table_EscapeSpace[] = {
                                                     {" ", "\\ "},
                                                     {"\\", "\\\\"},
                                                     {0, 0}
                                                  };
 
-static String::StringPair gString_EscapeTable_URL[] = {
+static String::StringPair gString_Table_EscapeURL[] = {
                                                     {"\x00", "%00"},
                                                     {"\x01", "%01"},
                                                     {"\x02", "%02"},
@@ -1202,7 +1202,7 @@ static String::StringPair gString_EscapeTable_URL[] = {
                                                     {0, 0}
                                                  };
 
-static String::StringPair gString_EscapeTable_Test[] = {
+static String::StringPair gString_Table_EscapeTest[] = {
                                                     {"a", "A"},
                                                     {"b", "B"},
                                                     {"ab", "AB"},
@@ -1307,17 +1307,17 @@ int String::escape(Escape_Type nType, bool bReverse)
 {
   int nEscaped = 0;
 
-  StringPair* pTable = gString_EscapeTable_Empty;
+  StringPair* pTable = gString_Table_EscapeEmpty;
   switch (nType) {
-    case EscapeAMP: pTable = gString_EscapeTable_AMP; break;
-    case EscapeXML: pTable = gString_EscapeTable_XML; break;
-    case EscapeDoubleQuotes: pTable = gString_EscapeTable_DoubleQuotes; break;
-    case EscapeCRLF: pTable = gString_EscapeTable_CRLF; break;
-    case EscapeLogLine: pTable = gString_EscapeTable_LogLine; break;
-    case EscapeSlash: pTable = gString_EscapeTable_Slash; break;
-    case EscapeSpace: pTable = gString_EscapeTable_Space; break;
-    case EscapeURL: pTable = gString_EscapeTable_URL; break;
-    case EscapeTest: pTable = gString_EscapeTable_Test; break;
+    case EscapeAMP: pTable = gString_Table_EscapeAMP; break;
+    case EscapeXML: pTable = gString_Table_EscapeXML; break;
+    case EscapeDoubleQuotes: pTable = gString_Table_EscapeDoubleQuotes; break;
+    case EscapeCRLF: pTable = gString_Table_EscapeCRLF; break;
+    case EscapeLogLine: pTable = gString_Table_EscapeLogLine; break;
+    case EscapeSlash: pTable = gString_Table_EscapeSlash; break;
+    case EscapeSpace: pTable = gString_Table_EscapeSpace; break;
+    case EscapeURL: pTable = gString_Table_EscapeURL; break;
+    case EscapeTest: pTable = gString_Table_EscapeTest; break;
     case EscapeNone: break;
   }
 

@@ -1,4 +1,5 @@
 #ässert utf-8
 Hello World=世界您好
+Send=發送
 ParamTest.Click me!=点击我！
 ParamTest.Clear=清楚的

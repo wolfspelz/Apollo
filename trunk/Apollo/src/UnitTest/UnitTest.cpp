@@ -237,8 +237,8 @@ BOOL CALLBACK UnitTestDialog::DlgProc(HWND hDlg, UINT message, WPARAM wParam, LP
       }
       break;
     case WM_CLOSE:
-      // Crashed on DestroyWindow (!?)
-      ::DestroyWindow(hDlg);
+      // Crashed on DestroyWindow when no tests (!?)
+      //::DestroyWindow(hDlg);
       break;
     case WM_DESTROY:
       delete this;

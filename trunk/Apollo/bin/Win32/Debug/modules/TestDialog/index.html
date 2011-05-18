@@ -2,26 +2,80 @@
 <html>
 <head>
 <style>
-* { padding:0; margin:0; font-family:Arial;font-size:12px; }
+* { padding:0; margin:0; font-family:Arial;font-size:11px; }
+h1 { margin-bottom:4px; font-weight:bold; }
+p { margin-bottom:4px; }
 input[type="button"] { padding-top:1px; padding-bottom:1px; padding-left:5px; padding-right:5px; }
 input[type="text"] { border:1px solid #808080; }
 </style>
 <script type="text/javascript">
   function Elem(sDomId) { return document.getElementById(sDomId); }
   api = parent.api;
+  
+  function TabPosition()
+  {
+    api.Message('TabPosition')
+      .setString('ApType', 'TestDialog_Control')
+      .setString('sTab', Elem('iTab').value)
+      .setString('nLeft', Elem('iLeft').value)
+      .setString('nBottom', Elem('iBottom').value)
+      .setString('nWidth', Elem('iWidth').value)
+      .setString('nHeight', Elem('iHeight').value)
+      .send();
+  }
+  
+  function TabNavigate()
+  {
+    api.Message('TabNavigate')
+      .setString('ApType', 'TestDialog_Control')
+      .setString('sTab', Elem('iTab').value)
+      .setString('sUrl', Elem('iUrl').value)
+      .send();
+    }
+  
+  function TabSelect()
+  {
+    api.Message('TabSelect')
+      .setString('ApType', 'TestDialog_Control')
+      .setString('sTab', Elem('iTab').value)
+      .send();
+  }
+  
+  function TabClose()
+  {
+    api.Message('TabClose')
+      .setString('ApType', 'TestDialog_Control')
+      .setString('sTab', Elem('iTab').value)
+      .send();
+  }
+  
 </script>
 </head>
-<body>
-<div style="background-color:#FFFFFF;-webkit-box-shadow:inset 0 0 5px #808080; position:absolute;left:0;top:0;right:0;bottom:0;padding:6px;">
+<body style="background-color:#f0f0f0;">
+<div style="position:absolute; border:1px solid #c0c0c0; left:0; top:0; right:0; bottom:0; padding:6px;">
 
-  <input type="button" value="Quit" onclick="api.Message('MainLoop_EndLoop').send();"/>
-  <input type="button" value="Connect" onclick="api.Message('Xmpp_Connect').send();" />
-  <input type="button" value="Disconnect" onclick="api.Message('Xmpp_Disconnect').send();" />
+  <h1>Main</h1>
+  <p>
+    <input type="button" value="Quit" onclick="api.Message('MainLoop_EndLoop').send();"/>
+    <input type="button" value="Connect" onclick="api.Message('Xmpp_Connect').send();" />
+    <input type="button" value="Disconnect" onclick="api.Message('Xmpp_Disconnect').send();" />
+  </p>
 
-  <span style="white-space:nowrap">URL: <input id="iURL" type="text" size="40" value="http://www.openvirtualworld.com/" /></span>
-  <span style="white-space:nowrap">Context: <input id="iContext" type="text" size="15" value="[10000000001]" /></span>
-  <input type="button" value="Navigate" onclick="api.Message('Vp_NavigateContext').setString('hContext', Elem('iContext').value).setString('sUrl', Elem('iURL').value).send();" />
-  <input type="button" value="Close" onclick="api.Message('Vp_CloseContext').setString('hContext', Elem('iContext').value).send();" />
+  <h1>Navigate</h1>
+  <p>
+  Tab: <input id="iTab" type="text" size="10" value="TabA" />
+  Left: <input id="iLeft" type="text" size="4" value="50" />
+  Bottom: <input id="iBottom" type="text" size="4" value="700" />
+  Width: <input id="iWidth" type="text" size="4" value="1000" />
+  Height: <input id="iHeight" type="text" size="4" value="300" />
+  <br />
+  URL: <input id="iUrl" type="text" size="40" value="http://openvirtualworld.blogspot.com/" />
+  </p>
+
+  <input type="button" value="TabPosition" onclick="TabPosition();" />
+  <input type="button" value="TabNavigate" onclick="TabNavigate();" />
+  <input type="button" value="TabSelect" onclick="TabSelect();" />
+  <input type="button" value="TabClose" onclick="TabClose();" />
 
 </div>
 </body>

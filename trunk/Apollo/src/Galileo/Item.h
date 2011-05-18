@@ -191,10 +191,9 @@ protected:
   void Step(Apollo::TimeValue& tvCurrent);
 
   Sequence* SelectNextSequence();
-  Sequence* GetSequenceByName(const String& sSequence);
   Sequence* GetSequenceByGroup(const String& sGroup);
-  Sequence* GetSequenceByGroupOrName(const String& sDesignation);
-  String GetDefaultSequence();
+  Sequence* GetSequenceByName(const String& sSequence);
+  Sequence* GetSequenceByGroupOrName(const String& sGroupOrName);
 
   int StartTimer();
   void StopTimer();

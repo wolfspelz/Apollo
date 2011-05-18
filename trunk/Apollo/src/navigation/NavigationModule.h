@@ -60,6 +60,8 @@ public:
   void On_MainLoop_EventLoopBegin(Msg_MainLoop_EventLoopBegin* pMsg);
   void On_MainLoop_EventLoopBeforeEnd(Msg_MainLoop_EventLoopBeforeEnd* pMsg);
 
+  void On_Navigation_Connected(Msg_Navigation_Connected* pMsg);
+  void On_Navigation_Disconnected(Msg_Navigation_Disconnected* pMsg);
   void On_Navigation_Receive(Msg_Navigation_Receive* pMsg);
   void On_Navigation_Send(Msg_Navigation_Send* pMsg);
 

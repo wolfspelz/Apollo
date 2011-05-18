@@ -1038,7 +1038,7 @@ void Participant::adjustThingyVariants()
   }
 }
 
-//---------------------------------------------
+//----------------------------------------------------------
 
 ParticipantThingyProvider::Variant ParticipantThingyList::getVariantByKey(const String& sKey)
 {

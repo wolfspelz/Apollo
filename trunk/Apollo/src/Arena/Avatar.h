@@ -39,7 +39,8 @@ public:
   void Destroy();
 
   void OnDetailsChanged(Apollo::ValueList& vlKeys);
-  void OnReceivePublicChat(const ApHandle& hChat, const String& sNickname, const String& sText, const Apollo::TimeValue& tv);
+  void OnReceivePublicChat(const ApHandle& hChat, const String& sNickname, const String& sText, const Apollo::TimeValue& tvTimestamp);
+  void OnPublicChatClosed(const ApHandle& hChat);
   void OnAnimationBegin(const String& sUrl);
 
 protected:
@@ -50,7 +51,8 @@ protected:
   void GetDetailRef(const String& sKey, Apollo::ValueList& vlMimeTypes);
   void UnSubscribeDetail(const String& sKey);
 
-  void RemoveOldChats(int nMax);
+  void RemoveOldPublicChats(int nMax);
+  void DeletePublicChat(const ApHandle& hChat);
 
   void SetNickname(const String& sNickname);
   void SetImage(const String& sUrl);

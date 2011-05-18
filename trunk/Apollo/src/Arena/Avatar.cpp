@@ -21,8 +21,8 @@ Avatar::Avatar(ArenaModule* pModule, Display* pDisplay, const ApHandle& hPartici
 ,nPositionConfirmed_(0)
 {
   avatarMimeTypes_.add("avatar/gif");
-  avatarMimeTypes_.add("image/gif");
-  avatarMimeTypes_.add("image/png");
+  //avatarMimeTypes_.add("image/gif");
+  //avatarMimeTypes_.add("image/png");
 }
 
 void Avatar::SubscribeAndGetDetail(const String& sKey)
@@ -255,8 +255,13 @@ void Avatar::OnDetailsChanged(Apollo::ValueList& vlKeys)
   }
 }
 
-void Avatar::OnReceivePublicChat(const ApHandle& hChat, const String& sNickname, const String& sText, const Apollo::TimeValue& tv)
+void Avatar::OnReceivePublicChat(const ApHandle& hChat, const String& sNickname, const String& sText, const Apollo::TimeValue& tvTimestamp)
 {
+  Apollo::TimeValue tv = tvTimestamp;
+  if (tv.isNull()) {
+    tv = Apollo::TimeValue::getTime();
+  }
+
   Chatline* pChat = 0;
   chats_.Get(hChat, pChat);
   if (pChat) {
@@ -271,13 +276,15 @@ void Avatar::OnReceivePublicChat(const ApHandle& hChat, const String& sNickname,
     pChat = new Chatline(sText, tv);
     chats_.Set(hChat, pChat);
 
-    RemoveOldChats(3);
+    RemoveOldPublicChats(3);
 
-    if (tvNewestChat_ < tv) {
-      tvNewestChat_ = tv;
-      AddChatline(hChat, sText);
-    }
+    AddChatline(hChat, sText);
   }
+}
+
+void Avatar::OnPublicChatClosed(const ApHandle& hChat)
+{
+  DeletePublicChat(hChat);
 }
 
 void Avatar::OnAnimationBegin(const String& sUrl)
@@ -290,7 +297,7 @@ void Avatar::OnAnimationBegin(const String& sUrl)
 
 //----------------------------------------------------------
 
-void Avatar::RemoveOldChats(int nMax)
+void Avatar::RemoveOldPublicChats(int nMax)
 {
   while (chats_.Count() > nMax) {
     Apollo::TimeValue tvOldestChat;
@@ -303,13 +310,21 @@ void Avatar::RemoveOldChats(int nMax)
       }
     }
     if (ApIsHandle(hOldestChat)) {
-      Chatline* pOldestChat = 0;
-      chats_.Get(hOldestChat, pOldestChat);
-      chats_.Unset(hOldestChat);
-      delete pOldestChat;
-      pOldestChat = 0;
-      RemoveChatline(hOldestChat);
+      DeletePublicChat(hOldestChat);
     }
+  }
+}
+
+void Avatar::DeletePublicChat(const ApHandle& hChat)
+{
+  Chatline* pChat = 0;
+  chats_.Get(hChat, pChat);
+  if (pChat) {
+    chats_.Unset(hChat);
+    delete pChat;
+    pChat = 0;
+
+    RemoveChatline(hChat);
   }
 }
 

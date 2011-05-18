@@ -34,7 +34,9 @@ void Chat::send_VpView_LocationPublicChat()
   msg.hChat = hAp_;
   msg.sNickname = getName();
   msg.sText = getString();
-  msg.nSec = tvAge.Sec();
-  msg.nMicroSec = tvAge.MicroSec();
+  //msg.nSec = tvAge.Sec();
+  //msg.nMicroSec = tvAge.MicroSec();
+  msg.nSec = tvCreated_.Sec();
+  msg.nMicroSec = tvCreated_.MicroSec();
   msg.Send();
 }

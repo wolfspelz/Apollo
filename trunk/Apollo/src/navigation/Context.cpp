@@ -14,19 +14,30 @@
 
 void Context::create() // throws ApException
 {
-  Msg_VpView_ContextCreated msg;
-  msg.hContext = apHandle();
-  msg.Send();
+  {
+    Msg_Vp_OpenContext msg;
+    msg.hContext = apHandle();
+    if (!msg.Request()) {
+      throw ApException("Msg_Vp_OpenContext failed: %s", StringType(msg.sComment));
+    }
+  }
+
+  {
+    Msg_VpView_ContextCreated msg;
+    msg.hContext = apHandle();
+    msg.Send();
+  }
 }
 
 void Context::destroy() // throws ApException
 {
-  {
+  if (bTrackingCoordinates_) {
     Msg_BrowserInfo_EndTrackCoordinates msg;
     msg.hContext = apHandle();
     if (!msg.Request()) {
       throw ApException("Msg_BrowserInfo_BeginTrackCoordinates failed: %s", StringType(msg.sComment));
     }
+    bTrackingCoordinates_ = 0;
   }
 
   {
@@ -64,6 +75,8 @@ void Context::nativeWindow(const String& sType, Apollo::KeyValueList& kvSignatur
   msg.kvSignature = kvSignature;
   if (!msg.Request()) {
     throw ApException("Msg_BrowserInfo_BeginTrackCoordinates failed: %s", StringType(msg.sComment));
+  } else {
+    bTrackingCoordinates_ = 1;
   }
 }
 

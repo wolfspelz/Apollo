@@ -98,6 +98,7 @@ protected:
 
 class DisplaySrpcMessage: public Msg_WebView_CallScriptSrpc
 {
+  typedef ApRequestMessage base;
 public:
   DisplaySrpcMessage(Display* pDisplay, const String& sMethod);
 };

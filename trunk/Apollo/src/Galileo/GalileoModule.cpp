@@ -44,6 +44,7 @@ AP_MSG_HANDLER_METHOD(GalileoModule, Animation_Create)
   if (pMsg->sMimeType == "avatar/gif") {
     // Handle it
   } else {
+    // Unhandled, no pMsg->apStatus, hope, that someone else likes it
     return;
   }
 
