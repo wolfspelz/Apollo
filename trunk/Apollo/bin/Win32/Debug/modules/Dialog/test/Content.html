@@ -14,9 +14,11 @@ function Stop()
   parent.apollo.sendMessage('Method=WebView_Destroy\nhView=' + parent.apollo.viewHandle + '\n');
 }
 
+document.onmousemove = function (ev) { return parent.document.onmousemove(ev); };
+
 </script>
 </head>
-<body style="background-color:rgba(128, 128, 255, 0.5);" onload="Start();">
+<body style="background-color:rgba(128, 128, 255, 0.5);" xonload="Start();">
 <div id="iOut"></div>
 Hello World<br/>
 Hello World<br/>

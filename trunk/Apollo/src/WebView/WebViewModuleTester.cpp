@@ -19,7 +19,7 @@ void WebViewModuleTester_LoadHtml_On_WebView_Event_DocumentComplete(Msg_WebView_
 {
   if (pMsg->hView != g_LoadHtml_hView) { return; }
 
-  Msg_WebView_Destroy::_(pMsg->hView);  
+  //Msg_WebView_Destroy::_(pMsg->hView);
   { Msg_WebView_Event_DocumentComplete msg; msg.Unhook(MODULE_NAME, (ApCallback) WebViewModuleTester_LoadHtml_On_WebView_Event_DocumentComplete, 0); }
 }
 
@@ -41,12 +41,13 @@ String WebViewModuleTester::LoadHtml()
   if (!s) { if (!Msg_WebView_LoadHtml::_(hView, 
     "<html>\n"
     "<head>\n"
+    "<script type=\"text/javascript\" src=\"LoadHtml.js\"></script>"
     "<style>\n"
     "* { margin:0; padding:0; }\n"
     "</style>\n"
     "<script>\n"
     "  function StartTimer() { window.setInterval('GetTime()', 1000); }\n"
-    "  function GetTime() { var sResponse = apollo.sendMessage('Method=System_GetTime\\nhView=' + apollo.viewHandle + '\\n'); document.getElementById('iLog').innerHTML = sResponse; }\n"
+    "  function GetTime() { var sResponse = apollo.sendMessage('Method=System_GetTime\\nhView=' + apollo.viewHandle + '\\n'); document.getElementById('iLog').innerHTML = sResponse + ' ' + 'This is a linked Javascript'; }\n"
     "  function Concat(a, b) { return a + b; }\n"
     "</script>\n"
     "</head>\n"
@@ -268,7 +269,7 @@ void WebViewModuleTester::Execute()
   AP_UNITTEST_EXECUTE(WebViewModuleTester::CallJSEcho);
   AP_UNITTEST_EXECUTE(WebViewModuleTester::CallSystemEcho);
   AP_UNITTEST_EXECUTE(WebViewModuleTester::CallCustomEcho);
-  //(void) WebViewModuleTester::Dev();
+  (void) WebViewModuleTester::Dev();
 }
 
 void WebViewModuleTester::End()
