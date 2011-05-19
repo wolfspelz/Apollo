@@ -328,8 +328,8 @@ ApolloApi.prototype =
           case 'cApMove': api.bIsMove = true; break;
 //          case 'cApSizeLeft': api.bIsSize = true; api.nSizeDirection = 1; break;
 //          case 'cApSizeTop': api.bIsSize = true; api.nSizeDirection = 2; break;
-//          case 'cApSizeRight': api.bIsSize = true; api.nSizeDirection = 3; break;
-//          case 'cApSizeBottom': api.bIsSize = true; api.nSizeDirection = 4; break;
+          case 'cApSizeRight': api.bIsSize = true; api.nSizeDirection = 3; break;
+          case 'cApSizeBottom': api.bIsSize = true; api.nSizeDirection = 4; break;
 //          case 'cApSizeTopLeft': api.bIsSize = true; api.nSizeDirection = 5; break;
 //          case 'cApSizeTopRight': api.bIsSize = true; api.nSizeDirection = 6; break;
 //          case 'cApSizeBottomLeft': api.bIsSize = true; api.nSizeDirection = 7; break;
@@ -338,7 +338,21 @@ ApolloApi.prototype =
       }
     }
     
-    if (api.bIsMove || api.bIsSize) {
+    if (api.bIsMove || api.bIsSize) {    
+      //<div id="Cover" style=";left:8px;top:24px;right:8px;bottom:8px;background-color:#FFFFFF;opacity:0.01;z-index:99;"></div>
+      var eDiv = document.createElement('DIV');
+      eDiv.setAttribute('id', 'Cover');
+      eDiv.style.cursor = ev.target.style.cursor;
+      eDiv.style.position = 'absolute';
+      eDiv.style.left = '0';
+      eDiv.style.top = '0';
+      eDiv.style.right = '0';
+      eDiv.style.bottom = '0';
+      eDiv.style.backgroundColor = '#FFFFFF';
+      eDiv.style.opacity = '0.05';
+      eDiv.style.zIndex = '99';
+      document.body.appendChild(eDiv);
+      
       api.Message('WebView_MouseCapture').send();
       api.nStartX = ev.x;
       api.nStartY = ev.y;
@@ -346,6 +360,7 @@ ApolloApi.prototype =
       api.bMouseCaptured = true;
     }
 
+    return false;
   },
 
   OnMouseMove: function(ev)
@@ -384,15 +399,23 @@ ApolloApi.prototype =
         }
       }
     }
+
+    return false;
   },
 
   OnMouseUp: function()
   {
+    if (document.getElementById('Cover')) {
+      document.body.removeChild(document.getElementById('Cover'));
+    }
+    
     api.bMouseCaptured = false;
     api.bMouseActive = false;
     api.bIsMove = false;
     api.bIsSize = false;
     api.Message('WebView_MouseRelease').send();
+
+    return false;
   },
 
   InitMoveSize: function()

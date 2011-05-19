@@ -134,13 +134,13 @@ Arena.prototype = {
   {
     $('#' + GetParticipantDomId(hParticipant) + ' .cChatContainer').append(''
       + '<div id="' + GetChatDomId(hParticipant, hChat) + '" class="cChatBubble">' 
+      + '<img src="CloseChatBubbleButton.png" class="cCloseButton" id="' + GetChatDomId(hParticipant, hChat) + '_Close" />'
       + '<span class="cText">'
       + EscapeHTML(sText)
       + '</span>'
-      + '<img src="CloseChatBubbleButton.png" class="cCloseButton" />'
       + '</div>'
     );
-    
+
     $('#' + GetChatDomId(hParticipant, hChat))
       .click(
         function () {
@@ -162,6 +162,11 @@ Arena.prototype = {
         $(this).attr('src', 'CloseChatBubbleButton.png');
       }
     ).click(
+//    (function (hParticipant, hChat) {
+//        return function () {
+//          arena.OnPublicChatClosed(hP, hC);
+//        };
+//      }) (hParticipant, hChat)
       function () {
         arena.OnPublicChatClosed(hParticipant, hChat);
       }
