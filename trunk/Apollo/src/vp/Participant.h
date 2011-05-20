@@ -18,8 +18,20 @@ class ParticipantThingyProvider;
 class ParticipantThingy: public Thingy
 {
 public:
-  ParticipantThingyProvider* getProvider() { return (ParticipantThingyProvider*) pProvider_; }
-  void setProvider(ParticipantThingyProvider* pProvider) { pProvider_ = (ThingyProvider*) pProvider; pProvider_->setOwner(this); }
+  ParticipantThingyProvider* getProvider()
+  {
+    return (ParticipantThingyProvider*) pProvider_;
+  }
+  
+  void setProvider(ParticipantThingyProvider* pProvider)
+  {
+    if (pProvider_) {
+      delete pProvider_;
+      pProvider_ = 0;
+    }
+    pProvider_ = (ThingyProvider*) pProvider;
+    pProvider_->setOwner(this);
+  }
 };
 
 //------------------------------
@@ -138,7 +150,8 @@ public:
   virtual void onSubscribe();
 
 protected:
-  virtual void getDataCore(Buffer& sbData, String& sMimeType, String& sLocalUrl, String& sOriginalUrl);
+  virtual void needData();
+  virtual void getDataCore(Buffer& sbData, int& bDataValid, String& sMimeType, String& sLocalUrl, String& sOriginalUrl);
 };
 
 //------------------------------
@@ -235,6 +248,7 @@ public:
 
 protected:
   void adjustThingyVariants();
+  void changeThingyVariant(ParticipantThingy* pThingy, ParticipantThingyProvider::Variant nVariant);
 
 protected:
   String sName_; // for debugging

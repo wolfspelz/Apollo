@@ -60,6 +60,7 @@ protected:
   void DisplaySetNickname(const String& sNickname);
   void DisplaySetImage(const String& sUrl);
   void DisplaySetIconAttachment(const String& sUrl, const String& sLabel, const String& sLink);
+  void DisplaySetOnlineStatus(const String& sStatus);
   void DisplayAddChatline(const ApHandle& hChat, const String& sText);
   void DisplaySetChatline(const ApHandle& hChat, const String& sText);
   void DisplayRemoveChatline(const ApHandle& hChat);
@@ -67,6 +68,8 @@ protected:
   //void SetUnknownPosition();
 
   void HandleImageData(const String& sMimeType, const String& sSource, Buffer& sbData);
+  void SuspendAnimation();
+  void ResumeAnimation();
 
   void DisplayCreateChatContainer(const String& sContainer);
   void DisplayDeleteAllChatBubbles(const String& sContainer);
@@ -78,6 +81,7 @@ protected:
 
   String sNickname_;
   String sImage_;
+  String sOnlineStatus_;
   String sCommunityTag_;
   String sCommunityName_;
   String sCommunityPage_;

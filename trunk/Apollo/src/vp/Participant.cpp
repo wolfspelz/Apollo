@@ -744,10 +744,8 @@ String IdentityItemParticipantThingyProvider::getItemType()
   return sItemType;
 }
 
-void IdentityItemParticipantThingyProvider::getDataCore(Buffer& sbData, String& sMimeType, String& sLocalUrl, String& sOriginalUrl)
+void IdentityItemParticipantThingyProvider::getDataCore(Buffer& sbData, int& bDataValid, String& sMimeType, String& sLocalUrl, String& sOriginalUrl)
 {
-  int ok = 0;
-  
   String sType = getItemType();
 
   if (pParticipant_ != 0) {
@@ -758,8 +756,7 @@ void IdentityItemParticipantThingyProvider::getDataCore(Buffer& sbData, String& 
       Msg_Identity_IsContainerAvailable msgIICA;
       msgIICA.sUrl = pParticipant_->getIdentitySrc();
       msgIICA.sDigest = pParticipant_->getIdentityDigest();
-      ok = msgIICA.Request();
-      if (!ok) {
+      if (!msgIICA.Request()) {
         apLog_Error((LOG_CHANNEL, "IdentityItemParticipantThingyProvider::getDataCore", "Msg_Identity_IsContainerAvailable failed part=" ApHandleFormat " url=%s", ApHandleType(pParticipant_->apHandle()), StringType(msgIICA.sUrl)));
       } else {
         if (msgIICA.bAvailable) {
@@ -768,8 +765,7 @@ void IdentityItemParticipantThingyProvider::getDataCore(Buffer& sbData, String& 
           msgIGII.sUrl = pParticipant_->getIdentitySrc();
           msgIGII.sType = sType;
           msgIGII.nMax = 1;
-          ok = msgIGII.Request();
-          if (!ok) {
+          if (!msgIGII.Request()) {
             apLog_Error((LOG_CHANNEL, "IdentityItemParticipantThingyProvider::getDataCore", "Msg_Identity_GetItemIds failed url=%s type=%s", StringType(msgIGII.sUrl), StringType(msgIGII.sType)));
           } else {
             String sId = msgIGII.vlIds.atIndex(0, "");
@@ -785,8 +781,7 @@ void IdentityItemParticipantThingyProvider::getDataCore(Buffer& sbData, String& 
                 apLog_Error((LOG_CHANNEL, "IdentityItemParticipantThingyProvider::getDataCore", "Msg_Identity_IsItemDataAvailable failed: url=%s or id=%s empty", StringType(msgIIDA.sUrl), StringType(msgIIDA.sId)));
               } else {
                 if (!msgIIDA.bAvailable) {
-                  ok = pParticipant_->requestIdentityItem(sId);
-                  if (!ok) {
+                  if (!pParticipant_->requestIdentityItem(sId)) {
                     apLog_Error((LOG_CHANNEL, "IdentityItemParticipantThingyProvider::getDataCore", "pParticipant_->requestIdentityItem() failed id=%s", StringType(sId)));
                   }
                 } // msgIIDA.bAvailable
@@ -806,18 +801,21 @@ void IdentityItemParticipantThingyProvider::getDataCore(Buffer& sbData, String& 
               // requested, then the internal HTTP server will redirect to the original item src URL
               sLocalUrl = VpModuleInstance::Get()->getItemDataExternUrl(pParticipant_->getIdentitySrc(), sId);
 
-              Msg_Identity_GetItemData msgIGID;
-              msgIGID.sUrl = pParticipant_->getIdentitySrc();
-              msgIGID.sId = sId;
-              ok = msgIGID.Request();
-              if (!ok) { 
-                apLog_Error((LOG_CHANNEL, "IdentityItemParticipantThingyProvider::getDataCore", "Msg_Identity_GetItemData failed: url=%s or id=%s empty", StringType(msgIGID.sUrl), StringType(msgIGID.sId)));
-              } else {
+              if (msgIIDA.bAvailable) {
+                Msg_Identity_GetItemData msgIGID;
+                msgIGID.sUrl = pParticipant_->getIdentitySrc();
+                msgIGID.sId = sId;
+                if (!msgIGID.Request()) {
+                  // Not an error, item data just not available, maybe already requested
+                  //apLog_Error((LOG_CHANNEL, "IdentityItemParticipantThingyProvider::getDataCore", "Msg_Identity_GetItemData failed: url=%s or id=%s empty", StringType(msgIGID.sUrl), StringType(msgIGID.sId)));
+                } else {
 
-                sbData = msgIGID.sbData;
-                sMimeType = msgIGID.sMimeType;
+                  sbData = msgIGID.sbData;
+                  sMimeType = msgIGID.sMimeType;
+                  bDataValid = 1;
 
-              } // msgIGID
+                } // msgIGID
+              } // msgIIDA.bAvailable
 
             } // sId
           } // msgIGII
@@ -885,7 +883,8 @@ void IdentityItemParticipantThingyProvider::getString(String& sValue, String& sM
   String sLocalUrl;
   String sOriginalUrl;
   Buffer sbData;
-  getDataCore(sbData, sMimeType, sLocalUrl, sOriginalUrl);
+  int bDataValid = 0;
+  getDataCore(sbData, bDataValid, sMimeType, sLocalUrl, sOriginalUrl);
   sbData.GetString(sValue);
 }
 
@@ -893,7 +892,8 @@ void IdentityItemParticipantThingyProvider::getData(Buffer& sbData, String& sMim
 {
   String sLocalUrl;
   String sOriginalUrl;
-  getDataCore(sbData, sMimeType, sLocalUrl, sOriginalUrl);
+  int bDataValid = 0;
+  getDataCore(sbData, bDataValid, sMimeType, sLocalUrl, sOriginalUrl);
   if (sOriginalUrl) {
     sSource = Msg_VpView_ParticipantDetail_SourcePrefix_IdentityItemUrl;
     sSource += Msg_VpView_ParticipantDetail_SourceSeparator;
@@ -905,18 +905,24 @@ void IdentityItemParticipantThingyProvider::getDataRef(String& sUrl, String& sMi
 {
   String sOriginalUrl;
   Buffer sbData;
-  getDataCore(sbData, sMimeType, sUrl, sOriginalUrl);
+  int bDataValid = 0;
+  getDataCore(sbData, bDataValid, sMimeType, sUrl, sOriginalUrl);
+}
+
+void IdentityItemParticipantThingyProvider::needData()
+{
+  if (pParticipant_ != 0) {
+    if (!pParticipant_->hasItemDataByType(getItemType())) {
+      pParticipant_->needItemDataByType(getItemType());
+    }
+  }
 }
 
 void IdentityItemParticipantThingyProvider::onSubscribe()
 {
   if (pThingy_) {
     if (!pThingy_->isSubscribed()) {
-      if (pParticipant_ != 0) {
-        if (!pParticipant_->hasItemDataByType(getItemType())) {
-          pParticipant_->needItemDataByType(getItemType());
-        }
-      } // pParticipant_
+      needData();
     } // ! was subscribed
   }
 }
@@ -1035,14 +1041,30 @@ void Participant::adjustThingyVariants()
     if (pProvider) {
       ParticipantThingyProvider::Variant nVariant = lThingys_.getVariantByKey(pThingy->getName());
       if (nVariant != pProvider->getVariant()) {
-        ParticipantThingyProvider* pNewProvider = (ParticipantThingyProvider*) lThingys_.newProvider(pThingy->getName());
-        if (pNewProvider) {
-          pThingy->setProvider(pNewProvider);
-          delete pProvider;
-          pProvider = pNewProvider;
-          pThingy->setChanged();
-        }
+        changeThingyVariant(pThingy, nVariant);
       }
+    }
+  }
+}
+
+void Participant::changeThingyVariant(ParticipantThingy* pThingy, ParticipantThingyProvider::Variant nVariant)
+{
+  ParticipantThingyProvider* pNewProvider = (ParticipantThingyProvider*) lThingys_.newProvider(pThingy->getName());
+  if (pNewProvider) {
+    pThingy->setProvider(pNewProvider);
+
+    if (pThingy->isSubscribed()) {
+
+      // Because onSubscribe() checks if isSubscribed() and won't re-subscribe.
+      // OK, this is a hack. 
+      pThingy->pretendNotSubscribed(1);
+
+      pNewProvider->onSubscribe();
+      pThingy->pretendNotSubscribed(0);
+    }
+
+    if (pNewProvider->hasData()) {
+      pThingy->setChanged();
     }
   }
 }

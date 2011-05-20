@@ -25,6 +25,65 @@ Avatar::Avatar(ArenaModule* pModule, Display* pDisplay, const ApHandle& hPartici
   //avatarMimeTypes_.add("image/png");
 }
 
+void Avatar::Create(int bSelf)
+{
+  DisplaySrpcMessage dsm(pDisplay_, "AddAvatar");
+  dsm.srpc.set("hParticipant", hParticipant_);
+  dsm.srpc.set("bSelf", bSelf);
+  dsm.srpc.set("nX", nX_);
+  dsm.Request();
+
+  SubscribeAndGetDetail(Msg_VpView_ParticipantDetail_Nickname);
+  SubscribeAndGetDetail(Msg_VpView_ParticipantDetail_Avatar);
+  SubscribeAndGetDetail(Msg_VpView_ParticipantDetail_OnlineStatus);
+  SubscribeAndGetDetail(Msg_VpView_ParticipantDetail_Message);
+  SubscribeAndGetDetail(Msg_VpView_ParticipantDetail_Position);
+  SubscribeAndGetDetail(Msg_VpView_ParticipantDetail_Condition);
+  SubscribeAndGetDetail(Msg_VpView_ParticipantDetail_ProfileUrl);
+  SubscribeAndGetDetail("CommunityTag");
+  SubscribeAndGetDetail("CommunityName");
+  SubscribeAndGetDetail("CommunityPage");
+}
+
+void Avatar::Destroy()
+{
+  UnSubscribeDetail(Msg_VpView_ParticipantDetail_Nickname);
+  UnSubscribeDetail(Msg_VpView_ParticipantDetail_Avatar);
+  UnSubscribeDetail(Msg_VpView_ParticipantDetail_OnlineStatus);
+  UnSubscribeDetail(Msg_VpView_ParticipantDetail_Message);
+  UnSubscribeDetail(Msg_VpView_ParticipantDetail_Position);
+  UnSubscribeDetail(Msg_VpView_ParticipantDetail_Condition);
+  UnSubscribeDetail(Msg_VpView_ParticipantDetail_ProfileUrl);
+  UnSubscribeDetail("CommunityTag");
+  UnSubscribeDetail("CommunityName");
+  UnSubscribeDetail("CommunityPage");
+
+  if (ApIsHandle(hAnimatedItem_)) {
+    if (pModule_) {
+      pModule_->DeleteContextOfHandle(hAnimatedItem_, pDisplay_->GetContext());
+      pModule_->DeleteParticipantOfAnimation(hAnimatedItem_, hParticipant_);
+    }
+
+    Msg_Animation_Stop msgAS;
+    msgAS.hItem = hAnimatedItem_;
+    if (!msgAS.Request()) {
+      apLog_Error((LOG_CHANNEL, "Avatar::Hide", "Msg_Animation_Stop failed: participant=" ApHandleFormat "", ApHandleType(hParticipant_)));
+    }
+  }
+
+  if (ApIsHandle(hAnimatedItem_)) {
+    Msg_Animation_Destroy msg;
+    msg.hItem = hAnimatedItem_;
+    if (!msg.Request()) {
+      apLog_Error((LOG_CHANNEL, "Avatar::Hide", "Msg_Animation_Destroy failed: participant=" ApHandleFormat "", ApHandleType(hParticipant_)));
+    }
+  }
+
+  DisplaySrpcMessage dsm(pDisplay_, "RemoveAvatar");
+  dsm.srpc.set("hParticipant", hParticipant_);
+  dsm.Request();
+}
+
 void Avatar::SubscribeAndGetDetail(const String& sKey)
 {
   Msg_VpView_SubscribeParticipantDetail msg;
@@ -66,9 +125,25 @@ void Avatar::GetDetailString(const String& sKey, Apollo::ValueList& vlMimeTypes)
 
     if (0) {
     } else if (sKey == Msg_VpView_ParticipantDetail_Nickname) {
-      DisplaySetNickname(msg.sValue);
+      if (sNickname_ != msg.sValue) {
+        sNickname_ = msg.sValue;
+        DisplaySetNickname(sNickname_);
+      }
 
     } else if (sKey == Msg_VpView_ParticipantDetail_OnlineStatus) {
+      if (sOnlineStatus_ != msg.sValue) {
+        sOnlineStatus_ = msg.sValue;
+
+        if (sOnlineStatus_ == "available" || sOnlineStatus_ == "" || sOnlineStatus_ == "chat") {
+          ResumeAnimation();
+        } else if (sOnlineStatus_ == "away" || sOnlineStatus_ == "xa" || sOnlineStatus_ == "dnd") {
+          SuspendAnimation();
+        } else {
+          ResumeAnimation();
+        }
+
+        DisplaySetOnlineStatus(sOnlineStatus_);
+      }
 
     } else if (sKey == Msg_VpView_ParticipantDetail_Message) {
 
@@ -87,19 +162,27 @@ void Avatar::GetDetailString(const String& sKey, Apollo::ValueList& vlMimeTypes)
     } else if (sKey == Msg_VpView_ParticipantDetail_ProfileUrl) {
 
     } else if (sKey == "CommunityTag") {
-      sCommunityTag_ = msg.sValue;
-      DisplaySetIconAttachment(sCommunityTag_, sCommunityName_, sCommunityPage_);
+      if (sCommunityTag_ != msg.sValue) {
+        sCommunityTag_ = msg.sValue;
+        if (sCommunityTag_) {
+          DisplaySetIconAttachment(sCommunityTag_, sCommunityName_, sCommunityPage_);
+        }
+      }
 
     } else if (sKey == "CommunityName") {
-      sCommunityName_ = msg.sValue;
-      if (sCommunityTag_) {
-        DisplaySetIconAttachment(sCommunityTag_, sCommunityName_, sCommunityPage_);
+      if (sCommunityName_ != msg.sValue) {
+        sCommunityName_ = msg.sValue;
+        if (sCommunityTag_) {
+          DisplaySetIconAttachment(sCommunityTag_, sCommunityName_, sCommunityPage_);
+        }
       }
 
     } else if (sKey == "CommunityPage") {
-      sCommunityPage_ = msg.sValue;
-      if (sCommunityTag_) {
-        DisplaySetIconAttachment(sCommunityTag_, sCommunityName_, sCommunityPage_);
+      if (sCommunityPage_ != msg.sValue) {
+        sCommunityPage_ = msg.sValue;
+        if (sCommunityTag_) {
+          DisplaySetIconAttachment(sCommunityTag_, sCommunityName_, sCommunityPage_);
+        }
       }
 
     }
@@ -190,6 +273,28 @@ void Avatar::HandleImageData(const String& sMimeType, const String& sSource, Buf
   }
 }
 
+void Avatar::SuspendAnimation()
+{
+  if (ApIsHandle(hAnimatedItem_)) {
+    Msg_Animation_Stop msgAS;
+    msgAS.hItem = hAnimatedItem_;
+    if (!msgAS.Request()) {
+      apLog_Error((LOG_CHANNEL, "Avatar::SuspendAnimation", "Msg_Animation_Stop failed: participant=" ApHandleFormat "", ApHandleType(hParticipant_)));
+    }
+  }
+}
+
+void Avatar::ResumeAnimation()
+{
+  if (ApIsHandle(hAnimatedItem_)) {
+    Msg_Animation_Start msgAS;
+    msgAS.hItem = hAnimatedItem_;
+    if (!msgAS.Request()) {
+      apLog_Error((LOG_CHANNEL, "Avatar::ResumeAnimation", "Msg_Animation_Start failed: participant=" ApHandleFormat "", ApHandleType(hParticipant_)));
+    }
+  }
+}
+
 void Avatar::UnSubscribeDetail(const String& sKey)
 {
   Msg_VpView_UnsubscribeParticipantDetail msg;
@@ -206,65 +311,6 @@ void Avatar::UnSubscribeDetail(const String& sKey)
   (void) msg.Request();
 }
 
-
-void Avatar::Create(int bSelf)
-{
-  DisplaySrpcMessage dsm(pDisplay_, "AddAvatar");
-  dsm.srpc.set("hParticipant", hParticipant_);
-  dsm.srpc.set("bSelf", bSelf);
-  dsm.srpc.set("nX", nX_);
-  dsm.Request();
-
-  SubscribeAndGetDetail(Msg_VpView_ParticipantDetail_Nickname);
-  SubscribeAndGetDetail(Msg_VpView_ParticipantDetail_Avatar);
-  SubscribeAndGetDetail(Msg_VpView_ParticipantDetail_OnlineStatus);
-  SubscribeAndGetDetail(Msg_VpView_ParticipantDetail_Message);
-  SubscribeAndGetDetail(Msg_VpView_ParticipantDetail_Position);
-  SubscribeAndGetDetail(Msg_VpView_ParticipantDetail_Condition);
-  SubscribeAndGetDetail(Msg_VpView_ParticipantDetail_ProfileUrl);
-  SubscribeAndGetDetail("CommunityTag");
-  SubscribeAndGetDetail("CommunityName");
-  SubscribeAndGetDetail("CommunityPage");
-}
-
-void Avatar::Destroy()
-{
-  UnSubscribeDetail(Msg_VpView_ParticipantDetail_Nickname);
-  UnSubscribeDetail(Msg_VpView_ParticipantDetail_Avatar);
-  UnSubscribeDetail(Msg_VpView_ParticipantDetail_OnlineStatus);
-  UnSubscribeDetail(Msg_VpView_ParticipantDetail_Message);
-  UnSubscribeDetail(Msg_VpView_ParticipantDetail_Position);
-  UnSubscribeDetail(Msg_VpView_ParticipantDetail_Condition);
-  UnSubscribeDetail(Msg_VpView_ParticipantDetail_ProfileUrl);
-  UnSubscribeDetail("CommunityTag");
-  UnSubscribeDetail("CommunityName");
-  UnSubscribeDetail("CommunityPage");
-
-  if (ApIsHandle(hAnimatedItem_)) {
-    if (pModule_) {
-      pModule_->DeleteContextOfHandle(hAnimatedItem_, pDisplay_->GetContext());
-      pModule_->DeleteParticipantOfAnimation(hAnimatedItem_, hParticipant_);
-    }
-
-    Msg_Animation_Stop msgAS;
-    msgAS.hItem = hAnimatedItem_;
-    if (!msgAS.Request()) {
-      apLog_Error((LOG_CHANNEL, "Avatar::Hide", "Msg_Animation_Stop failed: participant=" ApHandleFormat "", ApHandleType(hParticipant_)));
-    }
-  }
-
-  if (ApIsHandle(hAnimatedItem_)) {
-    Msg_Animation_Destroy msg;
-    msg.hItem = hAnimatedItem_;
-    if (!msg.Request()) {
-      apLog_Error((LOG_CHANNEL, "Avatar::Hide", "Msg_Animation_Destroy failed: participant=" ApHandleFormat "", ApHandleType(hParticipant_)));
-    }
-  }
-
-  DisplaySrpcMessage dsm(pDisplay_, "RemoveAvatar");
-  dsm.srpc.set("hParticipant", hParticipant_);
-  dsm.Request();
-}
 
 void Avatar::OnDetailsChanged(Apollo::ValueList& vlKeys)
 {
@@ -381,11 +427,9 @@ void Avatar::DeletePublicChat(const ApHandle& hChat)
 
 void Avatar::DisplaySetNickname(const String& sNickname)
 {
-  sNickname_ = sNickname;
-
   DisplaySrpcMessage dsm(pDisplay_, "SetAvatarNickname");
   dsm.srpc.set("hParticipant", hParticipant_);
-  dsm.srpc.set("sNickname", sNickname_);
+  dsm.srpc.set("sNickname", sNickname);
   dsm.Request();
 }
 
@@ -404,6 +448,14 @@ void Avatar::DisplaySetIconAttachment(const String& sUrl, const String& sLabel, 
   dsm.srpc.set("sUrl", sUrl);
   dsm.srpc.set("sLabel", sLabel);
   dsm.srpc.set("sLink", sLink);
+  dsm.Request();
+}
+
+void Avatar::DisplaySetOnlineStatus(const String& sStatus)
+{
+  DisplaySrpcMessage dsm(pDisplay_, "SetOnlineStatus");
+  dsm.srpc.set("hParticipant", hParticipant_);
+  dsm.srpc.set("sStatus", sStatus);
   dsm.Request();
 }
 

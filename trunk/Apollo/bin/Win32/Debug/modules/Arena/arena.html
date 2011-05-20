@@ -29,6 +29,7 @@ function DispatchMessage(msg)
     case 'SetAvatarNickname': return arena.SetAvatarNickname(msg.getString('hParticipant'), msg.getString('sNickname')); break;
     case 'SetAvatarImage': return arena.SetAvatarImage(msg.getString('hParticipant'), msg.getString('sUrl')); break;
     case 'SetIconAttachment': return arena.SetIconAttachment(msg.getString('hParticipant'), msg.getString('sUrl'), msg.getString('sLabel'), msg.getString('sLink')); break;
+    case 'SetOnlineStatus': return arena.SetOnlineStatus(msg.getString('hParticipant'), msg.getString('sStatus')); break;
     case 'AddAvatarChat': return arena.AddAvatarChat(msg.getString('hParticipant'), msg.getString('hChat'), msg.getString('sText')); break;
     case 'SetAvatarChat': return arena.SetAvatarChat(msg.getString('hParticipant'), msg.getString('hChat'), msg.getString('sText')); break;
     case 'RemoveAvatarChat': return arena.RemoveAvatarChat(msg.getString('hParticipant'), msg.getString('hChat')); break;

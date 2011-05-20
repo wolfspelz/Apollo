@@ -307,8 +307,10 @@ AP_MSG_HANDLER_METHOD(NavigationModule, Navigation_Receive)
             response.createError(pMsg->srpc, ex.getText());
           }
 
+        } else if (sMethod == Navigation_SrpcMethod_Open) {
+          response.createResponse(pMsg->srpc);
+
         } else if (sMethod == Navigation_SrpcMethod_Attach) {
-          // associateContextWithConnection() already done
           response.createResponse(pMsg->srpc);
 
         } else if (sMethod == Navigation_SrpcMethod_NativeWindow) {
