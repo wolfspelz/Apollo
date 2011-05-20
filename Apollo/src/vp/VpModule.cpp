@@ -1355,7 +1355,7 @@ void SrpcGate_VpView_GetLocations(ApSRPCMessage* pMsg)
     pMsg->response.createError(pMsg->srpc, msg.sComment);
   } else {
     pMsg->response.createResponse(pMsg->srpc);
-    pMsg->response.setList("vlLocations", msg.vlLocations);
+    pMsg->response.set("vlLocations", msg.vlLocations);
   }
 }
 
@@ -1368,9 +1368,9 @@ void SrpcGate_VpView_GetLocationDetail(ApSRPCMessage* pMsg)
     pMsg->response.createError(pMsg->srpc, msg.sComment);
   } else {
     pMsg->response.createResponse(pMsg->srpc);
-    pMsg->response.setString("sKey", msg.sKey);
-    pMsg->response.setString("sValue", msg.sValue);
-    pMsg->response.setString("sMimeType", msg.sMimeType);
+    pMsg->response.set("sKey", msg.sKey);
+    pMsg->response.set("sValue", msg.sValue);
+    pMsg->response.set("sMimeType", msg.sMimeType);
   }
 }
 
@@ -1406,7 +1406,7 @@ void SrpcGate_VpView_GetLocationContexts(ApSRPCMessage* pMsg)
     pMsg->response.createError(pMsg->srpc, msg.sComment);
   } else {
     pMsg->response.createResponse(pMsg->srpc);
-    pMsg->response.setList("vlContexts", msg.vlContexts);
+    pMsg->response.set("vlContexts", msg.vlContexts);
   }
 }
 
@@ -1419,9 +1419,9 @@ void SrpcGate_VpView_GetContextDetail(ApSRPCMessage* pMsg)
     pMsg->response.createError(pMsg->srpc, msg.sComment);
   } else {
     pMsg->response.createResponse(pMsg->srpc);
-    pMsg->response.setString("sKey", msg.sKey);
-    pMsg->response.setString("sValue", msg.sValue);
-    pMsg->response.setString("sMimeType", msg.sMimeType);
+    pMsg->response.set("sKey", msg.sKey);
+    pMsg->response.set("sValue", msg.sValue);
+    pMsg->response.set("sMimeType", msg.sMimeType);
   }
 }
 
@@ -1457,8 +1457,8 @@ void SrpcGate_VpView_GetParticipants(ApSRPCMessage* pMsg)
     pMsg->response.createError(pMsg->srpc, msg.sComment);
   } else {
     pMsg->response.createResponse(pMsg->srpc);
-    pMsg->response.setList("vlParticipants", msg.vlParticipants);
-    pMsg->response.setString("hSelf", ApIsHandle(msg.hSelf) ? msg.hSelf.toString() : "");
+    pMsg->response.set("vlParticipants", msg.vlParticipants);
+    pMsg->response.set("hSelf", ApIsHandle(msg.hSelf) ? msg.hSelf.toString() : "");
   }
 }
 
@@ -1472,9 +1472,9 @@ void SrpcGate_VpView_GetParticipantDetailString(ApSRPCMessage* pMsg)
     pMsg->response.createError(pMsg->srpc, msg.sComment);
   } else {
     pMsg->response.createResponse(pMsg->srpc);
-    pMsg->response.setString("sKey", msg.sKey);
-    pMsg->response.setString("sValue", msg.sValue);
-    pMsg->response.setString("sMimeType", msg.sMimeType);
+    pMsg->response.set("sKey", msg.sKey);
+    pMsg->response.set("sValue", msg.sValue);
+    pMsg->response.set("sMimeType", msg.sMimeType);
   }
 }
 
@@ -1488,9 +1488,9 @@ void SrpcGate_VpView_GetParticipantDetailRef(ApSRPCMessage* pMsg)
     pMsg->response.createError(pMsg->srpc, msg.sComment);
   } else {
     pMsg->response.createResponse(pMsg->srpc);
-    pMsg->response.setString("sKey", msg.sKey);
-    pMsg->response.setString("sUrl", msg.sUrl);
-    pMsg->response.setString("sMimeType", msg.sMimeType);
+    pMsg->response.set("sKey", msg.sKey);
+    pMsg->response.set("sUrl", msg.sUrl);
+    pMsg->response.set("sMimeType", msg.sMimeType);
   }
 }
 
@@ -1504,7 +1504,7 @@ void SrpcGate_VpView_SubscribeParticipantDetail(ApSRPCMessage* pMsg)
     pMsg->response.createError(pMsg->srpc, msg.sComment);
   } else {
     pMsg->response.createResponse(pMsg->srpc);
-    pMsg->response.setInt("bAvailable", msg.bAvailable);
+    pMsg->response.set("bAvailable", msg.bAvailable);
   }
 }
 

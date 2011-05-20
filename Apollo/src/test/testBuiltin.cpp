@@ -1230,7 +1230,7 @@ String Test_SrpcMessage()
   if (!s) {
     Apollo::SrpcMessage m;
     Apollo::ValueList vl; vl.add(111); vl.add(222);
-    m.setList("vlList", vl);
+    m.set("vlList", vl);
     List lExpected; lExpected.AddLast("vlList", "111 222");
     s = Apollo::Test_CompareLists("Test_SrpcMessage int", m, lExpected);
   }
@@ -1238,7 +1238,7 @@ String Test_SrpcMessage()
   if (!s) {
     Apollo::SrpcMessage m;
     Apollo::KeyValueList kv; kv.add("a", 111); kv.add("b", 222);
-    m.setList("kvList", kv);
+    m.set("kvList", kv);
     List lExpected; lExpected.AddLast("kvList", "a=111\\nb=222\\n");
     s = Apollo::Test_CompareLists("Test_SrpcMessage Key=int", m, lExpected);
   }
@@ -1246,7 +1246,7 @@ String Test_SrpcMessage()
   if (!s) {
     Apollo::SrpcMessage m;
     Apollo::ValueList vl; vl.add("111"); vl.add("222");
-    m.setList("vlList", vl);
+    m.set("vlList", vl);
     List lExpected; lExpected.AddLast("vlList", "111 222");
     s = Apollo::Test_CompareLists("Test_SrpcMessage String", m, lExpected);
   }
@@ -1254,7 +1254,7 @@ String Test_SrpcMessage()
   if (!s) {
     Apollo::SrpcMessage m;
     Apollo::KeyValueList kv; kv.add("a", "111"); kv.add("b", "222"); kv.add("c", "33 3");
-    m.setList("kvList", kv);
+    m.set("kvList", kv);
     List lExpected; lExpected.AddLast("kvList", "a=111\\nb=222\\nc=33 3\\n");
     s = Apollo::Test_CompareLists("Test_SrpcMessage Key=String", m, lExpected);
   }
@@ -1262,7 +1262,7 @@ String Test_SrpcMessage()
   if (!s) {
     Apollo::SrpcMessage m;
     Apollo::ValueList vl; vl.add(ApHandle(0, 111)); vl.add(ApHandle(0, 222));
-    m.setList("vlList", vl);
+    m.set("vlList", vl);
     List lExpected; lExpected.AddLast("vlList", "[111] [222]");
     s = Apollo::Test_CompareLists("Test_SrpcMessage ApHandle", m, lExpected);
   }
@@ -1270,14 +1270,14 @@ String Test_SrpcMessage()
   if (!s) {
     Apollo::SrpcMessage m;
     Apollo::KeyValueList kv; kv.add("a", ApHandle(0, 111)); kv.add("b", ApHandle(0, 222));
-    m.setList("kvList", kv);
+    m.set("kvList", kv);
     List lExpected; lExpected.AddLast("kvList", "a=[111]\\nb=[222]\\n");
     s = Apollo::Test_CompareLists("Test_SrpcMessage Key=ApHandle", m, lExpected);
   }
 
   if (!s) {
     Apollo::SrpcMessage m;
-    m.setString("vlList", "a b c");
+    m.set("vlList", "a b c");
     Apollo::ValueList vl;
     m.getValueList("vlList", vl);
     List lExpected; lExpected.AddLast("", "a"); lExpected.AddLast("", "b"); lExpected.AddLast("", "c");
@@ -1287,7 +1287,7 @@ String Test_SrpcMessage()
 
   if (!s) {
     Apollo::SrpcMessage m;
-    m.setString("vlList", "11 22 33");
+    m.set("vlList", "11 22 33");
     Apollo::ValueList vl;
     m.getValueList("vlList", vl);
     Apollo::ValueElem* e = 0;
@@ -1298,7 +1298,7 @@ String Test_SrpcMessage()
 
   if (!s) {
     Apollo::SrpcMessage m;
-    m.setString("vlList", "[11] [22] [33]");
+    m.set("vlList", "[11] [22] [33]");
     Apollo::ValueList vl;
     m.getValueList("vlList", vl);
     Apollo::ValueElem* e = 0;

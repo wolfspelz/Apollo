@@ -253,7 +253,7 @@ AP_MSG_HANDLER_METHOD(NavigationModule, Navigation_Receive)
       response.createError(pMsg->srpc, msg.sComment);
     } else {
       response.createResponse(pMsg->srpc);
-      response.setString("h", msg.h.toString());
+      response.set("h", msg.h);
     }
 
   } else if (sMethod == Navigation_SrpcMethod_Navigate || sMethod == Navigation_SrpcMethod_Open) {

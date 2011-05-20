@@ -62,7 +62,7 @@ int SrpcStreamParser::parse(unsigned char* pData, size_t nLen)
               pCurrentMessage_ = new Apollo::SrpcMessage();
             }
             if (pCurrentMessage_ != 0) {
-              pCurrentMessage_->set(sKey, sLine);
+              pCurrentMessage_->setUnescaped(sKey, sLine);
             }
           }
         }

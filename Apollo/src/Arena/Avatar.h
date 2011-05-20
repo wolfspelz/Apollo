@@ -40,10 +40,13 @@ public:
 
   void OnDetailsChanged(Apollo::ValueList& vlKeys);
   void OnReceivePublicChat(const ApHandle& hChat, const String& sNickname, const String& sText, const Apollo::TimeValue& tvTimestamp);
-  void OnPublicChatClosed(const ApHandle& hChat);
   void OnAnimationBegin(const String& sUrl);
+  void OnCallModuleSrpc(Apollo::SrpcMessage& request, Apollo::SrpcMessage& response);
 
 protected:
+  void OnPublicChatClosed(const ApHandle& hChat);
+  void OnIconAttachmentClicked(const String& sLink);
+
   void SubscribeAndGetDetail(const String& sKey);
   void GetDetail(const String& sKey);
   void GetDetailString(const String& sKey, Apollo::ValueList& vlMimeTypes);
@@ -54,17 +57,19 @@ protected:
   void RemoveOldPublicChats(int nMax);
   void DeletePublicChat(const ApHandle& hChat);
 
-  void SetNickname(const String& sNickname);
-  void SetImage(const String& sUrl);
-  void AddChatline(const ApHandle& hChat, const String& sText);
-  void SetChatline(const ApHandle& hChat, const String& sText);
-  void RemoveChatline(const ApHandle& hChat);
-  void SetPosition(int nX);
-  void SetUnknownPosition();
+  void DisplaySetNickname(const String& sNickname);
+  void DisplaySetImage(const String& sUrl);
+  void DisplaySetIconAttachment(const String& sUrl, const String& sLabel, const String& sLink);
+  void DisplayAddChatline(const ApHandle& hChat, const String& sText);
+  void DisplaySetChatline(const ApHandle& hChat, const String& sText);
+  void DisplayRemoveChatline(const ApHandle& hChat);
+  void DisplaySetAvatarPosition(int nX);
+  //void SetUnknownPosition();
+
   void HandleImageData(const String& sMimeType, const String& sSource, Buffer& sbData);
 
-  void CreateChatContainer(const String& sContainer);
-  void DeleteAllChatBubbles(const String& sContainer);
+  void DisplayCreateChatContainer(const String& sContainer);
+  void DisplayDeleteAllChatBubbles(const String& sContainer);
 
 protected:
   ArenaModule* pModule_;
@@ -73,6 +78,9 @@ protected:
 
   String sNickname_;
   String sImage_;
+  String sCommunityTag_;
+  String sCommunityName_;
+  String sCommunityPage_;
 
   Apollo::ValueList noMimeTypes_;
   Apollo::ValueList avatarMimeTypes_;

@@ -196,7 +196,7 @@ static void Test_VpView_SubscribeParticipantDetail(Msg_VpView_SubscribeParticipa
     if (0) {
     } else if (sKey == Msg_VpView_ParticipantDetail_Nickname) {
       pMsg->bAvailable = 1;
-    } else if (sKey == Msg_VpView_ParticipantDetail_avatar) {
+    } else if (sKey == Msg_VpView_ParticipantDetail_Avatar) {
       pMsg->bAvailable = 1;
     } else if (sKey == Msg_VpView_ParticipantDetail_OnlineStatus) {
       pMsg->bAvailable = 1;
@@ -246,7 +246,7 @@ static void Test_VpView_GetParticipantDetailData(Msg_VpView_GetParticipantDetail
   if (p) {
     String sKey = pMsg->sKey;
     if (0) {
-    } else if (sKey == Msg_VpView_ParticipantDetail_avatar) {
+    } else if (sKey == Msg_VpView_ParticipantDetail_Avatar) {
       pMsg->sbData = p->sbAvatar;
       pMsg->sMimeType = p->sAvatarMimetype;
       pMsg->sSource = p->sAvatarSource;
@@ -263,7 +263,7 @@ static void Test_VpView_GetParticipantDetailRef(Msg_VpView_GetParticipantDetailR
   if (p) {
     String sKey = pMsg->sKey;
     if (0) {
-    } else if (sKey == Msg_VpView_ParticipantDetail_avatar) {
+    } else if (sKey == Msg_VpView_ParticipantDetail_Avatar) {
       pMsg->sUrl = p->sAvatarUrl;
       pMsg->sMimeType = p->sAvatarMimetype;
     }

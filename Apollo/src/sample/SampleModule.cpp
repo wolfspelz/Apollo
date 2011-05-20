@@ -143,7 +143,7 @@ void SrpcGate_Sample_Get(ApSRPCMessage* pMsg)
   msg.hSample = Apollo::string2Handle(pMsg->srpc.getString("hSample"));
   msg.sKey = pMsg->srpc.getString("sKey");
   SRPCGATE_HANDLER_NATIVE_REQUEST(pMsg, msg);
-  pMsg->srpc.setInt("nValue", msg.nValue);
+  pMsg->srpc.set("nValue", msg.nValue);
 }
 
 //----------------------------------------------------------

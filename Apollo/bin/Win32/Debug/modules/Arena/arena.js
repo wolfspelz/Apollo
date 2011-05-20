@@ -66,6 +66,7 @@ Arena.prototype = {
     + '    <div class="cImageWrapper" style="z-index:30;">'
     + '      <div class="cImage" style="z-index:40;"></div>'
     + '      <div class="cNickname" style="z-index:50;">Long Nickname</div>'
+    + '      <img class="cIcon" style="display:none; z-index:43;" />'
     
     + (bSelf ? ''
       + '    <div class="cImageSensor" style="z-index:70;">'
@@ -128,6 +129,23 @@ Arena.prototype = {
       $('#' + GetParticipantDomId(hParticipant) + ' .cImage').css('background-image', 'url(' + sUrl + ')');
     }
     img.src = sUrl;
+  },
+
+  SetIconAttachment: function (hParticipant, sUrl, sLabel, sLink)
+  {
+    if (sUrl && sUrl != '') {
+      $('#' + GetParticipantDomId(hParticipant) + ' .cIcon')
+        .attr('title', EscapeHTML(sLabel))
+        .attr('src', sUrl)
+        .css('display', '')
+        .click(
+          function () {
+            arena.OnIconAttachmentClicked(hParticipant, sLink);
+          }
+        );
+    } else {
+      $('#' + GetParticipantDomId(hParticipant) + ' .cIcon').css('display', 'none');
+    }
   },
 
   AddAvatarChat: function (hParticipant, hChat, sText)
@@ -211,6 +229,11 @@ Arena.prototype = {
   OnPublicChatClosed: function (hParticipant, hChat)
   {
     api.Message('OnPublicChatClosed').setString('ApType', 'Arena_CallModuleSrpc').setString('hParticipant', hParticipant).setString('hChat', hChat).send();
+  },
+
+  OnIconAttachmentClicked: function (hParticipant, sLink)
+  {
+    api.Message('OnIconAttachmentClicked').setString('ApType', 'Arena_CallModuleSrpc').setString('hParticipant', hParticipant).setString('sLink', sLink).send();
   },
 
   SendPublicChat: function (sText)

@@ -19,11 +19,16 @@ public:
   SrpcMessage();
   virtual ~SrpcMessage();
 
+  void setUnescaped(const String& sKey, const String& sValue);
+  //void setString(const String& sKey, const String& sValue);
+  //void setInt(const String& sKey, int nValue);
+  //void setList(const String& sKey, ValueList& vlList);
+  //void setList(const String& sKey, KeyValueList& kvList);
   void set(const String& sKey, const String& sValue);
-  void setString(const String& sKey, const String& sValue);
-  void setInt(const String& sKey, int nValue);
-  void setList(const String& sKey, ValueList& vlList);
-  void setList(const String& sKey, KeyValueList& kvList);
+  void set(const String& sKey, int nValue);
+  void set(const String& sKey, const ApHandle& hValue);
+  void set(const String& sKey, ValueList& vlList);
+  void set(const String& sKey, KeyValueList& kvList);
 
   String getString(const String& sKey);
   int getInt(const String& sKey);

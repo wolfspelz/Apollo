@@ -156,7 +156,7 @@ void Display::OnEnterRequested()
   tvEnterRequested_ = Apollo::TimeValue::getTime();
 
   DisplaySrpcMessage dsm(this, "SetLocationState");
-  dsm.srpc.setString("sState", "EnterRequested");
+  dsm.srpc.set("sState", "EnterRequested");
   dsm.Request();
 }
 
@@ -167,7 +167,7 @@ void Display::OnEnterBegin()
   tvEnterBegin_ = Apollo::TimeValue::getTime();
 
   DisplaySrpcMessage dsm(this, "SetLocationState");
-  dsm.srpc.setString("sState", "EnterBegin");
+  dsm.srpc.set("sState", "EnterBegin");
   dsm.Request();
 }
 
@@ -185,7 +185,7 @@ void Display::OnEnterComplete()
   }
 
   DisplaySrpcMessage dsm(this, "SetLocationState");
-  dsm.srpc.setString("sState", "EnterComplete");
+  dsm.srpc.set("sState", "EnterComplete");
   dsm.Request();
 }
 
@@ -196,7 +196,7 @@ void Display::OnLeaveRequested()
   tvLeaveRequested_ = Apollo::TimeValue::getTime();
 
   DisplaySrpcMessage msg(this, "SetLocationState");
-  msg.srpc.setString("sState", "LeaveRequested");
+  msg.srpc.set("sState", "LeaveRequested");
   msg.Request();
 }
 
@@ -207,7 +207,7 @@ void Display::OnLeaveBegin()
   tvLeaveBegin_ = Apollo::TimeValue::getTime();
 
   DisplaySrpcMessage dsm(this, "SetLocationState");
-  dsm.srpc.setString("sState", "LeaveBegin");
+  dsm.srpc.set("sState", "LeaveBegin");
   dsm.Request();
 }
 
@@ -216,7 +216,7 @@ void Display::OnLeaveComplete()
   apLog_Verbose((LOG_CHANNEL, "Display::OnLeaveComplete", "ctxt=" ApHandleFormat " loc=" ApHandleFormat "", ApHandleType(hContext_), ApHandleType(hLocation_)));
 
   DisplaySrpcMessage dsm(this, "SetLocationState");
-  dsm.srpc.setString("sState", "LeaveComplete");
+  dsm.srpc.set("sState", "LeaveComplete");
   dsm.Request();
 }
 
@@ -248,30 +248,29 @@ void Display::OnAvatarAnimationBegin(const ApHandle& hParticipant, const String&
 
 void Display::OnCallModuleSrpc(Apollo::SrpcMessage& request, Apollo::SrpcMessage& response)
 {
-  String sMethod = request.getString("Method");
-
-  if (0){
-  } else if (sMethod == "SendPublicChat") {
-    String sText = request.getString("sText");
-    if (sText){
-      Msg_Vp_SendPublicChat msg;
-      msg.hLocation = hLocation_;
-      msg.sText = sText;
-      if (!msg.Request()) { throw ApException("Msg_Vp_SendPublicChat failed  loc=" ApHandleFormat "", ApHandleType(hLocation_)); }
-    }
-
-  } else if (sMethod == "OnPublicChatTimedOut" || sMethod == "OnPublicChatClosed") {
-    ApHandle hParticipant = Apollo::string2Handle(request.getString("hParticipant"));
-    ApHandle hChat = Apollo::string2Handle(request.getString("hChat"));
-    if (ApIsHandle(hParticipant) && ApIsHandle(hChat)){
-      AvatarListNode* pNode = avatars_.Find(hParticipant);
-      if (pNode) {
-        pNode->Value()->OnPublicChatClosed(hChat);
-      }
+  ApHandle hParticipant = Apollo::string2Handle(request.getString("hParticipant"));
+  if (ApIsHandle(hParticipant)) {
+    AvatarListNode* pNode = avatars_.Find(hParticipant);
+    if (pNode) {
+      pNode->Value()->OnCallModuleSrpc(request, response);
     }
 
   } else {
-    throw ApException("Unknown Method=%s", StringType(sMethod));
+    String sMethod = request.getString("Method");
+
+    if (0){
+    } else if (sMethod == "SendPublicChat") {
+      String sText = request.getString("sText");
+      if (sText){
+        Msg_Vp_SendPublicChat msg;
+        msg.hLocation = hLocation_;
+        msg.sText = sText;
+        if (!msg.Request()) { throw ApException("Msg_Vp_SendPublicChat failed  loc=" ApHandleFormat "", ApHandleType(hLocation_)); }
+      }
+
+    } else {
+      throw ApException("Display::OnCallModuleSrpc: Unknown Method=%s", StringType(sMethod));
+    }
   }
 }
 
@@ -289,13 +288,13 @@ void Display::OnContextDetailsChanged(Apollo::ValueList& vlKeys)
     } else if (e->getString() == Msg_VpView_ContextDetail_DocumentUrl) {
       if (msg.Request()) {
         DisplaySrpcMessage dsm(this, "SetDocumentUrl");
-        dsm.srpc.setString("sUrl", msg.sValue);
+        dsm.srpc.set("sUrl", msg.sValue);
         dsm.Request();
       }
     } else if (e->getString() == Msg_VpView_ContextDetail_LocationUrl) {
       if (msg.Request()) {
         DisplaySrpcMessage dsm(this, "SetLocationUrl");
-        dsm.srpc.setString("sUrl", msg.sValue);
+        dsm.srpc.set("sUrl", msg.sValue);
         dsm.Request();
       }
     }
@@ -426,7 +425,7 @@ void Display::ResetLocationInfo()
 
 DisplaySrpcMessage::DisplaySrpcMessage(Display* pDisplay, const String& sMethod)
 {
-  srpc.setString("Method", sMethod);
+  srpc.set("Method", sMethod);
   hView = pDisplay->GetView();
   sFunction = Apollo::getModuleConfig(MODULE_NAME, "CallScriptSrpcFunctionName", "receiveSrpcMessageAsString");
 }
