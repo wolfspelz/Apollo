@@ -32,7 +32,7 @@ void Avatar::SubscribeAndGetDetail(const String& sKey)
   msg.sKey = sKey;
 
   if (0) {
-  } else if (sKey == Msg_VpView_ParticipantDetail_avatar) {
+  } else if (sKey == Msg_VpView_ParticipantDetail_Avatar) {
     msg.vlMimeTypes = avatarMimeTypes_;
   } else {
     msg.vlMimeTypes = noMimeTypes_;
@@ -48,7 +48,7 @@ void Avatar::SubscribeAndGetDetail(const String& sKey)
 void Avatar::GetDetail(const String& sKey)
 {
   if (0) {
-  } else if (sKey == Msg_VpView_ParticipantDetail_avatar) {
+  } else if (sKey == Msg_VpView_ParticipantDetail_Avatar) {
     GetDetailData(sKey, avatarMimeTypes_);
 //Ref    GetDetailRef(sKey, avatarMimeTypes_);
   } else {
@@ -66,28 +66,41 @@ void Avatar::GetDetailString(const String& sKey, Apollo::ValueList& vlMimeTypes)
 
     if (0) {
     } else if (sKey == Msg_VpView_ParticipantDetail_Nickname) {
-      SetNickname(msg.sValue);
+      DisplaySetNickname(msg.sValue);
 
     } else if (sKey == Msg_VpView_ParticipantDetail_OnlineStatus) {
-      //= sValue;
 
     } else if (sKey == Msg_VpView_ParticipantDetail_Message) {
-      //= sValue;
 
     } else if (sKey == Msg_VpView_ParticipantDetail_Position) {
       List lCoords;
       KeyValueLfBlob2List(msg.sValue, lCoords);
       Elem* e = lCoords.FindByNameCase("x");
       if (e) {
-        int nX = String::atoi(e->getString());
-        SetPosition(nX);
+        nX_ = String::atoi(e->getString());
+        nPositionConfirmed_ = 1;
+        DisplaySetAvatarPosition(nX_);
       }
 
     } else if (sKey == Msg_VpView_ParticipantDetail_Condition) {
-      //= sValue;
 
     } else if (sKey == Msg_VpView_ParticipantDetail_ProfileUrl) {
-      //= sValue;
+
+    } else if (sKey == "CommunityTag") {
+      sCommunityTag_ = msg.sValue;
+      DisplaySetIconAttachment(sCommunityTag_, sCommunityName_, sCommunityPage_);
+
+    } else if (sKey == "CommunityName") {
+      sCommunityName_ = msg.sValue;
+      if (sCommunityTag_) {
+        DisplaySetIconAttachment(sCommunityTag_, sCommunityName_, sCommunityPage_);
+      }
+
+    } else if (sKey == "CommunityPage") {
+      sCommunityPage_ = msg.sValue;
+      if (sCommunityTag_) {
+        DisplaySetIconAttachment(sCommunityTag_, sCommunityName_, sCommunityPage_);
+      }
 
     }
   }
@@ -102,8 +115,8 @@ void Avatar::GetDetailRef(const String& sKey, Apollo::ValueList& vlMimeTypes)
   if (msg.Request()) {
 
     if (0) {
-    } else if (sKey == Msg_VpView_ParticipantDetail_avatar) {
-      SetImage(msg.sUrl);
+    } else if (sKey == Msg_VpView_ParticipantDetail_Avatar) {
+      DisplaySetImage(msg.sUrl);
     }
   }
 }
@@ -117,7 +130,7 @@ void Avatar::GetDetailData(const String& sKey, Apollo::ValueList& vlMimeTypes)
   if (msg.Request()) {
 
     if (0) {
-    } else if (sKey == Msg_VpView_ParticipantDetail_avatar) {
+    } else if (sKey == Msg_VpView_ParticipantDetail_Avatar) {
       HandleImageData(msg.sMimeType, msg.sSource, msg.sbData);
     }
   }
@@ -184,7 +197,7 @@ void Avatar::UnSubscribeDetail(const String& sKey)
   msg.sKey = sKey;
 
   if (0) {
-  } else if (sKey == Msg_VpView_ParticipantDetail_avatar) {
+  } else if (sKey == Msg_VpView_ParticipantDetail_Avatar) {
     msg.vlMimeTypes = avatarMimeTypes_;
   } else {
     msg.vlMimeTypes = noMimeTypes_;
@@ -197,29 +210,35 @@ void Avatar::UnSubscribeDetail(const String& sKey)
 void Avatar::Create(int bSelf)
 {
   DisplaySrpcMessage dsm(pDisplay_, "AddAvatar");
-  dsm.srpc.setString("hParticipant", hParticipant_.toString());
-  dsm.srpc.setInt("bSelf", bSelf);
-  dsm.srpc.setInt("nX", nX_);
+  dsm.srpc.set("hParticipant", hParticipant_);
+  dsm.srpc.set("bSelf", bSelf);
+  dsm.srpc.set("nX", nX_);
   dsm.Request();
 
   SubscribeAndGetDetail(Msg_VpView_ParticipantDetail_Nickname);
-  SubscribeAndGetDetail(Msg_VpView_ParticipantDetail_avatar);
+  SubscribeAndGetDetail(Msg_VpView_ParticipantDetail_Avatar);
   SubscribeAndGetDetail(Msg_VpView_ParticipantDetail_OnlineStatus);
   SubscribeAndGetDetail(Msg_VpView_ParticipantDetail_Message);
   SubscribeAndGetDetail(Msg_VpView_ParticipantDetail_Position);
   SubscribeAndGetDetail(Msg_VpView_ParticipantDetail_Condition);
   SubscribeAndGetDetail(Msg_VpView_ParticipantDetail_ProfileUrl);
+  SubscribeAndGetDetail("CommunityTag");
+  SubscribeAndGetDetail("CommunityName");
+  SubscribeAndGetDetail("CommunityPage");
 }
 
 void Avatar::Destroy()
 {
   UnSubscribeDetail(Msg_VpView_ParticipantDetail_Nickname);
-  UnSubscribeDetail(Msg_VpView_ParticipantDetail_avatar);
+  UnSubscribeDetail(Msg_VpView_ParticipantDetail_Avatar);
   UnSubscribeDetail(Msg_VpView_ParticipantDetail_OnlineStatus);
   UnSubscribeDetail(Msg_VpView_ParticipantDetail_Message);
   UnSubscribeDetail(Msg_VpView_ParticipantDetail_Position);
   UnSubscribeDetail(Msg_VpView_ParticipantDetail_Condition);
   UnSubscribeDetail(Msg_VpView_ParticipantDetail_ProfileUrl);
+  UnSubscribeDetail("CommunityTag");
+  UnSubscribeDetail("CommunityName");
+  UnSubscribeDetail("CommunityPage");
 
   if (ApIsHandle(hAnimatedItem_)) {
     if (pModule_) {
@@ -243,7 +262,7 @@ void Avatar::Destroy()
   }
 
   DisplaySrpcMessage dsm(pDisplay_, "RemoveAvatar");
-  dsm.srpc.setString("hParticipant", hParticipant_.toString());
+  dsm.srpc.set("hParticipant", hParticipant_);
   dsm.Request();
 }
 
@@ -267,7 +286,7 @@ void Avatar::OnReceivePublicChat(const ApHandle& hChat, const String& sNickname,
   if (pChat) {
     if (pChat->sText_ != sText) {
       pChat->sText_ = sText;
-      SetChatline(hChat, sText);
+      DisplaySetChatline(hChat, sText);
     }
     if (pChat->tv_ != tv) {
       pChat->tv_ = tv;
@@ -278,8 +297,41 @@ void Avatar::OnReceivePublicChat(const ApHandle& hChat, const String& sNickname,
 
     RemoveOldPublicChats(3);
 
-    AddChatline(hChat, sText);
+    DisplayAddChatline(hChat, sText);
   }
+}
+
+void Avatar::OnAnimationBegin(const String& sUrl)
+{
+  if (sUrl != sImage_) {
+    DisplaySetImage(sUrl);
+    sImage_ = sUrl;
+  }
+}
+
+//----------------------------------------------------------
+
+void Avatar::OnCallModuleSrpc(Apollo::SrpcMessage& request, Apollo::SrpcMessage& response)
+{
+  String sMethod = request.getString("Method");
+
+  if (0){
+  } else if (sMethod == "OnPublicChatTimedOut" || sMethod == "OnPublicChatClosed") {
+    ApHandle hChat = Apollo::string2Handle(request.getString("hChat"));
+    if (ApIsHandle(hChat)){
+      OnPublicChatClosed(hChat);
+    }
+
+  } else if (sMethod == "OnIconAttachmentClicked") {
+    String sLink = request.getString("sLink");
+    if (sLink){
+      OnIconAttachmentClicked(sLink);
+    }
+
+  } else {
+    throw ApException("Avatar::OnCallModuleSrpc: Unknown Method=%s", StringType(sMethod));
+  }
+  
 }
 
 void Avatar::OnPublicChatClosed(const ApHandle& hChat)
@@ -287,12 +339,9 @@ void Avatar::OnPublicChatClosed(const ApHandle& hChat)
   DeletePublicChat(hChat);
 }
 
-void Avatar::OnAnimationBegin(const String& sUrl)
+void Avatar::OnIconAttachmentClicked(const String& sLink)
 {
-  if (sUrl != sImage_) {
-    SetImage(sUrl);
-    sImage_ = sUrl;
-  }
+  // Navigate external browser
 }
 
 //----------------------------------------------------------
@@ -324,91 +373,98 @@ void Avatar::DeletePublicChat(const ApHandle& hChat)
     delete pChat;
     pChat = 0;
 
-    RemoveChatline(hChat);
+    DisplayRemoveChatline(hChat);
   }
 }
 
 //----------------------------------------------------------
 
-void Avatar::SetNickname(const String& sNickname)
+void Avatar::DisplaySetNickname(const String& sNickname)
 {
   sNickname_ = sNickname;
 
   DisplaySrpcMessage dsm(pDisplay_, "SetAvatarNickname");
-  dsm.srpc.setString("hParticipant", hParticipant_.toString());
-  dsm.srpc.setString("sNickname", sNickname_);
+  dsm.srpc.set("hParticipant", hParticipant_);
+  dsm.srpc.set("sNickname", sNickname_);
   dsm.Request();
 }
 
-void Avatar::SetImage(const String& sUrl)
+void Avatar::DisplaySetImage(const String& sUrl)
 {
   DisplaySrpcMessage dsm(pDisplay_, "SetAvatarImage");
-  dsm.srpc.setString("hParticipant", hParticipant_.toString());
-  dsm.srpc.setString("sUrl", sUrl);
+  dsm.srpc.set("hParticipant", hParticipant_);
+  dsm.srpc.set("sUrl", sUrl);
   dsm.Request();
 }
 
-void Avatar::CreateChatContainer(const String& sContainer)
+void Avatar::DisplaySetIconAttachment(const String& sUrl, const String& sLabel, const String& sLink)
+{
+  DisplaySrpcMessage dsm(pDisplay_, "SetIconAttachment");
+  dsm.srpc.set("hParticipant", hParticipant_);
+  dsm.srpc.set("sUrl", sUrl);
+  dsm.srpc.set("sLabel", sLabel);
+  dsm.srpc.set("sLink", sLink);
+  dsm.Request();
+}
+
+void Avatar::DisplayCreateChatContainer(const String& sContainer)
 {
 }
 
-void Avatar::DeleteAllChatBubbles(const String& sContainer)
+void Avatar::DisplayDeleteAllChatBubbles(const String& sContainer)
 {
 }
 
-void Avatar::AddChatline(const ApHandle& hChat, const String& sText)
+void Avatar::DisplayAddChatline(const ApHandle& hChat, const String& sText)
 {
   DisplaySrpcMessage dsm(pDisplay_, "AddAvatarChat");
-  dsm.srpc.setString("hParticipant", hParticipant_.toString());
-  dsm.srpc.setString("hChat", hChat.toString());
-  dsm.srpc.setString("sText", sText);
+  dsm.srpc.set("hParticipant", hParticipant_);
+  dsm.srpc.set("hChat", hChat);
+  dsm.srpc.set("sText", sText);
   dsm.Request();
 }
 
-void Avatar::SetChatline(const ApHandle& hChat, const String& sText)
+void Avatar::DisplaySetChatline(const ApHandle& hChat, const String& sText)
 {
   DisplaySrpcMessage dsm(pDisplay_, "SetAvatarChat");
-  dsm.srpc.setString("hParticipant", hParticipant_.toString());
-  dsm.srpc.setString("hChat", hChat.toString());
-  dsm.srpc.setString("sText", sText);
+  dsm.srpc.set("hParticipant", hParticipant_);
+  dsm.srpc.set("hChat", hChat);
+  dsm.srpc.set("sText", sText);
   dsm.Request();
 }
 
-void Avatar::RemoveChatline(const ApHandle& hChat)
+void Avatar::DisplayRemoveChatline(const ApHandle& hChat)
 {
   DisplaySrpcMessage dsm(pDisplay_, "RemoveAvatarChat");
-  dsm.srpc.setString("hParticipant", hParticipant_.toString());
-  dsm.srpc.setString("hChat", hChat.toString());
+  dsm.srpc.set("hParticipant", hParticipant_);
+  dsm.srpc.set("hChat", hChat);
   dsm.Request();
 }
 
-void Avatar::SetUnknownPosition()
+//void Avatar::SetUnknownPosition()
+//{
+//  int nX = 300;
+//  int nMin = 100;
+//  int nMax = 500;
+//
+//  if (pDisplay_) {
+//    nMax = pDisplay_->GetWidth();
+//  }
+//
+//  nX = nMin + Apollo::getRandom(nMax - nMin);
+//
+//  nPositionConfirmed_ = 0;
+//
+//  DisplaySrpcMessage dsm(pDisplay_, "SetAvatarPosition");
+//  dsm.srpc.setString("hParticipant", hParticipant_);
+//  dsm.srpc.setInt("nX", nX);
+//  dsm.Request();
+//}
+
+void Avatar::DisplaySetAvatarPosition(int nX)
 {
-  int nX = 300;
-  int nMin = 100;
-  int nMax = 500;
-
-  if (pDisplay_) {
-    nMax = pDisplay_->GetWidth();
-  }
-
-  nX = nMin + Apollo::getRandom(nMax - nMin);
-
-  nPositionConfirmed_ = 0;
-
   DisplaySrpcMessage dsm(pDisplay_, "SetAvatarPosition");
-  dsm.srpc.setString("hParticipant", hParticipant_.toString());
-  dsm.srpc.setInt("nX", nX);
-  dsm.Request();
-}
-
-void Avatar::SetPosition(int nX)
-{
-  nX_ = nX;
-  nPositionConfirmed_ = 1;
-
-  DisplaySrpcMessage dsm(pDisplay_, "SetAvatarPosition");
-  dsm.srpc.setString("hParticipant", hParticipant_.toString());
-  dsm.srpc.setInt("nX", nX);
+  dsm.srpc.set("hParticipant", hParticipant_);
+  dsm.srpc.set("nX", nX);
   dsm.Request();
 }

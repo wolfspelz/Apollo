@@ -206,7 +206,10 @@ BOOL CALLBACK UnitTestDialog::DlgProc(HWND hDlg, UINT message, WPARAM wParam, LP
           //::SetWindowPos(hDlg, NULL, (cx - (rDialog.right - rDialog.left)) / 3, (cy - (rDialog.bottom - rDialog.top)) / 3, 0, 0, SWP_NOSIZE|SWP_NOZORDER);
 
           // TopRight
-          ::SetWindowPos(hDlg, NULL, cx - (rDialog.right - rDialog.left), 0, 0, 0, SWP_NOSIZE|SWP_NOZORDER);
+          //::SetWindowPos(hDlg, NULL, cx - (rDialog.right - rDialog.left), 0, 0, 0, SWP_NOSIZE|SWP_NOZORDER);
+
+          // By config
+          ::SetWindowPos(hDlg, NULL, Apollo::getModuleConfig(MODULE_NAME, "Dialog/Left", 400), Apollo::getModuleConfig(MODULE_NAME, "Dialog/Top", 100), 0, 0, SWP_NOSIZE|SWP_NOZORDER);
         }
 
         ::SetWindowText(::GetDlgItem(hDlg, IDC_SUMMARY), pController_->Summary());

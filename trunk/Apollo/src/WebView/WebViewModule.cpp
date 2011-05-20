@@ -295,10 +295,10 @@ void SrpcGate_WebView_GetPosition(ApSRPCMessage* pMsg)
   Msg_WebView_GetPosition msg;
   msg.hView = Apollo::string2Handle(pMsg->srpc.getString("hView"));
   SRPCGATE_HANDLER_NATIVE_REQUEST(pMsg, msg);
-  pMsg->response.setInt("nLeft", msg.nLeft);
-  pMsg->response.setInt("nTop", msg.nTop);
-  pMsg->response.setInt("nWidth", msg.nWidth);
-  pMsg->response.setInt("nHeight", msg.nHeight);
+  pMsg->response.set("nLeft", msg.nLeft);
+  pMsg->response.set("nTop", msg.nTop);
+  pMsg->response.set("nWidth", msg.nWidth);
+  pMsg->response.set("nHeight", msg.nHeight);
 }
 
 void SrpcGate_WebView_GetVisibility(ApSRPCMessage* pMsg)
@@ -306,7 +306,7 @@ void SrpcGate_WebView_GetVisibility(ApSRPCMessage* pMsg)
   Msg_WebView_GetVisibility msg;
   msg.hView = Apollo::string2Handle(pMsg->srpc.getString("hView"));
   SRPCGATE_HANDLER_NATIVE_REQUEST(pMsg, msg);
-  pMsg->response.setInt("bVisible", msg.bVisible);
+  pMsg->response.set("bVisible", msg.bVisible);
 }
 
 //----------------------------------------------------------

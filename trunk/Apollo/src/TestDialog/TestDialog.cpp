@@ -118,8 +118,8 @@ AP_SRPC_HANDLER_METHOD(TestDialogModule, TestDialog_Control, ApSRPCMessage)
 
     Msg_Navigation_Receive msg;
     ApIN ApHandle hConnection = hBrowserConnection_ = (ApIsHandle(hBrowserConnection_) ? hBrowserConnection_ : Apollo::newHandle());
-    msg.srpc.setString("Method", "Context.Open");
-    msg.srpc.setString("hContext", hContext.toString());
+    msg.srpc.set("Method", "Context.Open");
+    msg.srpc.set("hContext", hContext);
     msg.Request();
 
     int nLeft = pMsg->srpc.getInt("nLeft");
@@ -154,9 +154,9 @@ AP_SRPC_HANDLER_METHOD(TestDialogModule, TestDialog_Control, ApSRPCMessage)
       ApHandle hContext = pElem->getHandle();
       Msg_Navigation_Receive msg;
       ApIN ApHandle hConnection = hBrowserConnection_ = (ApIsHandle(hBrowserConnection_) ? hBrowserConnection_ : Apollo::newHandle());
-      msg.srpc.setString("Method", "Context.Navigate");
-      msg.srpc.setString("hContext", hContext.toString());
-      msg.srpc.setString("sUrl", pMsg->srpc.getString("sUrl"));
+      msg.srpc.set("Method", "Context.Navigate");
+      msg.srpc.set("hContext", hContext);
+      msg.srpc.set("sUrl", pMsg->srpc.getString("sUrl"));
       msg.Request();
     }
 
@@ -168,8 +168,8 @@ AP_SRPC_HANDLER_METHOD(TestDialogModule, TestDialog_Control, ApSRPCMessage)
       kvBrowserTabContextList_.removeElem(pElem);
       Msg_Navigation_Receive msg;
       ApIN ApHandle hConnection = hBrowserConnection_ = (ApIsHandle(hBrowserConnection_) ? hBrowserConnection_ : Apollo::newHandle());
-      msg.srpc.setString("Method", "Context.Close");
-      msg.srpc.setString("hContext", hContext.toString());
+      msg.srpc.set("Method", "Context.Close");
+      msg.srpc.set("hContext", hContext);
       msg.Request();
       delete pElem; pElem = 0;
     }

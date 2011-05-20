@@ -998,6 +998,15 @@ void NicknameParticipantThingyProvider::setProtocolNickname(const String& sNickn
   setReferenceData(sProtocolNickname_);
 }
 
+int NicknameParticipantThingyProvider::hasData()
+{
+  int bHas = base::hasData();
+  if (!bHas) {
+    bHas = !sProtocolNickname_.empty();
+  }
+  return bHas;
+}
+
 void NicknameParticipantThingyProvider::getString(String& sValue, String& sMimeType)
 {
   getIdentityProperty("Nickname", sValue);

@@ -166,8 +166,10 @@ protected:
 
 class NicknameParticipantThingyProvider: public IdentityPropertyParticipantThingyProvider
 {
+  typedef IdentityPropertyParticipantThingyProvider base;
 public:
   NicknameParticipantThingyProvider() { nVariant_ = Variant_Nickname; }
+  virtual int hasData();
   virtual void getString(String& sValue, String& sMimeType);
   virtual void getData(Buffer& sbData, String& sMimeType, String& sSource) {} // shut up, string only
   virtual void setProtocolNickname(const String& sNickname);

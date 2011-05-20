@@ -158,7 +158,7 @@ void SrpcGateModule::On_Server_HttpRequest(Msg_Server_HttpRequest* pMsg)
         String sValue = e->getString();
         sKey.unescape(String::EscapeURL);
         sValue.unescape(String::EscapeURL);
-        request.setString(sKey, sValue);
+        request.set(sKey, sValue);
       }
 
       // Params from body
@@ -170,7 +170,7 @@ void SrpcGateModule::On_Server_HttpRequest(Msg_Server_HttpRequest* pMsg)
         String sKey = e->getName();
         String sValue = e->getString();
         sValue.unescape(String::EscapeCRLF);
-        request.setString(sKey, sValue);
+        request.set(sKey, sValue);
       }
 
       // Do the call
@@ -276,15 +276,15 @@ void SrpcGate_System_GetTime(ApSRPCMessage* pMsg)
   Msg_System_GetTime msg;
   SRPCGATE_HANDLER_NATIVE_REQUEST(pMsg, msg);
   pMsg->response.createResponse(pMsg->srpc);
-  pMsg->response.setInt("nSec", msg.nSec);
-  pMsg->response.setInt("nMicroSec", msg.nMicroSec);
+  pMsg->response.set("nSec", msg.nSec);
+  pMsg->response.set("nMicroSec", msg.nMicroSec);
 }
 
 void SrpcGate_System_GetHandle(ApSRPCMessage* pMsg)
 {
   Msg_System_GetHandle msg;
   SRPCGATE_HANDLER_NATIVE_REQUEST(pMsg, msg);
-  pMsg->response.setString("h", msg.h.toString());
+  pMsg->response.set("h", msg.h);
 }
 
 void SrpcGate_System_Echo(ApSRPCMessage* pMsg)
@@ -292,7 +292,7 @@ void SrpcGate_System_Echo(ApSRPCMessage* pMsg)
   Msg_System_Echo msg;
   msg.nIn = pMsg->srpc.getInt("nIn");
   SRPCGATE_HANDLER_NATIVE_REQUEST(pMsg, msg);
-  pMsg->response.setInt("nOut", msg.nOut);
+  pMsg->response.set("nOut", msg.nOut);
 }
 
 //--------------------------
@@ -311,7 +311,7 @@ void SrpcGate_Config_GetValue(ApSRPCMessage* pMsg)
   Msg_Config_GetValue msg;
   msg.sPath = pMsg->srpc.getString("sPath");
   SRPCGATE_HANDLER_NATIVE_REQUEST(pMsg, msg);
-  pMsg->response.setString("sValue", msg.sValue);
+  pMsg->response.set("sValue", msg.sValue);
 }
 
 //----------------------------------------------------------

@@ -6,3 +6,8 @@ Test=0
 
 # Close dialog on success [seconds] (disable close: -1)
 #SuccessCloseTimeout=0
+
+Dialog/Left=400
+Dialog/Top=100
+Dialog/Width=800
+Dialog/Height=600

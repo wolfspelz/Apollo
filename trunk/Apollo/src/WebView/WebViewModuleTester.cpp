@@ -181,7 +181,7 @@ void WebViewModuleTester_CallCustomEcho_On_CustomEchoType(ApSRPCMessage* pMsg)
   String sOut = sIn;
   if (sType != "CustomEchoType") { sOut.appendf(" (Error: Expected Type=%s got=%s)", StringType("CustomEchoType"), StringType(sType)); }
   if (sMethod != "CustomEchoMethod") { sOut.appendf(" (Error: Expected Method=%s got=%s)", StringType("CustomEchoMethod"), StringType(sMethod)); }
-  pMsg->response.setString("sOut", sOut);
+  pMsg->response.set("sOut", sOut);
   pMsg->apStatus = ApMessage::Ok;
 }
 
