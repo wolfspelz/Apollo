@@ -264,11 +264,13 @@ String View::CallJsFunction(const String& sFunction, List& lArgs)
 {
   String sResult;
 
-  JSGlobalContextRef runCtx = pWebFrame_->globalContext();
-
   AutoJSStringRef methodName = JSStringCreateWithUTF8CString(sFunction);
 
+  JSGlobalContextRef runCtx = pWebFrame_->globalContext();
+  if (runCtx == 0) { throw ApException("View::CallJsFunction pWebFrame_->globalContext() returned 0"); }
+
   JSObjectRef global = JSContextGetGlobalObject(runCtx);
+  if (global == 0) { throw ApException("View::CallJsFunction JSContextGetGlobalObject(runCtx) returned 0"); }
 
   JSValueRef* exception = 0;
   JSValueRef sampleFunction = JSObjectGetProperty(runCtx, global, methodName, exception);

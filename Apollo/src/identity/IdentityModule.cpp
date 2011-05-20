@@ -655,7 +655,8 @@ AP_MSG_HANDLER_METHOD(IdentityModule, Identity_GetItemData)
           // not in db, ok, shit happnz
         } else {
           if (!pContainer->hasItemData(pMsg->sId)) {
-            apLog_Error((LOG_CHANNEL, "IdentityModule::Identity_GetItemData", "pContainer->hasItemData() failed although just loaded: url=%s id=%s", StringType(pMsg->sUrl), StringType(pMsg->sId)));
+            // Not an error, just means, that there is an identity in storage but not the item data
+            //apLog_Error((LOG_CHANNEL, "IdentityModule::Identity_GetItemData", "pContainer->hasItemData() failed although just loaded: url=%s id=%s", StringType(pMsg->sUrl), StringType(pMsg->sId)));
           } else {
             bGetIt = 1;
           }

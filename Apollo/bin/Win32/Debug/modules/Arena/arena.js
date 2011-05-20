@@ -133,8 +133,10 @@ Arena.prototype = {
 
   SetIconAttachment: function (hParticipant, sUrl, sLabel, sLink)
   {
+    var e = $('#' + GetParticipantDomId(hParticipant) + ' .cIcon');
+
     if (sUrl && sUrl != '') {
-      $('#' + GetParticipantDomId(hParticipant) + ' .cIcon')
+      e
         .attr('title', EscapeHTML(sLabel))
         .attr('src', sUrl)
         .css('display', '')
@@ -144,7 +146,18 @@ Arena.prototype = {
           }
         );
     } else {
-      $('#' + GetParticipantDomId(hParticipant) + ' .cIcon').css('display', 'none');
+      e.css('display', 'none');
+    }
+  },
+
+  SetOnlineStatus: function (hParticipant, sStatus)
+  {
+    var e = $('#' + GetParticipantDomId(hParticipant));
+    
+    if (sStatus == 'available' || sStatus == '' || sStatus == 'chat') {
+      e.fadeTo('fast', 1);
+    } else if (sStatus == 'away' || sStatus == 'xa' || sStatus == 'dnd') {
+      e.fadeTo('fast', 0.5);
     }
   },
 
@@ -165,8 +178,8 @@ Arena.prototype = {
           $('#' + GetChatDomId(hParticipant, hChat)).stop(true).fadeTo('fast', 1);
         }
       )
-      .delay(10000)
-      .fadeOut(20000, 
+      .delay(30000)
+      .fadeOut(30000, 
         function () {
           arena.OnPublicChatTimedOut(hParticipant, hChat);
         }

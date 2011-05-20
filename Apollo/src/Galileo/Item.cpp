@@ -363,9 +363,11 @@ int Item::Start()
 {
   int ok = 1;
   
-  ok = StartTimer();
-  if (ok) {
-    bStarted_ = 1;
+  if (!bStarted_) {
+    ok = StartTimer();
+    if (ok) {
+      bStarted_ = 1;
+    }
   }
 
   return ok;

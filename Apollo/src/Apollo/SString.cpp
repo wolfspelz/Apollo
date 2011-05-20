@@ -204,6 +204,8 @@ void String::set(const char* szBegin, size_t nLen)
 
 void String::append(const char* szBegin, size_t nBytes, int bClear)
 {
+  if (szStr_ == szBegin) { return; }  // Copy onto itself
+
   if (bClear) {
     clear();
   }

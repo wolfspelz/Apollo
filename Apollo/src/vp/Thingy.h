@@ -34,6 +34,7 @@ public:
     ,pProvider_(pProvider)
     ,nSubscriber_(0)
     ,bChanged_(0)
+    ,bPretendNotSubscribed_(0)
   {}
   virtual ~Thingy();
 
@@ -43,15 +44,19 @@ public:
   virtual int isChanged() { return bChanged_; }
   virtual void clearChanged() { bChanged_ = 0; }
 
-  virtual int isSubscribed() { return nSubscriber_ > 0; }
+  virtual int isSubscribed() { return nSubscriber_ > 0 && ! bPretendNotSubscribed_; }
   virtual void addSubscription();
   virtual void removeSubscription();
   virtual void clearSubscriptions();
+
+  // This is a hack
+  void pretendNotSubscribed(int bState) { bPretendNotSubscribed_ = bState; }
 
 protected:
   ThingyProvider* pProvider_;
   int nSubscriber_;
   int bChanged_;
+  int bPretendNotSubscribed_;
 };
 
 template <class E> class ThingyList: public ListT<E, Elem>
@@ -103,8 +108,8 @@ public:
         if (pThingy->isChanged()) {
           if (pThingy->isSubscribed()) {
             vlChanges.add(pThingy->getName());
+            pThingy->clearChanged();
           }
-          pThingy->clearChanged();
         }
       }
 
