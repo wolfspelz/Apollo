@@ -16,7 +16,7 @@ public:
   String& getText() { return getString(); }
   Apollo::TimeValue& getTime() { return tvCreated_; }
 
-  void Chat::send_VpView_LocationPublicChat();
+  void Chat::send_VpView_LocationPublicChat(int bIsNew);
 
 protected:
   Apollo::TimeValue tvCreated_;

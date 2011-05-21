@@ -230,6 +230,14 @@ void Display::OnReceivePublicChat(const ApHandle& hParticipant, const ApHandle& 
   }
 }
 
+void Display::OnReceivePublicAction(const ApHandle& hParticipant, const String& sAction)
+{
+  AvatarListNode* pNode = avatars_.Find(hParticipant);
+  if (pNode) {
+    pNode->Value()->OnReceivePublicAction(sAction);
+  }
+}
+
 void Display::OnParticipantDetailsChanged(const ApHandle& hParticipant, Apollo::ValueList& vlKeys)
 {
   AvatarListNode* pNode = avatars_.Find(hParticipant);

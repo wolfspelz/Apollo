@@ -155,13 +155,13 @@ public:
     ,nDelayMSec_(100)
     //,nX_(0)
     //,nDestX_(0)
+    ,bStatic_(0)
     ,pCurrentSequence_(0)
     ,nSpentInCurrentSequenceMSec_(0)
     ,pPreviousFrame_(0)
   {}
 
   virtual ~Item();
-
 
   int Start();
   void Stop();
@@ -170,6 +170,7 @@ public:
   void SetStatus(const String& sStatus);
   void SetCondition(const String& sCondition);
   void PlayEvent(const String& sEvent);
+  void PlayStatic(int bState);
   //void SetPosition(int nX);
   //void MoveTo(int nX);
   void SetAnimationData(const String& sUrl, Buffer& sbData, const String& sMimeType);
@@ -194,6 +195,8 @@ protected:
   Sequence* GetSequenceByGroup(const String& sGroup);
   Sequence* GetSequenceByName(const String& sSequence);
   Sequence* GetSequenceByGroupOrName(const String& sGroupOrName);
+  Sequence* GetDefaultSequence();
+  String GetDefaultSequenceName();
 
   int StartTimer();
   void StopTimer();
@@ -213,6 +216,7 @@ protected:
   ListT<Group, Elem> lGroups_;
   String sStatus_;
   String sEvent_;
+  int bStatic_;
   String sActivity_;
   String sCondition_;
   String sNextSequence_; // enforce, e.g. after transition

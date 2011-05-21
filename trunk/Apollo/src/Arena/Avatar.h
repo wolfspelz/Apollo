@@ -40,6 +40,7 @@ public:
 
   void OnDetailsChanged(Apollo::ValueList& vlKeys);
   void OnReceivePublicChat(const ApHandle& hChat, const String& sNickname, const String& sText, const Apollo::TimeValue& tvTimestamp);
+  void OnReceivePublicAction(const String& sAction);
   void OnAnimationBegin(const String& sUrl);
   void OnCallModuleSrpc(Apollo::SrpcMessage& request, Apollo::SrpcMessage& response);
 
@@ -70,9 +71,6 @@ protected:
   void HandleImageData(const String& sMimeType, const String& sSource, Buffer& sbData);
   void SuspendAnimation();
   void ResumeAnimation();
-
-  void DisplayCreateChatContainer(const String& sContainer);
-  void DisplayDeleteAllChatBubbles(const String& sContainer);
 
 protected:
   ArenaModule* pModule_;

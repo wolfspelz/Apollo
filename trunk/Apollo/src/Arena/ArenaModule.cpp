@@ -247,6 +247,14 @@ AP_MSG_HANDLER_METHOD(ArenaModule, VpView_LocationPublicChat)
   }
 }
 
+AP_MSG_HANDLER_METHOD(ArenaModule, VpView_LocationPublicAction)
+{
+  Display* pDisplay = GetDisplayOfHandle(pMsg->hLocation);
+  if (pDisplay) {
+    pDisplay->OnReceivePublicAction(pMsg->hParticipant, pMsg->sAction);
+  }
+}
+
 AP_MSG_HANDLER_METHOD(ArenaModule, VpView_LocationDetailsChanged) {}
 
 AP_MSG_HANDLER_METHOD(ArenaModule, VpView_ContextDetailsChanged)
@@ -433,6 +441,7 @@ int ArenaModule::Init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ArenaModule, VpView_LocationContextsChanged, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ArenaModule, VpView_ParticipantsChanged, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ArenaModule, VpView_LocationPublicChat, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, ArenaModule, VpView_LocationPublicAction, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ArenaModule, VpView_LocationDetailsChanged, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ArenaModule, VpView_ContextDetailsChanged, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ArenaModule, VpView_ParticipantDetailsChanged, this, ApCallbackPosNormal);

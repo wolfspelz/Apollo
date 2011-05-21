@@ -453,42 +453,93 @@ void Location::sendPublicChat(const String& sText)
   if (!msg.Request()) { throw ApException("Location::sendPublicChat: Msg_Protocol_SendPublicChat failed, %s", StringType(sLocationUrl_)); }
 }
 
+String Location::getNickname(const ApHandle& hParticipant)
+{
+  String sNickname;
+
+  Participant* pParticipant = 0;
+  participants_.Get(hParticipant, pParticipant);
+  if (pParticipant != 0) {
+    Apollo::ValueList lMimeTypes;
+    String sMimeType;
+    pParticipant->getDetailString(Msg_VpView_ParticipantDetail_Nickname, lMimeTypes, sNickname, sMimeType);
+  }
+
+  return sNickname;
+}
+
 void Location::onReceivePublicChat(const ApHandle& hParticipant, const String& sText, int nSec, int nMicroSec)
 {
   ApHandle hChat = Apollo::newHandle();
 
   Participant* pParticipant = 0;
   participants_.Get(hParticipant, pParticipant);
-  if (pParticipant != 0) {
-    Apollo::ValueList l;
-    String sNickname;
-    String sMimeType;
-    pParticipant->getDetailString(Msg_VpView_ParticipantDetail_Nickname, l, sNickname, sMimeType);
 
+  if (ApIsHandle(hParticipant) && pParticipant != 0) {
+    String sNickname = getNickname(hParticipant);
+
+    int bIsNew = 1;
     Apollo::TimeValue tvStamp;
     if (nSec <= 0) {
       tvStamp = Apollo::getNow();
     } else {
       tvStamp = Apollo::TimeValue(nSec, nMicroSec);
+      bIsNew = 0;
     }
-    Chat* pChat = new Chat(apHandle(), hParticipant, hChat, sNickname, sText, tvStamp);
-    if (pChat != 0 && pParticipant != 0) {
-      //pParticipant->onReceivePublicChat(sText);
 
-      if (pParticipant->isSubscribedDetail(Msg_VpView_ParticipantDetail_PublicChat)) {
-        pChat->send_VpView_LocationPublicChat();
-      }
+    String sChatline;
+    {
+      Msg_Vp_FilterPublicChat msg;
+      msg.hLocation = hAp_;
+      msg.hParticipant = hParticipant;
+      msg.sText = sText;
+      msg.Filter();
 
-      // Store the thing
-      int nMaxPublicChatLines = Apollo::getModuleConfig(MODULE_NAME, "Location/MaxChatLines", 100);
-      if (nMaxPublicChatLines < 0) { nMaxPublicChatLines = 0; }
-      if (nMaxPublicChatLines > 0) {
-        lChats_.AddFirst(pChat);
-      } // nMaxPublicChatLines
+      sChatline = msg.sText;
+    }
 
-      cleanupChat();
-    } // pChat
+    if (sChatline) {
+      Chat* pChat = new Chat(apHandle(), hParticipant, hChat, sNickname, sChatline, tvStamp);
+      if (pChat != 0 && pParticipant != 0) {
+        //pParticipant->onReceivePublicChat(sChatline);
+
+        if (pParticipant->isSubscribedDetail(Msg_VpView_ParticipantDetail_PublicChat)) {
+          pChat->send_VpView_LocationPublicChat(bIsNew);
+        }
+
+        // Store the thing
+        int nMaxPublicChatLines = Apollo::getModuleConfig(MODULE_NAME, "Location/MaxChatLines", 100);
+        if (nMaxPublicChatLines < 0) { nMaxPublicChatLines = 0; }
+        if (nMaxPublicChatLines > 0) {
+          lChats_.AddFirst(pChat);
+        } // nMaxPublicChatLines
+
+        cleanupChat();
+      } // pChat
+    } // is Chat
+
   } // pParticipant
+}
+
+void Location::onFilterPublicChat(const ApHandle& hParticipant, String& sText)
+{
+  String sLine = sText;
+  String sCmd;
+  sLine.nextToken(" ", sCmd);
+
+  if (0) {
+  } else if (sCmd == "/do") {
+    sLine.trimWSP();
+
+    Msg_VpView_LocationPublicAction msg;
+    msg.hLocation = hAp_;
+    msg.hParticipant = hParticipant;
+    msg.sAction = sLine;
+    msg.Send();
+
+    // Translate sText
+    sText = "*" + getNickname(hParticipant) + " " + sLine;
+  }
 }
 
 void Location::replayChats(int nMaxAge, int nMaxLines, int nMaxData)
@@ -529,7 +580,7 @@ void Location::replayChats(int nMaxAge, int nMaxLines, int nMaxData)
   {
     Chat* pChat = 0;
     while ((pChat = lChatOut.First()) != 0) {
-      pChat->send_VpView_LocationPublicChat();
+      pChat->send_VpView_LocationPublicChat(0);
       lChatOut.Remove(pChat);
       lChats_.AddFirst(pChat);
     }

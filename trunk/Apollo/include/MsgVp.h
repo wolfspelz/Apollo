@@ -109,6 +109,17 @@ public:
   ApIN ApHandle hLocation;
 };
 
+// vp -> vp
+// Process chat command
+class Msg_Vp_FilterPublicChat: public ApFilterMessage
+{
+public:
+  Msg_Vp_FilterPublicChat() : ApFilterMessage("Vp_FilterPublicChat") {}
+  ApIN ApHandle hLocation;
+  ApIN ApHandle hParticipant;
+  ApINOUT String sText;
+};
+
 //-----------------------------------------
 
 class Msg_Vp_SendPublicChat: public ApRequestMessage

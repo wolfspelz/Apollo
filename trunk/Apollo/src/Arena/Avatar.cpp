@@ -64,9 +64,9 @@ void Avatar::Destroy()
       pModule_->DeleteParticipantOfAnimation(hAnimatedItem_, hParticipant_);
     }
 
-    Msg_Animation_Stop msgAS;
-    msgAS.hItem = hAnimatedItem_;
-    if (!msgAS.Request()) {
+    Msg_Animation_Stop msg;
+    msg.hItem = hAnimatedItem_;
+    if (!msg.Request()) {
       apLog_Error((LOG_CHANNEL, "Avatar::Hide", "Msg_Animation_Stop failed: participant=" ApHandleFormat "", ApHandleType(hParticipant_)));
     }
   }
@@ -134,9 +134,7 @@ void Avatar::GetDetailString(const String& sKey, Apollo::ValueList& vlMimeTypes)
       if (sOnlineStatus_ != msg.sValue) {
         sOnlineStatus_ = msg.sValue;
 
-        if (sOnlineStatus_ == "available" || sOnlineStatus_ == "" || sOnlineStatus_ == "chat") {
-          ResumeAnimation();
-        } else if (sOnlineStatus_ == "away" || sOnlineStatus_ == "xa" || sOnlineStatus_ == "dnd") {
+        if (sOnlineStatus_ == "away" || sOnlineStatus_ == "xa" || sOnlineStatus_ == "dnd") {
           SuspendAnimation();
         } else {
           ResumeAnimation();
@@ -276,10 +274,21 @@ void Avatar::HandleImageData(const String& sMimeType, const String& sSource, Buf
 void Avatar::SuspendAnimation()
 {
   if (ApIsHandle(hAnimatedItem_)) {
-    Msg_Animation_Stop msgAS;
-    msgAS.hItem = hAnimatedItem_;
-    if (!msgAS.Request()) {
-      apLog_Error((LOG_CHANNEL, "Avatar::SuspendAnimation", "Msg_Animation_Stop failed: participant=" ApHandleFormat "", ApHandleType(hParticipant_)));
+    {
+      Msg_Animation_Static msg;
+      msg.hItem = hAnimatedItem_;
+      msg.bState = 1;
+      if (!msg.Request()) {
+        apLog_Error((LOG_CHANNEL, "Avatar::SuspendAnimation", "Msg_Animation_Static failed: participant=" ApHandleFormat "", ApHandleType(hParticipant_)));
+      }
+    }
+
+    {
+      Msg_Animation_Stop msg;
+      msg.hItem = hAnimatedItem_;
+      if (!msg.Request()) {
+        apLog_Error((LOG_CHANNEL, "Avatar::SuspendAnimation", "Msg_Animation_Stop failed: participant=" ApHandleFormat "", ApHandleType(hParticipant_)));
+      }
     }
   }
 }
@@ -287,10 +296,21 @@ void Avatar::SuspendAnimation()
 void Avatar::ResumeAnimation()
 {
   if (ApIsHandle(hAnimatedItem_)) {
-    Msg_Animation_Start msgAS;
-    msgAS.hItem = hAnimatedItem_;
-    if (!msgAS.Request()) {
-      apLog_Error((LOG_CHANNEL, "Avatar::ResumeAnimation", "Msg_Animation_Start failed: participant=" ApHandleFormat "", ApHandleType(hParticipant_)));
+    {
+      Msg_Animation_Static msg;
+      msg.hItem = hAnimatedItem_;
+      msg.bState = 0;
+      if (!msg.Request()) {
+        apLog_Error((LOG_CHANNEL, "Avatar::ResumeAnimation", "Msg_Animation_Static failed: participant=" ApHandleFormat "", ApHandleType(hParticipant_)));
+      }
+    }
+
+    {
+      Msg_Animation_Start msg;
+      msg.hItem = hAnimatedItem_;
+      if (!msg.Request()) {
+        apLog_Error((LOG_CHANNEL, "Avatar::ResumeAnimation", "Msg_Animation_Start failed: participant=" ApHandleFormat "", ApHandleType(hParticipant_)));
+      }
     }
   }
 }
@@ -344,6 +364,18 @@ void Avatar::OnReceivePublicChat(const ApHandle& hChat, const String& sNickname,
     RemoveOldPublicChats(3);
 
     DisplayAddChatline(hChat, sText);
+  }
+}
+
+void Avatar::OnReceivePublicAction(const String& sAction)
+{
+  if (ApIsHandle(hAnimatedItem_)) {
+    Msg_Animation_Event msg;
+    msg.hItem = hAnimatedItem_;
+    msg.sEvent = sAction;
+    if (!msg.Request()) {
+      apLog_Error((LOG_CHANNEL, "Avatar::OnReceivePublicAction", "Msg_Animation_Event failed: participant=" ApHandleFormat " event=%s", ApHandleType(hParticipant_), StringType(sAction)));
+    }
   }
 }
 
@@ -457,14 +489,6 @@ void Avatar::DisplaySetOnlineStatus(const String& sStatus)
   dsm.srpc.set("hParticipant", hParticipant_);
   dsm.srpc.set("sStatus", sStatus);
   dsm.Request();
-}
-
-void Avatar::DisplayCreateChatContainer(const String& sContainer)
-{
-}
-
-void Avatar::DisplayDeleteAllChatBubbles(const String& sContainer)
-{
 }
 
 void Avatar::DisplayAddChatline(const ApHandle& hChat, const String& sText)

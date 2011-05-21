@@ -121,6 +121,7 @@ public:
 
   void sendPublicChat(const String& sText);
   void onReceivePublicChat(const ApHandle& hParticipant, const String& sText, int nSec, int nMicroSec);
+  void onFilterPublicChat(const ApHandle& hParticipant, String& sText);
   void replayChats(int nMaxAge, int nMaxLines, int nMaxData);
   void cleanupChat();
 
@@ -139,6 +140,7 @@ protected:
   int splitLocationUrl(String& sProtocol, String& sRoom);
   String& protocol();
   String& room();
+  String getNickname(const ApHandle& hParticipant);
 
   friend class StateLocationThingyProvider;
   String state2String(State nState);

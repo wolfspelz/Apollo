@@ -45,6 +45,7 @@ public:
   void OnParticipantsChanged();
   void OnParticipantDetailsChanged(const ApHandle& hParticipant, Apollo::ValueList& vlKeys);
   void OnReceivePublicChat(const ApHandle& hParticipant, const ApHandle& hChat, const String& sNickname, const String& sText, const Apollo::TimeValue& tv);
+  void OnReceivePublicAction(const ApHandle& hParticipant, const String& sAction);
   void OnContextDetailsChanged(Apollo::ValueList& vlKeys);
   void OnAvatarAnimationBegin(const ApHandle& hParticipant, const String& sUrl);
   void OnCallModuleSrpc(Apollo::SrpcMessage& request, Apollo::SrpcMessage& response);

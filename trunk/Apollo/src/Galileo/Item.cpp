@@ -439,6 +439,17 @@ void Item::PlayEvent(const String& sEvent)
   sEvent_ = sEvent;
 }
 
+void Item::PlayStatic(int bState)
+{
+  if (bStatic_ != bState) {
+    bStatic_ = bState;
+
+    if (bStatic_) {
+      OnTimer();
+    }
+  }
+}
+
 //void Item::SetPosition(int nX)
 //{
 //  nX_ = nX;
@@ -593,7 +604,11 @@ void Item::Step(Apollo::TimeValue& tvCurrent)
     Apollo::TimeValue tvDelay = tvCurrent - tvLastTimer_;
     int nInSequenceMSec = nSpentInCurrentSequenceMSec_ + tvDelay.MilliSec();
 
-    if (nInSequenceMSec > pCurrentSequence_->Duration()) {
+    if (bStatic_ || sEvent_) {
+      nInSequenceMSec = pCurrentSequence_->Duration();
+    }
+
+    if (nInSequenceMSec >= pCurrentSequence_->Duration()) {
       pPreviousSequence = pCurrentSequence_;
 
       pNextSequence = SelectNextSequence();
@@ -660,6 +675,12 @@ Sequence* Item::SelectNextSequence()
 {
   String sSequence;
   int bFinal = 0;
+
+  if (!sSequence) {
+    if (bStatic_) {
+      sSequence = GetDefaultSequenceName();
+    }
+  }
 
   if (!sSequence) {
     if (sNextSequence_) {
@@ -764,13 +785,7 @@ Sequence* Item::SelectNextSequence()
   }
 
   if (pSequence == 0) {
-    pSequence = GetSequenceByGroup(Item_Group_Standard);
-  }
-
-  if (pSequence == 0) {
-    if (sDefaultSequence_){
-      Sequence* pSequence = GetSequenceByName(sDefaultSequence_);
-    }
+    pSequence = GetDefaultSequence();
   }
 
   if (pSequence == 0) {
@@ -835,4 +850,27 @@ Sequence* Item::GetSequenceByGroupOrName(const String& sGroupOrName)
   }
 
   return pSequence;
+}
+
+Sequence* Item::GetDefaultSequence()
+{
+  Sequence* pSequence = GetSequenceByGroup(Item_Group_Standard);
+
+  if (pSequence == 0) {
+    if (sDefaultSequence_){
+      Sequence* pSequence = GetSequenceByName(sDefaultSequence_);
+    }
+  }
+
+  return pSequence;
+}
+
+String Item::GetDefaultSequenceName()
+{
+  Sequence* pSequence = GetDefaultSequence();
+  if (pSequence != 0) {
+    return pSequence->getName();
+  }
+
+  return "";
 }
