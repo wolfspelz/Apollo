@@ -61,6 +61,7 @@ public:
   void On_Animation_SetStatus(Msg_Animation_SetStatus* pMsg);
   void On_Animation_SetCondition(Msg_Animation_SetCondition* pMsg);
   void On_Animation_Event(Msg_Animation_Event* pMsg);
+  void On_Animation_Static(Msg_Animation_Static* pMsg);
   //void On_Animation_SetPosition(Msg_Animation_SetPosition* pMsg);
   //void On_Animation_MoveTo(Msg_Animation_MoveTo* pMsg);
   //void On_Animation_GetPosition(Msg_Animation_GetPosition* pMsg);

@@ -470,7 +470,7 @@ public:
 class Msg_VpView_LocationPublicChat: public ApNotificationMessage
 {
 public:
-  Msg_VpView_LocationPublicChat() : ApNotificationMessage("VpView_LocationPublicChat"), nSec(0), nMicroSec(0) {}
+  Msg_VpView_LocationPublicChat() : ApNotificationMessage("VpView_LocationPublicChat"), nSec(0), nMicroSec(0), bIsNew(0) {}
   ApIN ApHandle hLocation;
   ApIN ApHandle hParticipant;
   ApIN ApHandle hChat;
@@ -478,6 +478,17 @@ public:
   ApIN String sText;
   ApIN int nSec;
   ApIN int nMicroSec;
+  ApIN int bIsNew;
+};
+
+// VPA -> 
+class Msg_VpView_LocationPublicAction: public ApNotificationMessage
+{
+public:
+  Msg_VpView_LocationPublicAction() : ApNotificationMessage("VpView_LocationPublicAction") {}
+  ApIN ApHandle hLocation;
+  ApIN ApHandle hParticipant;
+  ApIN String sAction;
 };
 
 // -> VPA

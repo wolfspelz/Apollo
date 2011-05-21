@@ -89,6 +89,15 @@ public:
   ApIN String sEvent;
 };
 
+// -> Animation
+class Msg_Animation_Static: public ApRequestMessage
+{
+public:
+  Msg_Animation_Static() : ApRequestMessage("Animation_Static"), bState(1) {}
+  ApIN ApHandle hItem;
+  ApIN int bState;
+};
+
 //// -> Animation
 //class Msg_Animation_SetPosition: public ApRequestMessage
 //{

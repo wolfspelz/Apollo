@@ -23,7 +23,7 @@ Chat::~Chat()
 {
 }
 
-void Chat::send_VpView_LocationPublicChat()
+void Chat::send_VpView_LocationPublicChat(int bIsNew)
 {
   Apollo::TimeValue tvNow = Apollo::getNow();
   Apollo::TimeValue tvAge = tvNow - tvCreated_;
@@ -38,5 +38,6 @@ void Chat::send_VpView_LocationPublicChat()
   //msg.nMicroSec = tvAge.MicroSec();
   msg.nSec = tvCreated_.Sec();
   msg.nMicroSec = tvCreated_.MicroSec();
+  msg.bIsNew = bIsNew;
   msg.Send();
 }

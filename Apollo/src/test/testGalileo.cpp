@@ -438,9 +438,10 @@ public:
   {
     sDescription_ = "WaveCheerWave";
     int nCnt = 0;
-    lExpectedSequences_.AddLast("wave", ++nCnt);
-    lExpectedSequences_.AddLast("cheer", ++nCnt);
-    lExpectedSequences_.AddLast("wave", ++nCnt);
+    lExpectedSequences_.AddLast("wave", ++nCnt); // status wave
+    lExpectedSequences_.AddLast("wave", ++nCnt); // very short wave, just started, but interrupted by cheer event
+    lExpectedSequences_.AddLast("cheer", ++nCnt); // full cheer event
+    lExpectedSequences_.AddLast("wave", ++nCnt); // after event fll back to status wave
     nTerminateAtSequenceNumber_ = nCnt;
   }
 
@@ -459,15 +460,22 @@ public:
   }
 
   void OnSequenceBegin() {
-    if (nCntSeqenceBegin_ == 1) {
+    //if (nCntSeqenceBegin_ == 1) {
+    //  Msg_Animation_Event msg;
+    //  msg.hItem = hItem_;
+    //  msg.sEvent = "cheer";
+    //  msg.Request();
+    //}
+  }
+
+  void OnSequenceEnd() {
+    if (nCntSeqenceEnd_ == 1) {
       Msg_Animation_Event msg;
       msg.hItem = hItem_;
       msg.sEvent = "cheer";
       msg.Request();
     }
   }
-
-  void OnSequenceEnd() {}
 };
 
 String Test_Galileo_Display_Begin()

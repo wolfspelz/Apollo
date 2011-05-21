@@ -28,20 +28,7 @@ void Dialog::Create(int nLeft, int nTop, int nWidth, int nHeight, int bVisible, 
     if (!Msg_WebView_Position::_(hView, nLeft, nTop, nWidth, nHeight)) { throw ApException("Msg_WebView_Position failed"); }
     if (!Msg_WebView_Visibility::_(hView, bVisible)) { throw ApException("Msg_WebView_Visibility failed"); }
     if (!Msg_WebView_SetScriptAccessPolicy::Allow(hView)) { throw ApException("Msg_WebView_SetScriptAccessPolicy failed"); }
-    
-    String sHtml = String()
-      + "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\" \"http://www.w3.org/TR/html4/loose.dtd\">\n"
-      + "<html>\n"
-      + "<head>\n"
-      + "</head>\n"
-      + "<body style=\"padding:24px 10px 10px 10px; xbackground-color:#FF8080\">\n"
-      + "<iframe frameborder=\"0\" style=\"width:100%; height:100%;\" src=\"" + sContentUrl + "\"></iframe>\n"
-      + "</body>\n"
-      + "</html>\n"
-      ;
-
-    String sBase = "file://" + Apollo::getModuleResourcePath(MODULE_NAME) + "Dialog.html";
-    if (!Msg_WebView_Load::_(hView, sBase)) { throw ApException("Msg_WebView_LoadHtml failed"); }
+    if (!Msg_WebView_Load::_(hView, "file://" + Apollo::getModuleResourcePath(MODULE_NAME) + "Dialog.html")) { throw ApException("Msg_WebView_Load failed"); }
 
     //if (!Msg_WebView_SetNavigationPolicy::Deny(hView)) { throw ApException("Msg_WebView_SetNavigationPolicy failed"); }
 

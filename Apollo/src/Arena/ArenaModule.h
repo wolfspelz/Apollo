@@ -60,6 +60,7 @@ public:
   void On_VpView_LocationContextsChanged(Msg_VpView_LocationContextsChanged* pMsg);
   void On_VpView_ParticipantsChanged(Msg_VpView_ParticipantsChanged* pMsg);
   void On_VpView_LocationPublicChat(Msg_VpView_LocationPublicChat* pMsg);
+  void On_VpView_LocationPublicAction(Msg_VpView_LocationPublicAction* pMsg);
   void On_VpView_LocationDetailsChanged(Msg_VpView_LocationDetailsChanged* pMsg);
   void On_VpView_ContextDetailsChanged(Msg_VpView_ContextDetailsChanged* pMsg);
   void On_VpView_ParticipantDetailsChanged(Msg_VpView_ParticipantDetailsChanged* pMsg);

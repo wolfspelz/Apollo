@@ -352,30 +352,27 @@ String GalileoModuleTester::Test_PlayWave()
   if (!s) { t += d; s = Test_PlayStep(i, t, "idle", 220); }
   if (!s) { t += d; s = Test_PlayStep(i, t, "idle", 330); }
   i.PlayEvent("wave");
-  if (!s) { t += d; s = Test_PlayStep(i, t, "idle", 440); }
-  if (!s) { t += d; s = Test_PlayStep(i, t, "idle", 550); }
-  if (!s) { t += d; s = Test_PlayStep(i, t, "idle", 660); }
-  if (!s) { t += d; s = Test_PlayStep(i, t, "idle", 770); }
-  if (!s) { t += d; s = Test_PlayStep(i, t, "idle", 880); }
-  if (!s) { t += d; s = Test_PlayStep(i, t, "idle", 990); }
-  if (!s) { t += d; s = Test_PlayStep(i, t, "wave", 100); }
-  if (!s) { t += d; s = Test_PlayStep(i, t, "wave", 210); }
-  if (!s) { t += d; s = Test_PlayStep(i, t, "wave", 320); }
-  if (!s) { t += d; s = Test_PlayStep(i, t, "wave", 430); }
-  if (!s) { t += d; s = Test_PlayStep(i, t, "wave", 540); }
-  if (!s) { t += d; s = Test_PlayStep(i, t, "wave", 650); }
-  if (!s) { t += d; s = Test_PlayStep(i, t, "wave", 760); }
-  if (!s) { t += d; s = Test_PlayStep(i, t, "wave", 870); }
-  if (!s) { t += d; s = Test_PlayStep(i, t, "wave", 980); }
-  if (!s) { t += d; s = Test_PlayStep(i, t, "wave", 1090); }
-  if (!s) { t += d; s = Test_PlayStep(i, t, "wave", 1200); }
-  if (!s) { t += d; s = Test_PlayStep(i, t, "wave", 1310); }
-  if (!s) { t += d; s = Test_PlayStep(i, t, "wave", 1420); }
-  if (!s) { t += d; s = Test_PlayStep(i, t, "wave", 1530); }
-  if (!s) { t += d; s = Test_PlayStep(i, t, "wave", 1640); }
-  if (!s) { t += d; s = Test_PlayStep(i, t, "wave", 1750); }
-  if (!s) { t += d; s = Test_PlayStep(i, t, "idle", 60); }
-  if (!s) { t += d; s = Test_PlayStep(i, t, "idle", 170); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "wave", 0); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "wave", 110); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "wave", 220); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "wave", 330); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "wave", 440); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "wave", 550); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "wave", 660); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "wave", 770); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "wave", 880); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "wave", 990); }
+
+  if (!s) { t += d; s = Test_PlayStep(i, t, "wave", 1100); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "wave", 1210); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "wave", 1320); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "wave", 1430); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "wave", 1540); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "wave", 1650); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "wave", 1760); }
+
+  if (!s) { t += d; s = Test_PlayStep(i, t, "idle", 70); }
+  if (!s) { t += d; s = Test_PlayStep(i, t, "idle", 180); }
 
   { Msg_Galileo_ClearAllStorage msg; (void) msg.Request(); }
   { Msg_Galileo_SetStorageName msg; msg.sName = sOrigDb; (void) msg.Request(); }

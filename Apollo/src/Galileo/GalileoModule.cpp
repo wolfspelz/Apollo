@@ -151,6 +151,17 @@ AP_MSG_HANDLER_METHOD(GalileoModule, Animation_Event)
   pMsg->apStatus = ApMessage::Ok;
 }
 
+AP_MSG_HANDLER_METHOD(GalileoModule, Animation_Static)
+{
+  ItemListNode* pNode = items_.Find(pMsg->hItem);
+  if (pNode == 0) { return; }
+  Item* pItem = pNode->Value();
+
+  pItem->PlayStatic(pMsg->bState);
+
+  pMsg->apStatus = ApMessage::Ok;
+}
+
 //AP_MSG_HANDLER_METHOD(GalileoModule, Animation_SetPosition)
 //{
 //  ItemListNode* pNode = items_.Find(pMsg->hItem);
@@ -632,6 +643,7 @@ int GalileoModule::Init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, GalileoModule, Animation_SetStatus, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, GalileoModule, Animation_SetCondition, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, GalileoModule, Animation_Event, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, GalileoModule, Animation_Static, this, ApCallbackPosNormal);
   //AP_MSG_REGISTRY_ADD(MODULE_NAME, GalileoModule, Animation_SetPosition, this, ApCallbackPosNormal);
   //AP_MSG_REGISTRY_ADD(MODULE_NAME, GalileoModule, Animation_MoveTo, this, ApCallbackPosNormal);
   //AP_MSG_REGISTRY_ADD(MODULE_NAME, GalileoModule, Animation_GetPosition, this, ApCallbackPosNormal);
