@@ -31,9 +31,9 @@ function Hide()
 </style>
 
 </head>
-<body style="overflow:hidden;" onload="api.LogUser('Developer HTML loading')" onunload="api.LogUser('Developer HTML unloading')">
+<body style="overflow:hidden;" onload="api.Log.User('Developer HTML loading')" onunload="api.Log.User('Developer HTML unloading')">
 <div style="width:100%; height:100%; border:1px solid #000000; background-color:rgba(240,240,255,0.7);">
-  <div class="Move" style="cursor:default; width:100%; height:20px; border-bottom:1px solid #000000; background-color:#00ff00;">Caption</div>
+  <div class="cApMove" style="cursor:default; width:100%; height:20px; border-bottom:1px solid #000000; background-color:#00ff00;">Caption</div>
   <p id="iText" style="border:1px solid #0000ff; background:white;" contenteditable="true">--</p>
   <img alt="" src="http://webkit.org/images/icon-gold.png" />
   <img alt="" src="test1.png" />
@@ -46,7 +46,7 @@ function Hide()
     <input type="button" value="System_Echo" onclick="SetText(api.Message('System_Echo').setInt('nIn', 42).send().toString());"/>
     <input type="button" value="CustomType" onclick="SetText(api.Message('Method1').setString('ApType', 'CustomType').setInt('nParam', 42).send().toString());"/>
   </p>
-  <div class="SizeBottomRight" style="cursor:se-resize; width:20px; height:20px; background-image:url(sizer-se.png); position:absolute; right:1px; bottom:1px;" />
+  <div class="cApSizeBottomRight" style="cursor:se-resize; width:20px; height:20px; background-image:url(sizer-se.png); position:absolute; right:1px; bottom:1px;" />
 </div>
 </body>
 </html>
