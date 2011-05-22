@@ -197,6 +197,14 @@
 			UniqueIdentifier="{3328E564-2C57-4e03-ABD3-9766EC03B42C}"
 			>
 		</Filter>
+		<File
+			RelativePath="..\..\bin\Win32\Debug\modules\Dialog\apollo.js"
+			>
+		</File>
+		<File
+			RelativePath="..\..\bin\Win32\Debug\modules\Dialog\Dialog.html"
+			>
+		</File>
 	</Files>
 	<Globals>
 	</Globals>

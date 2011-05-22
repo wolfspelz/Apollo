@@ -209,7 +209,19 @@
 			>
 		</Filter>
 		<File
-			RelativePath="..\..\bin\Win32\Debug\modules\WebView\html\test\apollo.js"
+			RelativePath="..\..\bin\Win32\Debug\modules\WebView\test\apollo.js"
+			>
+		</File>
+		<File
+			RelativePath="..\..\bin\Win32\Debug\modules\WebView\test\CallCustomEcho.html"
+			>
+		</File>
+		<File
+			RelativePath="..\..\bin\Win32\Debug\modules\WebView\test\CallJSEcho.html"
+			>
+		</File>
+		<File
+			RelativePath="..\..\bin\Win32\Debug\modules\WebView\test\CallSystemEcho.html"
 			>
 		</File>
 		<File
@@ -217,7 +229,11 @@
 			>
 		</File>
 		<File
-			RelativePath="..\..\bin\Win32\Debug\modules\WebView\html\test\dev.html"
+			RelativePath="..\..\bin\Win32\Debug\modules\WebView\test\dev.html"
+			>
+		</File>
+		<File
+			RelativePath="..\..\bin\Win32\Debug\modules\WebView\test\LoadHtml.js"
 			>
 		</File>
 	</Files>

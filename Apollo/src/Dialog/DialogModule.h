@@ -71,6 +71,7 @@ public:
   static void End();
 
   static String CreateWaitCloseByContent();
+  static String ExternalUrl();
 };
 
 #endif
