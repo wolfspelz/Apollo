@@ -282,13 +282,27 @@ ApolloApi.prototype =
   // ------------------------------------------------
   // Babelfish
   
-  Translate: function(sContext, sText)
+  TranslateElement: function(oElement, sContext)
   {
-    if (sText == null) {
-      sText = sContext;
-      sContext = '';
+    if (oElement.innerText && oElement.innerText != '') {
+      Log.Debug(oElement.innerText);
+      oElement.innerText = api.Translate(oElement.innerText);
     }
     
+    if (oElement.tagName && oElement.tagName == 'INPUT') {
+      for (var i = 0; i < oElement.attributes.length; i++) {
+        if (oElement.attributes[i].name == 'type') {
+          if (oElement.attributes[i].value == 'button' || oElement.attributes[i].value == 'submit') {
+            oElement.value = api.Translate(oElement.value, sContext);
+            break;
+          }
+        }
+      }
+    }
+  },
+
+  Translate: function(sText, sContext)
+  {
     var sTranslated = api.Message('Translation_Get')
       .setString('sModule', api.moduleName)
       .setString('sContext', sContext)
@@ -315,9 +329,6 @@ ApolloApi.prototype =
   nSizeDirection: 8,
   nMinWidth: 100,
   nMinHeight: 100,
-  bDeferredSend: false,
-  nSendDx: 0,
-  nSendDy: 0,
   
   OnMouseDown: function(ev)
   {
@@ -366,46 +377,6 @@ ApolloApi.prototype =
     return false;
   },
 
-//  OnMouseMove: function(ev)
-//  {
-//    if (api.bMouseCaptured) {
-//      var dx = ev.x - api.nStartX;
-//      var dy = ev.y - api.nStartY;
-//      if (!api.bMouseActive) {
-//        if (dx > 4 || dx < -4 || dy > 4 || dy < -4) {
-//          api.bMouseActive = true;
-//        }
-//      }
-//      if (api.bMouseActive) {
-//        if (api.bIsMove) {
-//          api.Message('WebView_MoveBy').setInt('nX', dx).setInt('nY', dy).send();
-//        }
-//        if (api.bIsSize) {
-//          if (dx < 0 || dy < 0) {
-//            var pos = api.Message('WebView_GetPosition').send();
-//            var nW = pos.getInt('nWidth');
-//            var nH = pos.getInt('nHeight');
-//            var nNewW = nW + dx;
-//            var nNewH = nH + dy;
-//            if (nNewW < api.nMinWidth) { dx = api.nMinWidth - nW; }
-//            if (nNewH < api.nMinHeight) { dy = api.nMinHeight - nH; }
-//          }
-
-//          api.Message('WebView_SizeBy')
-//            .setInt('nX', dx)
-//            .setInt('nY', dy)
-//            .setInt('nDirection', api.nSizeDirection)
-//            .send();
-
-//          api.nStartX += dx;
-//          api.nStartY += dy;
-//        }
-//      }
-//    }
-
-//    return false;
-//  },
-
   OnMouseMove: function(ev)
   {
     if (api.bMouseCaptured) {
@@ -431,35 +402,19 @@ ApolloApi.prototype =
             if (nNewH < api.nMinHeight) { dy = api.nMinHeight - nH; }
           }
 
-          if (!api.bDeferredSend) {
-            api.bDeferredSend = true;
-            window.setTimeout('api.SendMouseMove(true);', 100);
-          } else {
-            api.nSendDx += dx;
-            api.nSendDy += dy;
-            api.nStartX += dx;
-            api.nStartY += dy;
-          }
+          api.Message('WebView_SizeBy')
+            .setInt('nX', dx)
+            .setInt('nY', dy)
+            .setInt('nDirection', api.nSizeDirection)
+            .send();
+
+          api.nStartX += dx;
+          api.nStartY += dy;
         }
       }
     }
-    
-    return false;
-  },
 
-  SendMouseMove: function(bRepeatOnce)
-  {
-    api.Message('WebView_SizeBy')
-      .setInt('nX', api.nSendDx)
-      .setInt('nY', api.nSendDy)
-      .setInt('nDirection', api.nSizeDirection)
-      .send();
-    api.nSendDx = 0;
-    api.nSendDy = 0;
-    api.bDeferredSend = false;
-    if (bRepeatOnce) {
-      window.setTimeout('api.SendMouseMove(false);', 100);
-    }
+    return false;
   },
 
   OnMouseUp: function()

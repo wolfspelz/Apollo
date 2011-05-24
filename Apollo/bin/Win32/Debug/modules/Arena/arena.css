@@ -7,16 +7,6 @@
   font-size:9px;
 }
 
-#iContent
-{
-  position:absolute;
-  left:0;
-  top:0;
-  width:40%;
-  height:100%;
-  overflow:hidden;
-}
-
 #iMeta
 {
   position:absolute;
