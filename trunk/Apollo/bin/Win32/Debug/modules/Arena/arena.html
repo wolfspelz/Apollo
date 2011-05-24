@@ -26,9 +26,11 @@ function DispatchMessage(msg)
     case 'HideAvatar': return arena.HideAvatar(msg.getString('hParticipant')); break;
 
     case 'SetAvatarPosition': return arena.SetAvatarPosition(msg.getString('hParticipant'), msg.getInt('nX')); break;
+    case 'MoveAvatarPosition': return arena.MoveAvatarPosition(msg.getString('hParticipant'), msg.getInt('nX')); break;
     case 'SetAvatarNickname': return arena.SetAvatarNickname(msg.getString('hParticipant'), msg.getString('sNickname')); break;
     case 'SetAvatarImage': return arena.SetAvatarImage(msg.getString('hParticipant'), msg.getString('sUrl')); break;
-    case 'SetIconAttachment': return arena.SetIconAttachment(msg.getString('hParticipant'), msg.getString('sUrl'), msg.getString('sLabel'), msg.getString('sLink')); break;
+    case 'SetCommunityAttachment': return arena.SetCommunityAttachment(msg.getString('hParticipant'), msg.getString('sUrl'), msg.getString('sLabel'), msg.getString('sLink')); break;
+    case 'SetIconAttachment': return arena.SetIconAttachment(msg.getString('hParticipant'), msg.getString('sUrl'), msg.getString('sLabel')); break;
     case 'SetOnlineStatus': return arena.SetOnlineStatus(msg.getString('hParticipant'), msg.getString('sStatus')); break;
     case 'AddAvatarChat': return arena.AddAvatarChat(msg.getString('hParticipant'), msg.getString('hChat'), msg.getString('sText')); break;
     case 'SetAvatarChat': return arena.SetAvatarChat(msg.getString('hParticipant'), msg.getString('hChat'), msg.getString('sText')); break;
@@ -40,30 +42,6 @@ function DispatchMessage(msg)
 
     default: throw 'Unknown method: ' + sMethod;
   }
-}
-
-function TranslateElement(o)
-{
-  if (o.innerText && o.innerText != '') {
-    Log.Debug(o.innerText);
-    o.innerText = api.Translate(o.innerText);
-  }
-  if (o.tagName && o.tagName == 'INPUT') {
-    for (var i = 0; i < o.attributes.length; i++) {
-      if (o.attributes[i].name == 'type') {
-        if (o.attributes[i].value == 'button' || o.attributes[i].value == 'submit') {
-          Log.Debug(o.value);
-          o.value = api.Translate(o.value);
-          break;
-        }
-      }
-    }
-  }
-}
-
-function TranslateAll()
-{
-  $('.cTranslate').each( function () { TranslateElement(this); } );
 }
 
 function RunUnittest()
@@ -113,41 +91,8 @@ function RunUnittest()
 <body style="overflow:hidden;">
 <div id="iWrapper" style="width:100%; height:100%">
 
-  <div id="iContent" class="cContent">
+  <div id="iContent" class="cContent"></div>
 
-<!--
-    <div style="position:absolute; left:0px; bottom:0px; height:20px; width:60px; -webkit-box-shadow:inset 0 0 1px 1px #000000;"></div>
-    <div class="cParticipant" id="iParticipant" style="left:110px;">
-      <div class="cCenter">
-        <div class="cChatWrapper">
-          <div class="cChatContainer">
-            <div class="cChatBubble" id="iChat1">hasjd haksjd haksd sdjfasdjf </div>
-            <div class="cChatBubble" id="iChat2">ajhd</div>
-            <div class="cChatBubble" id="iChat3"> hasjd haksjd haksd fajhdgf ajhd 
-            gajshdgf ajshdg fajshd hasjd haksjd haksd fajhdgf ajhd gajshdgf 
-            ajshdg fajshdaskjdhfakjdhalskjdfsdfqeowrfhafjghdfjh hasjd haksjd
-             haksd fajhdgf ajhd gajshdgf</div>
-          </div>
-        </div>
-        <div class="cImageWrapper">
-          <div class="cImage" style="z-index:40;"></div>
-          <div class="cNickname" style="z-index:50;">Long Nickname</div>
-          <div class="cImageSensor">
-            <div class="cMenu" style="display:none; z-index:80;"><img class="cBubble" src="Bubble.png" /></div>
-            <div class="cChatIn" style="display:none; z-index:100;">
-              <table border="0" cellpadding="0" cellspacing="0"><tr>
-                <td><input type="text" class="cText" size="30" /></td>
-                <td><input type="submit" class="cTranslate" value="Send" /></td>
-                <td><img src="CloseChatInButton.png" class="cCloseButton" /></td>
-              </tr></table>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
--->
-
-  </div>
   <div id="iControl" style="position:absolute; left:40%; top:0; width:10%; height:100%; overflow:auto;">
     <input type="button" value="WebView_Reload" onclick="api.Message('WebView_Reload').send();" />
     <input type="button" value="reload()" onclick="document.location.reload();" />
@@ -156,11 +101,12 @@ function RunUnittest()
     <input type="checkbox" id="iLogCheck" checked="checked"/><label for="iLogCheck">Logging</label>
     <input type="button" value="Clear" onclick="Log.instance.Clear();" />
     <input type="button" value="Translate" onclick="Log.Info(api.Translate('ParamTest', 'Click me!'));" />
-    <input type="button" value="TranslateAll" onclick="TranslateAll();" />
     <input type="button" value="Connect" onclick="api.Message('Xmpp_Connect').send();" />
     <input type="button" value="Disconnect" onclick="api.Message('Xmpp_Disconnect').send();" />
   </div>
+
   <div id="iOut" style="position:absolute; left:50%; top:0; width:50%; height:100%; overflow:auto; white-space: nowrap;"></div>
+
 </div>
 </body>
 

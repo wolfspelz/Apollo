@@ -66,7 +66,8 @@ Arena.prototype = {
     + '    <div class="cImageWrapper" style="z-index:30;">'
     + '      <div class="cImage" style="z-index:40;"></div>'
     + '      <div class="cNickname" style="z-index:50;">Long Nickname</div>'
-    + '      <img class="cIcon" style="display:none; z-index:43;" />'
+    + '      <img class="cIcon" style="display:none; z-index:42;" />'
+    + '      <img class="cCommunity" style="display:none; z-index:43;" />'
     
     + (bSelf ? ''
       + '    <div class="cImageSensor" style="z-index:70;">'
@@ -95,6 +96,9 @@ Arena.prototype = {
     if (bSelf) {
       arena.ActivateSelfAvatarElements(hParticipant);
     }
+
+    $('#' + GetParticipantDomId(hParticipant) + ' .cTranslate').each( function () { api.TranslateElement(this); } );
+
   },
 
   RemoveAvatar: function (hParticipant)
@@ -114,7 +118,25 @@ Arena.prototype = {
 
   SetAvatarPosition: function (hParticipant, nX)
   {
-    $('#' + GetParticipantDomId(hParticipant)).css('left', (50 + nX) + 'px');
+    $('#' + GetParticipantDomId(hParticipant)).css('left', nX + 'px');
+  },
+
+  MoveAvatarPosition: function (hParticipant, nX)
+  {
+    var e = $('#' + GetParticipantDomId(hParticipant));
+
+    var nOldX = parseInt(e.get(0).offsetLeft);
+    
+    var nDiff = nX - nOldX;
+    if (nDiff < 0) { nDiff = -nDiff; };
+    var nTime = (nDiff * 1000) / 55;
+
+    e .stop(true)
+      .animate(
+        { left: nX + 'px' },
+        nTime,
+        'linear'
+      );
   },
 
   SetAvatarNickname: function (hParticipant, sNickname)
@@ -131,13 +153,12 @@ Arena.prototype = {
     img.src = sUrl;
   },
 
-  SetIconAttachment: function (hParticipant, sUrl, sLabel, sLink)
+  SetCommunityAttachment: function (hParticipant, sUrl, sLabel, sLink)
   {
-    var e = $('#' + GetParticipantDomId(hParticipant) + ' .cIcon');
+    var e = $('#' + GetParticipantDomId(hParticipant) + ' .cCommunity');
 
     if (sUrl && sUrl != '') {
-      e
-        .attr('title', EscapeHTML(sLabel))
+      e .attr('title', EscapeHTML(sLabel))
         .attr('src', sUrl)
         .css('display', '')
         .click(
@@ -145,6 +166,19 @@ Arena.prototype = {
             arena.OnIconAttachmentClicked(hParticipant, sLink);
           }
         );
+    } else {
+      e.css('display', 'none');
+    }
+  },
+
+  SetIconAttachment: function (hParticipant, sUrl, sLabel)
+  {
+    var e = $('#' + GetParticipantDomId(hParticipant) + ' .cIcon');
+
+    if (sUrl && sUrl != '') {
+      e .attr('title', EscapeHTML(sLabel))
+        .attr('src', sUrl)
+        .css('display', '');
     } else {
       e.css('display', 'none');
     }
@@ -161,13 +195,24 @@ Arena.prototype = {
     }
   },
 
+  LimitChat: function (sText, nLength)
+  {
+    if (nLength == null) { nLength = 256; }
+    var sNewText = sText;
+    sNewText = sText.substring(0, nLength);
+    if (sNewText.length != sText) {
+      sNewText += '...';
+    }
+    return sNewText;
+  },
+    
   AddAvatarChat: function (hParticipant, hChat, sText)
   {
     $('#' + GetParticipantDomId(hParticipant) + ' .cChatContainer').append(''
       + '<div id="' + GetChatDomId(hParticipant, hChat) + '" class="cChatBubble">' 
       + '<img src="CloseChatBubbleButton.png" class="cCloseButton" id="' + GetChatDomId(hParticipant, hChat) + '_Close" />'
       + '<span class="cText">'
-      + EscapeHTML(sText)
+      + EscapeHTML(arena.LimitChat(sText))
       + '</span>'
       + '</div>'
     );
@@ -207,7 +252,8 @@ Arena.prototype = {
 
   SetAvatarChat: function (hParticipant, hChat, sText)
   {
-    $('#' + GetChatDomId(hParticipant, hChat) + ' .cText').html(EscapeHTML(sText));
+    sText = sText.substring(0, 300);
+    $('#' + GetChatDomId(hParticipant, hChat) + ' .cText').html(EscapeHTML(arena.LimitChat(sText)));
   },
 
   RemoveAvatarChat: function (hParticipant, hChat)

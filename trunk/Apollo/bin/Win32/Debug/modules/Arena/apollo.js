@@ -282,6 +282,25 @@ ApolloApi.prototype =
   // ------------------------------------------------
   // Babelfish
   
+  TranslateElement: function(o)
+  {
+    if (o.innerText && o.innerText != '') {
+      Log.Debug(o.innerText);
+      o.innerText = api.Translate(o.innerText);
+    }
+    
+    if (o.tagName && o.tagName == 'INPUT') {
+      for (var i = 0; i < o.attributes.length; i++) {
+        if (o.attributes[i].name == 'type') {
+          if (o.attributes[i].value == 'button' || o.attributes[i].value == 'submit') {
+            o.value = api.Translate(o.value);
+            break;
+          }
+        }
+      }
+    }
+  },
+
   Translate: function(sContext, sText)
   {
     if (sText == null) {

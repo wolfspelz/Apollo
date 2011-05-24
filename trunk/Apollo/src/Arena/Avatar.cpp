@@ -36,13 +36,15 @@ void Avatar::Create(int bSelf)
   SubscribeAndGetDetail(Msg_VpView_ParticipantDetail_Nickname);
   SubscribeAndGetDetail(Msg_VpView_ParticipantDetail_Avatar);
   SubscribeAndGetDetail(Msg_VpView_ParticipantDetail_OnlineStatus);
-  SubscribeAndGetDetail(Msg_VpView_ParticipantDetail_Message);
+  //SubscribeAndGetDetail(Msg_VpView_ParticipantDetail_Message);
   SubscribeAndGetDetail(Msg_VpView_ParticipantDetail_Position);
-  SubscribeAndGetDetail(Msg_VpView_ParticipantDetail_Condition);
-  SubscribeAndGetDetail(Msg_VpView_ParticipantDetail_ProfileUrl);
+  //SubscribeAndGetDetail(Msg_VpView_ParticipantDetail_Condition);
+  //SubscribeAndGetDetail(Msg_VpView_ParticipantDetail_ProfileUrl);
   SubscribeAndGetDetail("CommunityTag");
   SubscribeAndGetDetail("CommunityName");
   SubscribeAndGetDetail("CommunityPage");
+  SubscribeAndGetDetail("AttachedIcon");
+  SubscribeAndGetDetail("AttachedIconName");
 }
 
 void Avatar::Destroy()
@@ -50,13 +52,15 @@ void Avatar::Destroy()
   UnSubscribeDetail(Msg_VpView_ParticipantDetail_Nickname);
   UnSubscribeDetail(Msg_VpView_ParticipantDetail_Avatar);
   UnSubscribeDetail(Msg_VpView_ParticipantDetail_OnlineStatus);
-  UnSubscribeDetail(Msg_VpView_ParticipantDetail_Message);
+  //UnSubscribeDetail(Msg_VpView_ParticipantDetail_Message);
   UnSubscribeDetail(Msg_VpView_ParticipantDetail_Position);
-  UnSubscribeDetail(Msg_VpView_ParticipantDetail_Condition);
-  UnSubscribeDetail(Msg_VpView_ParticipantDetail_ProfileUrl);
+  //UnSubscribeDetail(Msg_VpView_ParticipantDetail_Condition);
+  //UnSubscribeDetail(Msg_VpView_ParticipantDetail_ProfileUrl);
   UnSubscribeDetail("CommunityTag");
   UnSubscribeDetail("CommunityName");
   UnSubscribeDetail("CommunityPage");
+  UnSubscribeDetail("AttachedIcon");
+  UnSubscribeDetail("AttachedIconName");
 
   if (ApIsHandle(hAnimatedItem_)) {
     if (pModule_) {
@@ -151,8 +155,12 @@ void Avatar::GetDetailString(const String& sKey, Apollo::ValueList& vlMimeTypes)
       Elem* e = lCoords.FindByNameCase("x");
       if (e) {
         nX_ = String::atoi(e->getString());
-        nPositionConfirmed_ = 1;
-        DisplaySetAvatarPosition(nX_);
+        if (!nPositionConfirmed_) {
+          nPositionConfirmed_ = 1;
+          DisplaySetAvatarPosition(nX_);
+        } else {
+          DisplayMoveAvatarPosition(nX_);
+        }
       }
 
     } else if (sKey == Msg_VpView_ParticipantDetail_Condition) {
@@ -163,7 +171,7 @@ void Avatar::GetDetailString(const String& sKey, Apollo::ValueList& vlMimeTypes)
       if (sCommunityTag_ != msg.sValue) {
         sCommunityTag_ = msg.sValue;
         if (sCommunityTag_) {
-          DisplaySetIconAttachment(sCommunityTag_, sCommunityName_, sCommunityPage_);
+          DisplaySetCommunityAttachment(sCommunityTag_, sCommunityName_, sCommunityPage_);
         }
       }
 
@@ -171,7 +179,7 @@ void Avatar::GetDetailString(const String& sKey, Apollo::ValueList& vlMimeTypes)
       if (sCommunityName_ != msg.sValue) {
         sCommunityName_ = msg.sValue;
         if (sCommunityTag_) {
-          DisplaySetIconAttachment(sCommunityTag_, sCommunityName_, sCommunityPage_);
+          DisplaySetCommunityAttachment(sCommunityTag_, sCommunityName_, sCommunityPage_);
         }
       }
 
@@ -179,7 +187,23 @@ void Avatar::GetDetailString(const String& sKey, Apollo::ValueList& vlMimeTypes)
       if (sCommunityPage_ != msg.sValue) {
         sCommunityPage_ = msg.sValue;
         if (sCommunityTag_) {
-          DisplaySetIconAttachment(sCommunityTag_, sCommunityName_, sCommunityPage_);
+          DisplaySetCommunityAttachment(sCommunityTag_, sCommunityName_, sCommunityPage_);
+        }
+      }
+
+    } else if (sKey == "AttachedIcon") {
+      if (sAttachedIcon_ != msg.sValue) {
+        sAttachedIcon_ = msg.sValue;
+        if (sAttachedIcon_) {
+          DisplaySetIconAttachment(sAttachedIcon_, sAttachedIconName_);
+        }
+      }
+
+    } else if (sKey == "AttachedIconName") {
+      if (sAttachedIconName_ != msg.sValue) {
+        sAttachedIconName_ = msg.sValue;
+        if (sAttachedIcon_) {
+          DisplaySetIconAttachment(sAttachedIcon_, sAttachedIconName_);
         }
       }
 
@@ -473,13 +497,22 @@ void Avatar::DisplaySetImage(const String& sUrl)
   dsm.Request();
 }
 
-void Avatar::DisplaySetIconAttachment(const String& sUrl, const String& sLabel, const String& sLink)
+void Avatar::DisplaySetCommunityAttachment(const String& sUrl, const String& sLabel, const String& sLink)
+{
+  DisplaySrpcMessage dsm(pDisplay_, "SetCommunityAttachment");
+  dsm.srpc.set("hParticipant", hParticipant_);
+  dsm.srpc.set("sUrl", sUrl);
+  dsm.srpc.set("sLabel", sLabel);
+  dsm.srpc.set("sLink", sLink);
+  dsm.Request();
+}
+
+void Avatar::DisplaySetIconAttachment(const String& sUrl, const String& sLabel)
 {
   DisplaySrpcMessage dsm(pDisplay_, "SetIconAttachment");
   dsm.srpc.set("hParticipant", hParticipant_);
   dsm.srpc.set("sUrl", sUrl);
   dsm.srpc.set("sLabel", sLabel);
-  dsm.srpc.set("sLink", sLink);
   dsm.Request();
 }
 
@@ -540,6 +573,14 @@ void Avatar::DisplayRemoveChatline(const ApHandle& hChat)
 void Avatar::DisplaySetAvatarPosition(int nX)
 {
   DisplaySrpcMessage dsm(pDisplay_, "SetAvatarPosition");
+  dsm.srpc.set("hParticipant", hParticipant_);
+  dsm.srpc.set("nX", nX);
+  dsm.Request();
+}
+
+void Avatar::DisplayMoveAvatarPosition(int nX)
+{
+  DisplaySrpcMessage dsm(pDisplay_, "MoveAvatarPosition");
   dsm.srpc.set("hParticipant", hParticipant_);
   dsm.srpc.set("nX", nX);
   dsm.Request();
