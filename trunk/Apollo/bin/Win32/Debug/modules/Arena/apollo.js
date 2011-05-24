@@ -282,18 +282,18 @@ ApolloApi.prototype =
   // ------------------------------------------------
   // Babelfish
   
-  TranslateElement: function(o)
+  TranslateElement: function(oElement, sContext)
   {
-    if (o.innerText && o.innerText != '') {
-      Log.Debug(o.innerText);
-      o.innerText = api.Translate(o.innerText);
+    if (oElement.innerText && oElement.innerText != '') {
+      Log.Debug(oElement.innerText);
+      oElement.innerText = api.Translate(oElement.innerText);
     }
     
-    if (o.tagName && o.tagName == 'INPUT') {
-      for (var i = 0; i < o.attributes.length; i++) {
-        if (o.attributes[i].name == 'type') {
-          if (o.attributes[i].value == 'button' || o.attributes[i].value == 'submit') {
-            o.value = api.Translate(o.value);
+    if (oElement.tagName && oElement.tagName == 'INPUT') {
+      for (var i = 0; i < oElement.attributes.length; i++) {
+        if (oElement.attributes[i].name == 'type') {
+          if (oElement.attributes[i].value == 'button' || oElement.attributes[i].value == 'submit') {
+            oElement.value = api.Translate(oElement.value, sContext);
             break;
           }
         }
@@ -301,13 +301,8 @@ ApolloApi.prototype =
     }
   },
 
-  Translate: function(sContext, sText)
+  Translate: function(sText, sContext)
   {
-    if (sText == null) {
-      sText = sContext;
-      sContext = '';
-    }
-    
     var sTranslated = api.Message('Translation_Get')
       .setString('sModule', api.moduleName)
       .setString('sContext', sContext)

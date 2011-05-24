@@ -29,6 +29,17 @@ function GetChatDomId(hParticipant, hChat)
   return 'iP' + StringApHandleBrackets(hParticipant) + 'C' + StringApHandleBrackets(hChat);
 }
 
+function LimitChat(sText, nMaxLength)
+{
+  if (nMaxLength == null) { nMaxLength = 256; }
+  var sNewText = sText;
+  sNewText = sText.substring(0, nMaxLength);
+  if (sNewText.length != sText.length) {
+    sNewText += '...';
+  }
+  return sNewText;
+}
+  
 // -------------------------------------------
 
 function Arena(sDomId)
@@ -93,12 +104,10 @@ Arena.prototype = {
     arena.SetAvatarPosition(hParticipant, nX);
     arena.ShowAvatar(hParticipant);
     
-    if (bSelf) {
-      arena.ActivateSelfAvatarElements(hParticipant);
-    }
+    if (bSelf) { arena.ActivateSelfAvatarElements(hParticipant); }
+    else { arena.ActivatePeerAvatarElements(hParticipant); }
 
-    $('#' + GetParticipantDomId(hParticipant) + ' .cTranslate').each( function () { api.TranslateElement(this); } );
-
+    $('#' + GetParticipantDomId(hParticipant) + ' .cTranslate').each( function () { api.TranslateElement(this, null); } );
   },
 
   RemoveAvatar: function (hParticipant)
@@ -195,24 +204,13 @@ Arena.prototype = {
     }
   },
 
-  LimitChat: function (sText, nLength)
-  {
-    if (nLength == null) { nLength = 256; }
-    var sNewText = sText;
-    sNewText = sText.substring(0, nLength);
-    if (sNewText.length != sText) {
-      sNewText += '...';
-    }
-    return sNewText;
-  },
-    
   AddAvatarChat: function (hParticipant, hChat, sText)
   {
     $('#' + GetParticipantDomId(hParticipant) + ' .cChatContainer').append(''
       + '<div id="' + GetChatDomId(hParticipant, hChat) + '" class="cChatBubble">' 
       + '<img src="CloseChatBubbleButton.png" class="cCloseButton" id="' + GetChatDomId(hParticipant, hChat) + '_Close" />'
       + '<span class="cText">'
-      + EscapeHTML(arena.LimitChat(sText))
+      + EscapeHTML(LimitChat(sText))
       + '</span>'
       + '</div>'
     );
@@ -253,7 +251,7 @@ Arena.prototype = {
   SetAvatarChat: function (hParticipant, hChat, sText)
   {
     sText = sText.substring(0, 300);
-    $('#' + GetChatDomId(hParticipant, hChat) + ' .cText').html(EscapeHTML(arena.LimitChat(sText)));
+    $('#' + GetChatDomId(hParticipant, hChat) + ' .cText').html(EscapeHTML(LimitChat(sText)));
   },
 
   RemoveAvatarChat: function (hParticipant, hChat)
@@ -302,6 +300,10 @@ Arena.prototype = {
 
   // --------------------------------------
   // protected
+  
+  ActivatePeerAvatarElements: function (hParticipant)
+  {
+  },
   
   ActivateSelfAvatarElements: function (hParticipant)
   {

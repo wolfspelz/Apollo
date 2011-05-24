@@ -282,13 +282,27 @@ ApolloApi.prototype =
   // ------------------------------------------------
   // Babelfish
   
-  Translate: function(sContext, sText)
+  TranslateElement: function(oElement, sContext)
   {
-    if (sText == null) {
-      sText = sContext;
-      sContext = '';
+    if (oElement.innerText && oElement.innerText != '') {
+      Log.Debug(oElement.innerText);
+      oElement.innerText = api.Translate(oElement.innerText);
     }
     
+    if (oElement.tagName && oElement.tagName == 'INPUT') {
+      for (var i = 0; i < oElement.attributes.length; i++) {
+        if (oElement.attributes[i].name == 'type') {
+          if (oElement.attributes[i].value == 'button' || oElement.attributes[i].value == 'submit') {
+            oElement.value = api.Translate(oElement.value, sContext);
+            break;
+          }
+        }
+      }
+    }
+  },
+
+  Translate: function(sText, sContext)
+  {
     var sTranslated = api.Message('Translation_Get')
       .setString('sModule', api.moduleName)
       .setString('sContext', sContext)
