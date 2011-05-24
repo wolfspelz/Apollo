@@ -74,7 +74,7 @@
 .cNickname
 {
   position:absolute;
-  bottom:12px;
+  bottom:10px;
   left:70px;
   padding:1px;
   border:1px solid #7CC100;
@@ -83,18 +83,28 @@
   overflow:hidden;
   text-overflow:ellipsis;
   white-space:nowrap;
-  -webkit-box-shadow:0 0 6px #333333;
+  -webkit-box-shadow:0 0 6px #7CC100;
+}
+
+.cCommunity
+{
+  position:absolute;
+  top:31px;
+  left:90px;
+  max-width:32px;
+  max-height:32px;
+  overflow:hidden;
+  cursor:pointer;
 }
 
 .cIcon
 {
   position:absolute;
-  bottom:50px;
-  left:80px;
+  top:5px;
+  left:90px;
   max-width:24px;
   max-height:24px;
   overflow:hidden;
-  cursor:pointer;
 }
 
 .cImageSensor
@@ -118,7 +128,7 @@
 {
   position:absolute;
   left:-40px;
-  top:15px;
+  bottom:0px;
   background-color:#FFFFFF;
   padding:8px;
   -webkit-border-radius:5px;

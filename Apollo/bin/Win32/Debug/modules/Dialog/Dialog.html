@@ -13,16 +13,17 @@
   -webkit-box-shadow:0 0 12px #333333;
 }
 
-.WindowTop { position:absolute;left:8px;top:0;right:8px;height:8px; }
-.WindowLeft { position:absolute;left:0;top:24px;width:8px;bottom:8px; }
-.WindowRight { position:absolute;right:0;top:24px;width:8px;bottom:8px; }
-.WindowBottom { position:absolute;left:8px;bottom:0;right:8px;height:8px; }
-.WindowTopLeft { position:absolute;left:0;top:0;width:8px;height:24px;border-top-left-radius:5px; }
-.WindowTopRight { position:absolute;right:0;top:0;width:8px;height:24px;border-top-right-radius:5px; }
-.WindowBottomLeft { position:absolute;left:0;bottom:0;width:8px;height:8px;border-bottom-left-radius:5px; }
-.WindowBottomRight { position:absolute;right:0;bottom:0;width:8px;height:8px;border-bottom-right-radius:5px; }
-.WindowTitle { position:absolute;left:8px;top:2px;right:50px;height:22px; }
-.WindowSystem { position:absolute;top:0px;right:8px;width:42px;height:24px; }
+.Center { position:absolute;left:4px;top:24px;right:4px;bottom:4px; }
+.WindowTop { position:absolute;left:4px;top:0;right:4px;height:4px; }
+.WindowLeft { position:absolute;left:0;top:24px;width:4px;bottom:4px; }
+.WindowRight { position:absolute;right:0;top:24px;width:4px;bottom:4px; }
+.WindowBottom { position:absolute;left:4px;bottom:0;right:4px;height:4px; }
+.WindowTopLeft { position:absolute;left:0;top:0;width:4px;height:24px;border-top-left-radius:5px; }
+.WindowTopRight { position:absolute;right:0;top:0;width:4px;height:24px;border-top-right-radius:5px; }
+.WindowBottomLeft { position:absolute;left:0;bottom:0;width:4px;height:4px;border-bottom-left-radius:5px; }
+.WindowBottomRight { position:absolute;right:0;bottom:0;width:14px;height:14px;border-bottom-right-radius:5px;background-image:url(SizeBottomRight-14.png);z-index:50; }
+.WindowTitle { position:absolute;left:4px;top:2px;right:50px;height:22px; }
+.WindowSystem { position:absolute;top:0px;right:4px;width:46px;height:24px;z-index:50; }
 
 .WindowTop,
 .WindowLeft,
@@ -31,7 +32,7 @@
 .WindowTopLeft,
 .WindowTopRight,
 .WindowBottomLeft,
-.WindowBottomRight,
+.xWindowBottomRight,
 .WindowTitle,
 .WindowSystem
 {
@@ -42,6 +43,7 @@
 .TitleIcon { padding-right:4px; }
 .TitleText {}
 .CloseButton { position:absolute;right:0;top:0; }
+#Content { width:100%;height:100%;-webkit-box-shadow:inset 0 0 5px #000000; }
 
 .cApMove { cursor:default; }
 .cApSizeTop { cursor:n-resize; }
@@ -58,8 +60,6 @@
   function SetContent(sUrl)
   {
     $('#Content').attr('src', sUrl);
-    $('#Content').css('display', '');
-    $('#Center').css('background-color', '');
   }
 
   function SetCaption(sCaption)
@@ -116,14 +116,14 @@
   <div class="WindowTopRight"></div>
 
   <div class="WindowLeft"></div>
-  <div id="Center" style="position:absolute;left:8px;top:24px;right:8px;bottom:8px;background-color:#FFFFFF;">
-    <iframe id="Content" style="display:none;width:100%;height:100%;-webkit-box-shadow:inset 0 0 5px #000000;" src="Blank.html" frameborder="0"></iframe>
+  <div class="Center">
+    <iframe id="Content" src="Blank.html" frameborder="0"></iframe>
   </div>
   <div class="WindowRight cApSizeRight"></div>
 
   <div class="WindowBottomLeft"></div>
   <div class="WindowBottom cApSizeBottom"></div>
-  <div class="WindowBottomRight cApSizeBottomRight" style="background-image:url(SizeBottomRight-8.png);"></div>
+  <div class="WindowBottomRight cApSizeBottomRight"></div>
 
 </div>
 </body>

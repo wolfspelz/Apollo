@@ -60,12 +60,14 @@ protected:
 
   void DisplaySetNickname(const String& sNickname);
   void DisplaySetImage(const String& sUrl);
-  void DisplaySetIconAttachment(const String& sUrl, const String& sLabel, const String& sLink);
+  void DisplaySetCommunityAttachment(const String& sUrl, const String& sLabel, const String& sLink);
+  void DisplaySetIconAttachment(const String& sUrl, const String& sLabel);
   void DisplaySetOnlineStatus(const String& sStatus);
   void DisplayAddChatline(const ApHandle& hChat, const String& sText);
   void DisplaySetChatline(const ApHandle& hChat, const String& sText);
   void DisplayRemoveChatline(const ApHandle& hChat);
   void DisplaySetAvatarPosition(int nX);
+  void DisplayMoveAvatarPosition(int nX);
   //void SetUnknownPosition();
 
   void HandleImageData(const String& sMimeType, const String& sSource, Buffer& sbData);
@@ -83,6 +85,8 @@ protected:
   String sCommunityTag_;
   String sCommunityName_;
   String sCommunityPage_;
+  String sAttachedIcon_;
+  String sAttachedIconName_;
 
   Apollo::ValueList noMimeTypes_;
   Apollo::ValueList avatarMimeTypes_;
