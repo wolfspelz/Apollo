@@ -1,5 +1,5 @@
 OpenOnStartup=1
 Left=200
-Top=-8
+Top=0
 Width=500
-Height=200
+Height=300

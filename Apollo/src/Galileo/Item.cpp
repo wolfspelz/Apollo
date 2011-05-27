@@ -314,6 +314,31 @@ String Sequence::Src()
   return sUrl;
 }
 
+void Sequence::GetInfo(
+                      String& sGroup,
+                      String& sType,
+                      String& sCondition,
+                      String& sSrc,
+                      int& nProbability,
+                      String& sIn,
+                      String& sOut,
+                      int& nDx,
+                      int& nDy,
+                      int& nDuration
+                      )
+{
+    sGroup = sGroup_;
+    sType = sType_;
+    sCondition = sCondition_;
+    sSrc = Src();
+    nProbability = nProbability_;
+    sIn = sIn_;
+    sOut = sOut_;
+    nDx = nDx_;
+    nDy = nDy_;
+    nDuration = nDurationMSec_;
+}
+
 // ------------------------------------------------------------
 
 void Group::AddSequence(Sequence* pSequence)
@@ -463,8 +488,60 @@ void Item::PlayStatic(int bState)
 
 void Item::SetAnimationData(const String& sUrl, Buffer& sbData, const String& sMimeType)
 {
-  for (Group* pGroup = 0; (pGroup =lGroups_.Next(pGroup)) != 0; ) {
+  for (Group* pGroup = 0; (pGroup = lGroups_.Next(pGroup)) != 0; ) {
     pGroup->SetAnimationData(sUrl, sbData, sMimeType);
+  }
+}
+
+void Item::GetGroups(Apollo::ValueList& vlGroups)
+{
+  for (Group* pGroup = 0; (pGroup = lGroups_.Next(pGroup)) != 0; ) {
+    vlGroups.add(pGroup->getName());
+  }
+}
+
+void Item::GetGroupSequences(const String& sGroup, Apollo::ValueList& vlSequences)
+{
+  Group* pGroup = lGroups_.FindByName(sGroup);
+  if (pGroup) {
+    for (Sequence* pSequence = 0; (pSequence = pGroup->Next(pSequence)) != 0; ) {
+      vlSequences.add(pSequence->getName());
+    }
+  }
+}
+
+void Item::GetSequenceInfo(const String& sSequence,
+                            String& sGroup,
+                            String& sType,
+                            String& sCondition,
+                            String& sSrc,
+                            int& nProbability,
+                            String& sIn,
+                            String& sOut,
+                            int& nDx,
+                            int& nDy,
+                            int& nDuration
+                          )
+{
+  Sequence* pSequence = 0;
+
+  for (Group* pGroup = 0; (pGroup = lGroups_.Next(pGroup)) != 0; ) {
+    pSequence = pGroup->FindByName(sSequence);
+  }
+
+  if (pSequence) {
+    pSequence->GetInfo(
+                       sGroup
+                      ,sType
+                      ,sCondition
+                      ,sSrc
+                      ,nProbability
+                      ,sIn
+                      ,sOut
+                      ,nDx
+                      ,nDy
+                      ,nDuration
+                      );
   }
 }
 

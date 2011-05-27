@@ -106,6 +106,18 @@ public:
   String Src();
   void Load();
   int IsLoaded() { return bLoaded_; }
+  void GetInfo(
+                String& sGroup,
+                String& sType,
+                String& sCondition,
+                String& sSrc,
+                int& nProbability,
+                String& sIn,
+                String& sOut,
+                int& nDx,
+                int& nDy,
+                int& nDuration
+              );
 
 protected:
   friend class GalileoModuleTester;
@@ -174,6 +186,20 @@ public:
   //void SetPosition(int nX);
   //void MoveTo(int nX);
   void SetAnimationData(const String& sUrl, Buffer& sbData, const String& sMimeType);
+  void GetGroups(Apollo::ValueList& vlGroups);
+  void GetGroupSequences(const String& sGroup, Apollo::ValueList& vlSequences);
+  void GetSequenceInfo(const String& sSequence,
+                              String& sGroup,
+                              String& sType,
+                              String& sCondition,
+                              String& sSrc,
+                              int& nProbability,
+                              String& sIn,
+                              String& sOut,
+                              int& nDx,
+                              int& nDy,
+                              int& nDuration
+                            );
 
   int HasTimer(const ApHandle& hTimer) { return ApIsHandle(hTimer) && hTimer_ == hTimer; }
   void OnTimer();

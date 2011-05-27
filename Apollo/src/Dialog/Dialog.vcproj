@@ -202,7 +202,11 @@
 			>
 		</File>
 		<File
-			RelativePath="..\..\bin\Win32\Debug\modules\Dialog\Dialog.html"
+			RelativePath="..\..\bin\Win32\Debug\modules\Dialog\config.txt"
+			>
+		</File>
+		<File
+			RelativePath="..\..\bin\Win32\Debug\modules\Dialog\theme\WhiteWin\Dialog.html"
 			>
 		</File>
 	</Files>

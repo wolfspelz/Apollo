@@ -363,7 +363,7 @@ ApolloApi.prototype =
       eDiv.style.right = '0';
       eDiv.style.bottom = '0';
       eDiv.style.backgroundColor = '#FFFFFF';
-      eDiv.style.opacity = '0.05';
+      eDiv.style.opacity = '0.01';
       eDiv.style.zIndex = '99';
       document.body.appendChild(eDiv);
       
