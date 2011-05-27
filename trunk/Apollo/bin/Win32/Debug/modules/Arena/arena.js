@@ -139,13 +139,16 @@ Arena.prototype = {
     
     var nDiff = nX - nOldX;
     if (nDiff < 0) { nDiff = -nDiff; };
-    var nTime = (nDiff * 1000) / 55;
+    var nDuration = (nDiff * 1000) / 50;
 
     e .stop(true)
       .animate(
         { left: nX + 'px' },
-        nTime,
-        'linear'
+        nDuration,
+        'linear',
+          function () {
+            arena.OnAvatarPositionReached(hParticipant, nX);
+          }
       );
   },
 
@@ -292,6 +295,11 @@ Arena.prototype = {
   OnIconAttachmentClicked: function (hParticipant, sLink)
   {
     api.Message('OnIconAttachmentClicked').setString('ApType', 'Arena_CallModuleSrpc').setString('hParticipant', hParticipant).setString('sLink', sLink).send();
+  },
+
+  OnAvatarPositionReached: function (hParticipant, nX)
+  {
+    api.Message('OnAvatarPositionReached').setString('ApType', 'Arena_CallModuleSrpc').setString('hParticipant', hParticipant).setInt('nX', nX).send();
   },
 
   SendPublicChat: function (sText)

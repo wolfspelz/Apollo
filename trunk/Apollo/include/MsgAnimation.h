@@ -90,6 +90,17 @@ public:
 };
 
 // -> Animation
+class Msg_Animation_Activity: public ApRequestMessage
+{
+public:
+  #define Msg_Animation_Activity_MoveRight "moveright"
+  #define Msg_Animation_Activity_MoveLeft "moveleft"
+  Msg_Animation_Activity() : ApRequestMessage("Animation_Activity") {}
+  ApIN ApHandle hItem;
+  ApIN String sActivity;
+};
+
+// -> Animation
 class Msg_Animation_Static: public ApRequestMessage
 {
 public:
@@ -143,7 +154,7 @@ public:
 //class Msg_Animation_SetPosition: public ApRequestMessage
 //{
 //public:
-//  Msg_Animation_SetPosition() : ApRequestMessage("Animation_SetPosition") {}
+//  Msg_Animation_SetPosition() : ApRequestMessage("Animation_SetPosition"), nX(0), nY(0), nZ(0) {}
 //  ApIN ApHandle hItem;
 //  ApIN int nX;
 //  ApIN int nY;
@@ -154,7 +165,7 @@ public:
 //class Msg_Animation_MoveTo: public ApRequestMessage
 //{
 //public:
-//  Msg_Animation_MoveTo() : ApRequestMessage("Animation_MoveTo") {}
+//  Msg_Animation_MoveTo() : ApRequestMessage("Animation_MoveTo"), nX(0), nY(0), nZ(0) {}
 //  ApIN ApHandle hItem;
 //  ApIN int nX;
 //  ApIN int nY;
@@ -165,7 +176,7 @@ public:
 //class Msg_Animation_GetPosition: public ApRequestMessage
 //{
 //public:
-//  Msg_Animation_GetPosition() : ApRequestMessage("Animation_GetPosition") {}
+//  Msg_Animation_GetPosition() : ApRequestMessage("Animation_GetPosition"), nX(0), nY(0), nZ(0) {}
 //  ApIN ApHandle hItem;
 //  ApOUT int nX;
 //  ApOUT int nY;

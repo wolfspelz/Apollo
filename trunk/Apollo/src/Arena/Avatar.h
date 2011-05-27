@@ -47,13 +47,14 @@ public:
 protected:
   void OnPublicChatClosed(const ApHandle& hChat);
   void OnIconAttachmentClicked(const String& sLink);
+  void OnAvatarPositionReached(int nX);
 
   void SubscribeAndGetDetail(const String& sKey);
   void GetDetail(const String& sKey);
   void GetDetailString(const String& sKey, Apollo::ValueList& vlMimeTypes);
   void GetDetailData(const String& sKey, Apollo::ValueList& vlMimeTypes);
   void GetDetailRef(const String& sKey, Apollo::ValueList& vlMimeTypes);
-  void UnSubscribeDetail(const String& sKey);
+  void UnsubscribeDetail(const String& sKey);
 
   void RemoveOldPublicChats(int nMax);
   void DeletePublicChat(const ApHandle& hChat);
@@ -73,6 +74,9 @@ protected:
   void HandleImageData(const String& sMimeType, const String& sSource, Buffer& sbData);
   void SuspendAnimation();
   void ResumeAnimation();
+  void BeginMove(int nDestX);
+  void EndMove(int nDestX);
+  int IsMoving() { return bMoving_; }
 
 protected:
   ArenaModule* pModule_;
@@ -97,6 +101,7 @@ protected:
 
   int nX_;
   int nPositionConfirmed_;
+  int bMoving_;
 
   ApHandle hView_;
 };

@@ -19,6 +19,7 @@ Avatar::Avatar(ArenaModule* pModule, Display* pDisplay, const ApHandle& hPartici
 ,hAnimatedItem_(ApNoHandle)
 ,nX_(300)
 ,nPositionConfirmed_(0)
+,bMoving_(0)
 {
   avatarMimeTypes_.add("avatar/gif");
   //avatarMimeTypes_.add("image/gif");
@@ -49,18 +50,18 @@ void Avatar::Create(int bSelf)
 
 void Avatar::Destroy()
 {
-  UnSubscribeDetail(Msg_VpView_ParticipantDetail_Nickname);
-  UnSubscribeDetail(Msg_VpView_ParticipantDetail_Avatar);
-  UnSubscribeDetail(Msg_VpView_ParticipantDetail_OnlineStatus);
-  //UnSubscribeDetail(Msg_VpView_ParticipantDetail_Message);
-  UnSubscribeDetail(Msg_VpView_ParticipantDetail_Position);
-  //UnSubscribeDetail(Msg_VpView_ParticipantDetail_Condition);
-  //UnSubscribeDetail(Msg_VpView_ParticipantDetail_ProfileUrl);
-  UnSubscribeDetail("CommunityTag");
-  UnSubscribeDetail("CommunityName");
-  UnSubscribeDetail("CommunityPage");
-  UnSubscribeDetail("AttachedIcon");
-  UnSubscribeDetail("AttachedIconName");
+  UnsubscribeDetail(Msg_VpView_ParticipantDetail_Nickname);
+  UnsubscribeDetail(Msg_VpView_ParticipantDetail_Avatar);
+  UnsubscribeDetail(Msg_VpView_ParticipantDetail_OnlineStatus);
+  //UnsubscribeDetail(Msg_VpView_ParticipantDetail_Message);
+  UnsubscribeDetail(Msg_VpView_ParticipantDetail_Position);
+  //UnsubscribeDetail(Msg_VpView_ParticipantDetail_Condition);
+  //UnsubscribeDetail(Msg_VpView_ParticipantDetail_ProfileUrl);
+  UnsubscribeDetail("CommunityTag");
+  UnsubscribeDetail("CommunityName");
+  UnsubscribeDetail("CommunityPage");
+  UnsubscribeDetail("AttachedIcon");
+  UnsubscribeDetail("AttachedIconName");
 
   if (ApIsHandle(hAnimatedItem_)) {
     if (pModule_) {
@@ -154,12 +155,18 @@ void Avatar::GetDetailString(const String& sKey, Apollo::ValueList& vlMimeTypes)
       KeyValueLfBlob2List(msg.sValue, lCoords);
       Elem* e = lCoords.FindByNameCase("x");
       if (e) {
-        nX_ = String::atoi(e->getString());
-        if (!nPositionConfirmed_) {
-          nPositionConfirmed_ = 1;
-          DisplaySetAvatarPosition(nX_);
-        } else {
-          DisplayMoveAvatarPosition(nX_);
+        int nX = String::atoi(e->getString());
+        if (nX_ != nX) {
+
+          if (!nPositionConfirmed_) {
+            nPositionConfirmed_ = 1;
+            DisplaySetAvatarPosition(nX);
+          } else {
+            BeginMove(nX);
+            DisplayMoveAvatarPosition(nX);
+          }
+          nX_ = nX;
+
         }
       }
 
@@ -303,7 +310,7 @@ void Avatar::SuspendAnimation()
       msg.hItem = hAnimatedItem_;
       msg.bState = 1;
       if (!msg.Request()) {
-        apLog_Error((LOG_CHANNEL, "Avatar::SuspendAnimation", "Msg_Animation_Static failed: participant=" ApHandleFormat "", ApHandleType(hParticipant_)));
+        apLog_Error((LOG_CHANNEL, "Avatar::SuspendAnimation", "%s failed: participant=" ApHandleFormat "", StringType(msg.Type()), ApHandleType(hParticipant_)));
       }
     }
 
@@ -311,7 +318,7 @@ void Avatar::SuspendAnimation()
       Msg_Animation_Stop msg;
       msg.hItem = hAnimatedItem_;
       if (!msg.Request()) {
-        apLog_Error((LOG_CHANNEL, "Avatar::SuspendAnimation", "Msg_Animation_Stop failed: participant=" ApHandleFormat "", ApHandleType(hParticipant_)));
+        apLog_Error((LOG_CHANNEL, "Avatar::SuspendAnimation", "%s failed: participant=" ApHandleFormat "", StringType(msg.Type()), ApHandleType(hParticipant_)));
       }
     }
   }
@@ -325,7 +332,7 @@ void Avatar::ResumeAnimation()
       msg.hItem = hAnimatedItem_;
       msg.bState = 0;
       if (!msg.Request()) {
-        apLog_Error((LOG_CHANNEL, "Avatar::ResumeAnimation", "Msg_Animation_Static failed: participant=" ApHandleFormat "", ApHandleType(hParticipant_)));
+        apLog_Error((LOG_CHANNEL, "Avatar::ResumeAnimation", "%s failed: participant=" ApHandleFormat "", StringType(msg.Type()), ApHandleType(hParticipant_)));
       }
     }
 
@@ -333,13 +340,45 @@ void Avatar::ResumeAnimation()
       Msg_Animation_Start msg;
       msg.hItem = hAnimatedItem_;
       if (!msg.Request()) {
-        apLog_Error((LOG_CHANNEL, "Avatar::ResumeAnimation", "Msg_Animation_Start failed: participant=" ApHandleFormat "", ApHandleType(hParticipant_)));
+        apLog_Error((LOG_CHANNEL, "Avatar::ResumeAnimation", "%s failed: participant=" ApHandleFormat "", StringType(msg.Type()), ApHandleType(hParticipant_)));
       }
     }
   }
 }
 
-void Avatar::UnSubscribeDetail(const String& sKey)
+void Avatar::BeginMove(int nDestX)
+{
+  bMoving_ = 1;
+
+  if (ApIsHandle(hAnimatedItem_) && nX_ != nDestX) {
+
+    Msg_Animation_Activity msg;
+    msg.hItem = hAnimatedItem_;
+    msg.sActivity = (nDestX > nX_ ? Msg_Animation_Activity_MoveRight : Msg_Animation_Activity_MoveLeft);
+    if (!msg.Request()) {
+      apLog_Error((LOG_CHANNEL, "Avatar::BeginMove", "%s failed: participant=" ApHandleFormat "", StringType(msg.Type()), ApHandleType(hParticipant_)));
+    }
+
+  }
+}
+
+void Avatar::EndMove(int nDestX)
+{
+  bMoving_ = 0;
+
+  if (ApIsHandle(hAnimatedItem_)) {
+
+    Msg_Animation_Activity msg;
+    msg.hItem = hAnimatedItem_;
+    msg.sActivity = "";
+    if (!msg.Request()) {
+      apLog_Error((LOG_CHANNEL, "Avatar::EndMove", "%s failed: participant=" ApHandleFormat "", StringType(msg.Type()), ApHandleType(hParticipant_)));
+    }
+
+  }
+}
+
+void Avatar::UnsubscribeDetail(const String& sKey)
 {
   Msg_VpView_UnsubscribeParticipantDetail msg;
   msg.hParticipant = hParticipant_;
@@ -406,8 +445,10 @@ void Avatar::OnReceivePublicAction(const String& sAction)
 void Avatar::OnAnimationBegin(const String& sUrl)
 {
   if (sUrl != sImage_) {
-    DisplaySetImage(sUrl);
-    sImage_ = sUrl;
+    //if (!IsMoving()) {
+      DisplaySetImage(sUrl);
+      sImage_ = sUrl;
+    //}
   }
 }
 
@@ -430,6 +471,10 @@ void Avatar::OnCallModuleSrpc(Apollo::SrpcMessage& request, Apollo::SrpcMessage&
       OnIconAttachmentClicked(sLink);
     }
 
+  } else if (sMethod == "OnAvatarPositionReached") {
+    int nX = request.getInt("nX");
+    OnAvatarPositionReached(nX);
+
   } else {
     throw ApException("Avatar::OnCallModuleSrpc: Unknown Method=%s", StringType(sMethod));
   }
@@ -444,6 +489,11 @@ void Avatar::OnPublicChatClosed(const ApHandle& hChat)
 void Avatar::OnIconAttachmentClicked(const String& sLink)
 {
   // Navigate external browser
+}
+
+void Avatar::OnAvatarPositionReached(int nX)
+{
+  EndMove(nX);
 }
 
 //----------------------------------------------------------
