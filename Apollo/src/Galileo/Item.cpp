@@ -372,7 +372,6 @@ void Group::SetAnimationData(const String& sUrl, Buffer& sbData, const String& s
 
 // ------------------------------------------------------------
 
-#define Item_Activity_Move "move"
 #define Item_Group_Standard "idle"
 #define Item_Group_MoveRight "moveright"
 #define Item_Group_MoveLeft "moveleft"
@@ -462,6 +461,16 @@ void Item::SetCondition(const String& sCondition)
 void Item::PlayEvent(const String& sEvent)
 {
   sEvent_ = sEvent;
+  bSwitchNow_ = 1;
+}
+
+void Item::PlayActivity(const String& sActivity)
+{
+  if (sActivity_ != sActivity) {
+    sActivity_ = sActivity;
+    bSwitchNow_ = 1;
+    OnTimer();
+  }
 }
 
 void Item::PlayStatic(int bState)
@@ -470,6 +479,7 @@ void Item::PlayStatic(int bState)
     bStatic_ = bState;
 
     if (bStatic_) {
+      bSwitchNow_ = 1;
       OnTimer();
     }
   }
@@ -681,7 +691,8 @@ void Item::Step(Apollo::TimeValue& tvCurrent)
     Apollo::TimeValue tvDelay = tvCurrent - tvLastTimer_;
     int nInSequenceMSec = nSpentInCurrentSequenceMSec_ + tvDelay.MilliSec();
 
-    if (bStatic_ || sEvent_) {
+    if (bSwitchNow_) {
+      bSwitchNow_ = 0;
       nInSequenceMSec = pCurrentSequence_->Duration();
     }
 
@@ -760,6 +771,12 @@ Sequence* Item::SelectNextSequence()
   }
 
   if (!sSequence) {
+    if (sActivity_) {
+      sSequence = sActivity_;
+    }
+  }
+
+  if (!sSequence) {
     if (sNextSequence_) {
       sSequence = sNextSequence_;
       sNextSequence_ = "";
@@ -767,20 +784,6 @@ Sequence* Item::SelectNextSequence()
       apLog_Verbose((LOG_CHANNEL, "Item::SelectNextSequence", "item=" ApHandleFormat " selecting next definitive seq=%s", ApHandleType(hAp_), StringType(sSequence)));
     }
   }
-
-  //if (!sSequence) {
-  //  if (sActivity_) {
-  //    if (sActivity_ == Item_Activity_Move) {
-  //      if (nX_ == nDestX_) {
-  //        // back to status or event
-  //      } else if (nX_ > nDestX_) {
-  //        sSequence = Item_Group_MoveLeft;
-  //      } else if (nX_ < nDestX_) {
-  //        sSequence = Item_Group_MoveRight;
-  //      }
-  //    }
-  //  }
-  //}
 
   if (!sSequence) {
     if (sEvent_) {

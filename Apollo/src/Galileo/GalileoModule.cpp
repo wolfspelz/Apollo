@@ -126,6 +126,12 @@ AP_MSG_HANDLER_METHOD(GalileoModule, Animation_Event)
   pMsg->apStatus = ApMessage::Ok;
 }
 
+AP_MSG_HANDLER_METHOD(GalileoModule, Animation_Activity)
+{
+  GetItem(pMsg->hItem)->PlayActivity(pMsg->sActivity);
+  pMsg->apStatus = ApMessage::Ok;
+}
+
 AP_MSG_HANDLER_METHOD(GalileoModule, Animation_Static)
 {
   GetItem(pMsg->hItem)->PlayStatic(pMsg->bState);
@@ -642,6 +648,7 @@ int GalileoModule::Init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, GalileoModule, Animation_SetStatus, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, GalileoModule, Animation_SetCondition, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, GalileoModule, Animation_Event, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, GalileoModule, Animation_Activity, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, GalileoModule, Animation_Static, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, GalileoModule, Animation_GetGroups, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, GalileoModule, Animation_GetGroupSequences, this, ApCallbackPosNormal);

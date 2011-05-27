@@ -168,6 +168,7 @@ public:
     //,nX_(0)
     //,nDestX_(0)
     ,bStatic_(0)
+    ,bSwitchNow_(0)
     ,pCurrentSequence_(0)
     ,nSpentInCurrentSequenceMSec_(0)
     ,pPreviousFrame_(0)
@@ -182,9 +183,10 @@ public:
   void SetStatus(const String& sStatus);
   void SetCondition(const String& sCondition);
   void PlayEvent(const String& sEvent);
+  void PlayActivity(const String& sActivity);
   void PlayStatic(int bState);
-  //void SetPosition(int nX);
-  //void MoveTo(int nX);
+  void SetPosition(int nX);
+  void MoveTo(int nX);
   void SetAnimationData(const String& sUrl, Buffer& sbData, const String& sMimeType);
   void GetGroups(Apollo::ValueList& vlGroups);
   void GetGroupSequences(const String& sGroup, Apollo::ValueList& vlSequences);
@@ -242,8 +244,11 @@ protected:
   ListT<Group, Elem> lGroups_;
   String sStatus_;
   String sEvent_;
-  int bStatic_;
   String sActivity_;
+  int bStatic_;
+  int bSwitchNow_;
+  //int nX_;
+  //int nDestX_;
   String sCondition_;
   String sNextSequence_; // enforce, e.g. after transition
   //int nX_;
