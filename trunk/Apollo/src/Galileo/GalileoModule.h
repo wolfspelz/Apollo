@@ -62,6 +62,9 @@ public:
   void On_Animation_SetCondition(Msg_Animation_SetCondition* pMsg);
   void On_Animation_Event(Msg_Animation_Event* pMsg);
   void On_Animation_Static(Msg_Animation_Static* pMsg);
+  void On_Animation_GetGroups(Msg_Animation_GetGroups* pMsg);
+  void On_Animation_GetGroupSequences(Msg_Animation_GetGroupSequences* pMsg);
+  void On_Animation_GetSequenceInfo(Msg_Animation_GetSequenceInfo* pMsg);
   //void On_Animation_SetPosition(Msg_Animation_SetPosition* pMsg);
   //void On_Animation_MoveTo(Msg_Animation_MoveTo* pMsg);
   //void On_Animation_GetPosition(Msg_Animation_GetPosition* pMsg);
@@ -90,6 +93,7 @@ public:
 
   String GetSequenceDataCacheUrl(ApHandle& hItem, const String& sGroup, const String& sName);
   int AnimationIsRequested(const String& sUrl);
+  Item* GetItem(const ApHandle& hItem);
 
 protected:
   Item* GetItemByTimer(const ApHandle& hTimer);

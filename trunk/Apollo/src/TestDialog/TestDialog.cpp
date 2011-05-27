@@ -9,6 +9,7 @@
 #include "MsgDialog.h"
 #include "MsgNavigation.h"
 #include "MsgVpView.h"
+#include "MsgSystem.h"
 
 #if defined(WIN32)
 BOOL APIENTRY DllMain(HANDLE hModule, DWORD dwReason, LPVOID lpReserved)
@@ -57,6 +58,7 @@ public:
   void Open();
 
   void On_TestDialog_Control(ApSRPCMessage* pMsg);
+  void On_System_RunLevel(Msg_System_RunLevel* pMsg);
 
 protected:
   AP_MSG_REGISTRY_DECLARE;
@@ -72,9 +74,6 @@ typedef ApModuleSingleton<TestDialogModule> TestDialogModuleInstance;
 
 void TestDialogModule::Init()
 {
-  if (Apollo::getModuleConfig(MODULE_NAME, "OpenOnStartup", 0)) {
-    Open();
-  }
 }
 
 void TestDialogModule::Exit()
@@ -203,6 +202,17 @@ AP_SRPC_HANDLER_METHOD(TestDialogModule, TestDialog_Control, ApSRPCMessage)
   pMsg->apStatus = ApMessage::Ok;
 }
 
+AP_MSG_HANDLER_METHOD(TestDialogModule, System_RunLevel)
+{
+  if (0) {
+  } else if (pMsg->sLevel == Msg_System_RunLevel_Normal) {
+    if (Apollo::getModuleConfig(MODULE_NAME, "OpenOnStartup", 0)) {
+      Open();
+    }
+
+  }
+}
+
 //----------------------------------------------------------
 
 TESTDIALOG_API int Load(AP_MODULE_CALL* pModuleData)
@@ -213,6 +223,7 @@ TESTDIALOG_API int Load(AP_MODULE_CALL* pModuleData)
   TestDialogModuleInstance::Get()->Init();
  
   { ApSRPCMessage msg("TestDialog_Control"); msg.Hook(MODULE_NAME, AP_REFINSTANCE_SRPC_CALLBACK(TestDialogModule, TestDialog_Control), TestDialogModuleInstance::Get(), Apollo::modulePos(ApCallbackPosEarly, MODULE_NAME)); }
+  { Msg_System_RunLevel msg; msg.Hook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(TestDialogModule, System_RunLevel), TestDialogModuleInstance::Get(), Apollo::modulePos(ApCallbackPosEarly, MODULE_NAME)); }
 
   return 1;
 }
@@ -222,6 +233,7 @@ TESTDIALOG_API int UnLoad(AP_MODULE_CALL* pModuleData)
   AP_UNUSED_ARG(pModuleData);
 
   { ApSRPCMessage msg("TestDialog_Control"); msg.Unhook(MODULE_NAME, AP_REFINSTANCE_SRPC_CALLBACK(TestDialogModule, TestDialog_Control), TestDialogModuleInstance::Get()); }
+  { Msg_System_RunLevel msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(TestDialogModule, System_RunLevel), TestDialogModuleInstance::Get()); }
 
   TestDialogModuleInstance::Get()->Exit();
   TestDialogModuleInstance::Delete();

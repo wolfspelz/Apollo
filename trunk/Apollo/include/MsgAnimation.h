@@ -98,6 +98,47 @@ public:
   ApIN int bState;
 };
 
+// -------------------------------------------------------------------
+// Information
+
+// -> Animation
+class Msg_Animation_GetGroups: public ApRequestMessage
+{
+public:
+  Msg_Animation_GetGroups() : ApRequestMessage("Animation_GetGroups") {}
+  ApIN ApHandle hItem;
+  ApOUT Apollo::ValueList vlGroups;
+};
+
+// -> Animation
+class Msg_Animation_GetGroupSequences: public ApRequestMessage
+{
+public:
+  Msg_Animation_GetGroupSequences() : ApRequestMessage("Animation_GetGroupSequences") {}
+  ApIN ApHandle hItem;
+  ApIN String sGroup;
+  ApOUT Apollo::ValueList vlSequences;
+};
+
+// -> Animation
+class Msg_Animation_GetSequenceInfo: public ApRequestMessage
+{
+public:
+  Msg_Animation_GetSequenceInfo() : ApRequestMessage("Animation_GetSequenceInfo"), nProbability(0), nDx(0), nDy(0) {}
+  ApIN ApHandle hItem;
+  ApIN String sSequence;
+  ApOUT String sGroup;
+  ApOUT String sType;
+  ApOUT String sCondition;
+  ApOUT String sSrc;
+  ApOUT int nProbability;
+  ApOUT String sIn;
+  ApOUT String sOut;
+  ApOUT int nDx;
+  ApOUT int nDy;
+  ApOUT int nDuration;
+};
+
 //// -> Animation
 //class Msg_Animation_SetPosition: public ApRequestMessage
 //{

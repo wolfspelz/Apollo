@@ -12,6 +12,10 @@
 
 int ConfigModule::setValue(ConfigPlane* pPlane, const String& sKey, const String& sValue)
 {
+  if (sKey == "Dialog/Theme") {
+    int AP_UNUSED_VARIABLE x = 1;
+  }
+
   if (pPlane) {
     String sTrimmed = sKey;
     sTrimmed.trimWSP();
@@ -32,7 +36,7 @@ AP_MSG_HANDLER_METHOD(ConfigModule, Config_SetValue)
 {
   int ok = 0;
 
-  if (pMsg->sPath == "Gm/EncryptedPassword") {
+  if (pMsg->sPath == "Dialog/Theme") {
     int AP_UNUSED_VARIABLE x = 1;
   }
 
@@ -69,7 +73,7 @@ AP_MSG_HANDLER_METHOD(ConfigModule, Config_GetValue)
 {
   int ok = 0;
 
-  if (pMsg->sPath == "Dun/OnLoad/DeleteDbFiles") {
+  if (pMsg->sPath == "Dialog/Theme") {
     int AP_UNUSED_VARIABLE x = 1;
   }
 

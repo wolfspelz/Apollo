@@ -37,6 +37,15 @@ int GalileoModule::AnimationIsRequested(const String& sUrl)
   return bIsIt;
 }
 
+Item* GalileoModule::GetItem(const ApHandle& hItem)
+{
+  ItemListNode* pNode = items_.Find(hItem);
+  if (pNode == 0) { throw ApException("Item not found: " ApHandleFormat "", ApHandleType(hItem)); }
+  Item* pItem = pNode->Value();
+  if (pItem == 0) { throw ApException("Node Value() empty: " ApHandleFormat "", ApHandleType(hItem)); }
+  return pItem;
+}
+
 //----------------------------------------------------------
 
 AP_MSG_HANDLER_METHOD(GalileoModule, Animation_Create)
@@ -60,9 +69,7 @@ AP_MSG_HANDLER_METHOD(GalileoModule, Animation_Create)
 
 AP_MSG_HANDLER_METHOD(GalileoModule, Animation_Destroy)
 {
-  ItemListNode* pNode = items_.Find(pMsg->hItem);
-  if (pNode == 0) { return; }
-  Item* pItem = pNode->Value();
+  Item* pItem = GetItem(pMsg->hItem);
 
   items_.Unset(pMsg->hItem);
   delete pItem;
@@ -73,31 +80,19 @@ AP_MSG_HANDLER_METHOD(GalileoModule, Animation_Destroy)
 
 AP_MSG_HANDLER_METHOD(GalileoModule, Animation_Start)
 {
-  ItemListNode* pNode = items_.Find(pMsg->hItem);
-  if (pNode == 0) { return; }
-  Item* pItem = pNode->Value();
-
-  pItem->Start();
-
+  GetItem(pMsg->hItem)->Start();
   pMsg->apStatus = ApMessage::Ok;
 }
 
 AP_MSG_HANDLER_METHOD(GalileoModule, Animation_Stop)
 {
-  ItemListNode* pNode = items_.Find(pMsg->hItem);
-  if (pNode == 0) { return; }
-  Item* pItem = pNode->Value();
-
-  pItem->Stop();
-
+  GetItem(pMsg->hItem)->Stop();
   pMsg->apStatus = ApMessage::Ok;
 }
 
 AP_MSG_HANDLER_METHOD(GalileoModule, Animation_SetRate)
 {
-  ItemListNode* pNode = items_.Find(pMsg->hItem);
-  if (pNode == 0) { return; }
-  Item* pItem = pNode->Value();
+  Item* pItem = GetItem(pMsg->hItem);
 
   if (pMsg->nMaxRate > 0 && pMsg->nMaxRate < 25) {
     int nDelay = 1000 / pMsg->nMaxRate;
@@ -109,56 +104,60 @@ AP_MSG_HANDLER_METHOD(GalileoModule, Animation_SetRate)
 
 AP_MSG_HANDLER_METHOD(GalileoModule, Animation_SetData)
 {
-  ItemListNode* pNode = items_.Find(pMsg->hItem);
-  if (pNode == 0) { return; }
-  Item* pItem = pNode->Value();
-
-  pItem->SetData(pMsg->sbData, pMsg->sSourceUrl);
-
+  GetItem(pMsg->hItem)->SetData(pMsg->sbData, pMsg->sSourceUrl);
   pMsg->apStatus = ApMessage::Ok;
 }
 
 AP_MSG_HANDLER_METHOD(GalileoModule, Animation_SetStatus)
 {
-  ItemListNode* pNode = items_.Find(pMsg->hItem);
-  if (pNode == 0) { return; }
-  Item* pItem = pNode->Value();
-
-  pItem->SetStatus(pMsg->sStatus);
-
+  GetItem(pMsg->hItem)->SetStatus(pMsg->sStatus);
   pMsg->apStatus = ApMessage::Ok;
 }
 
 AP_MSG_HANDLER_METHOD(GalileoModule, Animation_SetCondition)
 {
-  ItemListNode* pNode = items_.Find(pMsg->hItem);
-  if (pNode == 0) { return; }
-  Item* pItem = pNode->Value();
-
-  pItem->SetCondition(pMsg->sCondition);
-
+  GetItem(pMsg->hItem)->SetCondition(pMsg->sCondition);
   pMsg->apStatus = ApMessage::Ok;
 }
 
 AP_MSG_HANDLER_METHOD(GalileoModule, Animation_Event)
 {
-  ItemListNode* pNode = items_.Find(pMsg->hItem);
-  if (pNode == 0) { return; }
-  Item* pItem = pNode->Value();
-
-  pItem->PlayEvent(pMsg->sEvent);
-
+  GetItem(pMsg->hItem)->PlayEvent(pMsg->sEvent);
   pMsg->apStatus = ApMessage::Ok;
 }
 
 AP_MSG_HANDLER_METHOD(GalileoModule, Animation_Static)
 {
-  ItemListNode* pNode = items_.Find(pMsg->hItem);
-  if (pNode == 0) { return; }
-  Item* pItem = pNode->Value();
+  GetItem(pMsg->hItem)->PlayStatic(pMsg->bState);
+  pMsg->apStatus = ApMessage::Ok;
+}
 
-  pItem->PlayStatic(pMsg->bState);
+AP_MSG_HANDLER_METHOD(GalileoModule, Animation_GetGroups)
+{
+  GetItem(pMsg->hItem)->GetGroups(pMsg->vlGroups);
+  pMsg->apStatus = ApMessage::Ok;
+}
 
+AP_MSG_HANDLER_METHOD(GalileoModule, Animation_GetGroupSequences)
+{
+  GetItem(pMsg->hItem)->GetGroupSequences(pMsg->sGroup, pMsg->vlSequences);
+  pMsg->apStatus = ApMessage::Ok;
+}
+
+AP_MSG_HANDLER_METHOD(GalileoModule, Animation_GetSequenceInfo)
+{
+  GetItem(pMsg->hItem)->GetSequenceInfo(pMsg->sSequence
+                                        ,pMsg->sGroup
+                                        ,pMsg->sType
+                                        ,pMsg->sCondition
+                                        ,pMsg->sSrc
+                                        ,pMsg->nProbability
+                                        ,pMsg->sIn
+                                        ,pMsg->sOut
+                                        ,pMsg->nDx
+                                        ,pMsg->nDy
+                                        ,pMsg->nDuration
+                                       );
   pMsg->apStatus = ApMessage::Ok;
 }
 
@@ -644,6 +643,9 @@ int GalileoModule::Init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, GalileoModule, Animation_SetCondition, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, GalileoModule, Animation_Event, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, GalileoModule, Animation_Static, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, GalileoModule, Animation_GetGroups, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, GalileoModule, Animation_GetGroupSequences, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, GalileoModule, Animation_GetSequenceInfo, this, ApCallbackPosNormal);
   //AP_MSG_REGISTRY_ADD(MODULE_NAME, GalileoModule, Animation_SetPosition, this, ApCallbackPosNormal);
   //AP_MSG_REGISTRY_ADD(MODULE_NAME, GalileoModule, Animation_MoveTo, this, ApCallbackPosNormal);
   //AP_MSG_REGISTRY_ADD(MODULE_NAME, GalileoModule, Animation_GetPosition, this, ApCallbackPosNormal);

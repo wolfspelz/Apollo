@@ -28,7 +28,7 @@ void Dialog::Create(int nLeft, int nTop, int nWidth, int nHeight, int bVisible, 
     if (!Msg_WebView_Position::_(hView, nLeft, nTop, nWidth, nHeight)) { throw ApException("Msg_WebView_Position failed"); }
     if (!Msg_WebView_Visibility::_(hView, bVisible)) { throw ApException("Msg_WebView_Visibility failed"); }
     if (!Msg_WebView_SetScriptAccessPolicy::Allow(hView)) { throw ApException("Msg_WebView_SetScriptAccessPolicy failed"); }
-    if (!Msg_WebView_Load::_(hView, "file://" + Apollo::getModuleResourcePath(MODULE_NAME) + "Dialog.html")) { throw ApException("Msg_WebView_Load failed"); }
+    if (!Msg_WebView_Load::_(hView, "file://" + Apollo::getModuleResourcePath(MODULE_NAME) + "theme/" + Apollo::getModuleConfig(MODULE_NAME, "Theme", "WhiteWin") + "/Dialog.html")) { throw ApException("Msg_WebView_Load failed"); }
 
     //if (!Msg_WebView_SetNavigationPolicy::Deny(hView)) { throw ApException("Msg_WebView_SetNavigationPolicy failed"); }
 
@@ -69,6 +69,14 @@ void Dialog::OnDocumentLoaded()
     msg.hView = hView_;
     msg.sFunction = "SetIcon";
     msg.lArgs.AddLast(sIconUrl_);
+    if (!msg.Request()) { apLog_Error((LOG_CHANNEL, "Dialog::OnDocumentLoaded", "%s(%s) failed: %s", StringType(msg.Type()), StringType(msg.sFunction), StringType(msg.sComment))); }
+  }
+
+  {
+    Msg_WebView_CallScriptFunction msg;
+    msg.hView = hView_;
+    msg.sFunction = "ShowContent";
+    msg.lArgs.AddLast("true");
     if (!msg.Request()) { apLog_Error((LOG_CHANNEL, "Dialog::OnDocumentLoaded", "%s(%s) failed: %s", StringType(msg.Type()), StringType(msg.sFunction), StringType(msg.sComment))); }
   }
 }

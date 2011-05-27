@@ -51,7 +51,6 @@ Arena.prototype = {
 
   Startup: function()
   {
-    //$('#' + arena.sDomId).html('<b>Arena</b>');
     $('#' + arena.sDomId).append(''
       + '<div id="iMeta">'
       + '  <div class="cTranslate">Hello World</div>'
@@ -69,7 +68,9 @@ Arena.prototype = {
   {
     $('#' + arena.sDomId).append(''
 
-    + '<div class="cParticipant" id="' + GetParticipantDomId(hParticipant) + '" style="display:none;">'
+    + '<div class="cParticipant' 
+    + ' ' + (bSelf ? 'cSelf' : 'cPeer')
+    + '" id="' + GetParticipantDomId(hParticipant) + '" style="display:none;">'
     + '  <div class="cCenter">'
     + '    <div class="cChatWrapper" style="z-index:30;">'
     + '      <div class="cChatContainer"></div>'
