@@ -43,6 +43,7 @@
 .TitleIcon { padding-right:4px; }
 .TitleText {}
 .CloseButton { position:absolute;right:0;top:0; }
+#Icon { width:16px; height:16px; }
 #Content { width:100%;height:100%;-webkit-box-shadow:inset 0 0 5px #000000; }
 
 .cApMove { cursor:default; }
@@ -85,7 +86,7 @@
       $('.CloseButton').hover(
         function () {
           $(this).attr('src', 'CloseButtonHover.png');
-          $(this).css('-webkit-box-shadow', '0 0 12px #FF0000');
+          $(this).css('-webkit-box-shadow', '0 0 12px #FF3300');
         }, 
         function () {
           $(this).attr('src', 'CloseButton.png');
