@@ -1,0 +1,123 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Dialog</title>
+<script type="text/javascript" src="../../jquery-1.4.2.min.js"></script>
+<script type="text/javascript" src="../../apollo.js"></script>
+<style type="text/css">
+* { margin:0; padding:0; }
+
+.Wrapper
+{
+  position:absolute;left:12px;top:12px;right:12px;bottom:12px;
+}
+
+.Shadow { background-color:#ff0000; position:absolute;left:0px;top:0px;right:0px;bottom:0px; border-top-left-radius:6px; border-top-right-radius:6px; -webkit-box-shadow:0 0 12px #333333; }
+.Center { position:absolute;left:0px;top:23px;right:0px;bottom:0px;background-color:#ffffff;border-left:1px solid #8C8C8C;border-bottom:1px solid #8C8C8C;border-right:1px solid #8C8C8C; }
+.WindowHeader { position:absolute;left:6px;top:0px;right:6px;height:23px;background-image:url(Header.png); }
+.WindowHeaderTopLeft { position:absolute;left:0px;top:0px;width:6px;height:6px;background-image:url(HeaderTopLeft.png);border-top-left-radius:6px; }
+.WindowHeaderBottomLeft { position:absolute;left:0px;top:6px;width:6px;height:17px;background-image:url(HeaderBottomLeft.png); }
+.WindowHeaderTopRight { position:absolute;right:0px;top:0px;width:6px;height:6px;background-image:url(HeaderTopRight.png);border-top-right-radius:6px; }
+.WindowHeaderBottomRight { position:absolute;right:0px;top:6px;width:6px;height:17px;background-image:url(HeaderBottomRight.png); }
+.WindowSizer { position:absolute;right:1px;bottom:1px;width:15px;height:15px;background-image:url(Sizer.png);z-index:50; }
+.WindowTitle { position:absolute;left:1px;top:1px;right:1px;height:21px; }
+.WindowSystem { position:absolute;top:1px;left:1px;width:70px;height:21px; }
+
+.WindowTitle { padding-top:3px; color:#000000; text-align:center; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-family:Helvetica, Arial, sans-serif;font-size:12px;font-weight:bold; }
+.TitleText {}
+.CloseButton { position:absolute;left:6px;top:4px; }
+.MinimizeButton { position:absolute;left:27px;top:4px; }
+.ZoomButton { position:absolute;left:48px;top:4px; }
+#Content { width:100%;height:100%; }
+
+.cApMove { cursor:default; }
+.cApSizeBottomRight { cursor:se-resize; }
+
+</style>
+<script type="text/javascript">
+  function SetContent(sUrl)
+  {
+    $('#Content').attr('src', sUrl);
+  }
+
+  function ShowContent(bVisible)
+  {
+    if (bVisible) {
+      $('#Content').css('display', '');
+    } else {
+      $('#Content').css('display', 'none');
+    }
+  }
+
+  function SetCaption(sCaption)
+  {
+    $('#Caption').html(sCaption);
+  }
+
+  function SetIcon(sUrl)
+  {
+  }
+
+  var api = new ApolloApi();
+  api.moduleName = 'Dialog';
+  api.nMinWidth = 150;
+  api.nMinHeight = 52;
+  api.Init();
+  api.InitMoveSize();
+
+  $(document).ready(
+    function () {
+
+      $('.CloseButton').hover(
+        function () {
+          $(this).attr('src', 'CloseButtonHover.png');
+        }, 
+        function () {
+          $(this).attr('src', 'CloseButton.png');
+          $(this).css('-webkit-box-shadow', '');
+        }
+      ).mousedown(
+        function () {
+          $(this).attr('src', 'CloseButtonDown.png');
+        }
+      ).click(
+        function () {
+          api.Message('Dialog_Destroy').setString('hDialog', api.GetViewHandle()).send();
+        }
+      );
+
+    }
+  );
+
+</script>
+</head>
+<body style="overflow:hidden; margin:0; padding:0;">
+<div class="Wrapper">
+
+  <div class="Shadow"></div>
+  <div class="WindowHeader"></div>
+  <div class="WindowHeaderTopLeft"></div>
+  <div class="WindowHeaderBottomLeft"></div>
+  <div class="WindowHeaderTopRight"></div>
+  <div class="WindowHeaderBottomRight"></div>
+
+  <div class="WindowTitle cApMove">
+    <span id="Caption" class="cApMove TitleText" style="vertical-align:middle;">Apollo</span>
+    <input type="button" onclick="document.location.reload();" value="reload" style="position:absolute;right:30px;top:2px;font-family:Verdana;font-size:9px;"/>
+  </div>
+
+  <div class="WindowSystem cApMove">
+    <img class="CloseButton" src="CloseButton.png" alt="close" />
+    <img class="MinimizeButton" src="DisabledButton.png" alt="minimize" />
+    <img class="ZoomButton" src="DisabledButton.png" alt="zoom" />
+  </div>
+
+  <div class="Center">
+    <iframe id="Content" src="Blank.html" frameborder="0" style="display:none;"></iframe>
+  </div>
+  <div class="WindowSizer cApSizeBottomRight"></div>
+
+</div>
+</body>
+</html>
+  
