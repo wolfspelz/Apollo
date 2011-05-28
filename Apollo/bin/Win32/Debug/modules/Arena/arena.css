@@ -76,14 +76,14 @@
 
 .cSelf .cNickname
 {
-  border:1px solid #CCCCCC;
-  -webkit-box-shadow:0 0 6px #808080;
+  border:1px solid #7CC100;
+  -webkit-box-shadow:0 0 6px #7CC100;
 }
 
 .cPeer .cNickname
 {
-  border:1px solid #7CC100;
-  -webkit-box-shadow:0 0 6px #7CC100;
+  border:1px solid #CCCCCC;
+  -webkit-box-shadow:0 0 6px #808080;
 }
 
 .cCommunity
