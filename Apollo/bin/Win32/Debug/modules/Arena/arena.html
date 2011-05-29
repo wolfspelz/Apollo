@@ -2,7 +2,9 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-<script type="text/javascript" src="jquery-1.4.2.min.js"></script>
+<!--script type="text/javascript" src="jquery-1.4.2.min.js"></script-->
+<script src="jquery-ui-1.8.13.custom/js/jquery-1.5.1.min.js"></script> 
+<script src="jquery-ui-1.8.13.custom/js/jquery-ui-1.8.13.custom.min.js"></script> 
 <script type="text/javascript" src="utils.js"></script>
 <script type="text/javascript" src="apollo.js"></script>
 <script type="text/javascript" src="arena.js"></script>
@@ -26,7 +28,7 @@ function DispatchMessage(msg)
     case 'HideAvatar': return arena.HideAvatar(msg.getString('hParticipant')); break;
 
     case 'SetAvatarPosition': return arena.SetAvatarPosition(msg.getString('hParticipant'), msg.getInt('nX')); break;
-    case 'MoveAvatarPosition': return arena.MoveAvatarPosition(msg.getString('hParticipant'), msg.getInt('nX')); break;
+    case 'MoveAvatarPosition': return arena.MoveAvatarPosition(msg.getString('hParticipant'), msg.getInt('nX'), msg.getInt('nSpeedX')); break;
     case 'SetAvatarNickname': return arena.SetAvatarNickname(msg.getString('hParticipant'), msg.getString('sNickname')); break;
     case 'SetAvatarImage': return arena.SetAvatarImage(msg.getString('hParticipant'), msg.getString('sUrl')); break;
     case 'SetCommunityAttachment': return arena.SetCommunityAttachment(msg.getString('hParticipant'), msg.getString('sUrl'), msg.getString('sLabel'), msg.getString('sLink')); break;

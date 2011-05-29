@@ -48,6 +48,7 @@ protected:
   void OnPublicChatClosed(const ApHandle& hChat);
   void OnIconAttachmentClicked(const String& sLink);
   void OnAvatarPositionReached(int nX);
+  void OnAvatarDraggedBy(int nDiffX, int nDiffY);
 
   void SubscribeAndGetDetail(const String& sKey);
   void GetDetail(const String& sKey);
@@ -67,8 +68,8 @@ protected:
   void DisplayAddChatline(const ApHandle& hChat, const String& sText);
   void DisplaySetChatline(const ApHandle& hChat, const String& sText);
   void DisplayRemoveChatline(const ApHandle& hChat);
-  void DisplaySetAvatarPosition(int nX);
-  void DisplayMoveAvatarPosition(int nX);
+  void DisplaySetAvatarPosition(int nDestX);
+  void DisplayMoveAvatarPosition(int nDestX);
   //void SetUnknownPosition();
 
   void HandleImageData(const String& sMimeType, const String& sSource, Buffer& sbData);

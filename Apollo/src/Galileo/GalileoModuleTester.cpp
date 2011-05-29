@@ -140,7 +140,7 @@ String GalileoModuleTester::Test_LoadGIF()
   { Msg_Galileo_ClearAllStorage msg; (void) msg.Request(); }
 
   GalileoModule m;
-  Animation a(&m);
+  Animation a(&m, Apollo::getAppResourcePath() + "test/tassadar/" + "walk-l.gif", 0, 0);
   Apollo::loadFile(Apollo::getAppResourcePath() + "test/tassadar/" + "walk-l.gif", a.sbData_);
   a.Load();
   if (!s) { if (a.length() != 13) { s = "expected 13 frames"; } }
@@ -190,9 +190,9 @@ String GalileoModuleTester::Test_SelectByGroup()
 
   GalileoModule m;
   Group g("g");
-  Sequence *s1 = new Sequence("s1", &m, "g", "status", "normal", 100, "", "", 0, 0);
-  Sequence *s2 = new Sequence("s2", &m, "g", "status", "normal", 100, "", "", 0, 0);
-  Sequence *s3 = new Sequence("s3", &m, "g", "status", "normal", 100, "", "", 0, 0);
+  Sequence *s1 = new Sequence("s1", &m, "g", "status", "normal", 100, "", "");
+  Sequence *s2 = new Sequence("s2", &m, "g", "status", "normal", 100, "", "");
+  Sequence *s3 = new Sequence("s3", &m, "g", "status", "normal", 100, "", "");
   g.AddSequence(s1);
   g.AddSequence(s2);
   g.AddSequence(s3);

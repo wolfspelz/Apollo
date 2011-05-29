@@ -163,7 +163,6 @@ void Avatar::GetDetailString(const String& sKey, Apollo::ValueList& vlMimeTypes)
             DisplaySetAvatarPosition(nX);
           } else {
             BeginMove(nX);
-            DisplayMoveAvatarPosition(nX);
           }
           nX_ = nX;
 
@@ -360,6 +359,8 @@ void Avatar::BeginMove(int nDestX)
     }
 
   }
+
+  DisplayMoveAvatarPosition(nDestX);
 }
 
 void Avatar::EndMove(int nDestX)
@@ -475,6 +476,11 @@ void Avatar::OnCallModuleSrpc(Apollo::SrpcMessage& request, Apollo::SrpcMessage&
     int nX = request.getInt("nX");
     OnAvatarPositionReached(nX);
 
+  } else if (sMethod == "OnAvatarDraggedBy") {
+    int nX = request.getInt("nX");
+    int nY = request.getInt("nY");
+    OnAvatarDraggedBy(nX, nY);
+
   } else {
     throw ApException("Avatar::OnCallModuleSrpc: Unknown Method=%s", StringType(sMethod));
   }
@@ -494,6 +500,18 @@ void Avatar::OnIconAttachmentClicked(const String& sLink)
 void Avatar::OnAvatarPositionReached(int nX)
 {
   EndMove(nX);
+}
+
+void Avatar::OnAvatarDraggedBy(int nDiffX, int nDiffY)
+{
+  int nNewX = nX_ + nDiffX;
+
+  Msg_Vp_SendPosition msg;
+  msg.hLocation = pDisplay_->GetLocation();
+  msg.kvParams.add(Msg_Vp_Position_X, nNewX);
+  if (!msg.Request()) {
+    apLog_Warning(( MODULE_NAME, "Avatar::OnAvatarDraggedBy", "%s failed: %s", StringType(msg.Type()), StringType(msg.sComment) ));
+  }
 }
 
 //----------------------------------------------------------
@@ -620,18 +638,50 @@ void Avatar::DisplayRemoveChatline(const ApHandle& hChat)
 //  dsm.Request();
 //}
 
-void Avatar::DisplaySetAvatarPosition(int nX)
+void Avatar::DisplaySetAvatarPosition(int nDestX)
 {
   DisplaySrpcMessage dsm(pDisplay_, "SetAvatarPosition");
   dsm.srpc.set("hParticipant", hParticipant_);
-  dsm.srpc.set("nX", nX);
+  dsm.srpc.set("nX", nDestX);
   dsm.Request();
 }
 
-void Avatar::DisplayMoveAvatarPosition(int nX)
+void Avatar::DisplayMoveAvatarPosition(int nDestX)
 {
+  int nSpeedX = 50;
+
+  if (ApIsHandle(hAnimatedItem_)) {
+    String sSequence;
+
+    {
+      Msg_Animation_GetGroupSequences msg;
+      msg.hItem = hAnimatedItem_;
+      msg.sGroup = (nDestX > nX_ ? Msg_Animation_Activity_MoveRight : Msg_Animation_Activity_MoveLeft);
+      if (!msg.Request()) {
+        apLog_Error((LOG_CHANNEL, "Avatar::DisplayMoveAvatarPosition", "%s failed: participant=" ApHandleFormat " group=%s", StringType(msg.Type()), ApHandleType(hParticipant_), StringType(msg.sGroup)));
+      } else {
+        sSequence = msg.vlSequences.atIndex(0, (nDestX > nX_ ? Msg_Animation_Activity_MoveRight : Msg_Animation_Activity_MoveLeft));
+      }
+    }
+
+    if (sSequence) {
+      Msg_Animation_GetSequenceInfo msg;
+      msg.hItem = hAnimatedItem_;
+      msg.sSequence = sSequence;
+      if (!msg.Request()) {
+        apLog_Error((LOG_CHANNEL, "Avatar::DisplayMoveAvatarPosition", "%s failed: participant=" ApHandleFormat " sequence=%s", StringType(msg.Type()), ApHandleType(hParticipant_), StringType(msg.sSequence)));
+      } else {
+        if (msg.nDx != 0) {
+          nSpeedX = abs(msg.nDx);
+        }
+      }
+    }
+
+  }
+
   DisplaySrpcMessage dsm(pDisplay_, "MoveAvatarPosition");
   dsm.srpc.set("hParticipant", hParticipant_);
-  dsm.srpc.set("nX", nX);
+  dsm.srpc.set("nX", nDestX);
+  dsm.srpc.set("nSpeedX", nSpeedX);
   dsm.Request();
 }
