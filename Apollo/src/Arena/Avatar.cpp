@@ -304,12 +304,21 @@ void Avatar::HandleImageData(const String& sMimeType, const String& sSource, Buf
 void Avatar::SuspendAnimation()
 {
   if (ApIsHandle(hAnimatedItem_)) {
+    //{
+    //  Msg_Animation_Static msg;
+    //  msg.hItem = hAnimatedItem_;
+    //  msg.bState = 1;
+    //  if (!msg.Request()) {
+    //    apLog_Error((LOG_CHANNEL, "Avatar::SuspendAnimation", "%s failed: participant=" ApHandleFormat "", StringType(msg.Type()), ApHandleType(hParticipant_)));
+    //  }
+    //}
+
     {
-      Msg_Animation_Static msg;
+      Msg_Animation_Activity msg;
       msg.hItem = hAnimatedItem_;
-      msg.bState = 1;
+      msg.sActivity = Msg_Animation_Activity_Idle;
       if (!msg.Request()) {
-        apLog_Error((LOG_CHANNEL, "Avatar::SuspendAnimation", "%s failed: participant=" ApHandleFormat "", StringType(msg.Type()), ApHandleType(hParticipant_)));
+        apLog_Error((LOG_CHANNEL, "Avatar::SuspendAnimation", "%s failed: participant=" ApHandleFormat " activity=%s", StringType(msg.Type()), ApHandleType(hParticipant_), StringType(msg.sActivity)));
       }
     }
 
@@ -326,10 +335,19 @@ void Avatar::SuspendAnimation()
 void Avatar::ResumeAnimation()
 {
   if (ApIsHandle(hAnimatedItem_)) {
+    //{
+    //  Msg_Animation_Static msg;
+    //  msg.hItem = hAnimatedItem_;
+    //  msg.bState = 0;
+    //  if (!msg.Request()) {
+    //    apLog_Error((LOG_CHANNEL, "Avatar::ResumeAnimation", "%s failed: participant=" ApHandleFormat "", StringType(msg.Type()), ApHandleType(hParticipant_)));
+    //  }
+    //}
+
     {
-      Msg_Animation_Static msg;
+      Msg_Animation_Activity msg;
       msg.hItem = hAnimatedItem_;
-      msg.bState = 0;
+      msg.sActivity = "";
       if (!msg.Request()) {
         apLog_Error((LOG_CHANNEL, "Avatar::ResumeAnimation", "%s failed: participant=" ApHandleFormat "", StringType(msg.Type()), ApHandleType(hParticipant_)));
       }
@@ -355,7 +373,7 @@ void Avatar::BeginMove(int nDestX)
     msg.hItem = hAnimatedItem_;
     msg.sActivity = (nDestX > nX_ ? Msg_Animation_Activity_MoveRight : Msg_Animation_Activity_MoveLeft);
     if (!msg.Request()) {
-      apLog_Error((LOG_CHANNEL, "Avatar::BeginMove", "%s failed: participant=" ApHandleFormat "", StringType(msg.Type()), ApHandleType(hParticipant_)));
+      apLog_Error((LOG_CHANNEL, "Avatar::BeginMove", "%s failed: participant=" ApHandleFormat " activity=%s", StringType(msg.Type()), ApHandleType(hParticipant_), StringType(msg.sActivity)));
     }
 
   }
