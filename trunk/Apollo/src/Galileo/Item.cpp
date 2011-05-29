@@ -501,17 +501,17 @@ void Item::PlayActivity(const String& sActivity)
   }
 }
 
-void Item::PlayStatic(int bState)
-{
-  if (bStatic_ != bState) {
-    bStatic_ = bState;
-
-    if (bStatic_) {
-      bSwitchNow_ = 1;
-      OnTimer();
-    }
-  }
-}
+//void Item::PlayStatic(int bState)
+//{
+//  if (bStatic_ != bState) {
+//    bStatic_ = bState;
+//
+//    if (bStatic_) {
+//      bSwitchNow_ = 1;
+//      OnTimer();
+//    }
+//  }
+//}
 
 //void Item::SetPosition(int nX)
 //{
@@ -791,11 +791,11 @@ Sequence* Item::SelectNextSequence()
   String sSequence;
   int bFinal = 0;
 
-  if (!sSequence) {
-    if (bStatic_) {
-      sSequence = GetDefaultSequenceName();
-    }
-  }
+  //if (!sSequence) {
+  //  if (bStatic_) {
+  //    sSequence = GetDefaultSequenceName();
+  //  }
+  //}
 
   if (!sSequence) {
     if (sActivity_) {
@@ -972,12 +972,12 @@ Sequence* Item::GetDefaultSequence()
   return pSequence;
 }
 
-String Item::GetDefaultSequenceName()
-{
-  Sequence* pSequence = GetDefaultSequence();
-  if (pSequence != 0) {
-    return pSequence->getName();
-  }
-
-  return "";
-}
+//String Item::GetDefaultSequenceName()
+//{
+//  Sequence* pSequence = GetDefaultSequence();
+//  if (pSequence != 0) {
+//    return pSequence->getName();
+//  }
+//
+//  return "";
+//}

@@ -93,6 +93,7 @@ public:
 class Msg_Animation_Activity: public ApRequestMessage
 {
 public:
+  #define Msg_Animation_Activity_Idle "idle"
   #define Msg_Animation_Activity_MoveRight "moveright"
   #define Msg_Animation_Activity_MoveLeft "moveleft"
   Msg_Animation_Activity() : ApRequestMessage("Animation_Activity") {}
@@ -100,14 +101,14 @@ public:
   ApIN String sActivity;
 };
 
-// -> Animation
-class Msg_Animation_Static: public ApRequestMessage
-{
-public:
-  Msg_Animation_Static() : ApRequestMessage("Animation_Static"), bState(1) {}
-  ApIN ApHandle hItem;
-  ApIN int bState;
-};
+//// -> Animation
+//class Msg_Animation_Static: public ApRequestMessage
+//{
+//public:
+//  Msg_Animation_Static() : ApRequestMessage("Animation_Static"), bState(1) {}
+//  ApIN ApHandle hItem;
+//  ApIN int bState;
+//};
 
 // -------------------------------------------------------------------
 // Information

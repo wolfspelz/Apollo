@@ -62,7 +62,7 @@ public:
   void On_Animation_SetCondition(Msg_Animation_SetCondition* pMsg);
   void On_Animation_Event(Msg_Animation_Event* pMsg);
   void On_Animation_Activity(Msg_Animation_Activity* pMsg);
-  void On_Animation_Static(Msg_Animation_Static* pMsg);
+  //void On_Animation_Static(Msg_Animation_Static* pMsg);
   void On_Animation_GetGroups(Msg_Animation_GetGroups* pMsg);
   void On_Animation_GetGroupSequences(Msg_Animation_GetGroupSequences* pMsg);
   void On_Animation_GetSequenceInfo(Msg_Animation_GetSequenceInfo* pMsg);
