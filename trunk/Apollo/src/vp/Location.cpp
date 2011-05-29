@@ -786,19 +786,19 @@ void Location::setPosition(Apollo::KeyValueList& kvParams)
 
 void Location::onGetPosition(Apollo::KeyValueList& kvParams)
 {
-  String sX = kvPosition_["x"].getString();
+  String sX = kvPosition_[Msg_Vp_Position_X].getString();
   if (!sX) {
-    kvPosition_["x"].setString(Apollo::getModuleConfig(MODULE_NAME, "Location/DefaultX", "200"));
+    kvPosition_[Msg_Vp_Position_X].setString(Apollo::getModuleConfig(MODULE_NAME, "Location/DefaultX", "200"));
   }
 
-  String sY = kvPosition_["y"].getString();
+  String sY = kvPosition_[Msg_Vp_Position_Y].getString();
   if (!sY) {
-    kvPosition_["y"].setString(Apollo::getModuleConfig(MODULE_NAME, "Location/DefaultY", "0"));
+    kvPosition_[Msg_Vp_Position_Y].setString(Apollo::getModuleConfig(MODULE_NAME, "Location/DefaultY", "0"));
   }
 
-  String sZ = kvPosition_["z"].getString();
+  String sZ = kvPosition_[Msg_Vp_Position_Z].getString();
   if (!sZ) {
-    kvPosition_["z"].setString(Apollo::getModuleConfig(MODULE_NAME, "Location/DefaultZ", "0"));
+    kvPosition_[Msg_Vp_Position_Z].setString(Apollo::getModuleConfig(MODULE_NAME, "Location/DefaultZ", "0"));
   }
 
   kvParams = kvPosition_;

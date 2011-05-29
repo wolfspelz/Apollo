@@ -314,6 +314,34 @@ String Sequence::Src()
   return sUrl;
 }
 
+int Sequence::Dx()
+{
+  int nDx = 0;
+
+  if (length() > 0) {
+    Animation* pAnimation = First();
+    if (pAnimation) {
+      nDx = pAnimation->Dx();
+    }
+  }
+
+  return nDx;
+}
+
+int Sequence::Dy()
+{
+  int nDy = 0;
+
+  if (length() > 0) {
+    Animation* pAnimation = First();
+    if (pAnimation) {
+      nDy = pAnimation->Dy();
+    }
+  }
+
+  return nDy;
+}
+
 void Sequence::GetInfo(
                       String& sGroup,
                       String& sType,
@@ -334,8 +362,8 @@ void Sequence::GetInfo(
     nProbability = nProbability_;
     sIn = sIn_;
     sOut = sOut_;
-    nDx = nDx_;
-    nDy = nDy_;
+    nDx = Dx();
+    nDy = Dy();
     nDuration = nDurationMSec_;
 }
 
@@ -535,7 +563,7 @@ void Item::GetSequenceInfo(const String& sSequence,
 {
   Sequence* pSequence = 0;
 
-  for (Group* pGroup = 0; (pGroup = lGroups_.Next(pGroup)) != 0; ) {
+  for (Group* pGroup = 0; (pGroup = lGroups_.Next(pGroup)) != 0 && pSequence == 0; ) {
     pSequence = pGroup->FindByName(sSequence);
   }
 
@@ -597,18 +625,18 @@ void Item::ParseSequenceNode(Apollo::XMLNode* pNode)
   String sProbability = pNode->getAttribute("probability").getValue();
   String sIn = pNode->getAttribute("in").getValue();
   String sOut = pNode->getAttribute("out").getValue();
-  String sDx = pNode->getAttribute("dx").getValue();
-  String sDy = pNode->getAttribute("dy").getValue();
   int nProbability = String::atoi(sProbability);
   if (nProbability <= 0) { nProbability = 100; }
 
   if (sName) {
-    Sequence* pSequence = new Sequence(sName, pModule_, sGroup, sType, sCondition, nProbability, sIn, sOut, String::atoi(sDx), String::atoi(sDy));
+    Sequence* pSequence = new Sequence(sName, pModule_, sGroup, sType, sCondition, nProbability, sIn, sOut);
     if (pSequence) {
       for (Apollo::XMLNode* pChild = 0; (pChild = pNode->nextChild(pChild)) != 0; ) {
         if (0) {
         } else if (pChild->getName() == "animation") {
           String sSrc = pChild->getAttribute("src").getValue();
+          String sDx = pChild->getAttribute("dx").getValue();
+          String sDy = pChild->getAttribute("dy").getValue();
           if (sSrc) {
 
             if (sSrc.startsWith("http:") || sSrc.startsWith("https:")) {
@@ -617,9 +645,8 @@ void Item::ParseSequenceNode(Apollo::XMLNode* pNode)
               sSrc = sBaseUrl_ + sSrc;
             }
 
-            Animation* pAnimation = new Animation(pModule_);
+            Animation* pAnimation = new Animation(pModule_, sSrc, String::atoi(sDx), String::atoi(sDy));
             if (pAnimation) {
-              pAnimation->Src(sSrc);
               pSequence->AppendAnimation(pAnimation);
             }
           }

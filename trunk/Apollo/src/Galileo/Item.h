@@ -28,8 +28,11 @@ class GalileoModule;
 class Animation: public ListT<Frame, Elem>
 {
 public:
-  Animation(GalileoModule* pModule)
+  Animation(GalileoModule* pModule, const String& sSrc, int nDx, int nDy)
     :pModule_(pModule)
+    ,sSrc_(sSrc)
+    ,nDx_(nDx)
+    ,nDy_(nDy)
     ,bDataBroken_(0)
     ,nRequestSuspendDelaySec_(0)
     ,bLoaded_(0)
@@ -43,8 +46,9 @@ public:
   int HasData() { return sbData_.Length() > 0; }
   void AppendFrame(Frame* pFrame);
   int Duration() { return nDurationMSec_; }
-  void Src(const String& sSrc) { sSrc_ = sSrc;}
   String Src() { return sSrc_;}
+  int Dx() { return nDx_;}
+  int Dy() { return nDy_;}
   void SetAnimationData(const String& sUrl, Buffer& sbData, const String& sMimeType);
   void GetAnimationData(Buffer& sbData, String& sMimeType);
 
@@ -66,6 +70,8 @@ protected:
 
   GalileoModule* pModule_;
   String sSrc_;
+  int nDx_;
+  int nDy_;
   Buffer sbData_;
   String sMimeType_;
   int bDataBroken_;
@@ -81,7 +87,7 @@ protected:
 class Sequence: public ListT<Animation, Elem>
 {
 public:
-  Sequence(const String& sName, GalileoModule* pModule, const String& sGroup, const String& sType, const String& sCondition, int nProbability, const String& sIn, const String& sOut, int nDx, int nDy)
+  Sequence(const String& sName, GalileoModule* pModule, const String& sGroup, const String& sType, const String& sCondition, int nProbability, const String& sIn, const String& sOut)
     :ListT<Animation, Elem>(sName)
     ,pModule_(pModule)
     ,sGroup_(sGroup)
@@ -90,8 +96,6 @@ public:
     ,nProbability_(nProbability)
     ,sIn_(sIn)
     ,sOut_(sOut)
-    ,nDx_(nDx)
-    ,nDy_(nDy)
     ,nDurationMSec_(1000)
     ,bLoaded_(0)
   {}
@@ -104,6 +108,8 @@ public:
   int Duration() { return nDurationMSec_; }
   String& Group() { return sGroup_; }
   String Src();
+  int Dx();
+  int Dy();
   void Load();
   int IsLoaded() { return bLoaded_; }
   void GetInfo(
@@ -129,8 +135,6 @@ protected:
   int nProbability_;
   String sIn_;
   String sOut_;
-  int nDx_;
-  int nDy_;
   int nDurationMSec_;
   int bLoaded_;
 };

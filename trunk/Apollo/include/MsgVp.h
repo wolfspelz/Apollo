@@ -135,6 +135,9 @@ public:
 class Msg_Vp_SendPosition: public ApRequestMessage
 {
 public:
+  #define Msg_Vp_Position_X "x"
+  #define Msg_Vp_Position_Y "y"
+  #define Msg_Vp_Position_Z "z"
   Msg_Vp_SendPosition() : ApRequestMessage("Vp_SendPosition") {}
   ApIN ApHandle hLocation;
   ApIN Apollo::KeyValueList kvParams;

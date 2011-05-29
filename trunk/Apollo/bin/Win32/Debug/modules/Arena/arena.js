@@ -82,16 +82,16 @@ Arena.prototype = {
     + '      <img class="cCommunity" style="display:none; z-index:43;" />'
     
     + (bSelf ? ''
-      + '    <div class="cImageSensor" style="z-index:70;">'
-      + '      <div class="cMenu" style="display:none; z-index:80;"><img class="cBubble" src="Bubble.png" /></div>'
-      + '      <div class="cChatIn" style="display:none; z-index:100;">'
-      + '        <table border="0" cellpadding="0" cellspacing="0"><tr>'
-      + '          <td><input type="text" class="cText" size="30" /></td>'
-      + '          <td><input type="submit" class="cSend cTranslate" value="Send" /></td>'
-      + '          <td><img src="CloseChatInButton.png" class="cCloseButton" /></td>'
-      + '        </tr></table>'
-      + '      </div>'
-      + '    </div>'
+//      + '    <div class="cImageSensor" style="z-index:70;">'
+//      + '      <div class="cMenu" style="display:none; z-index:80;"><img class="cBubble" src="Bubble.png" /></div>'
+//      + '      <div class="cChatIn" style="display:none; z-index:100;">'
+//      + '        <table border="0" cellpadding="0" cellspacing="0"><tr>'
+//      + '          <td><input type="text" class="cText" size="30" /></td>'
+//      + '          <td><input type="submit" class="cSend cTranslate" value="Send" /></td>'
+//      + '          <td><img src="CloseChatInButton.png" class="cCloseButton" /></td>'
+//      + '        </tr></table>'
+//      + '      </div>'
+//      + '    </div>'
       :
       ''
       )
@@ -105,10 +105,21 @@ Arena.prototype = {
     arena.SetAvatarPosition(hParticipant, nX);
     arena.ShowAvatar(hParticipant);
     
-    if (bSelf) { arena.ActivateSelfAvatarElements(hParticipant); }
-    else { arena.ActivatePeerAvatarElements(hParticipant); }
+    if (bSelf) {
+      arena.ActivateSelfAvatarElements(hParticipant);
+    } else {
+      arena.ActivatePeerAvatarElements(hParticipant);
+    }
 
     $('#' + GetParticipantDomId(hParticipant) + ' .cTranslate').each( function () { api.TranslateElement(this, null); } );
+
+//    $('#' + GetParticipantDomId(hParticipant)).click(
+//      function () {
+//        Log.Debug(hParticipant);
+//        $('.cParticipant .cImage').css('z-index', '40');
+//        $('#' + GetParticipantDomId(hParticipant) + ' .cImage').css('z-index', '41');
+//      }
+//    );
   },
 
   RemoveAvatar: function (hParticipant)
@@ -131,7 +142,7 @@ Arena.prototype = {
     $('#' + GetParticipantDomId(hParticipant)).css('left', nX + 'px');
   },
 
-  MoveAvatarPosition: function (hParticipant, nX)
+  MoveAvatarPosition: function (hParticipant, nX, nSpeedX)
   {
     var e = $('#' + GetParticipantDomId(hParticipant));
 
@@ -139,7 +150,7 @@ Arena.prototype = {
     
     var nDiff = nX - nOldX;
     if (nDiff < 0) { nDiff = -nDiff; };
-    var nDuration = (nDiff * 1000) / 50;
+    var nDuration = (nDiff * 1000) / nSpeedX;
 
     e .stop(true)
       .animate(
@@ -302,6 +313,11 @@ Arena.prototype = {
     api.Message('OnAvatarPositionReached').setString('ApType', 'Arena_CallModuleSrpc').setString('hParticipant', hParticipant).setInt('nX', nX).send();
   },
 
+  OnAvatarDraggedBy: function (hParticipant, nX, nY)
+  {
+    api.Message('OnAvatarDraggedBy').setString('ApType', 'Arena_CallModuleSrpc').setString('hParticipant', hParticipant).setInt('nX', nX).setInt('nY', nY).send();
+  },
+
   SendPublicChat: function (sText)
   {
     api.Message('SendPublicChat').setString('ApType', 'Arena_CallModuleSrpc').setString('sText', sText).send();
@@ -309,11 +325,7 @@ Arena.prototype = {
 
   // --------------------------------------
   // protected
-  
-  ActivatePeerAvatarElements: function (hParticipant)
-  {
-  },
-  
+    
   ActivateSelfAvatarElements: function (hParticipant)
   {
     $('.cImageSensor').hover(
@@ -375,6 +387,32 @@ Arena.prototype = {
       }
     );
 
+    $('#' + GetParticipantDomId(hParticipant)).draggable(
+      {
+        containment: '#' + arena.sDomId,
+        scroll: false,
+        opacity: 0.7, 
+        helper: "clone",
+        stop: function(ev, ui) {
+          arena.OnAvatarDraggedBy(hParticipant, (ui.position.left - ui.originalPosition.left), (ui.position.top - ui.originalPosition.top));
+        },
+      }
+    );
+    
+  },
+
+  ActivatePeerAvatarElements: function (hParticipant)
+  {
+    $('#' + GetParticipantDomId(hParticipant)).draggable(
+      {
+        containment: '#' + arena.sDomId,
+        scroll: false,
+        axis: 'x',
+        stop: function(ev, ui) {
+          //arena.OnAvatarDraggedBy(hParticipant, (ui.position.left - ui.originalPosition.left), (ui.position.top - ui.originalPosition.top));
+        },
+      }
+    );    
   },
 
   CloseChat: function ()
