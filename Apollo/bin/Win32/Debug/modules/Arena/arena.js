@@ -391,8 +391,10 @@ Arena.prototype = {
       {
         containment: '#' + arena.sDomId,
         scroll: false,
+        stack: '.cParticipant',
         opacity: 0.7, 
         helper: "clone",
+        handle: '.cImage',
         stop: function(ev, ui) {
           arena.OnAvatarDraggedBy(hParticipant, (ui.position.left - ui.originalPosition.left), (ui.position.top - ui.originalPosition.top));
         },
@@ -407,9 +409,13 @@ Arena.prototype = {
       {
         containment: '#' + arena.sDomId,
         scroll: false,
-        axis: 'x',
+        stack: '.cParticipant',
+        xaxis: 'x',
+        handle: '.cImage',
         stop: function(ev, ui) {
-          //arena.OnAvatarDraggedBy(hParticipant, (ui.position.left - ui.originalPosition.left), (ui.position.top - ui.originalPosition.top));
+          $(this).css('bottom', 0 - (ui.position.top - ui.originalPosition.top) + 'px');
+          $(this).css('top', '');
+          $(this).animate( { bottom: '0px' }, 500 );
         },
       }
     );    
