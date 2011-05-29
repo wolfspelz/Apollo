@@ -27,16 +27,18 @@
 {
   position:fixed;
   bottom:0px;
-  width:100px;
+  width:10px;
   height:100px;
+  x-webkit-box-shadow:inset 0 0 1px #000000;
 }
 
 .cCenter
 {
   position:relative;
-  left:-50px;
+  left:-45px;
   width:100px;
   height:100px;
+  x-webkit-box-shadow:inset 0 0 1px #000000;
 }
 
 .cImageWrapper
