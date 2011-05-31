@@ -761,6 +761,13 @@ void Location::setPosition(Apollo::KeyValueList& kvParams)
 {
   kvPosition_ = kvParams;
 
+  String sX = kvParams[Msg_Vp_Position_X].getString();
+  String sY = kvPosition_[Msg_Vp_Position_Y].getString();
+  String sZ = kvPosition_[Msg_Vp_Position_Z].getString();
+  if (sX) { Apollo::setModuleConfig(MODULE_NAME, "Location/DefaultX", sX); }
+  if (sY) { Apollo::setModuleConfig(MODULE_NAME, "Location/DefaultY", sY); }
+  if (sZ) { Apollo::setModuleConfig(MODULE_NAME, "Location/DefaultZ", sZ); }
+
   {
     Msg_Protocol_Room_BeginState msg;
     msg.sProtocol = protocol();
@@ -787,19 +794,13 @@ void Location::setPosition(Apollo::KeyValueList& kvParams)
 void Location::onGetPosition(Apollo::KeyValueList& kvParams)
 {
   String sX = kvPosition_[Msg_Vp_Position_X].getString();
-  if (!sX) {
-    kvPosition_[Msg_Vp_Position_X].setString(Apollo::getModuleConfig(MODULE_NAME, "Location/DefaultX", "200"));
-  }
+  if (!sX) { kvPosition_[Msg_Vp_Position_X].setString(Apollo::getModuleConfig(MODULE_NAME, "Location/DefaultX", "200")); }
 
   String sY = kvPosition_[Msg_Vp_Position_Y].getString();
-  if (!sY) {
-    kvPosition_[Msg_Vp_Position_Y].setString(Apollo::getModuleConfig(MODULE_NAME, "Location/DefaultY", "0"));
-  }
+  if (!sY) { kvPosition_[Msg_Vp_Position_Y].setString(Apollo::getModuleConfig(MODULE_NAME, "Location/DefaultY", "0")); }
 
   String sZ = kvPosition_[Msg_Vp_Position_Z].getString();
-  if (!sZ) {
-    kvPosition_[Msg_Vp_Position_Z].setString(Apollo::getModuleConfig(MODULE_NAME, "Location/DefaultZ", "0"));
-  }
+  if (!sZ) { kvPosition_[Msg_Vp_Position_Z].setString(Apollo::getModuleConfig(MODULE_NAME, "Location/DefaultZ", "0")); }
 
   kvParams = kvPosition_;
 }
