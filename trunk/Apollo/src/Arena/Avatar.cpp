@@ -499,6 +499,9 @@ void Avatar::OnCallModuleSrpc(Apollo::SrpcMessage& request, Apollo::SrpcMessage&
     int nY = request.getInt("nY");
     OnAvatarDraggedBy(nX, nY);
 
+  } else if (sMethod == "OnAvatarPointerClosed") {
+    OnAvatarPointerClosed();
+
   } else {
     throw ApException("Avatar::OnCallModuleSrpc: Unknown Method=%s", StringType(sMethod));
   }
@@ -530,6 +533,10 @@ void Avatar::OnAvatarDraggedBy(int nDiffX, int nDiffY)
   if (!msg.Request()) {
     apLog_Warning(( MODULE_NAME, "Avatar::OnAvatarDraggedBy", "%s failed: %s", StringType(msg.Type()), StringType(msg.sComment) ));
   }
+}
+
+void Avatar::OnAvatarPointerClosed()
+{
 }
 
 //----------------------------------------------------------

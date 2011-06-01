@@ -75,27 +75,25 @@ Arena.prototype = {
     + '    <div class="cChatWrapper" style="z-index:30;">'
     + '      <div class="cChatContainer"></div>'
     + '    </div>'
+//    + (bSelf ? ''
+//      + '  <div class="cPointer" style="z-index:100;">'
+//      + '    <img class="cCloseButton" style="display:none;" src="img/CloseArrowButton.png" />'
+//      + '  </div>'
+//      :'')
     + '    <div class="cImageWrapper" style="z-index:30;">'
     + '      <div class="cImage" style="z-index:40;"></div>'
     + '      <div class="cNickname" style="z-index:50;">Long Nickname</div>'
     + '      <img class="cIcon" style="display:none; z-index:42;" />'
     + '      <img class="cCommunity" style="display:none; z-index:43;" />'
-    
     + (bSelf ? ''
-//      + '    <div class="cImageSensor" style="z-index:70;">'
-//      + '      <div class="cMenu" style="display:none; z-index:80;"><img class="cBubble" src="Bubble.png" /></div>'
-//      + '      <div class="cChatIn" style="display:none; z-index:100;">'
-//      + '        <table border="0" cellpadding="0" cellspacing="0"><tr>'
-//      + '          <td><input type="text" class="cText" size="30" /></td>'
-//      + '          <td><input type="submit" class="cSend cTranslate" value="Send" /></td>'
-//      + '          <td><img src="CloseChatInButton.png" class="cCloseButton" /></td>'
-//      + '        </tr></table>'
-//      + '      </div>'
-//      + '    </div>'
-      :
-      ''
-      )
-
+      + '    <div class="cChatIn" style="display:none; z-index:100;">'
+      + '      <table border="0" cellpadding="0" cellspacing="0"><tr>'
+      + '        <td><input type="text" class="cText" /></td>'
+      + '        <td><input type="submit" class="cSend cTranslate" value="Send" /></td>'
+      + '        <td><img src="img/CloseChatInButton.png" class="cCloseButton" /></td>'
+      + '      </tr></table>'
+      + '    </div>'
+      :'')
     + '    </div>'
     + '  </div>'
     + '</div>'
@@ -112,14 +110,6 @@ Arena.prototype = {
     }
 
     $('#' + GetParticipantDomId(hParticipant) + ' .cTranslate').each( function () { api.TranslateElement(this, null); } );
-
-//    $('#' + GetParticipantDomId(hParticipant)).click(
-//      function () {
-//        Log.Debug(hParticipant);
-//        $('.cParticipant .cImage').css('z-index', '40');
-//        $('#' + GetParticipantDomId(hParticipant) + ' .cImage').css('z-index', '41');
-//      }
-//    );
   },
 
   RemoveAvatar: function (hParticipant)
@@ -223,7 +213,7 @@ Arena.prototype = {
   {
     $('#' + GetParticipantDomId(hParticipant) + ' .cChatContainer').append(''
       + '<div id="' + GetChatDomId(hParticipant, hChat) + '" class="cChatBubble">' 
-      + '<img src="CloseChatBubbleButton.png" class="cCloseButton" id="' + GetChatDomId(hParticipant, hChat) + '_Close" />'
+      + '<img src="img/CloseChatBubbleButton.png" class="cCloseButton" id="' + GetChatDomId(hParticipant, hChat) + '_Close" />'
       + '<span class="cText">'
       + EscapeHTML(LimitChat(sText))
       + '</span>'
@@ -245,17 +235,18 @@ Arena.prototype = {
 
     $('#' + GetChatDomId(hParticipant, hChat) + ' .cCloseButton').hover(
       function () {
-        $(this).attr('src', 'CloseChatBubbleButtonHover.png');
+        $(this).attr('src', 'img/CloseChatBubbleButtonHover.png');
       }, 
       function () {
-        $(this).attr('src', 'CloseChatBubbleButton.png');
+        $(this).attr('src', 'img/CloseChatBubbleButton.png');
       }
     ).click(
-//    (function (hParticipant, hChat) {
-//        return function () {
-//          arena.OnPublicChatClosed(hP, hC);
-//        };
-//      }) (hParticipant, hChat)
+      // Example for closure executed now
+      //(function (hParticipant, hChat) {
+      //    return function () {
+      //      arena.OnPublicChatClosed(hP, hC);
+      //    };
+      //  }) (hParticipant, hChat)
       function () {
         arena.OnPublicChatClosed(hParticipant, hChat);
       }
@@ -318,6 +309,11 @@ Arena.prototype = {
     api.Message('OnAvatarDraggedBy').setString('ApType', 'Arena_CallModuleSrpc').setString('hParticipant', hParticipant).setInt('nX', nX).setInt('nY', nY).send();
   },
 
+  OnAvatarPointerClosed: function (hParticipant)
+  {
+    api.Message('OnAvatarPointerClosed').setString('ApType', 'Arena_CallModuleSrpc').setString('hParticipant', hParticipant).send();
+  },
+
   SendPublicChat: function (sText)
   {
     api.Message('SendPublicChat').setString('ApType', 'Arena_CallModuleSrpc').setString('sText', sText).send();
@@ -328,42 +324,51 @@ Arena.prototype = {
     
   ActivateSelfAvatarElements: function (hParticipant)
   {
-    $('.cImageSensor').hover(
+    $('.cChatIn .cCloseButton').hover(
       function () {
-        $('.cMenu').stop(true).fadeTo('fast', 1);
+        $(this).attr('src', 'img/CloseChatInButtonHover.png');
       }, 
       function () {
-        $('.cMenu').fadeTo('fast', 0);
-      }
-    );
-
-    $('.cBubble').click(
-      function () {
-        $('.cMenu').fadeTo('fast', 0);
-        $('.cChatIn').fadeIn('fast', 
-          function() {
-            $('.cChatIn .cText').focus();
-          }
-        );
-      }
-    );
-
-    $('.cCloseButton').hover(
-      function () {
-        $(this).attr('src', 'CloseChatInButtonHover.png');
-      }, 
-      function () {
-        $(this).attr('src', 'CloseChatInButton.png');
+        $(this).attr('src', 'img/CloseChatInButton.png');
       }
     ).click(
-      function () {
+      function (ev) {
+        ev.stopPropagation();
         arena.CloseChat();
       }
     );
 
+//    $('.cPointer').hover(
+//      function () {
+//        $('.cPointer .cCloseButton').fadeIn('fast');
+//      }, 
+//      function () {
+//        $('.cPointer .cCloseButton').fadeOut('fast');
+//      }
+//    ).click(
+//      function (ev) {
+//        ev.stopPropagation();
+//      }
+//    );
+
+//    $('.cPointer .cCloseButton').hover(
+//      function () {
+//        $(this).attr('src', 'img/CloseArrowButtonHover.png');
+//      }, 
+//      function () {
+//        $(this).attr('src', 'img/CloseArrowButton.png');
+//      }
+//    ).click(
+//      function (ev) {
+//        ev.stopPropagation();
+//        $('.cPointer').fadeOut('fast');
+//        arena.OnAvatarPointerClosed();
+//      }
+//    );
+
     $('.cChatIn .cText').bind("keydown", 
-      function(event) {
-        var keycode = (event.keyCode ? event.keyCode : (event.which ? event.which : event.charCode));
+      function(ev) {
+        var keycode = (ev.keyCode ? ev.keyCode : (ev.which ? ev.which : ev.charCode));
         switch (keycode) {
         case 13:
           arena.SendPublicChat(this.value);
@@ -378,12 +383,23 @@ Arena.prototype = {
           return true;
         }
       }
+    ).click(
+      function(ev) {
+        ev.stopPropagation();
+      }
     );
 
     $('.cChatIn .cSend').click(
-      function() {
+      function(ev) {
+        ev.stopPropagation();
         arena.SendPublicChat($('.cChatIn .cText').val());
         $('.cChatIn .cText').val('').focus();
+      }
+    );
+
+    $('.cChatIn').click(
+      function(ev) {
+        ev.stopPropagation();
       }
     );
 
@@ -399,6 +415,20 @@ Arena.prototype = {
           arena.OnAvatarDraggedBy(hParticipant, (ui.position.left - ui.originalPosition.left), (ui.position.top - ui.originalPosition.top));
         },
       }
+    ).click(
+      function() {
+
+        if ($('.cChatIn').css('display') == 'none') {
+          $('.cChatIn').fadeIn('fast', 
+            function() {
+              $('.cChatIn .cText').focus();
+            }
+          );
+        } else {
+          $('.cChatIn').fadeOut('fast');
+        }
+
+      }
     );
     
   },
@@ -410,12 +440,11 @@ Arena.prototype = {
         containment: '#' + arena.sDomId,
         scroll: false,
         stack: '.cParticipant',
-        xaxis: 'x',
         handle: '.cImage',
         stop: function(ev, ui) {
           $(this).css('bottom', 0 - (ui.position.top - ui.originalPosition.top) + 'px');
           $(this).css('top', '');
-          $(this).animate( { bottom: '0px' }, 500 );
+          $(this).animate( { bottom: '0px' }, 800 );
         },
       }
     );    

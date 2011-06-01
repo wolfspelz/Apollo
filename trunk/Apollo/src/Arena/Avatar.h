@@ -49,6 +49,7 @@ protected:
   void OnIconAttachmentClicked(const String& sLink);
   void OnAvatarPositionReached(int nX);
   void OnAvatarDraggedBy(int nDiffX, int nDiffY);
+  void OnAvatarPointerClosed();
 
   void SubscribeAndGetDetail(const String& sKey);
   void GetDetail(const String& sKey);
