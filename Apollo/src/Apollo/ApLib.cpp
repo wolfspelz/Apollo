@@ -744,7 +744,7 @@ AP_MSG_HANDLER_METHOD(ApLib, OS_KillProcess)
   int ok = 0;
 
 #if defined(WIN32)
-  HANDLE hProcess = hProcess = ::OpenProcess(PROCESS_ALL_ACCESS, FALSE, pMsg->nPid);
+  HANDLE hProcess = ::OpenProcess(PROCESS_ALL_ACCESS, FALSE, pMsg->nPid);
   if (hProcess != NULL) {
     ok = ::TerminateProcess(hProcess, 0);
     if (!ok) {
