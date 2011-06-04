@@ -27,6 +27,7 @@ public:
   static bool HasClass(HWND hWnd, const String& s);
   enum { MaxTitleLen = 10*1024 };
   static bool HasTitle(HWND hWnd, const String& s);
+  static bool HasCoordinates(HWND hWnd, int nLeft, int nTop, int nWidth, int nHeight);
 
   // override
   virtual void OnWindow(HWND hWnd) = 0;

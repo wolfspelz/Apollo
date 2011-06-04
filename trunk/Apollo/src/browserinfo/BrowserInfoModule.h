@@ -21,6 +21,8 @@ class BrowserInfoModuleTester
 {
 public:
   static String GetFirefoxToplevelWindow();
+  static String GetFirefoxToplevelWindowWithCoordinates();
+  static String DontGetFirefoxWithWrongCoordinates();
 };
 #endif
 

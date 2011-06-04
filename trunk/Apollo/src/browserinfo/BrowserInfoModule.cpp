@@ -214,20 +214,185 @@ AP_MSG_HANDLER_METHOD(BrowserInfoModule, System_SecTimer)
 #if defined(AP_TEST)
 
 #if defined(WIN32)
+
+#include "SRegistry.h"
+
+static HANDLE StartFirefox()
+{
+  HANDLE hProcess = NULL;
+
+  String sModule;
+  String sArgs = "-new-window about:blank";
+
+  // Start a FF and check the result
+  String sCmd = SRegistry::GetString(HKEY_CLASSES_ROOT, "FirefoxHTML\\shell\\open\\command", "", "");
+  if (sCmd.startsWith("\"")) {
+    String sPart;
+    sCmd.nextToken("\"", sPart);
+    sCmd.nextToken("\"", sPart);
+    sModule = sPart;
+  } else {
+    String sPart;
+    sCmd.nextToken(" ", sPart);
+    sModule = sPart;
+  }
+
+  STARTUPINFO	si;	
+  ZeroMemory (&si, sizeof(si));
+  si.cb = sizeof(si);
+  PROCESS_INFORMATION pi;
+
+  if (! CreateProcess(
+          sModule, // Module name 
+          sArgs,   // Command line. 
+          NULL,    // Process handle not inheritable. 
+          NULL,    // Thread handle not inheritable. 
+          FALSE,   // Set handle inheritance to FALSE.  
+          0,       // creation flags. 
+          NULL,    // Use parent's environment block. 
+          NULL,    // Use parent's starting directory. 
+          &si,     // Pointer to si structure.
+          &pi)     // Pointer to PROCESS_INFORMATION structure.
+          ) {
+     //s.appendf("CreateProcess failed for command line: '%s %s', GetLastError=%d", StringType(sModule), StringType(sArgs), ::GetLastError());
+  } else {
+    hProcess = pi.hProcess;
+  }
+
+  return hProcess;
+}
+
+static void KillFirefox(HANDLE hProcess)
+{
+  ::TerminateProcess(hProcess, 0);
+}
+
 String BrowserInfoModuleTester::GetFirefoxToplevelWindow()
 {
   String s;
 
-  // Should start a FF and check the result
-  //Apollo::WindowHandle win = FirefoxFinder::GetFirefoxToplevelWindow("Google Mail - Inbox - wolf.heiner@googlemail.com - Mozilla Firefox", 0, 0, 0, 0);
+  HANDLE hProcess = StartFirefox();
 
-  // Needs at least 1 FF window to succeed
-  Apollo::WindowHandle win = FirefoxFinder::GetFirefoxToplevelWindow("", 0, 0, 0, 0);
+  if (!s) {
+    // Needs at least 1 FF window to succeed
+    int bFound = 0;
+    int nCnt = 0;
+    while (!bFound && nCnt < 50) {
+      nCnt++;
+      Apollo::WindowHandle win = FirefoxFinder::GetFirefoxToplevelWindow("", IgnoreCoordinate, IgnoreCoordinate, IgnoreCoordinate, IgnoreCoordinate);
+      HWND hWnd = win;
+      if (hWnd != NULL) {
+        bFound = 1;
+      } else {
+        ::Sleep(200);
+      }
+    }
 
-  HWND hWnd = win;
-  if (hWnd == NULL) {
-    s = "No Firefox found";
+    if (!bFound) {
+      s = "No Firefox found";
+    }
   }
+
+  if (hProcess != NULL) { KillFirefox(hProcess); }
+  
+  return s;
+}
+
+String BrowserInfoModuleTester::GetFirefoxToplevelWindowWithCoordinates()
+{
+  String s;
+
+  HANDLE hProcess1 = StartFirefox();
+  HANDLE hProcess2 = StartFirefox();
+
+  if (!s) {
+    // Needs at least 1 FF window to succeed, wait for one
+    int bFound = 0;
+    int nCnt = 0;
+    while (!bFound && nCnt < 50) {
+      nCnt++;
+      Apollo::WindowHandle win = FirefoxFinder::GetFirefoxToplevelWindow("", IgnoreCoordinate, IgnoreCoordinate, IgnoreCoordinate, IgnoreCoordinate);
+      HWND hWnd = win;
+      if (hWnd != NULL) {
+        bFound = 1;
+      } else {
+        ::Sleep(200);
+      }
+    }
+    if (!bFound){
+      s = "No Firefox started";
+    }
+  }
+
+  HWND hPositionedWindow = NULL;
+
+  if (!s) {
+    // Arrange cooredinates
+    Apollo::WindowHandle win = FirefoxFinder::GetFirefoxToplevelWindow("", IgnoreCoordinate, IgnoreCoordinate, IgnoreCoordinate, IgnoreCoordinate);
+    ::MoveWindow(win, 100, 100, 800, 600, FALSE);
+    hPositionedWindow = win;
+  }
+
+  if (!s) {
+    // Act
+    // Find the one with the right coordinates
+    Apollo::WindowHandle win = FirefoxFinder::GetFirefoxToplevelWindow("", 100, 100, 800, 600);
+    HWND hWnd = win;
+    if (hWnd != hPositionedWindow) {
+      s = "Positioned Firefox window not found";
+    }
+  }
+
+  if (hProcess1 != NULL) { KillFirefox(hProcess1); }
+  if (hProcess2 != NULL) { KillFirefox(hProcess2); }
+
+  return s;
+}
+
+String BrowserInfoModuleTester::DontGetFirefoxWithWrongCoordinates()
+{
+  String s;
+
+  HANDLE hProcess1 = StartFirefox();
+  HANDLE hProcess2 = StartFirefox();
+
+  if (!s) {
+    // Needs at least 1 FF window to succeed, wait for one
+    int bFound = 0;
+    int nCnt = 0;
+    while (!bFound && nCnt < 50) {
+      nCnt++;
+      Apollo::WindowHandle win = FirefoxFinder::GetFirefoxToplevelWindow("", IgnoreCoordinate, IgnoreCoordinate, IgnoreCoordinate, IgnoreCoordinate);
+      HWND hWnd = win;
+      if (hWnd != NULL) {
+        bFound = 1;
+      } else {
+        ::Sleep(200);
+      }
+    }
+    if (!bFound){
+      s = "No Firefox started";
+    }
+  }
+
+  if (!s) {
+    // Arrange cooredinates
+    Apollo::WindowHandle win = FirefoxFinder::GetFirefoxToplevelWindow("", IgnoreCoordinate, IgnoreCoordinate, IgnoreCoordinate, IgnoreCoordinate);
+    ::MoveWindow(win, 100, 100, 800, 600, FALSE);
+  }
+
+  if (!s) {
+    // Act
+    // Find the one with the right coordinates
+    Apollo::WindowHandle win = FirefoxFinder::GetFirefoxToplevelWindow("", 111, 100, 800, 600); // <----------- X is wrong
+    HWND hWnd = win;
+    if (hWnd != NULL) {
+      s = "Should not find window";
+    }
+  }
+
+  if (hProcess1 != NULL) { KillFirefox(hProcess1); }
+  if (hProcess2 != NULL) { KillFirefox(hProcess2); }
 
   return s;
 }
@@ -239,6 +404,8 @@ AP_MSG_HANDLER_METHOD(BrowserInfoModule, UnitTest_Begin)
   if (Apollo::getConfig("Test/BrowserInfo", 0)) {
     #if defined(WIN32)
       AP_UNITTEST_REGISTER(BrowserInfoModuleTester::GetFirefoxToplevelWindow)
+      AP_UNITTEST_REGISTER(BrowserInfoModuleTester::GetFirefoxToplevelWindowWithCoordinates)
+      AP_UNITTEST_REGISTER(BrowserInfoModuleTester::DontGetFirefoxWithWrongCoordinates)
     #endif
   }
 }
@@ -249,6 +416,8 @@ AP_MSG_HANDLER_METHOD(BrowserInfoModule, UnitTest_Execute)
   if (Apollo::getConfig("Test/BrowserInfo", 0)) {
     #if defined(WIN32)
       AP_UNITTEST_EXECUTE(BrowserInfoModuleTester::GetFirefoxToplevelWindow)
+      AP_UNITTEST_EXECUTE(BrowserInfoModuleTester::GetFirefoxToplevelWindowWithCoordinates)
+      AP_UNITTEST_EXECUTE(BrowserInfoModuleTester::DontGetFirefoxWithWrongCoordinates)
     #endif
   }
 }

@@ -53,6 +53,17 @@ bool WindowFinder::HasTitle(HWND hWnd, const String& s)
   return false;
 }
 
+bool WindowFinder::HasCoordinates(HWND hWnd, int nLeft, int nTop, int nWidth, int nHeight)
+{
+  RECT r;
+  ::GetWindowRect(hWnd, &r);
+  if (nLeft != IgnoreCoordinate && nLeft != r.left) { return false; }
+  if (nTop != IgnoreCoordinate && nTop != r.top) { return false; }
+  if (nWidth != IgnoreCoordinate && nWidth != r.right - r.left) { return false; }
+  if (nHeight != IgnoreCoordinate && nHeight != r.bottom - r.top) { return false; }
+  return true;
+}
+
 //------------------------------
 
 void ChildClassFinder::OnWindow(HWND hWnd)
@@ -142,6 +153,12 @@ Apollo::WindowHandle FirefoxFinder::GetFirefoxToplevelWindow(const String& sTitl
 
     // Filter by coordinates
     if (nLeft != IgnoreCoordinate || nTop != IgnoreCoordinate || nWidth != IgnoreCoordinate || nHeight != IgnoreCoordinate) {
+      for (HWNDListNode* pNode = 0; (pNode = candidates_.Next(pNode)) != 0; ) {
+        if (!WindowFinder::HasCoordinates(pNode->Value(), nLeft, nTop, nWidth, nHeight)) {
+          foxPack.list_.Unset(pNode->Key());
+        }
+      }
+
     }
   }
 
