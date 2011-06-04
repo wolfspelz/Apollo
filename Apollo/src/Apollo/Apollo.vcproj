@@ -221,6 +221,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\SRegistry.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\SrpcGateHelper.cpp"
 				>
 			</File>
@@ -467,6 +471,10 @@
 				</File>
 				<File
 					RelativePath="..\..\include\SListT.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\SRegistry.h"
 					>
 				</File>
 				<File
