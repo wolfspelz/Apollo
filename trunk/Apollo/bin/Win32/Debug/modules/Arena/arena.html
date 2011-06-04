@@ -82,8 +82,25 @@ function RunUnittest()
 </script>
 
 <style type="text/css">
-#iWrapper { position:absolute; left:0px; top:0px; width:100%; height:100%; -webkit-box-shadow:inset 0 0 1px 1px #000000; }
-#iContent { position:absolute; left:0px; top:0px; width:40%; height:100%; overflow:hidden; }
+body
+{
+  overflow:hidden;
+  -webkit-box-shadow:inset 0 0 1px 1px #FF0000;
+}
+
+#iWrapper
+{
+  position:absolute; left:0px; top:0px; width:100%; height:100%;
+  -webkit-box-shadow:inset 0 0 1px 1px #0000FF;
+}
+
+#iContent
+{
+  position:absolute; left:100px; bottom:0px; right:100px; top:0px; 
+  overflow:hidden; 
+  -webkit-box-shadow:inset 0 0 1px 1px #00FF00;
+}
+
 #iControl { background-color:rgba(255,255,204,0.7); }
 #iControl * { font-family:Verdana; font-size:11px; }
 #iOut { background-color:rgba(240,240,240,0.9); }
@@ -91,10 +108,10 @@ function RunUnittest()
 </style>
 
 </head>
-<body style="overflow:hidden;">
+<body>
 <div id="iWrapper">
 
-  <div id="iContent" class="cContent"></div>
+  <div id="iContent" class="cContent" style=""></div>
 
   <div id="iControl" style="position:absolute; left:40%; top:0; width:10%; height:100%; overflow:auto;">
     <input type="button" value="WebView_Reload" onclick="api.Message('WebView_Reload').send();" />
