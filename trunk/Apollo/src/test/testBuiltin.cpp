@@ -16,6 +16,9 @@
   #define AP_TEST_List
   #define AP_TEST_KeyValueList
   #define AP_TEST_Tree
+  #if defined(WIN32)
+    #define AP_TEST_WinRegistry
+  #endif // defined(WIN32) 
   #define AP_TEST_Buffer
   #define AP_TEST_RegEx
   #define AP_TEST_Xml
@@ -1853,7 +1856,27 @@ String Test_Tree()
 #endif // AP_TEST_Tree
 
 //----------------------------------------------------------
-// Tree
+// Registry
+
+#if defined(AP_TEST_WinRegistry)
+
+#include "SRegistry.h"
+
+String Test_WinRegistry()
+{
+  String s;
+
+  if (!SRegistry::Test()) {
+    s = "failed";
+  }
+
+  return s;
+}
+
+#endif // AP_TEST_WinRegistry
+
+//----------------------------------------------------------
+// Buffer
 
 #if defined(AP_TEST_Buffer)
 
@@ -2635,6 +2658,10 @@ void Test_Builtin_Register()
   AP_UNITTEST_REGISTER(Test_Tree);
 #endif
 
+#if defined(AP_TEST_WinRegistry)
+  AP_UNITTEST_REGISTER(Test_WinRegistry);
+#endif
+
 #if defined(AP_TEST_Buffer)
   AP_UNITTEST_REGISTER(Test_Buffer);
 #endif
@@ -2743,6 +2770,10 @@ void Test_Builtin_Execute()
 
 #if defined(AP_TEST_Tree)
   AP_UNITTEST_EXECUTE(Test_Tree);
+#endif
+
+#if defined(AP_TEST_WinRegistry)
+  AP_UNITTEST_EXECUTE(Test_WinRegistry);
 #endif
 
 #if defined(AP_TEST_Buffer)
