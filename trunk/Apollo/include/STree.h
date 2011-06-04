@@ -1,8 +1,11 @@
 // ============================================================================
+//
+// Apollo
+//
 // ============================================================================
 
-#if !defined(Tree_h_INCLUDED)
-#define Tree_h_INCLUDED
+#if !defined(STree_h_INCLUDED)
+#define STree_h_INCLUDED
 
 #if _MSC_VER > 1000
 #pragma once
@@ -1200,4 +1203,4 @@ int TreeIterator<EXT_ID, INT_ID, COMPARE_KEYS>::forward_i (void)
   return node_ ? 1 : 0;
 }
 
-#endif // !defined(Tree_h_INCLUDED)
+#endif // !defined(STree_h_INCLUDED)
