@@ -25,6 +25,7 @@ public:
 
   inline ApHandle apHandle() { return hAp_; }
 
+  void AdjustPosition(int bVisible, int nLeft, int nBottom, int nWidth, int nHeight);
   void SetVisibility(int bVisible) { bVisible_ = bVisible; }
   void SetPosition(int nLeft, int nBottom) { nLeft_ = nLeft; nBottom_ = nBottom; }
   void SetSize(int nWidth, int nHeight) { nWidth_ = nWidth; nHeight_ = nHeight; }

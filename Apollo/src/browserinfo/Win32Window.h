@@ -11,8 +11,8 @@
 #include "ApContainer.h"
 #include "WindowHandle.h"
 
-typedef Tree<int, HWND, LessThan<int>> HWNDList;
-typedef TreeNode<int, HWND> HWNDListNode;
+typedef Tree<HWND, int, LessThan<HWND>> HWNDList;
+typedef TreeNode<HWND, int> HWNDListNode;
 
 class WindowFinder
 {

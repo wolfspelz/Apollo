@@ -150,37 +150,10 @@ AP_MSG_HANDLER_METHOD(BrowserInfoModule, VpView_ContextVisibility)
       if (bInLocalCall_) {
         //
       } else {
-        pContext->SetVisibility(pMsg->bVisible);
         if (!pBrowser->IsVisible()) {
           pMsg->bVisible = 0;
         }
       }
-    }
-  }
-
-  pMsg->apStatus = ApMessage::Ok;
-}
-
-AP_MSG_HANDLER_METHOD(BrowserInfoModule, VpView_ContextPosition)
-{
-  Browser* pBrowser = FindBrowserByContext(pMsg->hContext);
-  if (pBrowser) {
-    Context* pContext = pBrowser->GetContext(pMsg->hContext);
-    if (pContext) {
-      pContext->SetPosition(pMsg->nLeft, pMsg->nBottom);
-    }
-  }
-
-  pMsg->apStatus = ApMessage::Ok;
-}
-
-AP_MSG_HANDLER_METHOD(BrowserInfoModule, VpView_ContextSize)
-{
-  Browser* pBrowser = FindBrowserByContext(pMsg->hContext);
-  if (pBrowser) {
-    Context* pContext = pBrowser->GetContext(pMsg->hContext);
-    if (pContext) {
-      pContext->SetSize(pMsg->nWidth, pMsg->nHeight);
     }
   }
 
@@ -465,8 +438,6 @@ int BrowserInfoModule::Init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, BrowserInfoModule, BrowserInfo_BeginTrackCoordinates, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, BrowserInfoModule, BrowserInfo_EndTrackCoordinates, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, BrowserInfoModule, VpView_ContextVisibility, this, ApCallbackPosEarly); // Catch before UI responds and filter with toplevel window state
-  AP_MSG_REGISTRY_ADD(MODULE_NAME, BrowserInfoModule, VpView_ContextPosition, this, ApCallbackPosEarly); // Catch before UI responds and filter with toplevel window state
-  AP_MSG_REGISTRY_ADD(MODULE_NAME, BrowserInfoModule, VpView_ContextSize, this, ApCallbackPosEarly); // Catch before UI responds and filter with toplevel window state
   AP_MSG_REGISTRY_ADD(MODULE_NAME, BrowserInfoModule, VpView_GetContextVisibility, this, ApCallbackPosEarly);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, BrowserInfoModule, VpView_GetContextPosition, this, ApCallbackPosEarly);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, BrowserInfoModule, VpView_GetContextSize, this, ApCallbackPosEarly);

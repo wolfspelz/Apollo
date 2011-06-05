@@ -44,8 +44,6 @@ public:
   void On_BrowserInfo_EndTrackCoordinates(Msg_BrowserInfo_EndTrackCoordinates* pMsg);
 
   void On_VpView_ContextVisibility(Msg_VpView_ContextVisibility* pMsg);
-  void On_VpView_ContextPosition(Msg_VpView_ContextPosition* pMsg);
-  void On_VpView_ContextSize(Msg_VpView_ContextSize* pMsg);
   void On_VpView_GetContextVisibility(Msg_VpView_GetContextVisibility* pMsg);
   void On_VpView_GetContextPosition(Msg_VpView_GetContextPosition* pMsg);
   void On_VpView_GetContextSize(Msg_VpView_GetContextSize* pMsg);
