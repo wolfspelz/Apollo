@@ -43,7 +43,7 @@ void Win32FirefoxBrowser::OnTimer()
     // Then take the parent as content rect
     for (HWNDListNode* pNode = 0; (pNode = ccpf.list_.Next(pNode)) != 0; ) {
       RECT rContent;
-      HWND hParent = ::GetParent(pNode->Value());
+      HWND hParent = ::GetParent(pNode->Key());
       ::GetWindowRect(hParent, &rContent);
       if (rContent.right - rContent.left != 0 && rContent.bottom - rContent.top) {
         hContent = hParent;
@@ -72,35 +72,49 @@ void Win32FirefoxBrowser::OnTimer()
 
 void Win32FirefoxBrowser::AdjustStackingOrder()
 {
-  HWND hWnd = win_;
+  HWNDList contextWindows;
 
-  if (hWnd != NULL) {
-    ContextNode* pNode = contexts_.Next(0);
-    if (pNode) {
+  // Make a context window list
+  {
+    for (ContextNode* pNode = 0; (pNode = contexts_.Next(pNode)) != 0; ) {
       Context* pContext = pNode->Value();
-      if (pContext) {
 
-        Msg_BrowserInfo_GetContextWin32Window msg;
-        msg.hContext = pContext->apHandle();
-        if (msg.Request()) {
-          PutWindowBeforeBrowser(msg.hWnd);
-        }
-
+      Msg_BrowserInfo_GetContextWin32Window msg;
+      msg.hContext = pContext->apHandle();
+      if (msg.Request()) {
+        contextWindows.Set(msg.hWnd, 1);
       }
     }
   }
-}
 
-void Win32FirefoxBrowser::PutWindowBeforeBrowser(HWND hWnd)
-{
-  // Are we still in front of the browser?
-  HWND hWndNext = ::GetNextWindow(hWnd, GW_HWNDNEXT);
-  if (hWndNext != win_) {
-    // No -> re-stack
+  int bAllContextsAboveBrowser = 0;
+  HWND hWndPrev = NULL;
 
-    // Get window in front of browser and put us behind it = in between
-    HWND hWndPrev = ::GetNextWindow(win_, GW_HWNDPREV);
-    // If hWndPrev == NULL, then hWndPrev == HWND_TOP, because HWND_TOP == ((HWND)0)
-    ::SetWindowPos(hWnd, hWndPrev, 0, 0, 0, 0, SWP_NOACTIVATE | SWP_NOSIZE | SWP_NOMOVE);
+  // Find previous (foreign) window, which is not one of the contexts
+  {
+    HWND hWndCurrent = win_;
+    int bFoundPreviousWindowOrTop = 0;
+    int nCntContextsAboveBrowser = 0;
+    while (!bFoundPreviousWindowOrTop && nCntContextsAboveBrowser < contextWindows.Count()) {
+      hWndPrev = ::GetNextWindow(hWndCurrent, GW_HWNDPREV);
+      if (hWndPrev == NULL || contextWindows.Find(hWndPrev) == 0) {
+        bFoundPreviousWindowOrTop = 1;
+      } else {
+        nCntContextsAboveBrowser++;
+        hWndCurrent = hWndPrev;
+      }
+    }
+    if (nCntContextsAboveBrowser == contextWindows.Count()) {
+      bAllContextsAboveBrowser = 1;
+    }
+  }
+
+  // Re-stack below the just found previous window
+  if (!bAllContextsAboveBrowser) {
+    for (HWNDListNode* pNode = 0; (pNode = contextWindows.Next(pNode)) != 0; ) {
+      HWND hWnd = pNode->Key();
+      ::SetWindowPos(hWnd, hWndPrev, 0, 0, 0, 0, SWP_NOACTIVATE | SWP_NOSIZE | SWP_NOMOVE);
+      hWndPrev = hWnd;
+    }
   }
 }

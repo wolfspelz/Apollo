@@ -20,7 +20,6 @@ public:
 
 protected:
   void AdjustStackingOrder();
-  void PutWindowBeforeBrowser(HWND hWnd);
 };
 
 #endif // !defined(Win32FirefoxBrowser_h_INCLUDED)

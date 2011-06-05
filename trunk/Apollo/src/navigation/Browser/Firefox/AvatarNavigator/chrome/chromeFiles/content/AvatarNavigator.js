@@ -222,6 +222,20 @@ AvatarNavigator.prototype.identifyContextForTab = function(tab, hContext)
 
 // -------------------------------
 
+AvatarNavigator.prototype.openContext = function(hContext)
+{
+  anLogInfo('OpenContext ' + hContext);
+
+  if (this.protocol) {
+    var msg = new SrpcMessage();
+    msg.setString('Method', 'Context.Open');
+    msg.setString('hContext', hContext);
+    this.protocol.sendRequest(msg);
+  } else {
+    anLogVerbose('AvatarNavigator.openContext ignored(not-connected) ' + hContext);
+  }
+}
+
 AvatarNavigator.prototype.navigateContext = function(hContext, sUrl)
 {
   if (this.protocol) {
@@ -316,6 +330,8 @@ AvatarNavigator.prototype.processTabUrl = function(tab, url)
         AvatarNavigator.setTabHasNavigate(tab, false);
         this.closeContext(hContext);
       } else {
+        //this.openContext(hContext);
+        //this.identifyContextForTab(tab, hContext);
         anLogVerbose('AvatarNavigator.processTabUrl ignored(no-navigate) ' + hContext + ' ' + (url?url.spec:''));
       }
     }
@@ -354,7 +370,9 @@ AvatarNavigator.prototype.onTabSelect = function(e)
 
   if (tab != this.selectedTab) {
     if (this.selectedTab != null) {
-      this.hideContext(AvatarNavigator.getTabContext(this.selectedTab));
+      //if (AvatarNavigator.tabHasContext(this.selectedTab)) {
+        this.hideContext(AvatarNavigator.getTabContext(this.selectedTab));
+      //}
     }
     this.selectedTab = tab;
     if (AvatarNavigator.getTabHasNavigate(tab)) {

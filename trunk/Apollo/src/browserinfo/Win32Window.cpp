@@ -69,7 +69,7 @@ bool WindowFinder::HasCoordinates(HWND hWnd, int nLeft, int nTop, int nWidth, in
 void ChildClassFinder::OnWindow(HWND hWnd)
 {
   if (HasClass(hWnd, sClass_)) {
-    list_.Set(list_.Count(), hWnd);
+    list_.Set(hWnd, 1);
   }
 }
 
@@ -83,12 +83,12 @@ void ChildClassPathFinder::OnWindow(HWND hWnd)
     if (HasClass(hWnd, sClass)) {
 
       if (sPath.empty()) {
-        list_.Set(list_.Count(), hWnd);
+        list_.Set(hWnd, 1);
       } else {
         ChildClassPathFinder ccpf(hWnd, sPath);
         ccpf.Run();
         for (HWNDListNode* pNode = 0; (pNode = ccpf.list_.Next(pNode)) != 0; ) {
-          list_.Set(list_.Count(), pNode->Value());
+          list_.Set(pNode->Key(), 1);
         }
       }
 
@@ -112,7 +112,7 @@ void FirefoxFinder::OnWindow(HWND hWnd)
     ChildClassPathFinder ccpf(hWnd, sChildClassPath_);
     ccpf.Run();
     if (ccpf.list_.Count() > 0) {
-      list_.Set(list_.Count(), hWnd);
+      list_.Set(hWnd, 1);
     }
   }
 }
@@ -135,7 +135,7 @@ Apollo::WindowHandle FirefoxFinder::GetFirefoxToplevelWindow(const String& sTitl
       // Count how many titles match
       int nCnt = 0;
       for (HWNDListNode* pNode = 0; (pNode = candidates_.Next(pNode)) != 0; ) {
-        if (WindowFinder::HasTitle(pNode->Value(), sTitle)) {
+        if (WindowFinder::HasTitle(pNode->Key(), sTitle)) {
           nCnt++;
         }
       }
@@ -144,7 +144,7 @@ Apollo::WindowHandle FirefoxFinder::GetFirefoxToplevelWindow(const String& sTitl
         // do not filter by title if no match
       } else {
         for (HWNDListNode* pNode = 0; (pNode = candidates_.Next(pNode)) != 0; ) {
-          if (!WindowFinder::HasTitle(pNode->Value(), sTitle)) {
+          if (!WindowFinder::HasTitle(pNode->Key(), sTitle)) {
             foxPack.list_.Unset(pNode->Key());
           }
         }
@@ -154,7 +154,7 @@ Apollo::WindowHandle FirefoxFinder::GetFirefoxToplevelWindow(const String& sTitl
     // Filter by coordinates
     if (nLeft != IgnoreCoordinate || nTop != IgnoreCoordinate || nWidth != IgnoreCoordinate || nHeight != IgnoreCoordinate) {
       for (HWNDListNode* pNode = 0; (pNode = candidates_.Next(pNode)) != 0; ) {
-        if (!WindowFinder::HasCoordinates(pNode->Value(), nLeft, nTop, nWidth, nHeight)) {
+        if (!WindowFinder::HasCoordinates(pNode->Key(), nLeft, nTop, nWidth, nHeight)) {
           foxPack.list_.Unset(pNode->Key());
         }
       }
@@ -168,7 +168,7 @@ Apollo::WindowHandle FirefoxFinder::GetFirefoxToplevelWindow(const String& sTitl
     apLog_Error((LOG_CHANNEL, "BrowserInfoModule::GetFirefoxToplevelWindow", "No window found"));
   } else {
     // Extract
-    hWnd = foxPack.list_.Next(0)->Value();
+    hWnd = foxPack.list_.Next(0)->Key();
   }
 
   return hWnd;
