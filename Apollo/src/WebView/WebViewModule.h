@@ -45,8 +45,9 @@ public:
   void On_WebView_MouseRelease(Msg_WebView_MouseRelease* pMsg);
   void On_WebView_GetPosition(Msg_WebView_GetPosition* pMsg);
   void On_WebView_GetVisibility(Msg_WebView_GetVisibility* pMsg);
-
-  void On_System_3SecTimer(Msg_System_3SecTimer* pMsg);
+  #if defined(WIN32)
+  void On_WebView_GetWin32Window(Msg_WebView_GetWin32Window* pMsg);
+  #endif // defined(WIN32)
 
 #if defined(AP_TEST)
   void On_UnitTest_Begin(Msg_UnitTest_Begin* pMsg);

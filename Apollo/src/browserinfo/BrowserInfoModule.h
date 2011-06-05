@@ -10,7 +10,7 @@
 #include "ApModule.h"
 #include "MsgUnitTest.h"
 #include "MsgBrowserInfo.h"
-#include "MsgSystem.h"
+#include "MsgTimer.h"
 #include "MsgVp.h"
 #include "MsgVpView.h"
 #include "WindowHandle.h"
@@ -34,6 +34,7 @@ class BrowserInfoModule
 public:
   BrowserInfoModule()
     :bInLocalCall_(0)
+    ,nCntTimerUser_(0)
   {}
 
   int Init();
@@ -49,7 +50,7 @@ public:
   void On_VpView_GetContextPosition(Msg_VpView_GetContextPosition* pMsg);
   void On_VpView_GetContextSize(Msg_VpView_GetContextSize* pMsg);
 
-  void On_System_SecTimer(Msg_System_SecTimer* pMsg);
+  void On_Timer_Event(Msg_Timer_Event* pMsg);
 
   void InLocalCall(int bState) { bInLocalCall_ = bState; }
 
@@ -61,10 +62,15 @@ public:
 
 protected:
   Browser* FindBrowserByContext(const ApHandle& hContext);
+  void StartTimer();
+  void StopTimer();
 
 protected:
   BrowserList browsers_;
   int bInLocalCall_;
+
+  ApHandle hTimer_;
+  int nCntTimerUser_;
 
   AP_MSG_REGISTRY_DECLARE;
 

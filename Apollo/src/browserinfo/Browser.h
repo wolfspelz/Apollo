@@ -23,7 +23,7 @@ public:
     ,nHeight_(0)
   {}
 
-  ApHandle hAp_;
+  inline ApHandle apHandle() { return hAp_; }
 
   void SetVisibility(int bVisible) { bVisible_ = bVisible; }
   void SetPosition(int nLeft, int nBottom) { nLeft_ = nLeft; nBottom_ = nBottom; }
@@ -34,6 +34,7 @@ public:
   void GetSize(int& nWidth, int& nHeight) { nWidth = nWidth_; nHeight = nHeight_; }
 
 protected:
+  ApHandle hAp_;
   int bVisible_;
   int nLeft_;
   int nBottom_;
@@ -64,8 +65,8 @@ public:
   bool HasContext(const ApHandle& hContext) { return contexts_.Find(hContext) != 0; }
   Apollo::WindowHandle GetWindow() { return win_; }
 
-  virtual void SecTimer() {}
-  virtual void Browser::Evaluate(int bVisible, int nLeft, int nBottom, int nWidth, int nHeight);
+  virtual void OnTimer() {}
+  virtual void AdjustPosition(int bVisible, int nLeft, int nBottom, int nWidth, int nHeight);
 
   int IsVisible() { return bVisible_; }
 

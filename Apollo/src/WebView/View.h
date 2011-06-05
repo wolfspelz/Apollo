@@ -89,6 +89,7 @@ public:
   void MouseRelease();
   void GetPosition(int& nLeft, int& nTop, int& nWidth, int& nHeight);
   void GetVisibility(int& bVisible);
+  void GetWin32Window(HWND& hWnd);
 
   static JSValueRef JS_Apollo_getSharedValue(JSContextRef ctx, JSObjectRef thisObject, JSStringRef propertyName, JSValueRef* exception);
   static JSValueRef JS_Apollo_echoString(JSContextRef ctx, JSObjectRef function, JSObjectRef thisObject, size_t argumentCount, const JSValueRef* arguments, JSValueRef* exception);

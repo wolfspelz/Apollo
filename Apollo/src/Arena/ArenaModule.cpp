@@ -5,7 +5,6 @@
 // ============================================================================
 
 #include "Apollo.h"
-#include "MsgConfig.h"
 #include "Local.h"
 #include "ArenaModule.h"
 #include "ArenaModuleTester.h"
@@ -351,6 +350,21 @@ AP_SRPC_HANDLER_METHOD(ArenaModule, Arena_CallModuleSrpc, ApSRPCMessage)
   pMsg->apStatus = ApMessage::Ok;
 }
 
+#if defined(WIN32)
+AP_MSG_HANDLER_METHOD(ArenaModule, BrowserInfo_GetContextWin32Window)
+{
+  Display* pDisplay = FindDisplay(pMsg->hContext);
+  if (pDisplay == 0) { throw ApException("No display for context=" ApHandleFormat "", ApHandleType(pMsg->hContext)); }
+
+  Msg_WebView_GetWin32Window msg;
+  msg.hView = pDisplay->GetView();
+  if (!msg.Request()) { throw ApException("Msg_WebView_GetWin32Window(" ApHandleFormat ") failed: %s", ApHandleType(msg.hView), StringType(msg.sComment)); }
+
+  pMsg->hWnd = msg.hWnd;
+  pMsg->apStatus = ApMessage::Ok;
+}
+#endif // defined(WIN32)
+
 //----------------------------------------------------------
 
 #if defined(AP_TEST)
@@ -454,6 +468,9 @@ int ArenaModule::Init()
   //AP_MSG_REGISTRY_ADD(MODULE_NAME, ArenaModule, Animation_Frame, this, ApCallbackPosNormal);
   //AP_MSG_REGISTRY_ADD(MODULE_NAME, ArenaModule, Animation_SequenceEnd, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ArenaModule, Arena_CallModuleSrpc, this, ApCallbackPosNormal);
+  #if defined(WIN32)
+    AP_MSG_REGISTRY_ADD(MODULE_NAME, ArenaModule, BrowserInfo_GetContextWin32Window, this, ApCallbackPosNormal);
+  #endif // defined(WIN32)
 
   AP_UNITTEST_HOOK(ArenaModule, this);
 

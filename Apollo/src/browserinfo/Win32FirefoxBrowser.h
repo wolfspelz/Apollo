@@ -16,7 +16,11 @@ public:
     :Browser(win)
   {}
 
-  void SecTimer();
+  void OnTimer();
+
+protected:
+  void AdjustStackingOrder();
+  void PutWindowBeforeBrowser(HWND hWnd);
 };
 
 #endif // !defined(Win32FirefoxBrowser_h_INCLUDED)

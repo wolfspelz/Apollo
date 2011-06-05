@@ -175,28 +175,14 @@ AP_MSG_HANDLER_METHOD(WebViewModule, WebView_GetVisibility)
   pMsg->apStatus = ApMessage::Ok;
 }
 
-int g_nCnt = 0;
-AP_MSG_HANDLER_METHOD(WebViewModule, System_3SecTimer)
+#if defined(WIN32)
+AP_MSG_HANDLER_METHOD(WebViewModule, WebView_GetWin32Window)
 {
-  ViewListNode *pNode = views_.Next(0);
-  if (pNode) {
-    ApHandle hView = pNode->Key();
-    View* pView = pNode->Value();
-
-    if (pView) {
-      //if (g_nCnt++ == 3) {
-      //  Msg_WebView_Destroy::_(hView);
-      //}
-
-      //pView->SetVisibility(g_nCnt++ % 2 == 0 ? 1 : 0);
-
-      //List lArgs;
-      //lArgs.AddLast("abc");
-      //lArgs.AddLast("def");
-      //String s = pView->CallJsFunction("Concat", lArgs);
-    }
-  }
+  View* pView = FindView(pMsg->hView);
+  pView->GetWin32Window(pMsg->hWnd);
+  pMsg->apStatus = ApMessage::Ok;
 }
+#endif // defined(WIN32)
 
 //----------------------------------------------------------
 
@@ -368,8 +354,9 @@ int WebViewModule::Init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, WebViewModule, WebView_MouseRelease, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, WebViewModule, WebView_GetPosition, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, WebViewModule, WebView_GetVisibility, this, ApCallbackPosNormal);
-
-  AP_MSG_REGISTRY_ADD(MODULE_NAME, WebViewModule, System_3SecTimer, this, ApCallbackPosNormal);
+  #if defined(WIN32)
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, WebViewModule, WebView_GetWin32Window, this, ApCallbackPosNormal);
+  #endif // defined(WIN32)
 
   AP_UNITTEST_HOOK(WebViewModule, this);
 

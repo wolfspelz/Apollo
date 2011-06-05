@@ -1,5 +1,6 @@
 Extensions:
 -----------
+
 - Extension Developer https://addons.mozilla.org/en-US/firefox/addon/7434/
   - for reloading the extension 
 - Javascript Debugger https://www.mozilla.org/projects/venkman/
@@ -10,10 +11,14 @@ Extensions:
 
 Start a separate "dev" instance of FF:
 --------------------------------------
-Firefox-dev.bat
+
+- Execute Firefox-dev.bat
+- If the profile manager asks for a profile, then create one called "dev"
 
 Setup an extension proxy:
 -------------------------
-https://developer.mozilla.org/en/Setting_up_extension_development_environment
-Put AvatarNavigator@OpenVirtualWorld.org into the extensions folder of the "dev" profile
+
+- Edit file "AvatarNavigator@OpenVirtualWorld.org"
+- Put "AvatarNavigator@OpenVirtualWorld.org" into the extensions folder of the "dev" profile
+- (See https://developer.mozilla.org/en/Setting_up_extension_development_environment)
 
