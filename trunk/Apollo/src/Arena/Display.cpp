@@ -104,13 +104,16 @@ void Display::SetSize(int nWidth, int nHeight)
   SendPosition();
 }
 
+#define OVERFLOW_LEFT 100
+#define OVERFLOW_RIGHT 800
+
 void Display::SendPosition()
 {
   Msg_WebView_Position msg;
   msg.hView = hView_;
-  msg.nLeft = nLeft_;
+  msg.nLeft = nLeft_ - OVERFLOW_LEFT;
   msg.nTop = nBottom_ - nHeight_;
-  msg.nWidth = nWidth_;
+  msg.nWidth = nWidth_ + (OVERFLOW_LEFT + OVERFLOW_RIGHT);
   msg.nHeight = nHeight_;
   if (!msg.Request()) {
     apLog_Error((LOG_CHANNEL, "Display::SendPosition", "Msg_WebView_Position(" ApHandleFormat ") failed", ApHandleType(msg.hView)));

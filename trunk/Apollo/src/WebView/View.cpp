@@ -257,6 +257,11 @@ void View::GetVisibility(int& bVisible)
   bVisible = bVisible_;
 }
 
+void View::GetWin32Window(HWND& hWnd)
+{
+  hWnd = hWnd_;
+}
+
 //------------------------------------
 // Call JS
 

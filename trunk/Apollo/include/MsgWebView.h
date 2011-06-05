@@ -229,6 +229,16 @@ public:
   ApOUT int bVisible;
 };
 
+#if defined(WIN32)
+class Msg_WebView_GetWin32Window: public ApRequestMessage
+{
+public:
+  Msg_WebView_GetWin32Window() : ApRequestMessage("WebView_GetWin32Window"), hWnd(NULL) {}
+  ApIN ApHandle hView;
+  ApOUT HWND hWnd;
+};
+#endif // defined(WIN32)
+
 //--------------------------
 // Events
 

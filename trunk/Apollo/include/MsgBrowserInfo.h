@@ -65,4 +65,15 @@ public:
   ApIN int nHeight;
 };
 
+#if defined(WIN32)
+// browser window tracker module -> display module
+class Msg_BrowserInfo_GetContextWin32Window: public ApRequestMessage
+{
+public:
+  Msg_BrowserInfo_GetContextWin32Window() : ApRequestMessage("BrowserInfo_GetContextWin32Window"), hWnd(NULL) {}
+  ApIN ApHandle hContext;
+  ApIN HWND hWnd;
+};
+#endif // defined(WIN32)
+
 #endif // !defined(MsgBrowserInfo_h_INCLUDED)

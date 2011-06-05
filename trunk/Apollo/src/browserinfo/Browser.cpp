@@ -46,7 +46,7 @@ Context* Browser::GetContext(const ApHandle& hContext)
   return pContext;
 }
 
-void Browser::Evaluate(int bVisible, int nLeft, int nBottom, int nWidth, int nHeight)
+void Browser::AdjustPosition(int bVisible, int nLeft, int nBottom, int nWidth, int nHeight)
 {
   int bPosChanged = 0;
   int bSizeChanged = 0;
@@ -70,7 +70,7 @@ void Browser::Evaluate(int bVisible, int nLeft, int nBottom, int nWidth, int nHe
       nHeight_ = nHeight;
     }
   }
-  //apLog_Debug((LOG_CHANNEL, "Win32FirefoxBrowser::SecTimer", "%08x %d,%d,%d,%d", (int) hWnd, nLeft, nBottom, nWidth, nHeight));
+  //apLog_Debug((LOG_CHANNEL, "Win32FirefoxBrowser::OnTimer", "%08x %d,%d,%d,%d", (int) hWnd, nLeft, nBottom, nWidth, nHeight));
 
   for (ContextNode* pNode = 0; (pNode = contexts_.Next(pNode)) != 0; ) {
 

@@ -213,6 +213,10 @@
 			UniqueIdentifier="{6FEB3C2B-5221-41b2-9DC0-9C4A9F8E0E73}"
 			>
 		</Filter>
+		<File
+			RelativePath="..\..\bin\Win32\Debug\modules\browserinfo\config.txt"
+			>
+		</File>
 	</Files>
 	<Globals>
 	</Globals>

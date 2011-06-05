@@ -107,7 +107,7 @@ Socket.prototype.connect = function(sHostname, nPort, observer)
 // connect. Rather it comes on the first data and just before disconnect,
 // which is quite stupid. Yes, onStopRequest and onStartRequest are 
 // balanced. Thanks a lot. Still, sending a onStartRequest/onStopRequest 
-// pair when connect fails is a an amazing design. We want to know when 
+// pair when connect fails is a strange idea. We want to know when 
 // the connect succeeds, so that we can send a HELO. Therefore we have 
 // to care for ourself, as always, sigh.
 

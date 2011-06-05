@@ -43,6 +43,29 @@ Browser* BrowserInfoModule::FindBrowserByContext(const ApHandle& hContext)
   return pResult;
 }
 
+void BrowserInfoModule::StartTimer()
+{
+  nCntTimerUser_++;
+
+  if (nCntTimerUser_ == 1) {
+    if (!ApIsHandle(hTimer_)) {
+      int nDelayMSec = Apollo::getModuleConfig(MODULE_NAME, "TrackDelay", 314);
+      hTimer_ = Apollo::startInterval(0, nDelayMSec * 1000);
+    }
+  }
+}
+
+void BrowserInfoModule::StopTimer()
+{
+  nCntTimerUser_--;
+
+  if (nCntTimerUser_ == 0) {
+    if (ApIsHandle(hTimer_)) {
+      Apollo::cancelInterval(hTimer_);
+      hTimer_ = ApNoHandle;
+    }
+  }
+}
 //----------------------------------------------------------
 
 AP_MSG_HANDLER_METHOD(BrowserInfoModule, BrowserInfo_BeginTrackCoordinates)
@@ -78,13 +101,15 @@ AP_MSG_HANDLER_METHOD(BrowserInfoModule, BrowserInfo_BeginTrackCoordinates)
 #if defined(WIN32)
       } else if (pMsg->sType == Msg_BrowserInfo_BeginTrackCoordinates_Type_Firefox) {
         pBrowser = new Win32FirefoxBrowser(win);
-#endif
+#endif // defined(WIN32)
       }
 
       if (pBrowser == 0) {
         apLog_Error((LOG_CHANNEL, "BrowserInfoModule::BrowserInfo_BeginTrackCoordinates", "No browser for platformand type=%s", StringType(pMsg->sType)));
       } else {
         browsers_.Set(win, pBrowser);
+
+        StartTimer();
       }
     }
     if (pBrowser != 0) {
@@ -103,8 +128,10 @@ AP_MSG_HANDLER_METHOD(BrowserInfoModule, BrowserInfo_EndTrackCoordinates)
     apLog_Error((LOG_CHANNEL, "BrowserInfoModule::BrowserInfo_EndTrackCoordinates", "No browser for ctxt=" ApHandleFormat "", ApHandleType(pMsg->hContext)));
   } else {
     pBrowser->RemoveContext(pMsg->hContext);
-
+    
     if (!pBrowser->HasContexts()) {
+      StopTimer();
+
       browsers_.Unset(pBrowser->GetWindow());
       delete pBrowser;
       pBrowser = 0;
@@ -199,12 +226,12 @@ AP_MSG_HANDLER_METHOD(BrowserInfoModule, VpView_GetContextSize)
   pMsg->apStatus = ApMessage::Ok;
 }
 
-AP_MSG_HANDLER_METHOD(BrowserInfoModule, System_SecTimer)
+AP_MSG_HANDLER_METHOD(BrowserInfoModule, Timer_Event)
 {
   for (BrowserListNode* pNode = 0; (pNode = browsers_.Next(pNode)) != 0; ) {
     Browser* pBrowser = pNode->Value();
     if (pBrowser) {
-      pBrowser->SecTimer();
+      pBrowser->OnTimer();
     }
   }
 }
@@ -443,7 +470,7 @@ int BrowserInfoModule::Init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, BrowserInfoModule, VpView_GetContextVisibility, this, ApCallbackPosEarly);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, BrowserInfoModule, VpView_GetContextPosition, this, ApCallbackPosEarly);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, BrowserInfoModule, VpView_GetContextSize, this, ApCallbackPosEarly);
-  AP_MSG_REGISTRY_ADD(MODULE_NAME, BrowserInfoModule, System_SecTimer, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, BrowserInfoModule, Timer_Event, this, ApCallbackPosNormal);
   AP_UNITTEST_HOOK(BrowserInfoModule, this);
 
   return ok;

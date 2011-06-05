@@ -11,6 +11,8 @@
 #define LOG_CHANNEL MODULE_NAME
 
 #include "ApLog.h"
+#include "MsgConfig.h"
 #include "MsgWebView.h"
+#include "MsgBrowserInfo.h"
 
 #endif // Local_H_INCLUDED

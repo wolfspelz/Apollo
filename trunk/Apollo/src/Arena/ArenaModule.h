@@ -73,6 +73,9 @@ public:
   //void On_Animation_Frame(Msg_Animation_Frame* pMsg);
   //void On_Animation_SequenceEnd(Msg_Animation_SequenceEnd* pMsg);
   void On_Arena_CallModuleSrpc(ApSRPCMessage* pMsg);
+  #if defined(WIN32)
+    void On_BrowserInfo_GetContextWin32Window(Msg_BrowserInfo_GetContextWin32Window* pMsg);
+  #endif // defined(WIN32)
 
 #if defined(AP_TEST)
   void On_UnitTest_Begin(Msg_UnitTest_Begin* pMsg);

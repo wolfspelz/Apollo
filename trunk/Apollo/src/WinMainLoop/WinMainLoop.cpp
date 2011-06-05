@@ -9,6 +9,7 @@
 //#include "AutoWindowsMessage.h"
 #include "ApLog.h"
 #include "ApOS.h"
+#include "MsgLog.h"
 #include "MsgConfig.h"
 #include "MsgUnitTest.h"
 #include "MsgTimer.h"
@@ -451,20 +452,40 @@ void MainLoopModule::On_MainLoop_Win32Loop(Msg_MainLoop_Win32Loop* pMsg)
       ::UpdateWindow(hWnd_);
     }
 
-    HACCEL hAccelTable = ::LoadAccelerators(g_hDllInstance, (LPCTSTR) IDC_WIN32APP);
-
     nSecTimer_ = ::SetTimer(hWnd_, SEC_TIMER, nSecTimerDelayMS_, NULL);
 
+    HACCEL hAccelTable = ::LoadAccelerators(g_hDllInstance, (LPCTSTR) IDC_WIN32APP);
     MSG windowsMessage;
-    while (::GetMessage(&windowsMessage, NULL, 0, 0)) {
-      if (!::TranslateAccelerator(windowsMessage.hwnd, hAccelTable, &windowsMessage)) {
-        ::TranslateMessage(&windowsMessage);
-        ::DispatchMessage(&windowsMessage);
-      }
 
-      Msg_MainLoop_EventLoopIdle msg;
-      msg.Send();
+    int bReLoop = 0;
+loop:
+    bReLoop = 0;
+    try {
+
+      while (::GetMessage(&windowsMessage, NULL, 0, 0)) {
+        if (!::TranslateAccelerator(windowsMessage.hwnd, hAccelTable, &windowsMessage)) {
+          ::TranslateMessage(&windowsMessage);
+          ::DispatchMessage(&windowsMessage);
+        }
+
+        //Msg_MainLoop_EventLoopIdle msg;
+        //msg.Send();
+      }
+      // Terminate normally and exit
+
+    } catch (...) {
+
+      // Exception: restart loop
+      bReLoop = 1;
+      ApAsyncMessage<Msg_Log_Line> msgLL;
+      msgLL->nMask = apLog_MaskError;
+      msgLL->sChannel = MODULE_NAME;
+      msgLL->sContext = "MainLoopModule::On_MainLoop_Win32Loop";
+      msgLL->sMessage = "Unknown exception";
+      msgLL.Post();
+
     }
+    if (bReLoop) { goto loop; }
 
     ::KillTimer(hWnd_, SEC_TIMER);
 

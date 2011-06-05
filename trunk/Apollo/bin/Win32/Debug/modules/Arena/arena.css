@@ -25,9 +25,9 @@
 
 .cParticipant
 {
-  position:fixed;
+  position:absolute;
   bottom:0px;
-  width:10px;
+  width:2px;
   height:100px;
   x-webkit-box-shadow:inset 0 0 1px #000000;
 }
@@ -35,7 +35,7 @@
 .cCenter
 {
   position:relative;
-  left:-45px;
+  left:-49px;
   width:100px;
   height:100px;
   x-webkit-box-shadow:inset 0 0 1px #000000;
@@ -195,7 +195,7 @@
 .cChatBubble .cCloseButton
 {
   float:right;
-  margin:0 6px 0 0;
+  margin:0px 0px 3px 5px;
 }
 
 .cPointer
