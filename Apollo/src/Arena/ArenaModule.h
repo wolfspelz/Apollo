@@ -21,21 +21,10 @@ typedef ApHandlePointerTree<Display*> DisplayList;
 typedef ApHandlePointerTreeNode<Display*> DisplayListNode;
 typedef ApHandlePointerTreeIterator<Display*> DisplayListIterator;
 
-//typedef ApHandlePointerTree<Location*> LocationList;
-//typedef ApHandlePointerTreeNode<Location*> LocationListNode;
-//typedef ApHandlePointerTreeIterator<Location*> LocationListIterator;
-
-//class LocationAvatar
-//{
-//public:
-//  LocationAvatar(const ApHandle& hLocation, const ApHandle& hPartcipant)
-//    :hLocation_(hLocation)
-//    ,hPartcipant_(hPartcipant)
-//  {}
-//
-//  ApHandle hLocation_;
-//  ApHandle hPartcipant_;
-//};
+typedef ApHandleTree<int> ContextHandleList;
+typedef ApHandleTreeNode<int> ContextHandleNode;
+typedef ApHandleTree<ContextHandleList> LocationContextHandleList;
+typedef ApHandleTreeNode<ContextHandleList> LocationContextHandleNode;
 
 class ArenaModule
 {
@@ -83,6 +72,10 @@ public:
   void On_UnitTest_End(Msg_UnitTest_End* pMsg);
 #endif
 
+  void SetContextOfLocation(const ApHandle& hLocation, const ApHandle& hContext);
+  void DeleteContextOfLocation(const ApHandle& hLocation, const ApHandle& hContext);
+  ContextHandleList& GetContextsOfLocation(const ApHandle& hLocation);
+
   void SetContextOfHandle(const ApHandle& h, const ApHandle& hContext);
   void DeleteContextOfHandle(const ApHandle& h, const ApHandle& hContext);
   ApHandle GetContextOfHandle(const ApHandle& h);
@@ -99,6 +92,7 @@ protected:
 
 protected:
   DisplayList displays_;
+  LocationContextHandleList contextsOfLocation_;
   ApHandleTree<ApHandle> contextOfHandle_;
   ApHandleTree<ApHandle> participantOfAnimation_;
 

@@ -112,6 +112,49 @@ Display* ArenaModule::GetDisplayOfHandle(const ApHandle& h)
 
 //---------------------------
 
+void ArenaModule::SetContextOfLocation(const ApHandle& hLocation, const ApHandle& hContext)
+{
+  if (!contextsOfLocation_.IsSet(hLocation)) {
+    ContextHandleList locationContexts;
+    contextsOfLocation_.Set(hLocation, locationContexts);
+  }
+  LocationContextHandleNode* pLocationContexts = contextsOfLocation_.Find(hLocation);
+  if (pLocationContexts) {
+    pLocationContexts->Value().Set(hContext, 1);
+  }
+}
+
+void ArenaModule::DeleteContextOfLocation(const ApHandle& hLocation, const ApHandle& hContext)
+{
+  LocationContextHandleNode* pLocationContexts = contextsOfLocation_.Find(hLocation);
+  if (pLocationContexts == 0) {
+    apLog_Warning((LOG_CHANNEL, "ArenaModule::DeleteContextOfLocation", "Location not found loc=" ApHandleFormat "", ApHandleType(hLocation)));
+  } else {
+    if (!pLocationContexts->Value().IsSet(hContext)) {
+      apLog_Warning((LOG_CHANNEL, "ArenaModule::DeleteContextOfLocation", "Context of location not found loc=" ApHandleFormat " ctxt=" ApHandleFormat "", ApHandleType(hLocation), ApHandleType(hContext)));
+    } else {
+      pLocationContexts->Value().Unset(hContext);
+      if (pLocationContexts->Value().Count() == 0) {
+        contextsOfLocation_.Unset(hLocation);
+      }
+    }
+  }
+}
+
+static ContextHandleList ArenaModule_emptyContextHandleList;
+
+ContextHandleList& ArenaModule::GetContextsOfLocation(const ApHandle& hLocation)
+{
+  LocationContextHandleNode* pLocationContexts = contextsOfLocation_.Find(hLocation);
+  if (pLocationContexts) {
+    return pLocationContexts->Value();
+  } else {
+    return ArenaModule_emptyContextHandleList;
+  }
+}
+
+//---------------------------
+
 void ArenaModule::SetParticipantOfAnimation(const ApHandle& hAnimation, const ApHandle& hParticipant)
 {
   if (participantOfAnimation_.IsSet(hAnimation)) {
@@ -185,7 +228,7 @@ AP_MSG_HANDLER_METHOD(ArenaModule, VpView_ContextSize)
   }
 }
 
-AP_MSG_HANDLER_METHOD(ArenaModule, VpView_LocationsChanged){}
+AP_MSG_HANDLER_METHOD(ArenaModule, VpView_LocationsChanged) {}
 
 AP_MSG_HANDLER_METHOD(ArenaModule, VpView_ContextLocationAssigned)
 {
@@ -203,57 +246,6 @@ AP_MSG_HANDLER_METHOD(ArenaModule, VpView_ContextLocationUnassigned)
   }
 }
 
-AP_MSG_HANDLER_METHOD(ArenaModule, VpView_EnterLocationRequested)
-{
-  Display* pDisplay = GetDisplayOfHandle(pMsg->hLocation);
-  if (pDisplay) {
-    pDisplay->OnEnterRequested();
-  }
-}
-
-AP_MSG_HANDLER_METHOD(ArenaModule, VpView_EnterLocationBegin)
-{
-  Display* pDisplay = GetDisplayOfHandle(pMsg->hLocation);
-  if (pDisplay) {
-    pDisplay->OnEnterBegin();
-  }
-}
-
-AP_MSG_HANDLER_METHOD(ArenaModule, VpView_EnterLocationComplete)
-{
-  Display* pDisplay = GetDisplayOfHandle(pMsg->hLocation);
-  if (pDisplay) {
-    pDisplay->OnEnterComplete();
-  }
-}
-
-AP_MSG_HANDLER_METHOD(ArenaModule, VpView_LocationContextsChanged) {}
-
-AP_MSG_HANDLER_METHOD(ArenaModule, VpView_ParticipantsChanged)
-{
-  Display* pDisplay = GetDisplayOfHandle(pMsg->hLocation);
-  if (pDisplay) {
-    pDisplay->OnParticipantsChanged();
-  }
-}
-
-AP_MSG_HANDLER_METHOD(ArenaModule, VpView_LocationPublicChat)
-{
-  Display* pDisplay = GetDisplayOfHandle(pMsg->hLocation);
-  if (pDisplay) {
-    Apollo::TimeValue tv(pMsg->nSec, pMsg->nMicroSec);
-    pDisplay->OnReceivePublicChat(pMsg->hParticipant, pMsg->hChat, pMsg->sNickname, pMsg->sText, tv);
-  }
-}
-
-AP_MSG_HANDLER_METHOD(ArenaModule, VpView_LocationPublicAction)
-{
-  Display* pDisplay = GetDisplayOfHandle(pMsg->hLocation);
-  if (pDisplay) {
-    pDisplay->OnReceivePublicAction(pMsg->hParticipant, pMsg->sAction);
-  }
-}
-
 AP_MSG_HANDLER_METHOD(ArenaModule, VpView_LocationDetailsChanged) {}
 
 AP_MSG_HANDLER_METHOD(ArenaModule, VpView_ContextDetailsChanged)
@@ -264,41 +256,128 @@ AP_MSG_HANDLER_METHOD(ArenaModule, VpView_ContextDetailsChanged)
   }
 }
 
+//----------------------------
+
+AP_MSG_HANDLER_METHOD(ArenaModule, VpView_EnterLocationRequested)
+{
+  ContextHandleList& contextsOfLocation = GetContextsOfLocation(pMsg->hLocation);
+  for (ContextHandleNode* pContextNode = 0; (pContextNode = contextsOfLocation.Next(pContextNode)) != 0; ) {
+    Display* pDisplay = FindDisplay(pContextNode->Key());
+    if (pDisplay) {
+      pDisplay->OnEnterRequested();
+    }
+  }
+}
+
+AP_MSG_HANDLER_METHOD(ArenaModule, VpView_EnterLocationBegin)
+{
+  ContextHandleList& contextsOfLocation = GetContextsOfLocation(pMsg->hLocation);
+  for (ContextHandleNode* pContextNode = 0; (pContextNode = contextsOfLocation.Next(pContextNode)) != 0; ) {
+    Display* pDisplay = FindDisplay(pContextNode->Key());
+    if (pDisplay) {
+      pDisplay->OnEnterBegin();
+    }
+  }
+}
+
+AP_MSG_HANDLER_METHOD(ArenaModule, VpView_EnterLocationComplete)
+{
+  ContextHandleList& contextsOfLocation = GetContextsOfLocation(pMsg->hLocation);
+  for (ContextHandleNode* pContextNode = 0; (pContextNode = contextsOfLocation.Next(pContextNode)) != 0; ) {
+    Display* pDisplay = FindDisplay(pContextNode->Key());
+    if (pDisplay) {
+      pDisplay->OnEnterComplete();
+    }
+  }
+}
+
+AP_MSG_HANDLER_METHOD(ArenaModule, VpView_LocationContextsChanged) {}
+
+AP_MSG_HANDLER_METHOD(ArenaModule, VpView_ParticipantsChanged)
+{
+  //Display* pDisplay = GetDisplayOfHandle(pMsg->hLocation);
+  //if (pDisplay) {
+  //  pDisplay->OnParticipantsChanged();
+  //}
+  ContextHandleList& contextsOfLocation = GetContextsOfLocation(pMsg->hLocation);
+  for (ContextHandleNode* pContextNode = 0; (pContextNode = contextsOfLocation.Next(pContextNode)) != 0; ) {
+    Display* pDisplay = FindDisplay(pContextNode->Key());
+    if (pDisplay) {
+      pDisplay->OnParticipantsChanged();
+    }
+  }
+}
+
+AP_MSG_HANDLER_METHOD(ArenaModule, VpView_LocationPublicChat)
+{
+  Apollo::TimeValue tv(pMsg->nSec, pMsg->nMicroSec);
+  ContextHandleList& contextsOfLocation = GetContextsOfLocation(pMsg->hLocation);
+  for (ContextHandleNode* pContextNode = 0; (pContextNode = contextsOfLocation.Next(pContextNode)) != 0; ) {
+    Display* pDisplay = FindDisplay(pContextNode->Key());
+    if (pDisplay) {
+      pDisplay->OnReceivePublicChat(pMsg->hParticipant, pMsg->hChat, pMsg->sNickname, pMsg->sText, tv);
+    }
+  }
+}
+
+AP_MSG_HANDLER_METHOD(ArenaModule, VpView_LocationPublicAction)
+{
+  ContextHandleList& contextsOfLocation = GetContextsOfLocation(pMsg->hLocation);
+  for (ContextHandleNode* pContextNode = 0; (pContextNode = contextsOfLocation.Next(pContextNode)) != 0; ) {
+    Display* pDisplay = FindDisplay(pContextNode->Key());
+    if (pDisplay) {
+      pDisplay->OnReceivePublicAction(pMsg->hParticipant, pMsg->sAction);
+    }
+  }
+}
+
 AP_MSG_HANDLER_METHOD(ArenaModule, VpView_ParticipantDetailsChanged)
 {
-  Display* pDisplay = GetDisplayOfHandle(pMsg->hLocation);
-  if (pDisplay) {
-    pDisplay->OnParticipantDetailsChanged(pMsg->hParticipant, pMsg->vlKeys);
+  ContextHandleList& contextsOfLocation = GetContextsOfLocation(pMsg->hLocation);
+  for (ContextHandleNode* pContextNode = 0; (pContextNode = contextsOfLocation.Next(pContextNode)) != 0; ) {
+    Display* pDisplay = FindDisplay(pContextNode->Key());
+    if (pDisplay) {
+      pDisplay->OnParticipantDetailsChanged(pMsg->hParticipant, pMsg->vlKeys);
+    }
   }
 }
 
 AP_MSG_HANDLER_METHOD(ArenaModule, VpView_LeaveLocationRequested)
 {
-  Display* pDisplay = GetDisplayOfHandle(pMsg->hLocation);
-  if (pDisplay) {
-    pDisplay->OnLeaveRequested();
+  ContextHandleList& contextsOfLocation = GetContextsOfLocation(pMsg->hLocation);
+  for (ContextHandleNode* pContextNode = 0; (pContextNode = contextsOfLocation.Next(pContextNode)) != 0; ) {
+    Display* pDisplay = FindDisplay(pContextNode->Key());
+    if (pDisplay) {
+      pDisplay->OnLeaveRequested();
+    }
   }
 }
 
 AP_MSG_HANDLER_METHOD(ArenaModule, VpView_LeaveLocationBegin)
 {
-  Display* pDisplay = GetDisplayOfHandle(pMsg->hLocation);
-  if (pDisplay) {
-    pDisplay->OnLeaveBegin();
+  ContextHandleList& contextsOfLocation = GetContextsOfLocation(pMsg->hLocation);
+  for (ContextHandleNode* pContextNode = 0; (pContextNode = contextsOfLocation.Next(pContextNode)) != 0; ) {
+    Display* pDisplay = FindDisplay(pContextNode->Key());
+    if (pDisplay) {
+      pDisplay->OnLeaveBegin();
+    }
   }
 }
 
 AP_MSG_HANDLER_METHOD(ArenaModule, VpView_LeaveLocationComplete)
 {
-  Display* pDisplay = GetDisplayOfHandle(pMsg->hLocation);
-  if (pDisplay) {
-    pDisplay->OnLeaveComplete();
+  ContextHandleList& contextsOfLocation = GetContextsOfLocation(pMsg->hLocation);
+  for (ContextHandleNode* pContextNode = 0; (pContextNode = contextsOfLocation.Next(pContextNode)) != 0; ) {
+    Display* pDisplay = FindDisplay(pContextNode->Key());
+    if (pDisplay) {
+      pDisplay->OnLeaveComplete();
+    }
   }
 }
 
-AP_MSG_HANDLER_METHOD(ArenaModule, VpView_ParticipantAdded){}
+AP_MSG_HANDLER_METHOD(ArenaModule, VpView_ParticipantAdded) {}
 
-AP_MSG_HANDLER_METHOD(ArenaModule, VpView_ParticipantRemoved){}
+AP_MSG_HANDLER_METHOD(ArenaModule, VpView_ParticipantRemoved) {}
 
 //----------------------------
 
