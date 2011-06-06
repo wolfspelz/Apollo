@@ -131,14 +131,14 @@ void Display::AttachLocation(const ApHandle& hLocation)
   //}
 
   if (pModule_) {
-    pModule_->SetContextOfHandle(hLocation, hContext_);
+    pModule_->SetContextOfLocation(hLocation, hContext_);
   }
 }
 
 void Display::DetachLocation(const ApHandle& hLocation)
 {
   if (pModule_) {
-    pModule_->DeleteContextOfHandle(hLocation, hContext_);
+    pModule_->DeleteContextOfLocation(hLocation, hContext_);
   }
 
   RemoveAllAvatars();
