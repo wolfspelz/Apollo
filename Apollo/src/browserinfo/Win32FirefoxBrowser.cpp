@@ -45,7 +45,7 @@ void Win32FirefoxBrowser::OnTimer()
       RECT rContent;
       HWND hParent = ::GetParent(pNode->Key());
       ::GetWindowRect(hParent, &rContent);
-      if (rContent.right - rContent.left != 0 && rContent.bottom - rContent.top) {
+      if (rContent.right - rContent.left != 0 && rContent.bottom - rContent.top != 0) {
         hContent = hParent;
         break;
       }

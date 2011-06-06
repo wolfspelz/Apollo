@@ -395,7 +395,11 @@ int Client::dataOut(unsigned char* pData, size_t nLen)
   if (apLog_IsVerbose) {
     String sTraffic;
     sTraffic.set((const char*) pData, nLen);
-    apLog_Verbose((LOG_CHANNEL, "SENT", "%d %s", nLen, StringType(sTraffic)));
+    if (nLen == 1 && sTraffic == " ") {
+      // ignore keepalive packet
+    } else {
+      apLog_Verbose((LOG_CHANNEL, "SENT", "%d %s", nLen, StringType(sTraffic)));
+    }
   }
 
   if (pConnection_ != 0) {
