@@ -70,6 +70,7 @@ public:
 
   virtual void OnTimer() {}
   virtual void AdjustPosition(int bVisible, int nLeft, int nBottom, int nWidth, int nHeight);
+  virtual void AdjustStackingOrder() {}
 
   int IsVisible() { return bVisible_; }
 

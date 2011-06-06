@@ -9,17 +9,23 @@
 
 #include "Browser.h"
 
-class Win32FirefoxBrowser : public Browser
+class Win32Browser : public Browser
 {
 public:
-  Win32FirefoxBrowser(Apollo::WindowHandle& win)
-    :Browser(win)
-  {}
-
-  void OnTimer();
+  Win32Browser(Apollo::WindowHandle& win) : Browser(win) {}
 
 protected:
-  void AdjustStackingOrder();
+  virtual void AdjustStackingOrder();
+};
+
+// ---------------------------------------------------------
+
+class Win32FirefoxBrowser : public Win32Browser
+{
+public:
+  Win32FirefoxBrowser(Apollo::WindowHandle& win) : Win32Browser(win) {}
+
+  void OnTimer();
 };
 
 #endif // !defined(Win32FirefoxBrowser_h_INCLUDED)
