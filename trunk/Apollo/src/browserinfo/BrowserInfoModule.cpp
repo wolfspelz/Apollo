@@ -66,6 +66,7 @@ void BrowserInfoModule::StopTimer()
     }
   }
 }
+
 //----------------------------------------------------------
 
 AP_MSG_HANDLER_METHOD(BrowserInfoModule, BrowserInfo_BeginTrackCoordinates)

@@ -172,11 +172,11 @@ void View::SetVisibility(int bVisible)
   if (bChanged) {
 #if defined(WIN32)
     ::MoveWindow(hWnd_, nLeft_, nTop_ - (bVisible_ ? 0 : 10000), nWidth_, nHeight_, FALSE);
-
-    //::ShowWindow(hWnd_, bVisible_ ? SW_SHOW : SW_HIDE);
-    //if (bVisible_) {
-    //  ::UpdateWindow(hWnd_);
-    //}
+    if (bVisible_) {
+      // Force webkit repaint, which is suppressed while invisible
+      RECT r = { 0, 0, nWidth_, nHeight_ };
+      ::InvalidateRect(hWnd_, &r, FALSE);
+    }
 #endif // WIN32
   }
 }
