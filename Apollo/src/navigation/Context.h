@@ -24,7 +24,7 @@ public:
   void destroy(); // throws ApException
 
   void navigate(const String& sUrl); // throws ApException
-  void nativeWindow(const String& sType, Apollo::KeyValueList& kvSignature); // throws ApException
+  void nativeWindow(Apollo::KeyValueList& kvSignature); // throws ApException
   void show(); // throws ApException
   void hide(); // throws ApException
   void position(int nLeft, int nBottom); // throws ApException

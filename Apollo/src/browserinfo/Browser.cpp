@@ -9,51 +9,57 @@
 #include "Browser.h"
 #include "BrowserInfoModule.h"
 
-void Context::AdjustPosition(int bVisible, int nLeft, int nBottom, int nWidth, int nHeight)
+void Context::AdjustPosition(int bBrowserVisible, int nBrowserLeft, int nBrowserBottom, int nBrowserWidth, int nBrowserHeight)
 {
+  int bCombinedVisible = bBrowserVisible && bVisible_;
+  int nCombinedLeft = nBrowserLeft;
+  int nCombinedBottom = nBrowserBottom;
+  int nCombinedWidth = nBrowserWidth;
+  int nCombinedHeight = nBrowserHeight;
+
   int bPosChanged = 0;
   int bSizeChanged = 0;
   int bVisChanged = 0;
 
-  if (bVisible != bVisible_) {
+  if (bCombinedVisible != bCombinedVisible_) {
     bVisChanged = 1;
-    bVisible_ = bVisible;
+    bCombinedVisible_ = bCombinedVisible;
   }
 
-  if (bVisible) {
-    if (nLeft != nLeft_ || nBottom != nBottom_) {
+  if (bCombinedVisible) {
+    if (nCombinedLeft != nLeft_ || nCombinedBottom != nBottom_) {
       bPosChanged = 1;
-      nLeft_ = nLeft;
-      nBottom_ = nBottom;
+      nLeft_ = nCombinedLeft;
+      nBottom_ = nCombinedBottom;
     }
 
-    if (nWidth != nWidth_ || nHeight != nHeight_) {
+    if (nCombinedWidth != nWidth_ || nCombinedHeight != nHeight_) {
       bSizeChanged = 1;
-      nWidth_ = nWidth;
-      nHeight_ = nHeight;
+      nWidth_ = nCombinedWidth;
+      nHeight_ = nCombinedHeight;
     }
   }
 
   if (bPosChanged) {
     Msg_VpView_ContextPosition msg;
     msg.hContext = apHandle();
-    msg.nLeft = nLeft;
-    msg.nBottom = nBottom;
+    msg.nLeft = nCombinedLeft;
+    msg.nBottom = nCombinedBottom;
     LocalCallGuard g; msg.Send();
   }
 
   if (bSizeChanged) {
     Msg_VpView_ContextSize msg;
     msg.hContext = apHandle();
-    msg.nWidth = nWidth;
-    msg.nHeight = nHeight;
+    msg.nWidth = nCombinedWidth;
+    msg.nHeight = nCombinedHeight;
     LocalCallGuard g; msg.Send();
   }
 
   if (bVisChanged) {
     Msg_VpView_ContextVisibility msg;
     msg.hContext = apHandle();
-    msg.bVisible = bVisible;
+    msg.bVisible = bCombinedVisible;
     LocalCallGuard g; msg.Send();
   }
 }
@@ -101,28 +107,11 @@ void Browser::AdjustPosition(int bVisible, int nLeft, int nBottom, int nWidth, i
 {
   for (ContextNode* pNode = 0; (pNode = contexts_.Next(pNode)) != 0; ) {
 
-    int bPosChanged = 0;
-    int bSizeChanged = 0;
-    int bVisChanged = 0;
-
-    if (bVisible != bVisible_) {
-      bVisChanged = 1;
-      bVisible_ = bVisible;
-    }
-
-    if (bVisible) {
-      if (nLeft != nLeft_ || nBottom != nBottom_) {
-        bPosChanged = 1;
-        nLeft_ = nLeft;
-        nBottom_ = nBottom;
-      }
-
-      if (nWidth != nWidth_ || nHeight != nHeight_) {
-        bSizeChanged = 1;
-        nWidth_ = nWidth;
-        nHeight_ = nHeight;
-      }
-    }
+    bVisible_ = bVisible;
+    nLeft_ = nLeft;
+    nBottom_ = nBottom;
+    nWidth_ = nWidth;
+    nHeight_ = nHeight;
 
     //apLog_Debug((LOG_CHANNEL, "Win32FirefoxBrowser::OnTimer", "%08x %d,%d,%d,%d", (int) hWnd, nLeft, nBottom, nWidth, nHeight));
 

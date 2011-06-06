@@ -73,25 +73,17 @@ AP_MSG_HANDLER_METHOD(BrowserInfoModule, BrowserInfo_BeginTrackCoordinates)
 {
   ApHandle hContext = pMsg->hContext;
 
-  String sTitle = pMsg->kvSignature[Msg_BrowserInfo_BeginTrackCoordinates_Signature_Title].getString();
-  String sLeft = pMsg->kvSignature[Msg_BrowserInfo_BeginTrackCoordinates_Signature_Left].getString();
-  String sTop = pMsg->kvSignature[Msg_BrowserInfo_BeginTrackCoordinates_Signature_Top].getString();
-  String sWidth = pMsg->kvSignature[Msg_BrowserInfo_BeginTrackCoordinates_Signature_Width].getString();
-  String sHeight = pMsg->kvSignature[Msg_BrowserInfo_BeginTrackCoordinates_Signature_Height].getString();
-
-  int nLeft = IgnoreCoordinate; if (!sLeft.empty()) { nLeft = String::atoi(sLeft); }
-  int nTop = IgnoreCoordinate; if (!sTop.empty()) { nTop = String::atoi(sTop); }
-  int nWidth = IgnoreCoordinate; if (!sWidth.empty()) { nWidth = String::atoi(sWidth); }
-  int nHeight = IgnoreCoordinate; if (!sHeight.empty()) { nHeight = String::atoi(sHeight); }
+  String sType = pMsg->kvSignature[Msg_BrowserInfo_BeginTrackCoordinates_Signature_Type].getString();
+  String sVersion = pMsg->kvSignature[Msg_BrowserInfo_BeginTrackCoordinates_Signature_Version].getString();
 
   Apollo::WindowHandle win;
   if (0) {
-  } else if (pMsg->sType == Msg_BrowserInfo_BeginTrackCoordinates_Type_Firefox) {
-    win = FirefoxFinder::GetFirefoxToplevelWindow(sTitle, nLeft, nTop, nWidth, nHeight);
+  } else if (sType == Msg_BrowserInfo_BeginTrackCoordinates_Signature_Type_Firefox) {
+    win = FirefoxFinder::GetFirefoxToplevelWindow(pMsg->kvSignature);
   }
 
   if (!win.isValid()) {
-    apLog_Error((LOG_CHANNEL, "BrowserInfoModule::BrowserInfo_BeginTrackCoordinates", "No valid browser window, type=%s", StringType(pMsg->sType)));
+    apLog_Error((LOG_CHANNEL, "BrowserInfoModule::BrowserInfo_BeginTrackCoordinates", "No valid browser window, type=%s", StringType(sType)));
   } else {
 
     Browser* pBrowser = 0;
@@ -100,13 +92,13 @@ AP_MSG_HANDLER_METHOD(BrowserInfoModule, BrowserInfo_BeginTrackCoordinates)
 
       if (0) {
 #if defined(WIN32)
-      } else if (pMsg->sType == Msg_BrowserInfo_BeginTrackCoordinates_Type_Firefox) {
+      } else if (sType == Msg_BrowserInfo_BeginTrackCoordinates_Signature_Type_Firefox) {
         pBrowser = new Win32FirefoxBrowser(win);
 #endif // defined(WIN32)
       }
 
       if (pBrowser == 0) {
-        apLog_Error((LOG_CHANNEL, "BrowserInfoModule::BrowserInfo_BeginTrackCoordinates", "No browser for platformand type=%s", StringType(pMsg->sType)));
+        apLog_Error((LOG_CHANNEL, "BrowserInfoModule::BrowserInfo_BeginTrackCoordinates", "No browser for platformand type=%s", StringType(sType)));
       } else {
         browsers_.Set(win, pBrowser);
 
@@ -151,6 +143,7 @@ AP_MSG_HANDLER_METHOD(BrowserInfoModule, VpView_ContextVisibility)
       if (bInLocalCall_) {
         //
       } else {
+        pContext->SetVisibility(pMsg->bVisible);
         if (!pBrowser->IsVisible()) {
           pMsg->bVisible = 0;
         }
@@ -280,7 +273,8 @@ String BrowserInfoModuleTester::GetFirefoxToplevelWindow()
     int nCnt = 0;
     while (!bFound && nCnt < 50) {
       nCnt++;
-      Apollo::WindowHandle win = FirefoxFinder::GetFirefoxToplevelWindow("", IgnoreCoordinate, IgnoreCoordinate, IgnoreCoordinate, IgnoreCoordinate);
+      Apollo::KeyValueList kvSignature;
+      Apollo::WindowHandle win = FirefoxFinder::GetFirefoxToplevelWindow(kvSignature);
       HWND hWnd = win;
       if (hWnd != NULL) {
         bFound = 1;
@@ -312,7 +306,8 @@ String BrowserInfoModuleTester::GetFirefoxToplevelWindowWithCoordinates()
     int nCnt = 0;
     while (!bFound && nCnt < 50) {
       nCnt++;
-      Apollo::WindowHandle win = FirefoxFinder::GetFirefoxToplevelWindow("", IgnoreCoordinate, IgnoreCoordinate, IgnoreCoordinate, IgnoreCoordinate);
+      Apollo::KeyValueList kvSignature;
+      Apollo::WindowHandle win = FirefoxFinder::GetFirefoxToplevelWindow(kvSignature);
       HWND hWnd = win;
       if (hWnd != NULL) {
         bFound = 1;
@@ -329,7 +324,8 @@ String BrowserInfoModuleTester::GetFirefoxToplevelWindowWithCoordinates()
 
   if (!s) {
     // Arrange cooredinates
-    Apollo::WindowHandle win = FirefoxFinder::GetFirefoxToplevelWindow("", IgnoreCoordinate, IgnoreCoordinate, IgnoreCoordinate, IgnoreCoordinate);
+    Apollo::KeyValueList kvSignature;
+    Apollo::WindowHandle win = FirefoxFinder::GetFirefoxToplevelWindow(kvSignature);
     ::MoveWindow(win, 100, 100, 800, 600, FALSE);
     hPositionedWindow = win;
   }
@@ -337,7 +333,12 @@ String BrowserInfoModuleTester::GetFirefoxToplevelWindowWithCoordinates()
   if (!s) {
     // Act
     // Find the one with the right coordinates
-    Apollo::WindowHandle win = FirefoxFinder::GetFirefoxToplevelWindow("", 100, 100, 800, 600);
+    Apollo::KeyValueList kvSignature;
+    kvSignature.add(Msg_BrowserInfo_BeginTrackCoordinates_Signature_Left, 100);
+    kvSignature.add(Msg_BrowserInfo_BeginTrackCoordinates_Signature_Top, 100);
+    kvSignature.add(Msg_BrowserInfo_BeginTrackCoordinates_Signature_Width, 800);
+    kvSignature.add(Msg_BrowserInfo_BeginTrackCoordinates_Signature_Height, 600);
+    Apollo::WindowHandle win = FirefoxFinder::GetFirefoxToplevelWindow(kvSignature);
     HWND hWnd = win;
     if (hWnd != hPositionedWindow) {
       s = "Positioned Firefox window not found";
@@ -363,7 +364,8 @@ String BrowserInfoModuleTester::DontGetFirefoxWithWrongCoordinates()
     int nCnt = 0;
     while (!bFound && nCnt < 50) {
       nCnt++;
-      Apollo::WindowHandle win = FirefoxFinder::GetFirefoxToplevelWindow("", IgnoreCoordinate, IgnoreCoordinate, IgnoreCoordinate, IgnoreCoordinate);
+      Apollo::KeyValueList kvSignature;
+      Apollo::WindowHandle win = FirefoxFinder::GetFirefoxToplevelWindow(kvSignature);
       HWND hWnd = win;
       if (hWnd != NULL) {
         bFound = 1;
@@ -378,14 +380,20 @@ String BrowserInfoModuleTester::DontGetFirefoxWithWrongCoordinates()
 
   if (!s) {
     // Arrange cooredinates
-    Apollo::WindowHandle win = FirefoxFinder::GetFirefoxToplevelWindow("", IgnoreCoordinate, IgnoreCoordinate, IgnoreCoordinate, IgnoreCoordinate);
+    Apollo::KeyValueList kvSignature;
+    Apollo::WindowHandle win = FirefoxFinder::GetFirefoxToplevelWindow(kvSignature);
     ::MoveWindow(win, 100, 100, 800, 600, FALSE);
   }
 
   if (!s) {
     // Act
     // Find the one with the right coordinates
-    Apollo::WindowHandle win = FirefoxFinder::GetFirefoxToplevelWindow("", 111, 100, 800, 600); // <----------- X is wrong
+    Apollo::KeyValueList kvSignature;
+    kvSignature.add(Msg_BrowserInfo_BeginTrackCoordinates_Signature_Left, 111); // <----------- X is wrong
+    kvSignature.add(Msg_BrowserInfo_BeginTrackCoordinates_Signature_Top, 100);
+    kvSignature.add(Msg_BrowserInfo_BeginTrackCoordinates_Signature_Width, 800);
+    kvSignature.add(Msg_BrowserInfo_BeginTrackCoordinates_Signature_Height, 600);
+    Apollo::WindowHandle win = FirefoxFinder::GetFirefoxToplevelWindow(kvSignature);
     HWND hWnd = win;
     if (hWnd != NULL) {
       s = "Should not find window";
