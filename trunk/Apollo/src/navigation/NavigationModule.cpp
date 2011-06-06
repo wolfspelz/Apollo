@@ -314,11 +314,10 @@ AP_MSG_HANDLER_METHOD(NavigationModule, Navigation_Receive)
           response.createResponse(pMsg->srpc);
 
         } else if (sMethod == Navigation_SrpcMethod_NativeWindow) {
-          String sType = pMsg->srpc.getString("sType");
           Apollo::KeyValueList kvSignature;
           pMsg->srpc.getKeyValueList("kvSignature", kvSignature);
           try {
-            pContext->nativeWindow(sType, kvSignature);
+            pContext->nativeWindow(kvSignature);
             response.createResponse(pMsg->srpc);
           } catch (ApException ex) {
             response.createError(pMsg->srpc, ex.getText());

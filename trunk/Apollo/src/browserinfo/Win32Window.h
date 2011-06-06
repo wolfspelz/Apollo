@@ -77,7 +77,7 @@ public:
 
   void OnWindow(HWND hWnd);
 
-  static Apollo::WindowHandle GetFirefoxToplevelWindow(const String& sTitle, int nLeft, int nTop, int nWidth, int nHeight);
+  static Apollo::WindowHandle GetFirefoxToplevelWindow(Apollo::KeyValueList& kvSignature);
 
   String sToplevelClass_;
   String sChildClassPath_;

@@ -67,11 +67,10 @@ void Context::navigate(const String& sUrl) // throws ApException
   }
 }
 
-void Context::nativeWindow(const String& sType, Apollo::KeyValueList& kvSignature) // throws ApException
+void Context::nativeWindow(Apollo::KeyValueList& kvSignature) // throws ApException
 {
   Msg_BrowserInfo_BeginTrackCoordinates msg;
   msg.hContext = apHandle();
-  msg.sType = sType;
   msg.kvSignature = kvSignature;
   if (!msg.Request()) {
     throw ApException("Msg_BrowserInfo_BeginTrackCoordinates failed: %s", StringType(msg.sComment));

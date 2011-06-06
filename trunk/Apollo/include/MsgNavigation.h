@@ -67,15 +67,19 @@ public:
 
 #define Navigation_SrpcMethod_NativeWindow "Context.NativeWindow"
 // in: hContext
-// in: sType
-  #define Navigation_SrpcMethod_NativeWindow_Type_Firefox "Firefox"
-  #define Navigation_SrpcMethod_NativeWindow_Type_InternetExplorer "InternetExplorer"
 // in: kvSignature
+  #define Navigation_SrpcMethod_NativeWindow_Signature_Type "sType"
+    #define Navigation_SrpcMethod_NativeWindow_Signature_Type_Firefox "Firefox"
+    #define Navigation_SrpcMethod_NativeWindow_Signature_Type_InternetExplorer "InternetExplorer"
+    #define Navigation_SrpcMethod_NativeWindow_Signature_Type_Chrome "Chrome"
+  #define Navigation_SrpcMethod_NativeWindow_Signature_Version "sVersion"
   #define Navigation_SrpcMethod_NativeWindow_Signature_Title "sTitle"
   #define Navigation_SrpcMethod_NativeWindow_Signature_Left "nLeft"
   #define Navigation_SrpcMethod_NativeWindow_Signature_Top "nTop"
   #define Navigation_SrpcMethod_NativeWindow_Signature_Width "nWidth"
   #define Navigation_SrpcMethod_NativeWindow_Signature_Height "nHeight"
+  #define Navigation_SrpcMethod_NativeWindow_Signature_InnerWidth "nInnerWidth"
+  #define Navigation_SrpcMethod_NativeWindow_Signature_InnerHeight "nInnerHeight"
 
 #define Navigation_SrpcMethod_Show "Context.Show"
 // in: hContext

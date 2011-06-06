@@ -16,6 +16,7 @@ class Context
 public:
   Context(const ApHandle& hContext)
     :hAp_(hContext)
+    ,bCombinedVisible_(0)
     ,bVisible_(0)
     ,nLeft_(0)
     ,nBottom_(0)
@@ -36,6 +37,7 @@ public:
 
 protected:
   ApHandle hAp_;
+  int bCombinedVisible_;
   int bVisible_;
   int nLeft_;
   int nBottom_;

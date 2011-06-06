@@ -208,10 +208,15 @@ AvatarNavigator.prototype.identifyContextForTab = function(tab, hContext)
     var msg = new SrpcMessage();
     msg.setString('Method', 'Context.NativeWindow');
     msg.setString('hContext', hContext);
-    msg.setString('sType', AvatarNavigator.TYPE_FIREFOX);
     
     var kvSignature = new SrpcMessage();
+    kvSignature.setString('sType', AvatarNavigator.TYPE_FIREFOX);
+    kvSignature.setString('sVersion', navigator.userAgent);
     kvSignature.setString('sTitle', document.title);
+    kvSignature.setString('nLeft', window.screenX);
+    kvSignature.setString('nTop', window.screenY);
+    kvSignature.setString('nInnerWidth', window.innerWidth);
+    kvSignature.setString('nInnerHeight', window.innerHeight);
     msg.setString('kvSignature', kvSignature.toString());
     
     this.protocol.sendRequest(msg);    

@@ -117,8 +117,23 @@ void FirefoxFinder::OnWindow(HWND hWnd)
   }
 }
 
-Apollo::WindowHandle FirefoxFinder::GetFirefoxToplevelWindow(const String& sTitle, int nLeft, int nTop, int nWidth, int nHeight)
+Apollo::WindowHandle FirefoxFinder::GetFirefoxToplevelWindow(Apollo::KeyValueList& kvSignature)
 {
+  String sTitle = kvSignature[Msg_BrowserInfo_BeginTrackCoordinates_Signature_Title].getString();
+  String sLeft = kvSignature[Msg_BrowserInfo_BeginTrackCoordinates_Signature_Left].getString();
+  String sTop = kvSignature[Msg_BrowserInfo_BeginTrackCoordinates_Signature_Top].getString();
+  String sWidth = kvSignature[Msg_BrowserInfo_BeginTrackCoordinates_Signature_Width].getString();
+  String sHeight = kvSignature[Msg_BrowserInfo_BeginTrackCoordinates_Signature_Height].getString();
+  String sInnerWidth = kvSignature[Msg_BrowserInfo_BeginTrackCoordinates_Signature_InnerWidth].getString();
+  String sInnerHeight = kvSignature[Msg_BrowserInfo_BeginTrackCoordinates_Signature_InnerHeight].getString();
+
+  int nLeft = IgnoreCoordinate; if (!sLeft.empty()) { nLeft = String::atoi(sLeft); }
+  int nTop = IgnoreCoordinate; if (!sTop.empty()) { nTop = String::atoi(sTop); }
+  int nWidth = IgnoreCoordinate; if (!sWidth.empty()) { nWidth = String::atoi(sWidth); }
+  int nHeight = IgnoreCoordinate; if (!sHeight.empty()) { nHeight = String::atoi(sHeight); }
+  int nInnerWidth = IgnoreCoordinate; if (!sInnerWidth.empty()) { nInnerWidth = String::atoi(sInnerWidth); }
+  int nInnerHeight = IgnoreCoordinate; if (!sInnerHeight.empty()) { nInnerHeight = String::atoi(sInnerHeight); }
+
   HWND hWnd = NULL;
 
   FirefoxFinder foxPack;

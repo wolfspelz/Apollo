@@ -9,7 +9,6 @@
 
 #include "ApModule.h"
 #include "MsgUnitTest.h"
-#include "MsgBrowserInfo.h"
 #include "MsgTimer.h"
 #include "MsgVp.h"
 #include "MsgVpView.h"
