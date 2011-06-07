@@ -97,6 +97,7 @@ protected:
 
   Apollo::ValueList noMimeTypes_;
   Apollo::ValueList avatarMimeTypes_;
+  Apollo::ValueList imageMimeTypes_;
 
   ApHandle hAnimatedItem_;
   ChatlineList chats_;

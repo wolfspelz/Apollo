@@ -339,6 +339,7 @@ public:
 #define Msg_VpView_ParticipantDetail_Nickname "Nickname"
 #define Msg_VpView_ParticipantDetail_NicknameLink "NicknameLink"
 #define Msg_VpView_ParticipantDetail_NicknameTitle "NicknameTitle"
+#define Msg_VpView_ParticipantDetail_Image "avatar"
 #define Msg_VpView_ParticipantDetail_Avatar "avatar2"
 #define Msg_VpView_ParticipantDetail_OnlineStatus "Status"
 #define Msg_VpView_ParticipantDetail_Position "Position"
