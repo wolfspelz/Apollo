@@ -1,0 +1,123 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<style>
+* { padding:0; margin:0; font-family:Arial;font-size:11px; }
+h1 { margin-bottom:4px; font-weight:bold; }
+p { margin-bottom:4px; }
+input[type="button"] { padding-top:1px; padding-bottom:1px; padding-left:5px; padding-right:5px; }
+input[type="text"] { border:1px solid #808080; }
+</style>
+<script type="text/javascript">
+  function Elem(sDomId) { return document.getElementById(sDomId); }
+
+  api = parent.api;
+  
+  function SetConfig()
+  {
+    api.Message('Config_SetValue')
+      .setString('sPath', Elem('iKey').value)
+      .setString('sValue', Elem('iValue').value)
+      .send();
+  }
+
+  function DialogCreate()
+  {
+    api.Message('Dialog_Create')
+      .setString('hDialog', api.Message('System_GetHandle').send().getString('h'))
+      .setInt('nLeft', Elem('iLeft').value)
+      .setInt('nTop', Elem('iTop').value)
+      .setInt('nWidth', Elem('iWidth').value)
+      .setInt('nHeight', Elem('iHeight').value)
+      .setInt('bVisible', 1)
+      .setString('sCaption', Elem('iCaption').value)
+      .setString('sIconUrl', Elem('iIconUrl').value)
+      .setString('sContentUrl', Elem('iUrl').value)
+      .send();
+  }
+
+  function TabPosition()
+  {
+    api.Message('TabPosition')
+      .setString('ApType', 'TestDialog_Control')
+      .setString('sTab', Elem('iTab').value)
+      .setInt('nLeft', Elem('iLeft').value)
+      .setInt('nBottom', parseInt(Elem('iTop').value) + parseInt(Elem('iHeight').value))
+      .setInt('nWidth', Elem('iWidth').value)
+      .setInt('nHeight', Elem('iHeight').value)
+      .send();
+  }
+
+  function TabNavigate()
+  {
+    api.Message('TabNavigate')
+      .setString('ApType', 'TestDialog_Control')
+      .setString('sTab', Elem('iTab').value)
+      .setString('sUrl', Elem('iUrl').value)
+      .send();
+    }
+  
+  function TabSelect()
+  {
+    api.Message('TabSelect')
+      .setString('ApType', 'TestDialog_Control')
+      .setString('sTab', Elem('iTab').value)
+      .send();
+  }
+
+  function TabClose()
+  {
+    api.Message('TabClose')
+      .setString('ApType', 'TestDialog_Control')
+      .setString('sTab', Elem('iTab').value)
+      .send();
+  }
+
+</script>
+</head>
+<body>
+<div style="position:absolute; left:0; top:0; right:0; bottom:0; padding:6px;">
+
+  <h1>Main</h1>
+  <p>
+    <input type="button" value="Quit" onclick="api.Message('MainLoop_EndLoop').send();"/>
+    <input type="button" value="Connect" onclick="api.Message('Xmpp_Connect').send();" />
+    <input type="button" value="Disconnect" onclick="api.Message('Xmpp_Disconnect').send();" />
+    <br />
+    Config:
+    <input id="iKey" type="text" value="Dialog/Theme" />
+    <input id="iValue" type="text" value="Wood" />
+  <input type="button" value="Set" onclick="SetConfig();" />
+  </p>
+
+  <h1>Common</h1>
+  <p>
+    Left: <input id="iLeft" type="text" size="4" value="50" />
+    Top: <input id="iTop" type="text" size="4" value="300" />
+    Width: <input id="iWidth" type="text" size="4" value="1300" />
+    Height: <input id="iHeight" type="text" size="4" value="300" />
+    <br />
+    URL: <input id="iUrl" type="text" size="40" value="http://openvirtualworld.blogspot.com/" />
+  </p>
+
+  <h1>Dialog</h1>
+  <p>
+    Caption: <input id="iCaption" type="text" size="40" value="Open Virtual World" />
+    <br />
+    IconUrl: <input id="iIconUrl" type="text" size="40" value="http://forums.watchuseek.com/site/images/icons/blogger_16.png" />
+    <input type="button" value="Create" onclick="DialogCreate();" />
+  </p>
+
+  <h1>Navigate</h1>
+  <p>
+    Tab: <input id="iTab" type="text" size="10" value="TabA" />
+    <input type="button" value="Position" onclick="TabPosition();" />
+    <input type="button" value="Navigate" onclick="TabNavigate();" />
+    <input type="button" value="Select" onclick="TabSelect();" />
+    <input type="button" value="Close" onclick="TabClose();" />
+  </p>
+
+
+</div>
+</body>
+</html>

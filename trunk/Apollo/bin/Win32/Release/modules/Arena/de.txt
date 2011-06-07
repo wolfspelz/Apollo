@@ -1,0 +1,4 @@
+#ässert utf-8
+Hello World=Hallo Welt
+ParamTest.Click me!=Klick mich!
+ParamTest.Clear=Löschen
