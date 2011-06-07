@@ -156,17 +156,26 @@ void Avatar::GetDetailString(const String& sKey, Apollo::ValueList& vlMimeTypes)
       Elem* e = lCoords.FindByNameCase("x");
       if (e) {
         int nX = String::atoi(e->getString());
-        if (nX_ != nX) {
 
-          if (!nPositionConfirmed_) {
-            nPositionConfirmed_ = 1;
-            DisplaySetAvatarPosition(nX);
-          } else {
-            BeginMove(nX);
-          }
-          nX_ = nX;
-
+        int bPositionValid = 1;
+        if (nX > 10000) {
+          bPositionValid = 0;
         }
+
+        if (bPositionValid) {
+          if (nX_ != nX) {
+            if (!nPositionConfirmed_) {
+              nPositionConfirmed_ = 1;
+              DisplaySetAvatarPosition(nX);
+            } else {
+              BeginMove(nX);
+            }
+            nX_ = nX;
+          }
+        } else {
+          SetUnknownPosition();
+        }
+
       }
 
     } else if (sKey == Msg_VpView_ParticipantDetail_Condition) {
@@ -395,6 +404,23 @@ void Avatar::EndMove(int nDestX)
     }
 
   }
+}
+
+void Avatar::SetUnknownPosition()
+{
+  int nX = 300;
+  int nMin = 100;
+  int nMax = 500;
+
+  if (pDisplay_) {
+    nMax = pDisplay_->GetWidth();
+  }
+
+  nX = nMin + Apollo::getRandom(nMax - nMin);
+
+  nPositionConfirmed_ = 0;
+
+  DisplaySetAvatarPosition(nX);
 }
 
 void Avatar::UnsubscribeDetail(const String& sKey)
@@ -642,26 +668,6 @@ void Avatar::DisplayRemoveChatline(const ApHandle& hChat)
   dsm.srpc.set("hChat", hChat);
   dsm.Request();
 }
-
-//void Avatar::SetUnknownPosition()
-//{
-//  int nX = 300;
-//  int nMin = 100;
-//  int nMax = 500;
-//
-//  if (pDisplay_) {
-//    nMax = pDisplay_->GetWidth();
-//  }
-//
-//  nX = nMin + Apollo::getRandom(nMax - nMin);
-//
-//  nPositionConfirmed_ = 0;
-//
-//  DisplaySrpcMessage dsm(pDisplay_, "SetAvatarPosition");
-//  dsm.srpc.setString("hParticipant", hParticipant_);
-//  dsm.srpc.setInt("nX", nX);
-//  dsm.Request();
-//}
 
 void Avatar::DisplaySetAvatarPosition(int nDestX)
 {

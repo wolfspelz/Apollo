@@ -160,11 +160,17 @@ Arena.prototype = {
 
   SetAvatarImage: function (hParticipant, sUrl)
   {
-    var img = new Image()
-    img.onload = function() {
-      $('#' + GetParticipantDomId(hParticipant) + ' .cImage').css('background-image', 'url(' + sUrl + ')');
-    }
-    img.src = sUrl;
+//    var img = new Image()
+//    img.onload = function() {
+//      $('#' + GetParticipantDomId(hParticipant) + ' .cImage').css('background-image', 'url(' + sUrl + ')');
+//    }
+//    img.src = sUrl;
+    
+    // Set directly
+    // Disadvantage: might be empty=invisible, because takes time to load
+    // Advantage: idle won't overtake move animation, because move takes longer to load, 
+    // thus is set later and won't be reset to idle after short movements.
+    $('#' + GetParticipantDomId(hParticipant) + ' .cImage').css('background-image', 'url(' + sUrl + ')');
   },
 
   SetCommunityAttachment: function (hParticipant, sUrl, sLabel, sLink)

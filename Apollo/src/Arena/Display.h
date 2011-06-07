@@ -42,11 +42,14 @@ public:
   void OnLeaveBegin();
   void OnLeaveComplete();
 
+  void OnViewLoaded();
+  void OnViewUnload();
   void OnParticipantsChanged();
   void OnParticipantDetailsChanged(const ApHandle& hParticipant, Apollo::ValueList& vlKeys);
   void OnReceivePublicChat(const ApHandle& hParticipant, const ApHandle& hChat, const String& sNickname, const String& sText, const Apollo::TimeValue& tv);
   void OnReceivePublicAction(const ApHandle& hParticipant, const String& sAction);
   void OnContextDetailsChanged(Apollo::ValueList& vlKeys);
+  void OnLocationDetailsChanged(Apollo::ValueList& vlKeys);
   void OnAvatarAnimationBegin(const ApHandle& hParticipant, const String& sUrl);
   void OnCallModuleSrpc(Apollo::SrpcMessage& request, Apollo::SrpcMessage& response);
 
@@ -58,6 +61,7 @@ public:
   inline ApHandle GetLocation() { return hLocation_; }
 
 protected:
+  void StartDisplay();
   void ProcessAvatarList(Apollo::ValueList& vlParticipants, ApHandle& hSelf);
   void InitRemovedParticipants(ParticipantFlags& removedParticipants);
   void InitAddedParticipants(ParticipantFlags& addedParticipants);
@@ -66,11 +70,15 @@ protected:
   void EvaluateNewAvatarList(Apollo::ValueList& vlParticipants, ParticipantFlags& addedParticipants, ParticipantFlags& removedParticipants);
   void ProcessRemovedParticipants(ParticipantFlags& removedParticipants);
   void ProcessAddedParticipants(ParticipantFlags& addedParticipants);
+  void ShowContextDetailDocumentUrl(const String& sValue);
+  void ShowContextDetailLocationUrl(const String& sValue);
+  void ShowLocationDetailState(const String& sValue);
 
   void RemoveAllAvatars();
   void RemoveAllObjects();
   void ResetLocationInfo();
 
+  void SendVisibility();
   void SendPosition();
 
 protected:
@@ -83,8 +91,12 @@ protected:
   int nBottom_;
   int nWidth_;
   int nHeight_;
+  int bSendVisibility_;
+  int bHasPosition_;
+  int bHasSize_;
 
   ApHandle hView_;
+  int bViewLoaded_;
   ApHandle hSelf_; // Self Participant
 
   Apollo::TimeValue tvEnterRequested_;
