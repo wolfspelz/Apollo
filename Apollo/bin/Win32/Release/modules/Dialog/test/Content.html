@@ -1,0 +1,35 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<script type="text/javascript">
+
+function Start()
+{
+  window.setTimeout('Stop();', 1000);
+}
+
+function Stop()
+{
+  document.getElementById('iOut').innerHTML = String(parent.apollo.sendMessage);
+  parent.apollo.sendMessage('Method=WebView_Destroy\nhView=' + parent.apollo.viewHandle + '\n');
+}
+
+document.onmousemove = function (ev) { return parent.document.onmousemove(ev); };
+
+</script>
+</head>
+<body style="background-color:rgba(128, 128, 255, 0.5);" onload="Start();">
+<div id="iOut"></div>
+Hello World<br/>
+Hello World<br/>
+Hello World<br/>
+Hello World<br/>
+Hello World<br/>
+Hello World<br/>
+Hello World<br/>
+Hello World<br/>
+Hello World<br/>
+Hello World<br/>
+Hello World<br/>
+</body>
+</html>
