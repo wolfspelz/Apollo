@@ -22,8 +22,11 @@ Avatar::Avatar(ArenaModule* pModule, Display* pDisplay, const ApHandle& hPartici
 ,bMoving_(0)
 {
   avatarMimeTypes_.add("avatar/gif");
-  //avatarMimeTypes_.add("image/gif");
-  //avatarMimeTypes_.add("image/png");
+
+  imageMimeTypes_.add("image/gif");
+  imageMimeTypes_.add("image/png");
+  imageMimeTypes_.add("image/jpeg");
+  imageMimeTypes_.add("image/jpg");
 }
 
 void Avatar::Create(int bSelf)
@@ -35,6 +38,7 @@ void Avatar::Create(int bSelf)
   dsm.Request();
 
   SubscribeAndGetDetail(Msg_VpView_ParticipantDetail_Nickname);
+  SubscribeAndGetDetail(Msg_VpView_ParticipantDetail_Image);
   SubscribeAndGetDetail(Msg_VpView_ParticipantDetail_Avatar);
   SubscribeAndGetDetail(Msg_VpView_ParticipantDetail_OnlineStatus);
   //SubscribeAndGetDetail(Msg_VpView_ParticipantDetail_Message);
@@ -51,6 +55,7 @@ void Avatar::Create(int bSelf)
 void Avatar::Destroy()
 {
   UnsubscribeDetail(Msg_VpView_ParticipantDetail_Nickname);
+  UnsubscribeDetail(Msg_VpView_ParticipantDetail_Image);
   UnsubscribeDetail(Msg_VpView_ParticipantDetail_Avatar);
   UnsubscribeDetail(Msg_VpView_ParticipantDetail_OnlineStatus);
   //UnsubscribeDetail(Msg_VpView_ParticipantDetail_Message);
@@ -98,6 +103,8 @@ void Avatar::SubscribeAndGetDetail(const String& sKey)
   if (0) {
   } else if (sKey == Msg_VpView_ParticipantDetail_Avatar) {
     msg.vlMimeTypes = avatarMimeTypes_;
+  } else if (sKey == Msg_VpView_ParticipantDetail_Image) {
+    msg.vlMimeTypes = imageMimeTypes_;
   } else {
     msg.vlMimeTypes = noMimeTypes_;
   }
@@ -114,7 +121,8 @@ void Avatar::GetDetail(const String& sKey)
   if (0) {
   } else if (sKey == Msg_VpView_ParticipantDetail_Avatar) {
     GetDetailData(sKey, avatarMimeTypes_);
-//Ref    GetDetailRef(sKey, avatarMimeTypes_);
+  } else if (sKey == Msg_VpView_ParticipantDetail_Image) {
+    GetDetailRef(sKey, imageMimeTypes_);
   } else {
     GetDetailString(sKey, noMimeTypes_);
   }
@@ -235,8 +243,15 @@ void Avatar::GetDetailRef(const String& sKey, Apollo::ValueList& vlMimeTypes)
   if (msg.Request()) {
 
     if (0) {
-    } else if (sKey == Msg_VpView_ParticipantDetail_Avatar) {
-      DisplaySetImage(msg.sUrl);
+    } else if (sKey == Msg_VpView_ParticipantDetail_Image) {
+      if (!ApIsHandle(hAnimatedItem_)) {
+        String sUrl = msg.sUrl;
+        if (sUrl != sImage_) {
+          DisplaySetImage(sUrl);
+          sImage_ = sUrl;
+        }
+      }
+
     }
   }
 }
@@ -490,10 +505,8 @@ void Avatar::OnReceivePublicAction(const String& sAction)
 void Avatar::OnAnimationBegin(const String& sUrl)
 {
   if (sUrl != sImage_) {
-    //if (!IsMoving()) {
-      DisplaySetImage(sUrl);
-      sImage_ = sUrl;
-    //}
+    DisplaySetImage(sUrl);
+    sImage_ = sUrl;
   }
 }
 
