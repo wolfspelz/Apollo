@@ -78,6 +78,7 @@ protected:
   void ResumeAnimation();
   void BeginMove(int nDestX);
   void EndMove(int nDestX);
+  void SetUnknownPosition();
   int IsMoving() { return bMoving_; }
 
 protected:

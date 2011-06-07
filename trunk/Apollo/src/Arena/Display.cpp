@@ -20,6 +20,10 @@ Display::Display(ArenaModule* pModule, const ApHandle& hContext)
 ,nBottom_(0)
 ,nWidth_(0)
 ,nHeight_(0)
+,bSendVisibility_(0)
+,bHasPosition_(0)
+,bHasSize_(0)
+,bViewLoaded_(0)
 {
 }
 
@@ -54,12 +58,6 @@ int Display::Create()
   if (ok) {
     hView_ = hView;
     pModule_->SetContextOfHandle(hView_, hContext_);
-
-    { Msg_VpView_SubscribeContextDetail msg; msg.hContext = hContext_; msg.sKey = Msg_VpView_ContextDetail_DocumentUrl; msg.Request(); }
-    { Msg_VpView_SubscribeContextDetail msg; msg.hContext = hContext_; msg.sKey = Msg_VpView_ContextDetail_LocationUrl; msg.Request(); }
-
-    //{ Msg_VpView_GetContextDetail msg; msg.hContext = hContext_; msg.sKey = Msg_VpView_ContextDetail_DocumentUrl; if (msg.Request()) { Meta* p = GetMeta(); if (p) { p->OnDocumentUrl(msg.sValue); }} }
-    //{ Msg_VpView_GetContextDetail msg; msg.hContext = hContext_; msg.sKey = Msg_VpView_ContextDetail_LocationUrl; if (msg.Request()) { Meta* p = GetMeta(); if (p) { p->OnLocationUrl(msg.sValue); }} }
   }
 
   return ok;
@@ -80,12 +78,17 @@ void Display::SetVisibility(int bVisible)
 {
   bVisible_ = bVisible;
 
-  Msg_WebView_Visibility msg;
-  msg.hView = hView_;
-  msg.bVisible = bVisible_;
-  if (!msg.Request()) {
-    apLog_Error((LOG_CHANNEL, "Display::SetPosition", "Msg_WebView_Visibility(" ApHandleFormat ") failed", ApHandleType(msg.hView)));
-  }
+  SendVisibility();
+
+  //if (bVisible) {
+  //  if (bHasPosition_ && bHasSize_) {
+  //    SendVisibility();
+  //  } else {
+  //    bSendVisibility_ = 1;
+  //  }
+  //} else {
+  //  SendVisibility();
+  //}
 }
 
 void Display::SetPosition(int nLeft, int nBottom)
@@ -93,7 +96,14 @@ void Display::SetPosition(int nLeft, int nBottom)
   nLeft_ = nLeft;
   nBottom_ = nBottom;
 
+  bHasPosition_ = 1;
+
   SendPosition();
+
+  //if (bVisible_ && bHasPosition_ && bHasSize_) {
+  //  SendVisibility();
+  //  bSendVisibility_ = 0;
+  //}
 }
 
 void Display::SetSize(int nWidth, int nHeight)
@@ -101,20 +111,39 @@ void Display::SetSize(int nWidth, int nHeight)
   nWidth_ = nWidth;
   nHeight_ = nHeight;
 
+  bHasSize_ = 1;
+
   SendPosition();
+
+  //if (bVisible_ && bHasPosition_ && bHasSize_) {
+  //  SendVisibility();
+  //  bSendVisibility_ = 0;
+  //}
 }
 
-#define OVERFLOW_LEFT 100
-#define OVERFLOW_RIGHT 800
+void Display::SendVisibility()
+{
+  Msg_WebView_Visibility msg;
+  msg.hView = hView_;
+  msg.bVisible = bVisible_;
+  if (!msg.Request()) {
+    apLog_Error((LOG_CHANNEL, "Display::SendVisibility", "Msg_WebView_Visibility(" ApHandleFormat ") failed", ApHandleType(msg.hView)));
+  }
+}
 
 void Display::SendPosition()
 {
+  int nHtmlExtendLeft = Apollo::getModuleConfig(MODULE_NAME, "HtmlExtendLeft", 0);
+  int nHtmlExtendRight = Apollo::getModuleConfig(MODULE_NAME, "HtmlExtendRight", 0);
+  int nHtmlExtendTop = Apollo::getModuleConfig(MODULE_NAME, "HtmlExtendTop", 0);
+  int nHtmlExtendBottom = Apollo::getModuleConfig(MODULE_NAME, "HtmlExtendBottom", 0);
+
   Msg_WebView_Position msg;
   msg.hView = hView_;
-  msg.nLeft = nLeft_ - OVERFLOW_LEFT;
-  msg.nTop = nBottom_ - nHeight_;
-  msg.nWidth = nWidth_ + (OVERFLOW_LEFT + OVERFLOW_RIGHT);
-  msg.nHeight = nHeight_;
+  msg.nLeft = nLeft_ - nHtmlExtendLeft;
+  msg.nTop = nBottom_ - nHeight_ - nHtmlExtendTop;
+  msg.nWidth = nWidth_ + (nHtmlExtendLeft + nHtmlExtendRight);
+  msg.nHeight = nHeight_ + (nHtmlExtendTop + nHtmlExtendBottom);
   if (!msg.Request()) {
     apLog_Error((LOG_CHANNEL, "Display::SendPosition", "Msg_WebView_Position(" ApHandleFormat ") failed", ApHandleType(msg.hView)));
   }
@@ -126,12 +155,12 @@ void Display::AttachLocation(const ApHandle& hLocation)
 {
   hLocation_ = hLocation;
 
-  //if (pLocationInfo_) {
-  //  pLocationInfo_->SetLocation(hLocation);
-  //}
-
   if (pModule_) {
     pModule_->SetContextOfLocation(hLocation, hContext_);
+  }
+
+  if (bViewLoaded_ && ApIsHandle(hLocation_)) {
+    StartDisplay();
   }
 }
 
@@ -158,9 +187,9 @@ void Display::OnEnterRequested()
 
   tvEnterRequested_ = Apollo::TimeValue::getTime();
 
-  DisplaySrpcMessage dsm(this, "SetLocationState");
-  dsm.srpc.set("sState", "EnterRequested");
-  dsm.Request();
+  //DisplaySrpcMessage dsm(this, "SetLocationState");
+  //dsm.srpc.set("sState", "EnterRequested");
+  //dsm.Request();
 }
 
 void Display::OnEnterBegin()
@@ -169,9 +198,9 @@ void Display::OnEnterBegin()
 
   tvEnterBegin_ = Apollo::TimeValue::getTime();
 
-  DisplaySrpcMessage dsm(this, "SetLocationState");
-  dsm.srpc.set("sState", "EnterBegin");
-  dsm.Request();
+  //DisplaySrpcMessage dsm(this, "SetLocationState");
+  //dsm.srpc.set("sState", "EnterBegin");
+  //dsm.Request();
 }
 
 void Display::OnEnterComplete()
@@ -187,9 +216,9 @@ void Display::OnEnterComplete()
     msg->PostAsync();
   }
 
-  DisplaySrpcMessage dsm(this, "SetLocationState");
-  dsm.srpc.set("sState", "EnterComplete");
-  dsm.Request();
+  //DisplaySrpcMessage dsm(this, "SetLocationState");
+  //dsm.srpc.set("sState", "EnterComplete");
+  //dsm.Request();
 }
 
 void Display::OnLeaveRequested()
@@ -198,9 +227,9 @@ void Display::OnLeaveRequested()
 
   tvLeaveRequested_ = Apollo::TimeValue::getTime();
 
-  DisplaySrpcMessage msg(this, "SetLocationState");
-  msg.srpc.set("sState", "LeaveRequested");
-  msg.Request();
+  //DisplaySrpcMessage msg(this, "SetLocationState");
+  //msg.srpc.set("sState", "LeaveRequested");
+  //msg.Request();
 }
 
 void Display::OnLeaveBegin()
@@ -209,18 +238,18 @@ void Display::OnLeaveBegin()
 
   tvLeaveBegin_ = Apollo::TimeValue::getTime();
 
-  DisplaySrpcMessage dsm(this, "SetLocationState");
-  dsm.srpc.set("sState", "LeaveBegin");
-  dsm.Request();
+  //DisplaySrpcMessage dsm(this, "SetLocationState");
+  //dsm.srpc.set("sState", "LeaveBegin");
+  //dsm.Request();
 }
 
 void Display::OnLeaveComplete()
 {
   apLog_Verbose((LOG_CHANNEL, "Display::OnLeaveComplete", "ctxt=" ApHandleFormat " loc=" ApHandleFormat "", ApHandleType(hContext_), ApHandleType(hLocation_)));
 
-  DisplaySrpcMessage dsm(this, "SetLocationState");
-  dsm.srpc.set("sState", "LeaveComplete");
-  dsm.Request();
+  //DisplaySrpcMessage dsm(this, "SetLocationState");
+  //dsm.srpc.set("sState", "LeaveComplete");
+  //dsm.Request();
 }
 
 //---------------------------------------------------
@@ -298,16 +327,87 @@ void Display::OnContextDetailsChanged(Apollo::ValueList& vlKeys)
     if (0) {
     } else if (e->getString() == Msg_VpView_ContextDetail_DocumentUrl) {
       if (msg.Request()) {
-        DisplaySrpcMessage dsm(this, "SetDocumentUrl");
-        dsm.srpc.set("sUrl", msg.sValue);
-        dsm.Request();
+        ShowContextDetailDocumentUrl(msg.sValue);
       }
     } else if (e->getString() == Msg_VpView_ContextDetail_LocationUrl) {
       if (msg.Request()) {
-        DisplaySrpcMessage dsm(this, "SetLocationUrl");
-        dsm.srpc.set("sUrl", msg.sValue);
-        dsm.Request();
+        ShowContextDetailLocationUrl(msg.sValue);
       }
+    }
+  }
+}
+
+void Display::ShowContextDetailDocumentUrl(const String& sValue)
+{
+  DisplaySrpcMessage dsm(this, "SetDocumentUrl");
+  dsm.srpc.set("sUrl", sValue);
+  dsm.Request();
+}
+
+void Display::ShowContextDetailLocationUrl(const String& sValue)
+{
+  DisplaySrpcMessage dsm(this, "SetLocationUrl");
+  dsm.srpc.set("sUrl", sValue);
+  dsm.Request();
+}
+
+//---------------------------------------------------
+
+void Display::OnLocationDetailsChanged(Apollo::ValueList& vlKeys)
+{
+  Msg_VpView_GetLocationDetail msg;
+  msg.hLocation = hLocation_;
+
+  for (Apollo::ValueElem* e = 0; e = vlKeys.nextElem(e); ) {
+    msg.sKey = e->getString();
+
+    if (0) {
+    } else if (e->getString() == Msg_VpView_LocationDetail_State) {
+      if (msg.Request()) {
+        ShowLocationDetailState(msg.sValue);
+      }
+    }
+  }
+}
+
+void Display::ShowLocationDetailState(const String& sValue)
+{
+  DisplaySrpcMessage dsm(this, "SetLocationState");
+  dsm.srpc.set("sState", sValue);
+  dsm.Request();
+}
+
+//---------------------------------------------------
+
+void Display::OnViewLoaded()
+{
+  bViewLoaded_ = 1;
+
+  if (bViewLoaded_ && ApIsHandle(hLocation_)) {
+    StartDisplay();
+  }
+}
+
+void Display::OnViewUnload()
+{
+  bViewLoaded_ = 0;
+}
+
+void Display::StartDisplay()
+{
+  { Msg_VpView_SubscribeContextDetail msg; msg.hContext = hContext_; msg.sKey = Msg_VpView_ContextDetail_DocumentUrl; msg.Request(); }
+  { Msg_VpView_SubscribeContextDetail msg; msg.hContext = hContext_; msg.sKey = Msg_VpView_ContextDetail_LocationUrl; msg.Request(); }
+  { Msg_VpView_SubscribeLocationDetail msg; msg.hLocation = hLocation_; msg.sKey = Msg_VpView_LocationDetail_State; msg.Request(); }
+
+  { Msg_VpView_GetContextDetail msg; msg.hContext = hContext_; msg.sKey = Msg_VpView_ContextDetail_DocumentUrl; if (msg.Request()) { ShowContextDetailDocumentUrl(msg.sValue); } }
+  { Msg_VpView_GetContextDetail msg; msg.hContext = hContext_; msg.sKey = Msg_VpView_ContextDetail_LocationUrl; if (msg.Request()) { ShowContextDetailLocationUrl(msg.sValue); } }
+  { Msg_VpView_GetLocationDetail msg; msg.hLocation = hLocation_; msg.sKey = Msg_VpView_LocationDetail_State; if (msg.Request()) { ShowLocationDetailState(msg.sValue); } }
+
+  {
+    Msg_VpView_GetParticipants msg;
+    msg.hLocation = hLocation_;
+    if (msg.Request()) {
+      ProcessAvatarList(msg.vlParticipants, msg.hSelf);
     }
   }
 }

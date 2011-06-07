@@ -246,8 +246,6 @@ AP_MSG_HANDLER_METHOD(ArenaModule, VpView_ContextLocationUnassigned)
   }
 }
 
-AP_MSG_HANDLER_METHOD(ArenaModule, VpView_LocationDetailsChanged) {}
-
 AP_MSG_HANDLER_METHOD(ArenaModule, VpView_ContextDetailsChanged)
 {
   Display* pDisplay = FindDisplay(pMsg->hContext);
@@ -257,6 +255,17 @@ AP_MSG_HANDLER_METHOD(ArenaModule, VpView_ContextDetailsChanged)
 }
 
 //----------------------------
+
+AP_MSG_HANDLER_METHOD(ArenaModule, VpView_LocationDetailsChanged)
+{
+  ContextHandleList& contextsOfLocation = GetContextsOfLocation(pMsg->hLocation);
+  for (ContextHandleNode* pContextNode = 0; (pContextNode = contextsOfLocation.Next(pContextNode)) != 0; ) {
+    Display* pDisplay = FindDisplay(pContextNode->Key());
+    if (pDisplay) {
+      pDisplay->OnLocationDetailsChanged(pMsg->vlKeys);
+    }
+  }
+}
 
 AP_MSG_HANDLER_METHOD(ArenaModule, VpView_EnterLocationRequested)
 {
@@ -378,6 +387,24 @@ AP_MSG_HANDLER_METHOD(ArenaModule, VpView_LeaveLocationComplete)
 AP_MSG_HANDLER_METHOD(ArenaModule, VpView_ParticipantAdded) {}
 
 AP_MSG_HANDLER_METHOD(ArenaModule, VpView_ParticipantRemoved) {}
+
+//----------------------------
+
+AP_MSG_HANDLER_METHOD(ArenaModule, WebView_Event_DocumentLoaded)
+{
+  Display* pDisplay = GetDisplayOfHandle(pMsg->hView);
+  if (pDisplay) {
+    pDisplay->OnViewLoaded();
+  }
+}
+
+AP_MSG_HANDLER_METHOD(ArenaModule, WebView_Event_DocumentUnload)
+{
+  Display* pDisplay = GetDisplayOfHandle(pMsg->hView);
+  if (pDisplay) {
+    pDisplay->OnViewUnload();
+  }
+}
 
 //----------------------------
 
@@ -543,6 +570,8 @@ int ArenaModule::Init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ArenaModule, VpView_LeaveLocationComplete, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ArenaModule, VpView_ParticipantAdded, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ArenaModule, VpView_ParticipantRemoved, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, ArenaModule, WebView_Event_DocumentLoaded, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, ArenaModule, WebView_Event_DocumentUnload, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ArenaModule, Animation_SequenceBegin, this, ApCallbackPosNormal);
   //AP_MSG_REGISTRY_ADD(MODULE_NAME, ArenaModule, Animation_Frame, this, ApCallbackPosNormal);
   //AP_MSG_REGISTRY_ADD(MODULE_NAME, ArenaModule, Animation_SequenceEnd, this, ApCallbackPosNormal);
