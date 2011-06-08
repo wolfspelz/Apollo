@@ -4,8 +4,8 @@
 //
 // ============================================================================
 
-#if !defined(Win32FirefoxBrowser_h_INCLUDED)
-#define Win32FirefoxBrowser_h_INCLUDED
+#if !defined(Win32Browser_h_INCLUDED)
+#define Win32Browser_h_INCLUDED
 
 #include "Browser.h"
 
@@ -18,14 +18,4 @@ protected:
   virtual void AdjustStackingOrder();
 };
 
-// ---------------------------------------------------------
-
-class Win32FirefoxBrowser : public Win32Browser
-{
-public:
-  Win32FirefoxBrowser(Apollo::WindowHandle& win) : Win32Browser(win) {}
-
-  void OnTimer();
-};
-
-#endif // !defined(Win32FirefoxBrowser_h_INCLUDED)
+#endif // !defined(Win32Browser_h_INCLUDED)

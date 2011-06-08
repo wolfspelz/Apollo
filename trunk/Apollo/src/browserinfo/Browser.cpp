@@ -113,7 +113,7 @@ void Browser::AdjustPosition(int bVisible, int nLeft, int nBottom, int nWidth, i
     nWidth_ = nWidth;
     nHeight_ = nHeight;
 
-    //apLog_Debug((LOG_CHANNEL, "Win32FirefoxBrowser::OnTimer", "%08x %d,%d,%d,%d", (int) hWnd, nLeft, nBottom, nWidth, nHeight));
+    //apLog_Debug((LOG_CHANNEL, "Firefox3Win32Browser::OnTimer", "%08x %d,%d,%d,%d", (int) hWnd, nLeft, nBottom, nWidth, nHeight));
 
     Context* pContext = pNode->Value();
     if (pContext) {
