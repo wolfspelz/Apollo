@@ -70,17 +70,29 @@ public:
   String sClassPath_;
 };
 
-class FirefoxFinder: public WindowFinder
+class Firefox3Finder: public WindowFinder
 {
 public:
-  FirefoxFinder();
+  Firefox3Finder();
 
   void OnWindow(HWND hWnd);
 
-  static Apollo::WindowHandle GetFirefoxToplevelWindow(Apollo::KeyValueList& kvSignature);
+  static Apollo::WindowHandle GetToplevelWindow(Apollo::KeyValueList& kvSignature);
 
   String sToplevelClass_;
   String sChildClassPath_;
+};
+
+class Firefox4Finder: public WindowFinder
+{
+public:
+  Firefox4Finder();
+
+  void OnWindow(HWND hWnd);
+
+  static Apollo::WindowHandle GetToplevelWindow(Apollo::KeyValueList& kvSignature);
+
+  String sToplevelClass_;
 };
 
 #endif // !defined(Win32Window_h_INCLUDED)

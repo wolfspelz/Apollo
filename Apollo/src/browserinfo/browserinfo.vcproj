@@ -169,7 +169,15 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Win32FirefoxBrowser.cpp"
+				RelativePath=".\Firefox3Win32Browser.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Firefox4Win32Browser.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Win32Browser.cpp"
 				>
 			</File>
 			<File
@@ -195,11 +203,19 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Firefox3Win32Browser.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Firefox4Win32Browser.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Local.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Win32FirefoxBrowser.h"
+				RelativePath=".\Win32Browser.h"
 				>
 			</File>
 			<File

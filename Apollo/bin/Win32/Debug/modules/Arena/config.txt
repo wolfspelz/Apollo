@@ -7,7 +7,7 @@ HtmlExtendTop=0
 HtmlExtendBottom=0
 
 ShowDebugInterface=1
-  ShowMetaInformation=1
+#ShowMetaInformation=1
 
 Language/en=[[MODULE_RESOURCE_PATH]]/en.txt
 Language/de=[[MODULE_RESOURCE_PATH]]/de.txt
