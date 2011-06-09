@@ -1,7 +1,7 @@
-#Location/MaxChatLines=3
-#Location/MaxChatLineAge=60
-#Location/DefaultX=150
-#Location/DefaultY=0
-#Location/DefaultZ=0
-#Identity/Id=
+Location/MaxChatLines=3
+Location/MaxChatLineAge=60
+Location/DefaultX=150
+Location/DefaultY=0
+Location/DefaultZ=0
+Identity/Id=
 #HTTP/Enabled=1

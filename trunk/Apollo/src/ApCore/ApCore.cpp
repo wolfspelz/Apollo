@@ -513,6 +513,10 @@ int ApCore::Call(ApMessage* pMsg)
             pMsg->Stop();
           }
 
+          if (pMsg->apStatus == ApMessage::Error) {
+            pMsg->Stop();
+          }
+
           bContinue = pMsg->Forward();
           bCalled = 1;
         }

@@ -383,10 +383,10 @@ public:
   ApOUT String sSource; // e.g. "IdentityItemUrl=http://ydentiti.org/test/Tassadar/config.xml"
 };
 
-class Msg_VpView_GetParticipantDetailRef: public ApRequestMessage
+class Msg_VpView_GetParticipantDetailUrl: public ApRequestMessage
 {
 public:
-  Msg_VpView_GetParticipantDetailRef() : ApRequestMessage("VpView_GetParticipantDetailRef") {}
+  Msg_VpView_GetParticipantDetailUrl() : ApRequestMessage("VpView_GetParticipantDetailUrl") {}
   ApIN ApHandle hParticipant;
   ApIN String sKey;
   ApIN Apollo::ValueList vlMimeTypes;

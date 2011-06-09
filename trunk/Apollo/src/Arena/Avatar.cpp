@@ -122,7 +122,7 @@ void Avatar::GetDetail(const String& sKey)
   } else if (sKey == Msg_VpView_ParticipantDetail_Avatar) {
     GetDetailData(sKey, avatarMimeTypes_);
   } else if (sKey == Msg_VpView_ParticipantDetail_Image) {
-    GetDetailRef(sKey, imageMimeTypes_);
+    GetDetailUrl(sKey, imageMimeTypes_);
   } else {
     GetDetailString(sKey, noMimeTypes_);
   }
@@ -234,9 +234,9 @@ void Avatar::GetDetailString(const String& sKey, Apollo::ValueList& vlMimeTypes)
   }
 }
 
-void Avatar::GetDetailRef(const String& sKey, Apollo::ValueList& vlMimeTypes)
+void Avatar::GetDetailUrl(const String& sKey, Apollo::ValueList& vlMimeTypes)
 {
-  Msg_VpView_GetParticipantDetailRef msg;
+  Msg_VpView_GetParticipantDetailUrl msg;
   msg.hParticipant = hParticipant_;
   msg.sKey = sKey;
   msg.vlMimeTypes = vlMimeTypes;
@@ -512,7 +512,7 @@ void Avatar::OnAnimationBegin(const String& sUrl)
 
 //----------------------------------------------------------
 
-void Avatar::OnCallModuleSrpc(Apollo::SrpcMessage& request, Apollo::SrpcMessage& response)
+void Avatar::OnCallModule(Apollo::SrpcMessage& request, Apollo::SrpcMessage& response)
 {
   String sMethod = request.getString("Method");
 
@@ -542,7 +542,7 @@ void Avatar::OnCallModuleSrpc(Apollo::SrpcMessage& request, Apollo::SrpcMessage&
     OnAvatarPointerClosed();
 
   } else {
-    throw ApException("Avatar::OnCallModuleSrpc: Unknown Method=%s", StringType(sMethod));
+    throw ApException("Avatar::OnCallModule: Unknown Method=%s", StringType(sMethod));
   }
   
 }

@@ -477,10 +477,12 @@ JSValueRef View::JS_Apollo_sendMessage(JSContextRef ctx, JSObjectRef function, J
     // Custom message handlers just do the apStatus thing.
     // They rely on someone else (us here) to fill msg.response.
     if (msg.Call()) {
-      msg.response.set("Status", 1);
+      msg.response.createResponse(msg.srpc);
+      //msg.response.set("Status", 1);
     } else {
-      msg.response.set("Status", 0);
-      msg.response.set("Message", msg.sComment);
+      msg.response.createError(msg.srpc, msg.sComment);
+      //msg.response.set("Status", 0);
+      //msg.response.set("Message", msg.sComment);
     }
 
     sResponse = msg.response.toString();

@@ -1127,11 +1127,11 @@ AP_MSG_HANDLER_METHOD(VpModule, VpView_GetParticipantDetailData)
   pMsg->apStatus = ApMessage::Ok;
 }
 
-AP_MSG_HANDLER_METHOD(VpModule, VpView_GetParticipantDetailRef)
+AP_MSG_HANDLER_METHOD(VpModule, VpView_GetParticipantDetailUrl)
 {
   Participant* pParticipant = findParticipant(pMsg->hParticipant);
   if (pParticipant) {
-    if (!pParticipant->getDetailRef(pMsg->sKey, pMsg->vlMimeTypes, pMsg->sUrl, pMsg->sMimeType)) { throw ApException("Not available: part=" ApHandleFormat " key=%s", ApHandleType(pMsg->hParticipant), StringType(pMsg->sKey)); }
+    if (!pParticipant->getDetailUrl(pMsg->sKey, pMsg->vlMimeTypes, pMsg->sUrl, pMsg->sMimeType)) { throw ApException("Not available: part=" ApHandleFormat " key=%s", ApHandleType(pMsg->hParticipant), StringType(pMsg->sKey)); }
   }
   pMsg->apStatus = ApMessage::Ok;
 }
@@ -1494,9 +1494,9 @@ void SrpcGate_VpView_GetParticipantDetailString(ApSRPCMessage* pMsg)
   }
 }
 
-void SrpcGate_VpView_GetParticipantDetailRef(ApSRPCMessage* pMsg)
+void SrpcGate_VpView_GetParticipantDetailUrl(ApSRPCMessage* pMsg)
 {
-  Msg_VpView_GetParticipantDetailRef msg;
+  Msg_VpView_GetParticipantDetailUrl msg;
   msg.hParticipant = pMsg->srpc.getHandle("hParticipant");
   msg.sKey = pMsg->srpc.getString("sKey");
   pMsg->srpc.getValueList("vlMimeTypes", msg.vlMimeTypes);
@@ -1775,7 +1775,7 @@ int VpModule::init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, VpModule, VpView_GetParticipants, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, VpModule, VpView_GetParticipantDetailString, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, VpModule, VpView_GetParticipantDetailData, this, ApCallbackPosNormal);
-  AP_MSG_REGISTRY_ADD(MODULE_NAME, VpModule, VpView_GetParticipantDetailRef, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, VpModule, VpView_GetParticipantDetailUrl, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, VpModule, VpView_SubscribeParticipantDetail, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, VpModule, VpView_UnsubscribeParticipantDetail, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, VpModule, VpView_Profile_Create, this, ApCallbackPosNormal);
@@ -1813,7 +1813,7 @@ int VpModule::init()
   srpcGateRegistry_.add("VpView_UnsubscribeContextDetail", SrpcGate_VpView_UnsubscribeContextDetail);
   srpcGateRegistry_.add("VpView_GetParticipants", SrpcGate_VpView_GetParticipants);
   srpcGateRegistry_.add("VpView_GetParticipantDetailString", SrpcGate_VpView_GetParticipantDetailString);
-  srpcGateRegistry_.add("VpView_GetParticipantDetailRef", SrpcGate_VpView_GetParticipantDetailRef);
+  srpcGateRegistry_.add("VpView_GetParticipantDetailUrl", SrpcGate_VpView_GetParticipantDetailUrl);
   srpcGateRegistry_.add("VpView_SubscribeParticipantDetail", SrpcGate_VpView_SubscribeParticipantDetail);
   srpcGateRegistry_.add("VpView_UnsubscribeParticipantDetail", SrpcGate_VpView_UnsubscribeParticipantDetail);
   srpcGateRegistry_.add("VpView_Profile_Create", SrpcGate_VpView_Profile_Create);

@@ -23,6 +23,7 @@ Display::Display(ArenaModule* pModule, const ApHandle& hContext)
 ,bSendVisibility_(0)
 ,bHasPosition_(0)
 ,bHasSize_(0)
+,bDebug_(0)
 ,bViewLoaded_(0)
 {
 }
@@ -46,7 +47,7 @@ int Display::Create()
   }
 
   if (ok) {
-    ok = Msg_WebView_Load::_(hView, Apollo::getModuleConfig(MODULE_NAME, "DisplayHtml", "file://" + Apollo::getModuleResourcePath(MODULE_NAME) + "arena.html"));
+    ok = Msg_WebView_Load::_(hView, Apollo::getModuleConfig(MODULE_NAME, "File", "file://" + Apollo::getModuleResourcePath(MODULE_NAME) + "arena.html"));
     if (!ok) { apLog_Error((LOG_CHANNEL, "Display::Create", "Msg_WebView_Load(" ApHandleFormat ") failed", ApHandleType(hView))); }
   }
 
@@ -59,6 +60,8 @@ int Display::Create()
     hView_ = hView;
     pModule_->SetContextOfHandle(hView_, hContext_);
   }
+
+  bDebug_ = Apollo::getModuleConfig(MODULE_NAME, "ShowDebugInterface", 0);
 
   return ok;
 }
@@ -133,17 +136,24 @@ void Display::SendVisibility()
 
 void Display::SendPosition()
 {
-  int nHtmlExtendLeft = Apollo::getModuleConfig(MODULE_NAME, "HtmlExtendLeft", 0);
-  int nHtmlExtendRight = Apollo::getModuleConfig(MODULE_NAME, "HtmlExtendRight", 0);
-  int nHtmlExtendTop = Apollo::getModuleConfig(MODULE_NAME, "HtmlExtendTop", 0);
-  int nHtmlExtendBottom = Apollo::getModuleConfig(MODULE_NAME, "HtmlExtendBottom", 0);
+  int nExtendLeft = Apollo::getModuleConfig(MODULE_NAME, "Extend/Left", 0);
+  int nExtendRight = Apollo::getModuleConfig(MODULE_NAME, "Extend/Right", 0);
+  int nExtendTop = Apollo::getModuleConfig(MODULE_NAME, "Extend/Top", 0);
+  int nExtendBottom = Apollo::getModuleConfig(MODULE_NAME, "Extend/Bottom", 0);
+
+  if (bDebug_) {
+    nExtendLeft += Apollo::getModuleConfig(MODULE_NAME, "Debug/Left", 0);
+    nExtendRight += Apollo::getModuleConfig(MODULE_NAME, "Debug/Right", 700);
+    nExtendTop += Apollo::getModuleConfig(MODULE_NAME, "Debug/Top", 0);
+    nExtendBottom += Apollo::getModuleConfig(MODULE_NAME, "Debug/Bottom", 0);
+  }
 
   Msg_WebView_Position msg;
   msg.hView = hView_;
-  msg.nLeft = nLeft_ - nHtmlExtendLeft;
-  msg.nTop = nBottom_ - nHeight_ - nHtmlExtendTop;
-  msg.nWidth = nWidth_ + (nHtmlExtendLeft + nHtmlExtendRight);
-  msg.nHeight = nHeight_ + (nHtmlExtendTop + nHtmlExtendBottom);
+  msg.nLeft = nLeft_ - nExtendLeft;
+  msg.nTop = nBottom_ - nHeight_ - nExtendTop;
+  msg.nWidth = nWidth_ + (nExtendLeft + nExtendRight);
+  msg.nHeight = nHeight_ + (nExtendTop + nExtendBottom);
   if (!msg.Request()) {
     apLog_Error((LOG_CHANNEL, "Display::SendPosition", "Msg_WebView_Position(" ApHandleFormat ") failed", ApHandleType(msg.hView)));
   }
@@ -286,19 +296,22 @@ void Display::OnAvatarAnimationBegin(const ApHandle& hParticipant, const String&
   }
 }
 
-void Display::OnCallModuleSrpc(Apollo::SrpcMessage& request, Apollo::SrpcMessage& response)
+void Display::OnCallModule(Apollo::SrpcMessage& request, Apollo::SrpcMessage& response)
 {
   ApHandle hParticipant = Apollo::string2Handle(request.getString("hParticipant"));
   if (ApIsHandle(hParticipant)) {
     AvatarListNode* pNode = avatars_.Find(hParticipant);
     if (pNode) {
-      pNode->Value()->OnCallModuleSrpc(request, response);
+      pNode->Value()->OnCallModule(request, response);
     }
 
   } else {
     String sMethod = request.getString("Method");
 
     if (0){
+    } else if (sMethod == "OnShowDebug") {
+      OnShowDebug(request.getInt("bShow"));
+
     } else if (sMethod == "SendPublicChat") {
       String sText = request.getString("sText");
       if (sText){
@@ -309,8 +322,36 @@ void Display::OnCallModuleSrpc(Apollo::SrpcMessage& request, Apollo::SrpcMessage
       }
 
     } else {
-      throw ApException("Display::OnCallModuleSrpc: Unknown Method=%s", StringType(sMethod));
+      throw ApException("Display::OnCallModule: Unknown Method=%s", StringType(sMethod));
     }
+  }
+}
+
+void Display::OnShowDebug(int bShow)
+{
+  bDebug_ = bShow;
+
+  if (bDebug_){
+    SendPosition();
+    DisplaySrpcMessage msg(this, "ShowDebug"); msg.srpc.set("bShow", bDebug_); msg.Request();
+  } else { // Same, but different order
+    DisplaySrpcMessage msg(this, "ShowDebug"); msg.srpc.set("bShow", bDebug_); msg.Request();
+    SendPosition();
+  }
+
+}
+
+void Display::OnNavigatorCallDisplay(Apollo::SrpcMessage& request, Apollo::SrpcMessage& response)
+{
+  String sMethod = request.getString("Method");
+
+  if (0){
+  } else if (sMethod == "ShowDebug") {
+    int bShow = request.getInt("bShow");
+    OnShowDebug(bShow);
+
+  } else {
+    throw ApException("Display::OnNavigatorCallDisplay: Unknown Method=%s", StringType(sMethod));
   }
 }
 
@@ -397,6 +438,8 @@ void Display::StartDisplay()
 {
   DisplaySrpcMessage dsm(this, "Start");
   dsm.Request();
+
+  OnShowDebug(bDebug_);
 
   { Msg_VpView_SubscribeContextDetail msg; msg.hContext = hContext_; msg.sKey = Msg_VpView_ContextDetail_DocumentUrl; msg.Request(); }
   { Msg_VpView_SubscribeContextDetail msg; msg.hContext = hContext_; msg.sKey = Msg_VpView_ContextDetail_LocationUrl; msg.Request(); }

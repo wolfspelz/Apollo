@@ -1,2 +1,4 @@
 <!ENTITY  menuitem.label             "Avatar">
 <!ENTITY  statusbar.tooltip.default  "Avatar: enabled">
+<!ENTITY  statusbar.icon.Disconnect  "Reconnect navigation">
+<!ENTITY  statusbar.icon.ShowDebug   "Show developer tools">
