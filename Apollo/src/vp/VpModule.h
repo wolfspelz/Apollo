@@ -154,7 +154,7 @@ public:
   void On_VpView_GetParticipants(Msg_VpView_GetParticipants* pMsg);
   void On_VpView_GetParticipantDetailString(Msg_VpView_GetParticipantDetailString* pMsg);
   void On_VpView_GetParticipantDetailData(Msg_VpView_GetParticipantDetailData* pMsg);
-  void On_VpView_GetParticipantDetailRef(Msg_VpView_GetParticipantDetailRef* pMsg);
+  void On_VpView_GetParticipantDetailUrl(Msg_VpView_GetParticipantDetailUrl* pMsg);
   void On_VpView_SubscribeParticipantDetail(Msg_VpView_SubscribeParticipantDetail* pMsg);
   void On_VpView_UnsubscribeParticipantDetail(Msg_VpView_UnsubscribeParticipantDetail* pMsg);
   void On_VpView_Profile_Create(Msg_VpView_Profile_Create* pMsg);

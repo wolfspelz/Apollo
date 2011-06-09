@@ -42,7 +42,7 @@ public:
   void OnReceivePublicChat(const ApHandle& hChat, const String& sNickname, const String& sText, const Apollo::TimeValue& tvTimestamp);
   void OnReceivePublicAction(const String& sAction);
   void OnAnimationBegin(const String& sUrl);
-  void OnCallModuleSrpc(Apollo::SrpcMessage& request, Apollo::SrpcMessage& response);
+  void OnCallModule(Apollo::SrpcMessage& request, Apollo::SrpcMessage& response);
 
 protected:
   void OnPublicChatClosed(const ApHandle& hChat);
@@ -55,7 +55,7 @@ protected:
   void GetDetail(const String& sKey);
   void GetDetailString(const String& sKey, Apollo::ValueList& vlMimeTypes);
   void GetDetailData(const String& sKey, Apollo::ValueList& vlMimeTypes);
-  void GetDetailRef(const String& sKey, Apollo::ValueList& vlMimeTypes);
+  void GetDetailUrl(const String& sKey, Apollo::ValueList& vlMimeTypes);
   void UnsubscribeDetail(const String& sKey);
 
   void RemoveOldPublicChats(int nMax);

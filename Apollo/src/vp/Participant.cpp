@@ -578,7 +578,7 @@ int Participant::getDetailData(const String& sKey, Apollo::ValueList& vlMimeType
   return ok;
 }
 
-int Participant::getDetailRef(const String& sKey, Apollo::ValueList& vlMimeTypes, String& sUrl, String& sMimeType)
+int Participant::getDetailUrl(const String& sKey, Apollo::ValueList& vlMimeTypes, String& sUrl, String& sMimeType)
 {
   int ok = 0;
 

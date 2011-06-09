@@ -22,19 +22,29 @@
     </script>
   </window>
 
+  <popupset>
+    <menupopup id="anStatusbarIconContextMenu">
+      <menuitem label="&statusbar.icon.Disconnect;" oncommand="anCommandDisconnect();" />
+      <menuitem label="&statusbar.icon.ShowDebug;" oncommand="anCommandShowDebug();" />
+    </menupopup>
+  </popupset>
+  
   <!-- Add the avatarnav icon to the bottom right of screen -->
   <statusbar id="status-bar">
-    <statusbarpanel class="statusbarpanel-iconic" id="avatarnav_sbi"
+    <statusbarpanel class="statusbarpanel-iconic" id="anStatusbarIcon"
       tooltiptext="&statusbar.tooltip.default;"
-      onclick="anToggle();"
-      src="chrome://avatarnav/content/images/logo18.png" />
+      xonclick="anToggle();"
+      context="anStatusbarIconContextMenu"
+      src="chrome://avatarnav/content/images/logo18.png"
+    />
   </statusbar>
 
   <!-- Create an avatarnav menu item -->
   <menupopup id="menu_ToolsPopup">
     <menuitem label="&menuitem.label;"
       insertafter="devToolsSeparator" 
-      oncommand="anToggle();" />
+      oncommand="anToggle();"
+    />
   </menupopup>
 
 </overlay>

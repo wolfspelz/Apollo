@@ -441,19 +441,35 @@ AP_MSG_HANDLER_METHOD(ArenaModule, Animation_SequenceBegin)
 
 //----------------------------
 
-AP_SRPC_HANDLER_METHOD(ArenaModule, Arena_CallModuleSrpc, ApSRPCMessage)
+AP_SRPC_HANDLER_METHOD(ArenaModule, Arena_CallModule, ApSRPCMessage)
 {
   String sView = pMsg->srpc.getString("hView");
   if (!sView) { throw ApException("Missing hView"); }
 
   ApHandle hView = Apollo::string2Handle(sView);
-  if (!ApIsHandle(hView)) { throw ApException("Not a handle: %s", StringType(sView)); }
+  if (!ApIsHandle(hView)) { throw ApException("Not a handle: view=%s", StringType(sView)); }
 
   Display* pDisplay = GetDisplayOfHandle(hView);
   if (pDisplay) {
-    pDisplay->OnCallModuleSrpc(pMsg->srpc, pMsg->response);
+    pDisplay->OnCallModule(pMsg->srpc, pMsg->response);
   }
+
   pMsg->apStatus = ApMessage::Ok;
+}
+
+AP_SRPC_HANDLER_METHOD(ArenaModule, Navigator_CallDisplay, ApSRPCMessage)
+{
+  String sContext = pMsg->srpc.getString("hContext");
+  if (sContext) {
+    ApHandle hContext = Apollo::string2Handle(sContext);
+    if (ApIsHandle(hContext)) {
+      Display* pDisplay = FindDisplay(hContext);
+      if (pDisplay) {
+        pDisplay->OnNavigatorCallDisplay(pMsg->srpc, pMsg->response);
+        pMsg->apStatus = ApMessage::Ok;
+      }
+    }
+  }
 }
 
 #if defined(WIN32)
@@ -575,7 +591,8 @@ int ArenaModule::Init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ArenaModule, Animation_SequenceBegin, this, ApCallbackPosNormal);
   //AP_MSG_REGISTRY_ADD(MODULE_NAME, ArenaModule, Animation_Frame, this, ApCallbackPosNormal);
   //AP_MSG_REGISTRY_ADD(MODULE_NAME, ArenaModule, Animation_SequenceEnd, this, ApCallbackPosNormal);
-  AP_MSG_REGISTRY_ADD(MODULE_NAME, ArenaModule, Arena_CallModuleSrpc, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, ArenaModule, Arena_CallModule, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, ArenaModule, Navigator_CallDisplay, this, ApCallbackPosNormal);
   #if defined(WIN32)
     AP_MSG_REGISTRY_ADD(MODULE_NAME, ArenaModule, BrowserInfo_GetContextWin32Window, this, ApCallbackPosNormal);
   #endif // defined(WIN32)

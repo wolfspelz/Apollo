@@ -40,6 +40,16 @@ function anPageHide(e)
 
 function anToggle(e)
 {
-	AvatarNavigator.getInstance().toggle();
+	AvatarNavigator.getInstance().cmdToggle();
+}
+
+function anCommandDisconnect(e)
+{
+	AvatarNavigator.getInstance().cmdDisconnect();
+}
+
+function anCommandShowDebug(e)
+{
+	AvatarNavigator.getInstance().cmdShowDebug();
 }
 

@@ -206,7 +206,7 @@ public:
   int isDetailAvailable(const String& sKey, Apollo::ValueList& vlMimeTypes);
   int getDetailString(const String& sKey, Apollo::ValueList& vlMimeTypes, String& sValue, String& sMimeType);
   int getDetailData(const String& sKey, Apollo::ValueList& vlMimeTypes, Buffer& sbData, String& sMimeType, String& sSource);
-  int getDetailRef(const String& sKey, Apollo::ValueList& vlMimeTypes, String& sUrl, String& sMimeType);
+  int getDetailUrl(const String& sKey, Apollo::ValueList& vlMimeTypes, String& sUrl, String& sMimeType);
 
   int subscribeDetail(const String& sKey, Apollo::ValueList& vlMimeTypes);
   int unsubscribeDetail(const String& sKey, Apollo::ValueList& vlMimeTypes);

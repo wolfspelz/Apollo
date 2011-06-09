@@ -1,7 +1,7 @@
 
 Core/Modules/00100/WinMainLoop/Path=WinMainLoop
 Core/Modules/00200/SrpcGate/Path=srpcgate
-Core/Modules/00300/Log/Path=log
+Core/Modules/00300/log/Path=log
 Core/Modules/00400/Db/Path=db
 Core/Modules/00500/Dun/Path=dun
 Core/Modules/00600/Translation/Path=babelfish

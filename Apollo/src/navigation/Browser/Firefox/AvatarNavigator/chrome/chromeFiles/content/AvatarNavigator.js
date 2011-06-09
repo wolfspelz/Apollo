@@ -582,10 +582,35 @@ AvatarNavigator.prototype.startReconnectTimer = function()
 
 // -------------------------------
 
-AvatarNavigator.prototype.toggle = function()
+AvatarNavigator.prototype.cmdToggle = function()
 {
-  anLogTrace('AvatarNavigator.toggle');
+  anLogTrace('AvatarNavigator.cmdToggle');
+}
+
+AvatarNavigator.prototype.cmdDisconnect = function()
+{
+  anLogTrace('AvatarNavigator.cmdDisconnect');
   this.tcpDisconnect();
+}
+
+AvatarNavigator.prototype.cmdShowDebug = function()
+{
+  anLogTrace('AvatarNavigator.cmdShowDebug');
+
+  if (this.selectedTab != null) {
+    var hContext = AvatarNavigator.getTabContext(this.selectedTab);
+    if (this.protocol) {
+      var msg = new SrpcMessage();
+      msg.setString('ApType', 'Navigator_CallDisplay');
+      msg.setString('Method', 'ShowDebug');
+      msg.setString('hContext', hContext);
+      msg.setInt('bShow', 1);
+      //Just a test
+      //msg.setString('ApType', 'SrpcGate');
+      //msg.setString('Method', 'System_GetHandle');
+      this.protocol.sendRequest(msg);
+    }
+  }
 }
 
 // -------------------------------

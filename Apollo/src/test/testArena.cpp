@@ -254,7 +254,7 @@ static void Test_VpView_GetParticipantDetailData(Msg_VpView_GetParticipantDetail
   }
 }
 
-static void Test_VpView_GetParticipantDetailRef(Msg_VpView_GetParticipantDetailRef* pMsg)
+static void Test_VpView_GetParticipantDetailUrl(Msg_VpView_GetParticipantDetailUrl* pMsg)
 {
   Test_InNavigateChatOut* t = (Test_InNavigateChatOut*) pMsg->Ref();
   Test_Participant* p = 0;
@@ -861,7 +861,7 @@ void Test_InNavigateChatOut::Begin()
   { Msg_VpView_SubscribeParticipantDetail msg; msg.Hook(MODULE_NAME, (ApCallback) Test_VpView_SubscribeParticipantDetail, this, ApCallbackPosEarly); }
   { Msg_VpView_GetParticipantDetailString msg; msg.Hook(MODULE_NAME, (ApCallback) Test_VpView_GetParticipantDetailString, this, ApCallbackPosEarly); }
   { Msg_VpView_GetParticipantDetailData msg; msg.Hook(MODULE_NAME, (ApCallback) Test_VpView_GetParticipantDetailData, this, ApCallbackPosEarly); }
-  { Msg_VpView_GetParticipantDetailRef msg; msg.Hook(MODULE_NAME, (ApCallback) Test_VpView_GetParticipantDetailRef, this, ApCallbackPosEarly); }
+  { Msg_VpView_GetParticipantDetailUrl msg; msg.Hook(MODULE_NAME, (ApCallback) Test_VpView_GetParticipantDetailUrl, this, ApCallbackPosEarly); }
   { Msg_VpView_ReplayLocationPublicChat msg; msg.Hook(MODULE_NAME, (ApCallback) Test_VpView_ReplayLocationPublicChat, this, ApCallbackPosEarly); }
   { Msg_Galileo_IsAnimationDataInStorage msg; msg.Hook(MODULE_NAME, (ApCallback) Test_Galileo_IsAnimationDataInStorage, this, ApCallbackPosEarly); }
   { Msg_Galileo_LoadAnimationDataFromStorage msg; msg.Hook(MODULE_NAME, (ApCallback) Test_Galileo_LoadAnimationDataFromStorage, this, ApCallbackPosEarly); }
@@ -925,7 +925,7 @@ void Test_InNavigateChatOut::End()
   { Msg_VpView_SubscribeParticipantDetail msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_VpView_SubscribeParticipantDetail, this); }
   { Msg_VpView_GetParticipantDetailString msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_VpView_GetParticipantDetailString, this); }
   { Msg_VpView_GetParticipantDetailData msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_VpView_GetParticipantDetailData, this); }
-  { Msg_VpView_GetParticipantDetailRef msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_VpView_GetParticipantDetailRef, this); }
+  { Msg_VpView_GetParticipantDetailUrl msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_VpView_GetParticipantDetailUrl, this); }
   { Msg_VpView_ReplayLocationPublicChat msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_VpView_ReplayLocationPublicChat, this); }
   { Msg_Galileo_IsAnimationDataInStorage msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_Galileo_IsAnimationDataInStorage, this); }
   { Msg_Galileo_LoadAnimationDataFromStorage msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_Galileo_LoadAnimationDataFromStorage, this); }

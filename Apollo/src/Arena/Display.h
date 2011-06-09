@@ -51,7 +51,9 @@ public:
   void OnContextDetailsChanged(Apollo::ValueList& vlKeys);
   void OnLocationDetailsChanged(Apollo::ValueList& vlKeys);
   void OnAvatarAnimationBegin(const ApHandle& hParticipant, const String& sUrl);
-  void OnCallModuleSrpc(Apollo::SrpcMessage& request, Apollo::SrpcMessage& response);
+  void OnCallModule(Apollo::SrpcMessage& request, Apollo::SrpcMessage& response);
+  void OnShowDebug(int bShow);
+  void OnNavigatorCallDisplay(Apollo::SrpcMessage& request, Apollo::SrpcMessage& response);
 
   inline int GetWidth() { return nWidth_; }
   inline int GetHeight() { return nHeight_; }
@@ -94,6 +96,7 @@ protected:
   int bSendVisibility_;
   int bHasPosition_;
   int bHasSize_;
+  int bDebug_;
 
   ApHandle hView_;
   int bViewLoaded_;

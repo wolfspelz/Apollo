@@ -243,6 +243,9 @@ AP_MSG_HANDLER_METHOD(NavigationModule, Navigation_Receive)
   String sMethod = pMsg->srpc.getString("Method");
   Apollo::SrpcMessage response;
 
+  // -----------------------
+  // Special consideration
+
   if (0) {
   } else if (sMethod == Navigation_SrpcMethod_Connect) {
     response.createResponse(pMsg->srpc);
@@ -279,6 +282,34 @@ AP_MSG_HANDLER_METHOD(NavigationModule, Navigation_Receive)
     }
 
   } // sMethod
+
+  // -----------------------
+  // Any SRPC from the browser
+
+  if (response.getString("Status").empty()) {
+    String sType = pMsg->srpc.getString("ApType");
+
+    if (sType) {
+      // Supplied message type -> send SRPC with custom type
+
+      ApSRPCMessage msg(sType);
+      pMsg->srpc >> msg.srpc;
+      
+      if (msg.Call()) {
+        if (msg.response.getString("Status")) {
+          msg.response >> response;
+        } else {
+          response.createResponse(msg.srpc);
+        }
+      } else {
+        response.createError(msg.srpc, msg.sComment);
+      }
+    }
+
+  } // Message processed
+
+  // -----------------------
+  // Context related
 
   if (response.getString("Status").empty()) {
     ApHandle hContext = pMsg->srpc.getHandle("hContext");
@@ -371,7 +402,7 @@ AP_MSG_HANDLER_METHOD(NavigationModule, Navigation_Receive)
 
       } // pContext
     } // hContext
-  } // bDone
+  } // Message processed
 
   if (!response.getString("Status").empty()) {
     // if the response has been filled, then send it back to the navigator
