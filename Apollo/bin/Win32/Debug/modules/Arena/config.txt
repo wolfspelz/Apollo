@@ -1,12 +1,12 @@
-DisplayHtml=file://[[MODULE_RESOURCE_PATH]]/arena.html
-CallScriptSrpcFunctionName=ReceiveMessage
+#DisplayHtml=file://[[MODULE_RESOURCE_PATH]]/arena.html
+#CallScriptSrpcFunctionName=ReceiveMessage
 
-HtmlExtendLeft=100
-HtmlExtendRight=800
-HtmlExtendTop=0
-HtmlExtendBottom=0
+#HtmlExtendLeft=100
+#HtmlExtendRight=800
+#HtmlExtendTop=0
+#HtmlExtendBottom=0
 
-ShowDebugInterface=1
+#ShowDebugInterface=1
 #ShowMetaInformation=1
 
 Language/en=[[MODULE_RESOURCE_PATH]]/en.txt

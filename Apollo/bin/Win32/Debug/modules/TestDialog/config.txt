@@ -1,5 +1,5 @@
-//OpenOnStartup=1
-Left=200
-Top=0
-Width=500
-Height=300
+#OpenOnStartup=1
+#Left=200
+#Top=0
+#Width=500
+#Height=300
