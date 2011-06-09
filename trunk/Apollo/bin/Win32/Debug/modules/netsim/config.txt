@@ -1,3 +1,3 @@
-HTTP/IndexFile=[[MODULE_RESOURCE_PATH]]/http/index.txt
-HTTP/DataFilesBase=[[MODULE_RESOURCE_PATH]]/http
-HTTP/LogFile=[[MODULE_RESOURCE_PATH]]/http.log
+#HTTP/IndexFile=[[MODULE_RESOURCE_PATH]]/http/index.txt
+#HTTP/DataFilesBase=[[MODULE_RESOURCE_PATH]]/http
+#HTTP/LogFile=[[MODULE_RESOURCE_PATH]]/http.log

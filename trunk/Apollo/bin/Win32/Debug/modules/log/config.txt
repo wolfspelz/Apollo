@@ -1,1 +1,1 @@
-File/Path=[[USER_PROFILE]]apollo.log
+#File/Path=[[USER_PROFILE]]apollo.log

@@ -1,4 +1,4 @@
-#LoadDLL/01=[[MODULE_RESOURCE_PATH]]/WebKit/SQLite3.dll
+#LoadDLL/0100=[[MODULE_RESOURCE_PATH]]/WebKit/SQLite3.dll
 
 LoadDLL/0100=C:\cygwin\home\wolf\WebKit\WebKitBuild\Debug_Cairo_CFLite\bin\SQLite3.dll
 LoadDLL/0200=C:\cygwin\home\wolf\WebKit\WebKitBuild\Debug_Cairo_CFLite\bin\icudt40.dll
