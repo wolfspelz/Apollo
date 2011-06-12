@@ -46,6 +46,28 @@ void Dialog::Destroy()
   hView_ = ApNoHandle;
 }
 
+void Dialog::SetCaption(const String& sCaption)
+{
+  sCaption_ = sCaption;
+
+  Msg_WebView_CallScriptFunction msg;
+  msg.hView = hView_;
+  msg.sFunction = "SetCaption";
+  msg.lArgs.AddLast(sCaption_);
+  if (!msg.Request()) { apLog_Error((LOG_CHANNEL, "Dialog::SetCaption", "%s(%s) failed: %s", StringType(msg.Type()), StringType(msg.sFunction), StringType(msg.sComment))); }
+}
+
+void Dialog::SetIcon(const String& sIconUrl)
+{
+  sIconUrl_ = sIconUrl;
+
+  Msg_WebView_CallScriptFunction msg;
+  msg.hView = hView_;
+  msg.sFunction = "SetIcon";
+  msg.lArgs.AddLast(sIconUrl_);
+  if (!msg.Request()) { apLog_Error((LOG_CHANNEL, "Dialog::SetIcon", "%s(%s) failed: %s", StringType(msg.Type()), StringType(msg.sFunction), StringType(msg.sComment))); }
+}
+
 void Dialog::OnDocumentLoaded()
 {
   {
@@ -56,21 +78,8 @@ void Dialog::OnDocumentLoaded()
     if (!msg.Request()) { apLog_Error((LOG_CHANNEL, "Dialog::OnDocumentLoaded", "%s(%s) failed: %s", StringType(msg.Type()), StringType(msg.sFunction), StringType(msg.sComment))); }
   }
 
-  if (sCaption_) {
-    Msg_WebView_CallScriptFunction msg;
-    msg.hView = hView_;
-    msg.sFunction = "SetCaption";
-    msg.lArgs.AddLast(sCaption_);
-    if (!msg.Request()) { apLog_Error((LOG_CHANNEL, "Dialog::OnDocumentLoaded", "%s(%s) failed: %s", StringType(msg.Type()), StringType(msg.sFunction), StringType(msg.sComment))); }
-  }
-
-  if (sIconUrl_) {
-    Msg_WebView_CallScriptFunction msg;
-    msg.hView = hView_;
-    msg.sFunction = "SetIcon";
-    msg.lArgs.AddLast(sIconUrl_);
-    if (!msg.Request()) { apLog_Error((LOG_CHANNEL, "Dialog::OnDocumentLoaded", "%s(%s) failed: %s", StringType(msg.Type()), StringType(msg.sFunction), StringType(msg.sComment))); }
-  }
+  if (sCaption_) { SetCaption(sCaption_); }
+  if (sIconUrl_) { SetIcon(sIconUrl_); }
 
   {
     Msg_WebView_CallScriptFunction msg;
@@ -87,5 +96,12 @@ void Dialog::OnReceivedFocus()
 
 void Dialog::OnLostFocus()
 {
+}
+
+void Dialog::OnUnload()
+{
+  Msg_Dialog_OnClosed msg;
+  msg.hDialog = hAp_;
+  msg.Send();
 }
 

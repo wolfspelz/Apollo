@@ -80,6 +80,20 @@ AP_MSG_HANDLER_METHOD(DialogModule, Dialog_GetView)
   pMsg->apStatus = ApMessage::Ok;
 }
 
+AP_MSG_HANDLER_METHOD(DialogModule, Dialog_SetCaption)
+{
+  Dialog* pDialog = GetDialog(pMsg->hDialog);
+  pDialog->SetCaption(pMsg->sCaption);
+  pMsg->apStatus = ApMessage::Ok;
+}
+
+AP_MSG_HANDLER_METHOD(DialogModule, Dialog_SetIcon)
+{
+  Dialog* pDialog = GetDialog(pMsg->hDialog);
+  pDialog->SetIcon(pMsg->sIconUrl);
+  pMsg->apStatus = ApMessage::Ok;
+}
+
 AP_MSG_HANDLER_METHOD(DialogModule, WebView_Event_DocumentLoaded)
 {
   Dialog* pDialog = FindDialogByView(pMsg->hView);
@@ -104,12 +118,20 @@ AP_MSG_HANDLER_METHOD(DialogModule, WebView_Event_LostFocus)
   }
 }
 
+AP_MSG_HANDLER_METHOD(DialogModule, WebView_Event_DocumentUnload)
+{
+  Dialog* pDialog = FindDialogByView(pMsg->hView);
+  if (pDialog) {
+    pDialog->OnUnload();
+  }
+}
+
 //----------------------------
 
 void SrpcGate_Dialog_Create(ApSRPCMessage* pMsg)
 {
   Msg_Dialog_Create msg;
-  msg.hDialog = Apollo::string2Handle(pMsg->srpc.getString("hDialog"));
+  msg.hDialog = pMsg->srpc.getHandle("hDialog");
   msg.nLeft = pMsg->srpc.getInt("nLeft");
   msg.nTop = pMsg->srpc.getInt("nTop");
   msg.nWidth = pMsg->srpc.getInt("nWidth");
@@ -124,16 +146,32 @@ void SrpcGate_Dialog_Create(ApSRPCMessage* pMsg)
 void SrpcGate_Dialog_Destroy(ApSRPCMessage* pMsg)
 {
   Msg_Dialog_Destroy msg;
-  msg.hDialog = Apollo::string2Handle(pMsg->srpc.getString("hDialog"));
+  msg.hDialog = pMsg->srpc.getHandle("hDialog");
   SRPCGATE_HANDLER_NATIVE_REQUEST(pMsg, msg);
 }
 
 void SrpcGate_Dialog_GetView(ApSRPCMessage* pMsg)
 {
   Msg_Dialog_GetView msg;
-  msg.hDialog = Apollo::string2Handle(pMsg->srpc.getString("hDialog"));
+  msg.hDialog = pMsg->srpc.getHandle("hDialog");
   SRPCGATE_HANDLER_NATIVE_REQUEST(pMsg, msg);
   pMsg->srpc.getString("hView") = msg.hView.toString();
+}
+
+void SrpcGate_Dialog_SetCaption(ApSRPCMessage* pMsg)
+{
+  Msg_Dialog_SetCaption msg;
+  msg.hDialog = pMsg->srpc.getHandle("hDialog");
+  msg.sCaption = pMsg->srpc.getString("sCaption");
+  SRPCGATE_HANDLER_NATIVE_REQUEST(pMsg, msg);
+}
+
+void SrpcGate_Dialog_SetIcon(ApSRPCMessage* pMsg)
+{
+  Msg_Dialog_SetIcon msg;
+  msg.hDialog = pMsg->srpc.getHandle("hDialog");
+  msg.sIconUrl = pMsg->srpc.getString("sIconUrl");
+  SRPCGATE_HANDLER_NATIVE_REQUEST(pMsg, msg);
 }
 
 //----------------------------
@@ -175,12 +213,19 @@ int DialogModule::Init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, DialogModule, Dialog_Create, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, DialogModule, Dialog_Destroy, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, DialogModule, Dialog_GetView, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, DialogModule, Dialog_SetCaption, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, DialogModule, Dialog_SetIcon, this, ApCallbackPosNormal);
 
   AP_MSG_REGISTRY_ADD(MODULE_NAME, DialogModule, WebView_Event_DocumentLoaded, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, DialogModule, WebView_Event_ReceivedFocus, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, DialogModule, WebView_Event_LostFocus, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, DialogModule, WebView_Event_DocumentUnload, this, ApCallbackPosNormal);
 
   srpcGateRegistry_.add("Dialog_Create", SrpcGate_Dialog_Create);
   srpcGateRegistry_.add("Dialog_Destroy", SrpcGate_Dialog_Destroy);
   srpcGateRegistry_.add("Dialog_GetView", SrpcGate_Dialog_GetView);
+  srpcGateRegistry_.add("Dialog_SetCaption", SrpcGate_Dialog_SetCaption);
+  srpcGateRegistry_.add("Dialog_SetIcon", SrpcGate_Dialog_SetIcon);
 
   AP_UNITTEST_HOOK(DialogModule, this);
 
@@ -202,12 +247,14 @@ void DialogModuleTester::Begin()
 {
   AP_UNITTEST_REGISTER(DialogModuleTester::CreateWaitCloseByContent);
   AP_UNITTEST_REGISTER(DialogModuleTester::ExternalUrl);
+  AP_UNITTEST_REGISTER(DialogModuleTester::SetCaption);
 }
 
 void DialogModuleTester::Execute()
 {
   DialogModuleTester::CreateWaitCloseByContent();
   DialogModuleTester::ExternalUrl();
+  DialogModuleTester::SetCaption();
 }
 
 void DialogModuleTester::End()
@@ -294,6 +341,79 @@ String DialogModuleTester::ExternalUrl()
   msg.sCaption = "Wikipedia";
   msg.sContentUrl = "http://en.wikipedia.org/wiki/Main_Page";
   if (!s) { if (!msg.Request()) { s = "Msg_Dialog_Create failed"; }}
+
+  return s;
+}
+
+//----------------------------
+
+static ApHandle DialogModuleTester_SetCaption_hDialog;
+static String DialogModuleTester_SetCaption_sTheme;
+
+void DialogModuleTester_SetCaption_WebView_Event_DocumentLoaded(Msg_WebView_Event_DocumentLoaded* pMsg)
+{
+  if (pMsg->hView != DialogModuleTester_SetCaption_hDialog) { return; }
+  
+  String s;
+
+  if (!s) {
+    Msg_Dialog_SetCaption msg;
+    msg.hDialog = pMsg->hView ;
+    msg.sCaption = "Final Window Caption";
+    if (!msg.Request()) { s = "Msg_Dialog_SetCaption failed"; }
+  }
+
+  if (!s) {
+    Msg_Dialog_SetIcon msg;
+    msg.hDialog = pMsg->hView ;
+    msg.sIconUrl = "file://" + Apollo::getModuleResourcePath(MODULE_NAME) + "test/SetCaptionFinalIcon.png";
+    if (!msg.Request()) { s = "Msg_Dialog_SetCaption failed"; }
+  }
+
+  if (!s) {
+    String sResult = Msg_WebView_CallScriptFunction::_(pMsg->hView, "Eval", "$('#Caption').text()");
+    if (sResult != "Final Window Caption") {
+      s = "Caption wrong";
+    }
+  }
+
+  if (!s) {
+    String sResult = Msg_WebView_CallScriptFunction::_(pMsg->hView, "Eval", "$('#Icon').attr('src')");
+    if (sResult != "file://" + Apollo::getModuleResourcePath(MODULE_NAME) + "test/SetCaptionFinalIcon.png") {
+      s = "IconUrl wrong";
+    }
+  }
+
+  AP_UNITTEST_SUCCESS(DialogModuleTester::SetCaption);
+  { Msg_WebView_Event_DocumentLoaded msg; msg.Unhook(MODULE_NAME, (ApCallback) DialogModuleTester_SetCaption_WebView_Event_DocumentLoaded, 0); }
+}
+
+String DialogModuleTester::SetCaption()
+{
+  String s;
+
+  { Msg_WebView_Event_DocumentLoaded msg; msg.Hook(MODULE_NAME, (ApCallback) DialogModuleTester_SetCaption_WebView_Event_DocumentLoaded, 0, ApCallbackPosNormal); }
+
+  ApHandle hDialog = Apollo::newHandle();
+  DialogModuleTester_SetCaption_hDialog = hDialog;
+  DialogModuleTester_SetCaption_sTheme = Apollo::getModuleConfig(MODULE_NAME, "Theme", "");
+  Apollo::setModuleConfig(MODULE_NAME, "Theme", "WhiteWin");
+
+  Msg_Dialog_Create msg;
+  msg.hDialog = hDialog;
+  msg.nLeft = 500;
+  msg.nTop = 100;
+  msg.nWidth = 300;
+  msg.nHeight = 200;
+  msg.bVisible = 1;
+  msg.sCaption = "Initial Window Caption";
+  msg.sContentUrl = "file://" + Apollo::getModuleResourcePath(MODULE_NAME) + "test/Content.html";
+  msg.sIconUrl = "file://" + Apollo::getModuleResourcePath(MODULE_NAME) + "test/SetCaptionInitialIcon.png";
+  if (!s) { if (!msg.Request()) { s = "Msg_Dialog_Create failed"; }}
+
+  if (DialogModuleTester_SetCaption_sTheme) {
+    Apollo::setModuleConfig(MODULE_NAME, "Theme", DialogModuleTester_SetCaption_sTheme);
+  }
 
   return s;
 }

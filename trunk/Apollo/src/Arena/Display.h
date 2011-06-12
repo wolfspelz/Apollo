@@ -52,6 +52,7 @@ public:
   void OnLocationDetailsChanged(Apollo::ValueList& vlKeys);
   void OnAvatarAnimationBegin(const ApHandle& hParticipant, const String& sUrl);
   void OnCallModule(Apollo::SrpcMessage& request, Apollo::SrpcMessage& response);
+  void OnShowChat(int bShow);
   void OnShowDebug(int bShow);
   void OnNavigatorCallDisplay(Apollo::SrpcMessage& request, Apollo::SrpcMessage& response);
 

@@ -31,10 +31,13 @@ public:
   void On_Dialog_Create(Msg_Dialog_Create* pMsg);
   void On_Dialog_Destroy(Msg_Dialog_Destroy* pMsg);
   void On_Dialog_GetView(Msg_Dialog_GetView* pMsg);
+  void On_Dialog_SetCaption(Msg_Dialog_SetCaption* pMsg);
+  void On_Dialog_SetIcon(Msg_Dialog_SetIcon* pMsg);
 
   void On_WebView_Event_DocumentLoaded(Msg_WebView_Event_DocumentLoaded* pMsg);
   void On_WebView_Event_ReceivedFocus(Msg_WebView_Event_ReceivedFocus* pMsg);
   void On_WebView_Event_LostFocus(Msg_WebView_Event_LostFocus* pMsg);
+  void On_WebView_Event_DocumentUnload(Msg_WebView_Event_DocumentUnload* pMsg);
 
 #if defined(AP_TEST)
   void On_UnitTest_Begin(Msg_UnitTest_Begin* pMsg);
@@ -72,6 +75,7 @@ public:
 
   static String CreateWaitCloseByContent();
   static String ExternalUrl();
+  static String SetCaption();
 };
 
 #endif

@@ -11,8 +11,6 @@
 <link rel='stylesheet' href='arena.css' type='text/css' media='all' />
 
 <script type="text/javascript">
-function Eval(sText) { eval(sText); }
-
 function ReceiveMessage(sMsg)
 {
   return api.OnReceiveMessage(sMsg);
@@ -153,6 +151,7 @@ body
     <input type="button" value="Disconnect" onclick="api.Message('Xmpp_Disconnect').send();" />
     <input type="button" value="Reload" onclick="api.Message('WebView_Reload').send();" />
     <input type="button" value="Connect" onclick="api.Message('Xmpp_Connect').send();" />
+    <input type="button" value="Chat" onclick="api.Message('OnShowChat').setString('ApType', 'Arena_CallModule').send();" />
     <textarea id="iCmdLine" style="width:190px; height:100px; resize:auto;" />Log.Debug('xx');</textarea>
     <input type="button" value="Eval" onclick="eval(document.getElementById('iCmdLine').value);" />
   </div>

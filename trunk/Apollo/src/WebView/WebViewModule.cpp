@@ -83,6 +83,13 @@ AP_MSG_HANDLER_METHOD(WebViewModule, WebView_Visibility)
   pMsg->apStatus = ApMessage::Ok;
 }
 
+AP_MSG_HANDLER_METHOD(WebViewModule, WebView_SetWindowFlags)
+{
+  View* pView = FindView(pMsg->hView);
+  pView->SetWindowFlags(pMsg->nFlags);
+  pMsg->apStatus = ApMessage::Ok;
+}
+
 AP_MSG_HANDLER_METHOD(WebViewModule, WebView_LoadHtml)
 {
   View* pView = FindView(pMsg->hView);
@@ -189,21 +196,21 @@ AP_MSG_HANDLER_METHOD(WebViewModule, WebView_GetWin32Window)
 void SrpcGate_WebView_Create(ApSRPCMessage* pMsg)
 {
   Msg_WebView_Create msg;
-  msg.hView = Apollo::string2Handle(pMsg->srpc.getString("hView"));
+  msg.hView = pMsg->srpc.getHandle("hView");
   SRPCGATE_HANDLER_NATIVE_REQUEST(pMsg, msg);
 }
 
 void SrpcGate_WebView_Destroy(ApSRPCMessage* pMsg)
 {
   Msg_WebView_Destroy msg;
-  msg.hView = Apollo::string2Handle(pMsg->srpc.getString("hView"));
+  msg.hView = pMsg->srpc.getHandle("hView");
   SRPCGATE_HANDLER_NATIVE_REQUEST(pMsg, msg);
 }
 
 void SrpcGate_WebView_Position(ApSRPCMessage* pMsg)
 {
   Msg_WebView_Position msg;
-  msg.hView = Apollo::string2Handle(pMsg->srpc.getString("hView"));
+  msg.hView = pMsg->srpc.getHandle("hView");
   msg.nLeft = pMsg->srpc.getInt("nLeft");
   msg.nTop = pMsg->srpc.getInt("nTop");
   msg.nWidth = pMsg->srpc.getInt("nWidth");
@@ -214,15 +221,23 @@ void SrpcGate_WebView_Position(ApSRPCMessage* pMsg)
 void SrpcGate_WebView_Visibility(ApSRPCMessage* pMsg)
 {
   Msg_WebView_Visibility msg;
-  msg.hView = Apollo::string2Handle(pMsg->srpc.getString("hView"));
+  msg.hView = pMsg->srpc.getHandle("hView");
   msg.bVisible = pMsg->srpc.getInt("bVisible");
+  SRPCGATE_HANDLER_NATIVE_REQUEST(pMsg, msg);
+}
+
+void SrpcGate_WebView_SetWindowFlags(ApSRPCMessage* pMsg)
+{
+  Msg_WebView_SetWindowFlags msg;
+  msg.hView = pMsg->srpc.getHandle("hView");
+  msg.nFlags = pMsg->srpc.getInt("nFlags");
   SRPCGATE_HANDLER_NATIVE_REQUEST(pMsg, msg);
 }
 
 void SrpcGate_WebView_Load(ApSRPCMessage* pMsg)
 {
   Msg_WebView_Load msg;
-  msg.hView = Apollo::string2Handle(pMsg->srpc.getString("hView"));
+  msg.hView = pMsg->srpc.getHandle("hView");
   msg.sUrl = pMsg->srpc.getString("sUrl");
   SRPCGATE_HANDLER_NATIVE_REQUEST(pMsg, msg);
 }
@@ -230,7 +245,7 @@ void SrpcGate_WebView_Load(ApSRPCMessage* pMsg)
 void SrpcGate_WebView_LoadHtml(ApSRPCMessage* pMsg)
 {
   Msg_WebView_LoadHtml msg;
-  msg.hView = Apollo::string2Handle(pMsg->srpc.getString("hView"));
+  msg.hView = pMsg->srpc.getHandle("hView");
   msg.sHtml = pMsg->srpc.getString("sHtml");
   msg.sBase = pMsg->srpc.getString("sBase");
   SRPCGATE_HANDLER_NATIVE_REQUEST(pMsg, msg);
@@ -239,14 +254,14 @@ void SrpcGate_WebView_LoadHtml(ApSRPCMessage* pMsg)
 void SrpcGate_WebView_Reload(ApSRPCMessage* pMsg)
 {
   Msg_WebView_Reload msg;
-  msg.hView = Apollo::string2Handle(pMsg->srpc.getString("hView"));
+  msg.hView = pMsg->srpc.getHandle("hView");
   SRPCGATE_HANDLER_NATIVE_REQUEST(pMsg, msg);
 }
 
 void SrpcGate_WebView_MoveBy(ApSRPCMessage* pMsg)
 {
   Msg_WebView_MoveBy msg;
-  msg.hView = Apollo::string2Handle(pMsg->srpc.getString("hView"));
+  msg.hView = pMsg->srpc.getHandle("hView");
   msg.nX = pMsg->srpc.getInt("nX");
   msg.nY = pMsg->srpc.getInt("nY");
   SRPCGATE_HANDLER_NATIVE_REQUEST(pMsg, msg);
@@ -255,7 +270,7 @@ void SrpcGate_WebView_MoveBy(ApSRPCMessage* pMsg)
 void SrpcGate_WebView_SizeBy(ApSRPCMessage* pMsg)
 {
   Msg_WebView_SizeBy msg;
-  msg.hView = Apollo::string2Handle(pMsg->srpc.getString("hView"));
+  msg.hView = pMsg->srpc.getHandle("hView");
   msg.nX = pMsg->srpc.getInt("nX");
   msg.nY = pMsg->srpc.getInt("nY");
   msg.nDirection = pMsg->srpc.getInt("nDirection");
@@ -265,21 +280,21 @@ void SrpcGate_WebView_SizeBy(ApSRPCMessage* pMsg)
 void SrpcGate_WebView_MouseCapture(ApSRPCMessage* pMsg)
 {
   Msg_WebView_MouseCapture msg;
-  msg.hView = Apollo::string2Handle(pMsg->srpc.getString("hView"));
+  msg.hView = pMsg->srpc.getHandle("hView");
   SRPCGATE_HANDLER_NATIVE_REQUEST(pMsg, msg);
 }
 
 void SrpcGate_WebView_MouseRelease(ApSRPCMessage* pMsg)
 {
   Msg_WebView_MouseRelease msg;
-  msg.hView = Apollo::string2Handle(pMsg->srpc.getString("hView"));
+  msg.hView = pMsg->srpc.getHandle("hView");
   SRPCGATE_HANDLER_NATIVE_REQUEST(pMsg, msg);
 }
 
 void SrpcGate_WebView_GetPosition(ApSRPCMessage* pMsg)
 {
   Msg_WebView_GetPosition msg;
-  msg.hView = Apollo::string2Handle(pMsg->srpc.getString("hView"));
+  msg.hView = pMsg->srpc.getHandle("hView");
   SRPCGATE_HANDLER_NATIVE_REQUEST(pMsg, msg);
   pMsg->response.set("nLeft", msg.nLeft);
   pMsg->response.set("nTop", msg.nTop);
@@ -290,7 +305,7 @@ void SrpcGate_WebView_GetPosition(ApSRPCMessage* pMsg)
 void SrpcGate_WebView_GetVisibility(ApSRPCMessage* pMsg)
 {
   Msg_WebView_GetVisibility msg;
-  msg.hView = Apollo::string2Handle(pMsg->srpc.getString("hView"));
+  msg.hView = pMsg->srpc.getHandle("hView");
   SRPCGATE_HANDLER_NATIVE_REQUEST(pMsg, msg);
   pMsg->response.set("bVisible", msg.bVisible);
 }
@@ -341,6 +356,7 @@ int WebViewModule::Init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, WebViewModule, WebView_Destroy, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, WebViewModule, WebView_Position, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, WebViewModule, WebView_Visibility, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, WebViewModule, WebView_SetWindowFlags, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, WebViewModule, WebView_LoadHtml, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, WebViewModule, WebView_Load, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, WebViewModule, WebView_Reload, this, ApCallbackPosNormal);
@@ -364,6 +380,7 @@ int WebViewModule::Init()
   srpcGateRegistry_.add("WebView_Destroy", SrpcGate_WebView_Destroy);
   srpcGateRegistry_.add("WebView_Position", SrpcGate_WebView_Position);
   srpcGateRegistry_.add("WebView_Visibility", SrpcGate_WebView_Visibility);
+  srpcGateRegistry_.add("WebView_SetWindowFlags", SrpcGate_WebView_SetWindowFlags);
   srpcGateRegistry_.add("WebView_Load", SrpcGate_WebView_Load);
   srpcGateRegistry_.add("WebView_LoadHtml", SrpcGate_WebView_LoadHtml);
   srpcGateRegistry_.add("WebView_Reload", SrpcGate_WebView_Reload);

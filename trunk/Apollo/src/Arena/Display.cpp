@@ -42,6 +42,14 @@ int Display::Create()
   if (!ok) { apLog_Error((LOG_CHANNEL, "Display::Create", "Msg_WebView_Create(" ApHandleFormat ") failed", ApHandleType(hView))); }
 
   if (ok) {
+    Msg_WebView_SetWindowFlags msg;
+    msg.hView = hView;
+    msg.nFlags = Msg_WebView_SetWindowFlags::ToolWindow;
+    ok = msg.Request();
+    if (!ok) { apLog_Error((LOG_CHANNEL, "Display::Create", "Msg_WebView_SetScriptAccessPolicy::Allow(" ApHandleFormat ") failed", ApHandleType(hView))); }
+  }
+
+  if (ok) {
     ok = Msg_WebView_SetScriptAccessPolicy::Allow(hView);
     if (!ok) { apLog_Error((LOG_CHANNEL, "Display::Create", "Msg_WebView_SetScriptAccessPolicy::Allow(" ApHandleFormat ") failed", ApHandleType(hView))); }
   }
@@ -312,6 +320,9 @@ void Display::OnCallModule(Apollo::SrpcMessage& request, Apollo::SrpcMessage& re
     } else if (sMethod == "OnShowDebug") {
       OnShowDebug(request.getInt("bShow"));
 
+    } else if (sMethod == "OnShowChat") {
+      OnShowChat(request.getInt("bShow"));
+
     } else if (sMethod == "SendPublicChat") {
       String sText = request.getString("sText");
       if (sText){
@@ -323,6 +334,18 @@ void Display::OnCallModule(Apollo::SrpcMessage& request, Apollo::SrpcMessage& re
 
     } else {
       throw ApException("Display::OnCallModule: Unknown Method=%s", StringType(sMethod));
+    }
+  }
+}
+
+void Display::OnShowChat(int bShow)
+{
+  if (ApIsHandle(hLocation_)) {
+    Msg_ChatWindow_OpenForLocation msg;
+    msg.hChat = Apollo::newHandle();
+    msg.hLocation = hLocation_;
+    if (!msg.Request()) {
+      throw ApException("Display::OnShowChat: %s failed loc=" ApHandleFormat ": %s", StringType(msg.Type()), ApHandleType(msg.hLocation), StringType(msg.sComment));
     }
   }
 }

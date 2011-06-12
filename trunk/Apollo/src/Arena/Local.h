@@ -14,5 +14,6 @@
 #include "MsgConfig.h"
 #include "MsgWebView.h"
 #include "MsgBrowserInfo.h"
+#include "MsgChatWindow.h"
 
 #endif // Local_H_INCLUDED

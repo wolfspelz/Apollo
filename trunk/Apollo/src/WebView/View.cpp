@@ -44,27 +44,13 @@ void View::Create()
   if (FAILED( pWebViewPrivate_->viewWindow(reinterpret_cast<OLE_HANDLE*>(&hWnd_))) ) { throw ApException("View::Create pWebViewPrivate_->viewWindow() failed"); }
   if (hWnd_ == NULL) { throw ApException("View::Create pWebViewPrivate_->viewWindow() did not return hWnd"); }
 
-  // Remove from taskbar
-  ::SetWindowLong(hWnd_, GWL_EXSTYLE, ::GetWindowLong(hWnd_, GWL_EXSTYLE) | WS_EX_TOOLWINDOW);
-  
-  // Tried to set Parent (= Owner for toplevel windows) in order to remove it from taskbar, but failed
-  // Even worse: Win32FirefoxBrowser::AdjustStackingOrder always finds the app main window 
-  // on top and View::hWnd_(s) switch order all the time. This probably could be fixed, but 
-  // if it is true, that owned windows always stack above the owner, then the owner feature
-  // Is useless for us, because we need View::hWnd_(s) to be in different positions in the stacking 
-  // order, depending on their respective browser window.
-  //::SetWindowLong(hWnd_, GWL_HWNDPARENT, (LONG) Msg_Win32_GetMainWindow::_());
-
-  ::ShowWindow(hWnd_, SW_SHOW);
-  ::UpdateWindow(hWnd_);
-  
-  HWND hWndOwner = ::GetWindow(hWnd_, GW_OWNER);
-
   // -----------------------------
 
   if (FAILED( pWebView_->mainFrame(&pWebFrame_) )) { throw ApException("View::Create pWebView_->mainFrame() failed"); }
 
   ::MoveWindow(hWnd_, nLeft_, nTop_ - 10000, nWidth_, nHeight_, TRUE);
+  ::ShowWindow(hWnd_, SW_SHOW);
+  ::UpdateWindow(hWnd_);
 }
 
 void View::Destroy()  
@@ -189,6 +175,32 @@ void View::SetVisibility(int bVisible)
       // Force webkit repaint, which is suppressed while invisible
       RECT r = { 0, 0, nWidth_, nHeight_ };
       ::InvalidateRect(hWnd_, &r, FALSE);
+    }
+#endif // WIN32
+  }
+}
+
+void View::SetWindowFlags(int nFlags)
+{
+  int bChanged = (nFlags_ != nFlags);
+  nFlags_ = nFlags;
+
+  if (bChanged) {
+#if defined(WIN32)
+    if (nFlags_ & Msg_WebView_SetWindowFlags::ToolWindow != 0) {
+      // Remove from taskbar
+      ::SetWindowLong(hWnd_, GWL_EXSTYLE, ::GetWindowLong(hWnd_, GWL_EXSTYLE) | WS_EX_TOOLWINDOW);
+      //::ShowWindow(hWnd_, SW_SHOW);
+      //::UpdateWindow(hWnd_);
+            
+      // Tried to set Parent (= Owner for toplevel windows) in order to remove it from taskbar, but failed
+      // Even worse: Win32FirefoxBrowser::AdjustStackingOrder always finds the app main window 
+      // on top and View::hWnd_(s) switch order all the time. This probably could be fixed, but 
+      // if it is true, that owned windows always stack above the owner, then the owner feature
+      // is useless for us, because we need View::hWnd_(s) to be in different positions in the stacking 
+      // order, depending on their respective browser window.
+      //::SetWindowLong(hWnd_, GWL_HWNDPARENT, (LONG) Msg_Win32_GetMainWindow::_());
+      //HWND hWndOwner = ::GetWindow(hWnd_, GW_OWNER);
     }
 #endif // WIN32
   }

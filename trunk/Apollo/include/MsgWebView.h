@@ -74,6 +74,18 @@ public:
   ApIN int bVisible;
 };
 
+class Msg_WebView_SetWindowFlags: public ApRequestMessage
+{
+public:
+  enum _Flags { NoFlag = 0
+    ,ToolWindow = 1<<0 // = not an app window, not in taskbar, alt-tab, etc.
+    ,NextFlag = 1<<1
+  };
+  Msg_WebView_SetWindowFlags() : ApRequestMessage("WebView_SetWindowFlags"), nFlags(0) {}
+  ApIN ApHandle hView;
+  ApIN int nFlags;
+};
+
 class Msg_WebView_LoadHtml: public ApRequestMessage
 {
 public:
@@ -121,6 +133,38 @@ public:
   ApIN String sFunction;
   ApIN List lArgs;
   ApOUT String sResult;
+  static String _(const ApHandle& hView, const String& sFunction, List& lArgs)
+  {
+    Msg_WebView_CallScriptFunction msg;
+    msg.hView = hView;
+    msg.sFunction = sFunction;
+    for (Elem* e = 0; (e = lArgs.Next(e)) != 0; ) {
+      msg.lArgs.AddLast(e->getName());
+    }
+    msg.Request();
+    return msg.sResult;
+  }
+  static String _(const ApHandle& hView, const String& sFunction, const String& sArg1)
+  {
+    List lArgs;
+    lArgs.AddLast(sArg1);
+    return _(hView, sFunction, lArgs);
+  }
+  static String _(const ApHandle& hView, const String& sFunction, const String& sArg1, const String& sArg2)
+  {
+    List lArgs;
+    lArgs.AddLast(sArg1);
+    lArgs.AddLast(sArg2);
+    return _(hView, sFunction, lArgs);
+  }
+  static String _(const ApHandle& hView, const String& sFunction, const String& sArg1, const String& sArg2, const String& sArg3)
+  {
+    List lArgs;
+    lArgs.AddLast(sArg1);
+    lArgs.AddLast(sArg2);
+    lArgs.AddLast(sArg3);
+    return _(hView, sFunction, lArgs);
+  }
 };
 
 class Msg_WebView_CallScriptSrpc: public ApRequestMessage

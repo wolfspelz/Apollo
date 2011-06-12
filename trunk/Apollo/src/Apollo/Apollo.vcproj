@@ -330,6 +330,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\include\MsgChatWindow.h"
+					>
+				</File>
+				<File
 					RelativePath="..\..\include\MsgConfig.h"
 					>
 				</File>
