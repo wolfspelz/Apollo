@@ -126,21 +126,21 @@ AP_MSG_HANDLER_METHOD(SampleModule, UnitTest_End)
 void SrpcGate_Sample_Create(ApSRPCMessage* pMsg)
 {
   Msg_Sample_Create msg;
-  msg.hSample = Apollo::string2Handle(pMsg->srpc.getString("hSample"));
+  msg.hSample = pMsg->srpc.getHandle("hSample");
   SRPCGATE_HANDLER_NATIVE_REQUEST(pMsg, msg);
 }
 
 void SrpcGate_Sample_Destroy(ApSRPCMessage* pMsg)
 {
   Msg_Sample_Destroy msg;
-  msg.hSample = Apollo::string2Handle(pMsg->srpc.getString("hSample"));
+  msg.hSample = pMsg->srpc.getHandle("hSample");
   SRPCGATE_HANDLER_NATIVE_REQUEST(pMsg, msg);
 }
 
 void SrpcGate_Sample_Get(ApSRPCMessage* pMsg)
 {
   Msg_Sample_Get msg;
-  msg.hSample = Apollo::string2Handle(pMsg->srpc.getString("hSample"));
+  msg.hSample = pMsg->srpc.getHandle("hHandle");
   msg.sKey = pMsg->srpc.getString("sKey");
   SRPCGATE_HANDLER_NATIVE_REQUEST(pMsg, msg);
   pMsg->srpc.set("nValue", msg.nValue);

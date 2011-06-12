@@ -25,10 +25,13 @@ public:
 
   void Create(int nLeft, int nTop, int nWidth, int nHeight, int bVisible, const String& sCaption, const String& sIconUrl, const String& sContentUrl);
   void Destroy();
+  void SetCaption(const String& sCaption);
+  void SetIcon(const String& sIconUrl);
 
   void OnDocumentLoaded();
   void OnReceivedFocus();
   void OnLostFocus();
+  void OnUnload();
 
 protected:
   ApHandle hAp_;

@@ -56,6 +56,7 @@ public:
     ,nTop_(100)
     ,nWidth_(100)
     ,nHeight_(100)
+    ,nFlags_(0)
     ,bScriptAccessEnabled_(0)
     ,bNavigationEnabled_(1)
     ,pWebView_(0)
@@ -81,6 +82,7 @@ public:
 
   void SetPosition(int nLeft, int nTop, int nWidth, int nHeight);
   void SetVisibility(int bVisible);
+  void SetWindowFlags(int nFlags);
   void SetScriptAccessPolicy(const String& sPolicy);
   void SetNavigationPolicy(const String& sPolicy);
   void MoveBy(int nX, int nY);
@@ -111,6 +113,7 @@ protected:
   int nWidth_;
   int nHeight_;
 
+  int nFlags_;
   String sUrl_;
   int bScriptAccessEnabled_;
   int bNavigationEnabled_;

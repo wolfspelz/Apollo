@@ -191,6 +191,8 @@ Function.prototype.bind = function(fn)
   }
 }
 
+function Eval(sText) { return eval(sText); }
+
 function ApolloApi()
 {
 }

@@ -9,6 +9,7 @@
 
 #include "ApMessage.h"
 
+// -> Dialog 
 class Msg_Dialog_Create: public ApRequestMessage
 {
 public:
@@ -24,6 +25,7 @@ public:
   ApIN String sContentUrl;
 };
 
+// -> Dialog 
 class Msg_Dialog_Destroy: public ApRequestMessage
 {
 public:
@@ -31,12 +33,41 @@ public:
   ApIN ApHandle hDialog;
 };
 
+// -> Dialog 
 class Msg_Dialog_GetView: public ApRequestMessage
 {
 public:
   Msg_Dialog_GetView() : ApRequestMessage("Dialog_GetView") {}
   ApIN ApHandle hDialog;
   ApOUT ApHandle hView;
+};
+
+// -> Dialog 
+class Msg_Dialog_SetCaption: public ApRequestMessage
+{
+public:
+  Msg_Dialog_SetCaption() : ApRequestMessage("Dialog_SetCaption") {}
+  ApIN ApHandle hDialog;
+  ApIN String sCaption;
+};
+
+// -> Dialog 
+class Msg_Dialog_SetIcon: public ApRequestMessage
+{
+public:
+  Msg_Dialog_SetIcon() : ApRequestMessage("Dialog_SetIcon") {}
+  ApIN ApHandle hDialog;
+  ApIN String sIconUrl;
+};
+
+// ------------------------------------
+
+// Dialog -> 
+class Msg_Dialog_OnClosed: public ApNotificationMessage
+{
+public:
+  Msg_Dialog_OnClosed() : ApNotificationMessage("Dialog_OnClosed") {}
+  ApIN ApHandle hDialog;
 };
 
 #endif // !defined(MsgSample_h_INCLUDED)

@@ -249,14 +249,14 @@ void SrpcGate_Xmpp_Disconnect(ApSRPCMessage* pMsg)
 void SrpcGate_Vp_OpenContext(ApSRPCMessage* pMsg)
 {
   Msg_Vp_OpenContext msg;
-  msg.hContext = Apollo::string2Handle(pMsg->srpc.getString("hContext"));
+  msg.hContext = pMsg->srpc.getHandle("hContext");
   SRPCGATE_HANDLER_NATIVE_REQUEST(pMsg, msg);
 }
 
 void SrpcGate_Vp_NavigateContext(ApSRPCMessage* pMsg)
 {
   Msg_Vp_NavigateContext msg;
-  msg.hContext = Apollo::string2Handle(pMsg->srpc.getString("hContext"));
+  msg.hContext = pMsg->srpc.getHandle("hContext");
   msg.sUrl = pMsg->srpc.getString("sUrl");
   SRPCGATE_HANDLER_NATIVE_REQUEST(pMsg, msg);
 }
@@ -264,7 +264,7 @@ void SrpcGate_Vp_NavigateContext(ApSRPCMessage* pMsg)
 void SrpcGate_Vp_CloseContext(ApSRPCMessage* pMsg)
 {
   Msg_Vp_CloseContext msg;
-  msg.hContext = Apollo::string2Handle(pMsg->srpc.getString("hContext"));
+  msg.hContext = pMsg->srpc.getHandle("hContext");
   SRPCGATE_HANDLER_NATIVE_REQUEST(pMsg, msg);
 }
 

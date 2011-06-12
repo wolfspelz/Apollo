@@ -32,6 +32,7 @@ public:
   void On_WebView_Destroy(Msg_WebView_Destroy* pMsg);
   void On_WebView_Position(Msg_WebView_Position* pMsg);
   void On_WebView_Visibility(Msg_WebView_Visibility* pMsg);
+  void On_WebView_SetWindowFlags(Msg_WebView_SetWindowFlags* pMsg);
   void On_WebView_LoadHtml(Msg_WebView_LoadHtml* pMsg);
   void On_WebView_Load(Msg_WebView_Load* pMsg);
   void On_WebView_Reload(Msg_WebView_Reload* pMsg);
