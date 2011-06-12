@@ -496,7 +496,7 @@ ApHandle Test_Avatar_RemoveOldPublicChats_hRemovedChat_;
 void Test_Avatar_RemoveOldPublicChats_DisplaySrpcMessage(DisplaySrpcMessage* pMsg)
 {
   if (pMsg->srpc.getString("Method") == "RemoveAvatarChat") {
-    Test_Avatar_RemoveOldPublicChats_hRemovedChat_ = Apollo::string2Handle(pMsg->srpc.getString("hChat"));
+    Test_Avatar_RemoveOldPublicChats_hRemovedChat_ = pMsg->srpc.getHandle("hChat");
   }
 }
 
