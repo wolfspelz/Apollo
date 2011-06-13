@@ -106,7 +106,7 @@ int Handler::handle(ApSRPCMessage* pMsg)
 
 //----------------------------------------------------------
 
-void SrpcGateModule::On_SrpcGate_Register(Msg_SrpcGate_Register* pMsg)
+AP_MSG_HANDLER_METHOD(SrpcGateModule, SrpcGate_Register)
 {
   int ok = 0;
 
@@ -116,7 +116,7 @@ void SrpcGateModule::On_SrpcGate_Register(Msg_SrpcGate_Register* pMsg)
   pMsg->apStatus = ok ? ApMessage::Ok : ApMessage::Error;
 }
 
-void SrpcGateModule::On_SrpcGate_Unregister(Msg_SrpcGate_Unregister* pMsg)
+AP_MSG_HANDLER_METHOD(SrpcGateModule, SrpcGate_Unregister)
 {
   int ok = 0;
 
@@ -125,7 +125,7 @@ void SrpcGateModule::On_SrpcGate_Unregister(Msg_SrpcGate_Unregister* pMsg)
   pMsg->apStatus = ok ? ApMessage::Ok : ApMessage::Error;
 }
 
-void SrpcGateModule::On_SrpcGate(ApSRPCMessage* pMsg)
+AP_TYPEDMSG_HANDLER_METHOD(SrpcGateModule, SrpcGate, ApSRPCMessage)
 {
   int ok = 0;
 
@@ -138,7 +138,7 @@ void SrpcGateModule::On_SrpcGate(ApSRPCMessage* pMsg)
   pMsg->apStatus = ok ? ApMessage::Ok : ApMessage::Error;
 }
 
-void SrpcGateModule::On_Server_HttpRequest(Msg_Server_HttpRequest* pMsg)
+AP_MSG_HANDLER_METHOD(SrpcGateModule, Server_HttpRequest)
 {
   #define SrpcGateModule_Server_HttpRequest_sUriPrefix "/" MODULE_NAME
 
@@ -316,21 +316,13 @@ void SrpcGate_Config_GetValue(ApSRPCMessage* pMsg)
 
 //----------------------------------------------------------
 
-AP_REFINSTANCE_MSG_HANDLER(SrpcGateModule, SrpcGate_Register)
-AP_REFINSTANCE_MSG_HANDLER(SrpcGateModule, SrpcGate_Unregister)
-AP_REFINSTANCE_SRPC_HANDLER(SrpcGateModule, ApSRPCMessage, SrpcGate)
-AP_REFINSTANCE_MSG_HANDLER(SrpcGateModule, Server_HttpRequest)
-
-//----------------------------------------------------------
-
 SRPCGATE_API int Load(AP_MODULE_CALL* pModuleData)
 {
   AP_UNUSED_ARG(pModuleData);
 
   { Msg_SrpcGate_Register msg; msg.Hook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(SrpcGateModule, SrpcGate_Register), SrpcGateModuleInstance::Get(), Apollo::modulePos(ApCallbackPosEarly, MODULE_NAME)); }
   { Msg_SrpcGate_Unregister msg; msg.Hook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(SrpcGateModule, SrpcGate_Unregister), SrpcGateModuleInstance::Get(), Apollo::modulePos(ApCallbackPosEarly, MODULE_NAME)); }
-  { ApSRPCMessage msg("SrpcGate"); msg.Hook(MODULE_NAME, AP_REFINSTANCE_SRPC_CALLBACK(SrpcGateModule, SrpcGate), SrpcGateModuleInstance::Get(), Apollo::modulePos(ApCallbackPosEarly, MODULE_NAME)); }
-
+  { ApSRPCMessage msg("SrpcGate"); msg.Hook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(SrpcGateModule, SrpcGate), SrpcGateModuleInstance::Get(), Apollo::modulePos(ApCallbackPosEarly, MODULE_NAME)); }
   { Msg_Server_HttpRequest msg; msg.Hook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(SrpcGateModule, Server_HttpRequest), SrpcGateModuleInstance::Get(), Apollo::modulePos(ApCallbackPosEarly, MODULE_NAME)); }
 
   SrpcGateModule* pModule = SrpcGateModuleInstance::Get();
@@ -362,8 +354,7 @@ SRPCGATE_API int UnLoad(AP_MODULE_CALL* pModuleData)
 
   { Msg_SrpcGate_Register msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(SrpcGateModule, SrpcGate_Register), SrpcGateModuleInstance::Get()); }
   { Msg_SrpcGate_Unregister msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(SrpcGateModule, SrpcGate_Unregister), SrpcGateModuleInstance::Get()); }
-  { ApSRPCMessage msg("SrpcGate"); msg.Unhook(MODULE_NAME, AP_REFINSTANCE_SRPC_CALLBACK(SrpcGateModule, SrpcGate), SrpcGateModuleInstance::Get()); }
-
+  { ApSRPCMessage msg("SrpcGate"); msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(SrpcGateModule, SrpcGate), SrpcGateModuleInstance::Get()); }
   { Msg_Server_HttpRequest msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(SrpcGateModule, Server_HttpRequest), SrpcGateModuleInstance::Get()); }
 
   SrpcGateModuleInstance::Delete();

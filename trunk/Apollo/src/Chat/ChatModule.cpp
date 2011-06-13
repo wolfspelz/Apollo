@@ -90,24 +90,9 @@ AP_MSG_HANDLER_METHOD(ChatModule, Dialog_OnClosed)
 
 //---------------------------
 
-AP_MSG_HANDLER_METHOD(ChatModule, WebView_CallModuleSrpc)
+AP_TYPEDMSG_HANDLER_METHOD(ChatModule, WebView_CallModuleSrpc, Msg_WebView_CallModuleSrpc)
 {
   ChatWindow* pChat = FindChat(pMsg->hView);
-  if (pChat) {
-    pChat->OnCallModule(pMsg->srpc, pMsg->response);
-    pMsg->apStatus = ApMessage::Ok;
-  }
-}
-
-AP_SRPC_HANDLER_METHOD(ChatModule, ChatWindow_CallModule, ApSRPCMessage)
-{
-  String sView = pMsg->srpc.getString("hView");
-  if (!sView) { throw ApException("Missing hView"); }
-
-  ApHandle hView = Apollo::string2Handle(sView);
-  if (!ApIsHandle(hView)) { throw ApException("Not a handle: view=%s", StringType(sView)); }
-
-  ChatWindow* pChat = FindChat(hView);
   if (pChat) {
     pChat->OnCallModule(pMsg->srpc, pMsg->response);
     pMsg->apStatus = ApMessage::Ok;
@@ -234,7 +219,6 @@ int ChatModule::Init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ChatModule, Dialog_OnOpened, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ChatModule, Dialog_OnClosed, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ChatModule, WebView_CallModuleSrpc, this, ApCallbackPosNormal);
-  AP_MSG_REGISTRY_ADD(MODULE_NAME, ChatModule, ChatWindow_CallModule, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ChatModule, VpView_ParticipantAdded, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ChatModule, VpView_ParticipantRemoved, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ChatModule, VpView_LocationPublicChat, this, ApCallbackPosNormal);

@@ -32,7 +32,6 @@ public:
   void On_Dialog_OnOpened(Msg_Dialog_OnOpened* pMsg);
   void On_Dialog_OnClosed(Msg_Dialog_OnClosed* pMsg);
   void On_WebView_CallModuleSrpc(Msg_WebView_CallModuleSrpc* pMsg);
-  void On_ChatWindow_CallModule(ApSRPCMessage* pMsg);
   void On_VpView_ParticipantAdded(Msg_VpView_ParticipantAdded* pMsg);
   void On_VpView_ParticipantRemoved(Msg_VpView_ParticipantRemoved* pMsg);
   void On_VpView_LocationPublicChat(Msg_VpView_LocationPublicChat* pMsg);

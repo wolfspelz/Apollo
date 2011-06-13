@@ -140,29 +140,6 @@ public:
 #define ApCallbackPosEarly (-1000 * ApCallbackPosSegment)
 #define ApCallbackPosLate (1000 * ApCallbackPosSegment)
 
-// deprecated
-#define AP_REFINSTANCE_MSG_CALLBACK(_class_, _msgtype_) (ApCallback) _class_ ## _On_## _msgtype_
-#define AP_REFINSTANCE_MSG_HANDLER(_class_, _msgtype_) \
-void _class_ ## _On_ ## _msgtype_(Msg_ ## _msgtype_* pMsg) \
-{ \
-  _class_* self = (_class_*) pMsg->Ref(); \
-  if (self != 0) { \
-    self->On_ ## _msgtype_(pMsg); \
-  } \
-}
-
-// deprecated
-#define AP_REFINSTANCE_SRPC_CALLBACK(_class_, _msgtype_) (ApCallback) _class_ ## _On_## _msgtype_
-#define AP_REFINSTANCE_SRPC_HANDLER(_class_, _msgclass_, _msgtype_) \
-void _class_ ## _On_ ## _msgtype_(_msgclass_* pMsg) \
-{ \
-  _class_* self = (_class_*) pMsg->Ref(); \
-  if (self != 0) { \
-    self->On_ ## _msgtype_(pMsg); \
-  } \
-}
-
-// use this instead of AP_REFINSTANCE_MSG_CALLBACK
 #define AP_MSG_HANDLER_METHOD(_class_, _msgtype_) \
 void _class_ ## _On_ ## _msgtype_(Msg_ ## _msgtype_* pMsg) \
 { \
@@ -173,8 +150,7 @@ void _class_ ## _On_ ## _msgtype_(Msg_ ## _msgtype_* pMsg) \
 }\
 void _class_ ## :: ## On_ ## _msgtype_(Msg_## _msgtype_* pMsg)
 
-// use this instead of AP_REFINSTANCE_SRPC_CALLBACK
-#define AP_SRPC_HANDLER_METHOD(_class_, _msgtype_, _msgclass_) \
+#define AP_TYPEDMSG_HANDLER_METHOD(_class_, _msgtype_, _msgclass_) \
 void _class_ ## _On_ ## _msgtype_(_msgclass_* pMsg) \
 { \
   _class_* self = (_class_*) pMsg->Ref(); \
@@ -183,6 +159,21 @@ void _class_ ## _On_ ## _msgtype_(_msgclass_* pMsg) \
   } \
 }\
 void _class_ ## :: ## On_ ## _msgtype_(_msgclass_* pMsg)
+
+//----------------------------------------------------------
+
+// Deprecated, use AP_MSG_REGISTRY_ADD
+#define AP_REFINSTANCE_MSG_CALLBACK(_class_, _msgtype_) (ApCallback) _class_ ## _On_## _msgtype_
+
+// Deprecated, use AP_MSG_HANDLER_METHOD
+#define AP_REFINSTANCE_MSG_HANDLER(_class_, _msgtype_) \
+void _class_ ## _On_ ## _msgtype_(Msg_ ## _msgtype_* pMsg) \
+{ \
+  _class_* self = (_class_*) pMsg->Ref(); \
+  if (self != 0) { \
+    self->On_ ## _msgtype_(pMsg); \
+  } \
+}
 
 //----------------------------------------------------------
 
@@ -209,8 +200,10 @@ public:
 };
 
 #define AP_MSG_REGISTRY_DECLARE ApMsgHandlerRegistrantList apMsgRegistry_;
+
 #define AP_MSG_REGISTRY_ADD(_mod_, _class_, _msgtype_, _ref_, _pos_) \
   apMsgRegistry_.add(_mod_, # _msgtype_, (ApCallback) _class_ ## _On_## _msgtype_, _ref_, Apollo::modulePos(_pos_, _mod_));
+
 #define AP_MSG_REGISTRY_FINISH apMsgRegistry_.finish();
 
 #endif // !defined(ApMessage_h_INCLUDED)

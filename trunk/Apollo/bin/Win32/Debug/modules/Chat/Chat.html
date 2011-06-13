@@ -11,8 +11,8 @@
 
 function SendChat(sText)
 {
-  api.Message('SendChat')
-    .setString('ApType', 'ChatWindow_CallModule')
+  api.ModuleCall('SendChat')
+    .setString('ApType', 'WebView_CallModuleSrpc')
     .setString('sText', sText)
     .send();
 }

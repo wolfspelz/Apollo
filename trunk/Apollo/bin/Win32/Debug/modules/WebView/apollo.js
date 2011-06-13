@@ -242,13 +242,18 @@ ApolloApi.prototype =
     }
   },
   
-  Message: function(sType)
+  Message: function(sMethod)
   {
-    var msg = new ApMessage(sType);
-    if (sType) {
+    var msg = new ApMessage(sMethod);
       //if (msg.getString('Method') != 'Log_Line') { api.Log.Debug(sType + ' ' + apollo.viewHandle); }
-      msg.setString('hView', apollo.viewHandle);
-    }
+    msg.setString('hView', apollo.viewHandle);
+    return msg;
+  },
+
+  ModuleCall: function(sMethod)
+  {
+    var msg = new ApMessage(sMethod);
+    msg.setString('ApType', 'Msg_WebView_CallModuleSrpc');
     return msg;
   },
 

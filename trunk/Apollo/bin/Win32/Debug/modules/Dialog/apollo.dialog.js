@@ -9,6 +9,7 @@ DialogApi.prototype =
 {
   ModuleName: parent.api.ModuleName,
   Message: parent.api.Message,
+  ModuleCall: parent.api.ModuleCall,
   Log: parent.api.Log,
 
   Ready: function()

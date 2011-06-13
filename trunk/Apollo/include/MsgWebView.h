@@ -12,6 +12,7 @@
 //--------------------------
 // Manage views
 
+// -> WebView
 class Msg_WebView_Create: public ApRequestMessage
 {
 public:
@@ -25,6 +26,7 @@ public:
   ApIN ApHandle hView;
 };
 
+// -> WebView
 class Msg_WebView_Destroy: public ApRequestMessage
 {
 public:
@@ -38,6 +40,7 @@ public:
   ApIN ApHandle hView;
 };
 
+// -> WebView
 class Msg_WebView_Position: public ApRequestMessage
 {
 public:
@@ -59,6 +62,7 @@ public:
   ApIN int nHeight;
 };
 
+// -> WebView
 class Msg_WebView_Visibility: public ApRequestMessage
 {
 public:
@@ -74,6 +78,7 @@ public:
   ApIN int bVisible;
 };
 
+// -> WebView
 class Msg_WebView_SetWindowFlags: public ApRequestMessage
 {
 public:
@@ -86,6 +91,7 @@ public:
   ApIN int nFlags;
 };
 
+// -> WebView
 class Msg_WebView_LoadHtml: public ApRequestMessage
 {
 public:
@@ -103,6 +109,7 @@ public:
   ApIN String sBase;
 };
 
+// -> WebView
 class Msg_WebView_Load: public ApRequestMessage
 {
 public:
@@ -118,6 +125,7 @@ public:
   ApIN String sUrl;
 };
 
+// -> WebView
 class Msg_WebView_Reload: public ApRequestMessage
 {
 public:
@@ -125,6 +133,111 @@ public:
   ApIN ApHandle hView;
 };
 
+// -> WebView
+class Msg_WebView_SetScriptAccessPolicy: public ApRequestMessage
+{
+  #define Msg_WebView_SetScriptAccessPolicy_Denied "Denied"
+  #define Msg_WebView_SetScriptAccessPolicy_Allowed "Allowed"
+public:
+  Msg_WebView_SetScriptAccessPolicy() : ApRequestMessage("WebView_SetScriptAccessPolicy") {}
+  ApIN ApHandle hView;
+  ApIN String sPolicy;
+  static int Allow(const ApHandle& hView)
+  {
+    Msg_WebView_SetScriptAccessPolicy msg;
+    msg.hView = hView;
+    msg.sPolicy = Msg_WebView_SetScriptAccessPolicy_Allowed;
+    return msg.Request();
+  }
+};
+
+// -> WebView
+class Msg_WebView_SetNavigationPolicy: public ApRequestMessage
+{
+  #define Msg_WebView_SetNavigationPolicy_Denied "Denied"
+  #define Msg_WebView_SetNavigationPolicy_Allowed "Allowed"
+public:
+  Msg_WebView_SetNavigationPolicy() : ApRequestMessage("WebView_SetNavigationPolicy") {}
+  ApIN ApHandle hView;
+  ApIN String sPolicy;
+  static int Deny(const ApHandle& hView)
+  {
+    Msg_WebView_SetNavigationPolicy msg;
+    msg.hView = hView;
+    msg.sPolicy = Msg_WebView_SetNavigationPolicy_Denied;
+    return msg.Request();
+  }
+};
+
+// -> WebView
+class Msg_WebView_MoveBy: public ApRequestMessage
+{
+public:
+  Msg_WebView_MoveBy() : ApRequestMessage("WebView_MoveBy"), nX(0), nY(0) {}
+  ApIN ApHandle hView;
+  ApIN int nX;
+  ApIN int nY;
+};
+
+// -> WebView
+class Msg_WebView_SizeBy: public ApRequestMessage
+{
+public:
+  enum _Direction { NoDirection = 0
+    ,DirectionLeft
+    ,DirectionTop
+    ,DirectionRight
+    ,DirectionBottom
+    ,DirectionTopLeft
+    ,DirectionTopRight
+    ,DirectionBottomLeft
+    ,DirectionBottomRight
+  };
+  Msg_WebView_SizeBy() : ApRequestMessage("WebView_SizeBy"), nX(0), nY(0), nDirection(DirectionBottomRight) {}
+  ApIN ApHandle hView;
+  ApIN int nX;
+  ApIN int nY;
+  ApIN int nDirection;
+};
+
+// -> WebView
+class Msg_WebView_MouseCapture: public ApRequestMessage
+{
+public:
+  Msg_WebView_MouseCapture() : ApRequestMessage("WebView_MouseCapture") {}
+  ApIN ApHandle hView;
+};
+
+// -> WebView
+class Msg_WebView_MouseRelease: public ApRequestMessage
+{
+public:
+  Msg_WebView_MouseRelease() : ApRequestMessage("WebView_MouseRelease") {}
+  ApIN ApHandle hView;
+};
+
+// -> WebView
+class Msg_WebView_GetPosition: public ApRequestMessage
+{
+public:
+  Msg_WebView_GetPosition() : ApRequestMessage("WebView_GetPosition"), nLeft(0), nTop(0), nWidth(0), nHeight(0) {}
+  ApIN ApHandle hView;
+  ApOUT int nLeft;
+  ApOUT int nTop;
+  ApOUT int nWidth;
+  ApOUT int nHeight;
+};
+
+// -> WebView
+class Msg_WebView_GetVisibility: public ApRequestMessage
+{
+public:
+  Msg_WebView_GetVisibility() : ApRequestMessage("WebView_GetVisibility"), bVisible(0) {}
+  ApIN ApHandle hView;
+  ApOUT int bVisible;
+};
+
+// -> WebView
 class Msg_WebView_CallScriptFunction: public ApRequestMessage
 {
 public:
@@ -167,6 +280,7 @@ public:
   }
 };
 
+// Module DLL -> Script of Module
 class Msg_WebView_CallScriptSrpc: public ApRequestMessage
 {
 public:
@@ -177,6 +291,7 @@ public:
   ApOUT Apollo::SrpcMessage response;
 };
 
+// Script of Module -> Module DLL
 class Msg_WebView_CallModuleSrpc: public ApRequestMessage
 {
 public:
@@ -186,103 +301,8 @@ public:
   ApOUT Apollo::SrpcMessage response;
 };
 
-class Msg_WebView_SetScriptAccessPolicy: public ApRequestMessage
-{
-  #define Msg_WebView_SetScriptAccessPolicy_Denied "Denied"
-  #define Msg_WebView_SetScriptAccessPolicy_Allowed "Allowed"
-public:
-  Msg_WebView_SetScriptAccessPolicy() : ApRequestMessage("WebView_SetScriptAccessPolicy") {}
-  ApIN ApHandle hView;
-  ApIN String sPolicy;
-  static int Allow(const ApHandle& hView)
-  {
-    Msg_WebView_SetScriptAccessPolicy msg;
-    msg.hView = hView;
-    msg.sPolicy = Msg_WebView_SetScriptAccessPolicy_Allowed;
-    return msg.Request();
-  }
-};
-
-class Msg_WebView_SetNavigationPolicy: public ApRequestMessage
-{
-  #define Msg_WebView_SetNavigationPolicy_Denied "Denied"
-  #define Msg_WebView_SetNavigationPolicy_Allowed "Allowed"
-public:
-  Msg_WebView_SetNavigationPolicy() : ApRequestMessage("WebView_SetNavigationPolicy") {}
-  ApIN ApHandle hView;
-  ApIN String sPolicy;
-  static int Deny(const ApHandle& hView)
-  {
-    Msg_WebView_SetNavigationPolicy msg;
-    msg.hView = hView;
-    msg.sPolicy = Msg_WebView_SetNavigationPolicy_Denied;
-    return msg.Request();
-  }
-};
-
-class Msg_WebView_MoveBy: public ApRequestMessage
-{
-public:
-  Msg_WebView_MoveBy() : ApRequestMessage("WebView_MoveBy"), nX(0), nY(0) {}
-  ApIN ApHandle hView;
-  ApIN int nX;
-  ApIN int nY;
-};
-
-class Msg_WebView_SizeBy: public ApRequestMessage
-{
-public:
-  enum _Direction { NoDirection = 0
-    ,DirectionLeft
-    ,DirectionTop
-    ,DirectionRight
-    ,DirectionBottom
-    ,DirectionTopLeft
-    ,DirectionTopRight
-    ,DirectionBottomLeft
-    ,DirectionBottomRight
-  };
-  Msg_WebView_SizeBy() : ApRequestMessage("WebView_SizeBy"), nX(0), nY(0), nDirection(DirectionBottomRight) {}
-  ApIN ApHandle hView;
-  ApIN int nX;
-  ApIN int nY;
-  ApIN int nDirection;
-};
-
-class Msg_WebView_MouseCapture: public ApRequestMessage
-{
-public:
-  Msg_WebView_MouseCapture() : ApRequestMessage("WebView_MouseCapture") {}
-  ApIN ApHandle hView;
-};
-
-class Msg_WebView_MouseRelease: public ApRequestMessage
-{
-public:
-  Msg_WebView_MouseRelease() : ApRequestMessage("WebView_MouseRelease") {}
-  ApIN ApHandle hView;
-};
-
-class Msg_WebView_GetPosition: public ApRequestMessage
-{
-public:
-  Msg_WebView_GetPosition() : ApRequestMessage("WebView_GetPosition"), nLeft(0), nTop(0), nWidth(0), nHeight(0) {}
-  ApIN ApHandle hView;
-  ApOUT int nLeft;
-  ApOUT int nTop;
-  ApOUT int nWidth;
-  ApOUT int nHeight;
-};
-
-class Msg_WebView_GetVisibility: public ApRequestMessage
-{
-public:
-  Msg_WebView_GetVisibility() : ApRequestMessage("WebView_GetVisibility"), bVisible(0) {}
-  ApIN ApHandle hView;
-  ApOUT int bVisible;
-};
-
 #if defined(WIN32)
+// -> WebView
 class Msg_WebView_GetWin32Window: public ApRequestMessage
 {
 public:
