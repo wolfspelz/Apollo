@@ -29,6 +29,7 @@ public:
   void SetIcon(const String& sIconUrl);
 
   void OnDocumentLoaded();
+  void OnContentLoaded();
   void OnReceivedFocus();
   void OnLostFocus();
   void OnUnload();

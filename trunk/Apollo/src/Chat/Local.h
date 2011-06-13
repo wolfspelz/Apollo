@@ -15,6 +15,7 @@
 #include "MsgVp.h"
 #include "MsgWebView.h"
 #include "MsgDialog.h"
+#include "MsgVpView.h"
 #include "ChatModule.h"
 
 #endif // Local_H_INCLUDED

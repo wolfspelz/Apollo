@@ -60,7 +60,25 @@ public:
   ApIN String sIconUrl;
 };
 
+class Msg_Dialog_CallScriptFunction: public ApRequestMessage
+{
+public:
+  Msg_Dialog_CallScriptFunction() : ApRequestMessage("Dialog_CallScriptFunction") {}
+  ApIN ApHandle hDialog;
+  ApIN String sFunction;
+  ApIN List lArgs;
+  ApOUT String sResult;
+};
+
 // ------------------------------------
+
+// Dialog -> 
+class Msg_Dialog_OnOpened: public ApNotificationMessage
+{
+public:
+  Msg_Dialog_OnOpened() : ApNotificationMessage("Dialog_OnOpened") {}
+  ApIN ApHandle hDialog;
+};
 
 // Dialog -> 
 class Msg_Dialog_OnClosed: public ApNotificationMessage
@@ -68,6 +86,15 @@ class Msg_Dialog_OnClosed: public ApNotificationMessage
 public:
   Msg_Dialog_OnClosed() : ApNotificationMessage("Dialog_OnClosed") {}
   ApIN ApHandle hDialog;
+};
+
+// ------------------------------------
+// Dialog HTML -> Dialog
+class Msg_Dialog_ContentLoaded: public ApNotificationMessage
+{
+public:
+  Msg_Dialog_ContentLoaded() : ApNotificationMessage("Dialog_ContentLoaded") {}
+  ApIN ApHandle hView;
 };
 
 #endif // !defined(MsgSample_h_INCLUDED)

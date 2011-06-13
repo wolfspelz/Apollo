@@ -1,34 +1,63 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-<script type="text/javascript" src="jquery-1.4.2.min.js"></script>
+<script type="text/javascript" src="../WebView/jquery-1.5.1.min.js"></script> 
+<script type="text/javascript" src="jquery-ui-latest.js"></script>
+<script type="text/javascript" src="jquery.layout-latest.js"></script>
+<script type="text/javascript" src="../Dialog/apollo.dialog.js"></script>
+<link type="text/css" rel="stylesheet" href="layout-default-latest.css" /><link type='text/css' rel='stylesheet' href='Chat.css' media='all' />
+
 <script type="text/javascript">
 
-//document.onmousemove = function (ev) { return parent.document.onmousemove(ev); };
-//document.onmousedown = function (ev) { return parent.document.onmousedown(ev); };
-//document.onmouseup = function (ev) { return parent.document.onmouseup(ev); };
+function SendChat(sText)
+{
+  api.Message('SendChat')
+    .setString('ApType', 'ChatWindow_CallModule')
+    .setString('sText', sText)
+    .send();
+}
 
-$('#ChatSend').click(
-  function(ev) {
-    $('#ChatOut').html($('#ChatIn').attr('value'));
-//    parent.api.Message('SendChat')
-//      .setString('ApType', 'ChatWindow_CallModule')
-//      .setString('sText', 'xx')
-//      .send();
-    //$('#ChatIn').attr('value', '');
-    //$('#ChatIn').attr('value')
-  }
-);
+function SendChatIn()
+{
+  var sText = document.getElementById('ChatIn').value;
+  SendChat(sText);
+  document.getElementById('ChatIn').value = '';
+}
 
+$(document).ready(function () {  var gLayout = $('#Wrapper').layout({    south__size: 40,//    east__size: Math.floor( $('body').clientWidth / 3),    east__size: 150,    south__spacing_open: 4,    east__spacing_open: 4  });//  $.each('south,east'.split(','), function (i, pane) {//    var opts = myLayout.options[pane].resizeWhileDragging = true;
+//  });  $('#ChatIn').bind("keydown", 
+    function(ev) {
+      var keycode = (ev.keyCode ? ev.keyCode : (ev.which ? ev.which : ev.charCode));
+      switch (keycode) {
+      case 13:
+        if (!ev.ctrlKey && !ev.shiftKey) {
+          SendChatIn();
+          return false;
+        }
+        break;
+
+      default:
+        return true;
+      }
+    }
+  );
+});
 </script>
-<link rel='stylesheet' href='Chat.css' type='text/css' media='all' />
+
 </head>
+
 <body>
-<div id="ChatWindow" class="cApMove">
-  <div id="ChatOut"></div>
-  <div id="ParticipantList"></div>
-    <input type="text" id="ChatIn" value="Send" />
-    <input type="button" id="ChatSend" value="Send" />
+<div id="Wrapper">
+  <div class="ui-layout-south">    <textarea id="ChatIn"></textarea>
+    <input type="button" id="ChatSend" value="Send" onclick="SendChatIn();" />
+  </div>    <div class="ui-layout-east">  </div>    <div class="ui-layout-center">  </div>
 </div>
 </body>
+
+<script type="text/javascript">
+  var api = new DialogApi();
+  api.ModuleName('Chat-HTML');
+  api.Ready();
+</script>
+
 </html>

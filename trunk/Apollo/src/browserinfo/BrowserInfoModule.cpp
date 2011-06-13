@@ -306,6 +306,19 @@ static int WaitForFirefox()
 static void KillFirefox(HANDLE hProcess)
 {
   ::TerminateProcess(hProcess, 0);
+
+  int bTerminated = false;
+  int nCnt = 0;
+  while (!bTerminated && nCnt < 20) {
+    nCnt++;
+    DWORD nExitCode = 0;
+    BOOL bSuccess = ::GetExitCodeProcess(hProcess, &nExitCode);
+    if (nExitCode == STILL_ACTIVE) {
+      ::Sleep(200);
+    } else {
+      bTerminated = 1;
+    }
+  }
 }
 
 String BrowserInfoModuleTester::GetFirefoxToplevelWindow()

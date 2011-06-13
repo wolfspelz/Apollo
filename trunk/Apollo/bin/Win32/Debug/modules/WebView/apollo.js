@@ -191,6 +191,8 @@ Function.prototype.bind = function(fn)
   }
 }
 
+function Eval(sText) { return eval(sText); }
+
 function ApolloApi()
 {
 }
@@ -198,6 +200,11 @@ function ApolloApi()
 ApolloApi.prototype = 
 {
   moduleName: 'Unknown',
+
+  ModuleName: function(sModule)
+  {
+    api.moduleName = sModule; 
+  },
 
   GetViewHandle: function()
   {
@@ -250,8 +257,6 @@ ApolloApi.prototype =
   
   Log: {
 
-    channelName: 'Unknown',
-  
     Send: function(nMask, sChannel, sContext, sMessage)
     {
       return api.Message('Log_Line')
@@ -270,11 +275,11 @@ ApolloApi.prototype =
     LevelInfo   :  64,
     LevelVerbose: 128,
 
-    Error: function(sMessage) { api.Log.Send(api.Log.LevelError, api.Log.moduleName, 'JS:', String(sMessage)); },
-    Warning: function(sMessage) { api.Log.Send(api.Log.LevelWarning, api.Log.moduleName, 'JS:', String(sMessage)); },
-    User: function(sMessage) { api.Log.Send(api.Log.LevelUser, api.Log.moduleName, 'JS:', String(sMessage)); },
-    Debug: function(sMessage) { api.Log.Send(api.Log.LevelDebug, api.Log.moduleName, 'JS:', String(sMessage)); },
-    Info: function(sMessage) { api.Log.Send(api.Log.LevelInfo, api.Log.moduleName, 'JS:', String(sMessage)); },
+    Error: function(sMessage) { api.Log.Send(api.Log.LevelError, api.moduleName, 'JS:', String(sMessage)); },
+    Warning: function(sMessage) { api.Log.Send(api.Log.LevelWarning, api.moduleName, 'JS:', String(sMessage)); },
+    User: function(sMessage) { api.Log.Send(api.Log.LevelUser, api.moduleName, 'JS:', String(sMessage)); },
+    Debug: function(sMessage) { api.Log.Send(api.Log.LevelDebug, api.moduleName, 'JS:', String(sMessage)); },
+    Info: function(sMessage) { api.Log.Send(api.Log.LevelInfo, api.moduleName, 'JS:', String(sMessage)); },
 
     _:0
   },
@@ -363,7 +368,7 @@ ApolloApi.prototype =
       eDiv.style.right = '0';
       eDiv.style.bottom = '0';
       eDiv.style.backgroundColor = '#FFFFFF';
-      eDiv.style.opacity = '0.05';
+      eDiv.style.opacity = '0.01';
       eDiv.style.zIndex = '99';
       document.body.appendChild(eDiv);
       

@@ -90,6 +90,13 @@ void Dialog::OnDocumentLoaded()
   }
 }
 
+void Dialog::OnContentLoaded()
+{
+  Msg_Dialog_OnOpened msg;
+  msg.hDialog = hAp_;
+  msg.Send();
+}
+
 void Dialog::OnReceivedFocus()
 {
 }

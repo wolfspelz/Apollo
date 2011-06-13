@@ -63,6 +63,9 @@ public:
   inline ApHandle GetContext() { return hContext_; }
   inline ApHandle GetLocation() { return hLocation_; }
 
+  // For tesing. Do not use.
+  inline void _SetView(const ApHandle& h) { hView_ = h; }
+
 protected:
   void StartDisplay();
   void ProcessAvatarList(Apollo::ValueList& vlParticipants, ApHandle& hSelf);
@@ -113,11 +116,12 @@ protected:
 
 //---------------------------------------------------
 
-class DisplaySrpcMessage: public Msg_WebView_CallScriptSrpc
+class ViewSrpcMessage: public Msg_WebView_CallScriptSrpc
 {
-  typedef ApRequestMessage base;
+  typedef Msg_WebView_CallScriptSrpc base;
 public:
-  DisplaySrpcMessage(Display* pDisplay, const String& sMethod);
+  ViewSrpcMessage(Display* pDisplay, const String& sMethod);
+  int Request();
 };
 
 #endif // Display_H_INCLUDED

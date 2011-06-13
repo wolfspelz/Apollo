@@ -47,7 +47,9 @@ View* WebViewModule::FindView(const ApHandle& hView)
   View* pView = 0;  
 
   views_.Get(hView, pView);
-  if (pView == 0) { throw ApException("WebViewModule::FindView no webview=" ApHandleFormat "", ApHandleType(hView)); }
+  if (pView == 0) {
+    throw ApException("WebViewModule::FindView no webview=" ApHandleFormat "", ApHandleType(hView));
+  }
 
   return pView;
 }

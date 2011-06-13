@@ -117,6 +117,7 @@ public:
     ,EscapeLogLine // irreversible single line (no \ -> \\)
     ,EscapeSlash // reversible / -> \/ 
     ,EscapeSpace // reversible " " -> "\ "
+    ,EscapeQuotes // irreversible ' -> \' and " -> \"
     ,EscapeURL
     ,EscapeTest
   } Escape_Type;

@@ -945,6 +945,12 @@ static String::StringPair gString_Table_EscapeSpace[] = {
                                                     {0, 0}
                                                  };
 
+static String::StringPair gString_Table_EscapeQuotes[] = {
+                                                    {"'", "\\'"},
+                                                    {"\"", "\\\""},
+                                                    {0, 0}
+                                                 };
+
 static String::StringPair gString_Table_EscapeURL[] = {
                                                     {"\x00", "%00"},
                                                     {"\x01", "%01"},
@@ -1319,6 +1325,7 @@ int String::escape(Escape_Type nType, bool bReverse)
     case EscapeLogLine: pTable = gString_Table_EscapeLogLine; break;
     case EscapeSlash: pTable = gString_Table_EscapeSlash; break;
     case EscapeSpace: pTable = gString_Table_EscapeSpace; break;
+    case EscapeQuotes: pTable = gString_Table_EscapeQuotes; break;
     case EscapeURL: pTable = gString_Table_EscapeURL; break;
     case EscapeTest: pTable = gString_Table_EscapeTest; break;
     case EscapeNone: break;

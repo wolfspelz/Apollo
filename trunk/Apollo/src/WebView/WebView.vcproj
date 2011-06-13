@@ -208,32 +208,36 @@
 			UniqueIdentifier="{7A559A34-CD76-49a8-A212-11216CC3CC9F}"
 			>
 		</Filter>
-		<File
-			RelativePath="..\..\bin\Win32\Debug\modules\WebView\test\apollo.js"
+		<Filter
+			Name="HTML"
 			>
-		</File>
-		<File
-			RelativePath="..\..\bin\Win32\Debug\modules\WebView\test\CallCustomEcho.html"
-			>
-		</File>
-		<File
-			RelativePath="..\..\bin\Win32\Debug\modules\WebView\test\CallJSEcho.html"
-			>
-		</File>
-		<File
-			RelativePath="..\..\bin\Win32\Debug\modules\WebView\test\CallSystemEcho.html"
-			>
-		</File>
+			<File
+				RelativePath="..\..\bin\Win32\Debug\modules\WebView\apollo.js"
+				>
+			</File>
+			<File
+				RelativePath="..\..\bin\Win32\Debug\modules\WebView\test\CallCustomEcho.html"
+				>
+			</File>
+			<File
+				RelativePath="..\..\bin\Win32\Debug\modules\WebView\test\CallJSEcho.html"
+				>
+			</File>
+			<File
+				RelativePath="..\..\bin\Win32\Debug\modules\WebView\test\CallSystemEcho.html"
+				>
+			</File>
+			<File
+				RelativePath="..\..\bin\Win32\Debug\modules\WebView\test\dev.html"
+				>
+			</File>
+			<File
+				RelativePath="..\..\bin\Win32\Debug\modules\WebView\test\LoadHtml.js"
+				>
+			</File>
+		</Filter>
 		<File
 			RelativePath="..\..\bin\Win32\Debug\modules\WebView\config.txt"
-			>
-		</File>
-		<File
-			RelativePath="..\..\bin\Win32\Debug\modules\WebView\test\dev.html"
-			>
-		</File>
-		<File
-			RelativePath="..\..\bin\Win32\Debug\modules\WebView\test\LoadHtml.js"
 			>
 		</File>
 	</Files>

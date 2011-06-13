@@ -75,22 +75,48 @@ AP_MSG_HANDLER_METHOD(DialogModule, Dialog_Destroy)
 
 AP_MSG_HANDLER_METHOD(DialogModule, Dialog_GetView)
 {
-  Dialog* pDialog = GetDialog(pMsg->hDialog);
-  pMsg->hView = pDialog->GetView();
+  GetDialog(pMsg->hDialog)->GetView();
   pMsg->apStatus = ApMessage::Ok;
 }
 
 AP_MSG_HANDLER_METHOD(DialogModule, Dialog_SetCaption)
 {
-  Dialog* pDialog = GetDialog(pMsg->hDialog);
-  pDialog->SetCaption(pMsg->sCaption);
+  GetDialog(pMsg->hDialog)->SetCaption(pMsg->sCaption);
   pMsg->apStatus = ApMessage::Ok;
 }
 
 AP_MSG_HANDLER_METHOD(DialogModule, Dialog_SetIcon)
 {
-  Dialog* pDialog = GetDialog(pMsg->hDialog);
-  pDialog->SetIcon(pMsg->sIconUrl);
+  GetDialog(pMsg->hDialog)->SetIcon(pMsg->sIconUrl);
+  pMsg->apStatus = ApMessage::Ok;
+}
+
+AP_MSG_HANDLER_METHOD(DialogModule, Dialog_CallScriptFunction)
+{
+  // document.getElementById('Content').contentWindow.eval("SetText('zz')")
+
+  Msg_WebView_CallScriptFunction msg;
+  msg.hView = GetDialog(pMsg->hDialog)->GetView();
+  msg.sFunction = "ContentEval";
+
+  int nCnt = 0;
+  String sArglist = pMsg->sFunction + "(";
+  for (Elem* e = 0; (e = pMsg->lArgs.Next(e)) != 0; ) {
+    if (nCnt > 0) { sArglist += ", "; }
+    nCnt++;
+    String sArg = e->getName();
+    sArg.escape(String::EscapeQuotes);
+    sArg.escape(String::EscapeCRLF);
+    sArglist += "'" + sArg + "'" ;
+  }
+  sArglist += ")";
+  msg.lArgs.AddLast(sArglist);
+  if (!msg.Request()) {
+    pMsg->sComment = msg.sComment;
+  } else {
+    pMsg->sResult = msg.sResult;
+  }
+
   pMsg->apStatus = ApMessage::Ok;
 }
 
@@ -123,6 +149,14 @@ AP_MSG_HANDLER_METHOD(DialogModule, WebView_Event_DocumentUnload)
   Dialog* pDialog = FindDialogByView(pMsg->hView);
   if (pDialog) {
     pDialog->OnUnload();
+  }
+}
+
+AP_MSG_HANDLER_METHOD(DialogModule, Dialog_ContentLoaded)
+{
+  Dialog* pDialog = FindDialogByView(pMsg->hView);
+  if (pDialog) {
+    pDialog->OnContentLoaded();
   }
 }
 
@@ -174,6 +208,13 @@ void SrpcGate_Dialog_SetIcon(ApSRPCMessage* pMsg)
   SRPCGATE_HANDLER_NATIVE_REQUEST(pMsg, msg);
 }
 
+void SrpcGate_Dialog_ContentLoaded(ApSRPCMessage* pMsg)
+{
+  Msg_Dialog_ContentLoaded msg;
+  msg.hView = pMsg->srpc.getHandle("hView");
+  msg.Send();
+}
+
 //----------------------------
 
 #if defined(AP_TEST)
@@ -215,17 +256,20 @@ int DialogModule::Init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, DialogModule, Dialog_GetView, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, DialogModule, Dialog_SetCaption, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, DialogModule, Dialog_SetIcon, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, DialogModule, Dialog_CallScriptFunction, this, ApCallbackPosNormal);
 
   AP_MSG_REGISTRY_ADD(MODULE_NAME, DialogModule, WebView_Event_DocumentLoaded, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, DialogModule, WebView_Event_ReceivedFocus, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, DialogModule, WebView_Event_LostFocus, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, DialogModule, WebView_Event_DocumentUnload, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, DialogModule, Dialog_ContentLoaded, this, ApCallbackPosNormal);
 
   srpcGateRegistry_.add("Dialog_Create", SrpcGate_Dialog_Create);
   srpcGateRegistry_.add("Dialog_Destroy", SrpcGate_Dialog_Destroy);
   srpcGateRegistry_.add("Dialog_GetView", SrpcGate_Dialog_GetView);
   srpcGateRegistry_.add("Dialog_SetCaption", SrpcGate_Dialog_SetCaption);
   srpcGateRegistry_.add("Dialog_SetIcon", SrpcGate_Dialog_SetIcon);
+  srpcGateRegistry_.add("Dialog_ContentLoaded", SrpcGate_Dialog_ContentLoaded);
 
   AP_UNITTEST_HOOK(DialogModule, this);
 
@@ -246,6 +290,8 @@ void DialogModule::Exit()
 void DialogModuleTester::Begin()
 {
   AP_UNITTEST_REGISTER(DialogModuleTester::CreateWaitCloseByContent);
+  AP_UNITTEST_REGISTER(DialogModuleTester::ContentLoadedFromHtml);
+  AP_UNITTEST_REGISTER(DialogModuleTester::CallContent);
   AP_UNITTEST_REGISTER(DialogModuleTester::ExternalUrl);
   AP_UNITTEST_REGISTER(DialogModuleTester::SetCaption);
 }
@@ -253,6 +299,8 @@ void DialogModuleTester::Begin()
 void DialogModuleTester::Execute()
 {
   DialogModuleTester::CreateWaitCloseByContent();
+  DialogModuleTester::ContentLoadedFromHtml();
+  DialogModuleTester::CallContent();
   DialogModuleTester::ExternalUrl();
   DialogModuleTester::SetCaption();
 }
@@ -295,6 +343,176 @@ String DialogModuleTester::CreateWaitCloseByContent()
   return s;
 }
 
+//----------------------------
+
+static ApHandle DialogModuleTester_ContentLoadedFromHtml_hDialog;
+
+void DialogModuleTester_ContentLoadedFromHtml_Dialog_ContentLoaded(Msg_Dialog_ContentLoaded* pMsg)
+{
+  if (pMsg->hView != DialogModuleTester_ContentLoadedFromHtml_hDialog) { return; }
+  AP_UNITTEST_SUCCESS(DialogModuleTester::ContentLoadedFromHtml);
+  { Msg_Dialog_ContentLoaded msg; msg.Unhook(MODULE_NAME, (ApCallback) DialogModuleTester_ContentLoadedFromHtml_Dialog_ContentLoaded, 0); }
+  
+  // Not a good idea to destroy the view while in body-onload
+  { ApAsyncMessage<Msg_Dialog_Destroy> msg; msg->hDialog = DialogModuleTester_ContentLoadedFromHtml_hDialog; msg.Post(); }
+}
+
+String DialogModuleTester::ContentLoadedFromHtml()
+{
+  String s;
+
+  { Msg_Dialog_ContentLoaded msg; msg.Hook(MODULE_NAME, (ApCallback) DialogModuleTester_ContentLoadedFromHtml_Dialog_ContentLoaded, 0, ApCallbackPosNormal); }
+
+  ApHandle hDialog = Apollo::newHandle();
+  DialogModuleTester_ContentLoadedFromHtml_hDialog = hDialog;
+
+  Msg_Dialog_Create msg;
+  msg.hDialog = hDialog;
+  msg.nLeft = 500;
+  msg.nTop = 100;
+  msg.nWidth = 300;
+  msg.nHeight = 200;
+  msg.bVisible = 1;
+  msg.sCaption = "ContentLoadedFromHtml Caption";
+  msg.sContentUrl = "file://" + Apollo::getModuleResourcePath(MODULE_NAME) + "test/ContentLoadedFromHtml.html";
+  if (!s) { if (!msg.Request()) { s = "Msg_Dialog_Create failed"; }}
+
+  return s;
+}
+
+//----------------------------
+
+static ApHandle DialogModuleTester_CallContent_hDialog;
+
+void DialogModuleTester_CallContent_Dialog_ContentLoaded(Msg_Dialog_ContentLoaded* pMsg)
+{
+  if (pMsg->hView != DialogModuleTester_CallContent_hDialog) { return; }
+
+  String s;
+
+  if (!s) {
+    // document.getElementById('Content').contentWindow.eval("SetText('zz')")
+    Msg_Dialog_CallScriptFunction msg;
+    msg.hDialog = pMsg->hView;
+    msg.sFunction = "SetText";
+    msg.lArgs.AddLast("CallContent Text1");
+    msg.lArgs.AddLast("42");
+    if (!msg.Request()) {
+      s = "Msg_Dialog_CallScriptFunction failed";
+    }
+  }
+
+  if (!s) {
+    String sExpected = "1=CallContent Text1 2=42";
+    String sResult = Msg_WebView_CallScriptFunction::_(pMsg->hView, "ContentEval", "document.getElementById('iText').innerHTML");
+    if (sResult != sExpected) {
+      s = "Wrong text expected=" + sExpected + " got=" + sResult;
+    }
+  }
+
+  AP_UNITTEST_RESULT(DialogModuleTester::CallContent, s.empty(), s);
+
+  { Msg_Dialog_ContentLoaded msg; msg.Unhook(MODULE_NAME, (ApCallback) DialogModuleTester_CallContent_Dialog_ContentLoaded, 0); }
+
+  { ApAsyncMessage<Msg_Dialog_Destroy> msg; msg->hDialog = DialogModuleTester_CallContent_hDialog; msg.Post(); }
+}
+
+String DialogModuleTester::CallContent()
+{
+  String s;
+
+  { Msg_Dialog_ContentLoaded msg; msg.Hook(MODULE_NAME, (ApCallback) DialogModuleTester_CallContent_Dialog_ContentLoaded, 0, ApCallbackPosNormal); }
+
+  ApHandle hDialog = Apollo::newHandle();
+  DialogModuleTester_CallContent_hDialog = hDialog;
+
+  Msg_Dialog_Create msg;
+  msg.hDialog = hDialog;
+  msg.nLeft = 500;
+  msg.nTop = 100;
+  msg.nWidth = 300;
+  msg.nHeight = 200;
+  msg.bVisible = 1;
+  msg.sCaption = "CallContent Caption";
+  msg.sContentUrl = "file://" + Apollo::getModuleResourcePath(MODULE_NAME) + "test/CallContent.html";
+  if (!s) { if (!msg.Request()) { s = "Msg_Dialog_Create failed"; }}
+
+  return s;
+}
+
+////----------------------------
+//
+//static ApHandle DialogModuleTester_CallContent_hDialog;
+//
+//void DialogModuleTester_CallContent_WebView_Event_DocumentUnload(Msg_WebView_Event_DocumentUnload* pMsg)
+//{
+//  if (pMsg->hView != DialogModuleTester_CallContent_hDialog) { return; }
+////  AP_UNITTEST_SUCCESS(DialogModuleTester::CallContent);
+//  { Msg_WebView_Event_DocumentUnload msg; msg.Unhook(MODULE_NAME, (ApCallback) DialogModuleTester_CallContent_WebView_Event_DocumentUnload, 0); }
+//}
+//
+//void DialogModuleTester_CallContent_CallModule(ApSRPCMessage* pMsg)
+//{
+//  String sView = pMsg->srpc.getString("hView");
+//  if (!sView) { return; }
+//
+//  ApHandle hView = Apollo::string2Handle(sView);
+//  if (hView != DialogModuleTester_CallContent_hDialog) { return; }
+//
+//  String s;
+//
+//  String sMethod = pMsg->srpc.getString("Method");
+//  if (sMethod == "Start") {
+//    // document.getElementById('Content').contentWindow.eval("SetText('zz')")
+//    Msg_Dialog_CallScriptFunction msg;
+//    msg.hDialog = hView;
+//    msg.sFunction = "SetText";
+//    msg.lArgs.AddLast("CallContent Text1");
+//    msg.lArgs.AddLast("42");
+//    if (!msg.Request()) {
+//      s = "Msg_Dialog_CallScriptFunction failed";
+//    }
+//  }
+//
+//  if (!s) {
+//    String sExpected = "1=CallContent Text1 2=42";
+//    String sResult = Msg_WebView_CallScriptFunction::_(hView, "ContentEval", "document.getElementById('iText').innerHTML");
+//    if (sResult != sExpected) {
+//      s = "Wrong text expected=" + sExpected + " got=" + sResult;
+//    }
+//  }
+//
+//  AP_UNITTEST_RESULT(DialogModuleTester::CallContent, s.empty(), s);
+//
+//  { ApSRPCMessage msg("CallContent_CallModule"); msg.Unhook(MODULE_NAME, (ApCallback) DialogModuleTester_CallContent_CallModule, 0); }
+//
+//  { ApAsyncMessage<Msg_Dialog_Destroy> msg; msg->hDialog = DialogModuleTester_CallContent_hDialog; msg.Post(); }
+//}
+//
+//String DialogModuleTester::CallContent()
+//{
+//  String s;
+//
+//  { Msg_WebView_Event_DocumentUnload msg; msg.Hook(MODULE_NAME, (ApCallback) DialogModuleTester_CallContent_WebView_Event_DocumentUnload, 0, ApCallbackPosNormal); }
+//  { ApSRPCMessage msg("CallContent_CallModule"); msg.Hook(MODULE_NAME, (ApCallback) DialogModuleTester_CallContent_CallModule, 0, ApCallbackPosNormal); }
+//
+//  ApHandle hDialog = Apollo::newHandle();
+//  DialogModuleTester_CallContent_hDialog = hDialog;
+//
+//  Msg_Dialog_Create msg;
+//  msg.hDialog = hDialog;
+//  msg.nLeft = 500;
+//  msg.nTop = 100;
+//  msg.nWidth = 300;
+//  msg.nHeight = 200;
+//  msg.bVisible = 1;
+//  msg.sCaption = "CallContent Caption";
+//  msg.sContentUrl = "file://" + Apollo::getModuleResourcePath(MODULE_NAME) + "test/CallContent.html";
+//  if (!s) { if (!msg.Request()) { s = "Msg_Dialog_Create failed"; }}
+//
+//  return s;
+//}
+//
 //----------------------------
 
 static ApHandle DialogModuleTester_ExternalUrl_hDialog;
@@ -384,7 +602,7 @@ void DialogModuleTester_SetCaption_WebView_Event_DocumentLoaded(Msg_WebView_Even
     }
   }
 
-  AP_UNITTEST_SUCCESS(DialogModuleTester::SetCaption);
+  AP_UNITTEST_RESULT(DialogModuleTester::SetCaption, s.empty(), s);
   { Msg_WebView_Event_DocumentLoaded msg; msg.Unhook(MODULE_NAME, (ApCallback) DialogModuleTester_SetCaption_WebView_Event_DocumentLoaded, 0); }
 }
 

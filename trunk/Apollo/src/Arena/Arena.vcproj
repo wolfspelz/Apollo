@@ -215,28 +215,28 @@
 			UniqueIdentifier="{50200952-F8D0-433e-A3A5-3951C5C54E47}"
 			>
 		</Filter>
-		<File
-			RelativePath="..\..\bin\Win32\Debug\modules\Arena\apollo.js"
+		<Filter
+			Name="HTML"
 			>
-		</File>
-		<File
-			RelativePath="..\..\bin\Win32\Debug\modules\Arena\arena.css"
-			>
-		</File>
-		<File
-			RelativePath="..\..\bin\Win32\Debug\modules\Arena\arena.html"
-			>
-		</File>
-		<File
-			RelativePath="..\..\bin\Win32\Debug\modules\Arena\arena.js"
-			>
-		</File>
+			<File
+				RelativePath="..\..\bin\Win32\Debug\modules\Arena\arena.css"
+				>
+			</File>
+			<File
+				RelativePath="..\..\bin\Win32\Debug\modules\Arena\arena.html"
+				>
+			</File>
+			<File
+				RelativePath="..\..\bin\Win32\Debug\modules\Arena\arena.js"
+				>
+			</File>
+			<File
+				RelativePath="..\..\bin\Win32\Debug\modules\Arena\utils.js"
+				>
+			</File>
+		</Filter>
 		<File
 			RelativePath="..\..\bin\Win32\Debug\modules\Arena\config.txt"
-			>
-		</File>
-		<File
-			RelativePath="..\..\bin\Win32\Debug\modules\Arena\utils.js"
 			>
 		</File>
 	</Files>

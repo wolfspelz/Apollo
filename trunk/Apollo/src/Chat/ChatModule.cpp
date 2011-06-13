@@ -9,10 +9,10 @@
 
 ChatWindow* ChatModule::NewChat(const ApHandle& hChat)
 {
-  ChatWindow* pChat = new ChatWindow(hChat);
+  ChatWindow* pChat = new ChatWindow(this, hChat);
   if (pChat) {
     try {
-      Chats_.Set(hChat, pChat);
+      chats_.Set(hChat, pChat);
     } catch (ApException& ex) {
       delete pChat;
       pChat = 0;
@@ -27,7 +27,7 @@ void ChatModule::DeleteChat(const ApHandle& hChat)
 {
   ChatWindow* pChat = FindChat(hChat);
   if (pChat) {
-    Chats_.Unset(hChat);
+    chats_.Unset(hChat);
     delete pChat;
     pChat = 0;
   }
@@ -36,7 +36,7 @@ void ChatModule::DeleteChat(const ApHandle& hChat)
 ChatWindow* ChatModule::FindChat(const ApHandle& hChat)
 {
   ChatWindow* pChat = 0;
-  Chats_.Get(hChat, pChat);
+  chats_.Get(hChat, pChat);
   return pChat;
 }
 
@@ -51,7 +51,7 @@ ChatWindow* ChatModule::GetChat(const ApHandle& hChat)
 
 AP_MSG_HANDLER_METHOD(ChatModule, ChatWindow_OpenForLocation)
 {
-  if (Chats_.Find(pMsg->hChat) != 0) { throw ApException("ChatWindow=" ApHandleFormat " already exists", ApHandleType(pMsg->hChat)); }
+  if (chats_.Find(pMsg->hChat) != 0) { throw ApException("ChatWindow=" ApHandleFormat " already exists", ApHandleType(pMsg->hChat)); }
 
   ChatWindow* pChat = NewChat(pMsg->hChat);
   if (pChat == 0) { throw ApException("NewChat failed"); }
@@ -71,6 +71,14 @@ AP_MSG_HANDLER_METHOD(ChatModule, ChatWindow_Close)
 
 //---------------------------
 
+AP_MSG_HANDLER_METHOD(ChatModule, Dialog_OnOpened)
+{
+  ChatWindow* pChat = FindChat(pMsg->hDialog);
+  if (pChat != 0) {
+    pChat->OnLoaded();
+  }
+}
+
 AP_MSG_HANDLER_METHOD(ChatModule, Dialog_OnClosed)
 {
   ChatWindow* pChat = FindChat(pMsg->hDialog);
@@ -82,6 +90,15 @@ AP_MSG_HANDLER_METHOD(ChatModule, Dialog_OnClosed)
 
 //---------------------------
 
+AP_MSG_HANDLER_METHOD(ChatModule, WebView_CallModuleSrpc)
+{
+  ChatWindow* pChat = FindChat(pMsg->hView);
+  if (pChat) {
+    pChat->OnCallModule(pMsg->srpc, pMsg->response);
+    pMsg->apStatus = ApMessage::Ok;
+  }
+}
+
 AP_SRPC_HANDLER_METHOD(ChatModule, ChatWindow_CallModule, ApSRPCMessage)
 {
   String sView = pMsg->srpc.getString("hView");
@@ -91,11 +108,73 @@ AP_SRPC_HANDLER_METHOD(ChatModule, ChatWindow_CallModule, ApSRPCMessage)
   if (!ApIsHandle(hView)) { throw ApException("Not a handle: view=%s", StringType(sView)); }
 
   ChatWindow* pChat = FindChat(hView);
-  if (pChat != 0) {
+  if (pChat) {
     pChat->OnCallModule(pMsg->srpc, pMsg->response);
+    pMsg->apStatus = ApMessage::Ok;
   }
+}
 
-  pMsg->apStatus = ApMessage::Ok;
+//---------------------------
+
+AP_MSG_HANDLER_METHOD(ChatModule, VpView_ParticipantAdded)
+{
+  for (ChatListNode* pChatNode = 0; (pChatNode = chats_.Next(pChatNode)) != 0; ) {
+    ChatWindow* pChat = pChatNode->Value();
+    if (pChat) {
+      if (pChat->GetLocation() == pMsg->hLocation) {
+        pChat->OnParticipantAdded(pMsg->hParticipant, pMsg->bSelf);
+      }
+    }
+  }
+}
+
+AP_MSG_HANDLER_METHOD(ChatModule, VpView_ParticipantRemoved)
+{
+  for (ChatListNode* pChatNode = 0; (pChatNode = chats_.Next(pChatNode)) != 0; ) {
+    ChatWindow* pChat = pChatNode->Value();
+    if (pChat) {
+      if (pChat->GetLocation() == pMsg->hLocation) {
+        pChat->OnParticipantRemoved(pMsg->hParticipant);
+      }
+    }
+  }
+}
+
+AP_MSG_HANDLER_METHOD(ChatModule, VpView_LocationPublicChat)
+{
+  for (ChatListNode* pChatNode = 0; (pChatNode = chats_.Next(pChatNode)) != 0; ) {
+    ChatWindow* pChat = pChatNode->Value();
+    if (pChat) {
+      if (pChat->GetLocation() == pMsg->hLocation) {
+        Apollo::TimeValue tv(pMsg->nSec, pMsg->nMicroSec);
+        pChat->OnReceivePublicChat(pMsg->hParticipant, pMsg->hChat, pMsg->sNickname, pMsg->sText, tv);
+      }
+    }
+  }
+}
+
+AP_MSG_HANDLER_METHOD(ChatModule, VpView_ParticipantDetailsChanged)
+{
+  for (ChatListNode* pChatNode = 0; (pChatNode = chats_.Next(pChatNode)) != 0; ) {
+    ChatWindow* pChat = pChatNode->Value();
+    if (pChat) {
+      if (pChat->GetLocation() == pMsg->hLocation) {
+        pChat->OnParticipantDetailsChanged(pMsg->hParticipant, pMsg->vlKeys);
+      }
+    }
+  }
+}
+
+AP_MSG_HANDLER_METHOD(ChatModule, VpView_LocationDetailsChanged)
+{
+  for (ChatListNode* pChatNode = 0; (pChatNode = chats_.Next(pChatNode)) != 0; ) {
+    ChatWindow* pChat = pChatNode->Value();
+    if (pChat) {
+      if (pChat->GetLocation() == pMsg->hLocation) {
+        pChat->OnLocationDetailsChanged(pMsg->vlKeys);
+      }
+    }
+  }
 }
 
 //----------------------------------------------------------
@@ -152,8 +231,15 @@ int ChatModule::Init()
 
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ChatModule, ChatWindow_OpenForLocation, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ChatModule, ChatWindow_Close, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, ChatModule, Dialog_OnOpened, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ChatModule, Dialog_OnClosed, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, ChatModule, WebView_CallModuleSrpc, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ChatModule, ChatWindow_CallModule, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, ChatModule, VpView_ParticipantAdded, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, ChatModule, VpView_ParticipantRemoved, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, ChatModule, VpView_LocationPublicChat, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, ChatModule, VpView_LocationDetailsChanged, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, ChatModule, VpView_ParticipantDetailsChanged, this, ApCallbackPosNormal);
 
   srpcGateRegistry_.add("ChatWindow_OpenForLocation", SrpcGate_ChatWindow_OpenForLocation);
   srpcGateRegistry_.add("ChatWindow_Close", SrpcGate_ChatWindow_Close);
