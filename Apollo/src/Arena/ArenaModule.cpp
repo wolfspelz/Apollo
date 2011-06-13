@@ -441,23 +441,16 @@ AP_MSG_HANDLER_METHOD(ArenaModule, Animation_SequenceBegin)
 
 //----------------------------
 
-AP_SRPC_HANDLER_METHOD(ArenaModule, Arena_CallModule, ApSRPCMessage)
+AP_TYPEDMSG_HANDLER_METHOD(ArenaModule, Arena_CallModule, Msg_WebView_CallModuleSrpc)
 {
-  String sView = pMsg->srpc.getString("hView");
-  if (!sView) { throw ApException("Missing hView"); }
-
-  ApHandle hView = Apollo::string2Handle(sView);
-  if (!ApIsHandle(hView)) { throw ApException("Not a handle: view=%s", StringType(sView)); }
-
-  Display* pDisplay = GetDisplayOfHandle(hView);
+  Display* pDisplay = GetDisplayOfHandle(pMsg->hView);
   if (pDisplay) {
     pDisplay->OnCallModule(pMsg->srpc, pMsg->response);
+    pMsg->apStatus = ApMessage::Ok;
   }
-
-  pMsg->apStatus = ApMessage::Ok;
 }
 
-AP_SRPC_HANDLER_METHOD(ArenaModule, Navigator_CallDisplay, ApSRPCMessage)
+AP_TYPEDMSG_HANDLER_METHOD(ArenaModule, Navigator_CallDisplay, ApSRPCMessage)
 {
   String sContext = pMsg->srpc.getString("hContext");
   if (sContext) {

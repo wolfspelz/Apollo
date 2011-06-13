@@ -487,16 +487,29 @@ JSValueRef View::JS_Apollo_sendMessage(JSContextRef ctx, JSObjectRef function, J
     msg.hView = pView->apHandle();
     srpc >> msg.srpc;
 
-    // Custom message handlers just do the apStatus thing.
-    // They rely on someone else (us here) to fill msg.response.
     if (msg.Request()) {
-      msg.response.createResponse(msg.srpc);
-      //msg.response.set("Status", 1);
+      if (msg.response.getString("Status")) {
+        // Has response
+      } else {
+        msg.response.createResponse(msg.srpc);
+      }
     } else {
       msg.response.createError(msg.srpc, msg.sComment);
-      //msg.response.set("Status", 0);
-      //msg.response.set("Message", msg.sComment);
     }
+
+    //ApSRPCMessage msg(sType);
+    //srpc >> msg.srpc;
+
+    //// Custom message handlers just do the apStatus thing.
+    //// They rely on someone else (us here) to fill msg.response.
+    //if (msg.Call()) {
+    //  msg.response.createResponse(msg.srpc);
+    //  //msg.response.set("Status", 1);
+    //} else {
+    //  msg.response.createError(msg.srpc, msg.sComment);
+    //  //msg.response.set("Status", 0);
+    //  //msg.response.set("Message", msg.sComment);
+    //}
 
     sResponse = msg.response.toString();
 
