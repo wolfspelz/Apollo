@@ -483,12 +483,13 @@ JSValueRef View::JS_Apollo_sendMessage(JSContextRef ctx, JSObjectRef function, J
   if (sType) {
     // Supplied message type -> send SRPC with custom type
 
-    ApSRPCMessage msg(sType);
+    Msg_WebView_CallModuleSrpc msg(sType);
+    msg.hView = pView->apHandle();
     srpc >> msg.srpc;
 
     // Custom message handlers just do the apStatus thing.
     // They rely on someone else (us here) to fill msg.response.
-    if (msg.Call()) {
+    if (msg.Request()) {
       msg.response.createResponse(msg.srpc);
       //msg.response.set("Status", 1);
     } else {

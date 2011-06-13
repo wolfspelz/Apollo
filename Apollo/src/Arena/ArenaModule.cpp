@@ -493,7 +493,7 @@ AP_MSG_HANDLER_METHOD(ArenaModule, BrowserInfo_GetContextWin32Window)
 
 ApHandle Test_Avatar_RemoveOldPublicChats_hRemovedChat_;
 
-void Test_Avatar_RemoveOldPublicChats_DisplaySrpcMessage(DisplaySrpcMessage* pMsg)
+void Test_Avatar_RemoveOldPublicChats_ViewSrpcMessage(ViewSrpcMessage* pMsg)
 {
   if (pMsg->srpc.getString("Method") == "RemoveAvatarChat") {
     Test_Avatar_RemoveOldPublicChats_hRemovedChat_ = pMsg->srpc.getHandle("hChat");
@@ -505,10 +505,10 @@ static String Test_Avatar_RemoveOldPublicChats()
   String s;
 
   ArenaModule m;
-  Display d(&m, Apollo::newHandle());
+  Display d(&m, Apollo::newHandle()); d._SetView(ApHandle(765432, 145676543));
   Avatar a(&m, &d, Apollo::newHandle());
 
-  { DisplaySrpcMessage msg(&d, "Dummy"); msg.Hook(MODULE_NAME, (ApCallback) Test_Avatar_RemoveOldPublicChats_DisplaySrpcMessage, 0, ApCallbackPosEarly); }
+  { ViewSrpcMessage msg(&d, "Dummy"); msg.Hook(MODULE_NAME, (ApCallback) Test_Avatar_RemoveOldPublicChats_ViewSrpcMessage, 0, ApCallbackPosEarly); }
 
   ApHandle hChat2 = Apollo::newHandle();
   ApHandle hChat1 = Apollo::newHandle();
@@ -521,10 +521,10 @@ static String Test_Avatar_RemoveOldPublicChats()
   a.OnReceivePublicChat(hChat2, "Nickname2", "Text2", Apollo::TimeValue(2, 0));
 
   if (Test_Avatar_RemoveOldPublicChats_hRemovedChat_ != hChat1) {
-    s = "Did not remove oldest chat";
+    s = "Did not send remove oldest chat to view";
   }
 
-  { DisplaySrpcMessage msg(&d, "Dummy"); msg.Unhook(MODULE_NAME, (ApCallback) Test_Avatar_RemoveOldPublicChats_DisplaySrpcMessage, 0); }
+  { ViewSrpcMessage msg(&d, "Dummy"); msg.Unhook(MODULE_NAME, (ApCallback) Test_Avatar_RemoveOldPublicChats_ViewSrpcMessage, 0); }
 
   return s;
 }

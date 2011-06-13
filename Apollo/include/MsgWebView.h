@@ -177,6 +177,15 @@ public:
   ApOUT Apollo::SrpcMessage response;
 };
 
+class Msg_WebView_CallModuleSrpc: public ApRequestMessage
+{
+public:
+  Msg_WebView_CallModuleSrpc(const char* szType) : ApRequestMessage(szType) {}
+  ApIN ApHandle hView;
+  ApIN Apollo::SrpcMessage srpc;
+  ApOUT Apollo::SrpcMessage response;
+};
+
 class Msg_WebView_SetScriptAccessPolicy: public ApRequestMessage
 {
   #define Msg_WebView_SetScriptAccessPolicy_Denied "Denied"

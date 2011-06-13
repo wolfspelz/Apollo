@@ -168,6 +168,10 @@
 				RelativePath=".\dll.cpp"
 				>
 			</File>
+			<File
+				RelativePath=".\Participant.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -190,12 +194,32 @@
 				RelativePath=".\Local.h"
 				>
 			</File>
+			<File
+				RelativePath=".\Participant.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"
 			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
 			UniqueIdentifier="{6D24B475-582B-426e-B246-510B1F77B3AD}"
 			>
+		</Filter>
+		<Filter
+			Name="HTML"
+			>
+			<File
+				RelativePath="..\..\bin\Win32\Debug\modules\Chat\Chat.css"
+				>
+			</File>
+			<File
+				RelativePath="..\..\bin\Win32\Debug\modules\Chat\Chat.html"
+				>
+			</File>
+			<File
+				RelativePath="..\..\bin\Win32\Debug\modules\Chat\layout-default-latest.css"
+				>
+			</File>
 		</Filter>
 	</Files>
 	<Globals>

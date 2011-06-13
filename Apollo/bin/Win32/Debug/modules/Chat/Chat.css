@@ -7,7 +7,7 @@
   font-size:11px;
 }
 
-#ChatWindow
+#Wrapper
 {
   position:absolute;
   left:4px;
@@ -38,12 +38,14 @@
 
 #ChatIn
 {
+  padding:2px;
   position:absolute;
-  left:0px;
-  height:16px;
-  right:50px;
-  bottom:0px;
+  left:6px;
+  top:6px;
+  right:48px;
+  bottom:6px;
   background-color:#FFFFFF;
+  border: none;
 }
 
 #ChatSend
@@ -51,8 +53,12 @@
   position:absolute;
   width:40px;
   height:20px;
-  right:0px;
-  bottom:0px;
+  right:4px;
+  top:4px;
 }
 
+#ChatOut, #ParticipantList, #ChatIn
+{
+  background-color:rgba(255, 255, 255, 0.99);
+}
 

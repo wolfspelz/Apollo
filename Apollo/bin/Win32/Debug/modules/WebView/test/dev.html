@@ -1,14 +1,14 @@
 ﻿<html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-<script type="text/javascript" src="apollo.js"></script>
+<script type="text/javascript" src="../apollo.js"></script>
 
 <script type="text/javascript">
 function Elem(sId) { return document.getElementById(sId); }
 function SetText(sText) { Elem('iText').innerHTML = sText; }
 
 var api = new ApolloApi();
-api.moduleName = 'WebView';
+api.ModuleName('WebView');
 api.nMinWidth = 150;
 api.nMinHeight = 22;
 api.Init();

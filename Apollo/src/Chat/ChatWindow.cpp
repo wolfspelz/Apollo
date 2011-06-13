@@ -58,6 +58,31 @@ void ChatWindow::AttachToLocation(const ApHandle& hLocation)
   hLocation_ = hLocation;
 }
 
+//---------------------------------------------------
+
+void ChatWindow::OnLoaded()
+{
+  //ViewSrpcMessage vsm(this, "Start");
+
+  { Msg_VpView_SubscribeLocationDetail msg; msg.hLocation = hLocation_; msg.sKey = Msg_VpView_LocationDetail_State; msg.Request(); }
+  { Msg_VpView_GetLocationDetail msg; msg.hLocation = hLocation_; msg.sKey = Msg_VpView_LocationDetail_State; if (msg.Request()) { ShowLocationDetailState(msg.sValue); } }
+
+  {
+    Msg_VpView_GetParticipants msg;
+    msg.hLocation = hLocation_;
+    if (!msg.Request()) {
+      apLog_Warning((LOG_CHANNEL, "ChatWindow::StartDisplay", "% failed: %s", StringType(msg.Type()), StringType(msg.sComment)));
+    } else {
+      for (Apollo::ValueElem* e = 0; e = msg.vlParticipants.nextElem(e); ) {
+        ApHandle hParticipant = e->getHandle();
+        OnParticipantAdded(hParticipant, hParticipant == msg.hSelf);
+      }
+    }
+  }
+}
+
+//---------------------------------------------------
+
 void ChatWindow::OnUnload()
 {
   Msg_Vp_DestroyContext msg;
@@ -84,3 +109,69 @@ void ChatWindow::OnCallModule(Apollo::SrpcMessage& request, Apollo::SrpcMessage&
   }
 }
 
+void ChatWindow::OnParticipantAdded(const ApHandle& hParticipant, int bSelf)
+{
+  if (participants_.Find(hParticipant) == 0) {
+    Participant* pParticipant = new Participant(pModule_, this, hParticipant, bSelf);
+    if (pParticipant) {
+      participants_.Set(hParticipant, pParticipant);
+      pParticipant->Create();
+    }
+  }
+}
+
+void ChatWindow::OnParticipantRemoved(const ApHandle& hParticipant)
+{
+  ParticipantListNode* pNode = participants_.Find(hParticipant);
+  if (pNode != 0) {
+    Participant* pParticipant = pNode->Value();
+    participants_.Unset(hParticipant);
+    if (pParticipant) {
+      pParticipant->Destroy();
+      delete pParticipant;
+      pParticipant = 0;
+    }
+  }
+}
+
+void ChatWindow::OnParticipantDetailsChanged(const ApHandle& hParticipant, Apollo::ValueList& vlKeys)
+{
+  ParticipantListNode* pNode = participants_.Find(hParticipant);
+  if (pNode) {
+    Participant* pParticipant = pNode->Value();
+    pParticipant->OnDetailsChanged(vlKeys);
+  }
+}
+
+void ChatWindow::OnReceivePublicChat(const ApHandle& hParticipant, const ApHandle& hChat, const String& sNickname, const String& sText, const Apollo::TimeValue& tv)
+{
+  ParticipantListNode* pNode = participants_.Find(hParticipant);
+  if (pNode) {
+    Participant* pParticipant = pNode->Value();
+    pParticipant->OnReceivePublicChat(hChat, sNickname, sText, tv);
+  }
+}
+
+void ChatWindow::OnLocationDetailsChanged(Apollo::ValueList& vlKeys)
+{
+  Msg_VpView_GetLocationDetail msg;
+  msg.hLocation = hLocation_;
+
+  for (Apollo::ValueElem* e = 0; e = vlKeys.nextElem(e); ) {
+    msg.sKey = e->getString();
+
+    if (0) {
+    } else if (e->getString() == Msg_VpView_LocationDetail_State) {
+      if (msg.Request()) {
+        ShowLocationDetailState(msg.sValue);
+      }
+    }
+  }
+}
+
+// ----------------------------------
+
+void ChatWindow::ShowLocationDetailState(const String& sValue)
+{
+  //ViewSrpcMessage vsm(this, "SetLocationState");
+}

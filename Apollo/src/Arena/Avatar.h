@@ -95,9 +95,9 @@ protected:
   String sAttachedIcon_;
   String sAttachedIconName_;
 
-  Apollo::ValueList noMimeTypes_;
-  Apollo::ValueList avatarMimeTypes_;
-  Apollo::ValueList imageMimeTypes_;
+  static Apollo::ValueList noMimeTypes_;
+  static Apollo::ValueList avatarMimeTypes_;
+  static Apollo::ValueList imageMimeTypes_;
 
   ApHandle hAnimatedItem_;
   ChatlineList chats_;
@@ -106,8 +106,6 @@ protected:
   int nX_;
   int nPositionConfirmed_;
   int bMoving_;
-
-  ApHandle hView_;
 };
 
 #endif // Avatar_H_INCLUDED

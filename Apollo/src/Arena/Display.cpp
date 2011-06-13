@@ -76,12 +76,16 @@ int Display::Create()
 
 void Display::Destroy()
 {
-  pModule_->DeleteContextOfHandle(hView_, hContext_);
+  if (ApIsHandle(hView_) && ApIsHandle(hContext_)) {
+    pModule_->DeleteContextOfHandle(hView_, hContext_);
+  }
 
-  Msg_WebView_Destroy msg;
-  msg.hView = hView_;
-  if (!msg.Request()) {
-    apLog_Error((LOG_CHANNEL, "Display::Destroy", "Msg_WebView_Destroy(" ApHandleFormat ") failed", ApHandleType(msg.hView)));
+  if (ApIsHandle(hView_)) {
+    Msg_WebView_Destroy msg;
+    msg.hView = hView_;
+    if (!msg.Request()) {
+      apLog_Error((LOG_CHANNEL, "Display::Destroy", "Msg_WebView_Destroy(" ApHandleFormat ") failed", ApHandleType(msg.hView)));
+    }
   }
 }
 
@@ -134,11 +138,13 @@ void Display::SetSize(int nWidth, int nHeight)
 
 void Display::SendVisibility()
 {
-  Msg_WebView_Visibility msg;
-  msg.hView = hView_;
-  msg.bVisible = bVisible_;
-  if (!msg.Request()) {
-    apLog_Error((LOG_CHANNEL, "Display::SendVisibility", "Msg_WebView_Visibility(" ApHandleFormat ") failed", ApHandleType(msg.hView)));
+  if (ApIsHandle(hView_)) {
+    Msg_WebView_Visibility msg;
+    msg.hView = hView_;
+    msg.bVisible = bVisible_;
+    if (!msg.Request()) {
+      apLog_Error((LOG_CHANNEL, "Display::SendVisibility", "Msg_WebView_Visibility(" ApHandleFormat ") failed", ApHandleType(msg.hView)));
+    }
   }
 }
 
@@ -156,14 +162,16 @@ void Display::SendPosition()
     nExtendBottom += Apollo::getModuleConfig(MODULE_NAME, "Debug/Bottom", 0);
   }
 
-  Msg_WebView_Position msg;
-  msg.hView = hView_;
-  msg.nLeft = nLeft_ - nExtendLeft;
-  msg.nTop = nBottom_ - nHeight_ - nExtendTop;
-  msg.nWidth = nWidth_ + (nExtendLeft + nExtendRight);
-  msg.nHeight = nHeight_ + (nExtendTop + nExtendBottom);
-  if (!msg.Request()) {
-    apLog_Error((LOG_CHANNEL, "Display::SendPosition", "Msg_WebView_Position(" ApHandleFormat ") failed", ApHandleType(msg.hView)));
+  if (ApIsHandle(hView_)) {
+    Msg_WebView_Position msg;
+    msg.hView = hView_;
+    msg.nLeft = nLeft_ - nExtendLeft;
+    msg.nTop = nBottom_ - nHeight_ - nExtendTop;
+    msg.nWidth = nWidth_ + (nExtendLeft + nExtendRight);
+    msg.nHeight = nHeight_ + (nExtendTop + nExtendBottom);
+    if (!msg.Request()) {
+      apLog_Error((LOG_CHANNEL, "Display::SendPosition", "Msg_WebView_Position(" ApHandleFormat ") failed", ApHandleType(msg.hView)));
+    }
   }
 }
 
@@ -204,10 +212,6 @@ void Display::OnEnterRequested()
   apLog_Verbose((LOG_CHANNEL, "Display::OnEnterRequested", "ctxt=" ApHandleFormat " loc=" ApHandleFormat "", ApHandleType(hContext_), ApHandleType(hLocation_)));
 
   tvEnterRequested_ = Apollo::TimeValue::getTime();
-
-  //DisplaySrpcMessage dsm(this, "SetLocationState");
-  //dsm.srpc.set("sState", "EnterRequested");
-  //dsm.Request();
 }
 
 void Display::OnEnterBegin()
@@ -215,17 +219,13 @@ void Display::OnEnterBegin()
   apLog_Verbose((LOG_CHANNEL, "Display::OnEnterBegin", "ctxt=" ApHandleFormat " loc=" ApHandleFormat "", ApHandleType(hContext_), ApHandleType(hLocation_)));
 
   tvEnterBegin_ = Apollo::TimeValue::getTime();
-
-  //DisplaySrpcMessage dsm(this, "SetLocationState");
-  //dsm.srpc.set("sState", "EnterBegin");
-  //dsm.Request();
 }
 
 void Display::OnEnterComplete()
 {
   apLog_Verbose((LOG_CHANNEL, "Display::OnEnterComplete", "ctxt=" ApHandleFormat " loc=" ApHandleFormat "", ApHandleType(hContext_), ApHandleType(hLocation_)));
 
-  {
+  if (ApIsHandle(hLocation_)) {
     ApAsyncMessage<Msg_VpView_ReplayLocationPublicChat> msg;
     msg->hLocation = hLocation_;
     //msg->nMaxAge;
@@ -233,10 +233,6 @@ void Display::OnEnterComplete()
     //msg->nMaxData;
     msg->PostAsync();
   }
-
-  //DisplaySrpcMessage dsm(this, "SetLocationState");
-  //dsm.srpc.set("sState", "EnterComplete");
-  //dsm.Request();
 }
 
 void Display::OnLeaveRequested()
@@ -244,10 +240,6 @@ void Display::OnLeaveRequested()
   apLog_Verbose((LOG_CHANNEL, "Display::OnLeaveRequested", "ctxt=" ApHandleFormat " loc=" ApHandleFormat "", ApHandleType(hContext_), ApHandleType(hLocation_)));
 
   tvLeaveRequested_ = Apollo::TimeValue::getTime();
-
-  //DisplaySrpcMessage msg(this, "SetLocationState");
-  //msg.srpc.set("sState", "LeaveRequested");
-  //msg.Request();
 }
 
 void Display::OnLeaveBegin()
@@ -255,19 +247,11 @@ void Display::OnLeaveBegin()
   apLog_Verbose((LOG_CHANNEL, "Display::OnLeaveBegin", "ctxt=" ApHandleFormat " loc=" ApHandleFormat "", ApHandleType(hContext_), ApHandleType(hLocation_)));
 
   tvLeaveBegin_ = Apollo::TimeValue::getTime();
-
-  //DisplaySrpcMessage dsm(this, "SetLocationState");
-  //dsm.srpc.set("sState", "LeaveBegin");
-  //dsm.Request();
 }
 
 void Display::OnLeaveComplete()
 {
   apLog_Verbose((LOG_CHANNEL, "Display::OnLeaveComplete", "ctxt=" ApHandleFormat " loc=" ApHandleFormat "", ApHandleType(hContext_), ApHandleType(hLocation_)));
-
-  //DisplaySrpcMessage dsm(this, "SetLocationState");
-  //dsm.srpc.set("sState", "LeaveComplete");
-  //dsm.Request();
 }
 
 //---------------------------------------------------
@@ -325,11 +309,13 @@ void Display::OnCallModule(Apollo::SrpcMessage& request, Apollo::SrpcMessage& re
 
     } else if (sMethod == "SendPublicChat") {
       String sText = request.getString("sText");
-      if (sText){
-        Msg_Vp_SendPublicChat msg;
-        msg.hLocation = hLocation_;
-        msg.sText = sText;
-        if (!msg.Request()) { throw ApException("Msg_Vp_SendPublicChat failed  loc=" ApHandleFormat "", ApHandleType(hLocation_)); }
+      if (sText) {
+        if (ApIsHandle(hLocation_)) {
+          Msg_Vp_SendPublicChat msg;
+          msg.hLocation = hLocation_;
+          msg.sText = sText;
+          if (!msg.Request()) { throw ApException("Msg_Vp_SendPublicChat failed  loc=" ApHandleFormat "", ApHandleType(hLocation_)); }
+        }
       }
 
     } else {
@@ -356,9 +342,9 @@ void Display::OnShowDebug(int bShow)
 
   if (bDebug_){
     SendPosition();
-    DisplaySrpcMessage msg(this, "ShowDebug"); msg.srpc.set("bShow", bDebug_); msg.Request();
+    ViewSrpcMessage vsm(this, "ShowDebug"); vsm.srpc.set("bShow", bDebug_); vsm.Request();
   } else { // Same, but different order
-    DisplaySrpcMessage msg(this, "ShowDebug"); msg.srpc.set("bShow", bDebug_); msg.Request();
+    ViewSrpcMessage vsm(this, "ShowDebug"); vsm.srpc.set("bShow", bDebug_); vsm.Request();
     SendPosition();
   }
 
@@ -403,16 +389,16 @@ void Display::OnContextDetailsChanged(Apollo::ValueList& vlKeys)
 
 void Display::ShowContextDetailDocumentUrl(const String& sValue)
 {
-  DisplaySrpcMessage dsm(this, "SetDocumentUrl");
-  dsm.srpc.set("sUrl", sValue);
-  dsm.Request();
+  ViewSrpcMessage vsm(this, "SetDocumentUrl");
+  vsm.srpc.set("sUrl", sValue);
+  vsm.Request();
 }
 
 void Display::ShowContextDetailLocationUrl(const String& sValue)
 {
-  DisplaySrpcMessage dsm(this, "SetLocationUrl");
-  dsm.srpc.set("sUrl", sValue);
-  dsm.Request();
+  ViewSrpcMessage vsm(this, "SetLocationUrl");
+  vsm.srpc.set("sUrl", sValue);
+  vsm.Request();
 }
 
 //---------------------------------------------------
@@ -436,9 +422,9 @@ void Display::OnLocationDetailsChanged(Apollo::ValueList& vlKeys)
 
 void Display::ShowLocationDetailState(const String& sValue)
 {
-  DisplaySrpcMessage dsm(this, "SetLocationState");
-  dsm.srpc.set("sState", sValue);
-  dsm.Request();
+  ViewSrpcMessage vsm(this, "SetLocationState");
+  vsm.srpc.set("sState", sValue);
+  vsm.Request();
 }
 
 //---------------------------------------------------
@@ -459,8 +445,8 @@ void Display::OnViewUnload()
 
 void Display::StartDisplay()
 {
-  DisplaySrpcMessage dsm(this, "Start");
-  dsm.Request();
+  ViewSrpcMessage vsm(this, "Start");
+  vsm.Request();
 
   OnShowDebug(bDebug_);
 
@@ -603,9 +589,18 @@ void Display::ResetLocationInfo()
 
 //---------------------------------------------------
 
-DisplaySrpcMessage::DisplaySrpcMessage(Display* pDisplay, const String& sMethod)
+ViewSrpcMessage::ViewSrpcMessage(Display* pDisplay, const String& sMethod)
 {
   srpc.set("Method", sMethod);
   hView = pDisplay->GetView();
   sFunction = Apollo::getModuleConfig(MODULE_NAME, "CallScriptSrpcFunctionName", "receiveSrpcMessageAsString");
+}
+
+int ViewSrpcMessage::Request()
+{
+  if (ApIsHandle(hView)) {
+    return base::Request();
+  } else {
+    return 0;
+  }
 }

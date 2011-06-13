@@ -7,10 +7,13 @@
 #include "Apollo.h"
 #include "MsgVpView.h"
 #include "MsgAnimation.h"
-#include "ColorString.h"
 #include "Local.h"
 #include "Avatar.h"
 #include "ArenaModule.h"
+
+Apollo::ValueList Avatar::noMimeTypes_;
+Apollo::ValueList Avatar::avatarMimeTypes_;
+Apollo::ValueList Avatar::imageMimeTypes_;
 
 Avatar::Avatar(ArenaModule* pModule, Display* pDisplay, const ApHandle& hParticipant)
 :pModule_(pModule)
@@ -21,21 +24,25 @@ Avatar::Avatar(ArenaModule* pModule, Display* pDisplay, const ApHandle& hPartici
 ,nPositionConfirmed_(0)
 ,bMoving_(0)
 {
-  avatarMimeTypes_.add("avatar/gif");
+  if (avatarMimeTypes_.length() == 0) {
+    avatarMimeTypes_.add("avatar/gif");
+  }
 
-  imageMimeTypes_.add("image/gif");
-  imageMimeTypes_.add("image/png");
-  imageMimeTypes_.add("image/jpeg");
-  imageMimeTypes_.add("image/jpg");
+  if (imageMimeTypes_.length() == 0) {
+    imageMimeTypes_.add("image/gif");
+    imageMimeTypes_.add("image/png");
+    imageMimeTypes_.add("image/jpeg");
+    imageMimeTypes_.add("image/jpg");
+  }
 }
 
 void Avatar::Create(int bSelf)
 {
-  DisplaySrpcMessage dsm(pDisplay_, "AddAvatar");
-  dsm.srpc.set("hParticipant", hParticipant_);
-  dsm.srpc.set("bSelf", bSelf);
-  dsm.srpc.set("nX", nX_);
-  dsm.Request();
+  ViewSrpcMessage vsm(pDisplay_, "AddAvatar");
+  vsm.srpc.set("hParticipant", hParticipant_);
+  vsm.srpc.set("bSelf", bSelf);
+  vsm.srpc.set("nX", nX_);
+  vsm.Request();
 
   SubscribeAndGetDetail(Msg_VpView_ParticipantDetail_Nickname);
   SubscribeAndGetDetail(Msg_VpView_ParticipantDetail_Image);
@@ -89,9 +96,9 @@ void Avatar::Destroy()
     }
   }
 
-  DisplaySrpcMessage dsm(pDisplay_, "RemoveAvatar");
-  dsm.srpc.set("hParticipant", hParticipant_);
-  dsm.Request();
+  ViewSrpcMessage vsm(pDisplay_, "RemoveAvatar");
+  vsm.srpc.set("hParticipant", hParticipant_);
+  vsm.Request();
 }
 
 void Avatar::SubscribeAndGetDetail(const String& sKey)
@@ -615,79 +622,79 @@ void Avatar::DeletePublicChat(const ApHandle& hChat)
 
 void Avatar::DisplaySetNickname(const String& sNickname)
 {
-  DisplaySrpcMessage dsm(pDisplay_, "SetAvatarNickname");
-  dsm.srpc.set("hParticipant", hParticipant_);
-  dsm.srpc.set("sNickname", sNickname);
-  dsm.Request();
+  ViewSrpcMessage vsm(pDisplay_, "SetAvatarNickname");
+  vsm.srpc.set("hParticipant", hParticipant_);
+  vsm.srpc.set("sNickname", sNickname);
+  vsm.Request();
 }
 
 void Avatar::DisplaySetImage(const String& sUrl)
 {
-  DisplaySrpcMessage dsm(pDisplay_, "SetAvatarImage");
-  dsm.srpc.set("hParticipant", hParticipant_);
-  dsm.srpc.set("sUrl", sUrl);
-  dsm.Request();
+  ViewSrpcMessage vsm(pDisplay_, "SetAvatarImage");
+  vsm.srpc.set("hParticipant", hParticipant_);
+  vsm.srpc.set("sUrl", sUrl);
+  vsm.Request();
 }
 
 void Avatar::DisplaySetCommunityAttachment(const String& sUrl, const String& sLabel, const String& sLink)
 {
-  DisplaySrpcMessage dsm(pDisplay_, "SetCommunityAttachment");
-  dsm.srpc.set("hParticipant", hParticipant_);
-  dsm.srpc.set("sUrl", sUrl);
-  dsm.srpc.set("sLabel", sLabel);
-  dsm.srpc.set("sLink", sLink);
-  dsm.Request();
+  ViewSrpcMessage vsm(pDisplay_, "SetCommunityAttachment");
+  vsm.srpc.set("hParticipant", hParticipant_);
+  vsm.srpc.set("sUrl", sUrl);
+  vsm.srpc.set("sLabel", sLabel);
+  vsm.srpc.set("sLink", sLink);
+  vsm.Request();
 }
 
 void Avatar::DisplaySetIconAttachment(const String& sUrl, const String& sLabel)
 {
-  DisplaySrpcMessage dsm(pDisplay_, "SetIconAttachment");
-  dsm.srpc.set("hParticipant", hParticipant_);
-  dsm.srpc.set("sUrl", sUrl);
-  dsm.srpc.set("sLabel", sLabel);
-  dsm.Request();
+  ViewSrpcMessage vsm(pDisplay_, "SetIconAttachment");
+  vsm.srpc.set("hParticipant", hParticipant_);
+  vsm.srpc.set("sUrl", sUrl);
+  vsm.srpc.set("sLabel", sLabel);
+  vsm.Request();
 }
 
 void Avatar::DisplaySetOnlineStatus(const String& sStatus)
 {
-  DisplaySrpcMessage dsm(pDisplay_, "SetOnlineStatus");
-  dsm.srpc.set("hParticipant", hParticipant_);
-  dsm.srpc.set("sStatus", sStatus);
-  dsm.Request();
+  ViewSrpcMessage vsm(pDisplay_, "SetOnlineStatus");
+  vsm.srpc.set("hParticipant", hParticipant_);
+  vsm.srpc.set("sStatus", sStatus);
+  vsm.Request();
 }
 
 void Avatar::DisplayAddChatline(const ApHandle& hChat, const String& sText)
 {
-  DisplaySrpcMessage dsm(pDisplay_, "AddAvatarChat");
-  dsm.srpc.set("hParticipant", hParticipant_);
-  dsm.srpc.set("hChat", hChat);
-  dsm.srpc.set("sText", sText);
-  dsm.Request();
+  ViewSrpcMessage vsm(pDisplay_, "AddAvatarChat");
+  vsm.srpc.set("hParticipant", hParticipant_);
+  vsm.srpc.set("hChat", hChat);
+  vsm.srpc.set("sText", sText);
+  vsm.Request();
 }
 
 void Avatar::DisplaySetChatline(const ApHandle& hChat, const String& sText)
 {
-  DisplaySrpcMessage dsm(pDisplay_, "SetAvatarChat");
-  dsm.srpc.set("hParticipant", hParticipant_);
-  dsm.srpc.set("hChat", hChat);
-  dsm.srpc.set("sText", sText);
-  dsm.Request();
+  ViewSrpcMessage vsm(pDisplay_, "SetAvatarChat");
+  vsm.srpc.set("hParticipant", hParticipant_);
+  vsm.srpc.set("hChat", hChat);
+  vsm.srpc.set("sText", sText);
+  vsm.Request();
 }
 
 void Avatar::DisplayRemoveChatline(const ApHandle& hChat)
 {
-  DisplaySrpcMessage dsm(pDisplay_, "RemoveAvatarChat");
-  dsm.srpc.set("hParticipant", hParticipant_);
-  dsm.srpc.set("hChat", hChat);
-  dsm.Request();
+  ViewSrpcMessage vsm(pDisplay_, "RemoveAvatarChat");
+  vsm.srpc.set("hParticipant", hParticipant_);
+  vsm.srpc.set("hChat", hChat);
+  vsm.Request();
 }
 
 void Avatar::DisplaySetAvatarPosition(int nDestX)
 {
-  DisplaySrpcMessage dsm(pDisplay_, "SetAvatarPosition");
-  dsm.srpc.set("hParticipant", hParticipant_);
-  dsm.srpc.set("nX", nDestX);
-  dsm.Request();
+  ViewSrpcMessage vsm(pDisplay_, "SetAvatarPosition");
+  vsm.srpc.set("hParticipant", hParticipant_);
+  vsm.srpc.set("nX", nDestX);
+  vsm.Request();
 }
 
 void Avatar::DisplayMoveAvatarPosition(int nDestX)
@@ -723,9 +730,9 @@ void Avatar::DisplayMoveAvatarPosition(int nDestX)
 
   }
 
-  DisplaySrpcMessage dsm(pDisplay_, "MoveAvatarPosition");
-  dsm.srpc.set("hParticipant", hParticipant_);
-  dsm.srpc.set("nX", nDestX);
-  dsm.srpc.set("nSpeedX", nSpeedX);
-  dsm.Request();
+  ViewSrpcMessage vsm(pDisplay_, "MoveAvatarPosition");
+  vsm.srpc.set("hParticipant", hParticipant_);
+  vsm.srpc.set("nX", nDestX);
+  vsm.srpc.set("nSpeedX", nSpeedX);
+  vsm.Request();
 }
