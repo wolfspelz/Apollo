@@ -2,17 +2,14 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-<!--script type="text/javascript" src="jquery-1.4.2.min.js"></script-->
-<script src="jquery-ui-1.8.13.custom/js/jquery-1.5.1.min.js"></script> 
-<script src="jquery-ui-1.8.13.custom/js/jquery-ui-1.8.13.custom.min.js"></script> 
+<script src="../WebView/jquery-1.5.1.min.js"></script> 
+<script src="../WebView/jquery-ui-1.8.13.custom.min.js"></script> 
 <script type="text/javascript" src="utils.js"></script>
-<script type="text/javascript" src="apollo.js"></script>
+<script type="text/javascript" src="../WebView/apollo.js"></script>
 <script type="text/javascript" src="arena.js"></script>
 <link rel='stylesheet' href='arena.css' type='text/css' media='all' />
 
 <script type="text/javascript">
-function Eval(sText) { eval(sText); }
-
 function ReceiveMessage(sMsg)
 {
   return api.OnReceiveMessage(sMsg);
@@ -22,6 +19,9 @@ function DispatchMessage(msg)
 {
   var sMethod = msg.getString('Method');
   switch (sMethod) {
+    case 'Start': return Start(); break;
+    case 'ShowDebug': return ShowDebug(msg.getInt('bShow')); break;
+
     case 'AddAvatar': return arena.AddAvatar(msg.getString('hParticipant'), msg.getInt('bSelf'), msg.getInt('nX')); break;
     case 'RemoveAvatar': return arena.RemoveAvatar(msg.getString('hParticipant')); break;
     case 'ShowAvatar': return arena.ShowAvatar(msg.getString('hParticipant')); break;
@@ -48,37 +48,51 @@ function DispatchMessage(msg)
 
 function RunUnittest()
 {
-    var t = new Unittest();
-    t.Add('Unittest.SuccessTest', Unittest.SuccessTest);
-    //t.Add('Unittest.FailedTest', Unittest.FailedTest);
-    //t.Add('Unittest.ExceptionTest', Unittest.ExceptionTest);
-    t.Add('Observable Basic', Observable_Tester.Basic);
-    t.Add('Observable Remove', Observable_Tester.Remove);
-    t.Add('Observable Serialize', Observable_Tester.Serialize);
-    t.Add('String.toDomCompatible', String_Tester.toDomCompatible);
+  var t = new Unittest();
+  t.Add('Unittest.SuccessTest', Unittest.SuccessTest);
+  //t.Add('Unittest.FailedTest', Unittest.FailedTest);
+  //t.Add('Unittest.ExceptionTest', Unittest.ExceptionTest);
+  t.Add('Observable Basic', Observable_Tester.Basic);
+  t.Add('Observable Remove', Observable_Tester.Remove);
+  t.Add('Observable Serialize', Observable_Tester.Serialize);
+  t.Add('String.toDomCompatible', String_Tester.toDomCompatible);
 
-    t.Run();
+  t.Run();
 }
 
-  var api = new ApolloApi();
-  api.moduleName = 'Arena';
-  api.OnDispatchMessage = DispatchMessage;
-  api.Init();
+function Start()
+{  
+  var bMeta = api.Message('Config_GetValue').setString('sPath', 'Arena/ShowMetaInformation').send().getInt('sValue');
 
-  var logger = Log.GetInstance('iOut', 'iLogCheck');
-  Log.instance.SetLevel(Log.Level.VERBOSE);
-  Log.instance.Clear();
+  arena = new Arena('iContent');
+  arena.Startup(bMeta);
+}
 
-  ApMessage.prototype.onLog = Log.IO;
+function ShowDebug(bShow)
+{
+  if (bShow){
+    $('#iContent').css('right', '800px');
+    $('#iControl').css('display', '');
+    $('#iOut').css('display', '');
+    $('#iLogCheck').attr('checked', 'checked');
+  } else {
+    $('#iContent').css('right', '100px');
+    $('#iControl').css('display', 'none');
+    $('#iOut').css('display', 'none');
+    $('#iLogCheck').attr('checked', '');
+  }
+}
 
-  $(document).ready(
-    function () {
-      arena = new Arena('iContent');
-      arena.Startup();
-      
-      //TranslateAll();
-    }
-  );
+var api = new ApolloApi();
+api.ModuleName('Arena');
+api.OnDispatchMessage = DispatchMessage;
+api.Init();
+
+var logger = Log.GetInstance('iOut', 'iLogCheck');
+Log.instance.SetLevel(Log.Level.VERBOSE);
+Log.instance.Clear();
+
+ApMessage.prototype.onLog = Log.IO;
 </script>
 
 <style type="text/css">
@@ -96,13 +110,13 @@ body
 
 #iContent
 {
-  position:absolute; left:100px; right:800px; top:0px; bottom:0px;
+  position:absolute; left:100px; right:100px; top:0px; bottom:0px;
   x-webkit-box-shadow:inset 0 0 1px 1px #0000FF;
 }
 
 #iControl
 {
-  position:absolute; right:600px; width:194px; top:0px; bottom:0px;
+  position:absolute; right:600px; width:190px; top:0px; bottom:0px;
   overflow:auto;
   background-color:rgba(255,255,204,0.7);
   border:1px solid #a0a0a0;
@@ -126,20 +140,22 @@ body
 
   <div id="iContent" class="cContent"></div>
 
-  <div id="iControl">
-    <input type="button" value="Quit" onclick="api.Message('MainLoop_EndLoop').send();"/>
-    <input type="button" value="Unittest" onclick="RunUnittest();"/>
-    <input type="checkbox" id="iLogCheck" checked="checked"/><label for="iLogCheck">Logging</label>
+  <div id="iControl" style="display:none;">
+    <input type="button" value="Quit" onclick="api.Message('MainLoop_EndLoop').send();" />
+    <input type="button" value="Hide" onclick="api.ModuleCall('OnShowDebug').setInt('bShow', 0).send();" />
+    <input type="button" value="Unittest" onclick="RunUnittest();" />
+    <input type="checkbox" id="iLogCheck" checked="checked" /><label for="iLogCheck">Logging</label>
     <input type="button" value="Clear" onclick="Log.instance.Clear();" />
     <br/>
     <input type="button" value="Disconnect" onclick="api.Message('Xmpp_Disconnect').send();" />
-    <input type="button" value="Reload" onclick="document.location.reload();" />
+    <input type="button" value="Reload" onclick="api.Message('WebView_Reload').send();" />
     <input type="button" value="Connect" onclick="api.Message('Xmpp_Connect').send();" />
-    <textarea id="iCmdLine" style="width:190px; height:100px; resize:auto;"/>Log.Debug('xx');</textarea>
+    <input type="button" value="Chat" onclick="api.ModuleCall('OnShowChat').setInt('bShow', 1).send();" />
+    <textarea id="iCmdLine" style="width:190px; height:100px; resize:auto;" />Log.Debug('xx');</textarea>
     <input type="button" value="Eval" onclick="eval(document.getElementById('iCmdLine').value);" />
   </div>
 
-  <div id="iOut"></div>
+  <div id="iOut" style="display:none;"></div>
 
 </div>
 </body>

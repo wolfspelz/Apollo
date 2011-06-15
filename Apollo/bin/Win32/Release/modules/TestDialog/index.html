@@ -38,8 +38,7 @@ input[type="text"] { border:1px solid #808080; }
 
   function TabPosition()
   {
-    api.Message('TabPosition')
-      .setString('ApType', 'TestDialog_Control')
+    api.ModuleCall('TabPosition')
       .setString('sTab', Elem('iTab').value)
       .setInt('nLeft', Elem('iLeft').value)
       .setInt('nBottom', parseInt(Elem('iTop').value) + parseInt(Elem('iHeight').value))
@@ -50,8 +49,7 @@ input[type="text"] { border:1px solid #808080; }
 
   function TabNavigate()
   {
-    api.Message('TabNavigate')
-      .setString('ApType', 'TestDialog_Control')
+    api.ModuleCall('TabNavigate')
       .setString('sTab', Elem('iTab').value)
       .setString('sUrl', Elem('iUrl').value)
       .send();
@@ -59,16 +57,14 @@ input[type="text"] { border:1px solid #808080; }
   
   function TabSelect()
   {
-    api.Message('TabSelect')
-      .setString('ApType', 'TestDialog_Control')
+    api.ModuleCall('TabSelect')
       .setString('sTab', Elem('iTab').value)
       .send();
   }
 
   function TabClose()
   {
-    api.Message('TabClose')
-      .setString('ApType', 'TestDialog_Control')
+    api.ModuleCall('TabClose')
       .setString('sTab', Elem('iTab').value)
       .send();
   }
@@ -94,7 +90,7 @@ input[type="text"] { border:1px solid #808080; }
   <p>
     Left: <input id="iLeft" type="text" size="4" value="50" />
     Top: <input id="iTop" type="text" size="4" value="300" />
-    Width: <input id="iWidth" type="text" size="4" value="1300" />
+    Width: <input id="iWidth" type="text" size="4" value="600" />
     Height: <input id="iHeight" type="text" size="4" value="300" />
     <br />
     URL: <input id="iUrl" type="text" size="40" value="http://openvirtualworld.blogspot.com/" />

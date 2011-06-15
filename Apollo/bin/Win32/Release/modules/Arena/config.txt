@@ -1,10 +1,19 @@
-DisplayHtml=file://[[MODULE_RESOURCE_PATH]]/arena.html
+File=file://[[MODULE_RESOURCE_PATH]]/arena.html
+
+Extend/Left=100
+Extend/Right=100
+Extend/Top=0
+Extend/Bottom=0
+
+Debug/Left=0
+Debug/Right=700
+Debug/Top=0
+Debug/Bottom=0
+
 CallScriptSrpcFunctionName=ReceiveMessage
 
-HtmlExtendLeft=100
-HtmlExtendRight=800
-HtmlExtendTop=0
-HtmlExtendBottom=0
+#ShowDebugInterface=1
+#ShowMetaInformation=1
 
 Language/en=[[MODULE_RESOURCE_PATH]]/en.txt
 Language/de=[[MODULE_RESOURCE_PATH]]/de.txt
