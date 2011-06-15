@@ -39,7 +39,7 @@ function LimitChat(sText, nMaxLength)
   }
   return sNewText;
 }
-  
+
 // -------------------------------------------
 
 function Arena(sDomId)
@@ -49,16 +49,18 @@ function Arena(sDomId)
 
 Arena.prototype = {
 
-  Startup: function()
+  Startup: function(bShowMeta)
   {
-    $('#' + arena.sDomId).append(''
-      + '<div id="iMeta">'
-      + '  <div class="cTranslate">Hello World</div>'
-      + '  <div id="iDocumentUrl"></div>'
-      + '  <div id="iLocationUrl"></div>'
-      + '  <div id="iLocationState"></div>'
-      + '</div>'
-    );
+    if (bShowMeta) {
+      $('#' + arena.sDomId).append(''
+        + '<div id="iMeta">'
+        + '  <div class="cTranslate">Hello World</div>'
+        + '  <div id="iDocumentUrl"></div>'
+        + '  <div id="iLocationUrl"></div>'
+        + '  <div id="iLocationState"></div>'
+        + '</div>'
+      );
+    }
   },
 
   // --------------------------------------
@@ -160,17 +162,17 @@ Arena.prototype = {
 
   SetAvatarImage: function (hParticipant, sUrl)
   {
-//    var img = new Image()
-//    img.onload = function() {
-//      $('#' + GetParticipantDomId(hParticipant) + ' .cImage').css('background-image', 'url(' + sUrl + ')');
-//    }
-//    img.src = sUrl;
+    var img = new Image()
+    img.onload = function() {
+      $('#' + GetParticipantDomId(hParticipant) + ' .cImage').css('background-image', 'url(' + sUrl + ')');
+    }
+    img.src = sUrl;
     
     // Set directly
-    // Disadvantage: might be empty=invisible, because takes time to load
+    // Disadvantage: might be temporarily empty=invisible, because takes time to load -> flickers sometimes
     // Advantage: idle won't overtake move animation, because move takes longer to load, 
     // thus is set later and won't be reset to idle after short movements.
-    $('#' + GetParticipantDomId(hParticipant) + ' .cImage').css('background-image', 'url(' + sUrl + ')');
+//    $('#' + GetParticipantDomId(hParticipant) + ' .cImage').css('background-image', 'url(' + sUrl + ')');
   },
 
   SetCommunityAttachment: function (hParticipant, sUrl, sLabel, sLink)
@@ -292,37 +294,37 @@ Arena.prototype = {
   
   OnPublicChatTimedOut: function (hParticipant, hChat)
   {
-    api.Message('OnPublicChatTimedOut').setString('ApType', 'Arena_CallModuleSrpc').setString('hParticipant', hParticipant).setString('hChat', hChat).send();
+    api.ModuleCall('OnPublicChatTimedOut').setString('hParticipant', hParticipant).setString('hChat', hChat).send();
   },
 
   OnPublicChatClosed: function (hParticipant, hChat)
   {
-    api.Message('OnPublicChatClosed').setString('ApType', 'Arena_CallModuleSrpc').setString('hParticipant', hParticipant).setString('hChat', hChat).send();
+    api.ModuleCall('OnPublicChatClosed').setString('hParticipant', hParticipant).setString('hChat', hChat).send();
   },
 
   OnIconAttachmentClicked: function (hParticipant, sLink)
   {
-    api.Message('OnIconAttachmentClicked').setString('ApType', 'Arena_CallModuleSrpc').setString('hParticipant', hParticipant).setString('sLink', sLink).send();
+    api.ModuleCall('OnIconAttachmentClicked').setString('hParticipant', hParticipant).setString('sLink', sLink).send();
   },
 
   OnAvatarPositionReached: function (hParticipant, nX)
   {
-    api.Message('OnAvatarPositionReached').setString('ApType', 'Arena_CallModuleSrpc').setString('hParticipant', hParticipant).setInt('nX', nX).send();
+    api.ModuleCall('OnAvatarPositionReached').setString('hParticipant', hParticipant).setInt('nX', nX).send();
   },
 
   OnAvatarDraggedBy: function (hParticipant, nX, nY)
   {
-    api.Message('OnAvatarDraggedBy').setString('ApType', 'Arena_CallModuleSrpc').setString('hParticipant', hParticipant).setInt('nX', nX).setInt('nY', nY).send();
+    api.ModuleCall('OnAvatarDraggedBy').setString('hParticipant', hParticipant).setInt('nX', nX).setInt('nY', nY).send();
   },
 
   OnAvatarPointerClosed: function (hParticipant)
   {
-    api.Message('OnAvatarPointerClosed').setString('ApType', 'Arena_CallModuleSrpc').setString('hParticipant', hParticipant).send();
+    api.ModuleCall('OnAvatarPointerClosed').setString('hParticipant', hParticipant).send();
   },
 
   SendPublicChat: function (sText)
   {
-    api.Message('SendPublicChat').setString('ApType', 'Arena_CallModuleSrpc').setString('sText', sText).send();
+    api.ModuleCall('SendPublicChat').setString('sText', sText).send();
   },
 
   // --------------------------------------
