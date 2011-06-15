@@ -31,7 +31,7 @@ protected:
   void DisplaySetNickname(const String& sNickname);
   void DisplaySetImage(const String& sUrl);
   void DisplaySetOnlineStatus(const String& sStatus);
-  void DisplayAddChatline(const ApHandle& hChat, const String& sText);
+  void DisplayAddChatline(const String& sText);
 
 protected:
   ChatModule* pModule_;

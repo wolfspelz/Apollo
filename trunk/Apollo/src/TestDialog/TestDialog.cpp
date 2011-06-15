@@ -5,10 +5,12 @@
 // ============================================================================
 
 #include "Apollo.h"
+#include "ApContainer.h"
 #include "TestDialog.h"
 #include "MsgDialog.h"
 #include "MsgNavigation.h"
 #include "MsgVpView.h"
+#include "MsgWebView.h"
 #include "MsgSystem.h"
 
 #if defined(WIN32)
@@ -53,57 +55,45 @@ public:
   TestDialogModule() {}
   virtual ~TestDialogModule() {}
 
-  void Init();
+  int Init();
   void Exit();
   void Open();
 
-  void On_TestDialog_Control(ApSRPCMessage* pMsg);
+  void On_TestDialog_Srpc(ApSRPCMessage* pMsg);
+  void On_WebView_ModuleCall(Msg_WebView_ModuleCall* pMsg);
   void On_System_RunLevel(Msg_System_RunLevel* pMsg);
+  void On_Dialog_OnClosed(Msg_Dialog_OnClosed* pMsg);
 
 protected:
-  AP_MSG_REGISTRY_DECLARE;
-
   ApHandle hBrowserConnection_;
   Apollo::KeyValueList kvBrowserTabContextList_;
   String sBrowserSelectedTab_;
+  ApHandleTree<int> dialogs_;
+
+  AP_MSG_REGISTRY_DECLARE;
 };
 
 typedef ApModuleSingleton<TestDialogModule> TestDialogModuleInstance;
 
 //----------------------------------------------------------
 
-void TestDialogModule::Init()
-{
-}
-
-void TestDialogModule::Exit()
-{
-}
-
-void TestDialogModule::Open()
-{
-  Msg_Dialog_Create msg;
-  msg.hDialog = Apollo::newHandle();
-  msg.nLeft = Apollo::getModuleConfig(MODULE_NAME, "Left", 200);
-  msg.nTop = Apollo::getModuleConfig(MODULE_NAME, "Top", 200);
-  msg.nWidth = Apollo::getModuleConfig(MODULE_NAME, "Width", 500);
-  msg.nHeight = Apollo::getModuleConfig(MODULE_NAME, "Height", 300);
-  msg.bVisible = 1;
-  msg.sCaption = "Test Controls";
-  msg.sIconUrl = "file://" + Apollo::getModuleResourcePath(MODULE_NAME) + "icon.png";
-  msg.sContentUrl = "file://" + Apollo::getModuleResourcePath(MODULE_NAME) + "index.html";
-  if (!msg.Request()) { throw ApException("Msg_Dialog_Create failed: %s", StringType(msg.sComment)); }
-}
-
-//----------------------------------------------------------
-
-AP_TYPEDMSG_HANDLER_METHOD(TestDialogModule, TestDialog_Control, ApSRPCMessage)
+AP_MSGCLASS_HANDLER_METHOD(TestDialogModule, TestDialog_Srpc, ApSRPCMessage)
 {
   String sMethod = pMsg->srpc.getString("Method");
   if (0) {
   } else if (sMethod == "Open") {
     Open();
+  }
 
+  pMsg->apStatus = ApMessage::Ok;
+}
+
+AP_MSG_HANDLER_METHOD(TestDialogModule, WebView_ModuleCall)
+{
+  if (dialogs_.Find(pMsg->hView) == 0) { return; }
+
+  String sMethod = pMsg->srpc.getString("Method");
+  if (0) {
   } else if (sMethod == "TabPosition") {
     String sTab = pMsg->srpc.getString("sTab");
     Apollo::KeyValueElem* pElem = kvBrowserTabContextList_.find(sTab);
@@ -213,6 +203,49 @@ AP_MSG_HANDLER_METHOD(TestDialogModule, System_RunLevel)
   }
 }
 
+AP_MSG_HANDLER_METHOD(TestDialogModule, Dialog_OnClosed)
+{
+  if (dialogs_.Find(pMsg->hDialog) != 0) {
+    dialogs_.Unset(pMsg->hDialog);
+  }
+}
+
+//----------------------------------------------------------
+
+int TestDialogModule::Init()
+{
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, TestDialogModule, TestDialog_Srpc, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, TestDialogModule, WebView_ModuleCall, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, TestDialogModule, System_RunLevel, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, TestDialogModule, Dialog_OnClosed, this, ApCallbackPosNormal);
+
+  return 1;
+}
+
+void TestDialogModule::Exit()
+{
+  AP_MSG_REGISTRY_FINISH;
+}
+
+void TestDialogModule::Open()
+{
+  ApHandle hDialog = Apollo::newHandle();
+
+  Msg_Dialog_Create msg;
+  msg.hDialog = hDialog;
+  msg.nLeft = Apollo::getModuleConfig(MODULE_NAME, "Left", 200);
+  msg.nTop = Apollo::getModuleConfig(MODULE_NAME, "Top", 200);
+  msg.nWidth = Apollo::getModuleConfig(MODULE_NAME, "Width", 500);
+  msg.nHeight = Apollo::getModuleConfig(MODULE_NAME, "Height", 300);
+  msg.bVisible = 1;
+  msg.sCaption = "Test Controls";
+  msg.sIconUrl = "file://" + Apollo::getModuleResourcePath(MODULE_NAME) + "icon.png";
+  msg.sContentUrl = "file://" + Apollo::getModuleResourcePath(MODULE_NAME) + "index.html";
+  if (!msg.Request()) { throw ApException("Msg_Dialog_Create failed: %s", StringType(msg.sComment)); }
+
+  dialogs_.Set(hDialog, 1);
+}
+
 //----------------------------------------------------------
 
 TESTDIALOG_API int Load(AP_MODULE_CALL* pModuleData)
@@ -220,20 +253,14 @@ TESTDIALOG_API int Load(AP_MODULE_CALL* pModuleData)
   AP_UNUSED_ARG(pModuleData);
 
   TestDialogModuleInstance::Delete();
-  TestDialogModuleInstance::Get()->Init();
+  int ok = TestDialogModuleInstance::Get()->Init();
  
-  { ApSRPCMessage msg("TestDialog_Control"); msg.Hook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(TestDialogModule, TestDialog_Control), TestDialogModuleInstance::Get(), Apollo::modulePos(ApCallbackPosEarly, MODULE_NAME)); }
-  { Msg_System_RunLevel msg; msg.Hook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(TestDialogModule, System_RunLevel), TestDialogModuleInstance::Get(), Apollo::modulePos(ApCallbackPosEarly, MODULE_NAME)); }
-
-  return 1;
+  return ok;
 }
 
 TESTDIALOG_API int UnLoad(AP_MODULE_CALL* pModuleData)
 {
   AP_UNUSED_ARG(pModuleData);
-
-  { ApSRPCMessage msg("TestDialog_Control"); msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(TestDialogModule, TestDialog_Control), TestDialogModuleInstance::Get()); }
-  { Msg_System_RunLevel msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(TestDialogModule, System_RunLevel), TestDialogModuleInstance::Get()); }
 
   TestDialogModuleInstance::Get()->Exit();
   TestDialogModuleInstance::Delete();

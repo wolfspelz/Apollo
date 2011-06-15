@@ -288,13 +288,13 @@ void Display::OnAvatarAnimationBegin(const ApHandle& hParticipant, const String&
   }
 }
 
-void Display::OnCallModule(Apollo::SrpcMessage& request, Apollo::SrpcMessage& response)
+void Display::OnModuleCall(Apollo::SrpcMessage& request, Apollo::SrpcMessage& response)
 {
   ApHandle hParticipant = Apollo::string2Handle(request.getString("hParticipant"));
   if (ApIsHandle(hParticipant)) {
     AvatarListNode* pNode = avatars_.Find(hParticipant);
     if (pNode) {
-      pNode->Value()->OnCallModule(request, response);
+      pNode->Value()->OnModuleCall(request, response);
     }
 
   } else {
@@ -319,7 +319,7 @@ void Display::OnCallModule(Apollo::SrpcMessage& request, Apollo::SrpcMessage& re
       }
 
     } else {
-      throw ApException("Display::OnCallModule: Unknown Method=%s", StringType(sMethod));
+      throw ApException("Display::OnModuleCall: Unknown Method=%s", StringType(sMethod));
     }
   }
 }

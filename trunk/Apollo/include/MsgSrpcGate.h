@@ -10,6 +10,7 @@
 #include "ApMessage.h"
 
 typedef void (*ApSRPCCallback) (ApSRPCMessage* pMsg);
+#define SRPCGATE_HANDLER_TYPE "SrpcGate_Handler"
 
 // -> msggate
 class Msg_SrpcGate_Register: public ApRequestMessage

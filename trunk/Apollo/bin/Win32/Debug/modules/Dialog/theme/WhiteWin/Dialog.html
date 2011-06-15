@@ -59,12 +59,12 @@
 
 </style>
 <script type="text/javascript">
-  function SetContent(sUrl)
+  SetContent = function(sUrl)
   {
     $('#Content').attr('src', sUrl);
   }
 
-  function ShowContent(bVisible)
+  ShowContent = function(bVisible)
   {
     if (bVisible) {
       $('#Content').css('display', '');
@@ -73,27 +73,20 @@
     }
   }
 
-  function SetCaption(sCaption)
+  SetCaption = function(sCaption)
   {
     $('#Caption').html(sCaption);
   }
 
-  function SetIcon(sUrl)
+  SetIcon = function(sUrl)
   {
     $('#Icon').attr('src', sUrl);
   }
 
-  function ContentEval(sCode)
+  ContentEval = function(sCode)
   {
-    api.Log.Debug('ContentEval ' + sCode);
-    //document.getElementById('Content').contentWindow.eval(sCode);
-    var eContent = document.getElementById('Content');
-    api.Log.Debug(eContent);
-    var eWin = eContent.contentWindow;
-    api.Log.Debug(eWin);
-    var eEval = eWin.eval;
-    api.Log.Debug(eEval);
-    return eWin.eval(sCode);
+    //api.Log.Debug('ContentEval ' +sCode);
+    return document.getElementById('Content').contentWindow.EvalJS(sCode);
   }
 
   var api = new ApolloApi();

@@ -173,13 +173,15 @@ String WebViewModuleTester::CallSystemEcho()
 
 static ApHandle g_CallCustomEcho_hView;
 
-void WebViewModuleTester_CallCustomEcho_On_CustomEchoType(ApSRPCMessage* pMsg)
+void WebViewModuleTester_CallCustomEcho_On_WebView_ModuleCall(Msg_WebView_ModuleCall* pMsg)
 {
+  if (pMsg->hView != g_CallCustomEcho_hView) { return; }
+
   String sType = pMsg->Type();
   String sMethod = pMsg->srpc.getString("Method");
   String sIn = pMsg->srpc.getString("sIn");
   String sOut = sIn;
-  if (sType != "CustomEchoType") { sOut.appendf(" (Error: Expected Type=%s got=%s)", StringType("CustomEchoType"), StringType(sType)); }
+  if (sType != "WebView_ModuleCall") { sOut.appendf(" (Error: Expected Type=%s got=%s)", StringType("WebView_ModuleCall"), StringType(sType)); }
   if (sMethod != "CustomEchoMethod") { sOut.appendf(" (Error: Expected Method=%s got=%s)", StringType("CustomEchoMethod"), StringType(sMethod)); }
   pMsg->response.set("sOut", sOut);
   pMsg->apStatus = ApMessage::Ok;
@@ -204,9 +206,9 @@ void WebViewModuleTester_CallCustomEcho_On_WebView_Event_DocumentLoaded(Msg_WebV
   String s; if (!ok) { s = "received=" + msg.sResult + " expected=" + sOutExpected; }
   AP_UNITTEST_RESULT(WebViewModuleTester::CallCustomEcho_Result, ok, s);
 
-  Msg_WebView_Destroy::_(pMsg->hView);  
+  Msg_WebView_Destroy::_(pMsg->hView);
   { Msg_WebView_Event_DocumentLoaded msg; msg.Unhook(MODULE_NAME, (ApCallback) WebViewModuleTester_CallCustomEcho_On_WebView_Event_DocumentLoaded, 0); }
-  { ApSRPCMessage msg("CustomEchoType"); msg.Unhook(MODULE_NAME, (ApCallback) WebViewModuleTester_CallCustomEcho_On_CustomEchoType, 0); }
+  { Msg_WebView_ModuleCall msg; msg.Unhook(MODULE_NAME, (ApCallback) WebViewModuleTester_CallCustomEcho_On_WebView_ModuleCall, 0); }
 }
 
 String WebViewModuleTester::CallCustomEcho()
@@ -217,7 +219,7 @@ String WebViewModuleTester::CallCustomEcho()
   g_CallCustomEcho_hView = hView;
 
   { Msg_WebView_Event_DocumentLoaded msg; msg.Hook(MODULE_NAME, (ApCallback) WebViewModuleTester_CallCustomEcho_On_WebView_Event_DocumentLoaded, 0, ApCallbackPosNormal); }
-  { ApSRPCMessage msg("CustomEchoType"); msg.Hook(MODULE_NAME, (ApCallback) WebViewModuleTester_CallCustomEcho_On_CustomEchoType, 0, ApCallbackPosNormal); }
+  { Msg_WebView_ModuleCall msg; msg.Hook(MODULE_NAME, (ApCallback) WebViewModuleTester_CallCustomEcho_On_WebView_ModuleCall, 0, ApCallbackPosNormal); }
 
   if (!s) { if (!Msg_WebView_Create::_(hView)) { s = "Msg_WebView_Create failed"; }}
   if (!s) { if (!Msg_WebView_SetScriptAccessPolicy::Allow(hView)) { s = "Msg_WebView_SetScriptAccessPolicy failed"; }}

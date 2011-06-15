@@ -221,6 +221,10 @@
 				>
 			</File>
 		</Filter>
+		<File
+			RelativePath="..\..\bin\Win32\Debug\modules\Chat\config.txt"
+			>
+		</File>
 	</Files>
 	<Globals>
 	</Globals>

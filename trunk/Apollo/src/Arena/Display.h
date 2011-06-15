@@ -51,7 +51,7 @@ public:
   void OnContextDetailsChanged(Apollo::ValueList& vlKeys);
   void OnLocationDetailsChanged(Apollo::ValueList& vlKeys);
   void OnAvatarAnimationBegin(const ApHandle& hParticipant, const String& sUrl);
-  void OnCallModule(Apollo::SrpcMessage& request, Apollo::SrpcMessage& response);
+  void OnModuleCall(Apollo::SrpcMessage& request, Apollo::SrpcMessage& response);
   void OnShowChat(int bShow);
   void OnShowDebug(int bShow);
   void OnNavigatorCallDisplay(Apollo::SrpcMessage& request, Apollo::SrpcMessage& response);
@@ -116,9 +116,9 @@ protected:
 
 //---------------------------------------------------
 
-class ViewSrpcMessage: public Msg_WebView_CallScriptSrpc
+class ViewSrpcMessage: public Msg_WebView_ViewCall
 {
-  typedef Msg_WebView_CallScriptSrpc base;
+  typedef Msg_WebView_ViewCall base;
 public:
   ViewSrpcMessage(Display* pDisplay, const String& sMethod);
   int Request();

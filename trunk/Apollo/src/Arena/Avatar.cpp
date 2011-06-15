@@ -519,7 +519,7 @@ void Avatar::OnAnimationBegin(const String& sUrl)
 
 //----------------------------------------------------------
 
-void Avatar::OnCallModule(Apollo::SrpcMessage& request, Apollo::SrpcMessage& response)
+void Avatar::OnModuleCall(Apollo::SrpcMessage& request, Apollo::SrpcMessage& response)
 {
   String sMethod = request.getString("Method");
 
@@ -549,7 +549,7 @@ void Avatar::OnCallModule(Apollo::SrpcMessage& request, Apollo::SrpcMessage& res
     OnAvatarPointerClosed();
 
   } else {
-    throw ApException("Avatar::OnCallModule: Unknown Method=%s", StringType(sMethod));
+    throw ApException("Avatar::OnModuleCall: Unknown Method=%s", StringType(sMethod));
   }
   
 }

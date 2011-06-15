@@ -1,0 +1,22 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<script type="text/javascript" src="../../WebView/apollo.js"></script>
+<script type="text/javascript" src="../apollo.dialog.js"></script>
+<script type="text/javascript">
+
+var api = new DialogApi();
+api.ModuleName('CallContentSrpc Test');
+
+function SetText(sMessage)
+{
+  document.getElementById('iText').innerHTML = sMessage;
+}
+
+</script>
+</head>
+<body onload="api.Ready();">
+<div id="iText"></div>
+<input type="button" value="test" onclick="SetText('xx');" />
+</body>
+</html>

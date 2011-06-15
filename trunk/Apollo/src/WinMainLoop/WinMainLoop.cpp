@@ -171,7 +171,7 @@ int MainLoopModule::Handle_WM_COMMAND_TOOLS_TEST(HWND hWnd, UINT message, WPARAM
 {
   AP_UNUSED_ARG(hWnd); AP_UNUSED_ARG(message); AP_UNUSED_ARG(wParam); AP_UNUSED_ARG(lParam);
 
-  ApSRPCMessage msg("TestDialog_Control");
+  ApSRPCMessage msg("TestDialog_Srpc");
   msg.srpc.set("Method", "Open");
   (void) msg.Call();
 
@@ -182,9 +182,7 @@ int MainLoopModule::Handle_WM_COMMAND_TOOLS_DISPLAY(HWND hWnd, UINT message, WPA
 {
   AP_UNUSED_ARG(hWnd); AP_UNUSED_ARG(message); AP_UNUSED_ARG(wParam); AP_UNUSED_ARG(lParam);
 
-  ApSRPCMessage msg("ExDisplay_Control");
-  msg.srpc.set("Method", "Open");
-  (void) msg.Call();
+  // Unused 
 
   return 1;
 }

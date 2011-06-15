@@ -281,10 +281,10 @@ public:
 };
 
 // Module DLL -> Script of Module
-class Msg_WebView_CallScriptSrpc: public ApRequestMessage
+class Msg_WebView_ViewCall: public ApRequestMessage
 {
 public:
-  Msg_WebView_CallScriptSrpc() : ApRequestMessage("WebView_CallScriptSrpc") {}
+  Msg_WebView_ViewCall() : ApRequestMessage("WebView_ViewCall") {}
   ApIN ApHandle hView;
   ApIN String sFunction;
   ApIN Apollo::SrpcMessage srpc;
@@ -292,10 +292,10 @@ public:
 };
 
 // Script of Module -> Module DLL
-class Msg_WebView_CallModuleSrpc: public ApRequestMessage
+class Msg_WebView_ModuleCall: public ApRequestMessage
 {
 public:
-  Msg_WebView_CallModuleSrpc(const char* szType) : ApRequestMessage(szType) {}
+  Msg_WebView_ModuleCall() : ApRequestMessage("WebView_ModuleCall") {}
   ApIN ApHandle hView;
   ApIN Apollo::SrpcMessage srpc;
   ApOUT Apollo::SrpcMessage response;

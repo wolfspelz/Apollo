@@ -322,7 +322,7 @@ void GmModule::onLoginResult(SrpcMessage& srpc)
       Apollo::KeyValueList kvCommand;
       srpc.getKeyValueList(sKey, kvCommand);
 
-      ApSRPCMessage msg("SrpcGate");
+      ApSRPCMessage msg(SRPCGATE_HANDLER_TYPE);
       for (Apollo::KeyValueElem* e = 0; (e = kvCommand.nextElem(e)) != 0; ) {
         msg.srpc.set(e->getKey(), e->getString());
       }

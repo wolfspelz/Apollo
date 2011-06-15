@@ -110,6 +110,7 @@ protected:
   ListT<TranslationPlane, Elem> lPlanes_;
 
   Apollo::SrpcGateHandlerRegistry srpcGateRegistry_;
+  AP_MSG_REGISTRY_DECLARE;
 };
 
 typedef ApModuleSingleton<BabelfishModule> BabelfishModuleInstance;
@@ -142,23 +143,6 @@ void SrpcGate_Translation_Get(ApSRPCMessage* pMsg)
 }
 
 //----------------------------------------------------------
-
-int BabelfishModule::init()
-{
-  sContextSeparator_ = Apollo::getModuleConfig(MODULE_NAME, "ContextSeparator", ".");
-  sDefaultLanguage_ = Apollo::getModuleConfig(MODULE_NAME, "DefaultLanguage", "en");
-  sCurrentLanguage_ = sDefaultLanguage_;
-
-  srpcGateRegistry_.add("Translation_Get", SrpcGate_Translation_Get);
-
-  return 1;
-}
-
-int BabelfishModule::exit()
-{
-  srpcGateRegistry_.finish();
-  return 1;
-}
 
 int BabelfishModule::getText(String& sLang, String& sModule, String& sContext, String& sText, String& sTranslated)
 {
@@ -193,7 +177,7 @@ int BabelfishModule::getText(String& sLang, String& sModule, String& sContext, S
 
 //----------------------------------------------------------
 
-void BabelfishModule::On_Translation_Get(Msg_Translation_Get* pMsg)
+AP_MSG_HANDLER_METHOD(BabelfishModule, Translation_Get)
 {
  int ok = 0;
 
@@ -205,7 +189,7 @@ void BabelfishModule::On_Translation_Get(Msg_Translation_Get* pMsg)
   pMsg->apStatus = ok ? ApMessage::Ok : ApMessage::Error;
 }
 
-void BabelfishModule::On_Translation_SetLanguage(Msg_Translation_SetLanguage* pMsg)
+AP_MSG_HANDLER_METHOD(BabelfishModule, Translation_SetLanguage)
 {
   int ok = 1;
 
@@ -235,13 +219,13 @@ void BabelfishModule::On_Translation_SetLanguage(Msg_Translation_SetLanguage* pM
   pMsg->apStatus = ok ? ApMessage::Ok : ApMessage::Error;
 }
 
-void BabelfishModule::On_Translation_GetLanguage(Msg_Translation_GetLanguage* pMsg)
+AP_MSG_HANDLER_METHOD(BabelfishModule, Translation_GetLanguage)
 {
   pMsg->sLanguage = sCurrentLanguage_;
   pMsg->apStatus = ApMessage::Ok;
 }
 
-void BabelfishModule::On_Translation_Clear(Msg_Translation_Clear* pMsg)
+AP_MSG_HANDLER_METHOD(BabelfishModule, Translation_Clear)
 {
   apLog_Verbose((LOG_CHANNEL, "BabelfishModule::On_Translation_Clear", ""));
 
@@ -258,7 +242,7 @@ void BabelfishModule::On_Translation_Clear(Msg_Translation_Clear* pMsg)
   pMsg->apStatus = ApMessage::Ok;
 }
 
-void BabelfishModule::On_Translation_LoadModuleLanguageFile(Msg_Translation_LoadModuleLanguageFile* pMsg)
+AP_MSG_HANDLER_METHOD(BabelfishModule, Translation_LoadModuleLanguageFile)
 {
   int ok = 1;
   apLog_Verbose((LOG_CHANNEL, "BabelfishModule::On_Translation_LoadModuleLanguageFile", "module=%s lang=%s", StringType(pMsg->sModule), StringType(pMsg->sLanguage)));
@@ -335,7 +319,7 @@ void BabelfishModule::On_Translation_LoadModuleLanguageFile(Msg_Translation_Load
   pMsg->apStatus = ok ? ApMessage::Ok : ApMessage::Error;
 }
 
-void BabelfishModule::On_Translation_UnloadLanguage(Msg_Translation_UnloadLanguage* pMsg)
+AP_MSG_HANDLER_METHOD(BabelfishModule, Translation_UnloadLanguage)
 {
   int ok = 1;
   apLog_Verbose((LOG_CHANNEL, "BabelfishModule::On_Translation_UnloadLanguage", "lang=%s", StringType(pMsg->sLanguage)));
@@ -345,7 +329,7 @@ void BabelfishModule::On_Translation_UnloadLanguage(Msg_Translation_UnloadLangua
   pMsg->apStatus = ok ? ApMessage::Ok : ApMessage::Error;
 }
 
-void BabelfishModule::On_Translation_Plane(Msg_Translation_Plane* pMsg)
+AP_MSG_HANDLER_METHOD(BabelfishModule, Translation_Plane)
 {
   int ok = 1;
   apLog_Verbose((LOG_CHANNEL, "BabelfishModule::On_Translation_Plane", "plane=%s", StringType(pMsg->sPlane)));
@@ -355,7 +339,7 @@ void BabelfishModule::On_Translation_Plane(Msg_Translation_Plane* pMsg)
   pMsg->apStatus = ok ? ApMessage::Ok : ApMessage::Error;
 }
 
-void BabelfishModule::On_Core_ModuleLoaded(Msg_Core_ModuleLoaded* pMsg)
+AP_MSG_HANDLER_METHOD(BabelfishModule, Core_ModuleLoaded)
 {
   int ok = 1;
 
@@ -369,31 +353,22 @@ void BabelfishModule::On_Core_ModuleLoaded(Msg_Core_ModuleLoaded* pMsg)
 
 //----------------------------------------------------------
 
-AP_REFINSTANCE_MSG_HANDLER(BabelfishModule, Translation_Get)
-AP_REFINSTANCE_MSG_HANDLER(BabelfishModule, Translation_SetLanguage)
-AP_REFINSTANCE_MSG_HANDLER(BabelfishModule, Translation_GetLanguage)
-AP_REFINSTANCE_MSG_HANDLER(BabelfishModule, Translation_Clear)
-AP_REFINSTANCE_MSG_HANDLER(BabelfishModule, Translation_LoadModuleLanguageFile)
-AP_REFINSTANCE_MSG_HANDLER(BabelfishModule, Translation_UnloadLanguage)
-AP_REFINSTANCE_MSG_HANDLER(BabelfishModule, Translation_Plane)
-AP_REFINSTANCE_MSG_HANDLER(BabelfishModule, Core_ModuleLoaded)
-
-//----------------------------------------------------------
-
-BABELFISH_API int Load(AP_MODULE_CALL* pModuleData)
+int BabelfishModule::init()
 {
-  AP_UNUSED_ARG(pModuleData);
+  sContextSeparator_ = Apollo::getModuleConfig(MODULE_NAME, "ContextSeparator", ".");
+  sDefaultLanguage_ = Apollo::getModuleConfig(MODULE_NAME, "DefaultLanguage", "en");
+  sCurrentLanguage_ = sDefaultLanguage_;
 
-  (void) BabelfishModuleInstance::Get()->init();
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, BabelfishModule, Translation_Get, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, BabelfishModule, Translation_SetLanguage, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, BabelfishModule, Translation_GetLanguage, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, BabelfishModule, Translation_Clear, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, BabelfishModule, Translation_LoadModuleLanguageFile, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, BabelfishModule, Translation_UnloadLanguage, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, BabelfishModule, Translation_Plane, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, BabelfishModule, Core_ModuleLoaded, this, ApCallbackPosNormal);
 
-  { Msg_Translation_Get msg; msg.Hook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(BabelfishModule, Translation_Get), BabelfishModuleInstance::Get(), Apollo::modulePos(ApCallbackPosEarly, MODULE_NAME)); }
-  { Msg_Translation_SetLanguage msg; msg.Hook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(BabelfishModule, Translation_SetLanguage), BabelfishModuleInstance::Get(), Apollo::modulePos(ApCallbackPosEarly, MODULE_NAME)); }
-  { Msg_Translation_GetLanguage msg; msg.Hook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(BabelfishModule, Translation_GetLanguage), BabelfishModuleInstance::Get(), Apollo::modulePos(ApCallbackPosEarly, MODULE_NAME)); }
-  { Msg_Translation_Clear msg; msg.Hook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(BabelfishModule, Translation_Clear), BabelfishModuleInstance::Get(), Apollo::modulePos(ApCallbackPosEarly, MODULE_NAME)); }
-  { Msg_Translation_LoadModuleLanguageFile msg; msg.Hook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(BabelfishModule, Translation_LoadModuleLanguageFile), BabelfishModuleInstance::Get(), Apollo::modulePos(ApCallbackPosEarly, MODULE_NAME)); }
-  { Msg_Translation_UnloadLanguage msg; msg.Hook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(BabelfishModule, Translation_UnloadLanguage), BabelfishModuleInstance::Get(), Apollo::modulePos(ApCallbackPosEarly, MODULE_NAME)); }
-  { Msg_Translation_Plane msg; msg.Hook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(BabelfishModule, Translation_Plane), BabelfishModuleInstance::Get(), Apollo::modulePos(ApCallbackPosEarly, MODULE_NAME)); }
-  { Msg_Core_ModuleLoaded msg; msg.Hook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(BabelfishModule, Core_ModuleLoaded), BabelfishModuleInstance::Get(), Apollo::modulePos(ApCallbackPosEarly, MODULE_NAME)); }
+  srpcGateRegistry_.add("Translation_Get", SrpcGate_Translation_Get);
 
   {
     Msg_Translation_SetLanguage msg;
@@ -403,6 +378,23 @@ BABELFISH_API int Load(AP_MODULE_CALL* pModuleData)
     }
   }
 
+  return 1;
+}
+
+int BabelfishModule::exit()
+{
+  srpcGateRegistry_.finish();
+  return 1;
+}
+
+//----------------------------------------------------------
+
+BABELFISH_API int Load(AP_MODULE_CALL* pModuleData)
+{
+  AP_UNUSED_ARG(pModuleData);
+
+  BabelfishModuleInstance::Delete();
+  (void) BabelfishModuleInstance::Get()->init();
   return BabelfishModuleInstance::Get() != 0;
 }
 
@@ -410,17 +402,7 @@ BABELFISH_API int UnLoad(AP_MODULE_CALL* pModuleData)
 {
   AP_UNUSED_ARG(pModuleData);
 
-  { Msg_Translation_Get msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(BabelfishModule, Translation_Get), BabelfishModuleInstance::Get()); }
-  { Msg_Translation_SetLanguage msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(BabelfishModule, Translation_SetLanguage), BabelfishModuleInstance::Get()); }
-  { Msg_Translation_GetLanguage msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(BabelfishModule, Translation_GetLanguage), BabelfishModuleInstance::Get()); }
-  { Msg_Translation_Clear msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(BabelfishModule, Translation_Clear), BabelfishModuleInstance::Get()); }
-  { Msg_Translation_LoadModuleLanguageFile msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(BabelfishModule, Translation_LoadModuleLanguageFile), BabelfishModuleInstance::Get()); }
-  { Msg_Translation_UnloadLanguage msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(BabelfishModule, Translation_UnloadLanguage), BabelfishModuleInstance::Get()); }
-  { Msg_Translation_Plane msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(BabelfishModule, Translation_Plane), BabelfishModuleInstance::Get()); }
-  { Msg_Core_ModuleLoaded msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(BabelfishModule, Core_ModuleLoaded), BabelfishModuleInstance::Get()); }
-
   (void) BabelfishModuleInstance::Get()->exit();
-
   BabelfishModuleInstance::Delete();
 
   return 1;

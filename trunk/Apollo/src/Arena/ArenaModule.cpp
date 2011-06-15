@@ -441,16 +441,16 @@ AP_MSG_HANDLER_METHOD(ArenaModule, Animation_SequenceBegin)
 
 //----------------------------
 
-AP_TYPEDMSG_HANDLER_METHOD(ArenaModule, Arena_CallModule, Msg_WebView_CallModuleSrpc)
+AP_MSG_HANDLER_METHOD(ArenaModule, WebView_ModuleCall)
 {
   Display* pDisplay = GetDisplayOfHandle(pMsg->hView);
   if (pDisplay) {
-    pDisplay->OnCallModule(pMsg->srpc, pMsg->response);
+    pDisplay->OnModuleCall(pMsg->srpc, pMsg->response);
     pMsg->apStatus = ApMessage::Ok;
   }
 }
 
-AP_TYPEDMSG_HANDLER_METHOD(ArenaModule, Navigator_CallDisplay, ApSRPCMessage)
+AP_MSGCLASS_HANDLER_METHOD(ArenaModule, Navigator_CallDisplay, ApSRPCMessage)
 {
   String sContext = pMsg->srpc.getString("hContext");
   if (sContext) {
@@ -584,7 +584,7 @@ int ArenaModule::Init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ArenaModule, Animation_SequenceBegin, this, ApCallbackPosNormal);
   //AP_MSG_REGISTRY_ADD(MODULE_NAME, ArenaModule, Animation_Frame, this, ApCallbackPosNormal);
   //AP_MSG_REGISTRY_ADD(MODULE_NAME, ArenaModule, Animation_SequenceEnd, this, ApCallbackPosNormal);
-  AP_MSG_REGISTRY_ADD(MODULE_NAME, ArenaModule, Arena_CallModule, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, ArenaModule, WebView_ModuleCall, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ArenaModule, Navigator_CallDisplay, this, ApCallbackPosNormal);
   #if defined(WIN32)
     AP_MSG_REGISTRY_ADD(MODULE_NAME, ArenaModule, BrowserInfo_GetContextWin32Window, this, ApCallbackPosNormal);

@@ -57,7 +57,7 @@ AP_MSG_HANDLER_METHOD(LogModule, Log_Line)
 
 void LogModule::Init()
 {
-  { Msg_Log_Line msg; msg.Hook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(LogModule, Log_Line), this, Apollo::modulePos(ApCallbackPosNormal, MODULE_NAME)); }
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, LogModule, Log_Line, this, ApCallbackPosNormal);
 
   srpcGateRegistry_.add("Log_Line", SrpcGate_Log_Line);
   srpcGateRegistry_.add("Log_SetMask", SrpcGate_Log_SetMask);
@@ -65,8 +65,7 @@ void LogModule::Init()
 
 void LogModule::Exit()
 {
+  AP_MSG_REGISTRY_FINISH;
   srpcGateRegistry_.finish();
-
-  { Msg_Log_Line msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(LogModule, Log_Line), this); }
 }
 

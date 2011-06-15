@@ -313,17 +313,27 @@ String View::CallJsFunction(const String& sFunction, List& lArgs)
 
   JSValueRef result = 0;
 
+  String sLog = sFunction;
+
   if (lArgs.length() > 0) {
+
     AutoPtr<JSValueRef> args(new JSValueRef[lArgs.length()]);
     int nCnt = 0;
     for (Elem* e = 0; (e = lArgs.Next(e)) != 0; ) {
+      if (apLog_IsVerbose) { sLog += " " + e->getName(); }
       args[nCnt++] = JSValueMakeString (runCtx, JSStringCreateWithCharacters((LPCTSTR) e->getName(), e->getName().chars()));
     }
+
+    apLog_Verbose((LOG_CHANNEL, "View::CallJsFunction", "%s", StringType(sLog)));
     result = JSObjectCallAsFunction (runCtx, function, global, lArgs.length(), args.get(), exception);
     if (exception) { throw ApException("View::CallJsFunction JSObjectCallAsFunction() returned exception"); }
+
   } else {
+
+    apLog_Verbose((LOG_CHANNEL, "View::CallJsFunction", "%s", StringType(sLog)));
     result = JSObjectCallAsFunction (runCtx, function, global, 0, 0, exception);
     if (exception) { throw ApException("View::CallJsFunction JSObjectCallAsFunction() returned exception"); }
+
   }
 
   // Convert the result into a string.
@@ -480,10 +490,10 @@ JSValueRef View::JS_Apollo_sendMessage(JSContextRef ctx, JSObjectRef function, J
   String sType = srpc.getString("ApType");
   String sResponse;
 
-  if (sType) {
-    // Supplied message type -> send SRPC with custom type
+  if (sType == "WebView_ModuleCall") {
+    // Special type -> send a standard from-display-to-view message
 
-    Msg_WebView_CallModuleSrpc msg(sType);
+    Msg_WebView_ModuleCall msg;
     msg.hView = pView->apHandle();
     srpc >> msg.srpc;
 
@@ -497,26 +507,28 @@ JSValueRef View::JS_Apollo_sendMessage(JSContextRef ctx, JSObjectRef function, J
       msg.response.createError(msg.srpc, msg.sComment);
     }
 
-    //ApSRPCMessage msg(sType);
-    //srpc >> msg.srpc;
+    sResponse = msg.response.toString();
 
-    //// Custom message handlers just do the apStatus thing.
-    //// They rely on someone else (us here) to fill msg.response.
-    //if (msg.Call()) {
-    //  msg.response.createResponse(msg.srpc);
-    //  //msg.response.set("Status", 1);
-    //} else {
-    //  msg.response.createError(msg.srpc, msg.sComment);
-    //  //msg.response.set("Status", 0);
-    //  //msg.response.set("Message", msg.sComment);
-    //}
+  } else if (sType) {
+    // Other message type -> send SRPC with custom type
+
+    ApSRPCMessage msg(sType);
+    srpc >> msg.srpc;
+
+    // Custom message handlers just do the apStatus thing.
+    // They rely on someone else (us here) to fill msg.response.
+    if (msg.Call()) {
+      msg.response.createResponse(msg.srpc);
+    } else {
+      msg.response.createError(msg.srpc, msg.sComment);
+    }
 
     sResponse = msg.response.toString();
 
   } else {
-    // Handle SRPC message via SrpcGate with "SrpcGate" type
+    // Handle SRPC message via SrpcGate with SRPCGATE_HANDLER_TYPE type
 
-    ApSRPCMessage msg("SrpcGate");
+    ApSRPCMessage msg(SRPCGATE_HANDLER_TYPE);
     srpc >> msg.srpc;
 
     // SrpcGate handlers are supposed to do their own Status handling.
