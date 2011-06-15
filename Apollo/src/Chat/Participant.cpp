@@ -29,20 +29,35 @@ Participant::Participant(ChatModule* pModule, ChatWindow* pChatWindow, const ApH
 
 void Participant::Create()
 {
-//  ViewSrpcMessage vsm(pDisplay_, "AddParticipant");
+  Msg_VpView_GetParticipantDetailString msg;
+  msg.hParticipant = hAp_;
+  msg.sKey = Msg_VpView_ParticipantDetail_Nickname;
+  if (msg.Request()) {
+    sNickname_ = msg.sValue;
+  } else {
+    sNickname_ = Apollo::getModuleConfig(MODULE_NAME, "DefaultNickname", "User") + hAp_.toString();
+  }
+
+  ViewCall vc(pChatWindow_, "AddParticipant");
+  vc.srpc.set("hParticipant", hAp_);
+  vc.srpc.set("sNickname", sNickname_);
+  vc.srpc.set("bSelf", bSelf_);
+  vc.Request();
 
   SubscribeAndGetDetail(Msg_VpView_ParticipantDetail_Nickname);
-  SubscribeAndGetDetail(Msg_VpView_ParticipantDetail_Image);
-  SubscribeAndGetDetail(Msg_VpView_ParticipantDetail_OnlineStatus);
+  //SubscribeAndGetDetail(Msg_VpView_ParticipantDetail_Image);
+  //SubscribeAndGetDetail(Msg_VpView_ParticipantDetail_OnlineStatus);
 }
 
 void Participant::Destroy()
 {
   UnsubscribeDetail(Msg_VpView_ParticipantDetail_Nickname);
-  UnsubscribeDetail(Msg_VpView_ParticipantDetail_Image);
-  UnsubscribeDetail(Msg_VpView_ParticipantDetail_OnlineStatus);
+  //UnsubscribeDetail(Msg_VpView_ParticipantDetail_Image);
+  //UnsubscribeDetail(Msg_VpView_ParticipantDetail_OnlineStatus);
 
-//  ViewSrpcMessage vsm(pDisplay_, "RemoveParticipant");
+  ViewCall vc(pChatWindow_, "RemoveParticipant");
+  vc.srpc.set("hParticipant", hAp_);
+  vc.Request();
 }
 
 void Participant::SubscribeAndGetDetail(const String& sKey)
@@ -87,13 +102,21 @@ void Participant::GetDetailString(const String& sKey, Apollo::ValueList& vlMimeT
     } else if (sKey == Msg_VpView_ParticipantDetail_Nickname) {
       if (sNickname_ != msg.sValue) {
         sNickname_ = msg.sValue;
-        //DisplaySetNickname(sNickname_);
+
+        ViewCall vc(pChatWindow_, "SetNickname");
+        vc.srpc.set("hParticipant", hAp_);
+        vc.srpc.set("sNickname", sNickname_);
+        vc.Request();
       }
 
     } else if (sKey == Msg_VpView_ParticipantDetail_OnlineStatus) {
       if (sOnlineStatus_ != msg.sValue) {
         sOnlineStatus_ = msg.sValue;
-        //DisplaySetOnlineStatus(sOnlineStatus_);
+
+        //ViewCall vc(pChatWindow_, "SetOnlineStatus");
+        //vc.srpc.set("hParticipant", hAp_);
+        //vc.srpc.set("sStatus", sOnlineStatus_);
+        //vc.Request();
       }
 
     }
@@ -112,8 +135,12 @@ void Participant::GetDetailUrl(const String& sKey, Apollo::ValueList& vlMimeType
     } else if (sKey == Msg_VpView_ParticipantDetail_Image) {
       String sUrl = msg.sUrl;
       if (sUrl != sImage_) {
-        //DisplaySetImage(sUrl);
         sImage_ = sUrl;
+
+        //ViewCall vc(pChatWindow_, "SetImage");
+        //vc.srpc.set("hParticipant", hAp_);
+        //vc.srpc.set("sUrl", sImage_);
+        //vc.Request();
       }
 
     }
@@ -147,27 +174,9 @@ void Participant::OnDetailsChanged(Apollo::ValueList& vlKeys)
 
 void Participant::OnReceivePublicChat(const ApHandle& hChat, const String& sNickname, const String& sText, const Apollo::TimeValue& tv)
 {
-  //
-}
-
-//----------------------------------------------------------
-
-void Participant::DisplaySetNickname(const String& sNickname)
-{
-  //ViewSrpcMessage vsm(pDisplay_, "SetParticipantNickname");
-}
-
-void Participant::DisplaySetImage(const String& sUrl)
-{
-  //ViewSrpcMessage vsm(pDisplay_, "SetParticipantImage");
-}
-
-void Participant::DisplaySetOnlineStatus(const String& sStatus)
-{
-  //ViewSrpcMessage vsm(pDisplay_, "SetOnlineStatus");
-}
-
-void Participant::DisplayAddChatline(const ApHandle& hChat, const String& sText)
-{
-  //ViewSrpcMessage vsm(pDisplay_, "AddParticipantChat");
+  ViewCall vc(pChatWindow_, "AddChatline");
+  vc.srpc.set("hParticipant", hAp_);
+  vc.srpc.set("sNickname", sNickname);
+  vc.srpc.set("sText", sText);
+  vc.Request();
 }

@@ -43,7 +43,7 @@ public:
 
   void OnLoaded();
   void OnUnload();
-  void OnCallModule(Apollo::SrpcMessage& request, Apollo::SrpcMessage& response);
+  void OnModuleCall(Apollo::SrpcMessage& request, Apollo::SrpcMessage& response);
 
   void OnParticipantAdded(const ApHandle& hParticipant, int bSelf);
   void OnParticipantRemoved(const ApHandle& hParticipant);
@@ -68,6 +68,16 @@ protected:
 
   ApHandle hSelf_;
   ParticipantList participants_;
+};
+
+//---------------------------------------------------
+
+class ViewCall: public Msg_Dialog_ContentCall
+{
+  typedef Msg_Dialog_ContentCall base;
+public:
+  ViewCall(ChatWindow* pChatWindow, const String& sMethod);
+  int Request();
 };
 
 #endif // Chat_H_INCLUDED

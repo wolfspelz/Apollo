@@ -2,7 +2,7 @@
 <html>
 <head>
 <script type="text/javascript" src="../apollo.js"></script>
-<script>function TestEcho(n) { return new ApolloApi().Message('CustomEchoMethod').setString('ApType', 'CustomEchoType').setInt('sIn', '41').send().toString(); }</script>
+<script>function TestEcho(n) { return new ApolloApi().ModuleCall('CustomEchoMethod').setInt('sIn', '41').send().toString(); }</script>
 </head>
 <body></body>
 </html>

@@ -39,7 +39,7 @@ function LimitChat(sText, nMaxLength)
   }
   return sNewText;
 }
-  
+
 // -------------------------------------------
 
 function Arena(sDomId)
@@ -294,37 +294,37 @@ Arena.prototype = {
   
   OnPublicChatTimedOut: function (hParticipant, hChat)
   {
-    api.Message('OnPublicChatTimedOut').setString('ApType', 'Arena_CallModule').setString('hParticipant', hParticipant).setString('hChat', hChat).send();
+    api.ModuleCall('OnPublicChatTimedOut').setString('hParticipant', hParticipant).setString('hChat', hChat).send();
   },
 
   OnPublicChatClosed: function (hParticipant, hChat)
   {
-    api.Message('OnPublicChatClosed').setString('ApType', 'Arena_CallModule').setString('hParticipant', hParticipant).setString('hChat', hChat).send();
+    api.ModuleCall('OnPublicChatClosed').setString('hParticipant', hParticipant).setString('hChat', hChat).send();
   },
 
   OnIconAttachmentClicked: function (hParticipant, sLink)
   {
-    api.Message('OnIconAttachmentClicked').setString('ApType', 'Arena_CallModule').setString('hParticipant', hParticipant).setString('sLink', sLink).send();
+    api.ModuleCall('OnIconAttachmentClicked').setString('hParticipant', hParticipant).setString('sLink', sLink).send();
   },
 
   OnAvatarPositionReached: function (hParticipant, nX)
   {
-    api.Message('OnAvatarPositionReached').setString('ApType', 'Arena_CallModule').setString('hParticipant', hParticipant).setInt('nX', nX).send();
+    api.ModuleCall('OnAvatarPositionReached').setString('hParticipant', hParticipant).setInt('nX', nX).send();
   },
 
   OnAvatarDraggedBy: function (hParticipant, nX, nY)
   {
-    api.Message('OnAvatarDraggedBy').setString('ApType', 'Arena_CallModule').setString('hParticipant', hParticipant).setInt('nX', nX).setInt('nY', nY).send();
+    api.ModuleCall('OnAvatarDraggedBy').setString('hParticipant', hParticipant).setInt('nX', nX).setInt('nY', nY).send();
   },
 
   OnAvatarPointerClosed: function (hParticipant)
   {
-    api.Message('OnAvatarPointerClosed').setString('ApType', 'Arena_CallModule').setString('hParticipant', hParticipant).send();
+    api.ModuleCall('OnAvatarPointerClosed').setString('hParticipant', hParticipant).send();
   },
 
   SendPublicChat: function (sText)
   {
-    api.Message('SendPublicChat').setString('ApType', 'Arena_CallModule').setString('sText', sText).send();
+    api.ModuleCall('SendPublicChat').setString('sText', sText).send();
   },
 
   // --------------------------------------

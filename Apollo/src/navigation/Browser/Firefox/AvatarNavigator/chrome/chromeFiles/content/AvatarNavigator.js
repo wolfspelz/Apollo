@@ -606,7 +606,7 @@ AvatarNavigator.prototype.cmdShowDebug = function()
       msg.setString('hContext', hContext);
       msg.setInt('bShow', 1);
       //Just a test
-      //msg.setString('ApType', 'SrpcGate');
+      //msg.setString('ApType', 'SrpcGate_Handler');
       //msg.setString('Method', 'System_GetHandle');
       this.protocol.sendRequest(msg);
     }

@@ -7,7 +7,7 @@
 #if !defined(Local_H_INCLUDED)
 #define Local_H_INCLUDED
 
-#define MODULE_NAME "ChatWindow"
+#define MODULE_NAME "Chat"
 #define LOG_CHANNEL MODULE_NAME
 
 #include "ApLog.h"

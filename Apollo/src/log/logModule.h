@@ -25,22 +25,23 @@ class Msg_Log_Line;
 class LogModule
 {
 public:
-  LogModule() : bInShutdown_(0) {}
-public:
+  LogModule()
+    :bInShutdown_(0)
+  {}
+
   void Init();
   void Exit();
 
-public:
   void On_Core_BeforeModuleUnloaded(Msg_Core_BeforeModuleUnloaded* pMsg);
   void On_MainLoop_EventLoopBeforeEnd(Msg_MainLoop_EventLoopBeforeEnd* pMsg);
   void On_Log_Line(Msg_Log_Line* pMsg);
 
 protected:
+  int bInShutdown_;
   FileLogger fileLog_;
 
-protected:
-  int bInShutdown_;
   Apollo::SrpcGateHandlerRegistry srpcGateRegistry_;
+  AP_MSG_REGISTRY_DECLARE;
 };
 
 typedef ApModuleSingleton<LogModule> LogModuleInstance;

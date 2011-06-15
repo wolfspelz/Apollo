@@ -68,6 +68,62 @@ void Dialog::SetIcon(const String& sIconUrl)
   if (!msg.Request()) { apLog_Error((LOG_CHANNEL, "Dialog::SetIcon", "%s(%s) failed: %s", StringType(msg.Type()), StringType(msg.sFunction), StringType(msg.sComment))); }
 }
 
+String Dialog::CallScriptFunction(const String& sFunction, List& lArgs)
+{
+  // document.getElementById('Content').contentWindow.eval("SetText('zz')")
+
+  Msg_WebView_CallScriptFunction msg;
+  msg.hView = GetView();
+
+  msg.sFunction = "ContentEval";
+  int nCnt = 0;
+  String sArglist = sFunction + "(";
+  for (Elem* e = 0; (e = lArgs.Next(e)) != 0; ) {
+    if (nCnt > 0) { sArglist += ", "; }
+    nCnt++;
+    String sArg = e->getName();
+    sArg.escape(String::EscapeQuotes);
+    sArg.escape(String::EscapeCRLF);
+    sArglist += "'" + sArg + "'" ;
+  }
+  sArglist += ")";
+  msg.lArgs.AddLast(sArglist);
+
+  //msg.sFunction = "ContentReceiveMessage";
+  //for (Elem* e = 0; (e = lArgs.Next(e)) != 0; ) {
+  //  msg.lArgs.AddLast(e->getName());
+  //}
+
+  if (!msg.Request()) { throw ApException("Dialog::CallScriptFunction: %s failed: %s", StringType(msg.Type()), StringType(msg.sComment)); }
+
+  return msg.sResult;
+}
+
+void Dialog::ContentCall(const String& sFunction, Apollo::SrpcMessage& srpc, Apollo::SrpcMessage& response)
+{
+  Msg_Dialog_CallScriptFunction msg;
+  msg.hDialog = apHandle();
+  msg.sFunction = sFunction;
+  msg.lArgs.AddLast(srpc.toString());
+  if (!msg.Request()) { throw ApException("View::CallJsSrpc Msg_WebView_CallScriptFunction: %s", StringType(msg.sComment)); }
+
+  response.fromString(msg.sResult);
+  if (response.length() > 0) {
+    int nStatus = response.getInt("Status");
+    if (nStatus != 1) {
+      throw ApException("View::CallJsSrpc Status=%d Message=%s", nStatus, StringType(response.getString("Message")));
+    }
+  }
+
+  //Msg_Dialog_CallScriptFunction msg;
+  //msg.hDialog = hAp_;
+  //msg.sFunction = sFunction;
+  //msg.lArgs;
+
+  //if (!msg.Request()) { throw ApException("Dialog::ContentCall: %s failed: %s", StringType(msg.Type()), StringType(msg.sComment)); }
+  ////sResult;
+}
+
 void Dialog::OnDocumentLoaded()
 {
   {

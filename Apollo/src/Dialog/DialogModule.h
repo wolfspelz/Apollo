@@ -34,6 +34,7 @@ public:
   void On_Dialog_SetCaption(Msg_Dialog_SetCaption* pMsg);
   void On_Dialog_SetIcon(Msg_Dialog_SetIcon* pMsg);
   void On_Dialog_CallScriptFunction(Msg_Dialog_CallScriptFunction* pMsg);
+  void On_Dialog_ContentCall(Msg_Dialog_ContentCall* pMsg);
 
   void On_WebView_Event_DocumentLoaded(Msg_WebView_Event_DocumentLoaded* pMsg);
   void On_WebView_Event_ReceivedFocus(Msg_WebView_Event_ReceivedFocus* pMsg);
@@ -76,7 +77,8 @@ public:
   static void End();
 
   static String CreateWaitCloseByContent();
-  static String CallContent();
+  static String CallContentScript();
+  static String CallContentSrpc();
   static String ContentLoadedFromHtml();
   static String ExternalUrl();
   static String SetCaption();

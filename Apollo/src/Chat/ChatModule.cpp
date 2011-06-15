@@ -90,11 +90,11 @@ AP_MSG_HANDLER_METHOD(ChatModule, Dialog_OnClosed)
 
 //---------------------------
 
-AP_TYPEDMSG_HANDLER_METHOD(ChatModule, WebView_CallModuleSrpc, Msg_WebView_CallModuleSrpc)
+AP_MSG_HANDLER_METHOD(ChatModule, WebView_ModuleCall)
 {
   ChatWindow* pChat = FindChat(pMsg->hView);
   if (pChat) {
-    pChat->OnCallModule(pMsg->srpc, pMsg->response);
+    pChat->OnModuleCall(pMsg->srpc, pMsg->response);
     pMsg->apStatus = ApMessage::Ok;
   }
 }
@@ -218,7 +218,7 @@ int ChatModule::Init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ChatModule, ChatWindow_Close, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ChatModule, Dialog_OnOpened, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ChatModule, Dialog_OnClosed, this, ApCallbackPosNormal);
-  AP_MSG_REGISTRY_ADD(MODULE_NAME, ChatModule, WebView_CallModuleSrpc, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, ChatModule, WebView_ModuleCall, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ChatModule, VpView_ParticipantAdded, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ChatModule, VpView_ParticipantRemoved, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ChatModule, VpView_LocationPublicChat, this, ApCallbackPosNormal);

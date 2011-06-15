@@ -191,7 +191,7 @@ Function.prototype.bind = function(fn)
   }
 }
 
-function Eval(sText) { return eval(sText); }
+function EvalJS(sText) { return eval(sText); }
 
 function ApolloApi()
 {
@@ -253,7 +253,7 @@ ApolloApi.prototype =
   ModuleCall: function(sMethod)
   {
     var msg = new ApMessage(sMethod);
-    msg.setString('ApType', 'Msg_WebView_CallModuleSrpc');
+    msg.setString('ApType', 'WebView_ModuleCall');
     return msg;
   },
 

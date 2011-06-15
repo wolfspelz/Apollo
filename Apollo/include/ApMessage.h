@@ -139,6 +139,11 @@ public:
 #define ApCallbackPosNormal 0
 #define ApCallbackPosEarly (-1000 * ApCallbackPosSegment)
 #define ApCallbackPosLate (1000 * ApCallbackPosSegment)
+#define ApCallbackPosVeryEarly (-2000 * ApCallbackPosSegment)
+#define ApCallbackPosIncrediblyEarly (-3000 * ApCallbackPosSegment)
+#define ApCallbackPosBreathtakinglyEarly (-4000 * ApCallbackPosSegment)
+#define ApCallbackPosOverwhelminglyEarly (-5000 * ApCallbackPosSegment)
+#define ApCallbackPosRidiculouslyEarly (-6000 * ApCallbackPosSegment)
 
 #define AP_MSG_HANDLER_METHOD(_class_, _msgtype_) \
 void _class_ ## _On_ ## _msgtype_(Msg_ ## _msgtype_* pMsg) \
@@ -150,7 +155,7 @@ void _class_ ## _On_ ## _msgtype_(Msg_ ## _msgtype_* pMsg) \
 }\
 void _class_ ## :: ## On_ ## _msgtype_(Msg_## _msgtype_* pMsg)
 
-#define AP_TYPEDMSG_HANDLER_METHOD(_class_, _msgtype_, _msgclass_) \
+#define AP_MSGCLASS_HANDLER_METHOD(_class_, _msgtype_, _msgclass_) \
 void _class_ ## _On_ ## _msgtype_(_msgclass_* pMsg) \
 { \
   _class_* self = (_class_*) pMsg->Ref(); \

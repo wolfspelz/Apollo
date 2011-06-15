@@ -42,7 +42,7 @@ public:
   void OnReceivePublicChat(const ApHandle& hChat, const String& sNickname, const String& sText, const Apollo::TimeValue& tvTimestamp);
   void OnReceivePublicAction(const String& sAction);
   void OnAnimationBegin(const String& sUrl);
-  void OnCallModule(Apollo::SrpcMessage& request, Apollo::SrpcMessage& response);
+  void OnModuleCall(Apollo::SrpcMessage& request, Apollo::SrpcMessage& response);
 
 protected:
   void OnPublicChatClosed(const ApHandle& hChat);

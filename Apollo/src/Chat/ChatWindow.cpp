@@ -62,8 +62,6 @@ void ChatWindow::AttachToLocation(const ApHandle& hLocation)
 
 void ChatWindow::OnLoaded()
 {
-  //ViewSrpcMessage vsm(this, "Start");
-
   { Msg_VpView_SubscribeLocationDetail msg; msg.hLocation = hLocation_; msg.sKey = Msg_VpView_LocationDetail_State; msg.Request(); }
   { Msg_VpView_GetLocationDetail msg; msg.hLocation = hLocation_; msg.sKey = Msg_VpView_LocationDetail_State; if (msg.Request()) { ShowLocationDetailState(msg.sValue); } }
 
@@ -71,7 +69,7 @@ void ChatWindow::OnLoaded()
     Msg_VpView_GetParticipants msg;
     msg.hLocation = hLocation_;
     if (!msg.Request()) {
-      apLog_Warning((LOG_CHANNEL, "ChatWindow::StartDisplay", "% failed: %s", StringType(msg.Type()), StringType(msg.sComment)));
+      apLog_Warning((LOG_CHANNEL, "ChatWindow::OnLoaded", "% failed: %s", StringType(msg.Type()), StringType(msg.sComment)));
     } else {
       for (Apollo::ValueElem* e = 0; e = msg.vlParticipants.nextElem(e); ) {
         ApHandle hParticipant = e->getHandle();
@@ -90,7 +88,7 @@ void ChatWindow::OnUnload()
   if (!msg.Request()) { throw ApException("ChatWindow::OnUnload() %s failed: %s" ApHandleFormat "", StringType(msg.Type()), StringType(msg.sComment)); }
 }
 
-void ChatWindow::OnCallModule(Apollo::SrpcMessage& request, Apollo::SrpcMessage& response)
+void ChatWindow::OnModuleCall(Apollo::SrpcMessage& request, Apollo::SrpcMessage& response)
 {
   String sMethod = request.getString("Method");
 
@@ -101,11 +99,11 @@ void ChatWindow::OnCallModule(Apollo::SrpcMessage& request, Apollo::SrpcMessage&
       Msg_Vp_SendPublicChat msg;
       msg.hLocation = hLocation_;
       msg.sText = sText;
-      if (!msg.Request()) { throw ApException("ChatWindow::OnCallModule() %s failed  loc=" ApHandleFormat ": %s", StringType(msg.Type()), ApHandleType(hLocation_), StringType(msg.sComment)); }
+      if (!msg.Request()) { throw ApException("ChatWindow::OnModuleCall() %s failed  loc=" ApHandleFormat ": %s", StringType(msg.Type()), ApHandleType(hLocation_), StringType(msg.sComment)); }
     }
 
   } else {
-    throw ApException("ChatWindow::OnCallModule() Unknown Method=%s", StringType(sMethod));
+    throw ApException("ChatWindow::OnModuleCall() Unknown Method=%s", StringType(sMethod));
   }
 }
 
@@ -173,5 +171,23 @@ void ChatWindow::OnLocationDetailsChanged(Apollo::ValueList& vlKeys)
 
 void ChatWindow::ShowLocationDetailState(const String& sValue)
 {
-  //ViewSrpcMessage vsm(this, "SetLocationState");
+  //ViewCall vc(this, "SetLocationState");
+}
+
+//---------------------------------------------------
+
+ViewCall::ViewCall(ChatWindow* pChatWindow, const String& sMethod)
+{
+  srpc.set("Method", sMethod);
+  hDialog = pChatWindow->apHandle();
+  sFunction = Apollo::getModuleConfig(MODULE_NAME, "CallScriptSrpcFunctionName", "receiveSrpcMessageAsString");
+}
+
+int ViewCall::Request()
+{
+  if (ApIsHandle(hDialog)) {
+    return base::Request();
+  } else {
+    return 0;
+  }
 }

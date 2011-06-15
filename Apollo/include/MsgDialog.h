@@ -70,6 +70,17 @@ public:
   ApOUT String sResult;
 };
 
+// Module DLL -> script in dialog content
+class Msg_Dialog_ContentCall: public ApRequestMessage
+{
+public:
+  Msg_Dialog_ContentCall() : ApRequestMessage("Dialog_ContentCall") {}
+  ApIN ApHandle hDialog;
+  ApIN String sFunction;
+  ApIN Apollo::SrpcMessage srpc;
+  ApOUT Apollo::SrpcMessage response;
+};
+
 // ------------------------------------
 
 // Dialog -> 
