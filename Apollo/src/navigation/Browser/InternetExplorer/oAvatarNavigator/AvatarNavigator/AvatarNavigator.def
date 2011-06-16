@@ -1,9 +1,0 @@
-; AvatarNavigator.def : Declares the module parameters.
-
-LIBRARY      "AvatarNavigator.DLL"
-
-EXPORTS
-	DllCanUnloadNow		PRIVATE
-	DllGetClassObject	PRIVATE
-	DllRegisterServer	PRIVATE
-	DllUnregisterServer	PRIVATE
