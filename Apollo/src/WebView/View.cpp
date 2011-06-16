@@ -19,10 +19,14 @@ View::~View()
 void View::Create()
 {
   AutoComPtr<IWebPreferences> tmpPreferences;
-  AutoComPtr<IWebPreferences> standardPreferences;
   if (FAILED( WebKitCreateInstance(CLSID_WebPreferences, 0, IID_IWebPreferences, tmpPreferences) )) { throw ApException("View::Create WebKitCreateInstance(CLSID_WebPreferences) failed"); }
+  AutoComPtr<IWebPreferences> standardPreferences;
   if (FAILED( tmpPreferences->standardPreferences(standardPreferences) )) { throw ApException("View::Create tmpPreferences->standardPreferences() failed"); }
   if (FAILED( standardPreferences->setAcceleratedCompositingEnabled(TRUE) )) { throw ApException("View::Create standardPreferences->setAcceleratedCompositingEnabled() failed"); }
+
+  //AutoComPtr<IWebPreferencesPrivate> privatePreferences;
+  //// How to get privatePreferences?
+  //if (FAILED( privatePreferences->setDeveloperExtrasEnabled(FALSE) )) { throw ApException("View::Create privatePreferences->setDeveloperExtrasEnabled() failed"); }
 
   // -----------------------------
 

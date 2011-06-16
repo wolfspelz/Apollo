@@ -12,8 +12,12 @@
 
 int ConfigModule::setValue(ConfigPlane* pPlane, const String& sKey, const String& sValue)
 {
-  if (sKey == "Dialog/Theme") {
-    int AP_UNUSED_VARIABLE x = 1;
+  if (sKey == "Translation/Language") {
+    StringTreeNode<String>* pNode = pPlane->stData_.Find(sKey);
+    if (pNode != 0) {
+      String sPreviousValue = pNode->Value();
+      int AP_UNUSED_VARIABLE x = 1;
+    }
   }
 
   if (pPlane) {

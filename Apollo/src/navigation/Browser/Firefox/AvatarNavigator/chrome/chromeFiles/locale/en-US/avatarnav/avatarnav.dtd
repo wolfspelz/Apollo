@@ -2,3 +2,4 @@
 <!ENTITY  statusbar.tooltip.default  "Avatar: enabled">
 <!ENTITY  statusbar.icon.Disconnect  "Reconnect navigation">
 <!ENTITY  statusbar.icon.ShowDebug   "Show developer tools">
+<!ENTITY  statusbar.icon.ShowChat   "Show chat window">

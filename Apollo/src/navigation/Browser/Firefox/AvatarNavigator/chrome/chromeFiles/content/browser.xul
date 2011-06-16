@@ -26,6 +26,7 @@
     <menupopup id="anStatusbarIconContextMenu">
       <menuitem label="&statusbar.icon.Disconnect;" oncommand="anCommandDisconnect();" />
       <menuitem label="&statusbar.icon.ShowDebug;" oncommand="anCommandShowDebug();" />
+      <menuitem label="&statusbar.icon.ShowChat;" oncommand="anCommandShowChat();" />
     </menupopup>
   </popupset>
   

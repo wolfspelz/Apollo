@@ -1,0 +1,5 @@
+#ässert utf-8
+#ässert utf-8
+Chat=談話
+Send=發送
+Clear=空物

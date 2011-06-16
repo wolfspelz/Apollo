@@ -112,8 +112,8 @@ int Context::resolved()
 
   // Otherwise use the base URL as zone name
   if (ok && sZone.empty()) {
-    Apollo::URL uUrl = sDocumentUrl_;
-    sZone = uUrl.base();
+    Apollo::URL url = sDocumentUrl_;
+    sZone = url.base();
   }
 
   String sSuffix;

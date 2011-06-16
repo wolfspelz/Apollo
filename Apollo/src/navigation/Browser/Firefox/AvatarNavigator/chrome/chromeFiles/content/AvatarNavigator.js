@@ -613,6 +613,23 @@ AvatarNavigator.prototype.cmdShowDebug = function()
   }
 }
 
+AvatarNavigator.prototype.cmdShowChat = function()
+{
+  anLogTrace('AvatarNavigator.cmdShowChat');
+
+  if (this.selectedTab != null) {
+    var hContext = AvatarNavigator.getTabContext(this.selectedTab);
+    if (this.protocol) {
+      var msg = new SrpcMessage();
+      msg.setString('ApType', 'Navigator_CallDisplay');
+      msg.setString('Method', 'ShowChat');
+      msg.setString('hContext', hContext);
+      msg.setInt('bShow', 1);
+      this.protocol.sendRequest(msg);
+    }
+  }
+}
+
 // -------------------------------
 
 AvatarNavigator.prototype.init = function()

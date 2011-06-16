@@ -13,6 +13,7 @@ public:
   Dialog::Dialog(const ApHandle& hDialog)
     :hAp_(hDialog)
     ,bVisible_(0)
+    ,bDocumentLoaded_(0)
     ,nLeft_(100)
     ,nTop_(100)
     ,nWidth_(300)
@@ -39,6 +40,7 @@ public:
 protected:
   ApHandle hAp_;
   ApHandle hView_;
+  int bDocumentLoaded_;
   int bVisible_;
   int nLeft_;
   int nTop_;
