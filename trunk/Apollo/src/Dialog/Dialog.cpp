@@ -52,7 +52,7 @@ void Dialog::SetCaption(const String& sCaption)
 
   Msg_WebView_CallScriptFunction msg;
   msg.hView = hView_;
-  msg.sFunction = "SetCaption";
+  msg.sFunction = "ApSetCaption";
   msg.lArgs.AddLast(sCaption_);
   if (!msg.Request()) { apLog_Error((LOG_CHANNEL, "Dialog::SetCaption", "%s(%s) failed: %s", StringType(msg.Type()), StringType(msg.sFunction), StringType(msg.sComment))); }
 }
@@ -63,7 +63,7 @@ void Dialog::SetIcon(const String& sIconUrl)
 
   Msg_WebView_CallScriptFunction msg;
   msg.hView = hView_;
-  msg.sFunction = "SetIcon";
+  msg.sFunction = "ApSetIcon";
   msg.lArgs.AddLast(sIconUrl_);
   if (!msg.Request()) { apLog_Error((LOG_CHANNEL, "Dialog::SetIcon", "%s(%s) failed: %s", StringType(msg.Type()), StringType(msg.sFunction), StringType(msg.sComment))); }
 }
@@ -75,7 +75,7 @@ String Dialog::CallScriptFunction(const String& sFunction, List& lArgs)
   Msg_WebView_CallScriptFunction msg;
   msg.hView = GetView();
 
-  msg.sFunction = "ContentEval";
+  msg.sFunction = "ApContentEval";
   int nCnt = 0;
   String sArglist = sFunction + "(";
   for (Elem* e = 0; (e = lArgs.Next(e)) != 0; ) {
@@ -129,7 +129,7 @@ void Dialog::OnDocumentLoaded()
   {
     Msg_WebView_CallScriptFunction msg;
     msg.hView = hView_;
-    msg.sFunction = "SetContent";
+    msg.sFunction = "ApSetContent";
     msg.lArgs.AddLast(sContentUrl_);
     if (!msg.Request()) { apLog_Error((LOG_CHANNEL, "Dialog::OnDocumentLoaded", "%s(%s) failed: %s", StringType(msg.Type()), StringType(msg.sFunction), StringType(msg.sComment))); }
   }
@@ -140,7 +140,7 @@ void Dialog::OnDocumentLoaded()
   {
     Msg_WebView_CallScriptFunction msg;
     msg.hView = hView_;
-    msg.sFunction = "ShowContent";
+    msg.sFunction = "ApShowContent";
     msg.lArgs.AddLast("true");
     if (!msg.Request()) { apLog_Error((LOG_CHANNEL, "Dialog::OnDocumentLoaded", "%s(%s) failed: %s", StringType(msg.Type()), StringType(msg.sFunction), StringType(msg.sComment))); }
   }

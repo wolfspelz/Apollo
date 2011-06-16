@@ -180,7 +180,7 @@ ViewCall::ViewCall(ChatWindow* pChatWindow, const String& sMethod)
 {
   srpc.set("Method", sMethod);
   hDialog = pChatWindow->apHandle();
-  sFunction = Apollo::getModuleConfig(MODULE_NAME, "CallScriptSrpcFunctionName", "receiveSrpcMessageAsString");
+  sFunction = Apollo::getModuleConfig(MODULE_NAME, "CallScriptSrpcFunctionName", "ReceiveMessageFromModule");
 }
 
 int ViewCall::Request()

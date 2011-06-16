@@ -407,7 +407,7 @@ void DialogModuleTester_CallContentScript_Dialog_ContentLoaded(Msg_Dialog_Conten
 
   if (!s) {
     String sExpected = "1=CallContentScript Text1 2=42";
-    String sResult = Msg_WebView_CallScriptFunction::_(pMsg->hView, "ContentEval", "document.getElementById('iText').innerHTML");
+    String sResult = Msg_WebView_CallScriptFunction::_(pMsg->hView, "ApContentEval", "document.getElementById('iText').innerHTML");
     if (sResult != sExpected) {
       s = "Wrong text expected=" + sExpected + " got=" + sResult;
     }
@@ -467,7 +467,7 @@ void DialogModuleTester_CallContentSrpc_Dialog_ContentLoaded(Msg_Dialog_ContentL
 
   if (!s) {
     String sExpected = "String=41\nInt=42\n";
-    String sResult = Msg_WebView_CallScriptFunction::_(pMsg->hView, "ContentEval", "document.getElementById('iText').innerHTML");
+    String sResult = Msg_WebView_CallScriptFunction::_(pMsg->hView, "ApContentEval", "document.getElementById('iText').innerHTML");
     if (sResult != sExpected) {
       s = "Wrong text expected=" + sExpected + " got=" + sResult;
     }
@@ -579,14 +579,14 @@ void DialogModuleTester_SetCaption_WebView_Event_DocumentLoaded(Msg_WebView_Even
   }
 
   if (!s) {
-    String sResult = Msg_WebView_CallScriptFunction::_(pMsg->hView, "EvalJS", "$('#Caption').text()");
+    String sResult = Msg_WebView_CallScriptFunction::_(pMsg->hView, "ApEval", "$('#Caption').text()");
     if (sResult != "Final Window Caption") {
       s = "Caption wrong";
     }
   }
 
   if (!s) {
-    String sResult = Msg_WebView_CallScriptFunction::_(pMsg->hView, "EvalJS", "$('#Icon').attr('src')");
+    String sResult = Msg_WebView_CallScriptFunction::_(pMsg->hView, "ApEval", "$('#Icon').attr('src')");
     if (sResult != "file://" + Apollo::getModuleResourcePath(MODULE_NAME) + "test/SetCaptionFinalIcon.png") {
       s = "IconUrl wrong";
     }
