@@ -33,7 +33,7 @@ void ChatWindow::Open()
     msg.nWidth = Apollo::getModuleConfig(MODULE_NAME, "Width", 500);
     msg.nHeight = Apollo::getModuleConfig(MODULE_NAME, "Height", 300);
     msg.bVisible = 1;
-    msg.sCaption = "Chat";
+    msg.sCaption = Apollo::translate(MODULE_NAME, "", "Chat");
     msg.sIconUrl = "file://" + Apollo::getModuleResourcePath(MODULE_NAME) + "icon.png";
     msg.sContentUrl = "file://" + Apollo::getModuleResourcePath(MODULE_NAME) + "Chat.html";
     if (!msg.Request()) { throw ApException("%s failed: %s", StringType(msg.Type()), StringType(msg.sComment)); }
@@ -50,10 +50,33 @@ void ChatWindow::Close()
 
 void ChatWindow::AttachToLocation(const ApHandle& hLocation)
 {
-  Msg_Vp_AddLocationContext msg;
-  msg.hLocation = hLocation;
-  msg.hContext = hContext_;
-  if (!msg.Request()) { throw ApException("ChatWindow::AttachToLocation() %s failed: %s" ApHandleFormat "", StringType(msg.Type()), StringType(msg.sComment)); }
+  {
+    Msg_Vp_AddLocationContext msg;
+    msg.hLocation = hLocation;
+    msg.hContext = hContext_;
+    if (!msg.Request()) { throw ApException("ChatWindow::AttachToLocation() %s failed: %s" ApHandleFormat "", StringType(msg.Type()), StringType(msg.sComment)); }
+  }
+
+  {
+    Msg_VpView_GetLocationContexts msg;
+    msg.hLocation = hLocation;
+    if (msg.Request()) {
+      for (Apollo::ValueElem* e = 0; (e = msg.vlContexts.nextElem(e)) != 0; ) {
+        Msg_VpView_GetContextDetail msgVVGCD;
+        msgVVGCD.hContext = e->getHandle();
+        msgVVGCD.sKey = Msg_VpView_ContextDetail_DocumentUrl;
+        if (msgVVGCD.Request()) {
+          if (msgVVGCD.sValue) {
+            Msg_Dialog_SetCaption msgDSC;
+            msgDSC.hDialog = hAp_;
+            msgDSC.sCaption = Apollo::translate(MODULE_NAME, "", "Chat") + " " + msgVVGCD.sValue;
+            msgDSC.Request();
+            break;
+          }
+        }
+      }
+    }
+  }
 
   hLocation_ = hLocation;
 }

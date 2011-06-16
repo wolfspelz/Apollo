@@ -355,6 +355,10 @@ void Display::OnNavigatorCallDisplay(Apollo::SrpcMessage& request, Apollo::SrpcM
   String sMethod = request.getString("Method");
 
   if (0){
+  } else if (sMethod == "ShowChat") {
+    int bShow = request.getInt("bShow");
+    OnShowChat(bShow);
+
   } else if (sMethod == "ShowDebug") {
     int bShow = request.getInt("bShow");
     OnShowDebug(bShow);

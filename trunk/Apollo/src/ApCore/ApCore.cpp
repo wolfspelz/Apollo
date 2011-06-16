@@ -12,6 +12,8 @@
 #include "MsgCore.h"
 #include "MsgConfig.h"
 
+//#define DEBUG_CHECK_MEMORY 1
+
 #if defined(WIN32)
 BOOL APIENTRY DllMain(HANDLE hModule, DWORD dwReason, LPVOID lpReserved)
 {
@@ -476,7 +478,7 @@ int ApCore::Call(ApMessage* pMsg)
         if (fnCallback != 0) {
           pMsg->Ref(pCurrent->Ref());
 
-          #if defined(_DEBUG)
+          #if defined(_DEBUG) && defined(DEBUG_CHECK_MEMORY)
             #if defined(_WIN32) && defined(_MSC_VER)
               _CrtCheckMemory();
             #endif
@@ -486,7 +488,7 @@ int ApCore::Call(ApMessage* pMsg)
 
             fnCallback(pMsg);
 
-          #if defined(_DEBUG)
+          #if defined(_DEBUG) && defined(DEBUG_CHECK_MEMORY)
             #if defined(_WIN32) && defined(_MSC_VER)
               _CrtCheckMemory();
             #endif

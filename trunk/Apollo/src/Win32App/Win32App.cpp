@@ -18,9 +18,12 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
   //apLog_SetMask(apLog_MaskSilent);
   //apLog_SetMask(apLog_MaskNoTrace);
-  apLog_SetMask(apLog_MaskMaxUser);
   //apLog_SetMask(apLog_MaskMaxInfo);
+#if defined(_DEBUG)
   //apLog_SetMask(apLog_MaskMaxVerbose);
+#else
+  apLog_SetMask(apLog_MaskMaxUser);
+#endif
   
   if (!Apollo::Init(__argc, __argv)) {
     apLog_Alert(("Main", "WinMain", "Apollo::Init() failed"));

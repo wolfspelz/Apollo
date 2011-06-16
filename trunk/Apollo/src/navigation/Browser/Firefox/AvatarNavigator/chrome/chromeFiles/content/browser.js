@@ -53,3 +53,7 @@ function anCommandShowDebug(e)
 	AvatarNavigator.getInstance().cmdShowDebug();
 }
 
+function anCommandShowChat(e)
+{
+	AvatarNavigator.getInstance().cmdShowChat();
+}

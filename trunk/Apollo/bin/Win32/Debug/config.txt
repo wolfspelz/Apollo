@@ -40,4 +40,3 @@ Update/Version=3.0.4
 #Xmpp/Room/Nickname=jabberDun
 #Vp/Identity/Url=http://storage.zweitgeist.com/index.php/18137194 
 #Vp/Identity/Digest=a69e77843cb5e49283bc9f27eb766264563cc2ab
-

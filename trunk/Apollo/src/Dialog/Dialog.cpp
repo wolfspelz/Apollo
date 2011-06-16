@@ -50,22 +50,26 @@ void Dialog::SetCaption(const String& sCaption)
 {
   sCaption_ = sCaption;
 
-  Msg_WebView_CallScriptFunction msg;
-  msg.hView = hView_;
-  msg.sFunction = "ApSetCaption";
-  msg.lArgs.AddLast(sCaption_);
-  if (!msg.Request()) { apLog_Error((LOG_CHANNEL, "Dialog::SetCaption", "%s(%s) failed: %s", StringType(msg.Type()), StringType(msg.sFunction), StringType(msg.sComment))); }
+  if (bDocumentLoaded_) {
+    Msg_WebView_CallScriptFunction msg;
+    msg.hView = hView_;
+    msg.sFunction = "ApSetCaption";
+    msg.lArgs.AddLast(sCaption_);
+    if (!msg.Request()) { apLog_Error((LOG_CHANNEL, "Dialog::SetCaption", "%s(%s) failed: %s", StringType(msg.Type()), StringType(msg.sFunction), StringType(msg.sComment))); }
+  }
 }
 
 void Dialog::SetIcon(const String& sIconUrl)
 {
   sIconUrl_ = sIconUrl;
 
-  Msg_WebView_CallScriptFunction msg;
-  msg.hView = hView_;
-  msg.sFunction = "ApSetIcon";
-  msg.lArgs.AddLast(sIconUrl_);
-  if (!msg.Request()) { apLog_Error((LOG_CHANNEL, "Dialog::SetIcon", "%s(%s) failed: %s", StringType(msg.Type()), StringType(msg.sFunction), StringType(msg.sComment))); }
+  if (bDocumentLoaded_){
+    Msg_WebView_CallScriptFunction msg;
+    msg.hView = hView_;
+    msg.sFunction = "ApSetIcon";
+    msg.lArgs.AddLast(sIconUrl_);
+    if (!msg.Request()) { apLog_Error((LOG_CHANNEL, "Dialog::SetIcon", "%s(%s) failed: %s", StringType(msg.Type()), StringType(msg.sFunction), StringType(msg.sComment))); }
+  }
 }
 
 String Dialog::CallScriptFunction(const String& sFunction, List& lArgs)
@@ -126,6 +130,8 @@ void Dialog::ContentCall(const String& sFunction, Apollo::SrpcMessage& srpc, Apo
 
 void Dialog::OnDocumentLoaded()
 {
+  bDocumentLoaded_ = 1;
+
   {
     Msg_WebView_CallScriptFunction msg;
     msg.hView = hView_;
@@ -136,7 +142,10 @@ void Dialog::OnDocumentLoaded()
 
   if (sCaption_) { SetCaption(sCaption_); }
   if (sIconUrl_) { SetIcon(sIconUrl_); }
+}
 
+void Dialog::OnContentLoaded()
+{
   {
     Msg_WebView_CallScriptFunction msg;
     msg.hView = hView_;
@@ -144,13 +153,12 @@ void Dialog::OnDocumentLoaded()
     msg.lArgs.AddLast("true");
     if (!msg.Request()) { apLog_Error((LOG_CHANNEL, "Dialog::OnDocumentLoaded", "%s(%s) failed: %s", StringType(msg.Type()), StringType(msg.sFunction), StringType(msg.sComment))); }
   }
-}
 
-void Dialog::OnContentLoaded()
-{
-  Msg_Dialog_OnOpened msg;
-  msg.hDialog = hAp_;
-  msg.Send();
+  {
+    Msg_Dialog_OnOpened msg;
+    msg.hDialog = hAp_;
+    msg.Send();
+  }
 }
 
 void Dialog::OnReceivedFocus()

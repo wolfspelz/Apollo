@@ -183,7 +183,10 @@ AP_MSG_HANDLER_METHOD(BabelfishModule, Translation_Get)
 
   ok = getText(sCurrentLanguage_, pMsg->sModule, pMsg->sContext, pMsg->sText, pMsg->sTranslated);
   if (!ok && sCurrentLanguage_ != sDefaultLanguage_) {
-    (void) getText(sDefaultLanguage_, pMsg->sModule, pMsg->sContext, pMsg->sText, pMsg->sTranslated);
+    int iok = getText(sDefaultLanguage_, pMsg->sModule, pMsg->sContext, pMsg->sText, pMsg->sTranslated);
+    if (!iok) {
+      apLog_Warning((LOG_CHANNEL, "BabelfishModule::Translation_Get", "No translation for lang=%s, mod=%s, ctxt=%s, txt=%s", StringType(sCurrentLanguage_), StringType(pMsg->sModule), StringType(pMsg->sContext), StringType(pMsg->sText)));
+    }
   }
 
   pMsg->apStatus = ok ? ApMessage::Ok : ApMessage::Error;
