@@ -1,7 +1,7 @@
 @ECHO OFF
 
 SET VERSION=latest
-rem SET VERSION=3.0.3
+rem SET VERSION=3.0.4
 rem SET RC_VERSION=1
 
 PATH=%PATH%;"%CD%\bin"
@@ -42,4 +42,4 @@ ECHO ---------------------------------------------------------------------------
 ECHO Done ...
 @ECHO ON
 
-cmd
+pause
