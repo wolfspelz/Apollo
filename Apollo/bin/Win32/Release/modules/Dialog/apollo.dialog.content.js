@@ -11,6 +11,8 @@ ApDialogContent.prototype =
   Message: parent.api.Message,
   ModuleCall: parent.api.ModuleCall,
   Log: parent.api.Log,
+  TranslateElement: parent.api.TranslateElement,
+  Translate: parent.api.Translate,
 
   Ready: function()
   {

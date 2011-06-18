@@ -1,6 +1,9 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
+<script type="text/javascript" src="../WebView/apollo.js"></script>
+<script type="text/javascript" src="../Dialog/apollo.dialog.js"></script>
+<script type="text/javascript" src="../Dialog/apollo.dialog.content.js"></script>
 <style>
 * { padding:0; margin:0; font-family:Arial;font-size:11px; }
 h1 { margin-bottom:4px; font-weight:bold; }
@@ -11,8 +14,6 @@ input[type="text"] { border:1px solid #808080; }
 <script type="text/javascript">
   function Elem(sDomId) { return document.getElementById(sDomId); }
 
-  api = parent.api;
-  
   function SetConfig()
   {
     api.Message('Config_SetValue')
@@ -116,4 +117,11 @@ input[type="text"] { border:1px solid #808080; }
 
 </div>
 </body>
+
+<script type="text/javascript">
+  var api = new ApDialogContent();
+  api.ModuleName('TestDialog');
+  api.Ready();
+</script>
+
 </html>
