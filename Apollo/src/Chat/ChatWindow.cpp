@@ -39,6 +39,7 @@ void ChatWindow::Open()
     if (!msg.Request()) { throw ApException("%s failed: %s", StringType(msg.Type()), StringType(msg.sComment)); }
   }
 
+  { Msg_Dialog_SetWaitForContent msg; msg.hDialog = hAp_; msg.bWaitForContent = 1; msg.Request(); }
 }
 
 void ChatWindow::Close()
