@@ -14,6 +14,7 @@ public:
     :hAp_(hDialog)
     ,bVisible_(0)
     ,bDocumentLoaded_(0)
+    ,bShowContentOnDocumentLoaded_(1)
     ,nLeft_(100)
     ,nTop_(100)
     ,nWidth_(300)
@@ -28,6 +29,8 @@ public:
   void Destroy();
   void SetCaption(const String& sCaption);
   void SetIcon(const String& sIconUrl);
+  void SetWaitForContent(int bWaitForContent);
+  void ShowContent();
   String CallScriptFunction(const String& sFunction, List& lArgs);
   void ContentCall(const String& sFunction, Apollo::SrpcMessage& srpc, Apollo::SrpcMessage& response);
 
@@ -41,6 +44,7 @@ protected:
   ApHandle hAp_;
   ApHandle hView_;
   int bDocumentLoaded_;
+  int bShowContentOnDocumentLoaded_;
   int bVisible_;
   int nLeft_;
   int nTop_;

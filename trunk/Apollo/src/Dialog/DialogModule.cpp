@@ -102,6 +102,15 @@ AP_MSG_HANDLER_METHOD(DialogModule, Dialog_SetIcon)
   }
 }
 
+AP_MSG_HANDLER_METHOD(DialogModule, Dialog_SetWaitForContent)
+{
+  Dialog* pDialog = FindDialog(pMsg->hDialog);
+  if (pDialog) {
+    pDialog->SetWaitForContent(pMsg->bWaitForContent);
+    pMsg->apStatus = ApMessage::Ok;
+  }
+}
+
 AP_MSG_HANDLER_METHOD(DialogModule, Dialog_CallScriptFunction)
 {
   Dialog* pDialog = FindDialog(pMsg->hDialog);
@@ -256,6 +265,7 @@ int DialogModule::Init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, DialogModule, Dialog_GetView, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, DialogModule, Dialog_SetCaption, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, DialogModule, Dialog_SetIcon, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, DialogModule, Dialog_SetWaitForContent, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, DialogModule, Dialog_CallScriptFunction, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, DialogModule, Dialog_ContentCall, this, ApCallbackPosNormal);
 

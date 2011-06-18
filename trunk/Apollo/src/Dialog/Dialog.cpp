@@ -72,6 +72,20 @@ void Dialog::SetIcon(const String& sIconUrl)
   }
 }
 
+void Dialog::SetWaitForContent(int bWaitForContent)
+{
+  bShowContentOnDocumentLoaded_ = !bWaitForContent;
+}
+
+void Dialog::ShowContent()
+{
+  Msg_WebView_CallScriptFunction msg;
+  msg.hView = hView_;
+  msg.sFunction = "ApShowContent";
+  msg.lArgs.AddLast("true");
+  if (!msg.Request()) { apLog_Error((LOG_CHANNEL, "Dialog::OnDocumentLoaded", "%s(%s) failed: %s", StringType(msg.Type()), StringType(msg.sFunction), StringType(msg.sComment))); }
+}
+
 String Dialog::CallScriptFunction(const String& sFunction, List& lArgs)
 {
   // document.getElementById('Content').contentWindow.eval("SetText('zz')")
@@ -140,18 +154,18 @@ void Dialog::OnDocumentLoaded()
     if (!msg.Request()) { apLog_Error((LOG_CHANNEL, "Dialog::OnDocumentLoaded", "%s(%s) failed: %s", StringType(msg.Type()), StringType(msg.sFunction), StringType(msg.sComment))); }
   }
 
+  if (bShowContentOnDocumentLoaded_) {
+    ShowContent();
+  }
+
   if (sCaption_) { SetCaption(sCaption_); }
   if (sIconUrl_) { SetIcon(sIconUrl_); }
 }
 
 void Dialog::OnContentLoaded()
 {
-  {
-    Msg_WebView_CallScriptFunction msg;
-    msg.hView = hView_;
-    msg.sFunction = "ApShowContent";
-    msg.lArgs.AddLast("true");
-    if (!msg.Request()) { apLog_Error((LOG_CHANNEL, "Dialog::OnDocumentLoaded", "%s(%s) failed: %s", StringType(msg.Type()), StringType(msg.sFunction), StringType(msg.sComment))); }
+  if (!bShowContentOnDocumentLoaded_) {
+    ShowContent();
   }
 
   {
