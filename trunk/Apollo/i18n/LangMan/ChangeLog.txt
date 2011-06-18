@@ -1,0 +1,70 @@
+v0.9.4
+- Boundary and escape characters can be added to keys as well (changed properties: BoundaryChar.PART -> BoundaryCharVal.PART, EscapeChar.PART -> EscapeCharVal.PART, new optional properties: BoundaryCharKey.PART, EscapeCharKey.PART)
+- Minor bugfix (\n was added at the end of templates)
+
+v0.9.3
+- Changed behavior of import in case keys with references are imported
+
+v0.9.2
+- Added warning if a language found in a patchfile does not exist in the currently loaded dictionary.
+
+v0.9.1
+- Fixed bug: Default languages defined for languages work if called on the command line
+
+v0.9.0
+- Added support for references - references can be added in the "Reference" column in this format: Part::Key ... so never create a new Part with "::" in the name :-)
+
+v0.8.0
+- Added support for additional targets
+- Added commandline parameter -c/-config
+- Minor error handling enhancements
+
+v0.7.0
+- Added default language dependencies
+
+v0.6.2
+- Fixed typo in errormessage
+
+v0.6.1
+- Feedback messages are not treated as log entries anymore and so will be displayed always.
+
+v0.6.0
+- Multiple files can be exported in translator export.
+- CSV-Export is not asking anymore, wether a file should be overwritten, if it does not exist so far.
+- All output is logged to a logfile defined in the LangMan.properties with key "LogFile"
+- The loglevel can be set in the LangMan.properties. Possible levels are: log, warn, error, stfu. The key is "LogLevel[.Console|.File]".
+
+v0.5.1
+- Fixed patch bug introduced in v0.5.0 or v0.4.0
+
+v0.5.0
+- New Feature: Files for translators can be generated
+- Renamed "Export" to "Generate"
+
+v0.4.0
+- For each dictionary file (text.csv) a properties file can be defined. This property file must have the same path and name, but a different extension: "properties" (text.properties)
+- Default language can be set for each language in the LangMan.properties and in the dicionary properties (DefaultLang.[LANG]). The LangMan.properties will override the dicionary properties.
+- A LangMan.local.properties file can be defined and will override the LangMan.properties - make use of this to define your own paths ... and do not add it to the svn accidently!
+- UnitTests can be turned on/off via RunUnitTests=true/false
+
+v0.3.0
+- Support for language dependent export path/file: ExportPath.[PART].[LANG] and ExportName.[PART].[LANG] can be set.
+- Handling of multiple language definition
+
+v0.2.0
+- Support for language dependent templates
+- Support for "FileTemplate only"
+- The use of the DefaultLang can be turned of (is on by default) via UseDefaultLang.[PART]=[true|false]
+- Behavior on "no value found" can be defined for every part or in general - default is "empty"
+- Fancied up export dialog a bit
+- Bugfix: EmptyStrings are preserved on csv export
+
+v0.1.1
+- Bugfix: Encoding of export files was not read from the properties
+
+v0.1.0
+- TemplateEncoding can be set in the LangMan.properties (FileTemplate.Encoding[.PART], LineTemplate.Encoding[.PART])
+- Default Templates where changed to UTF-8
+- EmptyString can be defined in the LangMan.properties (EmptyString) and used in the csv
+- Added commandline parameter -v/-version
+- Version is displayed in the window title of the gui
