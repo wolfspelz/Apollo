@@ -341,7 +341,6 @@ Arena.prototype = {
       }
     ).click(
       function (ev) {
-        ev.stopPropagation();
         arena.CloseChat();
       }
     );
@@ -352,10 +351,6 @@ Arena.prototype = {
 //      }, 
 //      function () {
 //        $('.cPointer .cCloseButton').fadeOut('fast');
-//      }
-//    ).click(
-//      function (ev) {
-//        ev.stopPropagation();
 //      }
 //    );
 
@@ -368,7 +363,6 @@ Arena.prototype = {
 //      }
 //    ).click(
 //      function (ev) {
-//        ev.stopPropagation();
 //        $('.cPointer').fadeOut('fast');
 //        arena.OnAvatarPointerClosed();
 //      }
@@ -391,23 +385,12 @@ Arena.prototype = {
           return true;
         }
       }
-    ).click(
-      function(ev) {
-        ev.stopPropagation();
-      }
     );
 
     $('.cChatIn .cSend').click(
       function(ev) {
-        ev.stopPropagation();
         arena.SendPublicChat($('.cChatIn .cText').val());
         $('.cChatIn .cText').val('').focus();
-      }
-    );
-
-    $('.cChatIn').click(
-      function(ev) {
-        ev.stopPropagation();
       }
     );
 
@@ -416,26 +399,36 @@ Arena.prototype = {
         containment: '#' + arena.sDomId,
         scroll: false,
         stack: '.cParticipant',
-        opacity: 0.7, 
+        opacity: 0.7,
+        distance: 4,
         helper: "clone",
         handle: '.cImage',
+        start: function(ev, ui) {
+          $('#' + GetParticipantDomId(hParticipant) + ' .cImage')[0].apInDrag = true;
+        },
         stop: function(ev, ui) {
           arena.OnAvatarDraggedBy(hParticipant, (ui.position.left - ui.originalPosition.left), (ui.position.top - ui.originalPosition.top));
         },
       }
+    );
+    
+    $('#' + GetParticipantDomId(hParticipant) + ' .cImage').mousedown(
+      function(ev) {
+        this.apInDrag = false;
+      }
     ).click(
-      function() {
-
-        if ($('.cChatIn').css('display') == 'none') {
-          $('.cChatIn').fadeIn('fast', 
-            function() {
-              $('.cChatIn .cText').focus();
-            }
-          );
-        } else {
-          $('.cChatIn').fadeOut('fast');
+      function(ev) {
+        if (!this.apInDrag) {
+          if ($('.cChatIn').css('display') == 'none') {
+            $('.cChatIn').fadeIn('fast', 
+              function() {
+                $('.cChatIn .cText').focus();
+              }
+            );
+          } else {
+            $('.cChatIn').fadeOut('fast');
+          }
         }
-
       }
     );
     
