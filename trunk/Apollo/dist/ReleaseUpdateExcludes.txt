@@ -36,7 +36,7 @@ dun.dll
 dun.ilk
 Galileo.dll
 Galileo.ilk
-	Galileo.sqlite3
+Galileo.sqlite3
 gm.dll
 gm.ilk
 hw.html
@@ -79,6 +79,7 @@ vpi.ilk
 vld.dll
 vld.ilk
 vld.ini
+WebView\config.txt
 WebView.dll
 WebView.ilk
 Win32App.exe
