@@ -1,4 +1,3 @@
 #ässert utf-8
-Chat=Chat
+Hello World=Hallo Welt
 Send=Senden
-Clear=Leeren
