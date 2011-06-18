@@ -103,7 +103,7 @@ function AddParticipant(hParticipant, sNickname, bSelf)
 {
   //api.Log.Debug('AddParticipant ' + hParticipant + ' ' + sNickname + ' ' + bSelf);
   $('#ParticipantList').append(''
-    + '<div id="' + GetParticipantDomId(hParticipant) + '">'
+    + '<div id="' + GetParticipantDomId(hParticipant) + '" class="cParticipant">'
     + '  <span class="cNickname">' + LimitText(sNickname, 20) + '</span>'
     + '</div>'
   );
@@ -136,14 +136,14 @@ function AddChatline(hParticipant, sNickname, sText)
   //api.Log.Debug('AddChatline ' + hParticipant + ' ' + sNickname + ' ' + sText);
   $('#ChatOut').append(''
     + '<div class="cLine">'
-    + '  <span class="cNickname">' + EscapeHTML(LimitText(sNickname, 20)) + '</span>'
+    + '  <span class="cNickname">' + EscapeHTML(LimitText(sNickname, 20)) + ':</span>'
     + '  <span class="cText">' + EscapeHTML(LimitText(sText, 1000)) + '</span>'
     + '</div>'
   ).scrollTop($("#ChatOut")[0].scrollHeight);
 }
 
 function SetLocationState(sState){  //api.Log.Debug('SetLocationState ' + sState);
-}$(document).ready(function () {  var gLayout = $('#Wrapper').layout({    south__size: 40,//    east__size: Math.floor( $('body').clientWidth / 3),    east__size: 150,    south__spacing_open: 4,    east__spacing_open: 4  });//  $.each('south,east'.split(','), function (i, pane) {//    var opts = myLayout.options[pane].resizeWhileDragging = true;
+}$(document).ready(function () {  var gLayout = $('#Wrapper').layout({    south__size: 42,//    east__size: Math.floor( $('body').clientWidth / 3),    east__size: 150,    south__spacing_open: 4,    east__spacing_open: 4  });//  $.each('south,east'.split(','), function (i, pane) {//    var opts = myLayout.options[pane].resizeWhileDragging = true;
 //  });  $('#ChatIn').bind("keydown", 
     function(ev) {
       var keycode = (ev.keyCode ? ev.keyCode : (ev.which ? ev.which : ev.charCode));
@@ -160,23 +160,25 @@ function SetLocationState(sState){  //api.Log.Debug('SetLocationState ' + sSta
       }
     }
   ).focus();
-});
+  $('.cTranslate').each( function () { api.TranslateElement(this, null); } );
+});
 </script>
 
 </head>
 
 <body>
 <div id="Wrapper">
-  <div id="ChatInPane" class="ui-layout-south">    <textarea id="ChatIn"></textarea>
-    <input type="button" id="ChatSend" value="Send" onclick="SendChatIn();" />
-  </div>    <div id="ParticipantList" class="ui-layout-east">  </div>    <div id="ChatOutPane" class="ui-layout-center">    <div id="ChatOut"></div>    <input type="button" id="Clear" value="Clear" onclick="ClearChatOut();" />
+  <div id="ChatInPane" class="ui-layout-south">    <table style="width:100%; height:100%;"><tr>      <td width="99%" style="padding:5px;"><textarea id="ChatIn"></textarea></td>
+      <td style="vertical-align:top; padding:2px;"><input type="button" id="ChatSend" value="Send" class="cTranslate" onclick="SendChatIn();" /></td>
+    </tr></table>
+  </div>    <div id="ParticipantList" class="ui-layout-east">  </div>    <div id="ChatOutPane" class="ui-layout-center">    <div id="ChatOut" contenteditable="true"></div>    <input type="button" id="Clear" value="Clear" class="cTranslate" onclick="ClearChatOut();" />
   </div>
 </div>
 </body>
 
 <script type="text/javascript">
   var api = new ApDialogContent();
-  api.ModuleName('Chat-HTML');
+  api.ModuleName('Chat');
   api.Ready();
 </script>
 

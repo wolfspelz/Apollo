@@ -10,3 +10,6 @@ Room/SendJidInIdentityExtension=1
 ClientInfo/Name=Apollo
 ClientInfo/Version=0.2
 ClientInfo/OS=Unknown
+ReconnectMinDelay=3
+ReconnectRandomDelay=10
+HeartbeatDelay=30
