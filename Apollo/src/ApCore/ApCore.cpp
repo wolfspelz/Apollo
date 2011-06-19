@@ -494,7 +494,7 @@ int ApCore::Call(ApMessage* pMsg)
             #endif
           #endif
 
-          } catch (ApException ex) {
+          } catch (ApException& ex) {
             apLog_Error((pCurrent->ModuleName(), pMsg->Type(), ex.getText()));
             if (pMsg->sComment.empty()) {
               pMsg->sComment = ex.getText();

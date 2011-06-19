@@ -105,10 +105,9 @@ AP_MSG_HANDLER_METHOD(TestDialogModule, WebView_ModuleCall)
       kvBrowserTabContextList_.add(sTab, hContext);
     }
 
-    Msg_Navigation_Receive msg;
-    ApIN ApHandle hConnection = hBrowserConnection_ = (ApIsHandle(hBrowserConnection_) ? hBrowserConnection_ : Apollo::newHandle());
-    msg.srpc.set("Method", "Context.Open");
-    msg.srpc.set("hContext", hContext);
+    Msg_Navigation_ContextOpen msg;
+    msg.hConnection = hBrowserConnection_ = (ApIsHandle(hBrowserConnection_) ? hBrowserConnection_ : Apollo::newHandle());
+    msg.hContext = hContext;
     msg.Request();
 
     int nLeft = pMsg->srpc.getInt("nLeft");
@@ -141,11 +140,11 @@ AP_MSG_HANDLER_METHOD(TestDialogModule, WebView_ModuleCall)
     Apollo::KeyValueElem* pElem = kvBrowserTabContextList_.find(sTab);
     if (pElem) {
       ApHandle hContext = pElem->getHandle();
-      Msg_Navigation_Receive msg;
-      ApIN ApHandle hConnection = hBrowserConnection_ = (ApIsHandle(hBrowserConnection_) ? hBrowserConnection_ : Apollo::newHandle());
-      msg.srpc.set("Method", "Context.Navigate");
-      msg.srpc.set("hContext", hContext);
-      msg.srpc.set("sUrl", pMsg->srpc.getString("sUrl"));
+
+      Msg_Navigation_ContextNavigate msg;
+      msg.hConnection = hBrowserConnection_ = (ApIsHandle(hBrowserConnection_) ? hBrowserConnection_ : Apollo::newHandle());
+      msg.hContext = hContext;
+      msg.sUrl = pMsg->srpc.getString("sUrl");
       msg.Request();
     }
 
@@ -155,11 +154,11 @@ AP_MSG_HANDLER_METHOD(TestDialogModule, WebView_ModuleCall)
     if (pElem) {
       ApHandle hContext = pElem->getHandle();
       kvBrowserTabContextList_.removeElem(pElem);
-      Msg_Navigation_Receive msg;
-      ApIN ApHandle hConnection = hBrowserConnection_ = (ApIsHandle(hBrowserConnection_) ? hBrowserConnection_ : Apollo::newHandle());
-      msg.srpc.set("Method", "Context.Close");
-      msg.srpc.set("hContext", hContext);
+
+      Msg_Navigation_ContextClose msg;
+      msg.hContext = hContext;
       msg.Request();
+
       delete pElem; pElem = 0;
     }
 

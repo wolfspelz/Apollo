@@ -6,8 +6,6 @@
 
 #include "Apollo.h"
 #include "ApLog.h"
-#include "MsgSystem.h"
-#include "Local.h"
 #include "NavigationModule.h"
 #include "SrpcServer.h"
 #include "Context.h"
@@ -124,7 +122,7 @@ Context* NavigationModule::createContext(const ApHandle& hContext)
 
     try {
       pContext->create();
-    } catch (ApException ex) {
+    } catch (ApException& ex) {
       contexts_.Unset(hContext);
       delete pContext;
       pContext = 0;
@@ -145,7 +143,7 @@ int NavigationModule::destroyContext(const ApHandle& hContext)
     try {
       pContext->destroy();
       ok = 1;
-    } catch (ApException ex) {
+    } catch (ApException& ex) {
       apLog_Error((LOG_CHANNEL, "NavigationModule::destroyContext", "pContext->close() failed: %s", StringType(ex.getText())));
     }
 
@@ -227,197 +225,52 @@ AP_MSG_HANDLER_METHOD(NavigationModule, Navigation_Disconnected)
 
 AP_MSG_HANDLER_METHOD(NavigationModule, Navigation_Receive)
 {
-  int ok = 1;
+  Msg_Navigation_Send msgNS;
+  msgNS.hConnection = pMsg->hConnection;
 
-  if (apLog_IsVerbose) {
-    String sMsg;
-    for (Elem* e = 0; (e = pMsg->srpc.Next(e)) != 0; ) {
-      if (!sMsg.empty()) { sMsg += " "; }
-      sMsg.appendf("%s=%s", StringType(e->getName()), StringType(e->getString()));
-    }
-    if (apLog_IsVerbose) {
-      apLog_Verbose((LOG_CHANNEL, "NavigationModule::On_Navigation_Receive", "" ApHandleFormat " %s", ApHandleType(pMsg->hConnection), StringType(sMsg)));
-    }
-  }
+  String sType = pMsg->srpc.getString("ApType");
+  if (sType) {
+    // Given message type -> send SRPC with custom type
 
-  String sMethod = pMsg->srpc.getString("Method");
-  Apollo::SrpcMessage response;
+    ApSRPCMessage msg(sType);
+    pMsg->srpc >> msg.srpc;
 
-  // -----------------------
-  // Special consideration
-
-  if (0) {
-  } else if (sMethod == Navigation_SrpcMethod_Connect) {
-    response.createResponse(pMsg->srpc);
-
-  } else if (sMethod == Navigation_SrpcMethod_GetHandle) {
-    Msg_System_GetHandle msg;
-    if (!msg.Request()) {
-      response.createError(pMsg->srpc, msg.sComment);
+    // Custom message handlers just do the apStatus thing.
+    // They rely on someone else (us here) to fill msg.response.
+    if (msg.Call()) {
+      msg.response.createResponse(msg.srpc);
     } else {
-      response.createResponse(pMsg->srpc);
-      response.set("h", msg.h);
+      msg.response.createError(msg.srpc, msg.sComment);
     }
 
-  } else if (sMethod == Navigation_SrpcMethod_Navigate || sMethod == Navigation_SrpcMethod_Open) {
-    ApHandle hContext = pMsg->srpc.getHandle("hContext");
-    Context* pContext = findContext(hContext);
-    if (pContext == 0) {
-      pContext = createContext(hContext);
-      if (pContext == 0) {
-        String sError; sError.appendf("createContext() failed " ApHandleFormat "", ApHandleType(hContext));
-        response.createError(pMsg->srpc,sError);
-      } else {
-        // Create response later
-      }
+  } else {
+    // Handle SRPC message via SrpcGate with SRPCGATE_HANDLER_TYPE type
+
+    ApSRPCMessage msg(SRPCGATE_HANDLER_TYPE);
+    pMsg->srpc >> msg.srpc;
+
+    String sMethod = msg.srpc.getString("Method");
+    // Fake hConnection for some messages
+    if (0
+      || sMethod == "Navigation_NavigatorHello"
+      || sMethod == "Navigation_NavigatorBye"
+      || sMethod == "Navigation_ContextOpen"
+      || sMethod == "Navigation_ContextNavigate"
+      ) {
+      msg.srpc.set("hConnection", pMsg->hConnection);
     }
 
-  } else if (sMethod == Navigation_SrpcMethod_Close) {
-    ApHandle hContext = pMsg->srpc.getHandle("hContext");
-    if (!destroyContext(hContext)) {
-      String sError; sError.appendf("destroyContext() failed " ApHandleFormat "", ApHandleType(hContext));
-      response.createError(pMsg->srpc,sError);
-    } else {
-      response.createResponse(pMsg->srpc);
-    }
+    (void) msg.Call();
 
-  } // sMethod
-
-  // -----------------------
-  // Any SRPC from the browser
-
-  if (response.getString("Status").empty()) {
-    String sType = pMsg->srpc.getString("ApType");
-
-    if (sType) {
-      // Supplied message type -> send SRPC with custom type
-
-      ApSRPCMessage msg(sType);
-      pMsg->srpc >> msg.srpc;
-      
-      if (msg.Call()) {
-        if (msg.response.getString("Status")) {
-          msg.response >> response;
-        } else {
-          response.createResponse(msg.srpc);
-        }
-      } else {
-        response.createError(msg.srpc, msg.sComment);
-      }
-    }
-
-  } // Message processed
-
-  // -----------------------
-  // Context related
-
-  if (response.getString("Status").empty()) {
-    ApHandle hContext = pMsg->srpc.getHandle("hContext");
-    if (!ApIsHandle(hContext)) {
-      apLog_Warning((LOG_CHANNEL, "NavigationModule::On_Navigation_Receive", "No context " ApHandleFormat "", ApHandleType(hContext)));
-      response.createError(pMsg->srpc, "No context");
-    } else {
-
-      associateContextWithConnection(hContext, pMsg->hConnection);
-
-      Context* pContext = findContext(hContext);
-      if (pContext == 0) {
-        apLog_Warning((LOG_CHANNEL, "NavigationModule::On_Navigation_Receive", "Unknown context " ApHandleFormat "", ApHandleType(hContext)));
-        String sError; sError.appendf("Unknown context " ApHandleFormat "", ApHandleType(hContext));
-        response.createError(pMsg->srpc, sError);
-
-      } else {
-
-        if (0) {
-        } else if (sMethod == Navigation_SrpcMethod_Navigate) {
-          String sUrl = pMsg->srpc.getString("sUrl");
-          try {
-            pContext->navigate(sUrl);
-            response.createResponse(pMsg->srpc);
-          } catch (ApException ex) {
-            response.createError(pMsg->srpc, ex.getText());
-          }
-
-        } else if (sMethod == Navigation_SrpcMethod_Open) {
-          response.createResponse(pMsg->srpc);
-
-        } else if (sMethod == Navigation_SrpcMethod_Attach) {
-          response.createResponse(pMsg->srpc);
-
-        } else if (sMethod == Navigation_SrpcMethod_NativeWindow) {
-          Apollo::KeyValueList kvSignature;
-          pMsg->srpc.getKeyValueList("kvSignature", kvSignature);
-          try {
-            pContext->nativeWindow(kvSignature);
-            response.createResponse(pMsg->srpc);
-          } catch (ApException ex) {
-            response.createError(pMsg->srpc, ex.getText());
-          }
-
-        } else if (sMethod == Navigation_SrpcMethod_Show) {
-          try {
-            pContext->show();
-            response.createResponse(pMsg->srpc);
-          } catch (ApException ex) {
-            response.createError(pMsg->srpc, ex.getText());
-          }
-
-        } else if (sMethod == Navigation_SrpcMethod_Hide) {
-          try {
-            pContext->hide();
-            response.createResponse(pMsg->srpc);
-          } catch (ApException ex) {
-            response.createError(pMsg->srpc, ex.getText());
-          }
-
-        } else if (sMethod == Navigation_SrpcMethod_Position) {
-          String sLeft = pMsg->srpc.getString("nLeft");
-          String sBottom = pMsg->srpc.getString("nBottom");
-          try {
-            pContext->position(String::atoi(sLeft), String::atoi(sBottom));
-            response.createResponse(pMsg->srpc);
-          } catch (ApException ex) {
-            response.createError(pMsg->srpc, ex.getText());
-          }
-
-        } else if (sMethod == Navigation_SrpcMethod_Size) {
-          String sWidth = pMsg->srpc.getString("nWidth");
-          String sHeight = pMsg->srpc.getString("nHeight");
-          try {
-            pContext->size(String::atoi(sWidth), String::atoi(sHeight));
-            response.createResponse(pMsg->srpc);
-          } catch (ApException ex) {
-            response.createError(pMsg->srpc, ex.getText());
-          }
-
-        } else {
-          String sMsg;
-          for (Elem* e = 0; (e = pMsg->srpc.Next(e)) != 0; ) {
-            if (!sMsg.empty()) { sMsg += " "; }
-            sMsg.appendf("%s=%s", StringType(e->getName()), StringType(e->getString()));
-          }
-          apLog_Warning((LOG_CHANNEL, "NavigationModule::On_Navigation_Receive", "Unhandled message on connection " ApHandleFormat ": %s", ApHandleType(pMsg->hConnection), StringType(sMsg)));
-
-        } // sMethod
-
-      } // pContext
-    } // hContext
-  } // Message processed
-
-  if (!response.getString("Status").empty()) {
-    // if the response has been filled, then send it back to the navigator
-    Msg_Navigation_Send msgNS;
-    msgNS.hConnection = pMsg->hConnection;
+    // SrpcGate handlers make a complete response with Status and SrpcId if they like.
     // Shuffle response params without copying data. Original message looses the data.
-    response >> msgNS.srpc;
-
-    ok = msgNS.Request();
-    if (!ok) {
-      apLog_Error((LOG_CHANNEL, "NavigationModule::On_Navigation_Receive", "Msg_Navigation_Send response failed " ApHandleFormat "", ApHandleType(pMsg->hConnection)));
-    }
+    msg.response >> msgNS.srpc;
   }
 
-  pMsg->apStatus = ok ? ApMessage::Ok : ApMessage::Error;
+
+  if (!msgNS.Request()) { throw ApException("%s failed conn=" ApHandleFormat "", StringType(msgNS.Type()), ApHandleType(msgNS.hConnection)); }
+
+  pMsg->apStatus = ApMessage::Ok;
 }
 
 AP_MSG_HANDLER_METHOD(NavigationModule, Navigation_Send)
@@ -446,6 +299,132 @@ AP_MSG_HANDLER_METHOD(NavigationModule, Navigation_Send)
   pMsg->apStatus = ok ? ApMessage::Ok : ApMessage::Error;
 }
 
+//---------------------------
+
+AP_MSG_HANDLER_METHOD(NavigationModule, Navigation_NavigatorHello)
+{
+  apLog_Verbose((LOG_CHANNEL, "NavigationModule::Navigation_NavigatorHello", "conn=" ApHandleFormat "", ApHandleType(pMsg->hConnection)));
+  // do nothing
+  pMsg->apStatus = ApMessage::Ok;
+}
+
+AP_MSG_HANDLER_METHOD(NavigationModule, Navigation_NavigatorBye)
+{
+  apLog_Verbose((LOG_CHANNEL, "NavigationModule::Navigation_NavigatorBye", "conn=" ApHandleFormat "", ApHandleType(pMsg->hConnection)));
+  // do nothing
+  pMsg->apStatus = ApMessage::Ok;
+}
+
+AP_MSG_HANDLER_METHOD(NavigationModule, Navigation_ContextOpen)
+{
+  apLog_Verbose((LOG_CHANNEL, "NavigationModule::Navigation_ContextOpen", "conn=" ApHandleFormat " ctxt=" ApHandleFormat "", ApHandleType(pMsg->hConnection), ApHandleType(pMsg->hContext)));
+
+  Context* pContext = findContext(pMsg->hContext);
+  if (pContext == 0) {
+    pContext = createContext(pMsg->hContext);
+    if (pContext == 0) { throw ApException("createContext() failed conn=" ApHandleFormat " ctxt=" ApHandleFormat "", ApHandleType(pMsg->hConnection), ApHandleType(pMsg->hContext));}
+
+    associateContextWithConnection(pMsg->hContext, pMsg->hConnection);
+  }
+
+  pMsg->apStatus = ApMessage::Ok;
+}
+
+AP_MSG_HANDLER_METHOD(NavigationModule, Navigation_ContextNavigate)
+{
+  apLog_Verbose((LOG_CHANNEL, "NavigationModule::Navigation_ContextNavigate", "conn=" ApHandleFormat " ctxt=" ApHandleFormat ": %s", ApHandleType(pMsg->hConnection), ApHandleType(pMsg->hContext), StringType(pMsg->sUrl)));
+
+  Context* pContext = findContext(pMsg->hContext);
+  if (pContext == 0) {
+    pContext = createContext(pMsg->hContext);
+    if (pContext == 0) { throw ApException("createContext() failed conn=" ApHandleFormat " ctxt=" ApHandleFormat ": %s", ApHandleType(pMsg->hConnection), ApHandleType(pMsg->hContext), StringType(pMsg->sUrl));}
+  }
+
+  associateContextWithConnection(pMsg->hContext, pMsg->hConnection);
+
+  pContext->navigate(pMsg->sUrl);
+
+  pMsg->apStatus = ApMessage::Ok;
+}
+
+AP_MSG_HANDLER_METHOD(NavigationModule, Navigation_ContextClose)
+{
+  apLog_Verbose((LOG_CHANNEL, "NavigationModule::Navigation_ContextClose", "ctxt=" ApHandleFormat "", ApHandleType(pMsg->hContext)));
+
+  if (!destroyContext(pMsg->hContext)) { throw ApException("createContext() failed ctxt=" ApHandleFormat "", ApHandleType(pMsg->hContext));}
+
+  pMsg->apStatus = ApMessage::Ok;
+}
+
+AP_MSG_HANDLER_METHOD(NavigationModule, Navigation_ContextShow)
+{
+  apLog_Verbose((LOG_CHANNEL, "NavigationModule::Navigation_ContextShow", "ctxt=" ApHandleFormat "", ApHandleType(pMsg->hContext)));
+
+  Context* pContext = findContext(pMsg->hContext);
+  if (pContext != 0) {
+    pContext->show();
+  }
+
+  pMsg->apStatus = ApMessage::Ok;
+}
+
+AP_MSG_HANDLER_METHOD(NavigationModule, Navigation_ContextHide)
+{
+  apLog_Verbose((LOG_CHANNEL, "NavigationModule::Navigation_ContextHide", "ctxt=" ApHandleFormat "", ApHandleType(pMsg->hContext)));
+
+  Context* pContext = findContext(pMsg->hContext);
+  if (pContext != 0) {
+    pContext->hide();
+  }
+
+  pMsg->apStatus = ApMessage::Ok;
+}
+
+AP_MSG_HANDLER_METHOD(NavigationModule, Navigation_ContextPosition)
+{
+  apLog_Verbose((LOG_CHANNEL, "NavigationModule::Navigation_ContextPosition", "ctxt=" ApHandleFormat "", ApHandleType(pMsg->hContext)));
+
+  Context* pContext = findContext(pMsg->hContext);
+  if (pContext != 0) {
+    pContext->position(pMsg->nLeft, pMsg->nBottom);
+  }
+
+  pMsg->apStatus = ApMessage::Ok;
+}
+
+AP_MSG_HANDLER_METHOD(NavigationModule, Navigation_ContextSize)
+{
+  apLog_Verbose((LOG_CHANNEL, "NavigationModule::Navigation_ContextSize", "ctxt=" ApHandleFormat "", ApHandleType(pMsg->hContext)));
+
+  Context* pContext = findContext(pMsg->hContext);
+  if (pContext != 0) {
+    pContext->size(pMsg->nWidth, pMsg->nHeight);
+  }
+
+  pMsg->apStatus = ApMessage::Ok;
+}
+
+AP_MSG_HANDLER_METHOD(NavigationModule, Navigation_ContextNativeWindow)
+{
+  if (apLog_IsVerbose) {
+    String sSignature;
+    for (Apollo::KeyValueElem* e = 0; (e = pMsg->kvSignature.nextElem(e)) != 0; ) {
+      if (!sSignature.empty()) { sSignature += " "; }
+      sSignature.appendf("%s=%s", StringType(e->getKey()), StringType(e->getString()));
+    }
+    apLog_Verbose((LOG_CHANNEL, "NavigationModule::Navigation_ContextNativeWindow", "ctxt=" ApHandleFormat " sig: %s", ApHandleType(pMsg->hContext), StringType(sSignature)));
+  }
+
+  Context* pContext = findContext(pMsg->hContext);
+  if (pContext != 0) {
+    pContext->nativeWindow(pMsg->kvSignature);
+  }
+
+  pMsg->apStatus = ApMessage::Ok;
+}
+
+//---------------------------
+
 AP_MSG_HANDLER_METHOD(NavigationModule, BrowserInfo_Visibility)
 {
   int ok = 1;
@@ -465,6 +444,86 @@ AP_MSG_HANDLER_METHOD(NavigationModule, BrowserInfo_Size)
   int ok = 1;
 
   pMsg->apStatus = ok ? ApMessage::Ok : ApMessage::Error;
+}
+
+//---------------------------
+
+void SrpcGate_Navigation_NavigatorHello(ApSRPCMessage* pMsg)
+{
+  Msg_Navigation_NavigatorHello msg;
+  msg.hConnection = pMsg->srpc.getHandle("hConnection");
+  SRPCGATE_HANDLER_NATIVE_REQUEST(pMsg, msg);
+}
+
+void SrpcGate_Navigation_NavigatorBye(ApSRPCMessage* pMsg)
+{
+  Msg_Navigation_NavigatorBye msg;
+  msg.hConnection = pMsg->srpc.getHandle("hConnection");
+  SRPCGATE_HANDLER_NATIVE_REQUEST(pMsg, msg);
+}
+
+void SrpcGate_Navigation_ContextOpen(ApSRPCMessage* pMsg)
+{
+  Msg_Navigation_ContextOpen msg;
+  msg.hConnection = pMsg->srpc.getHandle("hConnection");
+  msg.hContext = pMsg->srpc.getHandle("hContext");
+  SRPCGATE_HANDLER_NATIVE_REQUEST(pMsg, msg);
+}
+
+void SrpcGate_Navigation_ContextNavigate(ApSRPCMessage* pMsg)
+{
+  Msg_Navigation_ContextNavigate msg;
+  msg.hConnection = pMsg->srpc.getHandle("hConnection");
+  msg.hContext = pMsg->srpc.getHandle("hContext");
+  msg.sUrl = pMsg->srpc.getString("sUrl");
+  SRPCGATE_HANDLER_NATIVE_REQUEST(pMsg, msg);
+}
+
+void SrpcGate_Navigation_ContextClose(ApSRPCMessage* pMsg)
+{
+  Msg_Navigation_ContextClose msg;
+  msg.hContext = pMsg->srpc.getHandle("hContext");
+  SRPCGATE_HANDLER_NATIVE_REQUEST(pMsg, msg);
+}
+
+void SrpcGate_Navigation_ContextShow(ApSRPCMessage* pMsg)
+{
+  Msg_Navigation_ContextShow msg;
+  msg.hContext = pMsg->srpc.getHandle("hContext");
+  SRPCGATE_HANDLER_NATIVE_REQUEST(pMsg, msg);
+}
+
+void SrpcGate_Navigation_ContextHide(ApSRPCMessage* pMsg)
+{
+  Msg_Navigation_ContextHide msg;
+  msg.hContext = pMsg->srpc.getHandle("hContext");
+  SRPCGATE_HANDLER_NATIVE_REQUEST(pMsg, msg);
+}
+
+void SrpcGate_Navigation_ContextPosition(ApSRPCMessage* pMsg)
+{
+  Msg_Navigation_ContextPosition msg;
+  msg.hContext = pMsg->srpc.getHandle("hContext");
+  msg.nLeft = pMsg->srpc.getInt("nLeft");
+  msg.nBottom = pMsg->srpc.getInt("nBottom");
+  SRPCGATE_HANDLER_NATIVE_REQUEST(pMsg, msg);
+}
+
+void SrpcGate_Navigation_ContextSize(ApSRPCMessage* pMsg)
+{
+  Msg_Navigation_ContextSize msg;
+  msg.hContext = pMsg->srpc.getHandle("hContext");
+  msg.nWidth = pMsg->srpc.getInt("nWidth");
+  msg.nHeight = pMsg->srpc.getInt("nHeight");
+  SRPCGATE_HANDLER_NATIVE_REQUEST(pMsg, msg);
+}
+
+void SrpcGate_Navigation_ContextNativeWindow(ApSRPCMessage* pMsg)
+{
+  Msg_Navigation_ContextNativeWindow msg;
+  msg.hContext = pMsg->srpc.getHandle("hContext");
+  pMsg->srpc.getKeyValueList("kvSignature", msg.kvSignature);
+  SRPCGATE_HANDLER_NATIVE_REQUEST(pMsg, msg);
 }
 
 //----------------------------------------------------------
@@ -570,11 +629,33 @@ int NavigationModule::init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, NavigationModule, Navigation_Receive, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, NavigationModule, Navigation_Send, this, ApCallbackPosNormal);
 
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, NavigationModule, Navigation_NavigatorHello, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, NavigationModule, Navigation_NavigatorBye, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, NavigationModule, Navigation_ContextOpen, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, NavigationModule, Navigation_ContextNavigate, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, NavigationModule, Navigation_ContextClose, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, NavigationModule, Navigation_ContextShow, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, NavigationModule, Navigation_ContextHide, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, NavigationModule, Navigation_ContextPosition, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, NavigationModule, Navigation_ContextSize, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, NavigationModule, Navigation_ContextNativeWindow, this, ApCallbackPosNormal);
+
   AP_MSG_REGISTRY_ADD(MODULE_NAME, NavigationModule, BrowserInfo_Visibility, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, NavigationModule, BrowserInfo_Position, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, NavigationModule, BrowserInfo_Size, this, ApCallbackPosNormal);
 
   AP_UNITTEST_HOOK(NavigationModule, this);
+
+  srpcGateRegistry_.add("Navigation_NavigatorHello", SrpcGate_Navigation_NavigatorHello);
+  srpcGateRegistry_.add("Navigation_NavigatorBye", SrpcGate_Navigation_NavigatorBye);
+  srpcGateRegistry_.add("Navigation_ContextOpen", SrpcGate_Navigation_ContextOpen);
+  srpcGateRegistry_.add("Navigation_ContextNavigate", SrpcGate_Navigation_ContextNavigate);
+  srpcGateRegistry_.add("Navigation_ContextClose", SrpcGate_Navigation_ContextClose);
+  srpcGateRegistry_.add("Navigation_ContextShow", SrpcGate_Navigation_ContextShow);
+  srpcGateRegistry_.add("Navigation_ContextHide", SrpcGate_Navigation_ContextHide);
+  srpcGateRegistry_.add("Navigation_ContextPosition", SrpcGate_Navigation_ContextPosition);
+  srpcGateRegistry_.add("Navigation_ContextSize", SrpcGate_Navigation_ContextSize);
+  srpcGateRegistry_.add("Navigation_ContextNativeWindow", SrpcGate_Navigation_ContextNativeWindow);
 
   return ok;
 }

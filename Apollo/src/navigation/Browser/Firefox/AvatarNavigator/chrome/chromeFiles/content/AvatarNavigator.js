@@ -183,9 +183,9 @@ AvatarNavigator.prototype.createContextForTab = function(tab)
   if (!AvatarNavigator.getTabContextRequested(tab)) {
     if (this.protocol) {
       AvatarNavigator.setTabContextRequested(tab, true);
-      var request = new SrpcMessage();
-      request.setString('Method', 'System.GetHandle');
-      this.protocol.sendRequest(request, fCallback);
+      var msg = new SrpcMessage();
+      msg.setString('Method', 'System_GetHandle');
+      this.protocol.sendRequest(msg, fCallback);
     } else {
       anLogVerbose('AvatarNavigator.createContextForTab ignored(not-connected)');
     }
@@ -206,7 +206,7 @@ AvatarNavigator.prototype.identifyContextForTab = function(tab, hContext)
 {
   if (this.protocol) {
     var msg = new SrpcMessage();
-    msg.setString('Method', 'Context.NativeWindow');
+    msg.setString('Method', 'Navigation_ContextNativeWindow');
     msg.setString('hContext', hContext);
     
     var kvSignature = new SrpcMessage();
@@ -233,7 +233,7 @@ AvatarNavigator.prototype.openContext = function(hContext)
 
   if (this.protocol) {
     var msg = new SrpcMessage();
-    msg.setString('Method', 'Context.Open');
+    msg.setString('Method', 'Navigation_ContextOpen');
     msg.setString('hContext', hContext);
     this.protocol.sendRequest(msg);
   } else {
@@ -246,7 +246,7 @@ AvatarNavigator.prototype.navigateContext = function(hContext, sUrl)
   if (this.protocol) {
     anLogInfo('NavigateContext ' + hContext + ' ' + sUrl);
     var msg = new SrpcMessage();
-    msg.setString('Method', 'Context.Navigate');
+    msg.setString('Method', 'Navigation_ContextNavigate');
     msg.setString('hContext', hContext);
     msg.setString('sUrl', sUrl);
     this.protocol.sendRequest(msg);
@@ -261,7 +261,7 @@ AvatarNavigator.prototype.closeContext = function(hContext)
 
   if (this.protocol) {
     var msg = new SrpcMessage();
-    msg.setString('Method', 'Context.Close');
+    msg.setString('Method', 'Navigation_ContextClose');
     msg.setString('hContext', hContext);
     this.protocol.sendRequest(msg);
   } else {
@@ -275,7 +275,7 @@ AvatarNavigator.prototype.showContext = function(hContext)
 
   if (this.protocol) {
     var msg = new SrpcMessage();
-    msg.setString('Method', 'Context.Show');
+    msg.setString('Method', 'Navigation_ContextShow');
     msg.setString('hContext', hContext);
     this.protocol.sendRequest(msg);    
   } else {
@@ -289,7 +289,7 @@ AvatarNavigator.prototype.hideContext = function(hContext)
 
   if (this.protocol) {
     var msg = new SrpcMessage();
-    msg.setString('Method', 'Context.Hide');
+    msg.setString('Method', 'Navigation_ContextHide');
     msg.setString('hContext', hContext);
     this.protocol.sendRequest(msg);
   } else {
@@ -474,9 +474,9 @@ AvatarNavigator.prototype.tcpDisconnect = function()
   }
 }
 
-AvatarNavigator.prototype.onSrpcConnectResponse = function()
+AvatarNavigator.prototype.onSrpcHelloResponse = function()
 {
-  anLogTrace('AvatarNavigator.onSrpcConnectResponse');
+  anLogTrace('AvatarNavigator.onSrpcHelloResponse');
 
   this.onTabTimer();
   this.startTabTimer();
@@ -492,9 +492,10 @@ AvatarNavigator.prototype.onConnected = function()
   this.protocol = new SrpcProtocol(this);
   this.resetAllTabs();
 
+// Check if 2-way communication is established
   var msg = new SrpcMessage();
-  msg.setString('Method', 'Connection.Connect');
-  this.protocol.sendRequest(msg, this.onSrpcConnectResponse.bind(this));
+  msg.setString('Method', 'Navigation_NavigatorHello');
+  this.protocol.sendRequest(msg, this.onSrpcHelloResponse.bind(this));
 }
 
 AvatarNavigator.prototype.onDisconnected = function()
@@ -605,9 +606,6 @@ AvatarNavigator.prototype.cmdShowDebug = function()
       msg.setString('Method', 'ShowDebug');
       msg.setString('hContext', hContext);
       msg.setInt('bShow', 1);
-      //Just a test
-      //msg.setString('ApType', 'SrpcGate_Handler');
-      //msg.setString('Method', 'System_GetHandle');
       this.protocol.sendRequest(msg);
     }
   }

@@ -512,7 +512,6 @@ AP_MSG_HANDLER_METHOD(ApLib, System_GetTime)
 
 AP_MSG_HANDLER_METHOD(ApLib, System_GetHandle)
 {
-  Apollo::TimeValue tv = Apollo::getNow();
   pMsg->h = Apollo::newHandle();
   pMsg->apStatus = ApMessage::Ok;
 }
