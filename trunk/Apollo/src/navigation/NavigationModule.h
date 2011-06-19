@@ -9,10 +9,7 @@
 
 #include "Apollo.h"
 #include "ApContainer.h"
-#include "MsgUnitTest.h"
-#include "MsgNavigation.h"
-#include "MsgBrowserInfo.h"
-#include "MsgMainLoop.h"
+#include "Local.h"
 
 class Connection;
 class Context;
@@ -65,6 +62,17 @@ public:
   void On_Navigation_Receive(Msg_Navigation_Receive* pMsg);
   void On_Navigation_Send(Msg_Navigation_Send* pMsg);
 
+  void On_Navigation_NavigatorHello(Msg_Navigation_NavigatorHello* pMsg);
+  void On_Navigation_NavigatorBye(Msg_Navigation_NavigatorBye* pMsg);
+  void On_Navigation_ContextOpen(Msg_Navigation_ContextOpen* pMsg);
+  void On_Navigation_ContextNavigate(Msg_Navigation_ContextNavigate* pMsg);
+  void On_Navigation_ContextClose(Msg_Navigation_ContextClose* pMsg);
+  void On_Navigation_ContextShow(Msg_Navigation_ContextShow* pMsg);
+  void On_Navigation_ContextHide(Msg_Navigation_ContextHide* pMsg);
+  void On_Navigation_ContextPosition(Msg_Navigation_ContextPosition* pMsg);
+  void On_Navigation_ContextSize(Msg_Navigation_ContextSize* pMsg);
+  void On_Navigation_ContextNativeWindow(Msg_Navigation_ContextNativeWindow* pMsg);
+
   void On_BrowserInfo_Visibility(Msg_BrowserInfo_Visibility* pMsg);
   void On_BrowserInfo_Position(Msg_BrowserInfo_Position* pMsg);
   void On_BrowserInfo_Size(Msg_BrowserInfo_Size* pMsg);
@@ -87,6 +95,7 @@ public:
   ContextList contexts_;
   ConnectionContextList connectionContexts_;
 
+  Apollo::SrpcGateHandlerRegistry srpcGateRegistry_;
   AP_MSG_REGISTRY_DECLARE;
 
 #if defined(AP_TEST)
