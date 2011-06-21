@@ -16,6 +16,10 @@ babelfish.ilk
 boot.local.txt
 browserinfo.dll
 browserinfo.ilk
+CFLite.dll
+CFLite.pdb
+CFLite_Debug.dll
+CFLite_Debug.pdb
 Chat.dll
 Chat.ilk
 config.dll
@@ -45,6 +49,8 @@ http.log
 identity.dll
 identity.ilk
 Identity.sqlite3
+JavaScriptCore_debug.dll
+JavaScriptCore_debug.pdb
 log.dll
 log.ilk
 navigation.dll
@@ -55,6 +61,8 @@ netapi.dll
 netapi.ilk
 netsim.dll
 netsim.ilk
+npTestNetscapePlugin_debug.ilk
+npTestNetscapePlugin_debug.pdb
 sample.dll
 sample.ilk
 server.dll
@@ -79,7 +87,8 @@ vpi.ilk
 vld.dll
 vld.ilk
 vld.ini
-WebView\config.txt
+WebKit_debug.dll
+WebKit_debug.pdb
 WebView.dll
 WebView.ilk
 Win32App.exe
@@ -90,4 +99,4 @@ xmpp.dll
 xmpp.ilk
 xmpptestserver.dll
 xmpptestserver.ilk
-
+zlib1.dll
