@@ -80,6 +80,7 @@ input[type="text"] { border:1px solid #808080; }
     <input type="button" value="Quit" onclick="api.Message('MainLoop_EndLoop').send();"/>
     <input type="button" value="Connect" onclick="api.Message('Xmpp_Connect').send();" />
     <input type="button" value="Disconnect" onclick="api.Message('Xmpp_Disconnect').send();" />
+    <input type="button" value="Cwd" onclick="api.ModuleCall('Cwd').send();" />
     <br />
     Config:
     <input id="iKey" type="text" value="Dialog/Theme" />

@@ -57,7 +57,7 @@ public:
 #endif
 
 public:
-  View* CreateView(const ApHandle& hView);
+  View* CreateView(const ApHandle& hView, int nLeft, int nTop, int nWidth, int nHeight);
   void DeleteView(const ApHandle& hView);
   View* FindView(const ApHandle& hView);
 

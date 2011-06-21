@@ -12,12 +12,36 @@
 #include "SrpcMessage.h"
 #include "SAutoPtr.h"
 
+View::View(const ApHandle& hView)
+:hAp_(hView)
+,bVisible_(0)
+,nLeft_(100)
+,nTop_(100)
+,nWidth_(200)
+,nHeight_(100)
+,nFlags_(0)
+,bScriptAccessEnabled_(0)
+,bNavigationEnabled_(1)
+,pWebView_(0)
+,pWebFrame_(0)
+,pWebViewPrivate_(0)
+,hWnd_(NULL)
+,nRefCount_(0)
+,pTopLoadingFrame_(0)
+,pScriptObject_(0)
+{}
+
 View::~View()
 {
 }
 
-void View::Create()
+void View::Create(int nLeft, int nTop, int nWidth, int nHeight)
 {
+  nLeft_ = nLeft;
+  nTop_ = nTop;
+  nWidth_ = nWidth;
+  nHeight_ = nHeight;
+
   AutoComPtr<IWebPreferences> tmpPreferences;
   if (FAILED( WebKitCreateInstance(CLSID_WebPreferences, 0, IID_IWebPreferences, tmpPreferences) )) { throw ApException("View::Create WebKitCreateInstance(CLSID_WebPreferences) failed"); }
   AutoComPtr<IWebPreferences> standardPreferences;
@@ -155,6 +179,13 @@ void View::Reload()
 
 //------------------------------------
 
+void View::MoveWindowRoCurrentRect()
+{
+#if defined(WIN32)
+  ::MoveWindow(hWnd_, nLeft_, nTop_ - (bVisible_ ? 0 : 10000), nWidth_, nHeight_, FALSE);
+#endif // WIN32
+}
+
 void View::SetPosition(int nLeft, int nTop, int nWidth, int nHeight)
 {
   nLeft_ = nLeft;
@@ -162,9 +193,7 @@ void View::SetPosition(int nLeft, int nTop, int nWidth, int nHeight)
   nWidth_ = nWidth;
   nHeight_ = nHeight;
 
-#if defined(WIN32)
-  ::MoveWindow(hWnd_, nLeft_, nTop_ - (bVisible_ ? 0 : 10000), nWidth_, nHeight_, FALSE);
-#endif // WIN32
+  MoveWindowRoCurrentRect();
 }
 
 void View::SetVisibility(int bVisible)
@@ -173,8 +202,9 @@ void View::SetVisibility(int bVisible)
   bVisible_ = bVisible;
 
   if (bChanged) {
+    MoveWindowRoCurrentRect();
+
 #if defined(WIN32)
-    ::MoveWindow(hWnd_, nLeft_, nTop_ - (bVisible_ ? 0 : 10000), nWidth_, nHeight_, FALSE);
     if (bVisible_) {
       // Force webkit repaint, which is suppressed while invisible
       RECT r = { 0, 0, nWidth_, nHeight_ };
@@ -229,9 +259,7 @@ void View::MoveBy(int nX, int nY)
   nLeft_ += nX;
   nTop_ += nY;
 
-#if defined(WIN32)
-  ::MoveWindow(hWnd_, nLeft_, nTop_ - (bVisible_ ? 0 : 10000), nWidth_, nHeight_, FALSE);
-#endif // WIN32
+  MoveWindowRoCurrentRect();
 }
   
 void View::SizeBy(int nX, int nY, int nDirection)
@@ -254,9 +282,7 @@ void View::SizeBy(int nX, int nY, int nDirection)
   if (nWidth_ < 1) { nWidth_ = 1; }
   if (nHeight_ < 1) { nHeight_ = 1; }
 
-#if defined(WIN32)
-  ::MoveWindow(hWnd_, nLeft_, nTop_ - (bVisible_ ? 0 : 10000), nWidth_, nHeight_, FALSE);
-#endif // WIN32
+  MoveWindowRoCurrentRect();
 }
 
 void View::MouseCapture()

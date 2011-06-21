@@ -10,12 +10,12 @@
 #include "Local.h"
 #include "WebViewModule.h"
 
-View* WebViewModule::CreateView(const ApHandle& hView)
+View* WebViewModule::CreateView(const ApHandle& hView, int nLeft, int nTop, int nWidth, int nHeight)
 {
   View* pView = new View(hView);
   if (pView) {
     try {
-      pView->Create();
+      pView->Create(nLeft, nTop, nWidth, nHeight);
       pView->AddRef();
       views_.Set(hView, pView);
     } catch (ApException& ex) {
@@ -59,7 +59,7 @@ View* WebViewModule::FindView(const ApHandle& hView)
 AP_MSG_HANDLER_METHOD(WebViewModule, WebView_Create)
 {
   if (views_.Find(pMsg->hView) != 0) { throw ApException("WebViewModule::WebView_Create: webview=" ApHandleFormat " already exists", ApHandleType(pMsg->hView)); }
-  View* pView = CreateView(pMsg->hView);
+  View* pView = CreateView(pMsg->hView, pMsg->nLeft, pMsg->nTop, pMsg->nWidth, pMsg->nHeight);
   bWebKitUsed_ = 1;
   pMsg->apStatus = ApMessage::Ok;
 }
@@ -199,6 +199,10 @@ void SrpcGate_WebView_Create(ApSRPCMessage* pMsg)
 {
   Msg_WebView_Create msg;
   msg.hView = pMsg->srpc.getHandle("hView");
+  msg.nLeft = pMsg->srpc.getInt("nLeft");
+  msg.nTop = pMsg->srpc.getInt("nTop");
+  msg.nWidth = pMsg->srpc.getInt("nWidth");
+  msg.nHeight = pMsg->srpc.getInt("nHeight");
   SRPCGATE_HANDLER_NATIVE_REQUEST(pMsg, msg);
 }
 

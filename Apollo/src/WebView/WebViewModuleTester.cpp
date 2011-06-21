@@ -33,7 +33,7 @@ String WebViewModuleTester::LoadHtml()
   { Msg_WebView_Event_DocumentComplete msg; msg.Hook(MODULE_NAME, (ApCallback) WebViewModuleTester_LoadHtml_On_WebView_Event_DocumentComplete, 0, ApCallbackPosNormal); }
 
   //if (!s) { if (!Msg_WebView_Create::_(hView, "<p style=\"background-color: #00FF00\">Testing " "\xe9\x87\x91" "</p><img src=\"http://webkit.org/images/icon-gold.png\" alt=\"Face\"><div style=\"border: solid blue; background: white;\" contenteditable=\"true\">div with blue border</div><ul><li>foo<li>bar<li>baz</ul><iframe src=\"http://www.wolfspelz.de\" style=\"width:100%;height:300px\" />")) { s = "Msg_WebView_Create failed"; }}
-  if (!s) { if (!Msg_WebView_Create::_(hView)) { s = "Msg_WebView_Create failed"; }}
+  if (!s) { if (!Msg_WebView_Create::_(hView, 100, 200, 400, 300)) { s = "Msg_WebView_Create failed"; }}
   if (!s) { if (!Msg_WebView_SetScriptAccessPolicy::Allow(hView)) { s = "Msg_WebView_SetScriptAccessPolicy failed"; }}
 
   //if (!s) { if (!Msg_WebView_Load::_(hView, "http://www.wolfspelz.de")) { s = "Msg_WebView_Load failed"; }}
@@ -53,7 +53,7 @@ String WebViewModuleTester::LoadHtml()
     "</head>\n"
     "<body style='overflow:hidden;' onload=\"StartTimer()\">\n"
     "<div style='width:100%; height:100%; border:1px solid #000000; background-color:rgba(240,240,255,0.7);'>\n"
-    "  <p style='width:100%; height:20px; border-bottom:1px solid #000000; background-color:#00ff00;'>Testing LoadHtml " "\xe9\x87\x91" " <a href='http://blog.wolfspelz.de'>Link</a></p>\n"
+    "  <p style='width:100%; height:20px; border-bottom:1px solid #000000; background-color:#00ff00;'>Testing LoadHtml " "\xe9\x87\x91" " <a href='http://blog.wolfspelz.de'>http://blog.wolfspelz.de</a></p> <a href='https://www.xing.com'>https://www.xing.com</a></p>\n"
     "  <p id=\"iLog\">--</p>\n"
     "  <img src='http://webkit.org/images/icon-gold.png' />\n"
     "  <img src='test1.png' />\n"
@@ -66,7 +66,7 @@ String WebViewModuleTester::LoadHtml()
     )) { s = "Msg_WebView_LoadHtml failed"; }}
 
   //if (!s) { if (!Msg_WebView_SetNavigationPolicy::Deny(hView)) { s = "Msg_WebView_SetNavigationPolicy failed"; }}
-  if (!s) { if (!Msg_WebView_Position::_(hView, 100, 200, 400, 300)) { s = "Msg_WebView_Position failed"; }}
+  //if (!s) { if (!Msg_WebView_Position::_(hView, 100, 200, 400, 300)) { s = "Msg_WebView_Position failed"; }}
   if (!s) { if (!Msg_WebView_Visibility::_(hView, 1)) { s = "Msg_WebView_Visibility failed"; }}
 
   if (0) {
@@ -113,10 +113,10 @@ String WebViewModuleTester::CallJSEcho()
 
   { Msg_WebView_Event_DocumentLoaded msg; msg.Hook(MODULE_NAME, (ApCallback) WebViewModuleTester_CallJSEcho_On_WebView_Event_DocumentLoaded, 0, ApCallbackPosNormal); }
 
-  if (!s) { if (!Msg_WebView_Create::_(hView)) { s = "Msg_WebView_Create failed"; }}
+  if (!s) { if (!Msg_WebView_Create::_(hView, 100, 500, 400, 300)) { s = "Msg_WebView_Create failed"; }}
   if (!s) { if (!Msg_WebView_SetScriptAccessPolicy::Allow(hView)) { s = "Msg_WebView_SetScriptAccessPolicy failed"; }}
   if (!s) { if (!Msg_WebView_Load::_(hView, "file://" + Apollo::getModuleResourcePath(MODULE_NAME) + "test/CallJSEcho.html")) { s = "Msg_WebView_LoadHtml failed"; }}
-  if (!s) { if (!Msg_WebView_Position::_(hView, 100, 500, 400, 300)) { s = "Msg_WebView_Position failed"; }}
+  //if (!s) { if (!Msg_WebView_Position::_(hView, 100, 500, 400, 300)) { s = "Msg_WebView_Position failed"; }}
   if (!s) { if (!Msg_WebView_Visibility::_(hView, 1)) { s = "Msg_WebView_Visibility failed"; }}
 
   return s;
@@ -159,10 +159,10 @@ String WebViewModuleTester::CallSystemEcho()
 
   { Msg_WebView_Event_DocumentLoaded msg; msg.Hook(MODULE_NAME, (ApCallback) WebViewModuleTester_CallSystemEcho_On_WebView_Event_DocumentLoaded, 0, ApCallbackPosNormal); }
 
-  if (!s) { if (!Msg_WebView_Create::_(hView)) { s = "Msg_WebView_Create failed"; }}
+  if (!s) { if (!Msg_WebView_Create::_(hView, 100, 500, 400, 300)) { s = "Msg_WebView_Create failed"; }}
   if (!s) { if (!Msg_WebView_SetScriptAccessPolicy::Allow(hView)) { s = "Msg_WebView_SetScriptAccessPolicy failed"; }}
   if (!s) { if (!Msg_WebView_Load::_(hView, "file://" + Apollo::getModuleResourcePath(MODULE_NAME) + "test/CallSystemEcho.html")) { s = "Msg_WebView_LoadHtml failed"; }}
-  if (!s) { if (!Msg_WebView_Position::_(hView, 100, 500, 400, 300)) { s = "Msg_WebView_Position failed"; }}
+  //if (!s) { if (!Msg_WebView_Position::_(hView, 100, 500, 400, 300)) { s = "Msg_WebView_Position failed"; }}
   if (!s) { if (!Msg_WebView_Visibility::_(hView, 1)) { s = "Msg_WebView_Visibility failed"; }}
 
   return s;
@@ -221,10 +221,10 @@ String WebViewModuleTester::CallCustomEcho()
   { Msg_WebView_Event_DocumentLoaded msg; msg.Hook(MODULE_NAME, (ApCallback) WebViewModuleTester_CallCustomEcho_On_WebView_Event_DocumentLoaded, 0, ApCallbackPosNormal); }
   { Msg_WebView_ModuleCall msg; msg.Hook(MODULE_NAME, (ApCallback) WebViewModuleTester_CallCustomEcho_On_WebView_ModuleCall, 0, ApCallbackPosNormal); }
 
-  if (!s) { if (!Msg_WebView_Create::_(hView)) { s = "Msg_WebView_Create failed"; }}
+  if (!s) { if (!Msg_WebView_Create::_(hView, 100, 500, 400, 300)) { s = "Msg_WebView_Create failed"; }}
   if (!s) { if (!Msg_WebView_SetScriptAccessPolicy::Allow(hView)) { s = "Msg_WebView_SetScriptAccessPolicy failed"; }}
   if (!s) { if (!Msg_WebView_Load::_(hView, "file://" + Apollo::getModuleResourcePath(MODULE_NAME) + "test/CallCustomEcho.html")) { s = "Msg_WebView_LoadHtml failed"; }}
-  if (!s) { if (!Msg_WebView_Position::_(hView, 100, 500, 400, 300)) { s = "Msg_WebView_Position failed"; }}
+  //if (!s) { if (!Msg_WebView_Position::_(hView, 100, 500, 400, 300)) { s = "Msg_WebView_Position failed"; }}
   if (!s) { if (!Msg_WebView_Visibility::_(hView, 1)) { s = "Msg_WebView_Visibility failed"; }}
 
   return s;
@@ -238,11 +238,11 @@ String WebViewModuleTester::Dev()
 
   ApHandle hView = Apollo::newHandle();
 
-  if (!s) { if (!Msg_WebView_Create::_(hView)) { s = "Msg_WebView_Create failed"; }}
+  if (!s) { if (!Msg_WebView_Create::_(hView, 500, 200, 400, 300)) { s = "Msg_WebView_Create failed"; }}
   if (!s) { if (!Msg_WebView_SetScriptAccessPolicy::Allow(hView)) { s = "Msg_WebView_SetScriptAccessPolicy failed"; }}
   //if (!s) { if (!Msg_WebView_Load::_(hView, "http://www.wolfspelz.de")) { s = "Msg_WebView_Load failed"; }}
   if (!s) { if (!Msg_WebView_Load::_(hView, "file://" + Apollo::getModuleResourcePath(MODULE_NAME) + "test/dev.html")) { s = "Msg_WebView_LoadHtml failed"; }}
-  if (!s) { if (!Msg_WebView_Position::_(hView, 500, 200, 400, 300)) { s = "Msg_WebView_Position failed"; }}
+  //if (!s) { if (!Msg_WebView_Position::_(hView, 500, 200, 400, 300)) { s = "Msg_WebView_Position failed"; }}
   if (!s) { if (!Msg_WebView_Visibility::_(hView, 1)) { s = "Msg_WebView_Visibility failed"; }}
 
   if (0) {

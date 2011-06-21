@@ -33,7 +33,6 @@ public:
   void On_Dialog_GetView(Msg_Dialog_GetView* pMsg);
   void On_Dialog_SetCaption(Msg_Dialog_SetCaption* pMsg);
   void On_Dialog_SetIcon(Msg_Dialog_SetIcon* pMsg);
-  void On_Dialog_SetWaitForContent(Msg_Dialog_SetWaitForContent* pMsg);
   void On_Dialog_CallScriptFunction(Msg_Dialog_CallScriptFunction* pMsg);
   void On_Dialog_ContentCall(Msg_Dialog_ContentCall* pMsg);
 

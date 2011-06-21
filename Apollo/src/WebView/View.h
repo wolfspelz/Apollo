@@ -49,29 +49,12 @@ private:
 class View : public IWebUIDelegate, IWebUIDelegatePrivate, IWebFrameLoadDelegate, IWebFrameLoadDelegatePrivate, IWebResourceLoadDelegate, IWebPolicyDelegate
 {
 public:
-  View::View(const ApHandle& hView)
-    :hAp_(hView)
-    ,bVisible_(0)
-    ,nLeft_(100)
-    ,nTop_(100)
-    ,nWidth_(100)
-    ,nHeight_(100)
-    ,nFlags_(0)
-    ,bScriptAccessEnabled_(0)
-    ,bNavigationEnabled_(1)
-    ,pWebView_(0)
-    ,pWebFrame_(0)
-    ,pWebViewPrivate_(0)
-    ,hWnd_(NULL)
-    ,nRefCount_(0)
-    ,pTopLoadingFrame_(0)
-    ,pScriptObject_(0)
-  {}
+  View(const ApHandle& hView);
   virtual ~View();
 
   inline ApHandle apHandle() { return hAp_; }
 
-  void Create();
+  void Create(int nLeft, int nTop, int nWidth, int nHeight);
   void Destroy();
 
   void LoadHtml(const String& sHtml, const String& sBase) throw(ApException);
@@ -100,6 +83,7 @@ public:
   int HasNavigation() { return bNavigationEnabled_; }
 
 protected:
+  void MoveWindowRoCurrentRect();
   void MakeScriptObject() throw(ApException);
   static String StringFromBSTR(BSTR bStr);
   static String GetUrlFrom(IWebFrame *frame);

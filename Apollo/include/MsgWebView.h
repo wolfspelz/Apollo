@@ -16,14 +16,22 @@
 class Msg_WebView_Create: public ApRequestMessage
 {
 public:
-  Msg_WebView_Create() : ApRequestMessage("WebView_Create") {}
-  static int _(const ApHandle& hView)
+  Msg_WebView_Create() : ApRequestMessage("WebView_Create"), nLeft(0), nTop(0), nWidth(0), nHeight(0) {}
+  static int _(const ApHandle& hView, int nLeft, int nTop, int nWidth, int nHeight)
   {
     Msg_WebView_Create msg;
     msg.hView = hView;
+    msg.nLeft = nLeft;
+    msg.nTop = nTop;
+    msg.nWidth = nWidth;
+    msg.nHeight = nHeight;
     return msg.Request();
   }
   ApIN ApHandle hView;
+  ApIN int nLeft;
+  ApIN int nTop;
+  ApIN int nWidth;
+  ApIN int nHeight;
 };
 
 // -> WebView
