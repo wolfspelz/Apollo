@@ -60,15 +60,6 @@ public:
   ApIN String sIconUrl;
 };
 
-// -> Dialog 
-class Msg_Dialog_SetWaitForContent: public ApRequestMessage
-{
-public:
-  Msg_Dialog_SetWaitForContent() : ApRequestMessage("Dialog_SetWaitForContent"), bWaitForContent(1) {}
-  ApIN ApHandle hDialog;
-  ApIN int bWaitForContent;
-};
-
 class Msg_Dialog_CallScriptFunction: public ApRequestMessage
 {
 public:

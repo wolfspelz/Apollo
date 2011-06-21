@@ -38,8 +38,6 @@ void ChatWindow::Open()
     msg.sContentUrl = "file://" + Apollo::getModuleResourcePath(MODULE_NAME) + "Chat.html";
     if (!msg.Request()) { throw ApException("%s failed: %s", StringType(msg.Type()), StringType(msg.sComment)); }
   }
-
-  { Msg_Dialog_SetWaitForContent msg; msg.hDialog = hAp_; msg.bWaitForContent = 1; msg.Request(); }
 }
 
 void ChatWindow::Close()

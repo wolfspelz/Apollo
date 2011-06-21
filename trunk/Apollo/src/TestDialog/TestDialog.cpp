@@ -6,12 +6,15 @@
 
 #include "Apollo.h"
 #include "ApContainer.h"
+#include "apLog.h"
 #include "TestDialog.h"
 #include "MsgDialog.h"
 #include "MsgNavigation.h"
 #include "MsgVpView.h"
 #include "MsgWebView.h"
 #include "MsgSystem.h"
+
+#define LOG_CHANNEL MODULE_NAME
 
 #if defined(WIN32)
 BOOL APIENTRY DllMain(HANDLE hModule, DWORD dwReason, LPVOID lpReserved)
@@ -94,6 +97,7 @@ AP_MSG_HANDLER_METHOD(TestDialogModule, WebView_ModuleCall)
 
   String sMethod = pMsg->srpc.getString("Method");
   if (0) {
+
   } else if (sMethod == "TabPosition") {
     String sTab = pMsg->srpc.getString("sTab");
     Apollo::KeyValueElem* pElem = kvBrowserTabContextList_.find(sTab);
@@ -185,6 +189,9 @@ AP_MSG_HANDLER_METHOD(TestDialogModule, WebView_ModuleCall)
       }
       sBrowserSelectedTab_ = sTab;
     }
+
+  } else if (sMethod == "Cwd") {
+    apLog_Debug((LOG_CHANNEL, "TestDialogModule, WebView_ModuleCall", "cwd=%s", StringType(Apollo::getCwd())));
 
   }
 

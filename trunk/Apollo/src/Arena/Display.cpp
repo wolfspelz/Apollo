@@ -38,7 +38,7 @@ int Display::Create()
 
   ApHandle hView = Apollo::newHandle();
 
-  ok = Msg_WebView_Create::_(hView);
+  ok = Msg_WebView_Create::_(hView, 100, 100, 100, 100);
   if (!ok) { apLog_Error((LOG_CHANNEL, "Display::Create", "Msg_WebView_Create(" ApHandleFormat ") failed", ApHandleType(hView))); }
 
   if (ok) {
