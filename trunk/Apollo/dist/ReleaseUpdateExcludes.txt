@@ -99,4 +99,3 @@ xmpp.dll
 xmpp.ilk
 xmpptestserver.dll
 xmpptestserver.ilk
-zlib1.dll
