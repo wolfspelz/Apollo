@@ -13,3 +13,4 @@ Dun/OnLoad/DeleteDbFiles=Identity
 #LogMask=63
 LogMask=255
 Debug/ShowConsole=0
+Translation/Language=de
