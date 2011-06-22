@@ -398,7 +398,7 @@ AP_MSG_HANDLER_METHOD(ArenaModule, WebView_Event_DocumentLoaded)
   }
 }
 
-AP_MSG_HANDLER_METHOD(ArenaModule, WebView_Event_DocumentUnload)
+AP_MSG_HANDLER_METHOD(ArenaModule, WebView_Event_Closing)
 {
   Display* pDisplay = GetDisplayOfHandle(pMsg->hView);
   if (pDisplay) {
@@ -580,7 +580,7 @@ int ArenaModule::Init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ArenaModule, VpView_ParticipantAdded, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ArenaModule, VpView_ParticipantRemoved, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ArenaModule, WebView_Event_DocumentLoaded, this, ApCallbackPosNormal);
-  AP_MSG_REGISTRY_ADD(MODULE_NAME, ArenaModule, WebView_Event_DocumentUnload, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, ArenaModule, WebView_Event_Closing, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ArenaModule, Animation_SequenceBegin, this, ApCallbackPosNormal);
   //AP_MSG_REGISTRY_ADD(MODULE_NAME, ArenaModule, Animation_Frame, this, ApCallbackPosNormal);
   //AP_MSG_REGISTRY_ADD(MODULE_NAME, ArenaModule, Animation_SequenceEnd, this, ApCallbackPosNormal);

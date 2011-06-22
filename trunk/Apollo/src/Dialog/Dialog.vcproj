@@ -217,11 +217,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\bin\Win32\Debug\modules\Dialog\test\Content.html"
+				RelativePath="..\..\bin\Win32\Debug\modules\Dialog\test\ContentLoadedFromHtml.html"
 				>
 			</File>
 			<File
-				RelativePath="..\..\bin\Win32\Debug\modules\Dialog\test\ContentLoadedFromHtml.html"
+				RelativePath="..\..\bin\Win32\Debug\modules\Dialog\test\CreateWaitCloseByContent.html"
 				>
 			</File>
 			<Filter

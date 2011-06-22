@@ -39,7 +39,7 @@ public:
   void On_WebView_Event_DocumentLoaded(Msg_WebView_Event_DocumentLoaded* pMsg);
   void On_WebView_Event_ReceivedFocus(Msg_WebView_Event_ReceivedFocus* pMsg);
   void On_WebView_Event_LostFocus(Msg_WebView_Event_LostFocus* pMsg);
-  void On_WebView_Event_DocumentUnload(Msg_WebView_Event_DocumentUnload* pMsg);
+  void On_WebView_Event_Closing(Msg_WebView_Event_Closing* pMsg);
   void On_Dialog_ContentLoaded(Msg_Dialog_ContentLoaded* pMsg);
 
 #if defined(AP_TEST)

@@ -144,7 +144,7 @@ AP_MSG_HANDLER_METHOD(DialogModule, WebView_Event_LostFocus)
   }
 }
 
-AP_MSG_HANDLER_METHOD(DialogModule, WebView_Event_DocumentUnload)
+AP_MSG_HANDLER_METHOD(DialogModule, WebView_Event_Closing)
 {
   Dialog* pDialog = FindDialogByView(pMsg->hView);
   if (pDialog) {
@@ -262,7 +262,7 @@ int DialogModule::Init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, DialogModule, WebView_Event_DocumentLoaded, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, DialogModule, WebView_Event_ReceivedFocus, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, DialogModule, WebView_Event_LostFocus, this, ApCallbackPosNormal);
-  AP_MSG_REGISTRY_ADD(MODULE_NAME, DialogModule, WebView_Event_DocumentUnload, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, DialogModule, WebView_Event_Closing, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, DialogModule, Dialog_ContentLoaded, this, ApCallbackPosNormal);
 
   srpcGateRegistry_.add("Dialog_Create", SrpcGate_Dialog_Create);
@@ -316,18 +316,18 @@ void DialogModuleTester::End()
 
 static ApHandle DialogModuleTester_CreateWaitCloseByContent_hDialog;
 
-void DialogModuleTester_CreateWaitCloseByContent_WebView_Event_DocumentUnload(Msg_WebView_Event_DocumentUnload* pMsg)
+void DialogModuleTester_CreateWaitCloseByContent_WebView_Event_Closing(Msg_WebView_Event_Closing* pMsg)
 {
   if (pMsg->hView != DialogModuleTester_CreateWaitCloseByContent_hDialog) { return; }
   AP_UNITTEST_SUCCESS(DialogModuleTester::CreateWaitCloseByContent);
-  { Msg_WebView_Event_DocumentUnload msg; msg.Unhook(MODULE_NAME, (ApCallback) DialogModuleTester_CreateWaitCloseByContent_WebView_Event_DocumentUnload, 0); }
+  { Msg_WebView_Event_Closing msg; msg.Unhook(MODULE_NAME, (ApCallback) DialogModuleTester_CreateWaitCloseByContent_WebView_Event_Closing, 0); }
 }
 
 String DialogModuleTester::CreateWaitCloseByContent()
 {
   String s;
 
-  { Msg_WebView_Event_DocumentUnload msg; msg.Hook(MODULE_NAME, (ApCallback) DialogModuleTester_CreateWaitCloseByContent_WebView_Event_DocumentUnload, 0, ApCallbackPosNormal); }
+  { Msg_WebView_Event_Closing msg; msg.Hook(MODULE_NAME, (ApCallback) DialogModuleTester_CreateWaitCloseByContent_WebView_Event_Closing, 0, ApCallbackPosNormal); }
 
   ApHandle hDialog = Apollo::newHandle();
   DialogModuleTester_CreateWaitCloseByContent_hDialog = hDialog;
@@ -340,7 +340,7 @@ String DialogModuleTester::CreateWaitCloseByContent()
   msg.nHeight = 200;
   msg.bVisible = 1;
   msg.sCaption = "Very Long Window Caption";
-  msg.sContentUrl = "file://" + Apollo::getModuleResourcePath(MODULE_NAME) + "test/Content.html";
+  msg.sContentUrl = "file://" + Apollo::getModuleResourcePath(MODULE_NAME) + "test/CreateWaitCloseByContent.html";
   if (!s) { if (!msg.Request()) { s = "Msg_Dialog_Create failed"; }}
 
   return s;
@@ -521,11 +521,11 @@ void DialogModuleTester_ExternalUrl_WebView_Event_DocumentComplete(Msg_WebView_E
   { Msg_WebView_Event_DocumentComplete msg; msg.Unhook(MODULE_NAME, (ApCallback) DialogModuleTester_ExternalUrl_WebView_Event_DocumentComplete, 0); }
 }
 
-void DialogModuleTester_ExternalUrl_WebView_Event_DocumentUnload(Msg_WebView_Event_DocumentUnload* pMsg)
+void DialogModuleTester_ExternalUrl_WebView_Event_Closing(Msg_WebView_Event_Closing* pMsg)
 {
   if (pMsg->hView != DialogModuleTester_ExternalUrl_hDialog) { return; }
   AP_UNITTEST_SUCCESS(DialogModuleTester::ExternalUrl);
-  { Msg_WebView_Event_DocumentUnload msg; msg.Unhook(MODULE_NAME, (ApCallback) DialogModuleTester_ExternalUrl_WebView_Event_DocumentUnload, 0); }
+  { Msg_WebView_Event_Closing msg; msg.Unhook(MODULE_NAME, (ApCallback) DialogModuleTester_ExternalUrl_WebView_Event_Closing, 0); }
 }
 
 String DialogModuleTester::ExternalUrl()
@@ -534,7 +534,7 @@ String DialogModuleTester::ExternalUrl()
 
   { Msg_WebView_Event_DocumentLoaded msg; msg.Hook(MODULE_NAME, (ApCallback) DialogModuleTester_ExternalUrl_WebView_Event_DocumentLoaded, 0, ApCallbackPosNormal); }
   { Msg_WebView_Event_DocumentComplete msg; msg.Hook(MODULE_NAME, (ApCallback) DialogModuleTester_ExternalUrl_WebView_Event_DocumentComplete, 0, ApCallbackPosNormal); }
-  { Msg_WebView_Event_DocumentUnload msg; msg.Hook(MODULE_NAME, (ApCallback) DialogModuleTester_ExternalUrl_WebView_Event_DocumentUnload, 0, ApCallbackPosNormal); }
+  { Msg_WebView_Event_Closing msg; msg.Hook(MODULE_NAME, (ApCallback) DialogModuleTester_ExternalUrl_WebView_Event_Closing, 0, ApCallbackPosNormal); }
 
   ApHandle hDialog = Apollo::newHandle();
   DialogModuleTester_ExternalUrl_hDialog = hDialog;
