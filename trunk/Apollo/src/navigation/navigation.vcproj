@@ -213,6 +213,58 @@
 			UniqueIdentifier="{33215DF1-C4A8-4a91-8DBA-69C7B3F19712}"
 			>
 		</Filter>
+		<Filter
+			Name="Browser"
+			>
+			<Filter
+				Name="Firefox"
+				>
+				<File
+					RelativePath=".\Browser\Firefox\AvatarNavigator\chrome\chromeFiles\locale\en-US\avatarnav\avatarnav.dtd"
+					>
+				</File>
+				<File
+					RelativePath=".\Browser\Firefox\AvatarNavigator\chrome\chromeFiles\content\AvatarNavigator.js"
+					>
+				</File>
+				<File
+					RelativePath=".\Browser\Firefox\AvatarNavigator\chrome\chromeFiles\content\browser.js"
+					>
+				</File>
+				<File
+					RelativePath=".\Browser\Firefox\AvatarNavigator\chrome\chromeFiles\content\browser.xul"
+					>
+				</File>
+				<File
+					RelativePath=".\Browser\Firefox\AvatarNavigator\chrome.manifest"
+					>
+				</File>
+				<File
+					RelativePath=".\Browser\Firefox\AvatarNavigator\install.rdf"
+					>
+				</File>
+				<File
+					RelativePath=".\Browser\Firefox\AvatarNavigator\chrome\chromeFiles\content\Log.js"
+					>
+				</File>
+				<File
+					RelativePath=".\Browser\Firefox\AvatarNavigator\defaults\preferences\settings.js"
+					>
+				</File>
+				<File
+					RelativePath=".\Browser\Firefox\AvatarNavigator\chrome\chromeFiles\content\Socket.js"
+					>
+				</File>
+				<File
+					RelativePath=".\Browser\Firefox\AvatarNavigator\chrome\chromeFiles\content\SrpcMessage.js"
+					>
+				</File>
+				<File
+					RelativePath=".\Browser\Firefox\AvatarNavigator\chrome\chromeFiles\content\SrpcProtocol.js"
+					>
+				</File>
+			</Filter>
+		</Filter>
 		<File
 			RelativePath="..\..\bin\win32\debug\modules\navigation\config.txt"
 			>
