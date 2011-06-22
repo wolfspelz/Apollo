@@ -83,11 +83,11 @@ void View::Create(int nLeft, int nTop, int nWidth, int nHeight)
 
 void View::Destroy()  
 {
-  {
-    Msg_WebView_Event_DocumentUnload msg;
-    msg.hView = apHandle();
-    msg.Send();
-  }
+  //{
+  //  Msg_WebView_Event_Closing msg;
+  //  msg.hView = apHandle();
+  //  msg.Send();
+  //}
 
   if (pWebViewPrivate_) {
     pWebViewPrivate_->Release();
@@ -847,10 +847,23 @@ HRESULT View::webViewLostFocus(IWebView *webView, OLE_HANDLE loseFocusTo)
   return E_NOTIMPL;
 }
 
+HRESULT View::webViewClosing(IWebView *webView)
+{
+  // In View::Destroy after pWebView_ = 0
+  // Do not check webView pointer, just trust WebKit that this makes sense.
+  {
+    Msg_WebView_Event_Closing msg;
+    msg.hView = apHandle();
+    msg.Send();
+  }
+
+  return E_NOTIMPL;
+}
+
 //HRESULT View::willCloseFrame(IWebView* webView, IWebFrame* frame)
 //{
 //  if (pTopLoadingFrame_ == frame) {
-//    Msg_WebView_Event_DocumentUnload msg;
+//    Msg_WebView_Event_Closing msg;
 //    msg.hView = apHandle();
 //    msg.Send();
 //

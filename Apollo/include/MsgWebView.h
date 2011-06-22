@@ -359,10 +359,10 @@ public:
 };
 
 // WebView ->
-class Msg_WebView_Event_DocumentUnload: public ApNotificationMessage
+class Msg_WebView_Event_Closing: public ApNotificationMessage
 {
 public:
-  Msg_WebView_Event_DocumentUnload() : ApNotificationMessage("WebView_Event_DocumentUnload") {}
+  Msg_WebView_Event_Closing() : ApNotificationMessage("WebView_Event_Closing") {}
   ApIN ApHandle hView;
 };
 

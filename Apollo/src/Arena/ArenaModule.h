@@ -59,7 +59,7 @@ public:
   void On_VpView_ParticipantAdded(Msg_VpView_ParticipantAdded* pMsg);
   void On_VpView_ParticipantRemoved(Msg_VpView_ParticipantRemoved* pMsg);
   void On_WebView_Event_DocumentLoaded(Msg_WebView_Event_DocumentLoaded* pMsg);
-  void On_WebView_Event_DocumentUnload(Msg_WebView_Event_DocumentUnload* pMsg);
+  void On_WebView_Event_Closing(Msg_WebView_Event_Closing* pMsg);
   void On_Animation_SequenceBegin(Msg_Animation_SequenceBegin* pMsg);
   //void On_Animation_Frame(Msg_Animation_Frame* pMsg);
   //void On_Animation_SequenceEnd(Msg_Animation_SequenceEnd* pMsg);

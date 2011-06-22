@@ -402,9 +402,9 @@ int Test_Config_Load()
   return ok;
 }
 
-int Test_Config_DBOverride()
+String Test_Config_DBOverride()
 {
-  int ok = 1;
+  String s;
 
   String sOriginalPlane = "default";
   { Msg_Config_GetPlane msg; if (msg.Request()) { sOriginalPlane = msg.sPlane; } }
@@ -418,51 +418,52 @@ int Test_Config_DBOverride()
   }
 
   // Check values from DB
-  { int n = Apollo::getConfig("Test_Config_DB/not-available", 42); if (n != 42) ok = 0; }
-  { int n = Apollo::getConfig("Test_Config_DB/String", 43); if (n != 0) ok = 0; }
-  { int n = Apollo::getConfig("Test_Config_DB/EmptyString", 44); if (n != 44) ok = 0; }
-  { int n = Apollo::getConfig("Test_Config_DB/Int", 45); if (n != 5) ok = 0; }
-  { int n = Apollo::getConfig("Test_Config_DB/Int0", 46); if (n != 0) ok = 0; }
+  { int n = Apollo::getConfig("Test_Config_DB/not-available", 42); if (n != 42) { s.from(__LINE__); } }
+  { int n = Apollo::getConfig("Test_Config_DB/String", 43); if (n != 0) { s.from(__LINE__); } }
+  { int n = Apollo::getConfig("Test_Config_DB/EmptyString", 44); if (n != 44) { s.from(__LINE__); } }
+  { int n = Apollo::getConfig("Test_Config_DB/Int", 45); if (n != 5) { s.from(__LINE__); } }
+  { int n = Apollo::getConfig("Test_Config_DB/Int0", 46); if (n != 0) { s.from(__LINE__); } }
 
-  { String s = Apollo::getConfig("Test_Config_DB/not-available", "s42"); if (s != "s42") ok = 0; }
-  { String s = Apollo::getConfig("Test_Config_DB/String", "s43"); if (s != "def") ok = 0; }
-  { String s = Apollo::getConfig("Test_Config_DB/EmptyString", "s44"); if (s != "") ok = 0; }
-  { String s = Apollo::getConfig("Test_Config_DB/Int", "s45"); if (s != "5") ok = 0; }
-  { String s = Apollo::getConfig("Test_Config_DB/Int0", "s46"); if (s != "0") ok = 0; }
+  { String s = Apollo::getConfig("Test_Config_DB/not-available", "s42"); if (s != "s42") { s.from(__LINE__); } }
+  { String s = Apollo::getConfig("Test_Config_DB/String", "s43"); if (s != "def") { s.from(__LINE__); } }
+  { String s = Apollo::getConfig("Test_Config_DB/EmptyString", "s44"); if (s != "") { s.from(__LINE__); } }
+  { String s = Apollo::getConfig("Test_Config_DB/Int", "s45"); if (s != "5") { s.from(__LINE__); } }
+  { String s = Apollo::getConfig("Test_Config_DB/Int0", "s46"); if (s != "0") { s.from(__LINE__); } }
 
-  { Apollo::ValueList vlKeys; Apollo::getConfigKeys("Test_Config_DB/List/D/d", vlKeys); if (vlKeys.length() != 0) { ok = 0; } }
-  { Apollo::ValueList vlKeys; Apollo::getConfigKeys("Test_Config_DB/List/D", vlKeys); if (vlKeys.length() != 1) { ok = 0; } }
-  { Apollo::ValueList vlKeys; Apollo::getConfigKeys("Test_Config_DB/List", vlKeys); if (vlKeys.length() != 3) { ok = 0; } }
-  { Apollo::ValueList vlKeys; Apollo::getConfigKeys("Test_Config_DB/List/F/f", vlKeys); if (vlKeys.length() != 0) { ok = 0; } }
+  { Apollo::ValueList vlKeys; Apollo::getConfigKeys("Test_Config_DB/List/D/d", vlKeys); if (vlKeys.length() != 0) { s.from(__LINE__); } }
+  { Apollo::ValueList vlKeys; Apollo::getConfigKeys("Test_Config_DB/List/D", vlKeys); if (vlKeys.length() != 1) { s.from(__LINE__); } }
+  { Apollo::ValueList vlKeys; Apollo::getConfigKeys("Test_Config_DB/List", vlKeys); if (vlKeys.length() != 3) { s.from(__LINE__); } }
+  { Apollo::ValueList vlKeys; Apollo::getConfigKeys("Test_Config_DB/List/F/f", vlKeys); if (vlKeys.length() != 0) { s.from(__LINE__); } }
 
   {
     Apollo::ValueList vlKeys;
     Apollo::getConfigKeys("Test_Config_DB/List", vlKeys);
     Apollo::ValueElem* e = 0;
-    e = vlKeys.nextElem(e); if (!e || e->getString() != "D") { ok = 0; }
-    e = vlKeys.nextElem(e); if (!e || e->getString() != "E") { ok = 0; }
-    e = vlKeys.nextElem(e); if (!e || e->getString() != "F") { ok = 0; }
+    e = vlKeys.nextElem(e); if (!e || e->getString() != "D") { s.from(__LINE__); }
+    e = vlKeys.nextElem(e); if (!e || e->getString() != "E") { s.from(__LINE__); }
+    e = vlKeys.nextElem(e); if (!e || e->getString() != "F") { s.from(__LINE__); }
   }
 
   // Check values from DB which override txt file
-  { int n = Apollo::getConfig("Test_Config_DBOverride/String", 43); if (n != 0) ok = 0; }
-  { String s = Apollo::getConfig("Test_Config_DBOverride/String", "s43"); if (s != "ghi") ok = 0; }
-  { Apollo::ValueList vlKeys; Apollo::getConfigKeys("Test_Config_DBOverride/List/G/g", vlKeys); if (vlKeys.length() != 0) { ok = 0; } }
-  { Apollo::ValueList vlKeys; Apollo::getConfigKeys("Test_Config_DBOverride/List/G", vlKeys); if (vlKeys.length() != 1) { ok = 0; } }
-  { Apollo::ValueList vlKeys; Apollo::getConfigKeys("Test_Config_DBOverride/List", vlKeys); if (vlKeys.length() != 3) { ok = 0; } }
-  { Apollo::ValueList vlKeys; Apollo::getConfigKeys("Test_Config_DBOverride/List/I/i", vlKeys); if (vlKeys.length() != 0) { ok = 0; } }
+  { int n = Apollo::getConfig("Test_Config_DBOverride/String", 43); if (n != 0) { s.from(__LINE__); } }
+  { String s = Apollo::getConfig("Test_Config_DBOverride/String", "s43"); if (s != "ghi") { s.from(__LINE__); } }
+  { Apollo::ValueList vlKeys; Apollo::getConfigKeys("Test_Config_DBOverride/List/G/g", vlKeys); if (vlKeys.length() != 0) { s.from(__LINE__); } }
+  { Apollo::ValueList vlKeys; Apollo::getConfigKeys("Test_Config_DBOverride/List/G", vlKeys); if (vlKeys.length() != 1) { s.from(__LINE__); } }
+  { Apollo::ValueList vlKeys; Apollo::getConfigKeys("Test_Config_DBOverride/List", vlKeys); if (vlKeys.length() != 3) { s.from(__LINE__); } }
+  { Apollo::ValueList vlKeys; Apollo::getConfigKeys("Test_Config_DBOverride/List/I/i", vlKeys); if (vlKeys.length() != 0) { s.from(__LINE__); } }
   {
     Apollo::ValueList vlKeys;
     Apollo::getConfigKeys("Test_Config_DBOverride/List", vlKeys);
     Apollo::ValueElem* e = 0;
-    e = vlKeys.nextElem(e); if (e->getString() != "G") { ok = 0; }
-    e = vlKeys.nextElem(e); if (e->getString() != "H") { ok = 0; }
-    e = vlKeys.nextElem(e); if (e->getString() != "I") { ok = 0; }
+    e = vlKeys.nextElem(e); if (e->getString() != "G") { s.from(__LINE__); }
+    e = vlKeys.nextElem(e); if (e->getString() != "H") { s.from(__LINE__); }
+    e = vlKeys.nextElem(e); if (e->getString() != "I") { s.from(__LINE__); }
   }
 
   { Msg_Config_Clear msg; msg.Request(); }
   { Msg_Config_SetPlane msg; msg.sPlane = sOriginalPlane; msg.Request(); }
-  return ok;
+
+  return s;
 }
 
 int Test_Config_Delete()
@@ -589,7 +590,7 @@ AP_MSG_HANDLER_METHOD(ConfigModule, UnitTest_Token)
     AP_UNITTEST_EXECUTE1(Test_Config_Load);
     AP_UNITTEST_EXECUTE1(Test_Config_Delete);
     if (bUseDb_) {
-      AP_UNITTEST_EXECUTE1(Test_Config_DBOverride);
+      AP_UNITTEST_EXECUTE(Test_Config_DBOverride);
       AP_UNITTEST_EXECUTE(Test_Config_Persist);
     }
 

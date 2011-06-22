@@ -231,19 +231,19 @@ public:
   virtual HRESULT STDMETHODCALLTYPE unused1() { return E_NOTIMPL; }
   virtual HRESULT STDMETHODCALLTYPE unused2() { return E_NOTIMPL; }
   virtual HRESULT STDMETHODCALLTYPE unused3() { return E_NOTIMPL; }
-  virtual HRESULT STDMETHODCALLTYPE webViewScrolled( /* [in] */ IWebView *sender) { return E_NOTIMPL; }
-  virtual HRESULT STDMETHODCALLTYPE webViewAddMessageToConsole(/* [in] */ IWebView *sender, /* [in] */ BSTR message, /* [in] */ int lineNumber, /* [in] */ BSTR url, /* [in] */ BOOL isError);// { return E_NOTIMPL; }
-  virtual HRESULT STDMETHODCALLTYPE webViewShouldInterruptJavaScript(/* [in] */ IWebView *sender, /* [retval][out] */ BOOL *result) { return E_NOTIMPL; }
-  virtual HRESULT STDMETHODCALLTYPE webViewReceivedFocus(/* [in] */ IWebView *sender);// { return E_NOTIMPL; }
-  virtual HRESULT STDMETHODCALLTYPE webViewLostFocus(/* [in] */ IWebView *sender, /* [in] */ OLE_HANDLE loseFocusTo);// { return E_NOTIMPL; }
-  virtual HRESULT STDMETHODCALLTYPE doDragDrop(/* [in] */ IWebView *sender, /* [in] */ IDataObject *dataObject, /* [in] */ IDropSource *dropSource, /* [in] */ DWORD okEffect, /* [retval][out] */ DWORD *performedEffect) { return E_NOTIMPL; }
-  virtual HRESULT STDMETHODCALLTYPE webViewGetDlgCode(/* [in] */ IWebView *sender, /* [in] */ UINT keyCode, /* [retval][out] */ LONG_PTR *code) { return E_NOTIMPL; }
-  virtual HRESULT STDMETHODCALLTYPE webViewPainted(/* [in] */ IWebView *sender) { return E_NOTIMPL; }
-  virtual HRESULT STDMETHODCALLTYPE exceededDatabaseQuota(/* [in] */ IWebView *sender, /* [in] */ IWebFrame *frame, /* [in] */ IWebSecurityOrigin *origin, /* [in] */ BSTR databaseIdentifier) { return E_NOTIMPL; }
-  virtual HRESULT STDMETHODCALLTYPE embeddedViewWithArguments(/* [in] */ IWebView *sender, /* [in] */ IWebFrame *frame, /* [in] */ IPropertyBag *arguments, /* [retval][out] */ IWebEmbeddedView **view) { return E_NOTIMPL; }
-  virtual HRESULT STDMETHODCALLTYPE webViewClosing(/* [in] */ IWebView *sender) { return E_NOTIMPL; }
-  virtual HRESULT STDMETHODCALLTYPE webViewSetCursor(/* [in] */ IWebView *sender, /* [in] */ OLE_HANDLE cursor) { return E_NOTIMPL; }
-  virtual HRESULT STDMETHODCALLTYPE webViewDidInvalidate(/* [in] */ IWebView *sender) { return E_NOTIMPL; }
+  virtual HRESULT STDMETHODCALLTYPE webViewScrolled(IWebView *sender) { return E_NOTIMPL; }
+  virtual HRESULT STDMETHODCALLTYPE webViewAddMessageToConsole(IWebView *sender, BSTR message, int lineNumber, BSTR url, BOOL isError);// { return E_NOTIMPL; }
+  virtual HRESULT STDMETHODCALLTYPE webViewShouldInterruptJavaScript(IWebView *sender, /* [retval][out] */ BOOL *result) { return E_NOTIMPL; }
+  virtual HRESULT STDMETHODCALLTYPE webViewReceivedFocus(IWebView *sender);// { return E_NOTIMPL; }
+  virtual HRESULT STDMETHODCALLTYPE webViewLostFocus(IWebView *sender, OLE_HANDLE loseFocusTo);// { return E_NOTIMPL; }
+  virtual HRESULT STDMETHODCALLTYPE doDragDrop(IWebView *sender, IDataObject *dataObject, IDropSource *dropSource, DWORD okEffect, /* [retval][out] */ DWORD *performedEffect) { return E_NOTIMPL; }
+  virtual HRESULT STDMETHODCALLTYPE webViewGetDlgCode(IWebView *sender, UINT keyCode, /* [retval][out] */ LONG_PTR *code) { return E_NOTIMPL; }
+  virtual HRESULT STDMETHODCALLTYPE webViewPainted(IWebView *sender) { return E_NOTIMPL; }
+  virtual HRESULT STDMETHODCALLTYPE exceededDatabaseQuota(IWebView *sender, IWebFrame *frame, IWebSecurityOrigin *origin, BSTR databaseIdentifier) { return E_NOTIMPL; }
+  virtual HRESULT STDMETHODCALLTYPE embeddedViewWithArguments(IWebView *sender, IWebFrame *frame, IPropertyBag *arguments, /* [retval][out] */ IWebEmbeddedView **view) { return E_NOTIMPL; }
+  virtual HRESULT STDMETHODCALLTYPE webViewClosing(IWebView *sender);// { return E_NOTIMPL; }
+  virtual HRESULT STDMETHODCALLTYPE webViewSetCursor(IWebView *sender, OLE_HANDLE cursor) { return E_NOTIMPL; }
+  virtual HRESULT STDMETHODCALLTYPE webViewDidInvalidate(IWebView *sender) { return E_NOTIMPL; }
   virtual HRESULT STDMETHODCALLTYPE desktopNotificationsDelegate(/* [out] */ IWebDesktopNotificationsDelegate** result) { return E_NOTIMPL; }
 
 };
