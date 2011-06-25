@@ -18,7 +18,12 @@ namespace SpicIE.AvatarNavigator
         int _nMaxReconnectInterval = 10000;
         System.Threading.Timer _connectTimer = null;
         bool _bInShutdown = false;
-        string _sContextHandle = "";
+        string _sContext = "";
+        bool _bConnected = false;
+        bool _bShow = false;
+        bool _bHasContext = false;
+        string _sNativeVersion = "";
+        int _nNativeHWND = 0;
 
         internal void Log(string s)
         {
@@ -35,6 +40,49 @@ namespace SpicIE.AvatarNavigator
                 catch { }
             }
         }
+
+        #region Utility // --------------------------------------
+
+        internal int GetRandomNumber(int nMax)
+        {
+            int nRandom = 0;
+            lock (this)
+            {
+                nRandom = _rnd.Next(nMax);
+            }
+            return nRandom;
+        }
+
+        internal string GetRegistryValue(string sName, string sDefault)
+        {
+            string sResult = "";
+            try
+            {
+                using (var key = Registry.CurrentUser.OpenSubKey(@"Software\OpenVirtualWorld\Avatar"))
+                {
+                    if (key != null)
+                    {
+                        sResult = (string)key.GetValue(sName);
+                    }
+                }
+            }
+            catch { }
+            return sResult;
+        }
+
+        internal int GetRegistryValue(string sName, int nDefault)
+        {
+            int nResult = 0;
+            if (!Int32.TryParse(GetRegistryValue(sName, ""), out nResult))
+            {
+                nResult = nDefault;
+            }
+            return nResult;
+        }
+
+        #endregion
+
+        #region Main Flow // --------------------------------------
 
         internal void Run()
         {
@@ -87,52 +135,78 @@ namespace SpicIE.AvatarNavigator
             }
         }
 
-        internal void Connect()
+        void Connect()
         {
             if (_client == null)
             {
+                _bConnected = false;
+                _bHasContext = false;
+
                 _client = new Client(this);
-                _client.SetQueueing(true);
                 _client.Connect(OnConnected, OnDisconnected);
             }
         }
 
-        internal void Disconnect()
+        void Disconnect()
         {
             _client.Disconnect();
             _client = null;
         }
 
-        internal void OnGetHandle(Srpc.Message response)
+        #endregion
+
+        #region Networking events // -----------------------------------
+
+        void OnGetHandle(Srpc.Message response)
         {
-            _sContextHandle = response.GetString("h");
-            if (_client != null)
+            _sContext = response.GetString("hResult");
+            _bHasContext = true;
+
+            SendContextOpen();
+            if (_bShow)
             {
-                _client.SetQueueing(false);
+                SendContextShow();
             }
+            else
+            {
+                SendContextHide();
+            }
+
+            if (_nNativeHWND != 0)
+            {
+                SendContextNativeWindow(_sNativeVersion, _nNativeHWND);
+            }
+            //SendContextPosition(200, 800);
+            //SendContextSize(600, 400);
         }
 
-        internal void OnHello(Srpc.Message response)
+        void OnHello(Srpc.Message response)
         {
-            var request = new Srpc.Message();
-            request.Set(Srpc.Key.Method, "System_GetHandle");
-            _client.Request(request, OnGetHandle);
+
+            var srpc = new Srpc.Message();
+            srpc.Set(Srpc.Key.Method, "System_GetHandle");
+            _client.Send(srpc, OnGetHandle);
         }
 
-        internal void OnConnected()
+        void OnConnected()
         {
+            _bConnected = true;
             _nReconnectInterval = _nMinReconnectInterval;
 
-            if (_client != null)
+            lock (this)
             {
-                var request = new Srpc.Message();
-                request.Set(Srpc.Key.Method, "Navigation_NavigatorHello");
-                _client.Request(request, OnHello);
+                if (_client != null)
+                {
+                    var srpc = new Srpc.Message();
+                    srpc.Set(Srpc.Key.Method, "Navigation_NavigatorHello");
+                    _client.Send(srpc, OnHello);
+                }
             }
         }
 
-        internal void OnDisconnected()
+        void OnDisconnected()
         {
+            _bConnected = false;
             _client = null;
 
             if (_bInShutdown)
@@ -145,68 +219,41 @@ namespace SpicIE.AvatarNavigator
             }
         }
 
-        internal void SendText(string sData)
+        void Send(Srpc.Message srpc)
         {
-            var srpc = new Srpc.Message();
-            srpc.Set(Srpc.Key.Method, "Data");
-            srpc.Set("Data", sData);
-            if (_client != null)
-            {
-                _client.Send(srpc);
-            }
-        }
-
-        internal void SendNavigate(string sUrl)
-        {
-            var srpc = new Srpc.Message();
-            srpc.Set(Srpc.Key.Method, "Navigate");
-            srpc.Set("Url", sUrl);
-            if (_client != null)
-            {
-                _client.Send(srpc);
-            }
-        }
-
-        internal int GetRandomNumber(int nMax)
-        {
-            int nRandom = 0;
             lock (this)
             {
-                nRandom = _rnd.Next(nMax);
-            }
-            return nRandom;
-        }
-
-        internal string GetRegistryValue(string sName, string sDefault)
-        {
-            string sResult = "";
-            try
-            {
-                using (var key = Registry.CurrentUser.OpenSubKey(@"Software\OpenVirtualWorld\Avatar"))
+                if (_client != null)
                 {
-                    if (key != null)
-                    {
-                        sResult = (string)key.GetValue(sName);
-                    }
+                    _client.Send(srpc);
                 }
             }
-            catch { }
-            return sResult;
         }
 
-        internal int GetRegistryValue(string sName, int nDefault)
-        {
-            int nResult = 0;
-            if (!Int32.TryParse(GetRegistryValue(sName, ""), out nResult))
-            {
-                nResult = nDefault;
-            }
-            return nResult;
-        }
+        #endregion
+
+        #region Tab events // ------------------------------------
 
         internal void OnTabCreate()
         {
             Log("OnTabCreate " + _sId + " " + _sUrl);
+        }
+
+        internal void OnTabNativeWindow(string sVersion, int nHWND)
+        {
+            Log("OnTabNativeWindow " + _sId + " " + sVersion + " HWND=" + nHWND);
+
+            if (_nNativeHWND != nHWND)
+            {
+                _sNativeVersion = sVersion;
+                _nNativeHWND = nHWND;
+
+                if (_bConnected && _bHasContext)
+                {
+                    SendContextNativeWindow(_sNativeVersion, _nNativeHWND);
+                }
+            }
+
         }
 
         internal void OnTabDestroy()
@@ -217,13 +264,13 @@ namespace SpicIE.AvatarNavigator
         internal void OnTabShow()
         {
             Log("OnTabShow " + _sId + " " + _sUrl);
-            lock (this)
+
+            if (!_bShow)
             {
-                if (_client != null)
+                _bShow = true;
+                if (_bConnected && _bHasContext)
                 {
-                    var srpc = new Srpc.Message();
-                    srpc.Set(Srpc.Key.Method, "Show");
-                    _client.Send(srpc);
+                    SendContextShow();
                 }
             }
         }
@@ -231,32 +278,102 @@ namespace SpicIE.AvatarNavigator
         internal void OnTabHide()
         {
             Log("OnTabHide " + _sId + " " + _sUrl);
-            lock (this)
+
+            if (_bShow)
             {
-                if (_client != null)
+                _bShow = false;
+                if (_bConnected && _bHasContext)
                 {
-                    var srpc = new Srpc.Message();
-                    srpc.Set(Srpc.Key.Method, "Hide");
-                    _client.Send(srpc);
+                    SendContextHide();
                 }
             }
         }
 
         internal void OnTabNavigate(string sUrl)
         {
-            _sUrl = sUrl;
-            Log("OnTabNavigate " + _sId + " " + _sUrl);
-            lock (this)
+            Log("OnTabNavigate " + _sId + " " + sUrl);
+
+            if (_sUrl != sUrl)
             {
-                if (_client != null)
+                _sUrl = sUrl;
+                if (_bConnected && _bHasContext)
                 {
-                    var srpc = new Srpc.Message();
-                    srpc.Set(Srpc.Key.Method, "Navigate");
-                    srpc.Set("Url", _sUrl);
-                    _client.Send(srpc);
+                    SendContextNavigate(sUrl);
                 }
             }
         }
-    
+
+        #endregion
+
+        #region Send Apollo messages // ---------------------------------------
+
+        void SendContextOpen()
+        {
+            var srpc = new Srpc.Message();
+            srpc.Set(Srpc.Key.Method, "Navigation_ContextOpen");
+            srpc.Set("hContext", _sContext);
+            Send(srpc);
+        }
+
+        void SendContextShow()
+        {
+            var srpc = new Srpc.Message();
+            srpc.Set(Srpc.Key.Method, "Navigation_ContextShow");
+            srpc.Set("hContext", _sContext);
+            Send(srpc);
+        }
+
+        void SendContextHide()
+        {
+            var srpc = new Srpc.Message();
+            srpc.Set(Srpc.Key.Method, "Navigation_ContextHide");
+            srpc.Set("hContext", _sContext);
+            Send(srpc);
+        }
+
+        void SendContextNavigate(string sUrl)
+        {
+            var srpc = new Srpc.Message();
+            srpc.Set(Srpc.Key.Method, "Navigation_ContextNavigate");
+            srpc.Set("hContext", _sContext);
+            srpc.Set("sUrl", sUrl);
+            Send(srpc);
+        }
+
+        void SendContextPosition(int nLeft, int nBottom)
+        {
+            var srpc = new Srpc.Message();
+            srpc.Set(Srpc.Key.Method, "Navigation_ContextPosition");
+            srpc.Set("hContext", _sContext);
+            srpc.Set("nLeft", nLeft);
+            srpc.Set("nBottom", nBottom);
+            Send(srpc);
+        }
+
+        void SendContextSize(int nWidth, int nHeight)
+        {
+            var srpc = new Srpc.Message();
+            srpc.Set(Srpc.Key.Method, "Navigation_ContextSize");
+            srpc.Set("hContext", _sContext);
+            srpc.Set("nWidth", nWidth);
+            srpc.Set("nHeight", nHeight);
+            Send(srpc);
+        }
+
+        void SendContextNativeWindow(string sVersion, int nHWND)
+        {
+            var sig =  new Srpc.Message();
+            sig.Set("sType", "InternetExplorer");
+            sig.Set("sVersion", sVersion);
+            sig.Set("nWin32HWND", nHWND);
+
+            var srpc = new Srpc.Message();
+            srpc.Set(Srpc.Key.Method, "Navigation_ContextNativeWindow");
+            srpc.Set("hContext", _sContext);
+            srpc.Set("kvSignature", sig.ToString());
+            Send(srpc);
+        }
+        
+        #endregion
     }
 }

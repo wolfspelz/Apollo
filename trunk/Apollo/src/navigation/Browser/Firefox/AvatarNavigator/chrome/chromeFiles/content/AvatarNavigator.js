@@ -167,7 +167,7 @@ AvatarNavigator.prototype.createContextForTab = function(tab)
   var fCallback = function(response)
   {
     if (response.getInt('Status') == 1) {
-      var hContext = response.getString('h');
+      var hContext = response.getString('hResult');
       if (hContext != '')  {
 
         AvatarNavigator.setTabContext(tab, hContext);

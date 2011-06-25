@@ -76,12 +76,19 @@ AP_MSG_HANDLER_METHOD(BrowserInfoModule, BrowserInfo_BeginTrackCoordinates)
 
   String sType = pMsg->kvSignature[Msg_BrowserInfo_BeginTrackCoordinates_Signature_Type].getString();
   String sVersion = pMsg->kvSignature[Msg_BrowserInfo_BeginTrackCoordinates_Signature_Version].getString();
+#if defined(WIN32)
+  int nWin32HWND = pMsg->kvSignature[Msg_BrowserInfo_BeginTrackCoordinates_Signature_Win32HWND].getInt();
+#endif // defined(WIN32)
 
   // sVersion
   // FF 4.0.1: Mozilla/5.0 (Windows NT 6.1; rv:2.0.1) Gecko/20100101 Firefox/4.0.1
 
   Apollo::WindowHandle win;
   if (0) {
+#if defined(WIN32)
+  } else if (nWin32HWND != 0) {
+    win = (HWND) nWin32HWND;
+#endif // defined(WIN32)
   } else if (sType == Msg_BrowserInfo_BeginTrackCoordinates_Signature_Type_Firefox && sVersion.contains("Firefox/4.")) {
     win = Firefox4Finder::GetToplevelWindow(pMsg->kvSignature);
   } else if (sType == Msg_BrowserInfo_BeginTrackCoordinates_Signature_Type_Firefox) {
@@ -98,6 +105,8 @@ AP_MSG_HANDLER_METHOD(BrowserInfoModule, BrowserInfo_BeginTrackCoordinates)
 
       if (0) {
 #if defined(WIN32)
+      } else if (nWin32HWND != 0) {
+        pBrowser = new Win32Browser(win);
       } else if (sType == Msg_BrowserInfo_BeginTrackCoordinates_Signature_Type_Firefox && sVersion.contains("Firefox/4.")) {
         pBrowser = new Firefox4Win32Browser(win);
       } else if (sType == Msg_BrowserInfo_BeginTrackCoordinates_Signature_Type_Firefox) {

@@ -11,6 +11,32 @@
 #include "Win32Window.h"
 #include "Win32Browser.h"
 
+void Win32Browser::OnTimer()
+{
+  HWND hWnd = win_;
+
+  if (hWnd != NULL) {
+    HWND hContent = hWnd;
+
+    RECT wr;
+    ::GetWindowRect(hContent, &wr);
+
+    int bVisible = 1;
+    int nWidth = wr.right - wr.left;
+    int nHeight = wr.bottom - wr.top;
+    int nLeft = wr.left;
+    int nBottom = wr.top + nHeight;
+
+    if (wr.top < -30000) {
+      bVisible = 0;
+    }
+
+    AdjustPosition(bVisible, nLeft, nBottom, nWidth, nHeight);
+    AdjustStackingOrder();
+
+  } // hWnd != NULL
+}
+
 void Win32Browser::AdjustStackingOrder()
 {
   HWNDList contextWindows;

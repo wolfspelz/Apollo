@@ -152,7 +152,7 @@ class APOLLO_API Msg_System_GetHandle : public ApRequestMessage
 public:
   Msg_System_GetHandle() : ApRequestMessage("System_GetHandle") {}
 public:
-  ApOUT ApHandle h;
+  ApOUT ApHandle hResult;
 };
 
 // -> system

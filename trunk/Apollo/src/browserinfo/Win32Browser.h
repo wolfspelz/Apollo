@@ -15,6 +15,7 @@ public:
   Win32Browser(Apollo::WindowHandle& win) : Browser(win) {}
 
 protected:
+  virtual void OnTimer();
   virtual void AdjustStackingOrder();
 };
 
