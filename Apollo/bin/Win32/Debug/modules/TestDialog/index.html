@@ -25,7 +25,7 @@ input[type="text"] { border:1px solid #808080; }
   function DialogCreate()
   {
     api.Message('Dialog_Create')
-      .setString('hDialog', api.Message('System_GetHandle').send().getString('h'))
+      .setString('hDialog', api.Message('System_GetHandle').send().getString('hResult'))
       .setInt('nLeft', Elem('iLeft').value)
       .setInt('nTop', Elem('iTop').value)
       .setInt('nWidth', Elem('iWidth').value)

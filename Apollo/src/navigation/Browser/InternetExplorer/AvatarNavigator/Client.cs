@@ -20,8 +20,6 @@ namespace SpicIE.AvatarNavigator
         byte[] _bytes = new byte[BUFFER_SIZE];
         int _nSize = BUFFER_SIZE;
         bool _bReceiving = false;
-        Queue<string> _queue = new Queue<string>();
-        bool _bQueue = true;
         string _sBuffer = "";
         int _nSrpcId = 1;
         Dictionary<string, SrpcCompletion> _completions = new Dictionary<string, SrpcCompletion>();
@@ -68,56 +66,31 @@ namespace SpicIE.AvatarNavigator
             }
         }
 
-        internal void SetQueueing(bool bEnabled)
-        {
-            lock (this)
-            {
-                _bQueue = bEnabled;
-
-                if (!bEnabled)
-                {
-                    while (_queue.Count > 0)
-                    {
-                        var sData = _queue.Dequeue();
-                        Send(sData);
-                    }
-                }
-            }
-        }
-
         internal void Send(string sText)
         {
             byte[] message = Encoding.UTF8.GetBytes(sText);
             lock (this)
             {
-                if (_bQueue)
-                {
-                    _queue.Enqueue(sText);
-                }
-                else
-                {
-                    Log("OUT " + sText);
-                    _socket.BeginSend(message, 0, message.Length, SocketFlags.None, new AsyncCallback(OnSent), _socket);
-                }
+                Log("OUT " + sText);
+                _socket.BeginSend(message, 0, message.Length, SocketFlags.None, new AsyncCallback(OnSent), _socket);
             }
         }
 
-        internal void Request(Srpc.Message msg, SrpcCompletion fComplete)
+        internal void Send(Srpc.Message msg, SrpcCompletion fComplete)
         {
-            string sSrpcId = "_" + _nSrpcId++;
-
             if (fComplete != null)
             {
+                string sSrpcId = "_" + _nSrpcId++;
                 msg.Set("SrpcId", sSrpcId);
                 _completions.Add(sSrpcId, fComplete);
             }
 
-            Send(msg);
+            Send(msg.ToString() + "\n");
         }
 
         internal void Send(Srpc.Message msg)
         {
-            Send(msg.ToString() + "\n");
+            Send(msg, null);
         }
 
         #endregion
@@ -221,6 +194,22 @@ namespace SpicIE.AvatarNavigator
             }
         }
 
+        private Srpc.Message ProcessData(ref string sData)
+        {
+            Srpc.Message msg = null;
+
+            string sLfClean = sData.Replace("\r\n", "\n");
+            int nEnd = sLfClean.IndexOf("\n\n");
+            if (nEnd >= 0)
+            {
+                string sMessage = sLfClean.Substring(0, nEnd + 1);
+                sData = sLfClean.Substring(nEnd + 2);
+                msg = new Srpc.Message(sMessage);
+            }
+
+            return msg;
+        }
+
         private void HandleResponse(Srpc.Message response, string sSrpcId)
         {
             if (_completions.ContainsKey(sSrpcId))
@@ -247,22 +236,6 @@ namespace SpicIE.AvatarNavigator
             //        Log("Unknown Method=" + sMethod);
             //        break;
             //}
-        }
-
-        private Srpc.Message ProcessData(ref string sData)
-        {
-            Srpc.Message msg = null;
-
-            string sLfClean = sData.Replace("\r\n", "\n");
-            int nEnd = sLfClean.IndexOf("\n\n");
-            if (nEnd >= 0)
-            {
-                string sMessage = sLfClean.Substring(0, nEnd + 1);
-                sData = sLfClean.Substring(nEnd + 2);
-                msg = new Srpc.Message(sMessage);
-            }
-
-            return msg;
         }
 
         void OnSent(IAsyncResult iar)

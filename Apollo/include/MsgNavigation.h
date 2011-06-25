@@ -138,9 +138,11 @@ public:
 #define Navigation_ContextNativeWindow_Signature_Height "nHeight"
 #define Navigation_ContextNativeWindow_Signature_InnerWidth "nInnerWidth"
 #define Navigation_ContextNativeWindow_Signature_InnerHeight "nInnerHeight"
+#define Navigation_ContextNativeWindow_Signature_Win32HWND "nWin32HWND"
+#define Navigation_ContextNativeWindow_Signature_Win32HWNDTarget "nWin32HWNDTarget"
 class Msg_Navigation_ContextNativeWindow: public ApRequestMessage
 {
-public:
+  public:
   Msg_Navigation_ContextNativeWindow() : ApRequestMessage("Navigation_ContextNativeWindow") {}
   ApIN ApHandle hContext;
   ApIN Apollo::KeyValueList kvSignature;

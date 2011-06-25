@@ -48,23 +48,16 @@ namespace SpicIE.AvatarNavigator
 
             Controller = new Controller();
             Controller.Run();
+                        string sWnd = Process.GetCurrentProcess().MainWindowHandle.ToString();
 
-#if DEBUG
-            Host.TraceSink.TraceInformation(string.Format("HtmlEvents.HtmlEvents - DEBUG {0} - {1}",
-                System.Reflection.Assembly.GetExecutingAssembly().FullName, DateTime.Now.TimeOfDay.ToString()));
-#else
-            Host.TraceSink.TraceInformation(string.Format("HtmlEvents.HtmlEvents - RELEASE {0} - {1}",
-                System.Reflection.Assembly.GetExecutingAssembly().FullName, DateTime.Now.TimeOfDay.ToString()));
-#endif
+            //Host.TraceSink.TraceInformation("xx";
 
-            // this is sample for using an event
-            // simply attach the event to your custom eventhandler function
             this.OnDocumentComplete += new SpicIE.Common.WebBrowserEvent_DocumentComplete(AvatarNavigator_OnDocumentComplete);
             this.OnBeforeNavigate += new SpicIE.Common.WebBrowserEvent_BeforeNavigate2(AvatarNavigator_OnBeforeNavigate);
             this.OnWindowStateChange += new Common.WebBrowserEvents_WindowStateChange(AvatarNavigator_OnWindowStateChange);
             this.OnQuit += new Common.WebBrowserEvent_OnQuit(AvatarNavigator_OnQuit);
-
             this.OnNavigateComplete += new Common.WebBrowserEvent_NavigateComplete2(AvatarNavigator_OnNavigateComplete);
+
         }
 
         #endregion
@@ -125,15 +118,16 @@ namespace SpicIE.AvatarNavigator
 
                 SHDocVw.IWebBrowser2 browser = null;
                 try { browser = HostInstance.BrowserRef as SHDocVw.IWebBrowser2; }
-                catch { }
+                catch (Exception ex) { Log("HostInstance.BrowserRef as SHDocVw.IWebBrowser2 " + ex.Message); }
 
                 if (browser != null)
                 {
                     // get the IHTMLDocument interface
+                    Log("AvatarNavigator_OnDocumentComplete: hwnd=" + browser.HWND + " left=" + browser.Left + " top=" + browser.Top + " width=" + browser.Width + " height=" + browser.Height);
 
                     mshtml.IHTMLDocument2 htmlDoc = null;
                     try { htmlDoc = browser.Document as mshtml.IHTMLDocument2; }
-                    catch { }
+                    catch (Exception ex) { Log("browser.Document as mshtml.IHTMLDocument2 " + ex.Message); }
 
                     if (htmlDoc != null)
                     {
@@ -146,6 +140,10 @@ namespace SpicIE.AvatarNavigator
                         else
                         {
                             //Log("Inject " + _sId + " " + url);
+                            var process = Process.GetCurrentProcess();
+                            string sWnd = process.MainWindowHandle.ToString();
+                            string sTitle = process.MainWindowTitle;
+                            Log("Window: " + sWnd + " " + sTitle);
 
                             // Creeate custom element for DOM event for ContentBrowser-Extension communication
                             mshtml.IHTMLWindow2 parentWindow = htmlDoc.parentWindow;
@@ -163,6 +161,17 @@ namespace SpicIE.AvatarNavigator
                             {
                                 _bCreated = true;
                                 OnTabCreate();
+
+                                string sVersion = "";
+                                try { sVersion = parentWindow.navigator.appVersion.ToString(); }
+                                catch (Exception ex) { Log("parentWindow.navigator.appVersion.ToString() " + ex.Message); }
+
+                                int nHWND = 0;
+                                try { nHWND = browser.HWND; }
+                                catch (Exception ex) { Log("browser. " + ex.Message); }
+
+                                OnTabNativeWindow(sVersion, nHWND);
+                                
                                 if (_bDoShowAfterCreate)
                                 {
                                     _bDoShowAfterCreate = false;
@@ -195,18 +204,16 @@ namespace SpicIE.AvatarNavigator
             Controller.OnTabCreate();
         }
 
+        private void OnTabNativeWindow(string sVersion, int nHWND)
+        {
+            Controller.OnTabNativeWindow(sVersion, nHWND);
+        }
+
         private void OnTabDestroy()
         {
             Controller.OnTabDestroy();
         }
 
-        //{
-        // "method":"change_tab",
-        // "data":{
-        //   "tab_id":93
-        // },
-        // "dest":"background"
-        //}
         private void OnTabShow()
         {
             Controller.OnTabShow();

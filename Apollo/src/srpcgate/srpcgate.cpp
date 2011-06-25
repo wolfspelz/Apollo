@@ -289,7 +289,7 @@ void SrpcGate_System_GetHandle(ApSRPCMessage* pMsg)
 {
   Msg_System_GetHandle msg;
   SRPCGATE_HANDLER_NATIVE_REQUEST(pMsg, msg);
-  pMsg->response.set("h", msg.h);
+  pMsg->response.set("hResult", msg.hResult);
 }
 
 void SrpcGate_System_Echo(ApSRPCMessage* pMsg)

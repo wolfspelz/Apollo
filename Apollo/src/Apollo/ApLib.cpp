@@ -512,7 +512,7 @@ AP_MSG_HANDLER_METHOD(ApLib, System_GetTime)
 
 AP_MSG_HANDLER_METHOD(ApLib, System_GetHandle)
 {
-  pMsg->h = Apollo::newHandle();
+  pMsg->hResult = Apollo::newHandle();
   pMsg->apStatus = ApMessage::Ok;
 }
 
