@@ -8,7 +8,7 @@
     <ProjectGuid>{853F9DF2-BE34-4913-B8A3-1E9BC2D265EE}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SpicIE.AvatarNavigator</RootNamespace>
+    <RootNamespace>OVW</RootNamespace>
     <AssemblyName>AvatarNavigator</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -38,6 +38,9 @@
   </PropertyGroup>
   <PropertyGroup>
     <AssemblyOriginatorKeyFile>sn.key.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <PropertyGroup>
+    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Interop.SHDocVw, Version=1.1.0.0, Culture=neutral, PublicKeyToken=c7066b1a7ed5618f, processorArchitecture=MSIL">

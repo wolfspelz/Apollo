@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.IO;
 
-namespace SpicIE.AvatarNavigator
+namespace OVW
 {
     /// <summary>
     /// This is the base class of a custom plugin. It must derive from SpicIE.Host and contain the 
@@ -48,15 +48,15 @@ namespace SpicIE.AvatarNavigator
 
             Controller = new Controller();
             Controller.Run();
-                        string sWnd = Process.GetCurrentProcess().MainWindowHandle.ToString();
 
-            //Host.TraceSink.TraceInformation("xx";
+            Log(string.Format("AvatarNavigator {0} - {1}", System.Reflection.Assembly.GetExecutingAssembly().FullName, DateTime.Now.TimeOfDay.ToString()));
+
 
             this.OnDocumentComplete += new SpicIE.Common.WebBrowserEvent_DocumentComplete(AvatarNavigator_OnDocumentComplete);
             this.OnBeforeNavigate += new SpicIE.Common.WebBrowserEvent_BeforeNavigate2(AvatarNavigator_OnBeforeNavigate);
-            this.OnWindowStateChange += new Common.WebBrowserEvents_WindowStateChange(AvatarNavigator_OnWindowStateChange);
-            this.OnQuit += new Common.WebBrowserEvent_OnQuit(AvatarNavigator_OnQuit);
-            this.OnNavigateComplete += new Common.WebBrowserEvent_NavigateComplete2(AvatarNavigator_OnNavigateComplete);
+            this.OnWindowStateChange += new SpicIE.Common.WebBrowserEvents_WindowStateChange(AvatarNavigator_OnWindowStateChange);
+            this.OnQuit += new SpicIE.Common.WebBrowserEvent_OnQuit(AvatarNavigator_OnQuit);
+            this.OnNavigateComplete += new SpicIE.Common.WebBrowserEvent_NavigateComplete2(AvatarNavigator_OnNavigateComplete);
 
         }
 
@@ -66,7 +66,7 @@ namespace SpicIE.AvatarNavigator
 
         void AvatarNavigator_OnNavigateComplete(object pDisp, ref object URL)
         {
-            //Log("OnNavigateComplete " + _sId + " " + URL);
+            //Log("OnNavigateComplete " + URL);
         }
 
         void AvatarNavigator_OnQuit()
@@ -81,7 +81,7 @@ namespace SpicIE.AvatarNavigator
         {
             if (_nState != dwWindowStateFlags)
             {
-                //Log("OnWindowStateChange " + _sId + " " + _nState + " -> =" + dwWindowStateFlags);
+                //Log("OnWindowStateChange " + _nState + " -> =" + dwWindowStateFlags);
                 _nState = dwWindowStateFlags;
 
                 if (_nState == 3)
@@ -107,14 +107,14 @@ namespace SpicIE.AvatarNavigator
 
         void AvatarNavigator_OnBeforeNavigate(object pDisp, ref object URL, ref object Flags, ref object TargetFrameName, ref object PostData, ref object Headers, ref bool Cancel)
         {
-            //Log("OnBeforeNavigate " + _sId + " URL=" + URL);
+            //Log("OnBeforeNavigate URL=" + URL);
         }
 
         private void AvatarNavigator_OnDocumentComplete(object pDisp, ref object url)
         {
             try
             {
-                //Log("OnDocumentComplete " + _sId + " " + url);
+                //Log("OnDocumentComplete " + url);
 
                 SHDocVw.IWebBrowser2 browser = null;
                 try { browser = HostInstance.BrowserRef as SHDocVw.IWebBrowser2; }
@@ -135,11 +135,11 @@ namespace SpicIE.AvatarNavigator
                         object sensor = htmlDoc.all.item("iAvatarNavigatorSensor");
                         if (sensor != null)
                         {
-                            //Log("Inject aborted " + _sId + " " + url);
+                            //Log("Inject aborted " + url);
                         }
                         else
                         {
-                            //Log("Inject " + _sId + " " + url);
+                            //Log("Inject " + url);
                             var process = Process.GetCurrentProcess();
                             string sWnd = process.MainWindowHandle.ToString();
                             string sTitle = process.MainWindowTitle;
@@ -240,7 +240,7 @@ namespace SpicIE.AvatarNavigator
         /// <returns></returns>
         internal static List<SpicIE.Controls.IControlBase> RunOnceCOMRegistration()
         {
-            Host.TraceSink.TraceEvent(TraceEventType.Information, 0, "RunOnceRegisterCOMControls");
+            SpicIE.Host.TraceSink.TraceEvent(TraceEventType.Information, 0, "RunOnceRegisterCOMControls");
 
             List<SpicIE.Controls.IControlBase> controls = new List<SpicIE.Controls.IControlBase>();
 

@@ -4,7 +4,7 @@ using System.Text;
 using Microsoft.Win32;
 using System.IO;
 
-namespace SpicIE.AvatarNavigator
+namespace OVW
 {
     public class Controller
     {
@@ -24,16 +24,20 @@ namespace SpicIE.AvatarNavigator
         bool _bHasContext = false;
         string _sNativeVersion = "";
         int _nNativeHWND = 0;
-
+        
         internal void Log(string s)
         {
+            string sLine = s.Replace("\r\n", "\n").Replace("\n", "\\n");
+
+            //SpicIE.Host.TraceSink.TraceInformation(sLine);
+
             if (!_bInShutdown)
             {
                 try
                 {
-                    using (StreamWriter sw = File.AppendText("C:\\logfile.txt"))
+                    using (StreamWriter sw = File.AppendText("C:\\temp\\AvatarNavigator.log"))
                     {
-                        sw.WriteLine(s.Replace("\r\n", "\n").Replace("\n", "\\n"));
+                        sw.WriteLine(sLine);
                         sw.Close();
                     }
                 }
@@ -81,7 +85,7 @@ namespace SpicIE.AvatarNavigator
         }
 
         #endregion
-
+        
         #region Main Flow // --------------------------------------
 
         internal void Run()
@@ -236,12 +240,12 @@ namespace SpicIE.AvatarNavigator
 
         internal void OnTabCreate()
         {
-            Log("OnTabCreate " + _sId + " " + _sUrl);
+            Log("OnTabCreate " + _sUrl);
         }
 
         internal void OnTabNativeWindow(string sVersion, int nHWND)
         {
-            Log("OnTabNativeWindow " + _sId + " " + sVersion + " HWND=" + nHWND);
+            Log("OnTabNativeWindow " + sVersion + " HWND=" + nHWND);
 
             if (_nNativeHWND != nHWND)
             {
@@ -258,12 +262,12 @@ namespace SpicIE.AvatarNavigator
 
         internal void OnTabDestroy()
         {
-            Log("OnTabDestroy " + _sId + " " + _sUrl);
+            Log("OnTabDestroy " + _sUrl);
         }
 
         internal void OnTabShow()
         {
-            Log("OnTabShow " + _sId + " " + _sUrl);
+            Log("OnTabShow " + _sUrl);
 
             if (!_bShow)
             {
@@ -277,7 +281,7 @@ namespace SpicIE.AvatarNavigator
 
         internal void OnTabHide()
         {
-            Log("OnTabHide " + _sId + " " + _sUrl);
+            Log("OnTabHide " + _sUrl);
 
             if (_bShow)
             {
@@ -291,7 +295,7 @@ namespace SpicIE.AvatarNavigator
 
         internal void OnTabNavigate(string sUrl)
         {
-            Log("OnTabNavigate " + _sId + " " + sUrl);
+            Log("OnTabNavigate " + sUrl);
 
             if (_sUrl != sUrl)
             {
