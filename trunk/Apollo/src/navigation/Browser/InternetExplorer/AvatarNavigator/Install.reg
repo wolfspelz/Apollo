@@ -1,0 +1,35 @@
+REGEDIT4
+
+[HKEY_CLASSES_ROOT\AvatarNavigator]
+@="OVW.AvatarNavigator"
+
+[HKEY_CLASSES_ROOT\AvatarNavigator\CLSID]
+@="{A319F1F2-61EB-44C1-B3B0-9005C7D73843}"
+
+[HKEY_CLASSES_ROOT\CLSID\{A319F1F2-61EB-44C1-B3B0-9005C7D73843}]
+@="OVW.AvatarNavigator"
+
+[HKEY_CLASSES_ROOT\CLSID\{A319F1F2-61EB-44C1-B3B0-9005C7D73843}\InprocServer32]
+@="mscoree.dll"
+"ThreadingModel"="Both"
+"Class"="OVW.AvatarNavigator"
+"Assembly"="AvatarNavigator, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b235e01d7bbe99ea"
+"RuntimeVersion"="v2.0.50727"
+"CodeBase"="file:///C:/Heiner/Apollo/src/navigation/Browser/InternetExplorer/AvatarNavigator/bin/Debug/AvatarNavigator.dll"
+
+[HKEY_CLASSES_ROOT\CLSID\{A319F1F2-61EB-44C1-B3B0-9005C7D73843}\InprocServer32\1.0.0.0]
+"Class"="OVW.AvatarNavigator"
+"Assembly"="AvatarNavigator, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b235e01d7bbe99ea"
+"RuntimeVersion"="v2.0.50727"
+"CodeBase"="file:///C:/Heiner/Apollo/src/navigation/Browser/InternetExplorer/AvatarNavigator/bin/Debug/AvatarNavigator.dll"
+
+[HKEY_CLASSES_ROOT\CLSID\{A319F1F2-61EB-44C1-B3B0-9005C7D73843}\ProgId]
+@="AvatarNavigator"
+
+[HKEY_CLASSES_ROOT\CLSID\{A319F1F2-61EB-44C1-B3B0-9005C7D73843}\Implemented Categories\{62C8FE65-4EBB-45E7-B440-6E39B2CDBF29}]
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Browser Helper Objects\{A319F1F2-61EB-44c1-B3B0-9005C7D73843}]
+"NoExplorer"=dword:00000001
+
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Ext\Settings\{A319F1F2-61EB-44C1-B3B0-9005C7D73843}]
+"Flags"=dword:00000400

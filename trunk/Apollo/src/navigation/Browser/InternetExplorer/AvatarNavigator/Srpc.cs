@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Globalization;
 
-namespace SpicIE.AvatarNavigator
+namespace OVW
 {
     public class Srpc
     {
