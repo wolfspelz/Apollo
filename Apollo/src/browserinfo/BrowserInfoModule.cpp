@@ -88,11 +88,11 @@ AP_MSG_HANDLER_METHOD(BrowserInfoModule, BrowserInfo_BeginTrackCoordinates)
 #if defined(WIN32)
   } else if (nWin32HWND != 0) {
     win = (HWND) nWin32HWND;
-#endif // defined(WIN32)
   } else if (sType == Msg_BrowserInfo_BeginTrackCoordinates_Signature_Type_Firefox && sVersion.contains("Firefox/4.")) {
     win = Firefox4Finder::GetToplevelWindow(pMsg->kvSignature);
   } else if (sType == Msg_BrowserInfo_BeginTrackCoordinates_Signature_Type_Firefox) {
     win = Firefox3Finder::GetToplevelWindow(pMsg->kvSignature);
+#endif // defined(WIN32)
   }
 
   if (!win.isValid()) {
