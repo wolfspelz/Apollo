@@ -88,10 +88,10 @@ AP_MSG_HANDLER_METHOD(BrowserInfoModule, BrowserInfo_BeginTrackCoordinates)
 #if defined(WIN32)
   } else if (nWin32HWND != 0) {
     win = (HWND) nWin32HWND;
-  } else if (sType == Msg_BrowserInfo_BeginTrackCoordinates_Signature_Type_Firefox && (sVersion.contains("Firefox/4.") || sVersion.contains("Firefox/5."))) {
-    win = Firefox4Finder::GetToplevelWindow(pMsg->kvSignature);
-  } else if (sType == Msg_BrowserInfo_BeginTrackCoordinates_Signature_Type_Firefox) {
+  } else if (sType == Msg_BrowserInfo_BeginTrackCoordinates_Signature_Type_Firefox && sVersion.contains("Firefox/3.")) {
     win = Firefox3Finder::GetToplevelWindow(pMsg->kvSignature);
+  } else if (sType == Msg_BrowserInfo_BeginTrackCoordinates_Signature_Type_Firefox) {
+    win = Firefox4Finder::GetToplevelWindow(pMsg->kvSignature);
 #endif // defined(WIN32)
   }
 
@@ -107,10 +107,10 @@ AP_MSG_HANDLER_METHOD(BrowserInfoModule, BrowserInfo_BeginTrackCoordinates)
 #if defined(WIN32)
       } else if (nWin32HWND != 0) {
         pBrowser = new Win32Browser(win);
-      } else if (sType == Msg_BrowserInfo_BeginTrackCoordinates_Signature_Type_Firefox && (sVersion.contains("Firefox/4.") || sVersion.contains("Firefox/5."))) {
-        pBrowser = new Firefox4Win32Browser(win);
-      } else if (sType == Msg_BrowserInfo_BeginTrackCoordinates_Signature_Type_Firefox) {
+      } else if (sType == Msg_BrowserInfo_BeginTrackCoordinates_Signature_Type_Firefox && sVersion.contains("Firefox/3.")) {
         pBrowser = new Firefox3Win32Browser(win);
+      } else if (sType == Msg_BrowserInfo_BeginTrackCoordinates_Signature_Type_Firefox) {
+        pBrowser = new Firefox4Win32Browser(win);
 #endif // defined(WIN32)
       }
 
