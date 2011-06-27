@@ -11,7 +11,7 @@
 #include "ApContainer.h"
 #include "MsgUnitTest.h"
 #include "MsgTimer.h"
-#include "MsgServer.h"
+#include "MsgHttpServer.h"
 #include "MsgAnimation.h"
 #include "MsgGalileo.h"
 #include "MsgSystem.h"
@@ -83,7 +83,7 @@ public:
   void On_System_AfterLoadModules(Msg_System_AfterLoadModules* pMsg);
   void On_System_BeforeUnloadModules(Msg_System_BeforeUnloadModules* pMsg);
   void On_System_RunLevel(Msg_System_RunLevel* pMsg);
-  void On_Server_HttpRequest(Msg_Server_HttpRequest* pMsg);
+  void On_HttpServer_Request(Msg_HttpServer_Request* pMsg);
 
 #if defined(AP_TEST)
   void On_UnitTest_Begin(Msg_UnitTest_Begin* pMsg);

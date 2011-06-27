@@ -10,16 +10,16 @@ namespace OVW
     {
         bool _bAutoStart = true;
         string _sId = "";
-        Client _client = null;
         Random _rnd = new Random();
         string _sUrl = "";
+        Client _client = null;
         int _nReconnectInterval = 20;
         int _nMinReconnectInterval = 20;
         int _nMaxReconnectInterval = 10000;
+        bool _bConnected = false;
         System.Threading.Timer _connectTimer = null;
         bool _bInShutdown = false;
         string _sContext = "";
-        bool _bConnected = false;
         bool _bShow = false;
         bool _bHasContext = false;
         string _sNativeVersion = "";

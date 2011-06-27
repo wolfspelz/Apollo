@@ -16,7 +16,7 @@
 #include "MsgProtocol.h"
 #include "MsgIdentity.h"
 #include "MsgUnitTest.h"
-#include "MsgServer.h"
+#include "MsgHttpServer.h"
 #include "SrpcGateHelper.h"
 #include "Context.h"
 #include "Location.h"
@@ -166,7 +166,7 @@ public:
 
   void On_VpView_ReplayLocationPublicChat(Msg_VpView_ReplayLocationPublicChat* pMsg);
 
-  void On_Server_HttpRequest(Msg_Server_HttpRequest* pMsg);
+  void On_HttpServer_Request(Msg_HttpServer_Request* pMsg);
 
   //void On_Xmpp_DataIn(Msg_Xmpp_DataIn* pMsg);
   //void On_Timer_Event(Msg_Timer_Event* pMsg);

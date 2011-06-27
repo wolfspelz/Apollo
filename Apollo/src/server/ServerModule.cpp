@@ -11,24 +11,60 @@
 #include "ServerModule.h"
 #include "HttpServer.h"
 #include "HttpConnection.h"
+#include "TcpServer.h"
+#include "TcpConnection.h"
+#include "MsgSrpcGate.h"
 
-int ServerModule::addHttpConnection(const ApHandle& hHttpConnection, HttpConnection* pHttpConnection)
+int ServerModule::addHttpConnection(const ApHandle& hConnection, HttpConnection* pConnection)
 {
   int ok = 1;
 
-  ok = httpConnections_.Set(hHttpConnection, pHttpConnection);
+  ok = httpConnections_.Set(hConnection, pConnection);
 
   return ok;
 }
 
-int ServerModule::removeHttpConnection(const ApHandle& hHttpConnection)
+int ServerModule::removeHttpConnection(const ApHandle& hConnection)
 {
   int ok = 1;
 
-  ok = httpConnections_.Unset(hHttpConnection);
-  // HttpConnection deletes itself
+  ok = httpConnections_.Unset(hConnection);
+  // HttpConnection deletes itself externally
 
   return ok;
+}
+
+HttpConnection* ServerModule::findHttpConnection(const ApHandle& hConnection)
+{
+  HttpConnection* pConnection = 0;
+  httpConnections_.Get(hConnection, pConnection);
+  return pConnection;
+}
+
+int ServerModule::addTcpConnection(const ApHandle& hConnection, TcpConnection* pConnection)
+{
+  int ok = 1;
+
+  ok = tcpConnections_.Set(hConnection, pConnection);
+
+  return ok;
+}
+
+int ServerModule::removeTcpConnection(const ApHandle& hConnection)
+{
+  int ok = 1;
+
+  ok = tcpConnections_.Unset(hConnection);
+  // TcpConnection deletes itself externally
+
+  return ok;
+}
+
+TcpConnection* ServerModule::findTcpConnection(const ApHandle& hConnection)
+{
+  TcpConnection* pConnection = 0;
+  tcpConnections_.Get(hConnection, pConnection);
+  return pConnection;
 }
 
 //----------------------------------------------------------
@@ -58,9 +94,9 @@ AP_MSG_HANDLER_METHOD(ServerModule, Server_StopHTTP)
   pMsg->apStatus = ApMessage::Ok;
 }
 
-AP_MSG_HANDLER_METHOD(ServerModule, Server_HttpRequest)
+AP_MSG_HANDLER_METHOD(ServerModule, HttpServer_Request)
 {
-  Msg_Server_HttpResponse msg;
+  Msg_HttpServer_SendResponse msg;
   msg.hConnection = pMsg->hConnection;
   msg.nStatus = 404;
   msg.sMessage = "Not Found";
@@ -71,16 +107,16 @@ AP_MSG_HANDLER_METHOD(ServerModule, Server_HttpRequest)
   msg.kvHeader.add("Content-length", String::from(msg.sbBody.Length()));
 
   if (!msg.Request()) {
-    apLog_Error((LOG_CHANNEL, "ServerModule::Server_HttpRequest", "Msg_Server_HttpResponse failed conn=" ApHandleFormat "", ApHandleType(pMsg->hConnection)));
+    apLog_Error((LOG_CHANNEL, "ServerModule::HttpServer_Request", "Msg_HttpServer_SendResponse failed conn=" ApHandleFormat "", ApHandleType(pMsg->hConnection)));
   }
 
   pMsg->apStatus = ApMessage::Ok;
 }
 
-AP_MSG_HANDLER_METHOD(ServerModule, Server_HttpResponse)
+AP_MSG_HANDLER_METHOD(ServerModule, HttpServer_SendResponse)
 {
-  HttpConnection* pConnection = 0;
-  if (! httpConnections_.Get(pMsg->hConnection, pConnection)) { throw ApException("httpConnections_.Get(" ApHandleFormat ") failed", ApHandleType(pMsg->hConnection)); }
+  HttpConnection* pConnection = findHttpConnection(pMsg->hConnection);
+  if (pConnection == 0) { throw ApException("findHttpConnection(" ApHandleFormat ") failed", ApHandleType(pMsg->hConnection)); }
 
   String sHeader;
 
@@ -129,16 +165,100 @@ AP_MSG_HANDLER_METHOD(ServerModule, Server_HttpResponse)
   pMsg->apStatus = ApMessage::Ok;
 }
 
+AP_MSG_HANDLER_METHOD(ServerModule, Server_StartTCP)
+{
+  if (pTcpServer_ == 0) {
+    pTcpServer_ = new TcpServer();
+    if (!pTcpServer_) { throw ApException("new TcpServer failed"); }
+
+    sTcpAddress_ = Apollo::getModuleConfig(MODULE_NAME, "TCP/Address", "localhost");
+    nTcpPort_ = Apollo::getModuleConfig(MODULE_NAME, "TCP/Port", 23761);
+    if (!pTcpServer_->Start(sTcpAddress_, nTcpPort_)) { throw ApException("pServer_->Start(%s, %d) failed", StringType(sTcpAddress_), nTcpPort_); }
+  }
+
+  pMsg->apStatus = ApMessage::Ok;
+}
+
+AP_MSG_HANDLER_METHOD(ServerModule, Server_StopTCP)
+{
+  if (pTcpServer_ != 0) {
+    pTcpServer_->Stop();
+    delete pTcpServer_;
+    pTcpServer_ = 0;
+  }
+
+  pMsg->apStatus = ApMessage::Ok;
+}
+
+AP_MSG_HANDLER_METHOD(ServerModule, TcpServer_SrpcRequest)
+{
+  String sResponse;
+
+  String sType = pMsg->srpc.getString("ApType");
+  if (sType) {
+    // Given message type -> send SRPC with custom type
+
+    ApSRPCMessage msg(sType);
+
+    pMsg->srpc >> msg.srpc;
+    (void) msg.Call();
+    sResponse = msg.response.toString();
+
+  } else {
+    // Handle SRPC message via SrpcGate with SRPCGATE_HANDLER_TYPE type
+
+    ApSRPCMessage msg(SRPCGATE_HANDLER_TYPE);
+
+    pMsg->srpc >> msg.srpc;
+    (void) msg.Call();
+    sResponse = msg.response.toString();
+
+  }
+
+  // Handlers are supposed to fill msg.response.
+  if (sResponse.empty()) {
+    sResponse = "Status=0\nMessage=No handler or empty response\n";
+  }
+
+  sResponse += "\n";
+
+  if (apLog_IsVerbose) {
+    apLog_Verbose((LOG_CHANNEL, "ServerModule, TcpServer_SrpcRequest", "conn=" ApHandleFormat "  send: %s", ApHandleType(pMsg->hConnection), StringType(sResponse)));
+  }
+
+  TcpConnection* pConnection = findTcpConnection(pMsg->hConnection);
+  if (pConnection == 0) { throw ApException("findTcpConnection(" ApHandleFormat ") failed", ApHandleType(pMsg->hConnection)); }
+  if (! pConnection->DataOut((unsigned char*) sResponse.c_str(), sResponse.bytes()) ) { throw ApException("Connection " ApHandleFormat " DataOut() failed", ApHandleType(pMsg->hConnection)); }
+
+  pMsg->apStatus = ApMessage::Ok;
+}
+
 AP_MSG_HANDLER_METHOD(ServerModule, System_RunLevel)
 {
   if (0) {
   } else if (pMsg->sLevel == Msg_System_RunLevel_Normal) {
-    Msg_Server_StartHTTP msg;
-    msg.Request();
+
+    if (Apollo::getModuleConfig(MODULE_NAME, "HTTP/Enabled", 0)) {
+      Msg_Server_StartHTTP msg;
+      msg.Request();
+    }
+
+    if (Apollo::getModuleConfig(MODULE_NAME, "TCP/Enabled", 0)) {
+      Msg_Server_StartTCP msg;
+      msg.Request();
+    }
 
   } else if (pMsg->sLevel == Msg_System_RunLevel_Shutdown) {
-    Msg_Server_StopHTTP msg;
-    msg.Request();
+
+    if (Apollo::getModuleConfig(MODULE_NAME, "HTTP/Enabled", 0)) {
+      Msg_Server_StopHTTP msg;
+      msg.Request();
+    }
+
+    if (Apollo::getModuleConfig(MODULE_NAME, "TCP/Enabled", 0)) {
+      Msg_Server_StopTCP msg;
+      msg.Request();
+    }
 
   }
 }
@@ -180,9 +300,12 @@ int ServerModule::init()
 
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ServerModule, Server_StartHTTP, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ServerModule, Server_StopHTTP, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, ServerModule, HttpServer_Request, this, ApCallbackPosLate); // as a default hander
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, ServerModule, HttpServer_SendResponse, this, ApCallbackPosNormal);
 
-  AP_MSG_REGISTRY_ADD(MODULE_NAME, ServerModule, Server_HttpRequest, this, ApCallbackPosLate); // as a default
-  AP_MSG_REGISTRY_ADD(MODULE_NAME, ServerModule, Server_HttpResponse, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, ServerModule, Server_StartTCP, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, ServerModule, Server_StopTCP, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, ServerModule, TcpServer_SrpcRequest, this, ApCallbackPosLate);
 
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ServerModule, System_RunLevel, this, ApCallbackPosNormal);
 

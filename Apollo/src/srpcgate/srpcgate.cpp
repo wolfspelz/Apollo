@@ -9,7 +9,7 @@
 #include "srpcgate.h"
 #include "MsgMainLoop.h"
 #include "MsgSrpcGate.h"
-#include "MsgServer.h"
+#include "MsgHttpServer.h"
 #include "SrpcGateHelper.h"
 
 #if defined(WIN32)
@@ -82,7 +82,7 @@ public:
   void On_SrpcGate_Unregister(Msg_SrpcGate_Unregister* pMsg);
   void On_SrpcGate_Handler(ApSRPCMessage* pMsg);
 
-  void On_Server_HttpRequest(Msg_Server_HttpRequest* pMsg);
+  void On_HttpServer_Request(Msg_HttpServer_Request* pMsg);
 
   Apollo::SrpcGateHandlerRegistry srpcGateRegistry_;
 
@@ -143,13 +143,13 @@ AP_MSGCLASS_HANDLER_METHOD(SrpcGateModule, SrpcGate_Handler, ApSRPCMessage)
   pMsg->apStatus = ok ? ApMessage::Ok : ApMessage::Error;
 }
 
-AP_MSG_HANDLER_METHOD(SrpcGateModule, Server_HttpRequest)
+AP_MSG_HANDLER_METHOD(SrpcGateModule, HttpServer_Request)
 {
-  #define SrpcGateModule_Server_HttpRequest_sUriPrefix "/" MODULE_NAME
+  #define SrpcGateModule_HttpServer_Request_sUriPrefix "/" MODULE_NAME
 
-  if (Apollo::getModuleConfig(MODULE_NAME, "HTTP/Enabled", 1) && pMsg->sUri.startsWith(SrpcGateModule_Server_HttpRequest_sUriPrefix)) {
+  if (Apollo::getModuleConfig(MODULE_NAME, "HTTP/Enabled", 1) && pMsg->sUri.startsWith(SrpcGateModule_HttpServer_Request_sUriPrefix)) {
 
-    String sUriPrefix = SrpcGateModule_Server_HttpRequest_sUriPrefix;
+    String sUriPrefix = SrpcGateModule_HttpServer_Request_sUriPrefix;
     try {
       Apollo::SrpcMessage request;
 
@@ -186,7 +186,7 @@ AP_MSG_HANDLER_METHOD(SrpcGateModule, Server_HttpRequest)
       // Create response
       String sResponse = msg.response.toString();
 
-      Msg_Server_HttpResponse msgSHR;
+      Msg_HttpServer_SendResponse msgSHR;
       msgSHR.sbBody.SetData(sResponse);
       msgSHR.kvHeader.add("Content-type", "text/plain");
 
@@ -194,16 +194,16 @@ AP_MSG_HANDLER_METHOD(SrpcGateModule, Server_HttpRequest)
       msgSHR.kvHeader.add("Pragma", "no-cache");
       msgSHR.kvHeader.add("Cache-Control", "no-store, no-cache, must-revalidate, post-check=0, pre-check=0");
       msgSHR.kvHeader.add("Expires", "Thu, 19 Nov 1981 08:52:00 GMT");
-      if (!msgSHR.Request()) { throw ApException("Msg_Server_HttpResponse failed: conn=" ApHandleFormat "", ApHandleType(msgSHR.hConnection)); }
+      if (!msgSHR.Request()) { throw ApException("Msg_HttpServer_SendResponse failed: conn=" ApHandleFormat "", ApHandleType(msgSHR.hConnection)); }
 
       pMsg->Stop();
       pMsg->apStatus = ApMessage::Ok;
 
     } catch (ApException& ex) {
 
-      apLog_Warning((LOG_CHANNEL, "SrpcGateModule::Server_HttpRequest", "%s", StringType(ex.getText())));
+      apLog_Warning((LOG_CHANNEL, "SrpcGateModule::HttpServer_Request", "%s", StringType(ex.getText())));
 
-      Msg_Server_HttpResponse msgSHR;
+      Msg_HttpServer_SendResponse msgSHR;
       msgSHR.hConnection = pMsg->hConnection;
       msgSHR.nStatus = 500;
       msgSHR.sMessage = "Internal Error";
@@ -214,7 +214,7 @@ AP_MSG_HANDLER_METHOD(SrpcGateModule, Server_HttpRequest)
       String sBody = ex.getText();
       msgSHR.sbBody.SetData(sBody);
       if (!msgSHR.Request()) {
-        { throw ApException("Msg_Server_HttpResponse (for error message) failed: conn=" ApHandleFormat "", ApHandleType(msgSHR.hConnection)); }
+        { throw ApException("Msg_HttpServer_SendResponse (for error message) failed: conn=" ApHandleFormat "", ApHandleType(msgSHR.hConnection)); }
       } else {
         pMsg->Stop();
         pMsg->apStatus = ApMessage::Ok;
@@ -326,7 +326,7 @@ int SrpcGateModule::Init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SrpcGateModule, SrpcGate_Register, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SrpcGateModule, SrpcGate_Unregister, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SrpcGateModule, SrpcGate_Handler, this, ApCallbackPosNormal);
-  AP_MSG_REGISTRY_ADD(MODULE_NAME, SrpcGateModule, Server_HttpRequest, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, SrpcGateModule, HttpServer_Request, this, ApCallbackPosNormal);
 
   srpcGateRegistry_.add("MainLoop_EndLoop", SrpcGate_MainLoop_EndLoop);
   srpcGateRegistry_.add("Xmpp_Connect", SrpcGate_Xmpp_Connect);

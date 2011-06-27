@@ -225,17 +225,6 @@ namespace OVW
 
         private void HandleRequest(Srpc.Message request)
         {
-            //string sMethod = request.GetString(Srpc.Key.Method);
-            //switch (sMethod)
-            //{
-            //    case "Name":
-            //        string xx = request.GetString("xx");
-            //        break;
-
-            //    default:
-            //        Log("Unknown Method=" + sMethod);
-            //        break;
-            //}
         }
 
         void OnSent(IAsyncResult iar)

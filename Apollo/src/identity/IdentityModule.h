@@ -12,7 +12,7 @@
 #include "MsgSystem.h"
 #include "MsgIdentity.h"
 #include "MsgUnitTest.h"
-#include "MsgServer.h"
+#include "MsgHttpServer.h"
 #include "Local.h"
 #include "Container.h"
 #include "ContainerClient.h"
@@ -105,7 +105,7 @@ public:
   void On_Identity_ExpireAllStorage(Msg_Identity_ExpireAllStorage* pMsg);
   void On_Identity_SetStorageName(Msg_Identity_SetStorageName* pMsg);
 
-  void On_Server_HttpRequest(Msg_Server_HttpRequest* pMsg);
+  void On_HttpServer_Request(Msg_HttpServer_Request* pMsg);
 
 #if defined(AP_TEST)
   void On_UnitTest_Begin(Msg_UnitTest_Begin* pMsg);

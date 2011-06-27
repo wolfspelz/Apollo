@@ -43,7 +43,6 @@ class NavigationModule
 {
 public:
   NavigationModule()
-    :pServer_(0)
     {}
 
   int init();
@@ -51,16 +50,8 @@ public:
 
   Context* findContext(const ApHandle& h);
 
-  int addConnection(const ApHandle& hConnection, Connection* pConnection);
-  int removeConnection(const ApHandle& hConnection);
-
-  void On_MainLoop_EventLoopBegin(Msg_MainLoop_EventLoopBegin* pMsg);
-  void On_MainLoop_EventLoopBeforeEnd(Msg_MainLoop_EventLoopBeforeEnd* pMsg);
-
-  void On_Navigation_Connected(Msg_Navigation_Connected* pMsg);
-  void On_Navigation_Disconnected(Msg_Navigation_Disconnected* pMsg);
-  void On_Navigation_Receive(Msg_Navigation_Receive* pMsg);
-  void On_Navigation_Send(Msg_Navigation_Send* pMsg);
+  void On_TcpServer_SrpcRequest(Msg_TcpServer_SrpcRequest* pMsg);
+  void On_TcpServer_Disconnected(Msg_TcpServer_Disconnected* pMsg);
 
   void On_Navigation_NavigatorHello(Msg_Navigation_NavigatorHello* pMsg);
   void On_Navigation_NavigatorBye(Msg_Navigation_NavigatorBye* pMsg);
@@ -83,15 +74,12 @@ protected:
   Context* createContext(const ApHandle& hContext);
   int destroyContext(const ApHandle& hContext);
 
-  Connection* findConnection(const ApHandle& h);
   ApHandle findConnectionHandleByContextHandle(const ApHandle& hContext);
   void associateContextWithConnection(const ApHandle& hContext, const ApHandle& hConnection);
   void addContextToConnection(const ApHandle& hContext, const ApHandle& hConnection);
   void removeContextFromConnection(const ApHandle& hContext, const ApHandle& hConnection);
 
 public:
-  SrpcServer* pServer_;
-  ConnectionList connections_;
   ContextList contexts_;
   ConnectionContextList connectionContexts_;
 

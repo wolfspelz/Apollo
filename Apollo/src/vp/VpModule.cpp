@@ -1237,7 +1237,7 @@ AP_MSG_HANDLER_METHOD(VpModule, Vp_SendCondition)
 
 //-----------------------------
 
-#define VpModule_Server_HttpRequest_sUriPrefix "/" MODULE_NAME
+#define VpModule_HttpServer_Request_sUriPrefix "/" MODULE_NAME
 
 String VpModule::getItemDataExternUrl(const String& sIdentityUrl, const String& sItemId)
 {
@@ -1254,9 +1254,9 @@ String VpModule::getItemDataExternUrl(const String& sIdentityUrl, const String& 
   return url();
 }
 
-AP_MSG_HANDLER_METHOD(VpModule, Server_HttpRequest)
+AP_MSG_HANDLER_METHOD(VpModule, HttpServer_Request)
 {
-  if (Apollo::getModuleConfig(MODULE_NAME, "HTTP/Enabled", 1) && pMsg->sUri.startsWith(VpModule_Server_HttpRequest_sUriPrefix)) {
+  if (Apollo::getModuleConfig(MODULE_NAME, "HTTP/Enabled", 1) && pMsg->sUri.startsWith(VpModule_HttpServer_Request_sUriPrefix)) {
 
     try {
       String sQuery = pMsg->sUri;
@@ -1282,14 +1282,14 @@ AP_MSG_HANDLER_METHOD(VpModule, Server_HttpRequest)
         msgIGID.sId = sId;
         if (!msgIGID.Request()) { throw ApException("Msg_Identity_GetItemData failed: url=%s id=%s", StringType(sUrl), StringType(sId)); }
 
-        Msg_Server_HttpResponse msgSHR;
+        Msg_HttpServer_SendResponse msgSHR;
         msgSHR.hConnection = pMsg->hConnection;
         msgSHR.kvHeader.add("Content-type", msgIGID.sMimeType);
         msgSHR.kvHeader.add("Pragma", "no-cache");
         msgSHR.kvHeader.add("Cache-Control", "no-store, no-cache, must-revalidate, post-check=0, pre-check=0");
         msgSHR.kvHeader.add("Expires", "Thu, 19 Nov 1981 08:52:00 GMT");
         msgSHR.sbBody = msgIGID.sbData;
-        if (!msgSHR.Request()) { throw ApException("Msg_Server_HttpResponse failed: conn=" ApHandleFormat "", ApHandleType(msgSHR.hConnection)); }
+        if (!msgSHR.Request()) { throw ApException("Msg_HttpServer_SendResponse failed: conn=" ApHandleFormat "", ApHandleType(msgSHR.hConnection)); }
 
       } else {
 
@@ -1299,12 +1299,12 @@ AP_MSG_HANDLER_METHOD(VpModule, Server_HttpRequest)
         msgIGI.sId = sId;
         if (!msgIGI.Request()) { throw ApException("Msg_Identity_GetItem failed: url=%s id=%s", StringType(sUrl), StringType(sId)); }
 
-        Msg_Server_HttpResponse msgSHR;
+        Msg_HttpServer_SendResponse msgSHR;
         msgSHR.hConnection = pMsg->hConnection;
         msgSHR.nStatus = 302;
         msgSHR.sMessage = "Found";
         msgSHR.kvHeader.add("Location", msgIGI.sSrc);
-        if (!msgSHR.Request()) { throw ApException("Msg_Server_HttpResponse failed: conn=" ApHandleFormat "", ApHandleType(msgSHR.hConnection)); }
+        if (!msgSHR.Request()) { throw ApException("Msg_HttpServer_SendResponse failed: conn=" ApHandleFormat "", ApHandleType(msgSHR.hConnection)); }
 
       }
 
@@ -1313,9 +1313,9 @@ AP_MSG_HANDLER_METHOD(VpModule, Server_HttpRequest)
 
     } catch (ApException& ex) {
 
-      apLog_Warning((LOG_CHANNEL, "VpModule::Server_HttpRequest", "%s", StringType(ex.getText())));
+      apLog_Warning((LOG_CHANNEL, "VpModule::HttpServer_Request", "%s", StringType(ex.getText())));
   
-      Msg_Server_HttpResponse msgSHR;
+      Msg_HttpServer_SendResponse msgSHR;
       msgSHR.hConnection = pMsg->hConnection;
       msgSHR.nStatus = 404;
       msgSHR.sMessage = "Not Found";
@@ -1326,7 +1326,7 @@ AP_MSG_HANDLER_METHOD(VpModule, Server_HttpRequest)
       String sBody = ex.getText();
       msgSHR.sbBody.SetData(sBody);
       if (!msgSHR.Request()) {
-        { throw ApException("Msg_Server_HttpResponse (for error message) failed: conn=" ApHandleFormat "", ApHandleType(msgSHR.hConnection)); }
+        { throw ApException("Msg_HttpServer_SendResponse (for error message) failed: conn=" ApHandleFormat "", ApHandleType(msgSHR.hConnection)); }
       } else {
         pMsg->Stop();
         pMsg->apStatus = ApMessage::Ok;
@@ -1787,7 +1787,7 @@ int VpModule::init()
 
   AP_MSG_REGISTRY_ADD(MODULE_NAME, VpModule, VpView_ReplayLocationPublicChat, this, ApCallbackPosNormal);
 
-  AP_MSG_REGISTRY_ADD(MODULE_NAME, VpModule, Server_HttpRequest, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, VpModule, HttpServer_Request, this, ApCallbackPosNormal);
 
   // For Debugging
   //AP_MSG_REGISTRY_ADD(MODULE_NAME, VpModule, Xmpp_DataIn, this, ApCallbackPosEarly);

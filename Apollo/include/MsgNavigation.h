@@ -9,42 +9,6 @@
 
 #include "ApMessage.h"
 
-// navigation module -> navigator via TCP connection
-class Msg_Navigation_Send: public ApRequestMessage
-{
-public:
-  Msg_Navigation_Send() : ApRequestMessage("Navigation_Send") {}
-  ApIN ApHandle hConnection;
-  ApIN Apollo::SrpcMessage srpc;
-};
-
-// navigator via TCP connection -> navigation module
-class Msg_Navigation_Receive: public ApRequestMessage
-{
-public:
-  Msg_Navigation_Receive() : ApRequestMessage("Navigation_Receive") {}
-  ApIN ApHandle hConnection;
-  ApIN Apollo::SrpcMessage srpc;
-};
-
-// navigation module -> navigation module
-class Msg_Navigation_Connected: public ApNotificationMessage
-{
-public:
-  Msg_Navigation_Connected() : ApNotificationMessage("Navigation_Connected") {}
-  ApIN ApHandle hConnection;
-};
-
-// navigation module -> navigation module
-class Msg_Navigation_Disconnected: public ApNotificationMessage
-{
-public:
-  Msg_Navigation_Disconnected() : ApNotificationMessage("Navigation_Disconnected") {}
-  ApIN ApHandle hConnection;
-};
-
-// -------------------------------
-
 // navigator connection -> navigation
 class Msg_Navigation_NavigatorHello: public ApRequestMessage
 {

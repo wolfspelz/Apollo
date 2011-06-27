@@ -429,13 +429,13 @@ String GalileoModule::GetSequenceDataCacheUrl(ApHandle& hItem, const String& sGr
   }
 }
 
-AP_MSG_HANDLER_METHOD(GalileoModule, Server_HttpRequest)
+AP_MSG_HANDLER_METHOD(GalileoModule, HttpServer_Request)
 {
-  #define GalileoModule_Server_HttpRequest_sUriPrefix "/" MODULE_NAME
+  #define GalileoModule_HttpServer_Request_sUriPrefix "/" MODULE_NAME
 
-  if (Apollo::getModuleConfig(MODULE_NAME, "HTTP/Enabled", 1) && pMsg->sUri.startsWith(GalileoModule_Server_HttpRequest_sUriPrefix)) {
+  if (Apollo::getModuleConfig(MODULE_NAME, "HTTP/Enabled", 1) && pMsg->sUri.startsWith(GalileoModule_HttpServer_Request_sUriPrefix)) {
 
-    String sUriPrefix = GalileoModule_Server_HttpRequest_sUriPrefix;
+    String sUriPrefix = GalileoModule_HttpServer_Request_sUriPrefix;
     try {
       String sQuery = pMsg->sUri;
       String sBase; sQuery.nextToken("?", sBase);
@@ -454,7 +454,7 @@ AP_MSG_HANDLER_METHOD(GalileoModule, Server_HttpRequest)
       sCmd = lQuery["cmd"].getString();
       if (sCmd.empty()) { sCmd = "menu"; }
 
-      Msg_Server_HttpResponse msgSHR;
+      Msg_HttpServer_SendResponse msgSHR;
 
       String sHtml;
       Apollo::UriBuilder baseUri;
@@ -561,16 +561,16 @@ AP_MSG_HANDLER_METHOD(GalileoModule, Server_HttpRequest)
       //msgSHR.kvHeader.add("Cache-Control", "no-store, no-cache, must-revalidate, post-check=0, pre-check=0");
       //msgSHR.kvHeader.add("Expires", "Thu, 19 Nov 1981 08:52:00 GMT");
       msgSHR.kvHeader.add("Expires", Apollo::getNow().operator+=(Apollo::TimeValue(3600, 0)).toRFC2822());
-      if (!msgSHR.Request()) { throw ApException("Msg_Server_HttpResponse failed: conn=" ApHandleFormat "", ApHandleType(msgSHR.hConnection)); }
+      if (!msgSHR.Request()) { throw ApException("Msg_HttpServer_SendResponse failed: conn=" ApHandleFormat "", ApHandleType(msgSHR.hConnection)); }
 
       pMsg->Stop();
       pMsg->apStatus = ApMessage::Ok;
 
     } catch (ApException& ex) {
 
-      apLog_Warning((LOG_CHANNEL, "GalileoModule::Server_HttpRequest", "%s", StringType(ex.getText())));
+      apLog_Warning((LOG_CHANNEL, "GalileoModule::HttpServer_Request", "%s", StringType(ex.getText())));
 
-      Msg_Server_HttpResponse msgSHR;
+      Msg_HttpServer_SendResponse msgSHR;
       msgSHR.hConnection = pMsg->hConnection;
       msgSHR.nStatus = 404;
       msgSHR.sMessage = "Not Found";
@@ -581,7 +581,7 @@ AP_MSG_HANDLER_METHOD(GalileoModule, Server_HttpRequest)
       String sBody = ex.getText();
       msgSHR.sbBody.SetData(sBody);
       if (!msgSHR.Request()) {
-        { throw ApException("Msg_Server_HttpResponse (for error message) failed: conn=" ApHandleFormat "", ApHandleType(msgSHR.hConnection)); }
+        { throw ApException("Msg_HttpServer_SendResponse (for error message) failed: conn=" ApHandleFormat "", ApHandleType(msgSHR.hConnection)); }
       } else {
         pMsg->Stop();
         pMsg->apStatus = ApMessage::Ok;
@@ -670,7 +670,7 @@ int GalileoModule::Init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, GalileoModule, System_AfterLoadModules, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, GalileoModule, System_BeforeUnloadModules, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, GalileoModule, System_RunLevel, this, ApCallbackPosNormal);
-  AP_MSG_REGISTRY_ADD(MODULE_NAME, GalileoModule, Server_HttpRequest, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, GalileoModule, HttpServer_Request, this, ApCallbackPosNormal);
 
   AP_UNITTEST_HOOK(GalileoModule, this);
 

@@ -1154,13 +1154,13 @@ AP_MSG_HANDLER_METHOD(IdentityModule, Identity_SetStorageName)
   pMsg->apStatus = ok ? ApMessage::Ok : ApMessage::Error;
 }
 
-AP_MSG_HANDLER_METHOD(IdentityModule, Server_HttpRequest)
+AP_MSG_HANDLER_METHOD(IdentityModule, HttpServer_Request)
 {
-  #define IdentityModule_Server_HttpRequest_sUriPrefix "/" MODULE_NAME
+  #define IdentityModule_HttpServer_Request_sUriPrefix "/" MODULE_NAME
 
-  if (Apollo::getModuleConfig(MODULE_NAME, "HTTP/Enabled", 1) && pMsg->sUri.startsWith(IdentityModule_Server_HttpRequest_sUriPrefix)) {
+  if (Apollo::getModuleConfig(MODULE_NAME, "HTTP/Enabled", 1) && pMsg->sUri.startsWith(IdentityModule_HttpServer_Request_sUriPrefix)) {
 
-    String sUriPrefix = IdentityModule_Server_HttpRequest_sUriPrefix;
+    String sUriPrefix = IdentityModule_HttpServer_Request_sUriPrefix;
     try {
       String sQuery = pMsg->sUri;
       String sBase; sQuery.nextToken("?", sBase);
@@ -1179,7 +1179,7 @@ AP_MSG_HANDLER_METHOD(IdentityModule, Server_HttpRequest)
       sCmd = lQuery["cmd"].getString();
       if (sCmd.empty()) { sCmd = "menu"; }
 
-      Msg_Server_HttpResponse msgSHR;
+      Msg_HttpServer_SendResponse msgSHR;
 
       String sHtml;
       Apollo::UriBuilder baseUri;
@@ -1257,16 +1257,16 @@ AP_MSG_HANDLER_METHOD(IdentityModule, Server_HttpRequest)
       msgSHR.kvHeader.add("Pragma", "no-cache");
       msgSHR.kvHeader.add("Cache-Control", "no-store, no-cache, must-revalidate, post-check=0, pre-check=0");
       msgSHR.kvHeader.add("Expires", "Thu, 19 Nov 1981 08:52:00 GMT");
-      if (!msgSHR.Request()) { throw ApException("Msg_Server_HttpResponse failed: conn=" ApHandleFormat "", ApHandleType(msgSHR.hConnection)); }
+      if (!msgSHR.Request()) { throw ApException("Msg_HttpServer_SendResponse failed: conn=" ApHandleFormat "", ApHandleType(msgSHR.hConnection)); }
 
       pMsg->Stop();
       pMsg->apStatus = ApMessage::Ok;
 
     } catch (ApException& ex) {
 
-      apLog_Warning((LOG_CHANNEL, "IdentityModule::Server_HttpRequest", "%s", StringType(ex.getText())));
+      apLog_Warning((LOG_CHANNEL, "IdentityModule::HttpServer_Request", "%s", StringType(ex.getText())));
 
-      Msg_Server_HttpResponse msgSHR;
+      Msg_HttpServer_SendResponse msgSHR;
       msgSHR.hConnection = pMsg->hConnection;
       msgSHR.nStatus = 404;
       msgSHR.sMessage = "Not Found";
@@ -1277,7 +1277,7 @@ AP_MSG_HANDLER_METHOD(IdentityModule, Server_HttpRequest)
       String sBody = ex.getText();
       msgSHR.sbBody.SetData(sBody);
       if (!msgSHR.Request()) {
-        { throw ApException("Msg_Server_HttpResponse (for error message) failed: conn=" ApHandleFormat "", ApHandleType(msgSHR.hConnection)); }
+        { throw ApException("Msg_HttpServer_SendResponse (for error message) failed: conn=" ApHandleFormat "", ApHandleType(msgSHR.hConnection)); }
       } else {
         pMsg->Stop();
         pMsg->apStatus = ApMessage::Ok;
@@ -1354,7 +1354,7 @@ int IdentityModule::init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, IdentityModule, Identity_ExpireAllStorage, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, IdentityModule, Identity_SetStorageName, this, ApCallbackPosNormal);
 
-  AP_MSG_REGISTRY_ADD(MODULE_NAME, IdentityModule, Server_HttpRequest, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, IdentityModule, HttpServer_Request, this, ApCallbackPosNormal);
 
 #if defined(AP_TEST)
   AP_MSG_REGISTRY_ADD(MODULE_NAME, IdentityModule, UnitTest_Begin, this, ApCallbackPosNormal);

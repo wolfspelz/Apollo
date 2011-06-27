@@ -6,8 +6,6 @@
 
 #include "Apollo.h"
 #include "server.h"
-#include "MsgServer.h"
-#include "MsgUnitTest.h"
 #include "Local.h"
 #include "ServerModule.h"
 

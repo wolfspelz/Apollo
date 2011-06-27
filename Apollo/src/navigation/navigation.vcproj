@@ -157,10 +157,6 @@
 			UniqueIdentifier="{980625B7-1C5C-40d7-884B-99AEA90B4DBB}"
 			>
 			<File
-				RelativePath=".\Connection.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\Context.cpp"
 				>
 			</File>
@@ -172,20 +168,12 @@
 				RelativePath=".\NavigationModule.cpp"
 				>
 			</File>
-			<File
-				RelativePath=".\SrpcServer.cpp"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{BCA9D879-6710-43ba-93E6-61A343C690E7}"
 			>
-			<File
-				RelativePath=".\Connection.h"
-				>
-			</File>
 			<File
 				RelativePath=".\Context.h"
 				>
@@ -200,10 +188,6 @@
 			</File>
 			<File
 				RelativePath=".\NavigationModule.h"
-				>
-			</File>
-			<File
-				RelativePath=".\SrpcServer.h"
 				>
 			</File>
 		</Filter>

@@ -23,7 +23,7 @@ int HttpConnection::OnDataIn(unsigned char* pData, size_t nLen) throw()
   parser_.parse(pData, nLen);
   while (parser_.hasRequest()) {
 
-    Msg_Server_HttpRequest msg;
+    Msg_HttpServer_Request msg;
     msg.hConnection = apHandle();
     msg.sMethod = parser_.method();
     msg.sUri = parser_.uri();
@@ -43,7 +43,7 @@ int HttpConnection::OnDataIn(unsigned char* pData, size_t nLen) throw()
     parser_.getBody(msg.sbBody);
 
     if (!msg.Request()) {
-      apLog_Error((LOG_CHANNEL, "HttpConnection::OnDataIn", "Msg_Server_HttpRequest failed conn=" ApHandleFormat " method=%s uri=%s body=%d", ApHandleType(msg.hConnection), StringType(msg.sMethod), StringType(msg.sUri), msg.sbBody.Length()));
+      apLog_Error((LOG_CHANNEL, "HttpConnection::OnDataIn", "Msg_HttpServer_Request failed conn=" ApHandleFormat " method=%s uri=%s body=%d", ApHandleType(msg.hConnection), StringType(msg.sMethod), StringType(msg.sUri), msg.sbBody.Length()));
     }
 
     parser_.skipRequest();
