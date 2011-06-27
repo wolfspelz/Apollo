@@ -12,6 +12,7 @@
 
 #include "MsgSystem.h"
 #include "MsgUnitTest.h"
+#include "MsgTcpServer.h"
 #include "MsgNavigation.h"
 #include "MsgBrowserInfo.h"
 #include "MsgMainLoop.h"

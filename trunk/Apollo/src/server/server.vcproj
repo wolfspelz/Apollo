@@ -176,6 +176,14 @@
 				RelativePath=".\ServerModule.cpp"
 				>
 			</File>
+			<File
+				RelativePath=".\TcpConnection.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\TcpServer.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -204,6 +212,14 @@
 			</File>
 			<File
 				RelativePath=".\ServerModule.h"
+				>
+			</File>
+			<File
+				RelativePath=".\TcpConnection.h"
+				>
+			</File>
+			<File
+				RelativePath=".\TcpServer.h"
 				>
 			</File>
 		</Filter>

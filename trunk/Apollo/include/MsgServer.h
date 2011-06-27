@@ -4,8 +4,8 @@
 //
 // ============================================================================
 
-#if !defined(MsgHTTPServer_h_INCLUDED)
-#define MsgHTTPServer_h_INCLUDED
+#if !defined(MsgServer_h_INCLUDED)
+#define MsgServer_h_INCLUDED
 
 // -> server
 class Msg_Server_StartHTTP: public ApRequestMessage
@@ -21,31 +21,20 @@ public:
   Msg_Server_StopHTTP() : ApRequestMessage("Server_StopHTTP") {}
 };
 
-// server ->
-class Msg_Server_HttpRequest: public ApRequestMessage
+// ------------------------------------------------------
+
+// -> server
+class Msg_Server_StartTCP: public ApRequestMessage
 {
 public:
-  Msg_Server_HttpRequest() : ApRequestMessage("Server_HttpRequest") {}
-  ApIN ApHandle hConnection;
-  ApIN String sMethod;
-  ApIN String sUri;
-  ApIN String sProtocol;
-  ApIN String sRemoteAddress;
-  ApIN Apollo::KeyValueList kvHeader;
-  ApIN Buffer sbBody;
+  Msg_Server_StartTCP() : ApRequestMessage("Server_StartTCP") {}
 };
 
 // -> server
-class Msg_Server_HttpResponse: public ApRequestMessage
+class Msg_Server_StopTCP: public ApRequestMessage
 {
 public:
-  Msg_Server_HttpResponse() : ApRequestMessage("Server_HttpResponse"), nStatus(0) {}
-  ApIN ApHandle hConnection;
-  ApIN int nStatus;
-  ApIN String sMessage;
-  ApIN String sProtocol;
-  ApIN Apollo::KeyValueList kvHeader;
-  ApIN Buffer sbBody;
+  Msg_Server_StopTCP() : ApRequestMessage("Server_StopTCP") {}
 };
 
-#endif // !defined(MsgHTTPServer_h_INCLUDED)
+#endif // !defined(MsgServer_h_INCLUDED)

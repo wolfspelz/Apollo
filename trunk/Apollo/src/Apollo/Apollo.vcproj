@@ -362,6 +362,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\include\MsgHttpServer.h"
+					>
+				</File>
+				<File
 					RelativePath="..\..\include\MsgIdentity.h"
 					>
 				</File>
@@ -419,6 +423,10 @@
 				</File>
 				<File
 					RelativePath="..\..\include\MsgSystem.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\MsgTcpServer.h"
 					>
 				</File>
 				<File

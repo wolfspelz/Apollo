@@ -7,9 +7,7 @@
 #include "Apollo.h"
 #include "ApLog.h"
 #include "NavigationModule.h"
-#include "SrpcServer.h"
 #include "Context.h"
-#include "Connection.h"
 
 Context* NavigationModule::findContext(const ApHandle& h)
 {
@@ -21,45 +19,6 @@ Context* NavigationModule::findContext(const ApHandle& h)
   }
 
   return pContext;
-}
-
-Connection* NavigationModule::findConnection(const ApHandle& h)
-{
-  Connection* pConnection = 0;
-
-  ConnectionNode* pNode = connections_.Find(h);
-  if (pNode) {
-    pConnection = pNode->Value();
-  }
-
-  return pConnection;
-}
-
-int NavigationModule::addConnection(const ApHandle& hConnection, Connection* pConnection)
-{
-  int ok = 1;
-
-  ok = connections_.Set(hConnection, pConnection);
-
-  Msg_Navigation_Connected msg;
-  msg.hConnection = hConnection;
-  msg.Send();
-
-  return ok;
-}
-
-int NavigationModule::removeConnection(const ApHandle& hConnection)
-{
-  int ok = 1;
-
-  ok = connections_.Unset(hConnection);
-
-  // Connection lost:
-  Msg_Navigation_Disconnected msg;
-  msg.hConnection = hConnection;
-  msg.Send();
-
-  return ok;
 }
 
 void NavigationModule::associateContextWithConnection(const ApHandle& hContext, const ApHandle& hConnection)
@@ -163,34 +122,25 @@ int NavigationModule::destroyContext(const ApHandle& hContext)
 
 //----------------------------------------------------------
 
-AP_MSG_HANDLER_METHOD(NavigationModule, MainLoop_EventLoopBegin)
+AP_MSG_HANDLER_METHOD(NavigationModule, TcpServer_SrpcRequest)
 {
-  if (pServer_ == 0) {
-    pServer_ = new SrpcServer();
-    if (pServer_ != 0) {
-      int ok = pServer_->Start(Apollo::getModuleConfig(MODULE_NAME, "Server/Address", "localhost"), Apollo::getModuleConfig(MODULE_NAME, "Server/Port", 23763));
-      if (!ok) {
-        apLog_Error((LOG_CHANNEL, "NavigationModule::MainLoop_EventLoopBegin", "SrpcServer::Start() failed"));
-      }
-    }
+  // Add/fake the hConnection for some messages
+  // Will be used by SrpcGate hander below
+
+  String sMethod = pMsg->srpc.getString("Method");
+  if (0
+    || sMethod == "Navigation_NavigatorHello"
+    || sMethod == "Navigation_NavigatorBye"
+    || sMethod == "Navigation_ContextOpen"
+    || sMethod == "Navigation_ContextNavigate"
+    ) {
+    pMsg->srpc.set("hConnection", pMsg->hConnection);
   }
+
+  // No apStatus
 }
 
-AP_MSG_HANDLER_METHOD(NavigationModule, MainLoop_EventLoopBeforeEnd)
-{
-  if (pServer_ != 0) {
-    pServer_->Stop();
-    delete pServer_;
-    pServer_ = 0;
-  }
-}
-
-AP_MSG_HANDLER_METHOD(NavigationModule, Navigation_Connected)
-{
-  // do nothing
-}
-
-AP_MSG_HANDLER_METHOD(NavigationModule, Navigation_Disconnected)
+AP_MSG_HANDLER_METHOD(NavigationModule, TcpServer_Disconnected)
 {
   // Lost connection -> cleanup associated contexts
   ApHandle hConnection = pMsg->hConnection;
@@ -221,82 +171,6 @@ AP_MSG_HANDLER_METHOD(NavigationModule, Navigation_Disconnected)
   // Cleanup, should do nothing, because destroyContext does removeContextFromConnection
   // and the last context also removes the connection in connectionContexts_
   (void) connectionContexts_.Unset(hConnection);
-}
-
-AP_MSG_HANDLER_METHOD(NavigationModule, Navigation_Receive)
-{
-  Msg_Navigation_Send msgNS;
-  msgNS.hConnection = pMsg->hConnection;
-
-  String sType = pMsg->srpc.getString("ApType");
-  if (sType) {
-    // Given message type -> send SRPC with custom type
-
-    ApSRPCMessage msg(sType);
-    pMsg->srpc >> msg.srpc;
-
-    // Custom message handlers just do the apStatus thing.
-    // They rely on someone else (us here) to fill msg.response.
-    if (msg.Call()) {
-      msg.response.createResponse(msg.srpc);
-    } else {
-      msg.response.createError(msg.srpc, msg.sComment);
-    }
-
-  } else {
-    // Handle SRPC message via SrpcGate with SRPCGATE_HANDLER_TYPE type
-
-    ApSRPCMessage msg(SRPCGATE_HANDLER_TYPE);
-    pMsg->srpc >> msg.srpc;
-
-    String sMethod = msg.srpc.getString("Method");
-    // Fake hConnection for some messages
-    if (0
-      || sMethod == "Navigation_NavigatorHello"
-      || sMethod == "Navigation_NavigatorBye"
-      || sMethod == "Navigation_ContextOpen"
-      || sMethod == "Navigation_ContextNavigate"
-      ) {
-      msg.srpc.set("hConnection", pMsg->hConnection);
-    }
-
-    (void) msg.Call();
-
-    // SrpcGate handlers make a complete response with Status and SrpcId if they like.
-    // Shuffle response params without copying data. Original message looses the data.
-    msg.response >> msgNS.srpc;
-  }
-
-
-  if (!msgNS.Request()) { throw ApException("%s failed conn=" ApHandleFormat "", StringType(msgNS.Type()), ApHandleType(msgNS.hConnection)); }
-
-  pMsg->apStatus = ApMessage::Ok;
-}
-
-AP_MSG_HANDLER_METHOD(NavigationModule, Navigation_Send)
-{
-  int ok = 1;
-
-  Connection* pConnection = findConnection(pMsg->hConnection);
-  if (pConnection != 0) {
-
-    String sMsg = pMsg->srpc.toString();
-
-    if (!sMsg.empty()) {
-      sMsg += "\n";
-
-      if (apLog_IsVerbose) {
-        apLog_Verbose((LOG_CHANNEL, "NavigationModule::Navigation_Send", "" ApHandleFormat " %s", ApHandleType(pMsg->hConnection), StringType(sMsg)));
-      }
-
-      ok = pConnection->DataOut((unsigned char*) sMsg.c_str(), sMsg.bytes());
-      if (!ok ) {
-        apLog_Error((LOG_CHANNEL, "NavigationModule::Navigation_Send", "Connection " ApHandleFormat " DataOut() failed", ApHandleType(pMsg->hConnection)));
-      }
-    }
-  }
-
-  pMsg->apStatus = ok ? ApMessage::Ok : ApMessage::Error;
 }
 
 //---------------------------
@@ -621,13 +495,8 @@ int NavigationModule::init()
 {
   int ok = 1;
 
-  AP_MSG_REGISTRY_ADD(MODULE_NAME, NavigationModule, MainLoop_EventLoopBegin, this, ApCallbackPosNormal);
-  AP_MSG_REGISTRY_ADD(MODULE_NAME, NavigationModule, MainLoop_EventLoopBeforeEnd, this, ApCallbackPosNormal);
-
-  AP_MSG_REGISTRY_ADD(MODULE_NAME, NavigationModule, Navigation_Connected, this, ApCallbackPosNormal);
-  AP_MSG_REGISTRY_ADD(MODULE_NAME, NavigationModule, Navigation_Disconnected, this, ApCallbackPosNormal);
-  AP_MSG_REGISTRY_ADD(MODULE_NAME, NavigationModule, Navigation_Receive, this, ApCallbackPosNormal);
-  AP_MSG_REGISTRY_ADD(MODULE_NAME, NavigationModule, Navigation_Send, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, NavigationModule, TcpServer_SrpcRequest, this, ApCallbackPosEarly);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, NavigationModule, TcpServer_Disconnected, this, ApCallbackPosNormal);
 
   AP_MSG_REGISTRY_ADD(MODULE_NAME, NavigationModule, Navigation_NavigatorHello, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, NavigationModule, Navigation_NavigatorBye, this, ApCallbackPosNormal);

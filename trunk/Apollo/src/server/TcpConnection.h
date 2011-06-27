@@ -4,20 +4,20 @@
 //
 // ============================================================================
 
-#if !defined(Connection_h_INCLUDED)
-#define Connection_h_INCLUDED
+#if !defined(TcpConnection_h_INCLUDED)
+#define TcpConnection_h_INCLUDED
 
 #include "Apollo.h"
 #include "netapi/NetInterface.h"
 #include "SrpcStreamParser.h"
 
-class Connection: public Apollo::TCPConnection
+class TcpConnection: public Apollo::TCPConnection
 {
 public:
-  Connection(const char* szName, const ApHandle& hConnection)
+  TcpConnection(const char* szName, const ApHandle& hConnection)
     :Apollo::TCPConnection(szName, hConnection)
   {}
-  virtual ~Connection() {}
+  virtual ~TcpConnection() {}
 
 protected:
   virtual int OnConnected();
@@ -28,4 +28,4 @@ protected:
   Apollo::SrpcStreamParser parser_;
 };
 
-#endif // !defined(Connection_h_INCLUDED)
+#endif // !defined(TcpConnection_h_INCLUDED)

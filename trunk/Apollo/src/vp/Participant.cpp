@@ -9,7 +9,7 @@
 #include "Local.h"
 #include "MsgVp.h"
 #include "MsgIdentity.h"
-#include "MsgServer.h"
+#include "MsgHttpServer.h"
 #include "Participant.h"
 #include "Location.h"
 #include "Chat.h"
