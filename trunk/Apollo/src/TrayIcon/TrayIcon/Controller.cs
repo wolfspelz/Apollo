@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.IO;
 using System.Windows.Forms;
 using Microsoft.VisualBasic.ApplicationServices;
 using System.Diagnostics;
@@ -117,6 +118,9 @@ namespace TrayIcon
 
     protected override void OnCreateMainForm()
     {
+      string sBaseFolder = AppDomain.CurrentDomain.BaseDirectory;
+      Directory.SetCurrentDirectory(sBaseFolder);
+      
       _form = new Form1(this);
 
       if (_bHelp) {
