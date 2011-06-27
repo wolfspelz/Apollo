@@ -75,6 +75,9 @@ test.dll
 test.ilk
 test.sqlite3
 thumbs.db
+TrayIcon.exe
+TrayIcon.pdb
+TrayIcon.vshost.exe
 UnitTest.dll
 UnitTest.ilk
 vld.dll

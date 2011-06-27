@@ -38,6 +38,8 @@ srpcgate.pdb
 test.pdb
 test.sqlite3
 thumbs.db
+TrayIcon.pdb
+TrayIcon.vshost.exe
 UnitTest.pdb
 vld.pdb
 vp.pdb
