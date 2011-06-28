@@ -15,6 +15,7 @@ Core/Modules/01300/Xmpp/Path=xmpp
 Core/Modules/01500/Vp/Path=vp
 Core/Modules/01600/Identity/Path=identity
 Core/Modules/01700/Server/Path=server
+Core/Modules/01800/TrayIcon/Path=TrayIcon
 Core/Modules/02000/BrowserInfo/Path=browserinfo
 Core/Modules/02100/Navigation/Path=navigation
 Core/Modules/02200/Gm/Path=gm
