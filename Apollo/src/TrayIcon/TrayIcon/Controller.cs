@@ -12,18 +12,21 @@ namespace TrayIcon
   public class Controller : WindowsFormsApplicationBase
   {
     Form1 _form = null;
-    bool _bInShutdown = false;
 
-    const string DEFAULT_EXE = "Avatar.exe";
-    const string DEFAULT_EXEARGS = "";
+    const bool DEFAULT_VISIBLE = false;
+    const bool DEFAULT_AUTOCONNECT = true;
+    const bool DEFAULT_AUTOSTART = true;
+    const string DEFAULT_APP = "Avatar.exe";
+    const string DEFAULT_APPARGS = "";
     const int DEFAULT_PORT = 23763;
     const int DEFAULT_MINRECONNECT = 20;
     const int DEFAULT_MAXRECONNECT = 3000;
 
-    bool _bVisible = false;
-    bool _bAutoStart = true;
-    string _sExePath = DEFAULT_EXE;
-    string _sExeArgs = DEFAULT_EXEARGS;
+    bool _bVisible = DEFAULT_VISIBLE;
+    bool _bAutoConnect = DEFAULT_AUTOCONNECT;
+    bool _bAutoStart = DEFAULT_AUTOSTART;
+    string _sAppPath = DEFAULT_APP;
+    string _sAppArgs = DEFAULT_APPARGS;
     int _nPort = DEFAULT_PORT;
     bool _bHelp = false;
 
@@ -34,25 +37,35 @@ namespace TrayIcon
     bool _bConnected = false;
     Timer _connectTimer = null;
 
+    bool _bInShutdown = false;
+    bool _bFirstDisconnect = true;
+    bool _bWasConnected = false;
+
     internal Controller()
     {
-      this.IsSingleInstance = true;
+      IsSingleInstance = true;
     }
 
     internal new void Log(string s)
     {
       if (!_bInShutdown) {
-        if (this.MainForm != null && this.MainForm.Visible) {
-          this.MainForm.Invoke(_form.LogHandler, s);
+        if (MainForm != null) {
+          MainForm.Invoke(_form.LogHandler, s);
         }
       }
     }
 
-    internal void Invoke(Form1.FormThreadInvokable fExecutable)
+    internal void Invoke(Form1.InvokableOnFormThread fExecutable)
     {
-      if (this.MainForm != null) {
-        this.MainForm.Invoke(_form.ExecHandler, fExecutable);
+      if (MainForm != null) {
+        MainForm.Invoke(_form.ExecHandler, fExecutable);
       }
+    }
+
+    bool TrueString(string sIn)
+    {
+      string s = sIn.ToLower();
+      return s == "yes" || s == "true" || s == "1" || s == "on" || s == "ok" || s == "sure" || s == "yessir";
     }
 
     #region Begin/End // --------------------------------------
@@ -65,24 +78,35 @@ namespace TrayIcon
         switch (args[i]) {
 
           case "-show": {
-              _bVisible = true;
+              if (args.Count > i) {
+                _bVisible = TrueString(args[++i]);
+              }
             }
             break;
 
-          case "-autostart": {
-              _bAutoStart = true;
+          case "-connect": {
+              if (args.Count > i) {
+                _bAutoConnect = TrueString(args[++i]);
+              }
             }
             break;
 
-          case "-exe":
+          case "-startapp": {
+              if (args.Count > i) {
+                _bAutoStart = TrueString(args[++i]);
+              }
+            }
+            break;
+
+          case "-app":
             if (args.Count > i) {
-              _sExePath = args[++i];
+              _sAppPath = args[++i];
             }
             break;
 
-          case "-exeargs":
+          case "-args":
             if (args.Count > i) {
-              _sExeArgs = args[++i];
+              _sAppArgs = args[++i];
             }
             break;
 
@@ -125,45 +149,59 @@ namespace TrayIcon
 
       if (_bHelp) {
         _bVisible = true;
+        _bAutoConnect = false;
         _bAutoStart = false;
       }
 
-      if (!_bVisible) {
-        _form.ShowInTaskbar = false;
-        _form.ShowIcon = false;
-        _form.Opacity = 0.0;
-        //_form.Hide(); // does not work
-      }
+      MainForm = _form;
 
       _form.SetVisible(_bVisible);
-
-      this.MainForm = _form;
+      _form.SetConnected(_bConnected);
 
       _nReconnectInterval = _nMinReconnectInterval;
+    }
 
-      if (_bAutoStart) {
+    internal void Start()
+    {
+      _form.SetConnecting(_bAutoConnect);
+
+      if (_bAutoConnect) {
         StartConnectTimer();
       }
 
       if (_bHelp) {
-        string sHelp = @"-help\n
+        string sHelp = @"Controls an application program via TCP/SRPC
+-help\n
 -show # Show dialog, default:no\n
--autostart # Connect automatically, default:yes\n
--exe <path to program exe> # default:" + DEFAULT_EXE + @"\n
--exeargs <program arguments> # default:(empty)\n
+-connect # Connect automatically, default:yes\n
+-startapp # Start app automatically, default:yes\n
+-app <path to application program> # default:" + DEFAULT_APP + @"\n
+-args <program arguments> # default:<empty>\n
 -port <program TCP port> # default:" + DEFAULT_PORT + @"\n
--minreconnect <min reconnect timer in msec> # default:" + DEFAULT_MINRECONNECT + @"\n
--maxreconnect <max reconnect timer in msec> # default:" + DEFAULT_MAXRECONNECT + @"\n
+-minreconnect <min reconnect timer> # in msec, default:" + DEFAULT_MINRECONNECT + @"\n
+-maxreconnect <max reconnect timer> # in msec, default:" + DEFAULT_MAXRECONNECT + @"\n
 ";
         _form.SetText(sHelp.Replace("\n", Environment.NewLine));
       }
     }
 
+    internal void Stop()
+    {
+      MainForm = null;
+
+      if (!_bInShutdown) {
+        _bInShutdown = true;
+
+        if (_client != null) {
+          _client.Disconnect();
+        }
+      }
+    }
+
     protected override void OnShutdown()
     {
-      _bInShutdown = true;
-      if (_client != null) {
-        _client.Disconnect();
+      if (!_bInShutdown) {
+        Stop();
       }
     }
 
@@ -203,7 +241,7 @@ namespace TrayIcon
         _bConnected = false;
 
         _client = new Client(this);
-        _client.Connect(_nPort, OnConnected, OnDisconnected);
+        _client.Connect(_nPort, OnConnected, OnMessage, OnDisconnected);
       }
     }
 
@@ -220,7 +258,34 @@ namespace TrayIcon
     void OnConnected()
     {
       _bConnected = true;
+      _bWasConnected = true;
       _nReconnectInterval = _nMinReconnectInterval;
+
+      Invoke(() => OnConnectedMainThread());
+    }
+
+    void OnConnectedMainThread()
+    {
+      _form.SetConnected(_bConnected);
+
+      var srpc = new Srpc.Message();
+      srpc.Set(Srpc.Key.Method, "TrayIcon_Hello");
+      Send(srpc);
+    }
+
+    void OnMessage(ref Srpc.Message request, ref Srpc.Message response)
+    {
+      string sMethod = request.GetString(Srpc.Key.Method);
+      switch (sMethod) {
+        case "TrayIcon_ConnectionStatus": {
+          int nConnections = request.GetInt("Connections");
+          if (nConnections > 0) {
+            Invoke(() => _form.ShowConnectedAppStatus());
+          } else {
+            Invoke(() => _form.ShowDisconnectedAppStatus());
+          }
+        } break;
+      }
     }
 
     void OnDisconnected()
@@ -228,10 +293,26 @@ namespace TrayIcon
       _bConnected = false;
       _client = null;
 
+      Invoke(() => OnDisconnectedMainThread());
+    }
+
+    void OnDisconnectedMainThread()
+    {
+      _form.SetConnected(_bConnected);
+
       if (_bInShutdown) {
         Log("OnDisconnected: skipping reconnect in shutdown");
       } else {
-        Invoke(() => StartConnectTimer());
+        if (_bFirstDisconnect) {
+          _bFirstDisconnect = false;
+          if (!_bWasConnected) {
+            if (_bAutoStart) {
+              LaunchApp();
+            }
+          }
+        }
+
+        StartConnectTimer();
       }
     }
 
@@ -249,14 +330,18 @@ namespace TrayIcon
 
     #region Commands // ---------------------------------------
 
-    internal void GoOnline()
+    internal void DoConnect()
     {
+      _bAutoConnect = true;
+      _bFirstDisconnect = false;
+      _form.SetConnecting(_bAutoConnect);
       StartConnectTimer();
     }
 
-    internal void StartExe()
+    internal void LaunchApp()
     {
-      var process = Process.Start(_sExePath, _sExeArgs);
+      Log("Launching " + _sAppPath + " " + _sAppArgs);
+      var process = Process.Start(_sAppPath, _sAppArgs);
       if (process == null) {
         Log("Process.Start failed");
       } else {
@@ -268,7 +353,7 @@ namespace TrayIcon
   
     #region Send Apollo messages // ---------------------------------------
 
-    internal void SendQuit()
+    internal void TerminateApp()
     {
       var srpc = new Srpc.Message();
       srpc.Set(Srpc.Key.Method, "MainLoop_EndLoop");
