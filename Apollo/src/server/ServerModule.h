@@ -50,6 +50,7 @@ public:
   void On_Server_StopTCP(Msg_Server_StopTCP* pMsg);
   void On_TcpServer_Connected(Msg_TcpServer_Connected* pMsg);
   void On_TcpServer_SrpcRequest(Msg_TcpServer_SrpcRequest* pMsg);
+  void On_TcpServer_SendSrpc(Msg_TcpServer_SendSrpc* pMsg);
   void On_TcpServer_Disconnected(Msg_TcpServer_Disconnected* pMsg);
 
   void On_System_RunLevel(Msg_System_RunLevel* pMsg);

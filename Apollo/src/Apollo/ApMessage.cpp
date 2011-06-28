@@ -44,6 +44,7 @@ void ApFilterMessage::Filter()
 
 int ApSRPCMessage::Call()
 {
+  Once(true); // Until someone handles it
   int bCalled = Apollo::callMsg(this, 0);
   return apStatus == ApMessage::Ok;
 }
