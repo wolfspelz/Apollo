@@ -14,6 +14,7 @@ namespace TrayIcon
     Controller Controller;
 
     ConnectedCallback _fOnConnected = null;
+    MessageCallback _fOnMessage = null;
     DisconnectedCallback _fOnDisconnected = null;
 
     const int BUFFER_SIZE = 10240;
@@ -38,11 +39,13 @@ namespace TrayIcon
     #region Control // -------------------------------
 
     internal delegate void ConnectedCallback();
+    internal delegate void MessageCallback(ref Srpc.Message request, ref Srpc.Message response);
     internal delegate void DisconnectedCallback();
 
-    internal void Connect(int nPort, ConnectedCallback fOnConnected, DisconnectedCallback fOnDisconnected)
+    internal void Connect(int nPort, ConnectedCallback fOnConnected, MessageCallback fOnMessage, DisconnectedCallback fOnDisconnected)
     {
       _fOnConnected = fOnConnected;
+      _fOnMessage = fOnMessage;
       _fOnDisconnected = fOnDisconnected;
 
       Log("Connecting...");
@@ -152,9 +155,9 @@ namespace TrayIcon
             do {
               srpc = ProcessData(ref _sBuffer);
               if (srpc != null) {
-                string sSrpcId = srpc.GetString("SrpcId");
-                if (!String.IsNullOrEmpty(sSrpcId)) {
-                  HandleResponse(srpc, sSrpcId);
+                string sStatus = srpc.GetString(Srpc.Key.Status);
+                if (!String.IsNullOrEmpty(sStatus)) {
+                  HandleResponse(srpc);
                 } else {
                   HandleRequest(srpc);
                 }
@@ -182,19 +185,26 @@ namespace TrayIcon
       return msg;
     }
 
-    private void HandleResponse(Srpc.Message response, string sSrpcId)
+    private void HandleResponse(Srpc.Message response)
     {
-      if (_completions.ContainsKey(sSrpcId)) {
-        var fCompletion = _completions[sSrpcId];
-        if (fCompletion != null) {
-          fCompletion(response);
+      string sSrpcId = response.GetString("SrpcId");
+      if (!String.IsNullOrEmpty(sSrpcId)) {
+        if (_completions.ContainsKey(sSrpcId)) {
+          var fCompletion = _completions[sSrpcId];
+          if (fCompletion != null) {
+            fCompletion(response);
+          }
+          _completions.Remove(sSrpcId);
         }
-        _completions.Remove(sSrpcId);
       }
     }
 
     private void HandleRequest(Srpc.Message request)
     {
+      if (_fOnMessage != null) {
+        var response = new Srpc.Message();
+        _fOnMessage(ref request, ref response);
+      }
     }
 
     void OnSent(IAsyncResult iar)

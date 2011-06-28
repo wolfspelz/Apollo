@@ -37,10 +37,10 @@
       // 
       // notifyIcon1
       // 
-      this.notifyIcon1.Icon = ((System.Drawing.Icon) (resources.GetObject("notifyIcon1.Icon")));
       this.notifyIcon1.Text = "Avatar";
       this.notifyIcon1.Visible = true;
       this.notifyIcon1.MouseClick += new System.Windows.Forms.MouseEventHandler(this.notifyIcon1_MouseClick);
+      this.notifyIcon1.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.notifyIcon1_MouseDoubleClick);
       // 
       // textBoxLog
       // 
@@ -51,16 +51,16 @@
       this.textBoxLog.Multiline = true;
       this.textBoxLog.Name = "textBoxLog";
       this.textBoxLog.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-      this.textBoxLog.Size = new System.Drawing.Size(401, 164);
+      this.textBoxLog.Size = new System.Drawing.Size(401, 237);
       this.textBoxLog.TabIndex = 0;
       // 
       // buttonConnect
       // 
       this.buttonConnect.Location = new System.Drawing.Point(13, 13);
       this.buttonConnect.Name = "buttonConnect";
-      this.buttonConnect.Size = new System.Drawing.Size(75, 23);
+      this.buttonConnect.Size = new System.Drawing.Size(98, 23);
       this.buttonConnect.TabIndex = 1;
-      this.buttonConnect.Text = "Connect";
+      this.buttonConnect.Text = "Start Connecting";
       this.buttonConnect.UseVisualStyleBackColor = true;
       this.buttonConnect.Click += new System.EventHandler(this.buttonConnect_Click);
       // 
@@ -79,7 +79,7 @@
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-      this.ClientSize = new System.Drawing.Size(426, 218);
+      this.ClientSize = new System.Drawing.Size(426, 291);
       this.Controls.Add(this.buttonClear);
       this.Controls.Add(this.buttonConnect);
       this.Controls.Add(this.textBoxLog);
@@ -87,7 +87,9 @@
       this.Name = "Form1";
       this.ShowInTaskbar = false;
       this.Text = "Avatar Tray Icon";
+      this.Shown += new System.EventHandler(this.Form1_Shown);
       this.VisibleChanged += new System.EventHandler(this.Form1_VisibleChanged);
+      this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
       this.ResumeLayout(false);
       this.PerformLayout();
 
