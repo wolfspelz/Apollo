@@ -33,10 +33,12 @@
       this.textBoxLog = new System.Windows.Forms.TextBox();
       this.buttonConnect = new System.Windows.Forms.Button();
       this.buttonClear = new System.Windows.Forms.Button();
+      this.timerDblClick = new System.Windows.Forms.Timer(this.components);
       this.SuspendLayout();
       // 
       // notifyIcon1
       // 
+      this.notifyIcon1.Icon = ((System.Drawing.Icon) (resources.GetObject("notifyIcon1.Icon")));
       this.notifyIcon1.Text = "Avatar";
       this.notifyIcon1.Visible = true;
       this.notifyIcon1.MouseClick += new System.Windows.Forms.MouseEventHandler(this.notifyIcon1_MouseClick);
@@ -75,6 +77,10 @@
       this.buttonClear.UseVisualStyleBackColor = true;
       this.buttonClear.Click += new System.EventHandler(this.buttonClear_Click);
       // 
+      // timerDblClick
+      // 
+      this.timerDblClick.Tick += new System.EventHandler(this.timerDblClick_Tick);
+      // 
       // Form1
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -101,6 +107,7 @@
     private System.Windows.Forms.TextBox textBoxLog;
     private System.Windows.Forms.Button buttonConnect;
     private System.Windows.Forms.Button buttonClear;
+    private System.Windows.Forms.Timer timerDblClick;
   }
 }
 

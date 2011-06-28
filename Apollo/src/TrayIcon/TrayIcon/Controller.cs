@@ -57,8 +57,10 @@ namespace TrayIcon
 
     internal void Invoke(Form1.InvokableOnFormThread fExecutable)
     {
-      if (MainForm != null) {
-        MainForm.Invoke(_form.ExecHandler, fExecutable);
+      if (!_bInShutdown) {
+        if (MainForm != null) {
+          MainForm.Invoke(_form.ExecHandler, fExecutable);
+        }
       }
     }
 
@@ -187,8 +189,6 @@ namespace TrayIcon
 
     internal void Stop()
     {
-      MainForm = null;
-
       if (!_bInShutdown) {
         _bInShutdown = true;
 
