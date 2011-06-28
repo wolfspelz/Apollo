@@ -279,7 +279,7 @@ int GmModule::doRegister()
     } else {
 
       SrpcMessage srpc;
-      srpc.set("Method", GmService_Method_Register);
+      srpc.set(Srpc::Key::Method, GmService_Method_Register);
       srpc.set("Token", Apollo::getModuleConfig(MODULE_NAME, "Srpc/ApiToken", "8uzxXXZTAmHcni6tK3t"));
       srpc.set("User", Apollo::getRandomString(20));
       srpc.set("Password", Apollo::getRandomString(20));
@@ -390,7 +390,7 @@ int GmModule::doLogin()
         kvClientInfo.add("Machine", getMachineId());
 
         SrpcMessage srpc;
-        srpc.set("Method", GmService_Method_Login);
+        srpc.set(Srpc::Key::Method, GmService_Method_Login);
         srpc.set("Token", Apollo::getModuleConfig(MODULE_NAME, "Srpc/ApiToken", "8uzxXXZTAmHcni6tK3t"));
         srpc.set("User", Apollo::getModuleConfig(MODULE_NAME, "User", ""));
         srpc.set("Password", getPassword());
@@ -569,7 +569,7 @@ AP_MSG_HANDLER_METHOD(GmModule, IdentityMgmt_SetProperty)
   if (sUrl.empty()) { throw ApException("Missing Srpc/Url"); }
 
   SrpcMessage srpc;
-  srpc.set("Method", GmService_Method_SetProperty);
+  srpc.set(Srpc::Key::Method, GmService_Method_SetProperty);
   srpc.set("Token", Apollo::getModuleConfig(MODULE_NAME, "Srpc/ApiToken", "8uzxXXZTAmHcni6tK3t"));
   srpc.set("User", Apollo::getModuleConfig(MODULE_NAME, "User", ""));
   srpc.set("Password", getPassword());

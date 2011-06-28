@@ -298,7 +298,7 @@ void Display::OnModuleCall(Apollo::SrpcMessage& request, Apollo::SrpcMessage& re
     }
 
   } else {
-    String sMethod = request.getString("Method");
+    String sMethod = request.getString(Srpc::Key::Method);
 
     if (0){
     } else if (sMethod == "OnShowDebug") {
@@ -352,7 +352,7 @@ void Display::OnShowDebug(int bShow)
 
 void Display::OnNavigatorCallDisplay(Apollo::SrpcMessage& request, Apollo::SrpcMessage& response)
 {
-  String sMethod = request.getString("Method");
+  String sMethod = request.getString(Srpc::Key::Method);
 
   if (0){
   } else if (sMethod == "ShowChat") {
@@ -595,7 +595,7 @@ void Display::ResetLocationInfo()
 
 ViewSrpcMessage::ViewSrpcMessage(Display* pDisplay, const String& sMethod)
 {
-  srpc.set("Method", sMethod);
+  srpc.set(Srpc::Key::Method, sMethod);
   hView = pDisplay->GetView();
   sFunction = Apollo::getModuleConfig(MODULE_NAME, "CallScriptSrpcFunctionName", "receiveSrpcMessageAsString");
 }

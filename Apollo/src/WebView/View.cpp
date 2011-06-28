@@ -401,9 +401,9 @@ void View::CallJsSrpc(const String& sFunction, Apollo::SrpcMessage& srpc, Apollo
 
   response.fromString(msg.sResult);
   if (response.length() > 0) {
-    int nStatus = response.getInt("Status");
+    int nStatus = response.getInt(Srpc::Key::Status);
     if (nStatus != 1) {
-      throw ApException("View::CallJsSrpc Status=%d Message=%s", nStatus, StringType(response.getString("Message")));
+      throw ApException("View::CallJsSrpc Status=%d Message=%s", nStatus, StringType(response.getString(Srpc::Key::Message)));
     }
   }
 }
@@ -528,7 +528,7 @@ JSValueRef View::JS_Apollo_sendMessage(JSContextRef ctx, JSObjectRef function, J
     srpc >> msg.srpc;
 
     if (msg.Request()) {
-      if (msg.response.getString("Status")) {
+      if (msg.response.getString(Srpc::Key::Status)) {
         // Has response
       } else {
         msg.response.createResponse(msg.srpc);

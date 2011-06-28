@@ -113,9 +113,9 @@ void Dialog::ContentCall(const String& sFunction, Apollo::SrpcMessage& srpc, Apo
 
   response.fromString(msg.sResult);
   if (response.length() > 0) {
-    int nStatus = response.getInt("Status");
+    int nStatus = response.getInt(Srpc::Key::Status);
     if (nStatus != 1) {
-      throw ApException("View::CallJsSrpc Status=%d Message=%s", nStatus, StringType(response.getString("Message")));
+      throw ApException("View::CallJsSrpc Status=%d Message=%s", nStatus, StringType(response.getString(Srpc::Key::Message)));
     }
   }
 

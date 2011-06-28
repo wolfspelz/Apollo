@@ -112,7 +112,7 @@ void ChatWindow::OnUnload()
 
 void ChatWindow::OnModuleCall(Apollo::SrpcMessage& request, Apollo::SrpcMessage& response)
 {
-  String sMethod = request.getString("Method");
+  String sMethod = request.getString(Srpc::Key::Method);
 
   if (0){
   } else if (sMethod == "SendChat") {
@@ -200,7 +200,7 @@ void ChatWindow::ShowLocationDetailState(const String& sValue)
 
 ViewCall::ViewCall(ChatWindow* pChatWindow, const String& sMethod)
 {
-  srpc.set("Method", sMethod);
+  srpc.set(Srpc::Key::Method, sMethod);
   hDialog = pChatWindow->apHandle();
   sFunction = Apollo::getModuleConfig(MODULE_NAME, "CallScriptSrpcFunctionName", "ReceiveMessageFromModule");
 }
