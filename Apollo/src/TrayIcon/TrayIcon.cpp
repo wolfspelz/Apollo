@@ -58,7 +58,7 @@ static void SendConnectionStatus()
     Msg_TcpServer_SendSrpc msg;
     msg.hConnection = g_hConnection;
     msg.srpc.set("Method" , "TrayIcon_ConnectionStatus");
-    msg.srpc.set("Connections" , g_nConnections);
+    msg.srpc.set("nConnections" , g_nConnections);
     msg.Request();
   }
 }
