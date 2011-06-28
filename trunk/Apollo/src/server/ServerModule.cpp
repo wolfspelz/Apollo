@@ -192,43 +192,38 @@ AP_MSG_HANDLER_METHOD(ServerModule, Server_StopTCP)
 
 AP_MSG_HANDLER_METHOD(ServerModule, TcpServer_SrpcRequest)
 {
-  String sResponse;
+  Msg_TcpServer_SendSrpc msgTSSS;
+  int ok = 0;
 
   String sType = pMsg->srpc.getString("ApType");
-  if (sType) {
-    // Given message type -> send SRPC with custom type
+  ApSRPCMessage msg(sType);
 
-    ApSRPCMessage msg(sType);
-
-    pMsg->srpc >> msg.srpc;
-    (void) msg.Call();
-    sResponse = msg.response.toString();
-
-  } else {
-    // Handle SRPC message via SrpcGate with SRPCGATE_HANDLER_TYPE type
-
-    ApSRPCMessage msg(SRPCGATE_HANDLER_TYPE);
-
-    pMsg->srpc >> msg.srpc;
-    (void) msg.Call();
-    sResponse = msg.response.toString();
-
+  // Given message type -> send SRPC with custom type
+  if (sType.empty()) {
+    // Empty message type -> send SRPC via SRPCGATE
+    msg.SetType(SRPCGATE_HANDLER_TYPE);
   }
 
-  // Handlers are supposed to fill msg.response.
-  if (sResponse.empty()) {
-    sResponse = "Status=0\nMessage=No handler or empty response\n";
-  }
+  pMsg->srpc >> msg.srpc;
+  ok = msg.Call();
+  msg.response >> pMsg->response;
 
-  sResponse += "\n";
+  pMsg->apStatus = ApMessage::Ok;
+}
+
+AP_MSG_HANDLER_METHOD(ServerModule, TcpServer_SendSrpc)
+{
+  String sMsg = pMsg->srpc.toString();
 
   if (apLog_IsVerbose) {
-    apLog_Verbose((LOG_CHANNEL, "ServerModule, TcpServer_SrpcRequest", "conn=" ApHandleFormat "  send: %s", ApHandleType(pMsg->hConnection), StringType(sResponse)));
+    apLog_Verbose((LOG_CHANNEL, "ServerModule, TcpServer_SendSrpc", "conn=" ApHandleFormat " send: %s", ApHandleType(pMsg->hConnection), StringType(sMsg)));
   }
+
+  sMsg += "\n";
 
   TcpConnection* pConnection = findTcpConnection(pMsg->hConnection);
   if (pConnection == 0) { throw ApException("findTcpConnection(" ApHandleFormat ") failed", ApHandleType(pMsg->hConnection)); }
-  if (! pConnection->DataOut((unsigned char*) sResponse.c_str(), sResponse.bytes()) ) { throw ApException("Connection " ApHandleFormat " DataOut() failed", ApHandleType(pMsg->hConnection)); }
+  if (! pConnection->DataOut((unsigned char*) sMsg.c_str(), sMsg.bytes()) ) { throw ApException("Connection " ApHandleFormat " DataOut() failed", ApHandleType(pMsg->hConnection)); }
 
   pMsg->apStatus = ApMessage::Ok;
 }
@@ -306,6 +301,7 @@ int ServerModule::init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ServerModule, Server_StartTCP, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ServerModule, Server_StopTCP, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ServerModule, TcpServer_SrpcRequest, this, ApCallbackPosLate);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, ServerModule, TcpServer_SendSrpc, this, ApCallbackPosLate);
 
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ServerModule, System_RunLevel, this, ApCallbackPosNormal);
 

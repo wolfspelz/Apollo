@@ -358,6 +358,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestDialog", "..\..\src\Tes
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Chat", "..\..\src\Chat\Chat.vcproj", "{FFD78D20-2DED-42DD-B93A-9D3EF07493D8}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TrayIcon", "..\..\src\TrayIcon\TrayIcon.vcproj", "{57C06D34-9E03-4750-A4E2-AFC99E033A1F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -532,6 +534,10 @@ Global
 		{FFD78D20-2DED-42DD-B93A-9D3EF07493D8}.Debug|Win32.Build.0 = Debug|Win32
 		{FFD78D20-2DED-42DD-B93A-9D3EF07493D8}.Release|Win32.ActiveCfg = Release|Win32
 		{FFD78D20-2DED-42DD-B93A-9D3EF07493D8}.Release|Win32.Build.0 = Release|Win32
+		{57C06D34-9E03-4750-A4E2-AFC99E033A1F}.Debug|Win32.ActiveCfg = Debug|Win32
+		{57C06D34-9E03-4750-A4E2-AFC99E033A1F}.Debug|Win32.Build.0 = Debug|Win32
+		{57C06D34-9E03-4750-A4E2-AFC99E033A1F}.Release|Win32.ActiveCfg = Release|Win32
+		{57C06D34-9E03-4750-A4E2-AFC99E033A1F}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

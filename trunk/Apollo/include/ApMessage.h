@@ -36,6 +36,7 @@ public:
   } ApStatus;
 
   inline String& Type() { return getName(); }
+  inline void SetType(const String& sType) { return setName(sType); }
 
   inline void Forward(bool bFlag) { bForward_ = bFlag; }
   inline bool Forward() { return bForward_; }

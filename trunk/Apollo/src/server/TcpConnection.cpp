@@ -34,9 +34,25 @@ int TcpConnection::OnDataIn(unsigned char* pData, size_t nLen)
       Msg_TcpServer_SrpcRequest msg;
       msg.hConnection = apHandle();
       *pMessage >> msg.srpc;
-      int ok = msg.Call();
-      if (!ok) {
+
+      if (apLog_IsVerbose) {
+        String sMsg = msg.srpc.toString();
+        apLog_Verbose((LOG_CHANNEL, "TcpConnection::OnDataIn", "conn=" ApHandleFormat " receive: %s", ApHandleType(hAp_), StringType(sMsg)));
+      }
+
+      if (!msg.Request()) {
         apLog_Error((LOG_CHANNEL, "TcpConnection::OnDataIn", "Msg_TcpServer_SrpcRequest() failed conn=" ApHandleFormat "", ApHandleType(msg.hConnection)));
+      } else {
+
+        // If a response was provided, then send it
+        if (msg.response.length() > 0) {
+          Msg_TcpServer_SendSrpc msgTSSS;
+          msg.response >> msgTSSS.srpc;
+          msgTSSS.hConnection = hAp_;
+          if (!msgTSSS.Request()) {
+            apLog_Error((LOG_CHANNEL, "TcpConnection::OnDataIn", "%s failed conn=", StringType(msgTSSS.Type()), ApHandleType(msgTSSS.hConnection)));
+          }
+        }
       }
 
       delete pMessage;

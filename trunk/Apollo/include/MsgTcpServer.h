@@ -16,11 +16,22 @@ public:
 };
 
 // server ->
-class Msg_TcpServer_SrpcRequest: public ApSRPCMessage
+class Msg_TcpServer_SrpcRequest: public ApRequestMessage
 {
 public:
-  Msg_TcpServer_SrpcRequest() : ApSRPCMessage("TcpServer_SrpcRequest") {}
+  Msg_TcpServer_SrpcRequest() : ApRequestMessage("TcpServer_SrpcRequest") {}
   ApIN ApHandle hConnection;
+  ApIN Apollo::SrpcMessage srpc;
+  ApOUT Apollo::SrpcMessage response;
+};
+
+// -> server
+class Msg_TcpServer_SendSrpc: public ApRequestMessage
+{
+public:
+  Msg_TcpServer_SendSrpc() : ApRequestMessage("TcpServer_SendSrpc") {}
+  ApIN ApHandle hConnection;
+  ApIN Apollo::SrpcMessage srpc;
 };
 
 // server ->

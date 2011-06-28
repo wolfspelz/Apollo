@@ -142,35 +142,42 @@ AP_MSG_HANDLER_METHOD(NavigationModule, TcpServer_SrpcRequest)
 
 AP_MSG_HANDLER_METHOD(NavigationModule, TcpServer_Disconnected)
 {
-  // Lost connection -> cleanup associated contexts
   ApHandle hConnection = pMsg->hConnection;
 
-  // Construct list of contexts to be closed
-  ContextHandleList closeContexts;
-  ConnectionContextListNode* pConnectionContextListNode = 0;
-  for (ConnectionContextListIterator connectionContextListIterator(connectionContexts_); (pConnectionContextListNode = connectionContextListIterator.Next()) != 0; ) {
-    if (pConnectionContextListNode->Key() == hConnection) {
-      closeContexts = pConnectionContextListNode->Value();
-      break;
+  ConnectionContextListNode* pNode = connectionContexts_.Find(hConnection);
+  if (pNode != 0) {
+    // We know the connection, otherwise ignore it
+
+    // Lost connection -> cleanup associated contexts
+
+    // Construct list of contexts to be closed
+    ContextHandleList closeContexts;
+    ConnectionContextListNode* pConnectionContextListNode = 0;
+    for (ConnectionContextListIterator connectionContextListIterator(connectionContexts_); (pConnectionContextListNode = connectionContextListIterator.Next()) != 0; ) {
+      if (pConnectionContextListNode->Key() == hConnection) {
+        closeContexts = pConnectionContextListNode->Value();
+        break;
+      }
     }
-  }
 
-  if (closeContexts.Count() == 0) {
-    apLog_Verbose((LOG_CHANNEL, "NavigationModule::removeConnection", "conn=" ApHandleFormat " no associated contexts", ApHandleType(hConnection)));
-  } else {
-    apLog_Verbose((LOG_CHANNEL, "NavigationModule::removeConnection", "Closing %d associated contexts of conn=" ApHandleFormat "", closeContexts.Count(), ApHandleType(hConnection)));
-  }
+    if (closeContexts.Count() == 0) {
+      apLog_Verbose((LOG_CHANNEL, "NavigationModule::removeConnection", "conn=" ApHandleFormat " no associated contexts", ApHandleType(hConnection)));
+    } else {
+      apLog_Verbose((LOG_CHANNEL, "NavigationModule::removeConnection", "Closing %d associated contexts of conn=" ApHandleFormat "", closeContexts.Count(), ApHandleType(hConnection)));
+    }
 
-  // Send Vp_CloseContext for all associated contexts
-  ContextHandleListNode* pContextHandleListNode = 0;
-  for (ContextHandleListIterator contextHandleListIterator(closeContexts); (pContextHandleListNode = contextHandleListIterator.Next()) != 0; ) {
-    ApHandle hContext = pContextHandleListNode->Key();
-    destroyContext(hContext);
-  } // for all Contexts
+    // Send Vp_CloseContext for all associated contexts
+    ContextHandleListNode* pContextHandleListNode = 0;
+    for (ContextHandleListIterator contextHandleListIterator(closeContexts); (pContextHandleListNode = contextHandleListIterator.Next()) != 0; ) {
+      ApHandle hContext = pContextHandleListNode->Key();
+      destroyContext(hContext);
+    } // for all Contexts
 
-  // Cleanup, should do nothing, because destroyContext does removeContextFromConnection
-  // and the last context also removes the connection in connectionContexts_
-  (void) connectionContexts_.Unset(hConnection);
+    // Cleanup, should do nothing, because destroyContext does removeContextFromConnection
+    // and the last context also removes the connection in connectionContexts_
+    (void) connectionContexts_.Unset(hConnection);
+
+  } // We know the connection
 }
 
 //---------------------------
