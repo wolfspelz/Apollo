@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using System.Runtime.InteropServices;
 
 namespace TrayIcon
 {
@@ -36,6 +37,8 @@ namespace TrayIcon
       Controller = c;
 
       InitializeComponent();
+
+      timerDblClick.Interval = SystemInformation.DoubleClickTime;
 
       LogHandler = new LogDelegate(Log);
       ExecHandler = new ExecDelegate(Exec);
@@ -130,20 +133,20 @@ namespace TrayIcon
 
     internal void ShowUnknownAppStatus()
     {
-      System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
-      notifyIcon1.Icon = ((System.Drawing.Icon) (resources.GetObject("IconUnknown")));
+      notifyIcon1.Icon = Properties.Resources.IconUnknown;
+      notifyIcon1.Text = "Avatar";
     }
 
     internal void ShowConnectedAppStatus()
     {
-      System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
-      notifyIcon1.Icon = ((System.Drawing.Icon) (resources.GetObject("IconConnected")));
+      notifyIcon1.Icon = Properties.Resources.IconConnected;
+      notifyIcon1.Text = "Avatar connected";
     }
 
     internal void ShowDisconnectedAppStatus()
     {
-      System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
-      notifyIcon1.Icon = ((System.Drawing.Icon) (resources.GetObject("IconDisconnected")));
+      notifyIcon1.Icon = Properties.Resources.IconDisconnected;
+      notifyIcon1.Text = "Avatar not connected";
     }
 
     private void Form1_VisibleChanged(object sender, EventArgs e)
@@ -207,12 +210,50 @@ namespace TrayIcon
 
     private void notifyIcon1_MouseClick(object sender, MouseEventArgs e)
     {
-      //_contextMenu.Show(notifyIcon1, e.Location);
+      if (e.Button == MouseButtons.Left) {
+        timerDblClick.Start();
+      }
     }
 
     private void notifyIcon1_MouseDoubleClick(object sender, MouseEventArgs e)
     {
+      if (e.Button == MouseButtons.Left) {
+        timerDblClick.Stop(); // cancel the left-click menu
+        timerDblClick.Enabled = false;
+      }
+    }
 
+    private void timerDblClick_Tick(object sender, EventArgs e)
+    {
+      timerDblClick.Stop();
+
+      // construct a right-click spoof input
+      INPUT[] rightClick = new INPUT[2];
+
+      MOUSEINPUT rightDown = new MOUSEINPUT();
+      rightDown.dwFlags = Win32.MOUSEEVENTF_RIGHTDOWN + Win32.MOUSEEVENTF_ABSOLUTE;
+      rightDown.dx = 0; // 0,0 means current cursor position
+      rightDown.dy = 0;
+      rightDown.time = 0;
+      rightDown.mouseData = 0;
+
+      MOUSEINPUT rightUp = new MOUSEINPUT();
+      rightUp.dwFlags = Win32.MOUSEEVENTF_RIGHTUP + Win32.MOUSEEVENTF_ABSOLUTE;
+      rightUp.dx = 0;
+      rightUp.dy = 0;
+      rightUp.time = 0;
+      rightUp.mouseData = 0;
+
+      rightClick[0] = new INPUT();
+      rightClick[0].type = Win32.INPUT_MOUSE;
+      rightClick[0].mi = rightDown;
+
+      rightClick[1] = new INPUT();
+      rightClick[1].type = Win32.INPUT_MOUSE;
+      rightClick[1].mi = rightUp;
+
+      // finally, send the spoofed right-click to invoke the menu
+      Win32.SendInput(2, rightClick, Marshal.SizeOf(rightClick[0]));
     }
 
   }
