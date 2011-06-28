@@ -278,7 +278,7 @@ namespace TrayIcon
       string sMethod = request.GetString(Srpc.Key.Method);
       switch (sMethod) {
         case "TrayIcon_ConnectionStatus": {
-          int nConnections = request.GetInt("Connections");
+          int nConnections = request.GetInt("nConnections");
           if (nConnections > 0) {
             Invoke(() => _form.ShowConnectedAppStatus());
           } else {
