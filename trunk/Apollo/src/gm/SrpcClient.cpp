@@ -87,9 +87,9 @@ int SrpcClient::OnClosed()
     if (srpc.length() == 0) {
       sError_ = "Login request returned no SRPC data";
     } else {
-      int nStatus = srpc.getInt("Status");
+      int nStatus = srpc.getInt(Srpc::Key::Status);
       if (nStatus == 0) {
-        sError_ = "The server returned: " + srpc.getString("Message");
+        sError_ = "The server returned: " + srpc.getString(Srpc::Key::Message);
       } else {
         bSuccess = 1;
         OnResult(srpc);

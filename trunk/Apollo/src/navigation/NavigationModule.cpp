@@ -127,7 +127,7 @@ AP_MSG_HANDLER_METHOD(NavigationModule, TcpServer_SrpcRequest)
   // Add/fake the hConnection for some messages
   // Will be used by SrpcGate hander below
 
-  String sMethod = pMsg->srpc.getString("Method");
+  String sMethod = pMsg->srpc.getString(Srpc::Key::Method);
   if (0
     || sMethod == "Navigation_NavigatorHello"
     || sMethod == "Navigation_NavigatorBye"

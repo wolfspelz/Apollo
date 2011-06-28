@@ -521,7 +521,7 @@ void Avatar::OnAnimationBegin(const String& sUrl)
 
 void Avatar::OnModuleCall(Apollo::SrpcMessage& request, Apollo::SrpcMessage& response)
 {
-  String sMethod = request.getString("Method");
+  String sMethod = request.getString(Srpc::Key::Method);
 
   if (0){
   } else if (sMethod == "OnPublicChatTimedOut" || sMethod == "OnPublicChatClosed") {

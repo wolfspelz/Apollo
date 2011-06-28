@@ -134,7 +134,7 @@ AP_MSGCLASS_HANDLER_METHOD(SrpcGateModule, SrpcGate_Handler, ApSRPCMessage)
 {
   int ok = 0;
 
-  String sMethod = pMsg->srpc.getString("Method");
+  String sMethod = pMsg->srpc.getString(Srpc::Key::Method);
   HandlerNode* pNode = handlers_.Find(sMethod);
   if (pNode != 0) {
     ok = pNode->Value().handle(pMsg);

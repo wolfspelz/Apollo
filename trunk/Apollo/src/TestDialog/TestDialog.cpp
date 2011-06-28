@@ -82,7 +82,7 @@ typedef ApModuleSingleton<TestDialogModule> TestDialogModuleInstance;
 
 AP_MSGCLASS_HANDLER_METHOD(TestDialogModule, TestDialog_Srpc, ApSRPCMessage)
 {
-  String sMethod = pMsg->srpc.getString("Method");
+  String sMethod = pMsg->srpc.getString(Srpc::Key::Method);
   if (0) {
   } else if (sMethod == "Open") {
     Open();
@@ -95,7 +95,7 @@ AP_MSG_HANDLER_METHOD(TestDialogModule, WebView_ModuleCall)
 {
   if (dialogs_.Find(pMsg->hView) == 0) { return; }
 
-  String sMethod = pMsg->srpc.getString("Method");
+  String sMethod = pMsg->srpc.getString(Srpc::Key::Method);
   if (0) {
 
   } else if (sMethod == "TabPosition") {

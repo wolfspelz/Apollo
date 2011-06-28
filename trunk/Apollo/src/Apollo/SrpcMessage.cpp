@@ -7,7 +7,14 @@
 #include "ApCompiler.h"
 #include "SrpcMessage.h"
 
+String Srpc::Key::Method = "Method";
+String Srpc::Key::Status = "Status";
+String Srpc::Key::Message = "Message";
+String Srpc::Key::SrpcId = "SrpcId";
+
 AP_NAMESPACE_BEGIN
+
+// ------------------------------------------------
 
 SrpcMessage::SrpcMessage()
 {
@@ -169,21 +176,21 @@ void SrpcMessage::moveTo(SrpcMessage& target)
 
 void SrpcMessage::createResponse(SrpcMessage& request)
 {
-  set("Status", 1);
-  String sSrpcId = request.getString("SrpcId");
+  set(Srpc::Key::Status, 1);
+  String sSrpcId = request.getString(Srpc::Key::SrpcId);
   if (!sSrpcId.empty()) {
-    set("SrpcId", sSrpcId);
+    set(Srpc::Key::SrpcId, sSrpcId);
   }
 }
 
 void SrpcMessage::createError(SrpcMessage& request, const String& sMessage)
 {
-  set("Status", 0);
-  String sSrpcId = request.getString("SrpcId");
+  set(Srpc::Key::Status, 0);
+  String sSrpcId = request.getString(Srpc::Key::SrpcId);
   if (!sSrpcId.empty()) {
-    set("SrpcId", sSrpcId);
+    set(Srpc::Key::SrpcId, sSrpcId);
   }
-  set("Message", sMessage);
+  set(Srpc::Key::Message, sMessage);
 }
 
 AP_NAMESPACE_END

@@ -172,7 +172,7 @@ int MainLoopModule::Handle_WM_COMMAND_TOOLS_TEST(HWND hWnd, UINT message, WPARAM
   AP_UNUSED_ARG(hWnd); AP_UNUSED_ARG(message); AP_UNUSED_ARG(wParam); AP_UNUSED_ARG(lParam);
 
   ApSRPCMessage msg("TestDialog_Srpc");
-  msg.srpc.set("Method", "Open");
+  msg.srpc.set(Srpc::Key::Method, "Open");
   (void) msg.Call();
 
   return 1;

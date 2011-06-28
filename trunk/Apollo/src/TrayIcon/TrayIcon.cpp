@@ -9,6 +9,7 @@
 #include "apLog.h"
 #include "MsgTcpServer.h"
 #include "MsgXmpp.h"
+#include "MsgUnittest.h"
 
 #if defined(WIN32)
 BOOL APIENTRY DllMain(HANDLE hModule, DWORD dwReason, LPVOID lpReserved)
@@ -57,7 +58,7 @@ static void SendConnectionStatus()
   if (ApIsHandle(g_hConnection)) {
     Msg_TcpServer_SendSrpc msg;
     msg.hConnection = g_hConnection;
-    msg.srpc.set("Method" , "TrayIcon_ConnectionStatus");
+    msg.srpc.set(Srpc::Key::Method , "TrayIcon_ConnectionStatus");
     msg.srpc.set("nConnections" , g_nConnections);
     msg.Request();
   }
@@ -65,14 +66,23 @@ static void SendConnectionStatus()
 
 static void Handle_TcpServer_SrpcRequest(Msg_TcpServer_SrpcRequest* pMsg)
 {
-  String sMethod = pMsg->srpc.getString("Method");
+  String sMethod = pMsg->srpc.getString(Srpc::Key::Method);
   if (sMethod == "TrayIcon_Hello") {
     if (ApIsHandle(g_hConnection) && g_hConnection != pMsg->hConnection) {
       apLog_Warning((LOG_CHANNEL, "Handle_TcpServer_SrpcRequest", "Received %s for conn=" ApHandleFormat " but already have conn=" ApHandleFormat ": replaced", StringType(sMethod), ApHandleType(pMsg->hConnection), ApHandleType(g_hConnection)));
     }
     g_hConnection = pMsg->hConnection;
 
-    pMsg->response.createResponse(pMsg->srpc);
+    if (0) {
+      // Either return a response in pMsg->response ...
+      pMsg->response.createResponse(pMsg->srpc);
+    } else {
+      // ... or leave pMsg->response empty and send your own response
+      Msg_TcpServer_SendSrpc msg;
+      msg.hConnection = g_hConnection;
+      msg.srpc.set(Srpc::Key::Status , 1);
+      msg.Request();
+    }
 
     SendConnectionStatus();
 
@@ -101,14 +111,95 @@ static void Handle_Xmpp_Disconnected(Msg_Xmpp_Disconnected* pMsg)
 
 //----------------------------------------------------------
 
+#if defined(AP_TEST)
+
+int Test_HelloXmppUpDownDisconnect_nCnt_0_Connections = 0;
+int Test_HelloXmppUpDownDisconnect_nCnt_1_Connections = 0;
+
+static void Test_HelloXmppUpDownDisconnect_Handle_TcpServer_SendSrpc(Msg_TcpServer_SendSrpc* pMsg)
+{
+  String sMethod = pMsg->srpc.getString(Srpc::Key::Method);
+
+  if (sMethod == "TrayIcon_ConnectionStatus") {
+    String sConnections = pMsg->srpc.getString("nConnections");
+    if (sConnections == "0") {
+      Test_HelloXmppUpDownDisconnect_nCnt_0_Connections++;
+    }
+    if (sConnections == "1") {
+      Test_HelloXmppUpDownDisconnect_nCnt_1_Connections++;
+    }
+  }
+
+  pMsg->apStatus = ApMessage::Ok;
+}
+
+static String Test_HelloXmppUpDownDisconnect()
+{
+  String s;
+
+  { Msg_TcpServer_SendSrpc msg; msg.Hook(MODULE_NAME, (ApCallback) Test_HelloXmppUpDownDisconnect_Handle_TcpServer_SendSrpc, 0, Apollo::modulePos(ApCallbackPosEarly, MODULE_NAME)); }
+
+  ApHandle hConn = Apollo::newHandle();
+
+  if (!s) {
+    Msg_TcpServer_SrpcRequest msg;
+    msg.hConnection = hConn;
+    msg.srpc.set(Srpc::Key::Method, "TrayIcon_Hello");
+    if (!msg.Request()) {
+      s.appendf("%s(%s) failed", StringType(msg.Type()), StringType(msg.srpc.getString(Srpc::Key::Method)));
+    }
+  }
+
+  if (!s) { if (g_hConnection != hConn) { s.appendf("Expected g_hConnection == hConn"); }}
+  if (!s) { if (Test_HelloXmppUpDownDisconnect_nCnt_0_Connections != 1) { s.appendf("Expected 1x nConnections=0"); }}
+  if (!s) { Msg_Xmpp_Connected msg; msg.hClient = ApHandle(1,1); msg.Send(); }
+  if (!s) { if (Test_HelloXmppUpDownDisconnect_nCnt_1_Connections != 1) { s.appendf("Expected 1x nConnections=1"); }}
+  if (!s) { Msg_Xmpp_Disconnected msg; msg.hClient = ApHandle(1,1); msg.Send(); }
+  if (!s) { if (Test_HelloXmppUpDownDisconnect_nCnt_0_Connections != 2) { s.appendf("Expected 2x nConnections=0"); }}
+  if (!s) { Msg_TcpServer_Disconnected msg; msg.hConnection = hConn; msg.Send(); }
+  if (!s) { if (ApIsHandle(g_hConnection)) { s.appendf("Expected g_hConnection == ApNoHandle"); }}
+
+  { Msg_TcpServer_SendSrpc msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_HelloXmppUpDownDisconnect_Handle_TcpServer_SendSrpc, 0); }
+
+  return s;
+}
+
+static void Handle_UnitTest_Begin(Msg_UnitTest_Begin* pMsg)
+{
+  if (Apollo::getConfig("Test/TrayIcon", 0)) {
+    AP_UNITTEST_REGISTER(Test_HelloXmppUpDownDisconnect);
+  }
+}
+
+static void Handle_UnitTest_Execute(Msg_UnitTest_Execute* pMsg)
+{
+  if (Apollo::getConfig("Test/TrayIcon", 0)) {
+    AP_UNITTEST_EXECUTE(Test_HelloXmppUpDownDisconnect);
+  }
+}
+
+static void Handle_UnitTest_End(Msg_UnitTest_End* pMsg)
+{
+}
+
+#endif // #if defined(AP_TEST)
+
+//----------------------------------------------------------
+
 TRAYICON_API int Load(AP_MODULE_CALL* pModuleData)
 {
   AP_UNUSED_ARG(pModuleData);
 
-  Apollo::hookMsg("TcpServer_SrpcRequest", "TrayIcon", (ApCallback) Handle_TcpServer_SrpcRequest, 0, Apollo::modulePos(ApCallbackPosEarly, MODULE_NAME));
-  Apollo::hookMsg("TcpServer_Disconnected", "TrayIcon", (ApCallback) Handle_TcpServer_Disconnected, 0, Apollo::modulePos(ApCallbackPosEarly, MODULE_NAME));
-  Apollo::hookMsg("Xmpp_Connected", "TrayIcon", (ApCallback) Handle_Xmpp_Connected, 0, Apollo::modulePos(ApCallbackPosEarly, MODULE_NAME));
-  Apollo::hookMsg("Xmpp_Disconnected", "TrayIcon", (ApCallback) Handle_Xmpp_Disconnected, 0, Apollo::modulePos(ApCallbackPosEarly, MODULE_NAME));
+  { Msg_TcpServer_SrpcRequest msg; msg.Hook(MODULE_NAME, (ApCallback) Handle_TcpServer_SrpcRequest, 0, Apollo::modulePos(ApCallbackPosEarly, MODULE_NAME)); }
+  { Msg_TcpServer_Disconnected msg; msg.Hook(MODULE_NAME, (ApCallback) Handle_TcpServer_Disconnected, 0, Apollo::modulePos(ApCallbackPosEarly, MODULE_NAME)); }
+  { Msg_Xmpp_Connected msg; msg.Hook(MODULE_NAME, (ApCallback) Handle_Xmpp_Connected, 0, Apollo::modulePos(ApCallbackPosNormal, MODULE_NAME)); }
+  { Msg_Xmpp_Disconnected msg; msg.Hook(MODULE_NAME, (ApCallback) Handle_Xmpp_Disconnected, 0, Apollo::modulePos(ApCallbackPosNormal, MODULE_NAME)); }
+
+#if defined(AP_TEST)
+  { Msg_UnitTest_Begin msg; msg.Hook(MODULE_NAME, (ApCallback) Handle_UnitTest_Begin, 0, ApCallbackPosNormal); }
+  { Msg_UnitTest_Execute msg; msg.Hook(MODULE_NAME, (ApCallback) Handle_UnitTest_Execute, 0, ApCallbackPosNormal); }
+  { Msg_UnitTest_End msg; msg.Hook(MODULE_NAME, (ApCallback) Handle_UnitTest_End, 0, ApCallbackPosNormal); }
+#endif // #if defined(AP_TEST)
 
   return 1;
 }
@@ -117,10 +208,16 @@ TRAYICON_API int UnLoad(AP_MODULE_CALL* pModuleData)
 {
   AP_UNUSED_ARG(pModuleData);
 
-  Apollo::unhookMsg("TcpServer_SrpcRequest", "TrayIcon", (ApCallback) Handle_TcpServer_SrpcRequest, 0);
-  Apollo::unhookMsg("TcpServer_Disconnected", "TrayIcon", (ApCallback) Handle_TcpServer_Disconnected, 0);
-  Apollo::unhookMsg("Xmpp_Connected", "TrayIcon", (ApCallback) Handle_Xmpp_Connected, 0);
-  Apollo::unhookMsg("Xmpp_Disconnected", "TrayIcon", (ApCallback) Handle_Xmpp_Disconnected, 0);
+  { Msg_TcpServer_SrpcRequest msg; msg.Unhook(MODULE_NAME, (ApCallback) Handle_TcpServer_SrpcRequest, 0); }
+  { Msg_TcpServer_Disconnected msg; msg.Unhook(MODULE_NAME, (ApCallback) Handle_TcpServer_Disconnected, 0); }
+  { Msg_Xmpp_Connected msg; msg.Unhook(MODULE_NAME, (ApCallback) Handle_Xmpp_Connected, 0); }
+  { Msg_Xmpp_Disconnected msg; msg.Unhook(MODULE_NAME, (ApCallback) Handle_Xmpp_Disconnected, 0); }
+
+#if defined(AP_TEST)
+  { Msg_UnitTest_Begin msg; msg.Unhook(MODULE_NAME, (ApCallback) Handle_UnitTest_Begin, 0); }
+  { Msg_UnitTest_Execute msg; msg.Unhook(MODULE_NAME, (ApCallback) Handle_UnitTest_Execute, 0); }
+  { Msg_UnitTest_End msg; msg.Unhook(MODULE_NAME, (ApCallback) Handle_UnitTest_End, 0); }
+#endif // #if defined(AP_TEST)
 
   return 1;
 }

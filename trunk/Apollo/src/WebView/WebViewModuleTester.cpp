@@ -178,7 +178,7 @@ void WebViewModuleTester_CallCustomEcho_On_WebView_ModuleCall(Msg_WebView_Module
   if (pMsg->hView != g_CallCustomEcho_hView) { return; }
 
   String sType = pMsg->Type();
-  String sMethod = pMsg->srpc.getString("Method");
+  String sMethod = pMsg->srpc.getString(Srpc::Key::Method);
   String sIn = pMsg->srpc.getString("sIn");
   String sOut = sIn;
   if (sType != "WebView_ModuleCall") { sOut.appendf(" (Error: Expected Type=%s got=%s)", StringType("WebView_ModuleCall"), StringType(sType)); }

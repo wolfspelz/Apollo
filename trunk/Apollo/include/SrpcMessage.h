@@ -11,6 +11,19 @@
 #include "ApTypes.h"
 #include "ApExports.h"
 
+class APOLLO_API Srpc
+{
+public:
+  class APOLLO_API Key
+  {
+  public:
+    static String Method;
+    static String Status;
+    static String Message;
+    static String SrpcId;
+  };
+};
+
 AP_NAMESPACE_BEGIN
 
 class APOLLO_API SrpcMessage: public List

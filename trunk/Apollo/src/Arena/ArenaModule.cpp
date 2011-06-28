@@ -488,7 +488,7 @@ ApHandle Test_Avatar_RemoveOldPublicChats_hRemovedChat_;
 
 void Test_Avatar_RemoveOldPublicChats_ViewSrpcMessage(ViewSrpcMessage* pMsg)
 {
-  if (pMsg->srpc.getString("Method") == "RemoveAvatarChat") {
+  if (pMsg->srpc.getString(Srpc::Key::Method) == "RemoveAvatarChat") {
     Test_Avatar_RemoveOldPublicChats_hRemovedChat_ = pMsg->srpc.getHandle("hChat");
   }
 }
