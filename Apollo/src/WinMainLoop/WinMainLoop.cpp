@@ -416,12 +416,12 @@ void MainLoopModule::On_MainLoop_Win32Loop(Msg_MainLoop_Win32Loop* pMsg)
     wcex.cbClsExtra = 0;
     wcex.cbWndExtra = sizeof(void*); // for MainLoopModule* this
     wcex.hInstance = g_hDllInstance;
-    wcex.hIcon = LoadIcon(g_hDllInstance, (LPCTSTR) IDI_MAIN);
-    wcex.hCursor = LoadCursor(NULL, IDC_ARROW);
+    wcex.hIcon = ::LoadIcon(g_hDllInstance, (LPCTSTR) IDI_MAIN);
+    wcex.hCursor = ::LoadCursor(NULL, IDC_ARROW);
     wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW+1);
     wcex.lpszMenuName = (LPTSTR)IDC_WIN32APP;
     wcex.lpszClassName = sClass;
-    wcex.hIconSm = LoadIcon(g_hDllInstance, (LPCTSTR) IDI_MAIN);
+    wcex.hIconSm = ::LoadIcon(g_hDllInstance, (LPCTSTR) IDI_MAIN);
     ATOM a = ::RegisterClassEx(&wcex);
     if (a == 0) {
       ok = 0;
