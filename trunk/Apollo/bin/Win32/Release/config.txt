@@ -21,6 +21,7 @@
 #Test/WebView=1
 #Test/Arena=1
 #Test/Dialog=1
+#Test/TrayIcon=1
 
 # ---------------------------------------------
 
