@@ -171,10 +171,14 @@ void Avatar::GetDetailString(const String& sKey, Apollo::ValueList& vlMimeTypes)
       Elem* e = lCoords.FindByNameCase("x");
       if (e) {
         int nX = String::atoi(e->getString());
-
         int bPositionValid = 1;
+
         if (nX > 10000) {
           bPositionValid = 0;
+        }
+
+        if (nX < 0) {
+          nX = 0;
         }
 
         if (bPositionValid) {

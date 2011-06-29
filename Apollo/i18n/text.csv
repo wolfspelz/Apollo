@@ -1,8 +1,16 @@
 "#ä";;;;;;;;;;;;;;;;;;;;
 ;"Part";"Changed";"Key";"Reference";"Comment";"Limit";"en";"enDev";"de";"deFormal";"es";"pt";"it";"fr";"ja";"pl";"en-us";"es-us";"zh";"tr"
 "#";;;;;;;;;;;;;;;;;;;;
-;"Arena";;"Hello World";;"For testing only";;"Hello World";;"Hallo Welt";"Hallo Welt";;;;;;;;;;
-;"Arena";;"Send";;"Chat input at avatar";10;"Send";;"Senden";"Senden";;;;;;;;;;
-;"Chat";;"Chat";;"Chat dialog caption, also used as prefix as in: ""Chat http://www.google.com/""";15;"Chat";;"Chat";"Chat";;;;;;;;;;
-;"Chat";;"Send";;"Send button";15;"Send";;"Senden";"Senden";;;;;;;;;;
-;"Chat";;"Clear";;"Clear button inside chat out area";15;"Clear";;"Löschen";"Löschen";;;;;;;;;;
+;"Arena";;"Hello World";;"For testing only";;"Hello World";;"Hallo Welt";;;;;;;;;;;
+;"Arena";;"Send";;"Chat input at avatar";10;"Send";;"Senden";;;;;;"送信";;;;;
+;"Chat";;"Chat";;"Chat dialog caption, also used as prefix as in: ""Chat http://www.google.com/""";15;"Chat";;"Chat";;;;;;"チャット";;;;;
+;"Chat";;"Send";;"Send button";15;"Send";;"Senden";;;;;;"送信";;;;;
+;"Chat";;"Clear";;"Clear button inside chat out area";15;"Clear";;"Löschen";;;;;;"削除";;;;;
+;"TrayIcon";;"Start Avatar";;"Tray Icon context menu";30;"Start Avatar";;"Avatar starten";;;;;;"スタート Avatar";;;;;
+;"TrayIcon";;"Stop Avatar";;"Tray Icon context menu";30;"Stop Avatar";;"Avatar beenden";;;;;;"Avatar を終了します";;;;;
+;"TrayIcon";;"Start with Windows";;"Tray Icon context menu";30;"Start with Windows";;"Mit Windows starten";;;;;;"Windowsで起動する";;;;;
+;"TrayIcon";;"Show";;"Tray Icon context menu";30;"Show";;"Anzeigen";;;;;;"開く";;;;;
+;"TrayIcon";;"Exit Tray Icon";;"Tray Icon context menu";30;"Exit Tray Icon";;"Symbol in der Taskleiste schließen";;;;;;"タスクバーにあるアイコンを閉じる";;;;;
+;"TrayIcon";;"Avatar";;"Tray Icon tooltip";50;"Avatar";;"Avatar";;;;;;"Avatar";;;;;
+;"TrayIcon";;"Avatar connected";;"Tray Icon tooltip";50;"Avatar connected";;"Avatar verbunden";;;;;;"Avatar 接続され";;;;;
+;"TrayIcon";;"Avatar not connected";;"Tray Icon tooltip";50;"Avatar not connected";;"Avatar nicht verbunden";;;;;;"Avatar 接続していない";;;;;
