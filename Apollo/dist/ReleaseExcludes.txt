@@ -8,6 +8,9 @@ apollo.log.old
 Apollo.pdb
 Arena.pdb
 Avatar.pdb
+AvatarTray.pdb
+AvatarTray.vshost.exe
+AvatarTray.vshost.exe.manifest
 babelfish.pdb
 boot.local.txt
 browserinfo.pdb
@@ -39,7 +42,6 @@ test.pdb
 test.sqlite3
 thumbs.db
 TrayIcon.pdb
-TrayIcon.vshost.exe
 UnitTest.pdb
 vld.pdb
 vp.pdb
