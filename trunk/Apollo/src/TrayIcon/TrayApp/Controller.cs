@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,7 +8,7 @@ using Microsoft.Win32;
 using Microsoft.VisualBasic.ApplicationServices;
 using System.Diagnostics;
 
-namespace TrayIcon
+namespace TrayApp
 {
   public class Controller : WindowsFormsApplicationBase
   {
@@ -206,7 +206,7 @@ namespace TrayIcon
 
     protected override void OnCreateMainForm()
     {
-      Babelfish.Instance.FilePrefix = "TrayIcon_";
+      Babelfish.Instance.FilePrefix = Global.ProgramName + "_";
       Babelfish.Instance.Language = _sLang;
 
       string sBaseFolder = AppDomain.CurrentDomain.BaseDirectory;
@@ -341,7 +341,7 @@ namespace TrayIcon
       _form.SetConnected(_bConnected);
 
       var srpc = new Srpc.Message();
-      srpc.Set(Srpc.Key.Method, "TrayIcon_Hello");
+      srpc.Set(Srpc.Key.Method, Protocol.Hello.Method);
       Send(srpc);
     }
 
@@ -349,8 +349,8 @@ namespace TrayIcon
     {
       string sMethod = request.GetString(Srpc.Key.Method);
       switch (sMethod) {
-        case "TrayIcon_ConnectionStatus": {
-          int nConnections = request.GetInt("nConnections");
+        case Protocol.ConnectionStatus.Method: {
+            int nConnections = request.GetInt(Protocol.ConnectionStatus.Key.Connections);
           if (nConnections > 0) {
             Invoke(() => _form.ShowConnectedAppStatus());
           } else {
@@ -405,7 +405,7 @@ namespace TrayIcon
     internal void SetAutostart(bool bOn)
     {
       if (bOn) {
-        string sCurrentCommandline = GetRegistryValue(Registry.CurrentUser, @"Software\Microsoft\Windows\CurrentVersion\Run", "AvatarTray", "");
+        string sCurrentCommandline = GetRegistryValue(Registry.CurrentUser, @"Software\Microsoft\Windows\CurrentVersion\Run", Global.ProductName, "");
 
         string sFilename = Process.GetCurrentProcess().MainModule.FileName;
         sFilename = sFilename.Replace(".vshost.exe", ".exe");
@@ -418,16 +418,16 @@ namespace TrayIcon
         if (_nPort != DEFAULT_PORT) { sCommandline += " -port " + _nPort; }
 
         if (sCommandline != sCurrentCommandline) {
-          SetRegistryValue(Registry.CurrentUser, @"Software\Microsoft\Windows\CurrentVersion\Run", "AvatarTray", sCommandline);
+          SetRegistryValue(Registry.CurrentUser, @"Software\Microsoft\Windows\CurrentVersion\Run", Global.ProductName, sCommandline);
         }
       } else {
-        DeleteRegistryValue(Registry.CurrentUser, @"Software\Microsoft\Windows\CurrentVersion\Run", "AvatarTray");
+        DeleteRegistryValue(Registry.CurrentUser, @"Software\Microsoft\Windows\CurrentVersion\Run", Global.ProductName);
       }
     }
 
     internal bool HasAutostart()
     {
-      string sCommandline = GetRegistryValue(Registry.CurrentUser, @"Software\Microsoft\Windows\CurrentVersion\Run", "AvatarTray", "");
+      string sCommandline = GetRegistryValue(Registry.CurrentUser, @"Software\Microsoft\Windows\CurrentVersion\Run", Global.ProductName, "");
       return !String.IsNullOrEmpty(sCommandline);
     }
 

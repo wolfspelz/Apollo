@@ -1,10 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Globalization;
 
-namespace TrayIcon
+namespace TrayApp
 {
   public class Srpc
   {
@@ -276,6 +276,7 @@ namespace TrayIcon
       public const string Method = "Method";
       public const string Status = "Status";
       public const string Message = "Message";
+      public const string SrpcId = "SrpcId";
       public const string Format = "Format";
     }
 
