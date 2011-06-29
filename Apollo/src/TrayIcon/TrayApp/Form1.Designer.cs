@@ -1,4 +1,4 @@
-﻿namespace TrayIcon
+namespace TrayApp
 {
   partial class Form1
   {

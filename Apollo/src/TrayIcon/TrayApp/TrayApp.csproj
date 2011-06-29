@@ -8,8 +8,8 @@
     <ProjectGuid>{6073AB92-8826-48AC-AD4C-35346CED1D21}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>TrayIcon</RootNamespace>
-    <AssemblyName>TrayIcon</AssemblyName>
+    <RootNamespace>TrayApp</RootNamespace>
+    <AssemblyName>AvatarTray</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ApplicationIcon>Resources\Icon.ico</ApplicationIcon>
@@ -59,6 +59,7 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
+    <Compile Include="Global.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Form1.resx">
@@ -83,6 +84,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Compile Include="Protocol.cs" />
     <Compile Include="Srpc.cs" />
     <Compile Include="Win32.cs" />
   </ItemGroup>

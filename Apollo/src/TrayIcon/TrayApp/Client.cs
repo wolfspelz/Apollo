@@ -1,11 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Net;
 using System.Net.Sockets;
 
-namespace TrayIcon
+namespace TrayApp
 {
   class Client
   {
@@ -187,7 +187,7 @@ namespace TrayIcon
 
     private void HandleResponse(Srpc.Message response)
     {
-      string sSrpcId = response.GetString("SrpcId");
+      string sSrpcId = response.GetString(Srpc.Key.SrpcId);
       if (!String.IsNullOrEmpty(sSrpcId)) {
         if (_completions.ContainsKey(sSrpcId)) {
           var fCompletion = _completions[sSrpcId];
