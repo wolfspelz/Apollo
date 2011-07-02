@@ -34,6 +34,7 @@ namespace TrayApp
       this.buttonConnect = new System.Windows.Forms.Button();
       this.buttonClear = new System.Windows.Forms.Button();
       this.timerDblClick = new System.Windows.Forms.Timer(this.components);
+      this.buttonStatus = new System.Windows.Forms.Button();
       this.SuspendLayout();
       // 
       // notifyIcon1
@@ -53,7 +54,7 @@ namespace TrayApp
       this.textBoxLog.Multiline = true;
       this.textBoxLog.Name = "textBoxLog";
       this.textBoxLog.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-      this.textBoxLog.Size = new System.Drawing.Size(401, 237);
+      this.textBoxLog.Size = new System.Drawing.Size(544, 237);
       this.textBoxLog.TabIndex = 0;
       // 
       // buttonConnect
@@ -69,7 +70,7 @@ namespace TrayApp
       // buttonClear
       // 
       this.buttonClear.Anchor = ((System.Windows.Forms.AnchorStyles) ((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-      this.buttonClear.Location = new System.Drawing.Point(339, 13);
+      this.buttonClear.Location = new System.Drawing.Point(482, 13);
       this.buttonClear.Name = "buttonClear";
       this.buttonClear.Size = new System.Drawing.Size(75, 23);
       this.buttonClear.TabIndex = 2;
@@ -81,11 +82,22 @@ namespace TrayApp
       // 
       this.timerDblClick.Tick += new System.EventHandler(this.timerDblClick_Tick);
       // 
+      // buttonStatus
+      // 
+      this.buttonStatus.Location = new System.Drawing.Point(118, 13);
+      this.buttonStatus.Name = "buttonStatus";
+      this.buttonStatus.Size = new System.Drawing.Size(75, 23);
+      this.buttonStatus.TabIndex = 3;
+      this.buttonStatus.Text = "Status";
+      this.buttonStatus.UseVisualStyleBackColor = true;
+      this.buttonStatus.Click += new System.EventHandler(this.buttonStatus_Click);
+      // 
       // Form1
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-      this.ClientSize = new System.Drawing.Size(426, 291);
+      this.ClientSize = new System.Drawing.Size(569, 291);
+      this.Controls.Add(this.buttonStatus);
       this.Controls.Add(this.buttonClear);
       this.Controls.Add(this.buttonConnect);
       this.Controls.Add(this.textBoxLog);
@@ -108,6 +120,7 @@ namespace TrayApp
     private System.Windows.Forms.Button buttonConnect;
     private System.Windows.Forms.Button buttonClear;
     private System.Windows.Forms.Timer timerDblClick;
+    private System.Windows.Forms.Button buttonStatus;
   }
 }
 

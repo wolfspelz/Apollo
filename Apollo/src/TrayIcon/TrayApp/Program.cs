@@ -30,7 +30,8 @@ namespace TrayApp
       try {
         _app = new Controller();
         _app.Run(args);
-      } catch {
+      } catch (Exception ex) {
+        var ex1 = ex;
         // Something about a system resource required for the single instance app 
         // is not available, whatever, we ignore it and let us restart later again.
       }

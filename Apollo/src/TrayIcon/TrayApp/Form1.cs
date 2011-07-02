@@ -49,21 +49,34 @@ namespace TrayApp
       _itemStop = _contextMenu.MenuItems.Add(Babelfish.Translate("Stop Avatar"), new System.EventHandler(_menuStop_Click));
       _contextMenu.MenuItems.Add("-");
       _itemAutostart = _contextMenu.MenuItems.Add(Babelfish.Translate("Start with Windows"), new System.EventHandler(_menuShow_Autostart));
-      _itemShow = _contextMenu.MenuItems.Add(Babelfish.Translate("Show"), new System.EventHandler(_menuShow_Click));
+      if (Controller.ShowShow) {
+        _itemShow = _contextMenu.MenuItems.Add(Babelfish.Translate("Show"), new System.EventHandler(_menuShow_Click));
+      }
       _contextMenu.MenuItems.Add(Babelfish.Translate("Exit Tray Icon"), new System.EventHandler(_menuExit_Click));
 
       notifyIcon1.ContextMenu = _contextMenu;
     }
 
-    internal void Log(string s)
+    internal void Log(string sLog)
     {
       try {
+        string sLine = sLog;
+        if (!String.IsNullOrEmpty(sLog)) {
+          var date = DateTime.Now;
+          string sTime = date.ToLongTimeString() + "." + date.Millisecond;
+          sLine = sTime + " " + sLine;
+        }
+        sLine = sLine.Replace("\r\n", "\n").Replace("\n", Environment.NewLine).Replace("\n", "\\n");
+
         if (textBoxLog.TextLength > 20000) {
           textBoxLog.Text = textBoxLog.Text.Substring(textBoxLog.TextLength - 10000);
         }
-        textBoxLog.AppendText(s.Replace("\r\n", "\n").Replace("\n", Environment.NewLine).Replace("\n", "\\n") + Environment.NewLine);
+
+        textBoxLog.AppendText(sLine + Environment.NewLine);
+
         textBoxLog.SelectionStart = textBoxLog.TextLength;
         textBoxLog.ScrollToCaret();
+      
       } catch { }
     }
 
@@ -87,7 +100,9 @@ namespace TrayApp
 
       if (_bVisible) {
 
-        _itemShow.Enabled = false;
+        if (_itemShow != null) {
+          _itemShow.Enabled = false;
+        }
 
         ShowInTaskbar = true;
         Opacity = 1.0;
@@ -95,7 +110,9 @@ namespace TrayApp
 
       } else {
 
-        _itemShow.Enabled = true;
+        if (_itemShow != null) {
+          _itemShow.Enabled = true;
+        }
 
         ShowInTaskbar = false;
         Opacity = 0.0;
@@ -267,6 +284,11 @@ namespace TrayApp
 
       // finally, send the spoofed right-click to invoke the menu
       Win32.SendInput(2, rightClick, Marshal.SizeOf(rightClick[0]));
+    }
+
+    private void buttonStatus_Click(object sender, EventArgs e)
+    {
+      Controller.ShowStatus();
     }
 
   }

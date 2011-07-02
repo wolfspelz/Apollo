@@ -17,6 +17,7 @@ namespace TrayApp
     const bool DEFAULT_VISIBLE = false;
     const bool DEFAULT_AUTOCONNECT = true;
     const bool DEFAULT_STARTAPP = true;
+    const bool DEFAULT_SHOWSHOW = true;
     const string DEFAULT_APP = "Avatar.exe";
     const string DEFAULT_APPARGS = "";
     const int DEFAULT_PORT = 23763;
@@ -26,6 +27,7 @@ namespace TrayApp
     bool _bVisible = DEFAULT_VISIBLE;
     bool _bAutoConnect = DEFAULT_AUTOCONNECT;
     bool _bStartApp = DEFAULT_STARTAPP;
+    bool _bShowShow = DEFAULT_SHOWSHOW;
     string _sAppPath = DEFAULT_APP;
     string _sAppArgs = DEFAULT_APPARGS;
     string _sLang = "";
@@ -47,6 +49,8 @@ namespace TrayApp
     {
       IsSingleInstance = true;
     }
+
+    internal bool ShowShow { get { return _bShowShow; } }
 
     #region Utils // --------------------------------------
 
@@ -156,6 +160,13 @@ namespace TrayApp
             }
             break;
 
+          case "-showshow": {
+              if (args.Count > i) {
+                _bShowShow  = TrueString(args[++i]);
+              }
+            }
+            break;
+
           case "-app":
             if (args.Count > i) {
               _sAppPath = args[++i];
@@ -222,14 +233,13 @@ namespace TrayApp
 
       MainForm = _form;
 
-      _form.SetVisible(_bVisible);
-      _form.SetConnected(_bConnected);
-
       _nReconnectInterval = _nMinReconnectInterval;
     }
 
     internal void Start()
     {
+      _form.SetVisible(_bVisible);
+      _form.SetConnected(_bConnected);
       _form.SetConnecting(_bAutoConnect);
 
       {
@@ -254,6 +264,7 @@ namespace TrayApp
 -lang <language code> # de-DE, en-US, ja-JP, etc., default:en" + DEFAULT_PORT + @"\n
 -minreconnect <min reconnect timer> # in msec, default:" + DEFAULT_MINRECONNECT + @"\n
 -maxreconnect <max reconnect timer> # in msec, default:" + DEFAULT_MAXRECONNECT + @"\n
+-showshow # Show the show dialog menu item, default:no\n
 ";
         _form.SetText(sHelp.Replace("\n", Environment.NewLine));
       }
@@ -448,6 +459,22 @@ namespace TrayApp
       } else {
         _nReconnectInterval = _nMinReconnectInterval;
       }
+    }
+
+    internal void ShowStatus()
+    {
+      Log("");
+      Log("AppPath=" + _sAppPath);
+      Log("AppArgs=" + _sAppArgs);
+      Log("Port=" + _nPort);
+      Log("Lang=" + _sLang);
+      Log("Autostart=" + GetRegistryValue(Registry.CurrentUser, @"Software\Microsoft\Windows\CurrentVersion\Run", Global.ProductName, ""));
+      Log("Connected=" + _bConnected);
+      Log("FirstDisconnect=" + _bFirstDisconnect);
+      Log("WasConnected=" + _bWasConnected);
+      Log("MinReconnectInterval=" + _nMinReconnectInterval);
+      Log("MaxReconnectInterval=" + _nMaxReconnectInterval);
+      Log("");
     }
 
     #endregion
