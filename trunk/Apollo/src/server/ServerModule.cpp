@@ -300,8 +300,8 @@ int ServerModule::init()
 
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ServerModule, Server_StartTCP, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ServerModule, Server_StopTCP, this, ApCallbackPosNormal);
-  AP_MSG_REGISTRY_ADD(MODULE_NAME, ServerModule, TcpServer_SrpcRequest, this, ApCallbackPosLate);
-  AP_MSG_REGISTRY_ADD(MODULE_NAME, ServerModule, TcpServer_SendSrpc, this, ApCallbackPosLate);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, ServerModule, TcpServer_SrpcRequest, this, ApCallbackPosLate); // as default handler and SRPC gateway
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, ServerModule, TcpServer_SendSrpc, this, ApCallbackPosNormal);
 
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ServerModule, System_RunLevel, this, ApCallbackPosNormal);
 

@@ -34,7 +34,7 @@ namespace TrayApp
 
     Babelfish()
     {
-      FilePrefix = "Babelfish_";
+      FilePrefix = "TrayApp_";
       FileSuffix = ".txt";
       Language = "";
     }

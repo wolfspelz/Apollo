@@ -360,8 +360,8 @@ namespace TrayApp
     {
       string sMethod = request.GetString(Srpc.Key.Method);
       switch (sMethod) {
-        case Protocol.ConnectionStatus.Method: {
-            int nConnections = request.GetInt(Protocol.ConnectionStatus.Key.Connections);
+        case Protocol.Status.Method: {
+            int nConnections = request.GetInt(Protocol.Status.Key.Connections);
           if (nConnections > 0) {
             Invoke(() => _form.ShowConnectedAppStatus());
           } else {
