@@ -12,12 +12,13 @@ namespace TrayApp
       internal const string Method = "TrayIcon_Hello";
     }
 
-    internal class ConnectionStatus
+    internal class Status
     {
-      internal const string Method = "TrayIcon_ConnectionStatus";
+      internal const string Method = "TrayIcon_Status";
       internal class Key
       {
         internal const string Connections = "nConnections";
+        internal const string Logins = "nLogins";
       }
     }
 

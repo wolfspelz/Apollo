@@ -63,7 +63,7 @@ namespace TrayApp
         string sLine = sLog;
         if (!String.IsNullOrEmpty(sLog)) {
           var date = DateTime.Now;
-          string sTime = date.ToLongTimeString() + "." + date.Millisecond;
+          string sTime = date.Hour.ToString("D2") + ":" + date.Minute.ToString("D2") + ":" + date.Second.ToString("D2") + "." + date.Millisecond.ToString("D3");
           sLine = sTime + " " + sLine;
         }
         sLine = sLine.Replace("\r\n", "\n").Replace("\n", Environment.NewLine).Replace("\n", "\\n");

@@ -54,7 +54,7 @@ namespace TrayApp
       this.textBoxLog.Multiline = true;
       this.textBoxLog.Name = "textBoxLog";
       this.textBoxLog.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-      this.textBoxLog.Size = new System.Drawing.Size(544, 237);
+      this.textBoxLog.Size = new System.Drawing.Size(544, 383);
       this.textBoxLog.TabIndex = 0;
       // 
       // buttonConnect
@@ -96,7 +96,7 @@ namespace TrayApp
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-      this.ClientSize = new System.Drawing.Size(569, 291);
+      this.ClientSize = new System.Drawing.Size(569, 437);
       this.Controls.Add(this.buttonStatus);
       this.Controls.Add(this.buttonClear);
       this.Controls.Add(this.buttonConnect);
