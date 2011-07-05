@@ -23,6 +23,9 @@ public:
   static String CallJSEcho();
   static String CallSystemEcho();
   static String CallCustomEcho();
+  static String FrameIO();
+  static String StartManuallySerialized();
+  static String StartAutomaticallySerialized();
   static String Dev();
 };
 #endif

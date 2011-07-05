@@ -116,7 +116,7 @@ AP_MSG_HANDLER_METHOD(WebViewModule, WebView_Reload)
 AP_MSG_HANDLER_METHOD(WebViewModule, WebView_CallScriptFunction)
 {
   View* pView = FindView(pMsg->hView);
-  pMsg->sResult = pView->CallJsFunction(pMsg->sFunction, pMsg->lArgs);
+  pMsg->sResult = pView->CallJsFunction(pMsg->sFrame, pMsg->sFunction, pMsg->lArgs);
   pMsg->apStatus = ApMessage::Ok;
 }
 
@@ -192,6 +192,12 @@ AP_MSG_HANDLER_METHOD(WebViewModule, WebView_GetWin32Window)
   pMsg->apStatus = ApMessage::Ok;
 }
 #endif // defined(WIN32)
+
+AP_MSG_HANDLER_METHOD(WebViewModule, WebView_Event_DocumentLoaded)
+{
+  View::LoadDone();
+}
+
 
 //----------------------------------------------------------
 
@@ -379,6 +385,7 @@ int WebViewModule::Init()
   #if defined(WIN32)
   AP_MSG_REGISTRY_ADD(MODULE_NAME, WebViewModule, WebView_GetWin32Window, this, ApCallbackPosNormal);
   #endif // defined(WIN32)
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, WebViewModule, WebView_Event_DocumentLoaded, this, ApCallbackPosNormal);
 
   AP_UNITTEST_HOOK(WebViewModule, this);
 

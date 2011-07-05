@@ -251,6 +251,7 @@ class Msg_WebView_CallScriptFunction: public ApRequestMessage
 public:
   Msg_WebView_CallScriptFunction() : ApRequestMessage("WebView_CallScriptFunction") {}
   ApIN ApHandle hView;
+  ApIN String sFrame;
   ApIN String sFunction;
   ApIN List lArgs;
   ApOUT String sResult;
