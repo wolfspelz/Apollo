@@ -12,6 +12,68 @@
 #include "SrpcMessage.h"
 #include "SAutoPtr.h"
 
+void SerializedLoadTask::Execute()
+{
+  if (pView_) {
+    apLog_Debug((LOG_CHANNEL, "SerializedLoadTask::Execute", "%s", StringType(sUrl_)));
+    pView_->SerializedLoad(sUrl_);
+  }
+}
+
+void SerializedLoadHtmlTask::Execute()
+{
+  if (pView_) {
+    apLog_Debug((LOG_CHANNEL, "SerializedLoadHtmlTask::Execute", "%s", StringType(sBase_)));
+    pView_->SerializedLoadHtml(sHtml_, sBase_);
+  }
+}
+
+//---------------------------
+
+void SerializedLoadTaskList::LoadHtml(View* pView, const String& sHtml, const String& sBase)
+{
+  apLog_Debug((LOG_CHANNEL, "SerializedLoadTaskList::LoadHtml", "%s", StringType(sBase)));
+  SerializedTask* pTask = new SerializedLoadHtmlTask(pView, sHtml, sBase);
+  if (pTask) {
+    AddLast(pTask);
+  }
+  TryLoad();
+}
+
+void SerializedLoadTaskList::Load(View* pView, const String& sUrl)
+{
+  apLog_Debug((LOG_CHANNEL, "SerializedLoadTaskList::Load", "%s", StringType(sUrl)));
+  SerializedTask* pTask = new SerializedLoadTask(pView, sUrl);
+  if (pTask) {
+    AddLast(pTask);
+  }
+  TryLoad();
+}
+
+void SerializedLoadTaskList::TryLoad()
+{
+  if (length() > 0 && !bLocked_) {
+    SerializedTask* pTask = First();
+    if (pTask) {
+      Remove(pTask);
+      bLocked_ = 1;
+      pTask->Execute();
+      delete pTask;
+      pTask = 0;
+    }
+  }
+}
+
+void SerializedLoadTaskList::LoadDone()
+{
+  bLocked_ = 0;
+  TryLoad();
+}
+
+//------------------------------------------------------
+
+SerializedLoadTaskList View::serializedLoads_;
+
 View::View(const ApHandle& hView)
 :hAp_(hView)
 ,bVisible_(0)
@@ -112,7 +174,22 @@ void View::Destroy()
 
 void View::LoadHtml(const String& sHtml, const String& sBase)
 {
-  if (!pWebFrame_) { throw ApException("View::LoadHtml pWebFrame_== 0"); }
+  serializedLoads_.LoadHtml(this, sHtml, sBase);
+}
+
+void View::Load(const String& sUrl)
+{
+  serializedLoads_.Load(this, sUrl);
+}
+
+void View::LoadDone()
+{
+  serializedLoads_.LoadDone();
+}
+
+void View::SerializedLoadHtml(const String& sHtml, const String& sBase)
+{
+  if (!pWebFrame_) { throw ApException("View::SerializedLoadHtml pWebFrame_== 0"); }
 
   if (1){
     if (FAILED( pWebFrame_->loadHTMLString(::SysAllocString(sHtml), ::SysAllocString(sBase)) )) { throw ApException("View::Load pWebFrame_->loadRequest() failed"); }
@@ -121,21 +198,21 @@ void View::LoadHtml(const String& sHtml, const String& sBase)
     pWebFrame_->loadHTMLString(bstrHTML, 0);
   }
 
-  MakeScriptObject();
+  //MakeScriptObject(pWebFrame_);
 }
 
 #include <shlwapi.h>
 #include <wininet.h>
 
-void View::Load(const String& sUrl)
+void View::SerializedLoad(const String& sUrl)
 {
   sUrl_ = sUrl;
 
   AutoComPtr<IWebMutableURLRequest> request;
-  if (FAILED( WebKitCreateInstance(CLSID_WebMutableURLRequest, 0, IID_IWebMutableURLRequest, request) )) { throw ApException("View::Load WebKitCreateInstance(CLSID_WebMutableURLRequest) failed"); }
+  if (FAILED( WebKitCreateInstance(CLSID_WebMutableURLRequest, 0, IID_IWebMutableURLRequest, request) )) { throw ApException("View::SerializedLoad WebKitCreateInstance(CLSID_WebMutableURLRequest) failed"); }
 
   if (1) {
-    if (FAILED( request->initWithURL(::SysAllocString(sUrl), WebURLRequestUseProtocolCachePolicy, 60) )) { throw ApException("View::Load request->initWithURL() failed"); }
+    if (FAILED( request->initWithURL(::SysAllocString(sUrl), WebURLRequestUseProtocolCachePolicy, 60) )) { throw ApException("View::SerializedLoad request->initWithURL() failed"); }
   } else {
     BSTR bstrUrl = 0;
     //BSTR bstrUrl = SysAllocString(_T("http://www.wolfspelz.de"));
@@ -160,21 +237,21 @@ void View::Load(const String& sUrl)
       }
     }
 
-    if (FAILED( request->initWithURL(bstrUrl, WebURLRequestUseProtocolCachePolicy, 60) )) { throw ApException("View::Load request->initWithURL() failed"); }
+    if (FAILED( request->initWithURL(bstrUrl, WebURLRequestUseProtocolCachePolicy, 60) )) { throw ApException("View::SerializedLoad request->initWithURL() failed"); }
   }
 
-  //if (FAILED( pWebFrame_->setAllowsScrolling(FALSE) )) { throw ApException("View::Load pWebFrame_->setAllowsScrolling() failed"); }
+  //if (FAILED( pWebFrame_->setAllowsScrolling(FALSE) )) { throw ApException("View::SerializedLoad pWebFrame_->setAllowsScrolling() failed"); }
 
-  if (FAILED( pWebFrame_->loadRequest(request) )) { throw ApException("View::Load pWebFrame_->loadRequest() failed"); }
+  if (FAILED( pWebFrame_->loadRequest(request) )) { throw ApException("View::SerializedLoad pWebFrame_->loadRequest() failed"); }
 
-  MakeScriptObject();
+  //MakeScriptObject(pWebFrame_);
 }
 
 void View::Reload()
 {
   if (FAILED( pWebFrame_->reloadFromOrigin() )) { throw ApException("View::Reload pWebFrame_->reload() failed"); }
 
-  MakeScriptObject();
+  //MakeScriptObject(pWebFrame_);
 }
 
 //------------------------------------
@@ -320,14 +397,63 @@ void View::GetWin32Window(HWND& hWnd)
 //------------------------------------
 // Call JS
 
-String View::CallJsFunction(const String& sFunction, List& lArgs)
+String View::CallJsFunction(const String& sFramePath, const String& sFunction, List& lArgs)
+{
+  String sResult;
+  String sError;
+
+  String sPath = sFramePath;
+  sPath.trim("/");
+
+  if (sPath.empty()) {
+    sResult = CallJsFunction(pWebFrame_, sFunction, lArgs);
+  } else {
+
+    AutoComPtr<IWebFrame> frame = pWebFrame_;
+    String sFrameId;
+
+    while (sPath.nextToken("/", sFrameId) && sError.empty()) {
+      AutoComPtr<IDOMDocument> doc;
+      frame->DOMDocument(doc);
+      if (doc.get() == 0) {
+        sError = "No document";
+      } else {
+        BSTR bstrId = ::SysAllocString(sFrameId);
+        AutoComPtr<IDOMElement> elem;
+        doc->getElementById(bstrId, elem);
+        if (elem.get() == 0) {
+          sError.appendf("getElementById(%s) failed", StringType(sFrameId));
+        } else {
+          AutoComPtr<IDOMHTMLIFrameElement> frameElem;
+          elem->QueryInterface(IID_IDOMHTMLIFrameElement, frameElem);
+          if (frameElem.get() == 0) {
+            sError.appendf("element '%s' is not an IFRAME", StringType(sFrameId));
+          } else {
+            frameElem->contentFrame(frame);
+          }
+        }
+        ::SysFreeString(bstrId);
+      }
+    }
+
+    if (!sError) {
+      sResult = CallJsFunction(frame, sFunction, lArgs);
+    } else {
+      throw ApException("View::CallJsFunction(%s, %s): %s", StringType(sFramePath), StringType(sFunction), StringType(sError));
+    }
+  }
+
+  return sResult;
+}
+
+String View::CallJsFunction(IWebFrame* pFrame, const String& sFunction, List& lArgs)
 {
   String sResult;
 
   AutoJSStringRef methodName = JSStringCreateWithUTF8CString(sFunction);
 
-  JSGlobalContextRef runCtx = pWebFrame_->globalContext();
-  if (runCtx == 0) { throw ApException("View::CallJsFunction pWebFrame_->globalContext() returned 0"); }
+  JSGlobalContextRef runCtx = pFrame->globalContext();
+  if (runCtx == 0) { throw ApException("View::CallJsFunction pFrame->globalContext() returned 0"); }
 
   JSObjectRef global = JSContextGetGlobalObject(runCtx);
   if (global == 0) { throw ApException("View::CallJsFunction JSContextGetGlobalObject(runCtx) returned 0"); }
@@ -335,11 +461,13 @@ String View::CallJsFunction(const String& sFunction, List& lArgs)
   JSValueRef* exception = 0;
   JSValueRef sampleFunction = JSObjectGetProperty(runCtx, global, methodName, exception);
   if (exception) { throw ApException("View::CallJsFunction JSObjectGetProperty(methodName) returned exception"); }
+  if (sampleFunction == 0) { throw ApException("View::CallJsFunction JSObjectGetProperty(methodName) returned 0"); }
 
   if (!JSValueIsObject(runCtx, sampleFunction)) { throw ApException("View::CallJsFunction no such function: %s", StringType(sFunction)); }
 
   JSObjectRef function = JSValueToObject(runCtx, sampleFunction, exception);
   if (exception) { throw ApException("View::CallJsFunction JSValueToObject(sampleFunction) returned exception"); }
+  if (function == 0) { throw ApException("View::CallJsFunction JSValueToObject(sampleFunction) returned 0"); }
 
   JSValueRef result = 0;
 
@@ -575,12 +703,12 @@ JSValueRef View::JS_Apollo_sendMessage(JSContextRef ctx, JSObjectRef function, J
   return value;
 }
 
-void View::MakeScriptObject()
+void View::MakeScriptObject(IWebFrame* pFrame)
 {
-  if (!pWebFrame_) { throw ApException("View::MakeScriptObject pWebFrame_== 0"); }
+  if (!pFrame) { throw ApException("View::MakeScriptObject pFrame== 0"); }
 
-  JSGlobalContextRef runCtx = pWebFrame_->globalContext();
-  if (runCtx == 0) { throw ApException("View::MakeScriptObject pWebFrame_->globalContext() failed"); }
+  JSGlobalContextRef runCtx = pFrame->globalContext();
+  if (runCtx == 0) { throw ApException("View::MakeScriptObject pFrame->globalContext() failed"); }
 
   JSObjectRef pGlobal = JSContextGetGlobalObject(runCtx);
   if (pGlobal == 0) { throw ApException("View::MakeScriptObject JSContextGetGlobalObject() failed"); }
@@ -687,15 +815,15 @@ HRESULT View::didFinishDocumentLoadForFrame(IWebView *webView, IWebFrame *frame)
     msg->hView = apHandle();
     msg.Post();
 
-    try {
-      MakeScriptObject();
-    } catch (ApException& ex) {
-      apLog_Error((LOG_CHANNEL, "View::didFinishDocumentLoadForFrame", "MakeScriptObject() %s", StringType(ex.getText())));
-    }
-
     if (apLog_IsVerbose) {
       apLog_Verbose((LOG_CHANNEL, "View::didFinishDocumentLoadForFrame", "%s", StringType(GetUrlFrom(frame))));
     }
+  }
+
+  try {
+    MakeScriptObject(frame);
+  } catch (ApException& ex) {
+    apLog_Error((LOG_CHANNEL, "View::didFinishDocumentLoadForFrame", "MakeScriptObject() %s", StringType(ex.getText())));
   }
 
   return S_OK;

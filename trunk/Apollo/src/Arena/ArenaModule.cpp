@@ -484,12 +484,16 @@ AP_MSG_HANDLER_METHOD(ArenaModule, BrowserInfo_GetContextWin32Window)
 
 #if defined(AP_TEST)
 
+ApHandle Test_Avatar_RemoveOldPublicChats_hView_;
 ApHandle Test_Avatar_RemoveOldPublicChats_hRemovedChat_;
 
 void Test_Avatar_RemoveOldPublicChats_ViewSrpcMessage(ViewSrpcMessage* pMsg)
 {
-  if (pMsg->srpc.getString(Srpc::Key::Method) == "RemoveAvatarChat") {
-    Test_Avatar_RemoveOldPublicChats_hRemovedChat_ = pMsg->srpc.getHandle("hChat");
+  if (pMsg->hView == Test_Avatar_RemoveOldPublicChats_hView_) {
+    if (pMsg->srpc.getString(Srpc::Key::Method) == "RemoveAvatarChat") {
+      Test_Avatar_RemoveOldPublicChats_hRemovedChat_ = pMsg->srpc.getHandle("hChat");
+    }
+    pMsg->apStatus = ApMessage::Ok;
   }
 }
 
@@ -497,8 +501,10 @@ static String Test_Avatar_RemoveOldPublicChats()
 {
   String s;
 
+  Test_Avatar_RemoveOldPublicChats_hView_ = ApHandle(12345, 12345);
+
   ArenaModule m;
-  Display d(&m, Apollo::newHandle()); d._SetView(ApHandle(765432, 145676543));
+  Display d(&m, Apollo::newHandle()); d._SetView(Test_Avatar_RemoveOldPublicChats_hView_);
   Avatar a(&m, &d, Apollo::newHandle());
 
   { ViewSrpcMessage msg(&d, "Dummy"); msg.Hook(MODULE_NAME, (ApCallback) Test_Avatar_RemoveOldPublicChats_ViewSrpcMessage, 0, ApCallbackPosEarly); }

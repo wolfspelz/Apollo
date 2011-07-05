@@ -46,6 +46,64 @@ private:
 
 //------------------------------------
 
+class View;
+
+class SerializedTask : public Elem
+{
+public:
+  SerializedTask(View* pView)
+    :pView_(pView)
+  {}
+  virtual void Execute() = 0;
+  View* pView_;
+};
+
+class SerializedLoadTask : public SerializedTask
+{
+public:
+  SerializedLoadTask(View* pView, const String& sUrl)
+    :SerializedTask(pView)
+    ,sUrl_(sUrl)
+  {}
+  void Execute();
+
+protected:
+  String sUrl_;
+};
+
+class SerializedLoadHtmlTask : public SerializedTask
+{
+public:
+  SerializedLoadHtmlTask(View* pView, const String& sHtml, const String& sBase)
+    :SerializedTask(pView)
+    ,sHtml_(sHtml)
+    ,sBase_(sBase)
+  {}
+  void Execute();
+
+protected:
+  String sHtml_;
+  String sBase_;
+};
+
+class SerializedLoadTaskList : public ListT<SerializedTask, Elem>
+{
+public:
+  SerializedLoadTaskList()
+    :bLocked_(0)
+  {}
+
+  void Load(View* pView, const String& sUrl);
+  void LoadHtml(View* pView, const String& sHtml, const String& sBase);
+  void TryLoad();
+  void LoadDone();
+
+protected:
+  int bLocked_;
+};
+
+//------------------------------------
+
 class View : public IWebUIDelegate, IWebUIDelegatePrivate, IWebFrameLoadDelegate, IWebFrameLoadDelegatePrivate, IWebResourceLoadDelegate, IWebPolicyDelegate
 {
 public:
@@ -60,8 +118,9 @@ public:
   void LoadHtml(const String& sHtml, const String& sBase) throw(ApException);
   void Load(const String& sUrl) throw(ApException);
   void Reload() throw(ApException);
-  String CallJsFunction(const String& sFunction, List& lArgs) throw(ApException);
+  String CallJsFunction(const String& sFramePath, const String& sFunction, List& lArgs);
   void CallJsSrpc(const String& sFunction, Apollo::SrpcMessage& srpc, Apollo::SrpcMessage& response) throw(ApException);
+  static void LoadDone();
 
   void SetPosition(int nLeft, int nTop, int nWidth, int nHeight);
   void SetVisibility(int bVisible);
@@ -83,11 +142,14 @@ public:
   int HasNavigation() { return bNavigationEnabled_; }
 
 protected:
+  void SerializedLoadHtml(const String& sHtml, const String& sBase) throw(ApException);
+  void SerializedLoad(const String& sUrl) throw(ApException);
   void MoveWindowRoCurrentRect();
-  void MakeScriptObject() throw(ApException);
+  void MakeScriptObject(IWebFrame* pFrame) throw(ApException);
   static String StringFromBSTR(BSTR bStr);
   static String GetUrlFrom(IWebFrame *frame);
   static String GetUrlFrom(IWebURLRequest *request);
+  String CallJsFunction(IWebFrame* pFrame, const String& sFunction, List& lArgs) throw(ApException);
 
 protected:
   ApHandle hAp_;
@@ -101,6 +163,10 @@ protected:
   String sUrl_;
   int bScriptAccessEnabled_;
   int bNavigationEnabled_;
+
+  static SerializedLoadTaskList serializedLoads_;
+  friend class SerializedLoadTask;
+  friend class SerializedLoadHtmlTask;
 
   IWebView* pWebView_;
   IWebFrame* pWebFrame_;
