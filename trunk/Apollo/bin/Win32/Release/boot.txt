@@ -33,7 +33,11 @@ Core/ModuleConfig/LocalFile=config.local.txt
 Core/ModuleConfig/ModulePathToken=[[MODULE_PATH]]
 Core/ModuleConfig/AppPathToken=[[APP_PATH]]
 
+#Core/Debug/HeapCheck=0
+
 System/UserProfileFolder=Avatar
 
 #Dun/OnLoad/DeleteDbFiles=Identity
 #LogMask=31
+#Debug/ShowConsole=0
+#Translation/Language=de

@@ -6,11 +6,14 @@
 
 #include "test.h"
 #include "ApLog.h"
-#include "Apcontainer.h"
+#include "ApContainer.h"
+#include "ApMessage.h"
 #include "MsgUnitTest.h"
 #include "MsgVpView.h"
 #include "MsgGalileo.h"
 #include "MsgTimer.h"
+#include "MsgLog.h"
+#include "MsgWebView.h"
 
 #if defined(AP_TEST_Arena)
 
@@ -45,6 +48,8 @@ public:
   {}
   virtual void SetList(ActionList* pList) {}
   virtual void Execute() {}
+
+  enum { Wait_For_Someone_Else_To_Call_Proceed = -1, Proceed_Immediately = 0 };
   int nDelayMSec_;
 };
 
@@ -66,10 +71,16 @@ public:
   void Proceed();
   static void On_Timer_Event(Msg_Timer_Event* pMsg);
   String Result() { return sError_; }
+  void Append(Action* pAction);
   Action* pNext_;
   ApHandle hTimer_;
   String sError_;
 };
+
+void ActionList::Append(Action* pAction)
+{
+  AddLast(pAction);
+}
 
 void NopAction::Execute()
 {
@@ -103,8 +114,10 @@ void ActionList::Proceed()
 
     pNext_ = Next(pNext_);
 
-    if (nDelayMSec == 0) {
+    if (nDelayMSec == Action::Wait_For_Someone_Else_To_Call_Proceed) {
       // Do nothing, wait for someone else to call Proceed()
+    } else if (nDelayMSec == Action::Proceed_Immediately || nDelayMSec == 0) {
+      Proceed();
     } else {
       int nSec = 0;
       int nMSec = nDelayMSec;
@@ -382,45 +395,103 @@ public:
 class Test_InNavigateChatOut_CreateAndConfigureContext: public Test_InNavigateChatOut_Action
 {
 public:
-  void Execute()
+  Test_InNavigateChatOut_CreateAndConfigureContext()
   {
-    {
-      Msg_VpView_ContextCreated msg;
-      msg.hContext = t->hContext_;
-      msg.Send();
-    }
-
-    {
-      Msg_VpView_ContextVisibility msg;
-      msg.hContext = t->hContext_;
-      msg.bVisible = 0;
-      msg.Send();
-    }
-
-    {
-      Msg_VpView_ContextPosition msg;
-      msg.hContext = t->hContext_;
-      msg.nLeft = t->nLeft_;
-      msg.nBottom = t->nBottom_;
-      msg.Send();
-    }
-
-    {
-      Msg_VpView_ContextSize msg;
-      msg.hContext = t->hContext_;
-      msg.nWidth = t->nWidth_;
-      msg.nHeight = t->nHeight_;
-      msg.Send();
-    }
-
-    {
-      Msg_VpView_ContextVisibility msg;
-      msg.hContext = t->hContext_;
-      msg.bVisible = 1;
-      msg.Send();
-    }
+    nDelayMSec_ = Proceed_Immediately;
   }
+  void On_WebView_Create(Msg_WebView_Create* pMsg);
+  void Execute();
+
+  friend class Test_InNavigateChatOut_WaitForDisplayReady;
+  ApHandle hView_;
 };
+
+AP_MSG_HANDLER_METHOD(Test_InNavigateChatOut_CreateAndConfigureContext, WebView_Create)
+{
+  hView_ = pMsg->hView;
+}
+
+void Test_InNavigateChatOut_CreateAndConfigureContext::Execute()
+{
+  //int nLogMask = 0;
+  //{
+  //  Msg_Log_SetMask msg;
+  //  msg.nMask = apLog_MaskTrace;
+  //  msg.Send();
+  //  nLogMask = msg.nOldMask;
+  //}
+  { Msg_WebView_Create msg; msg.Hook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(Test_InNavigateChatOut_CreateAndConfigureContext, WebView_Create), this, ApCallbackPosEarly); }  
+  
+  {
+    Msg_VpView_ContextCreated msg;
+    msg.hContext = t->hContext_;
+    msg.Send();
+  }
+
+  { Msg_WebView_Create msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(Test_InNavigateChatOut_CreateAndConfigureContext, WebView_Create), this); }  
+
+  //{
+  //  Msg_Log_SetMask msg;
+  //  msg.nMask = nLogMask;
+  //  msg.Send();
+  //}
+
+  {
+    Msg_VpView_ContextVisibility msg;
+    msg.hContext = t->hContext_;
+    msg.bVisible = 0;
+    msg.Send();
+  }
+
+  {
+    Msg_VpView_ContextPosition msg;
+    msg.hContext = t->hContext_;
+    msg.nLeft = t->nLeft_;
+    msg.nBottom = t->nBottom_;
+    msg.Send();
+  }
+
+  {
+    Msg_VpView_ContextSize msg;
+    msg.hContext = t->hContext_;
+    msg.nWidth = t->nWidth_;
+    msg.nHeight = t->nHeight_;
+    msg.Send();
+  }
+
+  {
+    Msg_VpView_ContextVisibility msg;
+    msg.hContext = t->hContext_;
+    msg.bVisible = 1;
+    msg.Send();
+  }
+}
+
+class Test_InNavigateChatOut_WaitForDisplayReady: public Test_InNavigateChatOut_Action
+{
+public:
+  Test_InNavigateChatOut_WaitForDisplayReady(Test_InNavigateChatOut_CreateAndConfigureContext* pCreate)
+  {
+    pCreate_ = pCreate;
+    nDelayMSec_ = Wait_For_Someone_Else_To_Call_Proceed;
+  }
+  void On_WebView_Event_DocumentLoaded(Msg_WebView_Event_DocumentLoaded* pMsg);
+  void Execute();
+  Test_InNavigateChatOut_CreateAndConfigureContext* pCreate_;
+};
+
+AP_MSG_HANDLER_METHOD(Test_InNavigateChatOut_WaitForDisplayReady, WebView_Event_DocumentLoaded)
+{
+  if (pMsg->hView == pCreate_->hView_) {
+    { Msg_WebView_Event_DocumentLoaded msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(Test_InNavigateChatOut_WaitForDisplayReady, WebView_Event_DocumentLoaded), this); }  
+    t->Proceed();
+  }
+}
+
+void Test_InNavigateChatOut_WaitForDisplayReady::Execute()
+{
+  { Msg_WebView_Event_DocumentLoaded msg; msg.Hook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(Test_InNavigateChatOut_WaitForDisplayReady, WebView_Event_DocumentLoaded), this, ApCallbackPosLate); }  
+}
 
 class Test_InNavigateChatOut_ContextLocationAssigned1: public Test_InNavigateChatOut_Action
 {
@@ -872,49 +943,52 @@ void Test_InNavigateChatOut::Begin()
   { Msg_VpView_GetLocationDetail msg; msg.Hook(MODULE_NAME, (ApCallback) Test_VpView_GetLocationDetail, this, ApCallbackPosEarly); }
 
   // IN: Open Context, Navigate
-  AddLast(new Test_InNavigateChatOut_CreateAndConfigureContext());
-  AddLast(new Test_InNavigateChatOut_ContextLocationAssigned1());
-  AddLast(new Test_InNavigateChatOut_ContextDetailsChanged_DocumentUrl());
-  AddLast(new Test_InNavigateChatOut_EnterLocationRequested1());
-  AddLast(new Test_InNavigateChatOut_ContextDetailsChanged_LocationUrl());
-  AddLast(new Test_InNavigateChatOut_LocationContextsChanged1a());
-  AddLast(new Test_InNavigateChatOut_EnterLocationBegin1());
-  AddLast(new Test_InNavigateChatOut_ParticipantsChanged1());
-  AddLast(new Test_InNavigateChatOut_EnterLocationComplete1());
+  Test_InNavigateChatOut_CreateAndConfigureContext* pCreate = new Test_InNavigateChatOut_CreateAndConfigureContext();
+  Append(pCreate);
 
-  AddLast(new Test_InNavigateChatOut_Wait(500));
-  AddLast(new Test_InNavigateChatOut_LeaveLocationRequested1());
-  AddLast(new Test_InNavigateChatOut_ContextDetailsChanged_LocationUrl());
-  AddLast(new Test_InNavigateChatOut_LocationContextsChanged1b());
-  AddLast(new Test_InNavigateChatOut_ContextLocationUnassigned1());
-  AddLast(new Test_InNavigateChatOut_ContextDetailsChanged_DocumentUrl());
-  AddLast(new Test_InNavigateChatOut_ContextLocationAssigned2());
-  AddLast(new Test_InNavigateChatOut_ContextDetailsChanged_DocumentUrl());
-  AddLast(new Test_InNavigateChatOut_EnterLocationRequested2());
-  AddLast(new Test_InNavigateChatOut_ContextDetailsChanged_LocationUrl());
-  AddLast(new Test_InNavigateChatOut_LocationContextsChanged2a());
-  AddLast(new Test_InNavigateChatOut_ParticipantsChanged());
-  AddLast(new Test_InNavigateChatOut_LeaveLocationComplete1());
-  AddLast(new Test_InNavigateChatOut_ParticipantsChanged2a());
-  AddLast(new Test_InNavigateChatOut_EnterLocationComplete2());
-  AddLast(new Test_InNavigateChatOut_Wait(500));
-  AddLast(new Test_InNavigateChatOut_Chat2a());
+  Append(new Test_InNavigateChatOut_WaitForDisplayReady(pCreate));
+  Append(new Test_InNavigateChatOut_ContextLocationAssigned1());
+  Append(new Test_InNavigateChatOut_ContextDetailsChanged_DocumentUrl());
+  Append(new Test_InNavigateChatOut_EnterLocationRequested1());
+  Append(new Test_InNavigateChatOut_ContextDetailsChanged_LocationUrl());
+  Append(new Test_InNavigateChatOut_LocationContextsChanged1a());
+  Append(new Test_InNavigateChatOut_EnterLocationBegin1());
+  Append(new Test_InNavigateChatOut_ParticipantsChanged1());
+  Append(new Test_InNavigateChatOut_EnterLocationComplete1());
 
-  AddLast(new Test_InNavigateChatOut_Wait(500));
-  AddLast(new Test_InNavigateChatOut_Chat2b());
-  AddLast(new Test_InNavigateChatOut_Wait(500));
-  AddLast(new Test_InNavigateChatOut_Chat2c());
-  AddLast(new Test_InNavigateChatOut_Wait(500));
-  AddLast(new Test_InNavigateChatOut_LeaveLocationRequested2());
-  AddLast(new Test_InNavigateChatOut_ContextDetailsChanged_LocationUrl());
-  AddLast(new Test_InNavigateChatOut_LocationContextsChanged2b());
+  Append(new Test_InNavigateChatOut_Wait(500));
+  Append(new Test_InNavigateChatOut_LeaveLocationRequested1());
+  Append(new Test_InNavigateChatOut_ContextDetailsChanged_LocationUrl());
+  Append(new Test_InNavigateChatOut_LocationContextsChanged1b());
+  Append(new Test_InNavigateChatOut_ContextLocationUnassigned1());
+  Append(new Test_InNavigateChatOut_ContextDetailsChanged_DocumentUrl());
+  Append(new Test_InNavigateChatOut_ContextLocationAssigned2());
+  Append(new Test_InNavigateChatOut_ContextDetailsChanged_DocumentUrl());
+  Append(new Test_InNavigateChatOut_EnterLocationRequested2());
+  Append(new Test_InNavigateChatOut_ContextDetailsChanged_LocationUrl());
+  Append(new Test_InNavigateChatOut_LocationContextsChanged2a());
+  Append(new Test_InNavigateChatOut_ParticipantsChanged());
+  Append(new Test_InNavigateChatOut_LeaveLocationComplete1());
+  Append(new Test_InNavigateChatOut_ParticipantsChanged2a());
+  Append(new Test_InNavigateChatOut_EnterLocationComplete2());
+  Append(new Test_InNavigateChatOut_Wait(500));
+  Append(new Test_InNavigateChatOut_Chat2a());
 
-  AddLast(new Test_InNavigateChatOut_ContextLocationUnassigned2());
-  AddLast(new Test_InNavigateChatOut_ContextDetailsChanged_DocumentUrl());
-  AddLast(new Test_InNavigateChatOut_ContextDestroyed());
-  AddLast(new Test_InNavigateChatOut_LeaveLocationBegin2());
-  AddLast(new Test_InNavigateChatOut_ParticipantsChanged2b());
-  AddLast(new Test_InNavigateChatOut_LeaveLocationComplete2());
+  Append(new Test_InNavigateChatOut_Wait(500));
+  Append(new Test_InNavigateChatOut_Chat2b());
+  Append(new Test_InNavigateChatOut_Wait(500));
+  Append(new Test_InNavigateChatOut_Chat2c());
+  Append(new Test_InNavigateChatOut_Wait(500));
+  Append(new Test_InNavigateChatOut_LeaveLocationRequested2());
+  Append(new Test_InNavigateChatOut_ContextDetailsChanged_LocationUrl());
+  Append(new Test_InNavigateChatOut_LocationContextsChanged2b());
+
+  Append(new Test_InNavigateChatOut_ContextLocationUnassigned2());
+  Append(new Test_InNavigateChatOut_ContextDetailsChanged_DocumentUrl());
+  Append(new Test_InNavigateChatOut_ContextDestroyed());
+  Append(new Test_InNavigateChatOut_LeaveLocationBegin2());
+  Append(new Test_InNavigateChatOut_ParticipantsChanged2b());
+  Append(new Test_InNavigateChatOut_LeaveLocationComplete2());
 
   ActionList::Begin();
 }

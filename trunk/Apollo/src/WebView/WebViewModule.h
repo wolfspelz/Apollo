@@ -9,8 +9,6 @@
 
 #include "ApModule.h"
 #include "ApContainer.h"
-#include "MsgUnitTest.h"
-#include "MsgSystem.h"
 #include "SrpcGateHelper.h"
 #include "View.h"
 
@@ -50,6 +48,7 @@ public:
   void On_WebView_GetWin32Window(Msg_WebView_GetWin32Window* pMsg);
   #endif // defined(WIN32)
   void On_WebView_Event_DocumentLoaded(Msg_WebView_Event_DocumentLoaded* pMsg);
+  void On_System_3SecTimer(Msg_System_3SecTimer* pMsg);
 
 #if defined(AP_TEST)
   void On_UnitTest_Begin(Msg_UnitTest_Begin* pMsg);

@@ -9,7 +9,6 @@
 
 #include "Apollo.h"
 #include "SString.h"
-#include "MsgWebView.h"
 
 #if defined(AP_TEST)
 class WebViewModuleTester

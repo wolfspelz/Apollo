@@ -81,6 +81,8 @@ int ApCore::loadModule(const char* szModuleName, const char* szDllPath)
 
   if (Apollo::isLoadedModule("Config")) {
 
+    bHeapCheck_ = Apollo::getConfig("Core/Debug/HeapCheck", 0);
+
     {
       // Load module config and write to config module
       String sModuleConfigFile = Apollo::getModuleResourcePath(sBaseName);
@@ -455,6 +457,7 @@ int ApCore::Call(ApMessage* pMsg)
         || pMsg->getName().startsWith("System_")
         || pMsg->getName().startsWith("MainLoop_")
         ) {
+          // Do not trace
       } else {
         apLog_TraceI(LOG_CHANNEL, "ApCore::Call", "%s", StringType(pMsg->getName()));
       }
@@ -478,20 +481,29 @@ int ApCore::Call(ApMessage* pMsg)
         if (fnCallback != 0) {
           pMsg->Ref(pCurrent->Ref());
 
-          #if defined(_DEBUG) && defined(DEBUG_CHECK_MEMORY)
+          #if defined(_DEBUG)
+          if (bHeapCheck_) {
             #if defined(_WIN32) && defined(_MSC_VER)
+              //_CrtCheckMemory();
+              //unsigned char* p = (unsigned char *) malloc(12);
+              //((int*)p)[2] = 0;
+              //((int*)p)[3] = 0;
+              //((int*)p)[4] = 0;
               _CrtCheckMemory();
             #endif
+          }
           #endif
 
           try {
 
             fnCallback(pMsg);
 
-          #if defined(_DEBUG) && defined(DEBUG_CHECK_MEMORY)
+          #if defined(_DEBUG)
+          if (bHeapCheck_) {
             #if defined(_WIN32) && defined(_MSC_VER)
               _CrtCheckMemory();
             #endif
+          }
           #endif
 
           } catch (ApException& ex) {
@@ -625,6 +637,7 @@ AP_REFINSTANCE_MSG_HANDLER(ApCore, Core_ModulePackageName)
 
 ApCore::ApCore()
 :bExiting_(0)
+,bHeapCheck_(1)
 {
 }
 

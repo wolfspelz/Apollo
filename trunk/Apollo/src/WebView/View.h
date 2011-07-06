@@ -55,6 +55,7 @@ public:
     :pView_(pView)
   {}
   virtual void Execute() = 0;
+  virtual String Description() = 0;
   View* pView_;
 };
 
@@ -66,6 +67,7 @@ public:
     ,sUrl_(sUrl)
   {}
   void Execute();
+  String Description() { return String("URL:") + sUrl_; }
 
 protected:
   String sUrl_;
@@ -80,6 +82,7 @@ public:
     ,sBase_(sBase)
   {}
   void Execute();
+  String Description() { return String("HTML:") + sBase_; }
 
 protected:
   String sHtml_;
@@ -100,6 +103,7 @@ public:
 
 protected:
   int bLocked_;
+  String sCurrent_;
 };
 
 //------------------------------------
@@ -120,7 +124,9 @@ public:
   void Reload() throw(ApException);
   String CallJsFunction(const String& sFramePath, const String& sFunction, List& lArgs);
   void CallJsSrpc(const String& sFunction, Apollo::SrpcMessage& srpc, Apollo::SrpcMessage& response) throw(ApException);
+
   static void LoadDone();
+  static void TryLoad();
 
   void SetPosition(int nLeft, int nTop, int nWidth, int nHeight);
   void SetVisibility(int bVisible);
@@ -153,6 +159,7 @@ protected:
 
 protected:
   ApHandle hAp_;
+  int bLoaded_;
   int bVisible_;
   int nLeft_;
   int nTop_;
