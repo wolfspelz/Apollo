@@ -59,14 +59,14 @@ namespace OVW
 
         internal string GetRegistryValue(string sName, string sDefault)
         {
-            string sResult = "";
+            string sResult = sDefault;
             try
             {
                 using (var key = Registry.CurrentUser.OpenSubKey(@"Software\OpenVirtualWorld\Avatar"))
                 {
                     if (key != null)
                     {
-                        sResult = (string)key.GetValue(sName);
+                        sResult = (string) key.GetValue(sName, sDefault);
                     }
                 }
             }
