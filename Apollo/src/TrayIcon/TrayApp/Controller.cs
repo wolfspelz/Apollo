@@ -106,11 +106,11 @@ namespace TrayApp
 
     internal string GetRegistryValue(RegistryKey root, string sPath, string sName, string sDefault)
     {
-      string sResult = "";
+      string sResult = sDefault;
       try {
         using (var key = root.OpenSubKey(sPath)) {
           if (key != null) {
-            sResult = (string) key.GetValue(sName);
+            sResult = (string) key.GetValue(sName, sDefault);
           }
         }
       } catch (Exception ex) {
@@ -463,7 +463,7 @@ namespace TrayApp
 
     internal void ShowStatus()
     {
-      Log("");
+      Log("----------------------------------------------------------------------");
       Log("AppPath=" + _sAppPath);
       Log("AppArgs=" + _sAppArgs);
       Log("Port=" + _nPort);
@@ -474,7 +474,7 @@ namespace TrayApp
       Log("WasConnected=" + _bWasConnected);
       Log("MinReconnectInterval=" + _nMinReconnectInterval);
       Log("MaxReconnectInterval=" + _nMaxReconnectInterval);
-      Log("");
+      Log("----------------------------------------------------------------------");
     }
 
     #endregion
