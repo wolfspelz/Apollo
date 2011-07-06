@@ -55,6 +55,21 @@ public:
 //#define ApHandleType((unsigned long)) // extractor for printf
 #define ApHandleType(__h__) (const char*) __h__.toString() // extractor for printf
 
+// ----------- Exception ------------------
+
+class APOLLO_API ApException
+{
+public:
+  ApException(const char* szFmt, ...);
+
+  String& getText() { return sText_; }
+
+  enum _Const { nMaxMessage = 2048 };
+
+protected:
+  String sText_;
+};
+
 // ----------- OS dependent ------------------
 
 // OS dependent types begin here

@@ -60,11 +60,6 @@ int Display::Create()
   }
 
   if (ok) {
-    ok = Msg_WebView_SetNavigationPolicy::Deny(hView);
-    if (!ok) { apLog_Error((LOG_CHANNEL, "Display::Create", "Msg_WebView_SetNavigationPolicy::Deny(" ApHandleFormat ") failed", ApHandleType(hView))); }
-  }
-
-  if (ok) {
     hView_ = hView;
     pModule_->SetContextOfHandle(hView_, hContext_);
   }
@@ -258,33 +253,41 @@ void Display::OnLeaveComplete()
 
 void Display::OnReceivePublicChat(const ApHandle& hParticipant, const ApHandle& hChat, const String& sNickname, const String& sText, const Apollo::TimeValue& tv)
 {
-  AvatarListNode* pNode = avatars_.Find(hParticipant);
-  if (pNode) {
-    pNode->Value()->OnReceivePublicChat(hChat, sNickname, sText, tv);
+  if (bViewLoaded_) {
+    AvatarListNode* pNode = avatars_.Find(hParticipant);
+    if (pNode) {
+      pNode->Value()->OnReceivePublicChat(hChat, sNickname, sText, tv);
+    }
   }
 }
 
 void Display::OnReceivePublicAction(const ApHandle& hParticipant, const String& sAction)
 {
-  AvatarListNode* pNode = avatars_.Find(hParticipant);
-  if (pNode) {
-    pNode->Value()->OnReceivePublicAction(sAction);
+  if (bViewLoaded_) {
+    AvatarListNode* pNode = avatars_.Find(hParticipant);
+    if (pNode) {
+      pNode->Value()->OnReceivePublicAction(sAction);
+    }
   }
 }
 
 void Display::OnParticipantDetailsChanged(const ApHandle& hParticipant, Apollo::ValueList& vlKeys)
 {
-  AvatarListNode* pNode = avatars_.Find(hParticipant);
-  if (pNode) {
-    pNode->Value()->OnDetailsChanged(vlKeys);
+  if (bViewLoaded_) {
+    AvatarListNode* pNode = avatars_.Find(hParticipant);
+    if (pNode) {
+      pNode->Value()->OnDetailsChanged(vlKeys);
+    }
   }
 }
 
 void Display::OnAvatarAnimationBegin(const ApHandle& hParticipant, const String& sUrl)
 {
-  AvatarListNode* pNode = avatars_.Find(hParticipant);
-  if (pNode) {
-    pNode->Value()->OnAnimationBegin(sUrl);
+  if (bViewLoaded_) {
+    AvatarListNode* pNode = avatars_.Find(hParticipant);
+    if (pNode) {
+      pNode->Value()->OnAnimationBegin(sUrl);
+    }
   }
 }
 
@@ -372,20 +375,22 @@ void Display::OnNavigatorCallDisplay(Apollo::SrpcMessage& request, Apollo::SrpcM
 
 void Display::OnContextDetailsChanged(Apollo::ValueList& vlKeys)
 {
-  Msg_VpView_GetContextDetail msg;
-  msg.hContext = hContext_;
+  if (bViewLoaded_) {
+    Msg_VpView_GetContextDetail msg;
+    msg.hContext = hContext_;
 
-  for (Apollo::ValueElem* e = 0; e = vlKeys.nextElem(e); ) {
-    msg.sKey = e->getString();
+    for (Apollo::ValueElem* e = 0; e = vlKeys.nextElem(e); ) {
+      msg.sKey = e->getString();
 
-    if (0) {
-    } else if (e->getString() == Msg_VpView_ContextDetail_DocumentUrl) {
-      if (msg.Request()) {
-        ShowContextDetailDocumentUrl(msg.sValue);
-      }
-    } else if (e->getString() == Msg_VpView_ContextDetail_LocationUrl) {
-      if (msg.Request()) {
-        ShowContextDetailLocationUrl(msg.sValue);
+      if (0) {
+      } else if (e->getString() == Msg_VpView_ContextDetail_DocumentUrl) {
+        if (msg.Request()) {
+          ShowContextDetailDocumentUrl(msg.sValue);
+        }
+      } else if (e->getString() == Msg_VpView_ContextDetail_LocationUrl) {
+        if (msg.Request()) {
+          ShowContextDetailLocationUrl(msg.sValue);
+        }
       }
     }
   }
@@ -409,16 +414,18 @@ void Display::ShowContextDetailLocationUrl(const String& sValue)
 
 void Display::OnLocationDetailsChanged(Apollo::ValueList& vlKeys)
 {
-  Msg_VpView_GetLocationDetail msg;
-  msg.hLocation = hLocation_;
+  if (bViewLoaded_) {
+    Msg_VpView_GetLocationDetail msg;
+    msg.hLocation = hLocation_;
 
-  for (Apollo::ValueElem* e = 0; e = vlKeys.nextElem(e); ) {
-    msg.sKey = e->getString();
+    for (Apollo::ValueElem* e = 0; e = vlKeys.nextElem(e); ) {
+      msg.sKey = e->getString();
 
-    if (0) {
-    } else if (e->getString() == Msg_VpView_LocationDetail_State) {
-      if (msg.Request()) {
-        ShowLocationDetailState(msg.sValue);
+      if (0) {
+      } else if (e->getString() == Msg_VpView_LocationDetail_State) {
+        if (msg.Request()) {
+          ShowLocationDetailState(msg.sValue);
+        }
       }
     }
   }
@@ -436,6 +443,8 @@ void Display::ShowLocationDetailState(const String& sValue)
 void Display::OnViewLoaded()
 {
   bViewLoaded_ = 1;
+
+  if (!Msg_WebView_SetNavigationPolicy::Deny(hView_)) { apLog_Error((LOG_CHANNEL, "Display::OnViewLoaded", "Msg_WebView_SetNavigationPolicy::Deny(" ApHandleFormat ") failed", ApHandleType(hView_))); }
 
   if (bViewLoaded_ && ApIsHandle(hLocation_)) {
     StartDisplay();
@@ -475,10 +484,12 @@ void Display::StartDisplay()
 
 void Display::OnParticipantsChanged()
 {
-  Msg_VpView_GetParticipants msg;
-  msg.hLocation = hLocation_;
-  if (msg.Request()) {
-    ProcessAvatarList(msg.vlParticipants, msg.hSelf);
+  if (bViewLoaded_) {
+    Msg_VpView_GetParticipants msg;
+    msg.hLocation = hLocation_;
+    if (msg.Request()) {
+      ProcessAvatarList(msg.vlParticipants, msg.hSelf);
+    }
   }
 }
 

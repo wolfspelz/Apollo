@@ -6,7 +6,6 @@
 
 #include "Apollo.h"
 #include "ApLog.h"
-#include "MsgConfig.h"
 #include "Local.h"
 #include "WebViewModule.h"
 
@@ -48,7 +47,7 @@ View* WebViewModule::FindView(const ApHandle& hView)
 
   views_.Get(hView, pView);
   if (pView == 0) {
-    throw ApException("WebViewModule::FindView no webview=" ApHandleFormat "", ApHandleType(hView));
+    throw ApException(LOG_CONTEXT + " no webview=" ApHandleFormat "", _szH(hView));
   }
 
   return pView;
@@ -58,7 +57,7 @@ View* WebViewModule::FindView(const ApHandle& hView)
 
 AP_MSG_HANDLER_METHOD(WebViewModule, WebView_Create)
 {
-  if (views_.Find(pMsg->hView) != 0) { throw ApException("WebViewModule::WebView_Create: webview=" ApHandleFormat " already exists", ApHandleType(pMsg->hView)); }
+  if (views_.Find(pMsg->hView) != 0) { throw ApException(LOG_CONTEXT + " view=" ApHandleFormat " already exists", _szH(pMsg->hView)); }
   View* pView = CreateView(pMsg->hView, pMsg->nLeft, pMsg->nTop, pMsg->nWidth, pMsg->nHeight);
   bWebKitUsed_ = 1;
   pMsg->apStatus = ApMessage::Ok;
@@ -196,6 +195,12 @@ AP_MSG_HANDLER_METHOD(WebViewModule, WebView_GetWin32Window)
 AP_MSG_HANDLER_METHOD(WebViewModule, WebView_Event_DocumentLoaded)
 {
   View::LoadDone();
+  View::TryLoad();
+}
+
+AP_MSG_HANDLER_METHOD(WebViewModule, System_3SecTimer)
+{
+  View::TryLoad();
 }
 
 
@@ -386,6 +391,7 @@ int WebViewModule::Init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, WebViewModule, WebView_GetWin32Window, this, ApCallbackPosNormal);
   #endif // defined(WIN32)
   AP_MSG_REGISTRY_ADD(MODULE_NAME, WebViewModule, WebView_Event_DocumentLoaded, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, WebViewModule, System_3SecTimer, this, ApCallbackPosNormal);
 
   AP_UNITTEST_HOOK(WebViewModule, this);
 

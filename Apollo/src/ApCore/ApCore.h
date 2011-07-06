@@ -181,6 +181,7 @@ protected:
   List lModules_;
   //List lIgnoredDllPaths_;
   int bExiting_;
+  int bHeapCheck_;
 
   Apollo::Mutex oMutex_;
 };

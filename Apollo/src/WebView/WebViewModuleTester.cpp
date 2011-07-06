@@ -4,12 +4,10 @@
 //
 // ============================================================================
 
-#include "Local.h"
 #include "ApTypes.h"
-#include "MsgWebView.h"
-#include "MsgUnitTest.h"
-#include "WebViewModuleTester.h"
+#include "Local.h"
 #include "View.h"
+#include "WebViewModuleTester.h"
 
 #if defined(AP_TEST)
 
@@ -191,8 +189,8 @@ void WebViewModuleTester_CallCustomEcho_On_WebView_ModuleCall(Msg_WebView_Module
   String sMethod = pMsg->srpc.getString(Srpc::Key::Method);
   String sIn = pMsg->srpc.getString("sIn");
   String sOut = sIn;
-  if (sType != "WebView_ModuleCall") { sOut.appendf(" (Error: Expected Type=%s got=%s)", StringType("WebView_ModuleCall"), StringType(sType)); }
-  if (sMethod != "CustomEchoMethod") { sOut.appendf(" (Error: Expected Method=%s got=%s)", StringType("CustomEchoMethod"), StringType(sMethod)); }
+  if (sType != "WebView_ModuleCall") { sOut.appendf(" (Error: Expected Type=%s got=%s)", _sz("WebView_ModuleCall"), _sz(sType)); }
+  if (sMethod != "CustomEchoMethod") { sOut.appendf(" (Error: Expected Method=%s got=%s)", _sz("CustomEchoMethod"), _sz(sMethod)); }
   pMsg->response.set("sOut", sOut);
   pMsg->apStatus = ApMessage::Ok;
 }
@@ -253,8 +251,8 @@ void WebViewModuleTester_FrameIO_On_WebView_ModuleCall(Msg_WebView_ModuleCall* p
   String sMethod = pMsg->srpc.getString(Srpc::Key::Method);
   String sIn = pMsg->srpc.getString("sIn");
   String sOut = sIn;
-  if (sType != "WebView_ModuleCall") { sOut.appendf(" (Error: Expected Type=%s got=%s)", StringType("WebView_ModuleCall"), StringType(sType)); }
-  if (sMethod != "CustomEchoMethod") { sOut.appendf(" (Error: Expected Method=%s got=%s)", StringType("CustomEchoMethod"), StringType(sMethod)); }
+  if (sType != "WebView_ModuleCall") { sOut.appendf(" (Error: Expected Type=%s got=%s)", _sz("WebView_ModuleCall"), _sz(sType)); }
+  if (sMethod != "CustomEchoMethod") { sOut.appendf(" (Error: Expected Method=%s got=%s)", _sz("CustomEchoMethod"), _sz(sMethod)); }
   pMsg->response.set("sOut", sOut);
   pMsg->apStatus = ApMessage::Ok;
 }
@@ -511,34 +509,34 @@ String WebViewModuleTester::Dev()
 
 void WebViewModuleTester::Begin()
 {
-  //AP_UNITTEST_REGISTER(WebViewModuleTester::LoadHtml);
-  //AP_UNITTEST_REGISTER(WebViewModuleTester::CallJSEcho);
-  //AP_UNITTEST_REGISTER(WebViewModuleTester::CallJSEcho_Result);
-  //AP_UNITTEST_REGISTER(WebViewModuleTester::CallSystemEcho);
-  //AP_UNITTEST_REGISTER(WebViewModuleTester::CallSystemEcho_Result);
-  //AP_UNITTEST_REGISTER(WebViewModuleTester::CallCustomEcho);
-  //AP_UNITTEST_REGISTER(WebViewModuleTester::CallCustomEcho_Result);
-  //AP_UNITTEST_REGISTER(WebViewModuleTester::FrameIO);
-  //AP_UNITTEST_REGISTER(WebViewModuleTester::FrameIO_Result0);
-  //AP_UNITTEST_REGISTER(WebViewModuleTester::FrameIO_Result1);
-  //AP_UNITTEST_REGISTER(WebViewModuleTester::FrameIO_Result2);
+  AP_UNITTEST_REGISTER(WebViewModuleTester::LoadHtml);
+  AP_UNITTEST_REGISTER(WebViewModuleTester::CallJSEcho);
+  AP_UNITTEST_REGISTER(WebViewModuleTester::CallJSEcho_Result);
+  AP_UNITTEST_REGISTER(WebViewModuleTester::CallSystemEcho);
+  AP_UNITTEST_REGISTER(WebViewModuleTester::CallSystemEcho_Result);
+  AP_UNITTEST_REGISTER(WebViewModuleTester::CallCustomEcho);
+  AP_UNITTEST_REGISTER(WebViewModuleTester::CallCustomEcho_Result);
+  AP_UNITTEST_REGISTER(WebViewModuleTester::FrameIO);
+  AP_UNITTEST_REGISTER(WebViewModuleTester::FrameIO_Result0);
+  AP_UNITTEST_REGISTER(WebViewModuleTester::FrameIO_Result1);
+  AP_UNITTEST_REGISTER(WebViewModuleTester::FrameIO_Result2);
   AP_UNITTEST_REGISTER(WebViewModuleTester::StartManuallySerialized);
   AP_UNITTEST_REGISTER(WebViewModuleTester::StartManuallySerialized_Result1);
   AP_UNITTEST_REGISTER(WebViewModuleTester::StartManuallySerialized_Result2);
-  //AP_UNITTEST_REGISTER(WebViewModuleTester::StartAutomaticallySerialized);
-  //AP_UNITTEST_REGISTER(WebViewModuleTester::StartAutomaticallySerialized_Result1);
-  //AP_UNITTEST_REGISTER(WebViewModuleTester::StartAutomaticallySerialized_Result2);
+  AP_UNITTEST_REGISTER(WebViewModuleTester::StartAutomaticallySerialized);
+  AP_UNITTEST_REGISTER(WebViewModuleTester::StartAutomaticallySerialized_Result1);
+  AP_UNITTEST_REGISTER(WebViewModuleTester::StartAutomaticallySerialized_Result2);
 }
 
 void WebViewModuleTester::Execute()
 {
-  //AP_UNITTEST_EXECUTE(WebViewModuleTester::LoadHtml);
-  //AP_UNITTEST_EXECUTE(WebViewModuleTester::CallJSEcho);
-  //AP_UNITTEST_EXECUTE(WebViewModuleTester::CallSystemEcho);
-  //AP_UNITTEST_EXECUTE(WebViewModuleTester::CallCustomEcho);
-  //AP_UNITTEST_EXECUTE(WebViewModuleTester::FrameIO);
+  AP_UNITTEST_EXECUTE(WebViewModuleTester::LoadHtml);
+  AP_UNITTEST_EXECUTE(WebViewModuleTester::CallJSEcho);
+  AP_UNITTEST_EXECUTE(WebViewModuleTester::CallSystemEcho);
+  AP_UNITTEST_EXECUTE(WebViewModuleTester::CallCustomEcho);
+  AP_UNITTEST_EXECUTE(WebViewModuleTester::FrameIO);
   AP_UNITTEST_EXECUTE(WebViewModuleTester::StartManuallySerialized);
-  //AP_UNITTEST_EXECUTE(WebViewModuleTester::StartAutomaticallySerialized);
+  AP_UNITTEST_EXECUTE(WebViewModuleTester::StartAutomaticallySerialized);
   
   //(void) WebViewModuleTester::Dev();
 }
