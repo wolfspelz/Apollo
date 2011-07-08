@@ -72,4 +72,22 @@ enum apLog_LogMask { apLog_MaskNone = 0
 #define apLog_Const_MAXMESSAGE 2048
 #define apLog_Const_MAXCONTEXT 1024
 
+//class apLog_LogContext
+//{
+//public:
+//  static String CodePosition(const char* pszFile, int nLine)
+//  {
+//    String s(pszFile);
+//    s += ":";
+//    s += String::from(nLine);
+//    return s;
+//  }
+//};
+//
+//#define apLog_Context apLog_LogContext::CodePosition(__FILE__, __LINE__)
+
+//#define apLog_Context String(__func__) // g++
+//#define apLog_Context String(__PRETTY_FUNCTION__) // gcc
+#define apLog_Context String(__FUNCTION__) // MSVC8
+
 #endif // !defined(ApLog_h_INCLUDED)

@@ -9,9 +9,6 @@
 
 #include "ApModule.h"
 #include "ApContainer.h"
-#include "MsgUnitTest.h"
-#include "MsgWebView.h"
-#include "MsgDialog.h"
 #include "SrpcGateHelper.h"
 #include "Dialog.h"
 

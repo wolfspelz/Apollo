@@ -5,6 +5,7 @@
 // ============================================================================
 
 #include "Apollo.h"
+#include "Local.h"
 #include "ApTypes.h"
 #include "ApLog.h"
 #include "NetOS.h"
@@ -40,7 +41,7 @@ int NetOS::PlatformAPI_Init()
     int nResult = ::WSAStartup(MAKEWORD(2,2), &wsaData);
     if (nResult != NO_ERROR) {
       ok = 0;
-      apLog_Error((MODULE_NAME, "ApCore::Init", "WSAStartup failed %d", WSAGetLastError()));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "WSAStartup failed %d", WSAGetLastError()));
     }
   }
 #elif defined(LINUX) || defined(MAC)
@@ -103,11 +104,11 @@ int NetOS::GetLocalIPAddressList(List &lList)
 			long ip = htonl(aIPAddresses[i]);
 			if ((ip != 0x7F000001) && (ip != 0)) {
         String sAddress = NetModule::ip4_LongtoStr(aIPAddresses[i]);
-        apLog_VeryVerbose((LOG_CHANNEL, "GetLocalIPAddressList", "IP address found: %s", StringType(sAddress)));
+        apLog_VeryVerbose((LOG_CHANNEL, LOG_CONTEXT, "IP address found: %s", _sz(sAddress)));
 
         String sKey = "IgnoreLocalIp/" + sAddress;
         if (Apollo::getModuleConfig(MODULE_NAME, sKey, 0)) {
-          apLog_VeryVerbose((LOG_CHANNEL, "GetLocalIPAddressList", "IP address ignored by config: %s", StringType(sAddress)));
+          apLog_VeryVerbose((LOG_CHANNEL, LOG_CONTEXT, "IP address ignored by config: %s", _sz(sAddress)));
         } else {
           lList.Add(sAddress);
         }
@@ -124,7 +125,7 @@ int NetOS::GetLocalIPAddressList(List &lList)
   nSockFd = ::socket(AF_INET, SOCK_DGRAM, 0); // 0 = default proto
   if (nSockFd < 0) {
     ok = 0;
-    apLog_Error(("Net", "NetOS::GetLocalIPAddressList", "Failed to create socket"));
+    apLog_Error(("Net", LOG_CONTEXT, "Failed to create socket"));
   }
   
   if (ok) {
@@ -134,7 +135,7 @@ int NetOS::GetLocalIPAddressList(List &lList)
     if (::ioctl(nSockFd, SIOCGIFCONF, &ifConf) < 0) {
       ::close(nSockFd);
       ok = 0;
-      apLog_Error(("Net", "NetOS::GetLocalIPAddressList", "ioctl SIOCGIFCONF failed: errno=%d", errno));
+      apLog_Error(("Net", LOG_CONTEXT, "ioctl SIOCGIFCONF failed: errno=%d", errno));
     }
   }
   
@@ -157,7 +158,7 @@ int NetOS::GetLocalIPAddressList(List &lList)
       String sIfaceName = pIfReq->ifr_name;
       struct ifreq ifReqCopy = *pIfReq;
       if (::ioctl(nSockFd, SIOCGIFFLAGS, &ifReqCopy) < 0) { 
-        apLog_Warning((LOG_CHANNEL, "NetOS::GetLocalIPAddressList", "ioctl SIOCGIFFLAGS failed for iface=%s: errno=%d", StringTypesIfaceName, errno));
+        apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "ioctl SIOCGIFFLAGS failed for iface=%s: errno=%d", StringTypesIfaceName, errno));
         continue; 
       }
       // Only up and running interfaces, no loopback
@@ -194,7 +195,7 @@ int NetOS::GetLocalIPAddressList(List &lList)
       NETFLAGS_CHECK(ifReqCopy.ifr_flags , IFF_PROMISC , sFlags)
       NETFLAGS_CHECK(ifReqCopy.ifr_flags , IFF_SIMPLEX , sFlags)
       
-      apLog_Debug((LOG_CHANNEL, "NetOS::GetLocalIPAddressList", "Found interface=[%s] ip=[%s] flags=[%s]", StringType(sIfaceName), StringType(sAddress), StringType(sFlags)));
+      apLog_Debug((LOG_CHANNEL, LOG_CONTEXT, "Found interface=[%s] ip=[%s] flags=[%s]", _sz(sIfaceName), _sz(sAddress), _sz(sFlags)));
 */
 #endif // _DEBUG      
       
@@ -328,7 +329,7 @@ void NetOS::SocketIOThreadProc(UINT nThreadId)
       } else if (nResult == (-1)) {
         if (errno != EINTR) {
           // error
-          apLog_Error(("Net", "NetOS::SocketIOThreadProc", "pselect() error: %d", errno));
+          apLog_Error(("Net", LOG_CONTEXT, "pselect() error: %d", errno));
 #if defined(_DEBUG)
           AP_DEBUG_BREAK();
 #endif
@@ -393,12 +394,12 @@ SOCKET NetOS::TCPSocketCreate(const ApHandle& hAp)
 #if defined(WIN32)
   nSock = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
   if (nSock == INVALID_SOCKET) {
-    apLog_Error(("Net", "NetOS::TCPSocketCreate", "::socket failed " ApHandleFormat " %d", ApHandleType(hAp), WSAGetLastError()));
+    apLog_Error(("Net", LOG_CONTEXT, "::socket failed " ApHandleFormat " %d", ApHandlePrintf(hAp), WSAGetLastError()));
   }
 #elif defined(LINUX) || defined(MAC)
   nSock = ::socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
   if (nSock == INVALID_SOCKET) {
-    apLog_Error(("Net", "NetOS::TCPSocketCreate", "::socket failed " ApHandleFormat " %d", ApHandleType(hAp), errno));
+    apLog_Error(("Net", LOG_CONTEXT, "::socket failed " ApHandleFormat " %d", ApHandlePrintf(hAp), errno));
   }
 #endif
   return nSock;
@@ -411,12 +412,12 @@ int NetOS::SocketSetNonblock(SOCKET nSock, const ApHandle& hAp)
   ULONG nNonBlock = 1;
   nResult = ::ioctlsocket(nSock, FIONBIO, &nNonBlock);
   if (nResult == SOCKET_ERROR) {
-    apLog_Error(("Net", "NetOS::SocketSetNonblock", "::ioctlsocket() failed " ApHandleFormat " %d", ApHandleType(hAp), WSAGetLastError()));
+    apLog_Error(("Net", LOG_CONTEXT, "::ioctlsocket() failed " ApHandleFormat " %d", ApHandlePrintf(hAp), WSAGetLastError()));
   }
 #elif defined(LINUX) || defined(MAC)
   nResult = ::fcntl(nSock, F_SETFL, O_NONBLOCK);
   if (nResult == SOCKET_ERROR) {
-    apLog_Error(("Net", "NetOS::SocketSetNonblock", "::fcntl() on socket failed " ApHandleFormat " %d", ApHandleType(hAp), errno));
+    apLog_Error(("Net", LOG_CONTEXT, "::fcntl() on socket failed " ApHandleFormat " %d", ApHandlePrintf(hAp), errno));
   }
 #endif
   return ((nResult == SOCKET_ERROR) ? 0 : 1);
@@ -428,12 +429,12 @@ int NetOS::SocketClose(SOCKET nSock, const ApHandle& hAp)
 #if defined(WIN32)
   nResult = ::closesocket(nSock);
   if (nResult == SOCKET_ERROR) {
-    apLog_Error(("Net", "NetOS::SocketClose", "::closesocket failed " ApHandleFormat " %d", ApHandleType(hAp), WSAGetLastError()));
+    apLog_Error(("Net", LOG_CONTEXT, "::closesocket failed " ApHandleFormat " %d", ApHandlePrintf(hAp), WSAGetLastError()));
   }
 #elif defined(LINUX) || defined(MAC)
   nResult = ::close(nSock); 
   if (nResult == SOCKET_ERROR) {
-    apLog_Error(("Net", "NetOS::SocketClose", "::close on socket failed " ApHandleFormat " %d", ApHandleType(hAp), errno));
+    apLog_Error(("Net", LOG_CONTEXT, "::close on socket failed " ApHandleFormat " %d", ApHandlePrintf(hAp), errno));
   }
 #endif
   return nResult;
@@ -462,7 +463,7 @@ String NetOS::HTTP_ErrorMessage(int nErr)
 #endif
 
   String sResult;
-  sResult.appendf("%d (%s)", nErr, StringType(sMessage));
+  sResult.appendf("%d (%s)", nErr, _sz(sMessage));
   return sResult;
 }
 
@@ -477,7 +478,7 @@ int NetOS::HTTP_Manager_Init(String& sClientName)
   if (nCode != 0) {
     AP_DEBUG_BREAK();
     String sCurlErrorMessage = NetOS::HTTP_ErrorMessage((int)nCode);
-    apLog_Error((LOG_CHANNEL, "NetOS::HTTP_Manager_Init", "InternetOpen() failed with %s", StringType(sCurlErrorMessage)));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "InternetOpen() failed with %s", _sz(sCurlErrorMessage)));
     ok = 0;
   }
 #elif defined(WIN32)
@@ -485,7 +486,7 @@ int NetOS::HTTP_Manager_Init(String& sClientName)
   oHttp.hWinInet_ = ::InternetOpen(sClientName, INTERNET_OPEN_TYPE_PRECONFIG, NULL, NULL, 0);//INTERNET_FLAG_ASYNC);
   if (oHttp.hWinInet_ == NULL) {
     String sInternetErrorMessage = NetOS::HTTP_ErrorMessage((int)::GetLastError());
-    apLog_Error((LOG_CHANNEL, "NetOS::HTTP_Manager_Init", "InternetOpen() failed with %s", StringType(sInternetErrorMessage)));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "InternetOpen() failed with %s", _sz(sInternetErrorMessage)));
     ok = 0;
   }
 #else
@@ -606,7 +607,7 @@ int NetOS::HTTP_PerformRequest(int bDoCall, Apollo::URL url, String& sMethod, in
     hConnect = ::curl_easy_init();
     if (hConnect == NULL) {
       sError.appendf("curl_easy_init() failed");
-      apLog_Warning((LOG_CHANNEL, "HTTPRequestTask::Execute", StringType(sError)));
+      apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, _sz(sError)));
       ok = 0;
     } else {
       self->SetHandle(hConnect);
@@ -636,27 +637,27 @@ int NetOS::HTTP_PerformRequest(int bDoCall, Apollo::URL url, String& sMethod, in
       ::curl_easy_setopt(self->GetHandle(), CURLOPT_POSTFIELDSIZE, self->sbBody_.Length()); 
     }
     for (Elem* e = NULL; (e = self->lHeader_.Next(e));) {
-      String sHeader; sHeader.appendf("%s: %s", StringType(e->getName()), StringType(e->getString()));
+      String sHeader; sHeader.appendf("%s: %s", _sz(e->getName()), _sz(e->getString()));
       pHeaders = ::curl_slist_append(pHeaders, (const char*) sHeader);
     }
     if (pHeaders != 0) {
       ::curl_easy_setopt(self->GetHandle(), CURLOPT_HTTPHEADER, pHeaders);
     }
     
-    apLog_VeryVerbose((LOG_CHANNEL, "NetOS::HTTP_PerformRequest", "Before curl_easy_perform()"));
+    apLog_VeryVerbose((LOG_CHANNEL, LOG_CONTEXT, "Before curl_easy_perform()"));
     
     CURLcode nCode = ::curl_easy_perform(self->GetHandle());
     
-    apLog_VeryVerbose((LOG_CHANNEL, "NetOS::HTTP_PerformRequest", "After curl_easy_perform()"));
+    apLog_VeryVerbose((LOG_CHANNEL, LOG_CONTEXT, "After curl_easy_perform()"));
     
     if (0) {
     } else if (nCode == CURLE_ABORTED_BY_CALLBACK) { 
       //::curl_easy_getinfo(self->GetHandle(), CURLINFO_RESPONSE_CODE, &(self->nRequestStatusCode_)); 
-      apLog_Verbose((LOG_CHANNEL, "NetOS::HTTP_PerformRequest", "" ApHandleFormat " curl_perform aborted by progress callback", ApHandleType(self->hAp_)));
+      apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "" ApHandleFormat " curl_perform aborted by progress callback", ApHandlePrintf(self->hAp_)));
     } else if (nCode != CURLE_OK) {
       String sCurlErrorMessage = NetOS::HTTP_ErrorMessage(nCode);
-      sError.appendf("curl_easy_perform() failed with %s: %s:%d%s", StringType(sCurlErrorMessage), StringType(url.host()), url.portnum(), StringType(url.uri()));
-      apLog_Warning((LOG_CHANNEL, "HTTPRequestTask::Execute", "%s", StringType(sError)));
+      sError.appendf("curl_easy_perform() failed with %s: %s:%d%s", _sz(sCurlErrorMessage), _sz(url.host()), url.portnum(), _sz(url.uri()));
+      apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "%s", _sz(sError)));
       ok= 0;
     }
   }
@@ -699,8 +700,8 @@ int NetOS::HTTP_PerformRequest(int bDoCall, Apollo::URL url, String& sMethod, in
     );
     if (hConnect == NULL) {
       String sInternetErrorMessage = NetOS::HTTP_ErrorMessage(::GetLastError());
-      sError.appendf("InternetConnect failed with %s: %s:%d", StringType(sInternetErrorMessage), StringType(url.host()), url.portnum());
-      apLog_Warning((LOG_CHANNEL, "HTTPRequestTask::Execute", "%s", StringType(sError)));
+      sError.appendf("InternetConnect failed with %s: %s:%d", _sz(sInternetErrorMessage), _sz(url.host()), url.portnum());
+      apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "%s", _sz(sError)));
       ok = 0;
     } else {
       self->SetHandle(hConnect);
@@ -726,8 +727,8 @@ int NetOS::HTTP_PerformRequest(int bDoCall, Apollo::URL url, String& sMethod, in
     );
     if (hRequest == NULL) {
       String sInternetErrorMessage = NetOS::HTTP_ErrorMessage(::GetLastError());
-      sError.appendf("HttpOpenRequest failed with %s: %s:%d%s", StringType(sInternetErrorMessage), StringType(url.host()), url.portnum(), StringType(url.uri()));
-      apLog_Warning((LOG_CHANNEL, "HTTPRequestTask::Execute", "%s", StringType(sError)));
+      sError.appendf("HttpOpenRequest failed with %s: %s:%d%s", _sz(sInternetErrorMessage), _sz(url.host()), url.portnum(), _sz(url.uri()));
+      apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "%s", _sz(sError)));
       ok = 0;
     }
   }
@@ -748,7 +749,7 @@ int NetOS::HTTP_PerformRequest(int bDoCall, Apollo::URL url, String& sMethod, in
     // Send the request.
     String sRequestHeaders;
     for (Elem* e = 0; (e = self->lHeader_.Next(e)) != 0; ) {
-      sRequestHeaders.appendf("%s: %s\r\n", StringType(e->getName()), StringType(e->getString()));
+      sRequestHeaders.appendf("%s: %s\r\n", _sz(e->getName()), _sz(e->getString()));
     }
     BOOL bSendRequest = ::HttpSendRequest(
       hRequest,
@@ -759,8 +760,8 @@ int NetOS::HTTP_PerformRequest(int bDoCall, Apollo::URL url, String& sMethod, in
     );
     if (!bSendRequest) {
       String sInternetErrorMessage = NetOS::HTTP_ErrorMessage(::GetLastError());
-      sError.appendf("HttpSendRequest failed with %s: %s:%d%s", StringType(sInternetErrorMessage), StringType(url.host()), url.portnum(), StringType(url.uri()));
-      apLog_Warning((LOG_CHANNEL, "HTTPRequestTask::Execute", "%s", StringType(sError)));
+      sError.appendf("HttpSendRequest failed with %s: %s:%d%s", _sz(sInternetErrorMessage), _sz(url.host()), url.portnum(), _sz(url.uri()));
+      apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "%s", _sz(sError)));
       ok = 0;
     }
   }
@@ -787,8 +788,8 @@ int NetOS::HTTP_PerformRequest(int bDoCall, Apollo::URL url, String& sMethod, in
     );
     if (!bQuery) {
       String sInternetErrorMessage = NetOS::HTTP_ErrorMessage(::GetLastError());
-      sError.appendf("HttpQueryInfo(STATUS_CODE) failed with %s: %s:%d%s", StringType(sInternetErrorMessage), StringType(url.host()), url.portnum(), StringType(url.uri()));
-      apLog_Warning((LOG_CHANNEL, "HTTPRequestTask::Execute", "%s", StringType(sError)));
+      sError.appendf("HttpQueryInfo(STATUS_CODE) failed with %s: %s:%d%s", _sz(sInternetErrorMessage), _sz(url.host()), url.portnum(), _sz(url.uri()));
+      apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "%s", _sz(sError)));
       ok= 0;
     }
   }
@@ -808,8 +809,8 @@ int NetOS::HTTP_PerformRequest(int bDoCall, Apollo::URL url, String& sMethod, in
     );
     if (!bQuery) {
       String sInternetErrorMessage = NetOS::HTTP_ErrorMessage(::GetLastError());
-      sError.appendf("HttpQueryInfo(RAW_HEADERS_CRLF) failed with %s: %s:%d%s", StringType(sInternetErrorMessage), StringType(url.host()), url.portnum(), StringType(url.uri()));
-      apLog_Warning((LOG_CHANNEL, "HTTPRequestTask::Execute", "%s", StringType(sError)));
+      sError.appendf("HttpQueryInfo(RAW_HEADERS_CRLF) failed with %s: %s:%d%s", _sz(sInternetErrorMessage), _sz(url.host()), url.portnum(), _sz(url.uri()));
+      apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "%s", _sz(sError)));
       ok= 0;
     } else {
       sHeaders.set(pHeaders, dwRawHeaderSize);
@@ -858,8 +859,8 @@ int NetOS::HTTP_PerformRequest(int bDoCall, Apollo::URL url, String& sMethod, in
           bDone = 1;
         } else {
           String sInternetErrorMessage = NetOS::HTTP_ErrorMessage(::GetLastError());
-          sError.appendf("InternetQueryDataAvailable() failed with %s: %s:%d%s", StringType(sInternetErrorMessage), StringType(url.host()), url.portnum(), StringType(url.uri()));
-          apLog_Warning((LOG_CHANNEL, "HTTPRequestTask::Execute", "%s", StringType(sError)));
+          sError.appendf("InternetQueryDataAvailable() failed with %s: %s:%d%s", _sz(sInternetErrorMessage), _sz(url.host()), url.portnum(), _sz(url.uri()));
+          apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "%s", _sz(sError)));
           ok= 0;
         }
       } else {
@@ -897,8 +898,8 @@ int NetOS::HTTP_PerformRequest(int bDoCall, Apollo::URL url, String& sMethod, in
           bDone = 1;
         } else {
           String sInternetErrorMessage = NetOS::HTTP_ErrorMessage(::GetLastError());
-          sError.appendf("InternetReadFile() failed with %s: %s:%d%s", StringType(sInternetErrorMessage), StringType(url.host()), url.portnum(), StringType(url.uri()));
-          apLog_Warning((LOG_CHANNEL, "HTTPRequestTask::Execute", "%s", StringType(sError)));
+          sError.appendf("InternetReadFile() failed with %s: %s:%d%s", _sz(sInternetErrorMessage), _sz(url.host()), url.portnum(), _sz(url.uri()));
+          apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "%s", _sz(sError)));
           ok= 0;
         }
       } else {

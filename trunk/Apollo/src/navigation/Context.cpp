@@ -5,11 +5,10 @@
 // ============================================================================
 
 #include "Apollo.h"
+#include "Local.h"
 #include "MsgVp.h"
 #include "MsgVpView.h"
 #include "MsgBrowserInfo.h"
-#include "Local.h"
-#include "ApLog.h"
 #include "Context.h"
 
 void Context::create() // throws ApException
@@ -18,7 +17,7 @@ void Context::create() // throws ApException
     Msg_Vp_OpenContext msg;
     msg.hContext = apHandle();
     if (!msg.Request()) {
-      throw ApException("Msg_Vp_OpenContext failed: %s", StringType(msg.sComment));
+      throw ApException(LOG_CONTEXT, "Msg_Vp_OpenContext failed: %s", _sz(msg.sComment));
     }
   }
 
@@ -35,7 +34,7 @@ void Context::destroy() // throws ApException
     Msg_BrowserInfo_EndTrackCoordinates msg;
     msg.hContext = apHandle();
     if (!msg.Request()) {
-      throw ApException("Msg_BrowserInfo_BeginTrackCoordinates failed: %s", StringType(msg.sComment));
+      throw ApException(LOG_CONTEXT, "Msg_BrowserInfo_BeginTrackCoordinates failed: %s", _sz(msg.sComment));
     }
     bTrackingCoordinates_ = 0;
   }
@@ -44,7 +43,7 @@ void Context::destroy() // throws ApException
     Msg_Vp_CloseContext msg;
     msg.hContext = apHandle();
     if (!msg.Request()) {
-      throw ApException("Msg_Vp_CloseContext failed: %s", StringType(msg.sComment));
+      throw ApException(LOG_CONTEXT, "Msg_Vp_CloseContext failed: %s", _sz(msg.sComment));
     }
   }
 
@@ -63,7 +62,7 @@ void Context::navigate(const String& sUrl) // throws ApException
   msg.hContext = apHandle();
   msg.sUrl = sUrl;
   if (!msg.Request()) {
-    throw ApException("Msg_Vp_NavigateContext failed: %s", StringType(msg.sComment));
+    throw ApException(LOG_CONTEXT, "Msg_Vp_NavigateContext failed: %s", _sz(msg.sComment));
   }
 }
 
@@ -73,7 +72,7 @@ void Context::nativeWindow(Apollo::KeyValueList& kvSignature) // throws ApExcept
   msg.hContext = apHandle();
   msg.kvSignature = kvSignature;
   if (!msg.Request()) {
-    throw ApException("Msg_BrowserInfo_BeginTrackCoordinates failed: %s", StringType(msg.sComment));
+    throw ApException(LOG_CONTEXT, "Msg_BrowserInfo_BeginTrackCoordinates failed: %s", _sz(msg.sComment));
   } else {
     bTrackingCoordinates_ = 1;
   }

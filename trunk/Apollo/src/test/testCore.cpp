@@ -415,60 +415,60 @@ String Test_Core_AppPath()
   sPath = Apollo::getAppBasePath();
   if (s.empty()) {
     if (sPath.empty()) {
-      s.appendf("getAppBasePath returned empty path: %s", StringType(sPath));
+      s.appendf("getAppBasePath returned empty path: %s", _sz(sPath));
     }
   }
   if (s.empty()) {
     if (!String::filenameIsAbsolutePath(sPath)) {
-      s.appendf("getAppBasePath returned no absolute path: %s", StringType(sPath));
+      s.appendf("getAppBasePath returned no absolute path: %s", _sz(sPath));
     }
   }
 
   sPath = Apollo::getModuleResourcePath(sModuleBaseName);
   if (s.empty()) {
     if (sPath.empty()) {
-      s.appendf("getAppResourcePath returned empty path: %s", StringType(sPath));
+      s.appendf("getAppResourcePath returned empty path: %s", _sz(sPath));
     }
   }
   if (s.empty()) {
     if (!String::filenameIsAbsolutePath(sPath)) {
-      s.appendf("getAppResourcePath returned no absolute path: %s", StringType(sPath));
+      s.appendf("getAppResourcePath returned no absolute path: %s", _sz(sPath));
     }
   }
 
   sPath = Apollo::getAppModulePath();
   if (s.empty()) {
     if (sPath.empty()) {
-      s.appendf("getAppModulePath returned empty path: %s", StringType(sPath));
+      s.appendf("getAppModulePath returned empty path: %s", _sz(sPath));
     }
   }
   if (s.empty()) {
     if (!String::filenameIsAbsolutePath(sPath)) {
-      s.appendf("getAppModulePath returned no absolute path: %s", StringType(sPath));
+      s.appendf("getAppModulePath returned no absolute path: %s", _sz(sPath));
     }
   }
 
   sPath = Apollo::getAppResourcePath();
   if (s.empty()) {
     if (sPath.empty()) {
-      s.appendf("getAppResourcePath returned empty path: %s", StringType(sPath));
+      s.appendf("getAppResourcePath returned empty path: %s", _sz(sPath));
     }
   }
   if (s.empty()) {
     if (!String::filenameIsAbsolutePath(sPath)) {
-      s.appendf("getAppResourcePath returned no absolute path: %s", StringType(sPath));
+      s.appendf("getAppResourcePath returned no absolute path: %s", _sz(sPath));
     }
   }
 
   sPath = Apollo::getAppLibraryPath();
   if (s.empty()) {
     if (sPath.empty()) {
-      s.appendf("getAppLibraryPath returned empty path: %s", StringType(sPath));
+      s.appendf("getAppLibraryPath returned empty path: %s", _sz(sPath));
     }
   }
   if (s.empty()) {
     if (!String::filenameIsAbsolutePath(sPath)) {
-      s.appendf("getAppLibraryPath returned no absolute path: %s", StringType(sPath));
+      s.appendf("getAppLibraryPath returned no absolute path: %s", _sz(sPath));
     }
   }
   

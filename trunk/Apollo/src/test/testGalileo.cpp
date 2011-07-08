@@ -16,7 +16,7 @@
 
 static void Test_Galileo_UnitTest_TokenEnd()
 {
-  apLog_Info((LOG_CHANNEL, "Test_Galileo_UnitTest_TokenEnd", "Finished Test/Galileo"));
+  apLog_Info((LOG_CHANNEL, LOG_CONTEXT, "Finished Test/Galileo"));
   { ApAsyncMessage<Msg_UnitTest_Token> msg; msg.Post(); }
 }
 
@@ -133,7 +133,7 @@ void Test_Galileo_Display_Controller::CreateDisplay()
   {
     Msg_Win32_GetInstance msg;
     if (!msg.Request()) {
-      apLog_Error((LOG_CHANNEL, "Test_Galileo_Display_Controller::CreateDisplay", "Msg_Win32_GetInstance failed"));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_Win32_GetInstance failed"));
     } else {
       hInstance_ = msg.hInstance;
     }
@@ -141,7 +141,7 @@ void Test_Galileo_Display_Controller::CreateDisplay()
 
   if (hInstance_ == NULL) {
     ok = 0;
-    apLog_Error((LOG_CHANNEL, "Test_Galileo_Display_Controller::CreateDisplay", "Missing hInstance"));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Missing hInstance"));
   }
 
   if (ok) {
@@ -159,7 +159,7 @@ void Test_Galileo_Display_Controller::CreateDisplay()
       ATOM a = ::RegisterClassEx(&wcex);
       if (a == 0) {
         ok = 0;
-        apLog_Error((LOG_CHANNEL, "Test_Galileo_Display_Controller::CreateDisplay", "RegisterClassEx failed"));
+        apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "RegisterClassEx failed"));
       }
     }
   }
@@ -178,7 +178,7 @@ void Test_Galileo_Display_Controller::CreateDisplay()
       );
     if (hWnd_ == NULL) {
       ok = 0;
-      apLog_Error((LOG_CHANNEL, "Test_Galileo_Display_Controller::CreateDisplay", "CreateWindowEx failed"));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "CreateWindowEx failed"));
     }
   }
 
@@ -210,7 +210,7 @@ void Test_Galileo_Display_Controller::CreateDisplay()
     if (hBitmap_ == NULL) {
       ok = 0;
       DWORD dw = ::GetLastError(); // returns ERROR_NOT_ENOUGH_MEMORY ?
-      apLog_Error((LOG_CHANNEL, "Test_Galileo_Display_Controller::CreateDisplay", "CreateDIBSection failed: GetLastError()=%d", dw));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "CreateDIBSection failed: GetLastError()=%d", dw));
     }
   }
 }
@@ -322,7 +322,7 @@ static void Test_Galileo_Display_Animation_SequenceBegin(Msg_Animation_SequenceB
 {
   Test_Galileo_Display_Controller* pTest_Galileo_Display_Controller = (Test_Galileo_Display_Controller*) pMsg->Ref();
   if (pTest_Galileo_Display_Controller->hItem_ != pMsg->hItem) { return; }
-  apLog_Verbose((LOG_CHANNEL, "Test_Galileo_Display_Animation_SequenceBegin", "" ApHandleFormat "", ApHandleType(pMsg->hItem)));
+  apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "" ApHandleFormat "", ApHandlePrintf(pMsg->hItem)));
 
   pTest_Galileo_Display_Controller->nCntSeqenceBegin_++;
 
@@ -333,7 +333,7 @@ static void Test_Galileo_Display_Animation_Frame(Msg_Animation_Frame* pMsg)
 {
   Test_Galileo_Display_Controller* pTest_Galileo_Display_Controller = (Test_Galileo_Display_Controller*) pMsg->Ref();
   if (pTest_Galileo_Display_Controller->hItem_ != pMsg->hItem) { return; }
-  apLog_Verbose((LOG_CHANNEL, "Test_Galileo_Display_Animation_Frame", "" ApHandleFormat "", ApHandleType(pMsg->hItem)));
+  apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "" ApHandleFormat "", ApHandlePrintf(pMsg->hItem)));
 
   pTest_Galileo_Display_Controller->DisplayFrame(pMsg->iFrame);
 }
@@ -341,7 +341,7 @@ static void Test_Galileo_Display_Animation_Frame(Msg_Animation_Frame* pMsg)
 static void Test_Galileo_Display_Galileo_RequestAnimation(Msg_Galileo_RequestAnimation* pMsg)
 {
   Test_Galileo_Display_Controller* pTest_Galileo_Display_Controller = (Test_Galileo_Display_Controller*) pMsg->Ref();
-  apLog_Verbose((LOG_CHANNEL, "Test_Galileo_Display_Galileo_RequestAnimation", "%s", StringType(pMsg->sUrl)));
+  apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "%s", _sz(pMsg->sUrl)));
 
   //String sFile = String::filenameFile(pMsg->sUrl);
 
@@ -359,14 +359,14 @@ static void Test_Galileo_Display_Galileo_RequestAnimation(Msg_Galileo_RequestAni
 //static void Test_Galileo_Display_Galileo_RequestAnimationComplete(Msg_Galileo_RequestAnimationComplete* pMsg)
 //{
 //  Test_Galileo_Display_Controller* pTest_Galileo_Display_Controller = (Test_Galileo_Display_Controller*) pMsg->Ref();
-//  apLog_Verbose((LOG_CHANNEL, "Test_Galileo_Display_Galileo_RequestAnimationComplete", "%s", StringType(pMsg->sUrl)));
+//  apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "%s", _sz(pMsg->sUrl)));
 //  pMsg->apStatus = ApMessage::Ok;
 //}
 
 static void Test_Galileo_Display_Galileo_SaveAnimationDataToStorage(Msg_Galileo_SaveAnimationDataToStorage* pMsg)
 {
   Test_Galileo_Display_Controller* pTest_Galileo_Display_Controller = (Test_Galileo_Display_Controller*) pMsg->Ref();
-  apLog_Verbose((LOG_CHANNEL, "Test_Galileo_Display_Galileo_SaveAnimationDataToStorage", "%s", StringType(pMsg->sUrl)));
+  apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "%s", _sz(pMsg->sUrl)));
 
   pMsg->apStatus = ApMessage::Ok;
 }
@@ -374,7 +374,7 @@ static void Test_Galileo_Display_Galileo_SaveAnimationDataToStorage(Msg_Galileo_
 static void Test_Galileo_Display_Galileo_IsAnimationDataInStorage(Msg_Galileo_IsAnimationDataInStorage* pMsg)
 {
   Test_Galileo_Display_Controller* pTest_Galileo_Display_Controller = (Test_Galileo_Display_Controller*) pMsg->Ref();
-  apLog_Verbose((LOG_CHANNEL, "Test_Galileo_Display_Galileo_IsAnimationDataInStorage", "%s", StringType(pMsg->sUrl)));
+  apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "%s", _sz(pMsg->sUrl)));
 
   pMsg->bAvailable = 1;
 
@@ -384,7 +384,7 @@ static void Test_Galileo_Display_Galileo_IsAnimationDataInStorage(Msg_Galileo_Is
 static void Test_Galileo_Display_Galileo_LoadAnimationDataFromStorage(Msg_Galileo_LoadAnimationDataFromStorage* pMsg)
 {
   Test_Galileo_Display_Controller* pTest_Galileo_Display_Controller = (Test_Galileo_Display_Controller*) pMsg->Ref();
-  apLog_Verbose((LOG_CHANNEL, "Test_Galileo_Display_Galileo_LoadAnimationDataFromStorage", "%s", StringType(pMsg->sUrl)));
+  apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "%s", _sz(pMsg->sUrl)));
 
   String sFile = String::filenameFile(pMsg->sUrl);
   Apollo::loadFile(Apollo::getAppResourcePath() + "test/tassadar/" + sFile, pMsg->sbData);
@@ -397,7 +397,7 @@ static void Test_Galileo_Display_Animation_SequenceEnd(Msg_Animation_SequenceEnd
 {
   Test_Galileo_Display_Controller* pTest_Galileo_Display_Controller = (Test_Galileo_Display_Controller*) pMsg->Ref();
   if (pTest_Galileo_Display_Controller->hItem_ != pMsg->hItem) { return; }
-  apLog_Verbose((LOG_CHANNEL, "Test_Galileo_Display_Animation_SequenceEnd", "" ApHandleFormat "", ApHandleType(pMsg->hItem)));
+  apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "" ApHandleFormat "", ApHandlePrintf(pMsg->hItem)));
 
   pTest_Galileo_Display_Controller->nCntSeqenceEnd_++;
   pTest_Galileo_Display_Controller->lSequences_.AddLast(pMsg->sGroup, pTest_Galileo_Display_Controller->nCntSeqenceEnd_);
@@ -595,7 +595,7 @@ static void Test_Galileo_UnitTest_Token(Msg_UnitTest_Token* pMsg)
 {
   AP_UNUSED_ARG(pMsg);
   { Msg_UnitTest_Token msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_Galileo_UnitTest_Token, 0); }
-  apLog_Info((LOG_CHANNEL, "Test_Galileo_UnitTest_Token", "Starting Test/Galileo"));
+  apLog_Info((LOG_CHANNEL, LOG_CONTEXT, "Starting Test/Galileo"));
   int bTokenEndNow = 1;
   
   AP_UNITTEST_EXECUTE(Test_Galileo_Display_Begin); bTokenEndNow = 0;

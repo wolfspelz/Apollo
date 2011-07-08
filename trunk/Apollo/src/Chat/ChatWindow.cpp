@@ -19,7 +19,7 @@ void ChatWindow::Open()
   {
     Msg_Vp_CreateContext msg;
     msg.hContext = hContext_;
-    if (!msg.Request()) { throw ApException("ChatWindow::Open() %s failed" ApHandleFormat "", StringType(msg.Type())); }
+    if (!msg.Request()) { throw ApException(LOG_CONTEXT, "%s failed" ApHandleFormat "", _sz(msg.Type())); }
   }
 
   {
@@ -36,7 +36,7 @@ void ChatWindow::Open()
     msg.sCaption = Apollo::translate(MODULE_NAME, "", "Chat");
     msg.sIconUrl = "file://" + Apollo::getModuleResourcePath(MODULE_NAME) + "icon.png";
     msg.sContentUrl = "file://" + Apollo::getModuleResourcePath(MODULE_NAME) + "Chat.html";
-    if (!msg.Request()) { throw ApException("%s failed: %s", StringType(msg.Type()), StringType(msg.sComment)); }
+    if (!msg.Request()) { throw ApException(LOG_CONTEXT, "%s failed: %s", _sz(msg.Type()), _sz(msg.sComment)); }
   }
 }
 
@@ -44,7 +44,7 @@ void ChatWindow::Close()
 {
   Msg_Dialog_Destroy msg;
   msg.hDialog = hAp_;
-  if (!msg.Request()) { throw ApException("%s failed: %s", StringType(msg.Type()), StringType(msg.sComment)); }
+  if (!msg.Request()) { throw ApException(LOG_CONTEXT, "%s failed: %s", _sz(msg.Type()), _sz(msg.sComment)); }
 }
 
 void ChatWindow::AttachToLocation(const ApHandle& hLocation)
@@ -53,7 +53,7 @@ void ChatWindow::AttachToLocation(const ApHandle& hLocation)
     Msg_Vp_AddLocationContext msg;
     msg.hLocation = hLocation;
     msg.hContext = hContext_;
-    if (!msg.Request()) { throw ApException("ChatWindow::AttachToLocation() %s failed: %s" ApHandleFormat "", StringType(msg.Type()), StringType(msg.sComment)); }
+    if (!msg.Request()) { throw ApException(LOG_CONTEXT, "%s failed: %s" ApHandleFormat "", _sz(msg.Type()), _sz(msg.sComment)); }
   }
 
   {
@@ -91,7 +91,7 @@ void ChatWindow::OnLoaded()
     Msg_VpView_GetParticipants msg;
     msg.hLocation = hLocation_;
     if (!msg.Request()) {
-      apLog_Warning((LOG_CHANNEL, "ChatWindow::OnLoaded", "% failed: %s", StringType(msg.Type()), StringType(msg.sComment)));
+      apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "% failed: %s", _sz(msg.Type()), _sz(msg.sComment)));
     } else {
       for (Apollo::ValueElem* e = 0; e = msg.vlParticipants.nextElem(e); ) {
         ApHandle hParticipant = e->getHandle();
@@ -107,7 +107,7 @@ void ChatWindow::OnUnload()
 {
   Msg_Vp_DestroyContext msg;
   msg.hContext = hContext_;
-  if (!msg.Request()) { throw ApException("ChatWindow::OnUnload() %s failed: %s" ApHandleFormat "", StringType(msg.Type()), StringType(msg.sComment)); }
+  if (!msg.Request()) { throw ApException(LOG_CONTEXT, "%s failed: %s" ApHandleFormat "", _sz(msg.Type()), _sz(msg.sComment)); }
 }
 
 void ChatWindow::OnModuleCall(Apollo::SrpcMessage& request, Apollo::SrpcMessage& response)
@@ -121,11 +121,11 @@ void ChatWindow::OnModuleCall(Apollo::SrpcMessage& request, Apollo::SrpcMessage&
       Msg_Vp_SendPublicChat msg;
       msg.hLocation = hLocation_;
       msg.sText = sText;
-      if (!msg.Request()) { throw ApException("ChatWindow::OnModuleCall() %s failed  loc=" ApHandleFormat ": %s", StringType(msg.Type()), ApHandleType(hLocation_), StringType(msg.sComment)); }
+      if (!msg.Request()) { throw ApException(LOG_CONTEXT, "%s failed  loc=" ApHandleFormat ": %s", _sz(msg.Type()), ApHandlePrintf(hLocation_), _sz(msg.sComment)); }
     }
 
   } else {
-    throw ApException("ChatWindow::OnModuleCall() Unknown Method=%s", StringType(sMethod));
+    throw ApException(LOG_CONTEXT, "Unknown Method=%s", _sz(sMethod));
   }
 }
 

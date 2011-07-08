@@ -29,8 +29,9 @@ BOOL APIENTRY DllMain(HANDLE hModule, DWORD dwReason, LPVOID lpReserved)
 }
 #endif // defined(WIN32)
 
-#define LOG_CHANNEL "WinMainLoop"
 #define MODULE_NAME "WinMainLoop"
+#define LOG_CHANNEL MODULE_NAME
+#define LOG_CONTEXT apLog_Context
 
 static AP_MODULE_INFO g_info = {
   sizeof(AP_MODULE_INFO),
@@ -401,7 +402,7 @@ void MainLoopModule::On_MainLoop_Win32Loop(Msg_MainLoop_Win32Loop* pMsg)
   if (Apollo::getModuleConfig(MODULE_NAME, "Singleton", 1)) {
     HWND hWnd = FindWindow(sClass, sTitle);
     if (hWnd != NULL) {
-      apLog_Info((LOG_CHANNEL, "MainLoopModule::On_MainLoop_Win32Loop", "Terminating because of Singleton requirement, found window class=%s title=%s", StringType(sClass), StringType(sTitle)));
+      apLog_Info((LOG_CHANNEL, LOG_CONTEXT, "Terminating because of Singleton requirement, found window class=%s title=%s", _sz(sClass), _sz(sTitle)));
       ok = 0;
     }
   }
@@ -478,7 +479,7 @@ loop:
       ApAsyncMessage<Msg_Log_Line> msgLL;
       msgLL->nMask = apLog_MaskError;
       msgLL->sChannel = MODULE_NAME;
-      msgLL->sContext = "MainLoopModule::On_MainLoop_Win32Loop";
+      msgLL->sContext = LOG_CONTEXT;
       msgLL->sMessage = "Unknown exception";
       msgLL.Post();
 
@@ -733,7 +734,7 @@ String MainLoopModule::Test_Timer_Queue()
     ApHandle hApExpected = e.hExpected_;
     ApHandle hAp = tle->hTimer_;
     if (hAp != hApExpected) {
-      err.appendf("Position %d has " ApHandleFormat " expected " ApHandleFormat, nCnt, ApHandleType(hAp), ApHandleType(hApExpected));
+      err.appendf("Position %d has " ApHandleFormat " expected " ApHandleFormat, nCnt, ApHandlePrintf(hAp), ApHandlePrintf(hApExpected));
       break;
     }
   }
@@ -786,7 +787,7 @@ static void Test_Timer_Interval_On_Timer_Event(Msg_Timer_Event* pMsg)
   if (pMsg->hTimer == hTest_Timer_Interval_On_Timer_Event) {
     nTest_Timer_Interval_On_Timer_Event++;
     Apollo::TimeValue tv = Apollo::TimeValue::getTime();
-    apLog_Info((LOG_CHANNEL, "Test_Timer_Interval_On_Timer_Event", "%d %s", nTest_Timer_Interval_On_Timer_Event, StringType(tv.toString())));
+    apLog_Info((LOG_CHANNEL, LOG_CONTEXT, "%d %s", nTest_Timer_Interval_On_Timer_Event, _sz(tv.toString())));
     if (nTest_Timer_Interval_On_Timer_Event == 10) {
       String err;
       if (!Apollo::cancelInterval(hTest_Timer_Interval_On_Timer_Event)) {
@@ -819,7 +820,7 @@ String MainLoopModule::Test_Timer_Interval()
 
 void MainLoopModule::UnitTest_TokenEnd()
 {
-  apLog_Info((LOG_CHANNEL, "MainLoopModule::UnitTest_TokenEnd", "Finished Test/Timer"));
+  apLog_Info((LOG_CHANNEL, LOG_CONTEXT, "Finished Test/Timer"));
   { ApAsyncMessage<Msg_UnitTest_Token> msg; msg.Post(); }
 }
 
@@ -827,7 +828,7 @@ void MainLoopModule::UnitTest_Token(Msg_UnitTest_Token* pMsg)
 {
   AP_UNUSED_ARG(pMsg);
   { Msg_UnitTest_Token msg; msg.Unhook(MODULE_NAME, (ApCallback) MainLoopModule::UnitTest_Token, 0); }
-  apLog_Info((LOG_CHANNEL, "MainLoopModule::UnitTest_Token", "Starting Test/Timer"));
+  apLog_Info((LOG_CHANNEL, LOG_CONTEXT, "Starting Test/Timer"));
   int bTokenEndNow = 0;
 
   AP_UNITTEST_EXECUTE(MainLoopModule::Test_Timer_Basic);

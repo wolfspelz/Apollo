@@ -6,7 +6,6 @@
 
 #include "Apollo.h"
 #include "Local.h"
-#include "ApLog.h"
 #include "MsgXmpp.h"
 #include "MsgProtocol.h"
 #include "Client.h"
@@ -115,7 +114,7 @@ int Room::sendState()
 
   ok = pClient_->sendStanza(presence);
   if (!ok) {
-    apLog_Error((LOG_CHANNEL, "Room::sendState", "pClient_->sendStanza() failed " ApHandleFormat "", ApHandleType(hAp_)));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "pClient_->sendStanza() failed " ApHandleFormat "", ApHandlePrintf(hAp_)));
   }
 
   return ok;
@@ -129,7 +128,7 @@ int Room::enter(String& sNickname)
 
   ok = sendState();
   if (!ok) {
-    apLog_Error((LOG_CHANNEL, "Room::enter", "sendState() failed " ApHandleFormat " nick=%s", ApHandleType(hAp_), StringType(sNickname)));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "sendState() failed " ApHandleFormat " nick=%s", ApHandlePrintf(hAp_), _sz(sNickname)));
   } else {
     nPhase_ = Phase_EnterRequested;
   }
@@ -142,7 +141,7 @@ int Room::enterRetryNextNickname(String& sConflictedNickname)
   int ok = 0;
 
   if (nNicknameConflictRetryCount_ > Apollo::getModuleConfig(MODULE_NAME, "Room/NicknameConflictRetry", 20)) {
-    apLog_Error((LOG_CHANNEL, "Room::enterRetryNextNickname", "Nickname conflict: too many retries: giving up, %s", StringType(getName())));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Nickname conflict: too many retries: giving up, %s", _sz(getName())));
   } else {
     nNicknameConflictRetryCount_++;
     String sNextNickname = nextNickname(sConflictedNickname); // getNickname() may or may not be correct here, use the parameter
@@ -163,7 +162,7 @@ int Room::leave()
   PresenceStanza presence(JABBER_PRESENCE_UNAVAILABLE, sTo);
   ok = pClient_->sendStanza(presence);
   if (!ok) {
-    apLog_Error((LOG_CHANNEL, "Room::leave", "pClient_->sendStanza() failed " ApHandleFormat "", ApHandleType(hAp_)));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "pClient_->sendStanza() failed " ApHandleFormat "", ApHandlePrintf(hAp_)));
   } else {
     nPhase_ = Phase_LeaveRequested;
   }
@@ -328,7 +327,7 @@ int Room::sendGroupchat(String& sText)
   message.addText(sText);
   ok = pClient_->sendStanza(message);
   if (!ok) {
-    apLog_Error((LOG_CHANNEL, "Room::sendGroupchat", "failed " ApHandleFormat "", ApHandleType(hAp_)));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "failed " ApHandleFormat "", ApHandlePrintf(hAp_)));
   }
 
   return ok;
@@ -615,7 +614,7 @@ int Room::receiveGroupchat(Stanza& stanza)
   }
 
   if (bDropMessage) {
-    apLog_Verbose((LOG_CHANNEL, "Room::receiveGroupchat", "Dropping delayed chat delay=%d from=%s", nAgeSec, StringType(sResource)));
+    apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "Dropping delayed chat delay=%d from=%s", nAgeSec, _sz(sResource)));
 
   } else {
     Participant* pParticipant = lParticipants_.FindByName(sResource);
@@ -644,7 +643,7 @@ String Room::test_nextNickname1(const char* szNickname, const char* szExpectedNe
   String sNickName = szNickname;
   String sNextNickname = Room::nextNickname(sNickName);
   if (sNextNickname != szExpectedNextNickname) {
-    s.appendf("%s: got=%s expected=%s", StringType(szNickname), StringType(sNextNickname), StringType(szExpectedNextNickname));
+    s.appendf("%s: got=%s expected=%s", _sz(szNickname), _sz(sNextNickname), _sz(szExpectedNextNickname));
   }
 
   return s;
@@ -672,7 +671,7 @@ String Room::test_parseDelay1(int nLine, const char* szXml, Apollo::TimeValue tv
   if (!s) {
     Apollo::XMLProcessor xml;
     if (!xml.XmlText(szXml)) {
-      s.appendf("%d: %s", nLine, StringType(xml.GetErrorString()));
+      s.appendf("%d: %s", nLine, _sz(xml.GetErrorString()));
     } else {
       Apollo::XMLNode* pRoot = xml.Root();
       if (!pRoot) {
@@ -700,7 +699,7 @@ String Room::test_parseDelay2(int nLine, const char* szXml, Apollo::TimeValue tv
   if (!s) {
     Apollo::XMLProcessor xml;
     if (!xml.XmlText(szXml)) {
-      s.appendf("%d: %s", nLine, StringType(xml.GetErrorString()));
+      s.appendf("%d: %s", nLine, _sz(xml.GetErrorString()));
     } else {
       Apollo::XMLNode* pRoot = xml.Root();
       if (!pRoot) {

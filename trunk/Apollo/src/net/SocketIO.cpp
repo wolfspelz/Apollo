@@ -4,6 +4,7 @@
 //
 // ============================================================================
 
+#include "Local.h"
 #include "ApCompiler.h"
 #include "ApOS.h"
 #include "SocketIO.h"
@@ -96,17 +97,17 @@ void TCPConnectTask::Execute()
   int ok = 0;
   Socket* s = new Socket(hAp_);
   if (s == 0) {
-    apLog_Error((LOG_CHANNEL, "TCPConnectTask::Execute", "new Socket failed " ApHandleFormat "", ApHandleType(hAp_)));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "new Socket failed " ApHandleFormat "", ApHandlePrintf(hAp_)));
   } else {
     ok = s->Open();
     if (!ok) {
-      apLog_Error((LOG_CHANNEL, "TCPConnectTask::Execute", "Open failed " ApHandleFormat "", ApHandleType(hAp_)));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Open failed " ApHandleFormat "", ApHandlePrintf(hAp_)));
     } else {
 
       if (!NetModuleInstance::Get()->inShutdown()) {
         ok = s->Connect(saAddress_);
         if (!ok) {
-          apLog_Error((LOG_CHANNEL, "TCPConnectTask::Execute", "Connect failed " ApHandleFormat "", ApHandleType(hAp_)));
+          apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Connect failed " ApHandleFormat "", ApHandlePrintf(hAp_)));
           s->Close();
         } else {
           NetModuleInstance::Get()->oSocketIO_.AddSocket(s);
@@ -128,19 +129,19 @@ void TCPListenTask::Execute()
   String sError = "";
   Socket* s = new Socket(hAp_);
   if (s == 0) {
-    apLog_Error((LOG_CHANNEL, "TCPListenTask::Execute", "new Socket failed " ApHandleFormat "", ApHandleType(hAp_)));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "new Socket failed " ApHandleFormat "", ApHandlePrintf(hAp_)));
     sError = "new Socket failed";
   } else {
     ok = s->Open();
     if (!ok) {
-      apLog_Error((LOG_CHANNEL, "TCPListenTask::Execute", "Open failed " ApHandleFormat "", ApHandleType(hAp_)));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Open failed " ApHandleFormat "", ApHandlePrintf(hAp_)));
       sError = "Socket::Open() failed";
     } else {
 
       if (!NetModuleInstance::Get()->inShutdown()) {
         ok = s->Listen(saAddress_);
         if (!ok) {
-          apLog_Error((LOG_CHANNEL, "TCPListenTask::Execute", "Listen failed " ApHandleFormat "", ApHandleType(hAp_)));
+          apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Listen failed " ApHandleFormat "", ApHandlePrintf(hAp_)));
           s->Close();
           sError = "Socket::Listen() failed";
         } else {

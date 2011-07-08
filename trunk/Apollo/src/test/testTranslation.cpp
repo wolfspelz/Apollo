@@ -17,7 +17,7 @@ String Test_Translation_Basic_1(const char* szLine, const char* szModule, const 
   String sExpected = szExpected;
   String sTranslated = Apollo::translate(szModule, szContext, szText);
   if (sTranslated != sExpected) {
-    s.appendf("%s: Got:%s expected:%s", StringType(szLine), StringType(sTranslated), StringType(sExpected));
+    s.appendf("%s: Got:%s expected:%s", _sz(szLine), _sz(sTranslated), _sz(sExpected));
   }
 
   return s;
@@ -56,7 +56,7 @@ String Test_Translation_Basic()
     if (!msg.Request()) {
       s = "Msg_Translation_GetLanguage de failed " + String::from(__LINE__);
     } else if (msg.sLanguage != "de") {
-      s.appendf("Msg_Translation_GetLanguage got:%s expected:%s", StringType(msg.sLanguage), StringType("de"));
+      s.appendf("Msg_Translation_GetLanguage got:%s expected:%s", _sz(msg.sLanguage), _sz("de"));
     }
   }
 

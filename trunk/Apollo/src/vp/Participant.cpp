@@ -5,7 +5,6 @@
 // ============================================================================
 
 #include "Apollo.h"
-#include "ApLog.h"
 #include "Local.h"
 #include "MsgVp.h"
 #include "MsgIdentity.h"
@@ -173,7 +172,7 @@ void Participant::onProtocolIdentity(const String& sId, const String& sSrc, cons
 
     if (bIdentityBasedDetailSubscribed) {
       if (!requestIdentityContainer()) {
-        apLog_Error((LOG_CHANNEL, "Participant::setIdentity", "requestIdentityContainer failed part=" ApHandleFormat " url=%s", ApHandleType(hAp_), StringType(sSrc)));
+        apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "requestIdentityContainer failed part=" ApHandleFormat " url=%s", ApHandlePrintf(hAp_), _sz(sSrc)));
       }
     }
 
@@ -266,7 +265,7 @@ void Participant::onIdentityItemChanged(const String& sUrl, const String& sId)
   msgIGI.sId = sId;
   ok = msgIGI.Request();
   if (!ok) {
-    apLog_Error((LOG_CHANNEL, "Participant::onIdentityItemChanged", "Msg_Identity_IsItemDataAvailable failed part=" ApHandleFormat " url=%s id=%s", ApHandleType(apHandle()), StringType(msgIGI.sUrl), StringType(msgIGI.sId)));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_Identity_IsItemDataAvailable failed part=" ApHandleFormat " url=%s id=%s", ApHandlePrintf(apHandle()), _sz(msgIGI.sUrl), _sz(msgIGI.sId)));
   } else {
     sType = msgIGI.sType;
   }
@@ -337,7 +336,7 @@ void Participant::onIdentityItemDataAvailable(const String& sUrl, const String& 
           msg.sUrl = sIdentitySrc_;
           msg.sKey = pThingy->getName();
           if (!msg.Request()) {
-            apLog_Error((LOG_CHANNEL, "Participant::onIdentityItemDataAvailable", "Msg_Identity_GetProperty failed part=" ApHandleFormat " url=%s key=%s", ApHandleType(hAp_), StringType(msg.sUrl), StringType(msg.sKey)));
+            apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_Identity_GetProperty failed part=" ApHandleFormat " url=%s key=%s", ApHandlePrintf(hAp_), _sz(msg.sUrl), _sz(msg.sKey)));
           } else {
             String sValue = ((IdentityPropertyParticipantThingyProvider*) pProvider)->getReferenceData();
             #if defined(_DEBUG)
@@ -394,7 +393,7 @@ int Participant::hasItemDataById(const String& sId)
     msgIIIDA.sId = sId;
     ok = msgIIIDA.Request();
     if (!ok) {
-      apLog_Error((LOG_CHANNEL, "Participant::hasItemDataById", "Msg_Identity_IsItemDataAvailable failed part=" ApHandleFormat " url=%s id=%s", ApHandleType(hAp_), StringType(msgIIIDA.sUrl), StringType(msgIIIDA.sId)));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_Identity_IsItemDataAvailable failed part=" ApHandleFormat " url=%s id=%s", ApHandlePrintf(hAp_), _sz(msgIIIDA.sUrl), _sz(msgIIIDA.sId)));
     } else {
 
       if (msgIIIDA.bAvailable) {
@@ -418,7 +417,7 @@ int Participant::hasItemDataByType(const String& sType)
     msgIICA.sDigest = sIdentityDigest_;
     ok = msgIICA.Request();
     if (!ok) {
-      apLog_Error((LOG_CHANNEL, "Participant::hasItemDataByType", "Msg_Identity_IsContainerAvailable failed part=" ApHandleFormat " url=%s", ApHandleType(hAp_), StringType(msgIICA.sUrl)));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_Identity_IsContainerAvailable failed part=" ApHandleFormat " url=%s", ApHandlePrintf(hAp_), _sz(msgIICA.sUrl)));
     } else {
       if (msgIICA.bAvailable) {
 
@@ -427,7 +426,7 @@ int Participant::hasItemDataByType(const String& sType)
         msgIGII.sType = sType;
         ok = msgIGII.Request();
         if (!ok) {
-          apLog_Error((LOG_CHANNEL, "Participant::hasItemDataByType", "Msg_Identity_GetItemIds failed url=%s type=%s", StringType(msgIGII.sUrl), StringType(msgIGII.sType)));
+          apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_Identity_GetItemIds failed url=%s type=%s", _sz(msgIGII.sUrl), _sz(msgIGII.sType)));
         } else {
           String sId = msgIGII.vlIds.atIndex(0, "");
           if (sId) {
@@ -474,7 +473,7 @@ int Participant::acquireItemDataByType(const String& sType)
     msg.sType = sType;
     ok = msg.Request();
     if (!ok) {
-      apLog_Error((LOG_CHANNEL, "Participant::acquireItemDataByType", "Msg_Identity_AcquireItemData failed part=" ApHandleFormat " url=%s type=%s", ApHandleType(hAp_), StringType(msg.sUrl), StringType(msg.sType)));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_Identity_AcquireItemData failed part=" ApHandleFormat " url=%s type=%s", ApHandlePrintf(hAp_), _sz(msg.sUrl), _sz(msg.sType)));
     }
   }
 
@@ -493,7 +492,7 @@ int Participant::requestIdentityContainer()
     msg.sDigest = sIdentityDigest_;
     ok = msg.Request();
     if (!ok) {
-      apLog_Error((LOG_CHANNEL, "Participant::requestIdentityContainer", "Msg_Identity_RequestContainer failed url=%s", StringType(msg.sUrl)));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_Identity_RequestContainer failed url=%s", _sz(msg.sUrl)));
     }
   }
 
@@ -510,7 +509,7 @@ int Participant::requestIdentityItem(const String sId)
     msgIGI.sUrl = sIdentitySrc_;
     msgIGI.sId = sId;
     if (!msgIGI.Request()) {
-      apLog_Warning((LOG_CHANNEL, "Participant::requestIdentityItem", "Msg_Identity_GetItem failed url=%s id=%s", StringType(msgIGI.sUrl), StringType(msgIGI.sId)));
+      apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "Msg_Identity_GetItem failed url=%s id=%s", _sz(msgIGI.sUrl), _sz(msgIGI.sId)));
     } else {
 
       Msg_Identity_RequestItem msgIRI;
@@ -521,7 +520,7 @@ int Participant::requestIdentityItem(const String sId)
       msgIRI.sDigest = msgIGI.sDigest;
       ok = msgIRI.Request();
       if (!ok) {
-        apLog_Error((LOG_CHANNEL, "Participant::requestIdentityItem", "Msg_Identity_RequestItem failed url=%s id=%s", StringType(msgIRI.sUrl), StringType(msgIRI.sId)));
+        apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_Identity_RequestItem failed url=%s id=%s", _sz(msgIRI.sUrl), _sz(msgIRI.sId)));
       }
     }
   }
@@ -757,7 +756,7 @@ void IdentityItemParticipantThingyProvider::getDataCore(Buffer& sbData, int& bDa
       msgIICA.sUrl = pParticipant_->getIdentitySrc();
       msgIICA.sDigest = pParticipant_->getIdentityDigest();
       if (!msgIICA.Request()) {
-        apLog_Error((LOG_CHANNEL, "IdentityItemParticipantThingyProvider::getDataCore", "Msg_Identity_IsContainerAvailable failed part=" ApHandleFormat " url=%s", ApHandleType(pParticipant_->apHandle()), StringType(msgIICA.sUrl)));
+        apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_Identity_IsContainerAvailable failed part=" ApHandleFormat " url=%s", ApHandlePrintf(pParticipant_->apHandle()), _sz(msgIICA.sUrl)));
       } else {
         if (msgIICA.bAvailable) {
 
@@ -766,7 +765,7 @@ void IdentityItemParticipantThingyProvider::getDataCore(Buffer& sbData, int& bDa
           msgIGII.sType = sType;
           msgIGII.nMax = 1;
           if (!msgIGII.Request()) {
-            apLog_Error((LOG_CHANNEL, "IdentityItemParticipantThingyProvider::getDataCore", "Msg_Identity_GetItemIds failed url=%s type=%s", StringType(msgIGII.sUrl), StringType(msgIGII.sType)));
+            apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_Identity_GetItemIds failed url=%s type=%s", _sz(msgIGII.sUrl), _sz(msgIGII.sType)));
           } else {
             String sId = msgIGII.vlIds.atIndex(0, "");
             if (sId) {
@@ -778,11 +777,11 @@ void IdentityItemParticipantThingyProvider::getDataCore(Buffer& sbData, int& bDa
               msgIIDA.sUrl = pParticipant_->getIdentitySrc();
               msgIIDA.sId = sId;
               if (!msgIIDA.Request()) { 
-                apLog_Error((LOG_CHANNEL, "IdentityItemParticipantThingyProvider::getDataCore", "Msg_Identity_IsItemDataAvailable failed: url=%s or id=%s empty", StringType(msgIIDA.sUrl), StringType(msgIIDA.sId)));
+                apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_Identity_IsItemDataAvailable failed: url=%s or id=%s empty", _sz(msgIIDA.sUrl), _sz(msgIIDA.sId)));
               } else {
                 if (!msgIIDA.bAvailable) {
                   if (!pParticipant_->requestIdentityItem(sId)) {
-                    apLog_Error((LOG_CHANNEL, "IdentityItemParticipantThingyProvider::getDataCore", "pParticipant_->requestIdentityItem() failed id=%s", StringType(sId)));
+                    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "pParticipant_->requestIdentityItem() failed id=%s", _sz(sId)));
                   }
                 } // msgIIDA.bAvailable
               } // msgIIDA
@@ -791,7 +790,7 @@ void IdentityItemParticipantThingyProvider::getDataCore(Buffer& sbData, int& bDa
               msgIGI.sUrl = pParticipant_->getIdentitySrc();
               msgIGI.sId = sId;
               if (!msgIGI.Request()) {
-                apLog_Warning((LOG_CHANNEL, "IdentityItemParticipantThingyProvider::getDataCore", "Msg_Identity_GetItem failed url=%s id=%s", StringType(msgIGI.sUrl), StringType(msgIGI.sId)));
+                apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "Msg_Identity_GetItem failed url=%s id=%s", _sz(msgIGI.sUrl), _sz(msgIGI.sId)));
               } else {
                 sMimeType = msgIGI.sMimeType;
                 sOriginalUrl = msgIGI.sSrc;
@@ -807,7 +806,7 @@ void IdentityItemParticipantThingyProvider::getDataCore(Buffer& sbData, int& bDa
                 msgIGID.sId = sId;
                 if (!msgIGID.Request()) {
                   // Not an error, item data just not available, maybe already requested
-                  //apLog_Error((LOG_CHANNEL, "IdentityItemParticipantThingyProvider::getDataCore", "Msg_Identity_GetItemData failed: url=%s or id=%s empty", StringType(msgIGID.sUrl), StringType(msgIGID.sId)));
+                  //apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_Identity_GetItemData failed: url=%s or id=%s empty", _sz(msgIGID.sUrl), _sz(msgIGID.sId)));
                 } else {
 
                   sbData = msgIGID.sbData;
@@ -842,7 +841,7 @@ int IdentityItemParticipantThingyProvider::hasData()
       msgIICA.sDigest = pParticipant_->getIdentityDigest();
       ok = msgIICA.Request();
       if (!ok) {
-        apLog_Error((LOG_CHANNEL, "IdentityItemParticipantThingyProvider::hasData", "Msg_Identity_IsContainerAvailable failed part=" ApHandleFormat " url=%s", ApHandleType(pParticipant_->apHandle()), StringType(msgIICA.sUrl)));
+        apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_Identity_IsContainerAvailable failed part=" ApHandleFormat " url=%s", ApHandlePrintf(pParticipant_->apHandle()), _sz(msgIICA.sUrl)));
       } else {
         if (msgIICA.bAvailable) {
 
@@ -852,7 +851,7 @@ int IdentityItemParticipantThingyProvider::hasData()
           msgIGII.nMax = 1;
           ok = msgIGII.Request();
           if (!ok) {
-            apLog_Error((LOG_CHANNEL, "IdentityItemParticipantThingyProvider::hasData", "Msg_Identity_GetItemIds failed url=%s type=%s", StringType(msgIGII.sUrl), StringType(msgIGII.sType)));
+            apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_Identity_GetItemIds failed url=%s type=%s", _sz(msgIGII.sUrl), _sz(msgIGII.sType)));
           } else {
             String sId = msgIGII.vlIds.atIndex(0, "");
             if (sId) {
@@ -863,7 +862,7 @@ int IdentityItemParticipantThingyProvider::hasData()
               msgIIDA.sUrl = pParticipant_->getIdentitySrc();
               msgIIDA.sId = sId;
               if (!msgIIDA.Request()) { 
-                apLog_Error((LOG_CHANNEL, "IdentityItemParticipantThingyProvider::hasData", "Msg_Identity_IsItemDataAvailable failed: url=%s or id=%s empty", StringType(msgIIDA.sUrl), StringType(msgIIDA.sId)));
+                apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_Identity_IsItemDataAvailable failed: url=%s or id=%s empty", _sz(msgIIDA.sUrl), _sz(msgIIDA.sId)));
               } else {
                 bAvailable = msgIIDA.bAvailable;
 
@@ -943,7 +942,7 @@ void IdentityPropertyParticipantThingyProvider::getIdentityProperty(const String
       msgIICA.sDigest = pParticipant_->getIdentityDigest();
       ok = msgIICA.Request();
       if (!ok) {
-        apLog_Error((LOG_CHANNEL, "IdentityPropertyParticipantThingyProvider::getIdentityProperty", "Msg_Identity_IsContainerAvailable failed part=" ApHandleFormat " url=%s", ApHandleType(pParticipant_->apHandle()), StringType(msgIICA.sUrl)));
+        apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_Identity_IsContainerAvailable failed part=" ApHandleFormat " url=%s", ApHandlePrintf(pParticipant_->apHandle()), _sz(msgIICA.sUrl)));
       } else {
         if (msgIICA.bAvailable) {
 
@@ -953,7 +952,7 @@ void IdentityPropertyParticipantThingyProvider::getIdentityProperty(const String
           msgIGII.nMax = 1;
           ok = msgIGII.Request();
           if (!ok) {
-            apLog_Error((LOG_CHANNEL, "IdentityPropertyParticipantThingyProvider::getIdentityProperty", "Msg_Identity_GetItemIds failed url=%s type=%s", StringType(msgIGII.sUrl), StringType(msgIGII.sType)));
+            apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_Identity_GetItemIds failed url=%s type=%s", _sz(msgIGII.sUrl), _sz(msgIGII.sType)));
           } else {
             if (msgIGII.vlIds.length() > 0) {
 
@@ -961,7 +960,7 @@ void IdentityPropertyParticipantThingyProvider::getIdentityProperty(const String
               msg.sUrl = pParticipant_->getIdentitySrc();
               msg.sKey = sKey;
               if (!msg.Request()) {
-                apLog_Error((LOG_CHANNEL, "IdentityPropertyParticipantThingyProvider::getIdentityProperty", "Msg_Identity_GetProperty failed part=" ApHandleFormat " url=%s key=%s", ApHandleType(pParticipant_->apHandle()), StringType(msg.sUrl), StringType(msg.sKey)));
+                apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_Identity_GetProperty failed part=" ApHandleFormat " url=%s key=%s", ApHandlePrintf(pParticipant_->apHandle()), _sz(msg.sUrl), _sz(msg.sKey)));
               } else {
                 if (!msg.sValue.empty()) {
                   sValue = msg.sValue;
@@ -1095,7 +1094,7 @@ ParticipantThingyProvider::Variant ParticipantThingyList::getVariantByKey(const 
       msgIICA.sUrl = pParticipant_->getIdentitySrc();
       msgIICA.sDigest = pParticipant_->getIdentityDigest();
       if (!msgIICA.Request()) {
-        apLog_Error((LOG_CHANNEL, "ParticipantThingyList::getVariantByKey", "Msg_Identity_IsContainerAvailable failed part=" ApHandleFormat " url=%s", ApHandleType(pParticipant_->apHandle()), StringType(msgIICA.sUrl)));
+        apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_Identity_IsContainerAvailable failed part=" ApHandleFormat " url=%s", ApHandlePrintf(pParticipant_->apHandle()), _sz(msgIICA.sUrl)));
       } else {
         if (msgIICA.bAvailable) {
 
@@ -1104,7 +1103,7 @@ ParticipantThingyProvider::Variant ParticipantThingyList::getVariantByKey(const 
             msgIHP.sUrl = pParticipant_->getIdentitySrc();
             msgIHP.sKey = sKey;
             if (!msgIHP.Request()) {
-              apLog_Error((LOG_CHANNEL, "ParticipantThingyList::getVariantByKey", "Msg_Identity_HasProperty failed part=" ApHandleFormat " url=%s", ApHandleType(pParticipant_->apHandle()), StringType(msgIHP.sUrl)));
+              apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_Identity_HasProperty failed part=" ApHandleFormat " url=%s", ApHandlePrintf(pParticipant_->apHandle()), _sz(msgIHP.sUrl)));
             } else {
               if (msgIHP.bIsProperty) {
                 bIsProperty = 1;
@@ -1117,7 +1116,7 @@ ParticipantThingyProvider::Variant ParticipantThingyList::getVariantByKey(const 
             msgIGII.sUrl = pParticipant_->getIdentitySrc();
             msgIGII.sType = sKey;
             if (!msgIGII.Request()) {
-              apLog_Error((LOG_CHANNEL, "ParticipantThingyList::getVariantByKey", "Msg_Identity_GetItemIds failed part=" ApHandleFormat " url=%s", ApHandleType(pParticipant_->apHandle()), StringType(msgIGII.sUrl)));
+              apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_Identity_GetItemIds failed part=" ApHandleFormat " url=%s", ApHandlePrintf(pParticipant_->apHandle()), _sz(msgIGII.sUrl)));
             } else {
               if (msgIGII.vlIds.length() > 0) {
                 bIsItem = 1;

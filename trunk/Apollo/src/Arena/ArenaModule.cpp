@@ -66,7 +66,7 @@ Display* ArenaModule::FindDisplay(const ApHandle& hContext)
 //    }
 //
 //    if (ApIsHandle(hLocation)) {
-//      apLog_Info((LOG_CHANNEL, "ArenaModule::DeleteOldLeaveRequestedLocations", "deleting location=" ApHandleFormat "", ApHandleType(hLocation)));
+//      apLog_Info((LOG_CHANNEL, LOG_CONTEXT, "deleting location=" ApHandleFormat "", ApHandlePrintf(hLocation)));
 //      DeleteLocation(hLocation);
 //    }
 //  }
@@ -87,7 +87,7 @@ void ArenaModule::DeleteContextOfHandle(const ApHandle& h, const ApHandle& hCont
   ApHandle hDelete;
   contextOfHandle_.Get(h, hDelete);
   if (hDelete != hContext) {
-    apLog_Warning((LOG_CHANNEL, "ArenaModule::DeleteContextOfHandle", "Context not found for handle=" ApHandleFormat " ctxt=" ApHandleFormat "", ApHandleType(h), ApHandleType(hContext)));
+    apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "Context not found for handle=" ApHandleFormat " ctxt=" ApHandleFormat "", ApHandlePrintf(h), ApHandlePrintf(hContext)));
   } else {
     contextOfHandle_.Unset(h);
   }
@@ -128,10 +128,10 @@ void ArenaModule::DeleteContextOfLocation(const ApHandle& hLocation, const ApHan
 {
   LocationContextHandleNode* pLocationContexts = contextsOfLocation_.Find(hLocation);
   if (pLocationContexts == 0) {
-    apLog_Warning((LOG_CHANNEL, "ArenaModule::DeleteContextOfLocation", "Location not found loc=" ApHandleFormat "", ApHandleType(hLocation)));
+    apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "Location not found loc=" ApHandleFormat "", ApHandlePrintf(hLocation)));
   } else {
     if (!pLocationContexts->Value().IsSet(hContext)) {
-      apLog_Warning((LOG_CHANNEL, "ArenaModule::DeleteContextOfLocation", "Context of location not found loc=" ApHandleFormat " ctxt=" ApHandleFormat "", ApHandleType(hLocation), ApHandleType(hContext)));
+      apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "Context of location not found loc=" ApHandleFormat " ctxt=" ApHandleFormat "", ApHandlePrintf(hLocation), ApHandlePrintf(hContext)));
     } else {
       pLocationContexts->Value().Unset(hContext);
       if (pLocationContexts->Value().Count() == 0) {
@@ -168,7 +168,7 @@ void ArenaModule::DeleteParticipantOfAnimation(const ApHandle& hAnimation, const
   ApHandle h;
   participantOfAnimation_.Get(hAnimation, h);
   if (h != hParticipant) {
-    apLog_Warning((LOG_CHANNEL, "ArenaModule::DeleteParticipantOfAnimation", "Participant not found for loc=" ApHandleFormat " ctxt=" ApHandleFormat "", ApHandleType(hParticipant)));
+    apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "Participant not found for loc=" ApHandleFormat " ctxt=" ApHandleFormat "", ApHandlePrintf(hParticipant)));
   } else {
     participantOfAnimation_.Unset(hAnimation);
   }
@@ -188,7 +188,7 @@ AP_MSG_HANDLER_METHOD(ArenaModule, VpView_ContextCreated)
 {
   Display* pDisplay = FindDisplay(pMsg->hContext);
   if (pDisplay) {
-    apLog_Warning((LOG_CHANNEL, "ArenaModule:VpView_ContextCreated", "Display already exists for ctxt=" ApHandleFormat "", ApHandleType(pMsg->hContext)));
+    apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "Display already exists for ctxt=" ApHandleFormat "", ApHandlePrintf(pMsg->hContext)));
   } else {
     pDisplay = CreateDisplay(pMsg->hContext);
   }
@@ -198,7 +198,7 @@ AP_MSG_HANDLER_METHOD(ArenaModule, VpView_ContextDestroyed)
 {
   Display* pDisplay = FindDisplay(pMsg->hContext);
   if (pDisplay == 0) {
-    apLog_Warning((LOG_CHANNEL, "ArenaModule::VpView_ContextDestroyed", "No display for ctxt=" ApHandleFormat "", ApHandleType(pMsg->hContext)));
+    apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "No display for ctxt=" ApHandleFormat "", ApHandlePrintf(pMsg->hContext)));
   } else {
     DeleteDisplay(pMsg->hContext);
   }
@@ -469,11 +469,11 @@ AP_MSGCLASS_HANDLER_METHOD(ArenaModule, Navigator_CallDisplay, ApSRPCMessage)
 AP_MSG_HANDLER_METHOD(ArenaModule, BrowserInfo_GetContextWin32Window)
 {
   Display* pDisplay = FindDisplay(pMsg->hContext);
-  if (pDisplay == 0) { throw ApException("No display for context=" ApHandleFormat "", ApHandleType(pMsg->hContext)); }
+  if (pDisplay == 0) { throw ApException(LOG_CONTEXT, "No display for context=" ApHandleFormat "", ApHandlePrintf(pMsg->hContext)); }
 
   Msg_WebView_GetWin32Window msg;
   msg.hView = pDisplay->GetView();
-  if (!msg.Request()) { throw ApException("Msg_WebView_GetWin32Window(" ApHandleFormat ") failed: %s", ApHandleType(msg.hView), StringType(msg.sComment)); }
+  if (!msg.Request()) { throw ApException(LOG_CONTEXT, "Msg_WebView_GetWin32Window(" ApHandleFormat ") failed: %s", ApHandlePrintf(msg.hView), _sz(msg.sComment)); }
 
   pMsg->hWnd = msg.hWnd;
   pMsg->apStatus = ApMessage::Ok;

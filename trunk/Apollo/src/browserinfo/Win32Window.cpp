@@ -5,7 +5,6 @@
 // ============================================================================
 
 #include "Apollo.h"
-#include "ApLog.h"
 #include "Local.h"
 #include "Win32Window.h"
 
@@ -178,9 +177,9 @@ Apollo::WindowHandle Firefox3Finder::GetToplevelWindow(Apollo::KeyValueList& kvS
   }
 
   if (foxPack.list_.Count() > 1) {
-    apLog_Error((LOG_CHANNEL, "BrowserInfoModule::GetToplevelWindow", "Ambiguity: %d candidates", foxPack.list_.Count()));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Ambiguity: %d candidates", foxPack.list_.Count()));
   } if (foxPack.list_.Count() == 0) {
-    apLog_Error((LOG_CHANNEL, "BrowserInfoModule::GetToplevelWindow", "No window found"));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "No window found"));
   } else {
     // Extract
     hWnd = foxPack.list_.Next(0)->Key();
@@ -265,9 +264,9 @@ Apollo::WindowHandle Firefox4Finder::GetToplevelWindow(Apollo::KeyValueList& kvS
   }
 
   if (foxPack.list_.Count() > 1) {
-    apLog_Error((LOG_CHANNEL, "BrowserInfoModule::GetToplevelWindow", "Ambiguity: %d candidates", foxPack.list_.Count()));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Ambiguity: %d candidates", foxPack.list_.Count()));
   } if (foxPack.list_.Count() == 0) {
-    apLog_Warning((LOG_CHANNEL, "BrowserInfoModule::GetToplevelWindow", "No window found"));
+    apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "No window found"));
   } else {
     // Extract
     hWnd = foxPack.list_.Next(0)->Key();

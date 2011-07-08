@@ -35,8 +35,9 @@ extern "C" {
 
 //----------------------------------------------------------
 
-#define LOG_CHANNEL "test"
 #define MODULE_NAME "test"
+#define LOG_CHANNEL MODULE_NAME
+#define LOG_CONTEXT apLog_Context
 
 #if defined (AP_TEST)
   #define AP_TEST_Builtin

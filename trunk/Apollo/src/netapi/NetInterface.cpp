@@ -10,6 +10,7 @@
 #include "NetInterface.h"
 
 #define LOG_CHANNEL "Net"
+#define LOG_CONTEXT apLog_Context
 
 AP_NAMESPACE_BEGIN
 
@@ -56,7 +57,7 @@ int TCPServer::Stop()
       msg.hServer = apHandle();
       ok = msg.Request();
       if (!ok) {
-        apLog_Error((LOG_CHANNEL, "TCPServer::Stop", "Msg_Net_TCP_ListenStop failed: " ApHandleFormat "", ApHandleType(apHandle())));
+        apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_Net_TCP_ListenStop failed: " ApHandleFormat "", ApHandlePrintf(apHandle())));
       }
     }
   } else {
@@ -85,12 +86,12 @@ int TCPServer::InternalConnectionAccepted(const ApHandle& hConnection, String& s
 {
   int ok = 0;
 
-  String sName; sName.appendf("%s %d", StringType(sClientAddress), nClientPort);
+  String sName; sName.appendf("%s %d", _sz(sClientAddress), nClientPort);
   TCPConnection* pConnection = OnConnectionAccepted(sName, hConnection, sClientAddress, nClientPort);
   if (pConnection != 0) {
     ok = 1;
   } else {
-    apLog_Warning((LOG_CHANNEL, "TCPServer::InternalConnectionAccepted", "OnConnectionAccepted(" ApHandleFormat ", %s, %d) returned NULL", ApHandleType(hConnection), StringType(sClientAddress), nClientPort));
+    apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "OnConnectionAccepted(" ApHandleFormat ", %s, %d) returned NULL", ApHandlePrintf(hConnection), _sz(sClientAddress), nClientPort));
   }
 
   if (ok) {
@@ -142,7 +143,7 @@ int TCPConnection::Connect(const char* szAddress, int nPort)
   msg.nPort = nPort_;
 
   String sName;
-  sName.appendf("%s %d", StringType(sAddress_), nPort_);
+  sName.appendf("%s %d", _sz(sAddress_), nPort_);
   setName(sName);
 
   int nHandlers = Apollo::callMsg(&msg);
@@ -195,7 +196,7 @@ int TCPConnection::InternalDataIn(unsigned char* pData, size_t nLen)
 
 int TCPConnection::InternalClosed()
 {
-  apLog_VeryVerbose((LOG_CHANNEL, "TCPConnection::InternalClosed", ApHandleFormat " %s %d", ApHandleType(hAp_), StringType(sAddress_), nPort_));
+  apLog_VeryVerbose((LOG_CHANNEL, LOG_CONTEXT, ApHandleFormat " %s %d", ApHandlePrintf(hAp_), _sz(sAddress_), nPort_));
 
   bOpen_ = 0;
   int nResult = OnClosed();
@@ -239,7 +240,7 @@ int HTTPClient::Get(const char* szUrl, KeyValueList& kvHeaders)
   msg.sReason = sReason_;
 
   String sName;
-  sName.appendf("%s %s %s", StringType(msg.sMethod), StringType(sUrl_), StringType(sReason_));
+  sName.appendf("%s %s %s", _sz(msg.sMethod), _sz(sUrl_), _sz(sReason_));
   setName(sName);
 
   int nHandlers = Apollo::callMsg(&msg);
@@ -260,7 +261,7 @@ int HTTPClient::Post(const char* szUrl, const unsigned char* pData, size_t nLen,
   msg.sReason = sReason_;
 
   String sName;
-  sName.appendf("%s %s %s", StringType(msg.sMethod), StringType(sUrl_), StringType(sReason_));
+  sName.appendf("%s %s %s", _sz(msg.sMethod), _sz(sUrl_), _sz(sReason_));
   setName(sName);
   
   int nHandlers = Apollo::callMsg(&msg);
@@ -310,7 +311,7 @@ int HTTPClient::InternalFailed(const char* szMessage)
 
 int HTTPClient::InternalClosed()
 {
-  apLog_VeryVerbose((LOG_CHANNEL, "HTTPClient::InternalClosed", ApHandleFormat " %s", ApHandleType(hAp_), StringType(sUrl_)));
+  apLog_VeryVerbose((LOG_CHANNEL, LOG_CONTEXT, ApHandleFormat " %s", ApHandlePrintf(hAp_), _sz(sUrl_)));
 
   int nResult = OnClosed();
 

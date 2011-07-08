@@ -625,9 +625,9 @@ String Test_Participant_presence_FirebatDetail::evaluate()
   for (Elem* eExpected = 0; (eExpected = lExpected_.Next(eExpected)); ) {
     Elem* eReal = lReal_.FindByName(eExpected->getName());
     if (eReal == 0) {
-      s.appendf(" %s missing, expected=%s", StringType(eExpected->getName()), StringType(eExpected->getString()));
+      s.appendf(" %s missing, expected=%s", _sz(eExpected->getName()), _sz(eExpected->getString()));
     } else if (eExpected->getString() != eReal->getString()) {
-      s.appendf(" %s=%s, expected=%s", StringType(eExpected->getName()), StringType(eReal->getString()), StringType(eExpected->getString()));
+      s.appendf(" %s=%s, expected=%s", _sz(eExpected->getName()), _sz(eReal->getString()), _sz(eExpected->getString()));
     }
   }
 
@@ -704,10 +704,10 @@ String Participant::test_presence()
   Test_Participant_presence* pScenario = 0;
   while ((pScenario = lScenarios.Next(pScenario)) && s.empty()) {
     String t;
-    if (!s) { t = pScenario->begin(); if (!t.empty()) { s.appendf("%s: begin: %s", StringType(pScenario->getName()), StringType(t)); }}
-    if (!s) { t = pScenario->exec(); if (!t.empty()) { s.appendf("%s: exec: %s", StringType(pScenario->getName()), StringType(t)); }}
-    if (!s) { t = pScenario->end(); if (!t.empty()) { s.appendf("%s: end: %s", StringType(pScenario->getName()), StringType(t)); }}
-    if (!s) { t = pScenario->evaluate(); if (!t.empty()) { s.appendf("%s: %s", StringType(pScenario->getName()), StringType(t)); }}
+    if (!s) { t = pScenario->begin(); if (!t.empty()) { s.appendf("%s: begin: %s", _sz(pScenario->getName()), _sz(t)); }}
+    if (!s) { t = pScenario->exec(); if (!t.empty()) { s.appendf("%s: exec: %s", _sz(pScenario->getName()), _sz(t)); }}
+    if (!s) { t = pScenario->end(); if (!t.empty()) { s.appendf("%s: end: %s", _sz(pScenario->getName()), _sz(t)); }}
+    if (!s) { t = pScenario->evaluate(); if (!t.empty()) { s.appendf("%s: %s", _sz(pScenario->getName()), _sz(t)); }}
   }
 
   return s;

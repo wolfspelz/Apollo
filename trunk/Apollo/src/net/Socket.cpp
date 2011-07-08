@@ -5,7 +5,7 @@
 // ============================================================================
 
 #include "Apollo.h"
-
+#include "Local.h"
 #include "Socket.h"
 #include "NetModule.h"
 
@@ -23,19 +23,19 @@ SocketAddress::SocketAddress(const char* szAddress, int nPort)
 #if defined(WIN32)
     unsigned long nAddress = inet_addr(szAddress);
     if (nAddress == INADDR_NONE) {
-      apLog_Error((LOG_CHANNEL, "SocketAddress::SocketAddress", "Address convertion to long failed: %s", StringType(szAddress)));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Address convertion to long failed: %s", _sz(szAddress)));
     } else {
       memcpy(&sai.sin_addr, &nAddress, sizeof(nAddress));
     }
 #else
     if (!inet_aton(szAddress, &sai.sin_addr)) {
-      apLog_Error((LOG_CHANNEL, "SocketAddress::SocketAddress", "Address convertion to long failed: %s", StringType(szAddress)));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Address convertion to long failed: %s", _sz(szAddress)));
     }
 #endif
 
     saddr_ = *((struct sockaddr*) &sai);
   } else {
-    apLog_Error((LOG_CHANNEL, "SocketAddress::SocketAddress", "Address family not supported: %s", StringType(szAddress)));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Address family not supported: %s", _sz(szAddress)));
   }
 }
 
@@ -138,7 +138,7 @@ int Socket::Connect(SocketAddress& saAddress)
 #endif
       ok= 1;
     } else {
-      apLog_Error((LOG_CHANNEL, "Socket::Connect", "::connect failed " ApHandleFormat " %d", ApHandleType(hAp_), nErr));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "::connect failed " ApHandleFormat " %d", ApHandlePrintf(hAp_), nErr));
     }
   } else {
     ok= 1;
@@ -168,9 +168,9 @@ int Socket::Listen(SocketAddress& saAddress)
 #error Not implemented for this platform
 #endif
     if (bAddrInUse) {
-      apLog_Error((LOG_CHANNEL, "Socket::Listen", "::bind failed: hAp=" ApHandleFormat " err=\"Address in use\" (%d)", ApHandleType(hAp_), nErr));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "::bind failed: hAp=" ApHandleFormat " err=\"Address in use\" (%d)", ApHandlePrintf(hAp_), nErr));
     } else {
-      apLog_Error((LOG_CHANNEL, "Socket::Listen", "::bind failed: hAp=" ApHandleFormat " err=%d", ApHandleType(hAp_), nErr));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "::bind failed: hAp=" ApHandleFormat " err=%d", ApHandlePrintf(hAp_), nErr));
     }
   } else {
     if (::listen(nSock_, SOMAXCONN) == SOCKET_ERROR) {
@@ -184,9 +184,9 @@ int Socket::Listen(SocketAddress& saAddress)
 #error Not implemented for this platform
 #endif
       if (bAddrInUse) {
-        apLog_Error((LOG_CHANNEL, "Socket::Listen", "::listen() failed: hAp=" ApHandleFormat " err=%d (address in use)", ApHandleType(hAp_), nErr));
+        apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "::listen() failed: hAp=" ApHandleFormat " err=%d (address in use)", ApHandlePrintf(hAp_), nErr));
       } else {
-        apLog_Error((LOG_CHANNEL, "Socket::Listen", "::listen() failed: hAp=" ApHandleFormat " err=%d", ApHandleType(hAp_), nErr));
+        apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "::listen() failed: hAp=" ApHandleFormat " err=%d", ApHandlePrintf(hAp_), nErr));
       }
     } else {
       nState_ = SocketState_Listening;
@@ -240,7 +240,7 @@ int Socket::DoSendQueue()
         OnClose();
 #endif
       } else {
-        apLog_Error((LOG_CHANNEL, "Socket::DoSendQueue", "::send failed " ApHandleFormat " %d", ApHandleType(hAp_), nErr));
+        apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "::send failed " ApHandleFormat " %d", ApHandlePrintf(hAp_), nErr));
       }
     }
   }
@@ -310,10 +310,10 @@ void Socket::OnAccept()
 #error Not implemented for this OS
 #endif
     if (ok) {
-      apLog_Warning((LOG_CHANNEL, "Socket::OnAccept", "Got accept but no incoming connection: socket=" ApHandleFormat "", ApHandleType(hAp_)));
+      apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "Got accept but no incoming connection: socket=" ApHandleFormat "", ApHandlePrintf(hAp_)));
     } else {
       Error(nErr);
-      apLog_Warning((LOG_CHANNEL, "Socket::OnAccept", "accept failed: socket=" ApHandleFormat " error=%s", ApHandleType(hAp_), StringType(sError_)));
+      apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "accept failed: socket=" ApHandleFormat " error=%s", ApHandlePrintf(hAp_), _sz(sError_)));
     }
   } else {
     ApHandle hAp = Apollo::newHandle();
@@ -332,13 +332,13 @@ void Socket::OnAccept()
         nClientPort = ::ntohs(saiClient->sin_port);
       } else {
         ok = 0;
-        apLog_Warning((LOG_CHANNEL, "Socket::OnAccept", "Unknown or unsupported address type of client, disconnecting"));
+        apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "Unknown or unsupported address type of client, disconnecting"));
         (void) s->Close();
         delete s; s = NULL;
       }
       
       if (ok) {
-        apLog_Verbose((LOG_CHANNEL, "Socket::OnAccept", "Accepted client connection: hAp=" ApHandleFormat " addr=%s port=%d", ApHandleType(hAp), StringType(sClientAddr), nClientPort));
+        apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "Accepted client connection: hAp=" ApHandleFormat " addr=%s port=%d", ApHandlePrintf(hAp), _sz(sClientAddr), nClientPort));
         
         {
           ApAsyncMessage<Msg_Net_TCP_ConnectionAccepted> msg;
@@ -351,7 +351,7 @@ void Socket::OnAccept()
         NetModuleInstance::Get()->oSocketIO_.AddSocket(s);
       }
     } else {
-      apLog_Error((LOG_CHANNEL, "Socket::OnAccept", "new Socket() failed, closing connection"));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "new Socket() failed, closing connection"));
       NetOS::SocketClose(nClientSocket, hAp);
     }
   }
@@ -396,12 +396,12 @@ void Socket::OnRead()
 #endif
         bWouldBlock = 1;
         if (nCount == 1) {
-          apLog_Warning((LOG_CHANNEL, "Socket::OnRead", "Got read state but no data on first recv " ApHandleFormat " %d", ApHandleType(hAp_), nErr));
+          apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "Got read state but no data on first recv " ApHandleFormat " %d", ApHandlePrintf(hAp_), nErr));
         } else {
           ok = 1;
         }
       } else {
-        apLog_Error((LOG_CHANNEL, "Socket::OnRead", "::recv failed " ApHandleFormat " %d", ApHandleType(hAp_), nErr));
+        apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "::recv failed " ApHandleFormat " %d", ApHandlePrintf(hAp_), nErr));
       }
     }
   }

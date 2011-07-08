@@ -14,7 +14,7 @@
 
 static void Test_Vpi_UnitTest_TokenEnd()
 {
-  apLog_Info((LOG_CHANNEL, "Test_Vpi_UnitTest_TokenEnd", "Finished Test/Vpi"));
+  apLog_Info((LOG_CHANNEL, LOG_CONTEXT, "Finished Test/Vpi"));
   { ApAsyncMessage<Msg_UnitTest_Token> msg; msg.Post(); }
 }
 
@@ -47,13 +47,13 @@ static int Test_Vpi_WithExistingData_Vpi_LocationXmlResponse(Msg_Vpi_LocationXml
         if (msg.sLocationUrl == g_sTest_Vpi_WithExistingData_Vpi_ExpectedLocationUrl) {
           // ok
         } else {
-          s.appendf("Got:%s, expected:%s, url:%s", StringType(msg.sLocationUrl), StringType(g_sTest_Vpi_WithExistingData_Vpi_ExpectedLocationUrl), StringType(pMsg->sDocumentUrl));
+          s.appendf("Got:%s, expected:%s, url:%s", _sz(msg.sLocationUrl), _sz(g_sTest_Vpi_WithExistingData_Vpi_ExpectedLocationUrl), _sz(pMsg->sDocumentUrl));
         }
       } else {
-        s.appendf("Location url failed for url:%s", StringType(pMsg->sDocumentUrl));
+        s.appendf("Location url failed for url:%s", _sz(pMsg->sDocumentUrl));
       }
     } else {
-      s.appendf("Location request failed for url:%s", StringType(pMsg->sDocumentUrl));
+      s.appendf("Location request failed for url:%s", _sz(pMsg->sDocumentUrl));
     }
 
     { Msg_Vpi_LocationXmlResponse msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_Vpi_WithExistingData_Vpi_LocationXmlResponse, 0); }
@@ -301,13 +301,13 @@ static int Test_Vpi_DetailedMap_Vpi_LocationXmlResponse(Msg_Vpi_LocationXmlRespo
           if (msg.sLocationUrl == g_sTest_Vpi_DetailedMap_Vpi_ExpectedLocationUrl) {
             // ok
           } else {
-            s.appendf("Got:%s, expected:%s", StringType(msg.sLocationUrl), StringType(g_sTest_Vpi_DetailedMap_Vpi_ExpectedLocationUrl));
+            s.appendf("Got:%s, expected:%s", _sz(msg.sLocationUrl), _sz(g_sTest_Vpi_DetailedMap_Vpi_ExpectedLocationUrl));
           }
         } else {
-          s.appendf("Location url failed for url:%s", StringType(pMsg->sDocumentUrl));
+          s.appendf("Location url failed for url:%s", _sz(pMsg->sDocumentUrl));
         }
       } else {
-        s.appendf("Location request failed for url:%s", StringType(pMsg->sDocumentUrl));
+        s.appendf("Location request failed for url:%s", _sz(pMsg->sDocumentUrl));
       }
     } else {
       s.appendf("response=%d request=%d receive=%d", g_bTest_Vpi_DetailedMap, g_bTest_Vpi_DetailedMap_Vpi_RequestFile, g_bTest_Vpi_DetailedMap_Vpi_ReceiveFile);
@@ -349,7 +349,7 @@ static String Test_Vpi_DetailedMap_Start()
     msg.sDocumentUrl = g_sTest_Vpi_DetailedMap_Vpi_DocumentURL;
     msg.hRequest = g_hTest_Vpi_DetailedMap = Apollo::newHandle();
     if (!msg.Request()) {
-      s.appendf("Failed to map '%s'", StringType(g_sTest_Vpi_DetailedMap_Vpi_DocumentURL));
+      s.appendf("Failed to map '%s'", _sz(g_sTest_Vpi_DetailedMap_Vpi_DocumentURL));
     }
   }
 
@@ -412,15 +412,15 @@ static int Test_Vpi_Map_Vpi_LocationXmlResponse(Msg_Vpi_LocationXmlResponse* pMs
             nTest_Vpi_Map_Success++;
           } else {
             bDone = 1;
-            s.appendf("Got:%s, expected:%s for:%s ", StringType(msg.sLocationUrl), StringType(d->sLocationUrl_), StringType(d->sDocumentUrl_));
+            s.appendf("Got:%s, expected:%s for:%s ", _sz(msg.sLocationUrl), _sz(d->sLocationUrl_), _sz(d->sDocumentUrl_));
           }
         } else {
           bDone = 1;
-          s.appendf("Location url failed for url:%s ", StringType(pMsg->sDocumentUrl));
+          s.appendf("Location url failed for url:%s ", _sz(pMsg->sDocumentUrl));
         }
       } else {
         bDone = 1;
-        s.appendf("Location request failed for url:%s ", StringType(pMsg->sDocumentUrl));
+        s.appendf("Location request failed for url:%s ", _sz(pMsg->sDocumentUrl));
       }
     }
   }
@@ -442,7 +442,7 @@ static int Test_Vpi_Map_Vpi_LocationXmlResponse(Msg_Vpi_LocationXmlResponse* pMs
       if (status_ok) {
         AP_UNITTEST_SUCCESS(Test_Vpi_Map_End);
       } else {
-        s.appendf("mapped ok, but VPI module status is different: %s", StringType(sWhich));
+        s.appendf("mapped ok, but VPI module status is different: %s", _sz(sWhich));
       }
 
     } else {
@@ -484,7 +484,7 @@ static String Test_Vpi_Map_Start()
       msg.sDocumentUrl = d->sDocumentUrl_;
       msg.hRequest = d->apHandle();
       if (!msg.Request()) {
-        s.appendf("Failed to map '%s'", StringType(d->sDocumentUrl_));
+        s.appendf("Failed to map '%s'", _sz(d->sDocumentUrl_));
       }
     }
   }
@@ -502,7 +502,7 @@ static void Test_Vpi_UnitTest_Token(Msg_UnitTest_Token* pMsg)
 {
   AP_UNUSED_ARG(pMsg);
   { Msg_UnitTest_Token msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_Vpi_UnitTest_Token, 0); }
-  apLog_Info((LOG_CHANNEL, "Test_Vpi_UnitTest_Token", "Starting Test/Vpi"));
+  apLog_Info((LOG_CHANNEL, LOG_CONTEXT, "Starting Test/Vpi"));
   int bTokenEndNow = 1;
 
   AP_UNITTEST_EXECUTE(Test_Vpi_WithExistingData_Start);
@@ -524,14 +524,9 @@ void Test_Vpi_Register()
 {
 #if defined(AP_TEST_Vpi)
 
-#if defined(AP_TEST_Net_HTTP)
+  #if defined(AP_TEST_Net_HTTP)
     if (Apollo::isLoadedModule("Net")) {
-      Msg_Net_IsOnline msg;
-      if (msg.Request()) {
-        if (msg.bIsOnline) {
-          g_bTest_Vpi_Online = 1;
-        }
-      }
+      g_bTest_Vpi_Online = Msg_Net_IsOnline::_();
     }
   #endif // AP_TEST_Net_HTTP
 

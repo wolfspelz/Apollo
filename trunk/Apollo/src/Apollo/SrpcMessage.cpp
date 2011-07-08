@@ -104,7 +104,7 @@ String SrpcMessage::toString()
   String sMsg;
 
   for (Elem* e = 0; (e = Next(e)) != 0; ) {
-    sMsg.appendf("%s=%s\n", StringType(e->getName()), StringType(e->getString()));
+    sMsg.appendf("%s=%s\n", _sz(e->getName()), _sz(e->getString()));
   }
 
   return sMsg;

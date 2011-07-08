@@ -15,6 +15,7 @@
 #include "MsgSystem.h"
 
 #define LOG_CHANNEL MODULE_NAME
+#define LOG_CONTEXT apLog_Context
 
 #if defined(WIN32)
 BOOL APIENTRY DllMain(HANDLE hModule, DWORD dwReason, LPVOID lpReserved)
@@ -191,7 +192,7 @@ AP_MSG_HANDLER_METHOD(TestDialogModule, WebView_ModuleCall)
     }
 
   } else if (sMethod == "Cwd") {
-    apLog_Debug((LOG_CHANNEL, "TestDialogModule, WebView_ModuleCall", "cwd=%s", StringType(Apollo::getCwd())));
+    apLog_Debug((LOG_CHANNEL, LOG_CONTEXT, "cwd=%s", _sz(Apollo::getCwd())));
 
   }
 
@@ -247,7 +248,7 @@ void TestDialogModule::Open()
   msg.sCaption = "Test Controls";
   msg.sIconUrl = "file://" + Apollo::getModuleResourcePath(MODULE_NAME) + "icon.png";
   msg.sContentUrl = "file://" + Apollo::getModuleResourcePath(MODULE_NAME) + "index.html";
-  if (!msg.Request()) { throw ApException("Msg_Dialog_Create failed: %s", StringType(msg.sComment)); }
+  if (!msg.Request()) { throw ApException(LOG_CONTEXT, "Msg_Dialog_Create failed: %s", _sz(msg.sComment)); }
 
   dialogs_.Set(hDialog, 1);
 }

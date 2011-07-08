@@ -18,6 +18,7 @@
 
 #define APLIB_NAME "ApLib"
 #define LOG_CHANNEL APLIB_NAME
+#define LOG_CONTEXT apLog_Context
 #define MODULE_NAME APLIB_NAME
 
 // -------------------------------------------------------------------
@@ -134,9 +135,9 @@ HANDLE ApLib::libraryLoad(const String& sDllPath)
   if (hDll == NULL) {
     #if defined(LINUX) || defined(MAC)
       String sError = dlerror();
-      apLog_Warning((LOG_CHANNEL, "ApLib::libraryLoad", "dlopen(%s) failed: %s", StringType(sDllPath), StringType(sError)));
+      apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "dlopen(%s) failed: %s", _sz(sDllPath), _sz(sError)));
     #else
-      apLog_Warning((LOG_CHANNEL, "ApLib::libraryLoad", "failed to load library %s %d", StringType(sDllPath), GetLastError()));
+      apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "failed to load library %s %d", _sz(sDllPath), GetLastError()));
     #endif
     AP_DEBUG_BREAK();
   }
@@ -146,13 +147,13 @@ HANDLE ApLib::libraryLoad(const String& sDllPath)
 void* ApLib::libraryGetProcAddress(HANDLE hDll, const String& sSymbol)
 {
 #if defined(WIN32)
-  return (void*) ::GetProcAddress((HINSTANCE)hDll, StringType(sSymbol));
+  return (void*) ::GetProcAddress((HINSTANCE)hDll, _sz(sSymbol));
 #elif defined(LINUX) || defined(MAC)
   dlerror();
-  HANDLE hSym = dlsym(hDll, StringType(sSymbol));
+  HANDLE hSym = dlsym(hDll, _sz(sSymbol));
   if (hSym == NULL) {
     String sErr = dlerror();
-    if (!sErr.empty()) { apLog_Warning((LOG_CHANNEL, "ApLib::LibraryGetAddress", "dlsym failed: %s", StringType(sErr))); }
+    if (!sErr.empty()) { apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "dlsym failed: %s", _sz(sErr))); }
   }
   return hSym;
 #else
@@ -168,7 +169,7 @@ int ApLib::libraryFree(HANDLE hDll)
   ::FreeLibrary((HINSTANCE)hDll);
 #elif defined(LINUX) || defined(MAC)
   if (dlclose(hDll) != 0) {
-    apLog_Warning((LOG_CHANNEL, "ApLib::libraryFree", "dlclose failed: %s", dlerror()));
+    apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "dlclose failed: %s", dlerror()));
     ok = 0;
   }
 #else
@@ -466,7 +467,7 @@ String ApLib::getUserProfilePath()
   }
   if (!bCanReadWrite) {
     s = Apollo::getAppBasePath();
-    //apLog_Error((LOG_CHANNEL, "SQLiteFile::pathFromName", "Can not read/write %s", StringType(sAssertWriteabilityPath)));
+    //apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Can not read/write %s", _sz(sAssertWriteabilityPath)));
   }
 
   return s;
@@ -705,7 +706,7 @@ AP_MSG_HANDLER_METHOD(ApLib, OS_StartProcess)
   //}
 
   String sCmdLine;
-  sCmdLine.appendf("\"%s\" %s", StringType(pMsg->sExePath), StringType(pMsg->sArgs));
+  sCmdLine.appendf("\"%s\" %s", _sz(pMsg->sExePath), _sz(pMsg->sArgs));
 
   STARTUPINFO si; 
   memset(&si, '\0', sizeof STARTUPINFO);
@@ -726,9 +727,9 @@ AP_MSG_HANDLER_METHOD(ApLib, OS_StartProcess)
                       &pi       // Pointer to PROCESS_INFORMATION structure.
                     );
   if (!ok) {
-    apLog_Error((LOG_CHANNEL, "ApLib::On_OS_StartProcess", "CreateProcess failed for command line: %s %s", StringType(sCmdLine), StringType(_FormatLastError())));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "CreateProcess failed for command line: %s %s", _sz(sCmdLine), _sz(_FormatLastError())));
   } else {
-    apLog_Info((LOG_CHANNEL, "ApLib::On_OS_StartProcess", "%s", StringType(sCmdLine)));
+    apLog_Info((LOG_CHANNEL, LOG_CONTEXT, "%s", _sz(sCmdLine)));
     pMsg->nPid = pi.dwProcessId;
   }
 
@@ -895,7 +896,7 @@ int ApLib::Init(int nArgc, char** pszArgv)
   hCoreDll_ = Apollo::libraryLoad(sApCoreDll);
   if (hCoreDll_ == 0) {
     ok = 0;
-    apLog_Error((LOG_CHANNEL, "ApCore::Init", "Apollo::libraryLoad %d", StringType(sApCoreDll)));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Apollo::libraryLoad %d", _sz(sApCoreDll)));
   } else {
     { String sSymbol = "Init"; fpInit_ = (ApCoreInitF) Apollo::libraryGetProcAddress(hCoreDll_, sSymbol); }
     { String sSymbol = "Exit"; fpExit_ = (ApCoreExitF) Apollo::libraryGetProcAddress(hCoreDll_, sSymbol); }
@@ -904,14 +905,14 @@ int ApLib::Init(int nArgc, char** pszArgv)
 
   if (fpCall_ == 0 || fpInit_ == 0 || fpExit_ == 0) {
     ok = 0;
-    apLog_Error((LOG_CHANNEL, "ApCore::Init", "Missing interface Call=0x&08x Init=0x&08x Exit=0x&08x", (long) fpCall_, (long) fpInit_, (long) fpExit_));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Missing interface Call=0x&08x Init=0x&08x Exit=0x&08x", (long) fpCall_, (long) fpInit_, (long) fpExit_));
   }
 
   if (ok) {
     if (fpInit_ != 0) {
       ok = fpInit_();
       if (! ok) {
-        apLog_Error((LOG_CHANNEL, "ApCore::Init", "hCoreDll_->fpInit_ failed"));
+        apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "hCoreDll_->fpInit_ failed"));
       }
     }
   }

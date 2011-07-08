@@ -5,9 +5,8 @@
 // ============================================================================
 
 #include "Apollo.h"
-#include "ApLog.h"
-#include "MsgDb.h"
 #include "Local.h"
+#include "MsgDb.h"
 #include "DunModule.h"
 
 AP_MSG_HANDLER_METHOD(DunModule, Core_ModuleLoaded)
@@ -22,7 +21,7 @@ AP_MSG_HANDLER_METHOD(DunModule, Core_ModuleLoaded)
       Msg_DB_DeleteFile msg;
       msg.sName = e->getName();
       if (!msg.Request()) {
-        apLog_Warning((LOG_CHANNEL, "DunModule::Core_ModuleLoaded", "Msg_DB_DeleteFile failed name=%s", StringType(msg.sName)));
+        apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "Msg_DB_DeleteFile failed name=%s", _sz(msg.sName)));
       }
     }
   }

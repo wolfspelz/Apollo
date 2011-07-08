@@ -17,4 +17,4 @@ CallScriptSrpcFunctionName=ReceiveMessage
 
 Language/en=[[MODULE_RESOURCE_PATH]]/en.txt
 Language/de=[[MODULE_RESOURCE_PATH]]/de.txt
-Language/zh=[[MODULE_RESOURCE_PATH]]/zh.txt
+Language/ja=[[MODULE_RESOURCE_PATH]]/ja.txt

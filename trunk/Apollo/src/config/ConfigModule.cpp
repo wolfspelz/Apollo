@@ -5,7 +5,6 @@
 // ============================================================================
 
 #include "Apollo.h"
-#include "ApLog.h"
 #include "MsgDB.h"
 #include "Local.h"
 #include "ConfigModule.h"
@@ -25,9 +24,9 @@ int ConfigModule::setValue(ConfigPlane* pPlane, const String& sKey, const String
     sTrimmed.trimWSP();
     if (!sTrimmed.empty()) {
       if (sKey.startsWith("#")) {
-        apLog_Verbose((LOG_CHANNEL, "setValue", "%s:%s=%s", StringType(pPlane->getName()), StringType(sKey), StringType(sValue)));
+        apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "%s:%s=%s", _sz(pPlane->getName()), _sz(sKey), _sz(sValue)));
       } else {
-        apLog_Info((LOG_CHANNEL, "setValue", "%s:%s=%s", StringType(pPlane->getName()), StringType(sKey), StringType(sValue)));
+        apLog_Info((LOG_CHANNEL, LOG_CONTEXT, "%s:%s=%s", _sz(pPlane->getName()), _sz(sKey), _sz(sValue)));
       }
       return pPlane->stData_.Set(sKey, sValue);
     }
@@ -63,7 +62,7 @@ AP_MSG_HANDLER_METHOD(ConfigModule, Config_SetValue)
           msg.sValue = pMsg->sValue;
           ok = msg.Request();
           if (!ok) {
-            apLog_Error((LOG_CHANNEL, "Msg_DB_Set", "Msg_DB_Set failed name=%s key=%s", StringType(msg.sName), StringType(msg.sKey)));
+            apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_DB_Set failed name=%s key=%s", _sz(msg.sName), _sz(msg.sKey)));
           }
         }
       }
@@ -113,7 +112,7 @@ AP_MSG_HANDLER_METHOD(ConfigModule, Config_DeleteValue)
           msg.sName = pPlane->sDbName_;
           msg.sKey = pKey->getName();
           if (!msg.Request()) {
-            apLog_Error((LOG_CHANNEL, "Msg_DB_Set", "Msg_DB_Set failed name=%s key=%s", StringType(msg.sName), StringType(msg.sKey)));
+            apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_DB_Set failed name=%s key=%s", _sz(msg.sName), _sz(msg.sKey)));
           }
         }
       }
@@ -140,7 +139,7 @@ AP_MSG_HANDLER_METHOD(ConfigModule, Config_Load)
   int ok = 0;
 
   if (pMsg->sName.empty()) {
-    apLog_Warning((LOG_CHANNEL, "On_Config_Load", "Filename empty"));
+    apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "Filename empty"));
   } else {
 
     ConfigPlane* pPlane = lPlanes_.FindByName(sCurrentPlane_);
@@ -165,7 +164,7 @@ AP_MSG_HANDLER_METHOD(ConfigModule, Config_Load)
 
         String sData;
         if (!Apollo::loadFile(sFile, sData)) {
-          apLog_Error((LOG_CHANNEL, "On_Config_Load", "fConfig.Load(%s)", StringType(sFile)));
+          apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "fConfig.Load(%s)", _sz(sFile)));
         } else {
           ok = 1;
           pPlane->vlPathNames_.add(sFile);
@@ -186,7 +185,7 @@ AP_MSG_HANDLER_METHOD(ConfigModule, Config_Load)
 
         String sData;
         if (!Apollo::loadFile(sFile, sData)) {
-          apLog_Info((LOG_CHANNEL, "On_Config_Load", "fConfig.Load failed(%s)", StringType(sFile)));
+          apLog_Info((LOG_CHANNEL, LOG_CONTEXT, "fConfig.Load failed(%s)", _sz(sFile)));
         } else {
           ok = 1;
           pPlane->vlPathNames_.add(sFile);
@@ -209,13 +208,13 @@ AP_MSG_HANDLER_METHOD(ConfigModule, Config_Load)
             Msg_DB_Open msgDO;
             msgDO.sName = sDbName;
             if (!msgDO.Request()) {
-              apLog_Error((LOG_CHANNEL, "ConfigModule::Config_Load", "Msg_DB_Open %s failed", StringType(msgDO.sName)));
+              apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_DB_Open %s failed", _sz(msgDO.sName)));
             } else {
 
               Msg_DB_GetKeys msgDGK;
               msgDGK.sName = sDbName;
               if (!msgDGK.Request()) {
-                apLog_Error((LOG_CHANNEL, "ConfigModule::Config_Load", "Msg_DB_GetKeys %s failed", StringType(msgDGK.sName)));
+                apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_DB_GetKeys %s failed", _sz(msgDGK.sName)));
               } else {
 
                 for (Apollo::ValueElem* e = 0; (e = msgDGK.vlKeys.nextElem(e)) != 0; ) {
@@ -223,7 +222,7 @@ AP_MSG_HANDLER_METHOD(ConfigModule, Config_Load)
                   msgDG.sName = sDbName;
                   msgDG.sKey = e->getString();
                   if (!msgDG.Request()) {
-                    apLog_Error((LOG_CHANNEL, "ConfigModule::Config_Load", "Msg_DB_Get %s failed key=%s", StringType(msgDG.sName), StringType(msgDG.sKey)));
+                    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_DB_Get %s failed key=%s", _sz(msgDG.sName), _sz(msgDG.sKey)));
                   } else {
                     (void) setValue(pPlane, e->getString(), msgDG.sValue);
                   }
@@ -290,7 +289,7 @@ AP_MSG_HANDLER_METHOD(ConfigModule, Config_DeletePlane)
         msg.sName = pPlane->sDbName_;
         if (!msg.Request()) {
           ok = 0;
-          apLog_Error((LOG_CHANNEL, "ConfigModule::Config_DeletePlane", "Msg_DB_Close %s failed", StringType(msg.sName)));
+          apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_DB_Close %s failed", _sz(msg.sName)));
         }
       }
     }
@@ -574,7 +573,7 @@ String Test_Config_Persist()
 
 void Test_Config_UnitTest_TokenEnd()
 {
-  apLog_Info((LOG_CHANNEL, "Test_Config_UnitTest_TokenEnd", "Finishing Test/Config"));
+  apLog_Info((LOG_CHANNEL, LOG_CONTEXT, "Finishing Test/Config"));
   { ApAsyncMessage<Msg_UnitTest_Token> msg; msg.Post(); }
 }
 
@@ -582,7 +581,7 @@ AP_MSG_HANDLER_METHOD(ConfigModule, UnitTest_Token)
 {
   AP_UNUSED_ARG(pMsg);
   { Msg_UnitTest_Token msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(ConfigModule, UnitTest_Token), this); }
-  apLog_Info((LOG_CHANNEL, "ConfigModule::UnitTest_Token", "Starting Test/Config"));
+  apLog_Info((LOG_CHANNEL, LOG_CONTEXT, "Starting Test/Config"));
   int bTokenEndNow = 1;
 
   if (Apollo::getConfig("Test/Config", 0)) {

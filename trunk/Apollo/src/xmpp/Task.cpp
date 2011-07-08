@@ -6,7 +6,6 @@
 
 #include "Apollo.h"
 #include "Local.h"
-#include "ApLog.h"
 #include "XMLProcessor.h"
 #include "MessageDigest.h"
 #include "Protocol.h"
@@ -39,7 +38,7 @@ int LoginTask::handleStanza(Stanza& stanza, StanzaHandlerResult& result)
       result.stanzaConsumed(1);
       sStreamId_ = stanza.getAttribute("id").getValue();
       if (sStreamId_.empty()) {
-        apLog_Error((LOG_CHANNEL, "LoginTask::handleStanza", "<stream:stream> No stream ID"));
+        apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "<stream:stream> No stream ID"));
         nPhase_ = LoginFailed;
         result.connectionFinished(1);
         result.taskFinished(1);
@@ -62,9 +61,9 @@ int LoginTask::handleStanza(Stanza& stanza, StanzaHandlerResult& result)
         if (sType == "error") {
           String sError; int nError = 0;
           if (stanza.getError(nError, sError)) {
-            apLog_Error((LOG_CHANNEL, "LoginTask::handleStanza", "jabber:iq:auth error result: %d %s", nError, StringType(sError)));
+            apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "jabber:iq:auth error result: %d %s", nError, _sz(sError)));
           } else {
-            apLog_Error((LOG_CHANNEL, "LoginTask::handleStanza", "jabber:iq:auth unknown error result"));
+            apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "jabber:iq:auth unknown error result"));
           }
           nPhase_ = LoginFailed;
           result.connectionFinished(1);
@@ -81,7 +80,7 @@ int LoginTask::handleStanza(Stanza& stanza, StanzaHandlerResult& result)
             sendPasswordAuth();
             nPhase_ = PasswordAuth;
           } else {
-            apLog_Error((LOG_CHANNEL, "LoginTask::handleStanza", "jabber:iq:auth result: neither digest nor password auth available"));
+            apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "jabber:iq:auth result: neither digest nor password auth available"));
             nPhase_ = LoginFailed;
             result.connectionFinished(1);
             pClient_->onProtocolLoginFailed();
@@ -102,15 +101,15 @@ int LoginTask::handleStanza(Stanza& stanza, StanzaHandlerResult& result)
         if (sType == "error") {
           String sError; int nError = 0;
           if (stanza.getError(nError, sError)) {
-            apLog_Error((LOG_CHANNEL, "LoginTask::handleStanza", "DigestAuth error result: %d %s", nError, StringType(sError)));
+            apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "DigestAuth error result: %d %s", nError, _sz(sError)));
           } else {
-            apLog_Error((LOG_CHANNEL, "LoginTask::handleStanza", "DigestAuth unknown error result"));
+            apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "DigestAuth unknown error result"));
           }
           nPhase_ = LoginFailed;
           result.connectionFinished(1);
           pClient_->onProtocolLoginFailed();
         } else {
-          apLog_Info((LOG_CHANNEL, "LoginTask::handleStanza", "Logged in"));
+          apLog_Info((LOG_CHANNEL, LOG_CONTEXT, "Logged in"));
           nPhase_ = LoggedIn;
           pClient_->onProtocolLogin();
         }
@@ -129,15 +128,15 @@ int LoginTask::handleStanza(Stanza& stanza, StanzaHandlerResult& result)
         if (sType == "error") {
           String sError; int nError = 0;
           if (stanza.getError(nError, sError)) {
-            apLog_Error((LOG_CHANNEL, "LoginTask::handleStanza", "PasswordAuth error result: %d %s", nError, StringType(sError)));
+            apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "PasswordAuth error result: %d %s", nError, _sz(sError)));
           } else {
-            apLog_Error((LOG_CHANNEL, "LoginTask::handleStanza", "PasswordAuth unknown error result"));
+            apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "PasswordAuth unknown error result"));
           }
           nPhase_ = LoginFailed;
           result.connectionFinished(1);
           pClient_->onProtocolLoginFailed();
         } else {
-          apLog_Info((LOG_CHANNEL, "LoginTask::handleStanza", "Logged in"));
+          apLog_Info((LOG_CHANNEL, LOG_CONTEXT, "Logged in"));
           nPhase_ = LoggedIn;
           pClient_->onProtocolLogin();
         }
@@ -146,12 +145,12 @@ int LoginTask::handleStanza(Stanza& stanza, StanzaHandlerResult& result)
     break;
 
   case LoginFailed:
-    apLog_Warning((LOG_CHANNEL, "LoginTask::handleStanza", "Ignoring stanza after LoginFailed"));
+    apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "Ignoring stanza after LoginFailed"));
     result.connectionFinished(1);
     break;
 
   default:
-    apLog_Error((LOG_CHANNEL, "LoginTask::handleStanza", "Unknown phase"));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Unknown phase"));
     result.connectionFinished(1);
   }
 
@@ -177,7 +176,7 @@ int LoginTask::sendAuthMechQuery()
 
   ok = pClient_->sendStanza(request);
   if (!ok) {
-    apLog_Error((LOG_CHANNEL, "LoginTask::sendAuthMechQuery", "pClient_->sendStanza() failed <%s ...", StringType(request.getName())));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "pClient_->sendStanza() failed <%s ...", _sz(request.getName())));
   }
 
   return ok;
@@ -215,7 +214,7 @@ int LoginTask::sendDigestAuth()
 
   ok = pClient_->sendStanza(request);
   if (!ok) {
-    apLog_Error((LOG_CHANNEL, "LoginTask::sendDigestAuth", "pClient_->sendStanza() failed <%s ...", StringType(request.getName())));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "pClient_->sendStanza() failed <%s ...", _sz(request.getName())));
   }
 
   return ok;
@@ -260,7 +259,7 @@ int PresenceTask::handleStanza(Stanza& stanza, StanzaHandlerResult& result)
   if (stanza.getName() == "presence") {
     JabberId from = stanza.getAttribute("from").getValue();
 
-    apLog_Verbose((LOG_CHANNEL, "PresenceTask::handleStanza", "<presence from=%s ...", StringType(from)));
+    apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "<presence from=%s ...", _sz(from)));
 
     Room* pRoom = pClient_->findRoom(from.base());
     Buddy* pBuddy = pClient_->findBuddy(from.base());
@@ -349,7 +348,7 @@ int VersionTask::handleStanza(Stanza& stanza, StanzaHandlerResult& result)
         result.stanzaConsumed(1);
         ok = sendResponse(stanza);
         if (!ok) {
-          apLog_Error((LOG_CHANNEL, "VersionTask::handleStanza", "sendResponse() failed"));
+          apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "sendResponse() failed"));
         }
       }
     }
@@ -373,7 +372,7 @@ int VersionTask::sendResponse(Stanza& stanza)
   String sFrom = stanza.getAttribute("from").getValue();
   if (sFrom.empty()) {
     ok = 0;
-    apLog_Warning((LOG_CHANNEL, "VersionTask::sendResponse", "missing from"));
+    apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "missing from"));
   } else {
     ResultStanza result(sId, sFrom);
     Apollo::XMLNode& AP_UNUSED_VARIABLE query = result.addQuery(JABBER_NS_VERSION);
@@ -397,7 +396,7 @@ int VersionTask::sendResponse(Stanza& stanza)
 
     ok = pClient_->sendStanza(result);
     if (!ok) {
-      apLog_Error((LOG_CHANNEL, "VersionTask::sendResponse", "pClient_->sendStanza() failed to=%s", StringType(sFrom)));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "pClient_->sendStanza() failed to=%s", _sz(sFrom)));
     }
   }
 
@@ -417,7 +416,7 @@ int GroupchatTask::handleStanza(Stanza& stanza, StanzaHandlerResult& result)
   if (stanza.getName() == "message" && sType == "groupchat") {
     JabberId from = stanza.getAttribute("from").getValue();
 
-    apLog_Verbose((LOG_CHANNEL, "GroupchatTask::handleStanza", "<message from=%s ...", StringType(from)));
+    apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "<message from=%s ...", _sz(from)));
 
     Room* pRoom = pClient_->findRoom(from.base());
 
@@ -453,7 +452,7 @@ int StreamErrorTask::handleStanza(Stanza& stanza, StanzaHandlerResult& result)
       sError = text.getCData();
     }
 
-    apLog_Info((LOG_CHANNEL, "StreamErrorTask::handleStanza", "%s", StringType(sError)));
+    apLog_Info((LOG_CHANNEL, LOG_CONTEXT, "%s", _sz(sError)));
 
     result.stanzaHandled(1);
     result.stanzaConsumed(1);

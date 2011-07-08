@@ -5,7 +5,7 @@
 // ============================================================================
 
 #include "Apollo.h"
-#include "ApLog.h"
+#include "Local.h"
 #include "MsgNet.h"
 #include "netsim.h"
 #include "NetSimModule.h"
@@ -20,9 +20,6 @@ BOOL APIENTRY DllMain(HANDLE hModule, DWORD dwReason, LPVOID lpReserved)
   return TRUE;
 }
 #endif // defined(WIN32)
-
-#define LOG_CHANNEL "NetSim"
-#define MODULE_NAME "NetSim"
 
 static AP_MODULE_INFO g_info = {
   sizeof(AP_MODULE_INFO),

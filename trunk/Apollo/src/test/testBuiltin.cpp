@@ -38,7 +38,7 @@ String Test_Check(String& s, size_t nBytes, size_t nChars, size_t nAllocated, co
   String err;
 
   if (!err) {
-    if (s.bytes() != nBytes || s.chars() != nChars || (nAllocated != 0 && s.allocated() != nAllocated)) { err.appendf("%s: bytes()=%d != %d || chars()=%d != %d || allocated()=%d != %d", StringType(s), s.bytes(), nBytes, s.chars(), nChars, s.allocated(), nAllocated); }
+    if (s.bytes() != nBytes || s.chars() != nChars || (nAllocated != 0 && s.allocated() != nAllocated)) { err.appendf("%s: bytes()=%d != %d || chars()=%d != %d || allocated()=%d != %d", _sz(s), s.bytes(), nBytes, s.chars(), nChars, s.allocated(), nAllocated); }
   }
   
   if (!err && pBytes != 0) {
@@ -51,7 +51,7 @@ String Test_Check(String& s, size_t nBytes, size_t nChars, size_t nAllocated, co
       }
     }
     if (!sDiff.empty()) {
-      err.appendf("bytes differ: %s", StringType(sDiff));
+      err.appendf("bytes differ: %s", _sz(sDiff));
     }
   }
 
@@ -63,7 +63,7 @@ String Test_Check(String& s, const char* sz)
   String err;
 
   if (!err) {
-    if (s != sz) { err.appendf("%s != %s", StringType(s), sz); }
+    if (s != sz) { err.appendf("%s != %s", _sz(s), sz); }
   }
   
   return err;
@@ -84,51 +84,51 @@ String Test_String_SimpleASCII()
 {
   String err;
 
-  if (!err) { String s; if (!s.empty()) { err.appendf("%d: %s ! empty()", __LINE__, StringType(s)); } }
-  if (!err) { String s(""); if (!s.empty()) { err.appendf("%d: %s ! empty()", __LINE__, StringType(s)); } }
-  if (!err) { String s = ""; if (!s.empty()) { err.appendf("%d: %s ! empty()", __LINE__, StringType(s)); } }
-  if (!err) { String s; s = ""; if (!s.empty()) { err.appendf("%d: %s ! empty()", __LINE__, StringType(s)); } }
-  if (!err) { String s; if (s != "") { err.appendf("%d: %s != \"\"", __LINE__, StringType(s)); } }
+  if (!err) { String s; if (!s.empty()) { err.appendf("%d: %s ! empty()", __LINE__, _sz(s)); } }
+  if (!err) { String s(""); if (!s.empty()) { err.appendf("%d: %s ! empty()", __LINE__, _sz(s)); } }
+  if (!err) { String s = ""; if (!s.empty()) { err.appendf("%d: %s ! empty()", __LINE__, _sz(s)); } }
+  if (!err) { String s; s = ""; if (!s.empty()) { err.appendf("%d: %s ! empty()", __LINE__, _sz(s)); } }
+  if (!err) { String s; if (s != "") { err.appendf("%d: %s != \"\"", __LINE__, _sz(s)); } }
 
-  if (!err) { String s; if (s) { err.appendf("%d: %s ! empty()", __LINE__, StringType(s)); } }
-  if (!err) { String s(""); if (s) { err.appendf("%d: %s ! empty()", __LINE__, StringType(s)); } }
-  if (!err) { String s = ""; if (s) { err.appendf("%d: %s ! empty()", __LINE__, StringType(s)); } }
-  if (!err) { String s; s = ""; if (s) { err.appendf("%d: %s ! empty()", __LINE__, StringType(s)); } }
+  if (!err) { String s; if (s) { err.appendf("%d: %s ! empty()", __LINE__, _sz(s)); } }
+  if (!err) { String s(""); if (s) { err.appendf("%d: %s ! empty()", __LINE__, _sz(s)); } }
+  if (!err) { String s = ""; if (s) { err.appendf("%d: %s ! empty()", __LINE__, _sz(s)); } }
+  if (!err) { String s; s = ""; if (s) { err.appendf("%d: %s ! empty()", __LINE__, _sz(s)); } }
 
-  if (!err) { String s("xx"); if (!s) { err.appendf("%d: %s is empty()", __LINE__, StringType(s)); } }
+  if (!err) { String s("xx"); if (!s) { err.appendf("%d: %s is empty()", __LINE__, _sz(s)); } }
 
-  if (!err) { String t; String s = t.c_str(); if (s != "") { err.appendf("%d: %s != \"\"", __LINE__, StringType(s)); } }
-  if (!err) { String t; String s = (const char*) t; if (s != "") { err.appendf("%d: %s != \"\"", __LINE__, StringType(s)); } }
+  if (!err) { String t; String s = t.c_str(); if (s != "") { err.appendf("%d: %s != \"\"", __LINE__, _sz(s)); } }
+  if (!err) { String t; String s = (const char*) t; if (s != "") { err.appendf("%d: %s != \"\"", __LINE__, _sz(s)); } }
   if (!err) { String s; err = Test_String_AsConst(s); }
   if (!err) { err = Test_String_AsConst(""); }
 
   if (!err) {
     String s("abc");
     s.append("de");
-    if (s != "abcde") { err.appendf("5: %s != %s", StringType(s), "abcde"); }
+    if (s != "abcde") { err.appendf("5: %s != %s", _sz(s), "abcde"); }
   }
   if (!err) {
     String s("abc");
     s += "de";
-    if (s != "abcde") { err.appendf("6: %s != %s", StringType(s), "abcde"); }
+    if (s != "abcde") { err.appendf("6: %s != %s", _sz(s), "abcde"); }
   }
   if (!err) {
     String s("abc");
     String s2("de");
     s += s2;
-    if (s != "abcde") { err.appendf("7: %s != %s", StringType(s), "abcde"); }
+    if (s != "abcde") { err.appendf("7: %s != %s", _sz(s), "abcde"); }
   }
   if (!err) {
     String s("ab");
     String s2("de");
     s += "c" + s2;
-    if (s != "abcde") { err.appendf("8: %s != %s", StringType(s), "abcde"); }
+    if (s != "abcde") { err.appendf("8: %s != %s", _sz(s), "abcde"); }
   }
 
   if (!err) {
     String s("abc");
     s.appendf("d%s", "e");
-    if (s != "abcde") { err.appendf("10: %s != %s", StringType(s), "abcde"); }
+    if (s != "abcde") { err.appendf("10: %s != %s", _sz(s), "abcde"); }
   }
   if (!err) {
     String s("123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 ");
@@ -249,22 +249,22 @@ String Test_String_operators()
 {
   String err;
 
-  if (!err) { String s1 = "b"; String s2 = "c"; if (s1 > s2) { err.appendf("%s > %s", StringType(s1), StringType(s2)); }; }
-  if (!err) { String s1 = "bbbbbbbb"; String s2 = "bbbbbbbc"; if (s1 > s2) { err.appendf("%s > %s", StringType(s1), StringType(s2)); }; }
-  if (!err) { String s1 = "\xE9\xA0\x81"; String s2 = "\xE9\xA6\x96"; if (s1 > s2) { err.appendf("%s > %s", StringType(s1), StringType(s2)); }; }
-  if (!err) { String s1 = "\xC3\xA4" "\xC3\xA4" "\xC3\xA4" "\xE9\xA0\x81"; String s2 = "\xC3\xA4" "\xC3\xA4" "\xC3\xA4" "\xE9\xA6\x96"; if (s1 > s2) { err.appendf("%s > %s", StringType(s1), StringType(s2)); }; }
-  if (!err) { String s1 = "\xC3\xA4" "\xC3\xA4" "\xC3\xA4" "\xE9\xA6\x96"; String s2 = "\xC3\xA4" "\xC3\xA4" "\xE9\xA0\x81" "\xC3\xA4"; if (s1 > s2) { err.appendf("%s > %s", StringType(s1), StringType(s2)); }; }
+  if (!err) { String s1 = "b"; String s2 = "c"; if (s1 > s2) { err.appendf("%s > %s", _sz(s1), _sz(s2)); }; }
+  if (!err) { String s1 = "bbbbbbbb"; String s2 = "bbbbbbbc"; if (s1 > s2) { err.appendf("%s > %s", _sz(s1), _sz(s2)); }; }
+  if (!err) { String s1 = "\xE9\xA0\x81"; String s2 = "\xE9\xA6\x96"; if (s1 > s2) { err.appendf("%s > %s", _sz(s1), _sz(s2)); }; }
+  if (!err) { String s1 = "\xC3\xA4" "\xC3\xA4" "\xC3\xA4" "\xE9\xA0\x81"; String s2 = "\xC3\xA4" "\xC3\xA4" "\xC3\xA4" "\xE9\xA6\x96"; if (s1 > s2) { err.appendf("%s > %s", _sz(s1), _sz(s2)); }; }
+  if (!err) { String s1 = "\xC3\xA4" "\xC3\xA4" "\xC3\xA4" "\xE9\xA6\x96"; String s2 = "\xC3\xA4" "\xC3\xA4" "\xE9\xA0\x81" "\xC3\xA4"; if (s1 > s2) { err.appendf("%s > %s", _sz(s1), _sz(s2)); }; }
 
-  if (!err) { String s2 = "b"; String s1 = "c"; if (s1 < s2) { err.appendf("%s < %s", StringType(s1), StringType(s2)); }; }
-  if (!err) { String s2 = "bbbbbbbb"; String s1 = "bbbbbbbc"; if (s1 < s2) { err.appendf("%s < %s", StringType(s1), StringType(s2)); }; }
-  if (!err) { String s2 = "\xE9\xA0\x81"; String s1 = "\xE9\xA6\x96"; if (s1 < s2) { err.appendf("%s < %s", StringType(s1), StringType(s2)); }; }
-  if (!err) { String s2 = "\xC3\xA4" "\xC3\xA4" "\xC3\xA4" "\xE9\xA0\x81"; String s1 = "\xC3\xA4" "\xC3\xA4" "\xC3\xA4" "\xE9\xA6\x96"; if (s1 < s2) { err.appendf("%s < %s", StringType(s1), StringType(s2)); }; }
-  if (!err) { String s2 = "\xC3\xA4" "\xC3\xA4" "\xC3\xA4" "\xE9\xA6\x96"; String s1 = "\xC3\xA4" "\xC3\xA4" "\xE9\xA0\x81" "\xC3\xA4"; if (s1 < s2) { err.appendf("%s < %s", StringType(s1), StringType(s2)); }; }
+  if (!err) { String s2 = "b"; String s1 = "c"; if (s1 < s2) { err.appendf("%s < %s", _sz(s1), _sz(s2)); }; }
+  if (!err) { String s2 = "bbbbbbbb"; String s1 = "bbbbbbbc"; if (s1 < s2) { err.appendf("%s < %s", _sz(s1), _sz(s2)); }; }
+  if (!err) { String s2 = "\xE9\xA0\x81"; String s1 = "\xE9\xA6\x96"; if (s1 < s2) { err.appendf("%s < %s", _sz(s1), _sz(s2)); }; }
+  if (!err) { String s2 = "\xC3\xA4" "\xC3\xA4" "\xC3\xA4" "\xE9\xA0\x81"; String s1 = "\xC3\xA4" "\xC3\xA4" "\xC3\xA4" "\xE9\xA6\x96"; if (s1 < s2) { err.appendf("%s < %s", _sz(s1), _sz(s2)); }; }
+  if (!err) { String s2 = "\xC3\xA4" "\xC3\xA4" "\xC3\xA4" "\xE9\xA6\x96"; String s1 = "\xC3\xA4" "\xC3\xA4" "\xE9\xA0\x81" "\xC3\xA4"; if (s1 < s2) { err.appendf("%s < %s", _sz(s1), _sz(s2)); }; }
 
-  if (!err) { String s1 = "b"; String s2 = "b"; if (s1 != s2) { err.appendf("%s != %s", StringType(s1), StringType(s2)); }; }
-  if (!err) { String s1 = "b"; if (s1 != "b") { err.appendf("%s != %s", StringType(s1), StringType("b")); }; }
-  if (!err) { String s1 = "b"; String s2 = "c"; if (s1 == s2) { err.appendf("%s == %s", StringType(s1), StringType(s2)); }; }
-  if (!err) { String s1 = "b"; if (s1 == "c") { err.appendf("%s == %s", StringType(s1), StringType("c")); }; }
+  if (!err) { String s1 = "b"; String s2 = "b"; if (s1 != s2) { err.appendf("%s != %s", _sz(s1), _sz(s2)); }; }
+  if (!err) { String s1 = "b"; if (s1 != "b") { err.appendf("%s != %s", _sz(s1), _sz("b")); }; }
+  if (!err) { String s1 = "b"; String s2 = "c"; if (s1 == s2) { err.appendf("%s == %s", _sz(s1), _sz(s2)); }; }
+  if (!err) { String s1 = "b"; if (s1 == "c") { err.appendf("%s == %s", _sz(s1), _sz("c")); }; }
 
   return err;
 }
@@ -332,7 +332,7 @@ String Test_String_StartsWith_One(const char* szText, const char* szHaystack, co
 
   String s = szHaystack;
   if (bResult != s.startsWith(szNeedle)) {
-    err.appendf("%s: %s %s %s", szText, StringType(s), bResult?"does not start with":"starts with", szNeedle);
+    err.appendf("%s: %s %s %s", szText, _sz(s), bResult?"does not start with":"starts with", szNeedle);
   }
 
   return err;
@@ -358,7 +358,7 @@ String Test_String_EndsWith_One(const char* szText, const char* szHaystack, cons
 
   String s = szHaystack;
   if (bResult != s.endsWith(szNeedle)) {
-    err.appendf("%s: %s %s %s", szText, StringType(s), bResult?"does not end with":"ends with", szNeedle);
+    err.appendf("%s: %s %s %s", szText, _sz(s), bResult?"does not end with":"ends with", szNeedle);
   }
 
   return err;
@@ -388,7 +388,7 @@ String Test_String_Contains_One(const char* szText, const char* szHaystack, cons
 
   String s = szHaystack;
   if (bResult != s.contains(szNeedle)) {
-    err.appendf("%s: %s %s %s", szText, StringType(s), bResult?"does not contain":"contains", szNeedle);
+    err.appendf("%s: %s %s %s", szText, _sz(s), bResult?"does not contain":"contains", szNeedle);
   }
 
   return err;
@@ -415,7 +415,7 @@ String Test_String_Char_One(const char* szText, const char* szChar, unsigned int
 
   unsigned int n = String::UTF8_Char(szChar);
   if (n != nChar) {
-    err.appendf("%s: %s=0x%x != 0x%x", szText, StringType(szChar), n, nChar);
+    err.appendf("%s: %s=0x%x != 0x%x", szText, _sz(szChar), n, nChar);
   }
 
   return err;
@@ -442,11 +442,11 @@ String Test_String_FindCharSingle_One(const char* szText, const char* szHaystack
   const char* pPos = s.findChar(nNeedle);
   if (nPos < 0) {
     if (pPos != 0) {
-      err.appendf("%s: 0x%x found in %s", szText, nNeedle, StringType(s));
+      err.appendf("%s: 0x%x found in %s", szText, nNeedle, _sz(s));
     }
   } else {
     if (nPos != String::UTF8_CharLen(s.c_str(), pPos - s.c_str())) {
-      err.appendf("%s: 0x%x not found @%d in %s", szText, nNeedle, nPos, StringType(s));
+      err.appendf("%s: 0x%x not found @%d in %s", szText, nNeedle, nPos, _sz(s));
     }
   }
 
@@ -474,11 +474,11 @@ String Test_String_FindCharMultiple_One(const char* szText, const char* szHaysta
   const char* pPos = s.findChar(szNeedle);
   if (nPos < 0) {
     if (pPos != 0) {
-      err.appendf("%s: one of %s found in %s", szText, szNeedle, StringType(s));
+      err.appendf("%s: one of %s found in %s", szText, szNeedle, _sz(s));
     }
   } else {
     if (pPos != s.c_str() + String::UTF8_ByteLen(s.c_str(), nPos)) {
-      err.appendf("%s: none of %s found @%d in %s", szText, szNeedle, nPos, StringType(s));
+      err.appendf("%s: none of %s found @%d in %s", szText, szNeedle, nPos, _sz(s));
     }
   }
   
@@ -514,7 +514,7 @@ String Test_String_Token_One(const char* szText, const char* szHaystack, const c
     }
   }
   if (sToken != szToken) {
-    err.appendf("%s: '%s' not at pos %d in '%s'", szText, szToken, nPos, StringType(s));
+    err.appendf("%s: '%s' not at pos %d in '%s'", szText, szToken, nPos, _sz(s));
   }
   
   return err;
@@ -532,7 +532,7 @@ String Test_String_ReverseToken_One(const char* szText, const char* szHaystack, 
     }
   }
   if (sToken != szToken) {
-    err.appendf("%s: '%s' not at pos %d in '%s'", szText, szToken, nPos, StringType(s));
+    err.appendf("%s: '%s' not at pos %d in '%s'", szText, szToken, nPos, _sz(s));
   }
   
   return err;
@@ -625,7 +625,7 @@ String Test_String_ReplaceSingle_One(const char* szText, const char* szSubject, 
 {
   String err;
   String sSubject = szSubject; sSubject.replace(szSearch, szReplace);
-  if (sSubject != szResult) { err.appendf("%s: %s != %s", szText, StringType(sSubject), szResult); }
+  if (sSubject != szResult) { err.appendf("%s: %s != %s", szText, _sz(sSubject), szResult); }
   return err;
 }
 
@@ -647,7 +647,7 @@ String Test_String_ReplaceList_One(const char* szText, const char* szSubject, Li
 {
   String err;
   String sSubject = szSubject; sSubject.replace(lSearchReplace);
-  if (sSubject != szResult) { err.appendf("%s: %s != %s", szText, StringType(sSubject), szResult); }
+  if (sSubject != szResult) { err.appendf("%s: %s != %s", szText, _sz(sSubject), szResult); }
   return err;
 }
 
@@ -681,7 +681,7 @@ String Test_String_Trim_One(const char* szText, const char* szString, const char
   String s = szString;
   s.trim(szChars);
   if (s != szResult) {
-    err.appendf("%s: got %s instead of %s", szText, StringType(s), szResult);
+    err.appendf("%s: got %s instead of %s", szText, _sz(s), szResult);
   }
   
   return err;
@@ -721,7 +721,7 @@ String Test_String_Reverse_One(const char* szText, const char* szString, const c
 
   String sReverse = String::reverse(szString);
   if (sReverse != szResult) {
-    err.appendf("%s: got %s instead of %s", szText, StringType(sReverse), szResult);
+    err.appendf("%s: got %s instead of %s", szText, _sz(sReverse), szResult);
   }
   
   return err;
@@ -752,7 +752,7 @@ String Test_String_Escape_One(const char* szText, const char* szString, String::
   String s = szString;
   s.escape(nType);
   if (s != szResult) {
-    err.appendf("%s: got %s instead of %s", szText, StringType(s), szResult);
+    err.appendf("%s: got %s instead of %s", szText, _sz(s), szResult);
   }
   
   return err;
@@ -785,7 +785,7 @@ String Test_String_UnEscape_One(const char* szText, const char* szString, String
   String s = szString;
   s.unescape(nType);
   if (s != szResult) {
-    err.appendf("%s: got %s instead of %s", szText, StringType(s), szResult);
+    err.appendf("%s: got %s instead of %s", szText, _sz(s), szResult);
   }
   
   return err;
@@ -807,7 +807,7 @@ String Test_String_FilenameExtension_One(const char* szText, const char* szStrin
   String s = szString;
   String sExt = String::filenameExtension(s);
   if (sExt != szResult) {
-    err.appendf("%s: got %s instead of %s", szText, StringType(sExt), szResult);
+    err.appendf("%s: got %s instead of %s", szText, _sz(sExt), szResult);
   }
   
   return err;
@@ -820,7 +820,7 @@ String Test_String_FilenameBasePath_One(const char* szText, const char* szString
   String s = szString;
   String sExt = String::filenameBasePath(s);
   if (sExt != szResult) {
-    err.appendf("%s: got %s instead of %s", szText, StringType(sExt), szResult);
+    err.appendf("%s: got %s instead of %s", szText, _sz(sExt), szResult);
   }
   
   return err;
@@ -833,7 +833,7 @@ String Test_String_FilenameFile_One(const char* szText, const char* szString, co
   String s = szString;
   String sFile = String::filenameFile(s);
   if (sFile != szResult) {
-    err.appendf("%s: got %s instead of %s", szText, StringType(sFile), szResult);
+    err.appendf("%s: got %s instead of %s", szText, _sz(sFile), szResult);
   }
   
   return err;
@@ -913,7 +913,7 @@ String Test_String_Truncate_One(const char* szText, const char* szString, int nL
 
   String s = String::truncate(szString, nLen);
   if (s != szResult) {
-    err.appendf("%s: got %s instead of %s", StringType(szText), StringType(szString), StringType(szResult));
+    err.appendf("%s: got %s instead of %s", _sz(szText), _sz(szString), _sz(szResult));
   }
   
   return err;
@@ -937,7 +937,7 @@ String Test_String_ToLower_One(const char* szText, const char* szString, const c
 
   String s = String::toLower(szString);
   if (s != szResult) {
-    err.appendf("%s: got %s instead of %s", StringType(szText), StringType(s), StringType(szResult));
+    err.appendf("%s: got %s instead of %s", _sz(szText), _sz(s), _sz(szResult));
   }
   
   return err;
@@ -961,7 +961,7 @@ String Test_String_isDigit_1(const char* szText, const char* szString, int bResu
 
   int is = String::isDigit(szString);
   if (is != bResult) {
-    err.appendf("%s: isDigit returned %d (expected %d)", StringType(szText), is, bResult);
+    err.appendf("%s: isDigit returned %d (expected %d)", _sz(szText), is, bResult);
   }
   
   return err;
@@ -973,7 +973,7 @@ String Test_String_isPunct_1(const char* szText, const char* szString, int bResu
 
   int is = String::isPunct(szString);
   if (is != bResult) {
-    err.appendf("%s: isPunct returned %d (expected %d)", StringType(szText), is, bResult);
+    err.appendf("%s: isPunct returned %d (expected %d)", _sz(szText), is, bResult);
   }
   
   return err;
@@ -1046,7 +1046,7 @@ String Test_String_operator_equals_returns_ref()
     if ( (s = "1") == "1") {
       // ok
     } else {
-      err.appendf("3: result of operator= is <%s> should be <1>", StringType(s));
+      err.appendf("3: result of operator= is <%s> should be <1>", _sz(s));
     }
   }
 
@@ -1055,7 +1055,7 @@ String Test_String_operator_equals_returns_ref()
     if ( (s = "2") == "2") {
       // ok
     } else {
-      err.appendf("3: result of operator= is <%s> should be <2>", StringType(s));
+      err.appendf("3: result of operator= is <%s> should be <2>", _sz(s));
     }
   }
 
@@ -1065,7 +1065,7 @@ String Test_String_operator_equals_returns_ref()
     if ( (s = s2) == "1") {
       // ok
     } else {
-      err.appendf("3: result of operator= is <%s> should be <1>", StringType(s));
+      err.appendf("3: result of operator= is <%s> should be <1>", _sz(s));
     }
   }
 
@@ -1198,11 +1198,11 @@ String Test_ApHandle()
     }
   }
 
-  // ApHandleFormat/ApHandleType
+  // ApHandleFormat/ApHandlePrintf
   if (!s) {
     String sString;
     ApHandle h = Apollo::newHandle();
-    sString.appendf("xx," ApHandleFormat ",yy", ApHandleType(h));
+    sString.appendf("xx," ApHandleFormat ",yy", ApHandlePrintf(h));
 
     String sToken;
     if (!s) { sString.nextToken(",", sToken); if (sToken != "xx") { s = "expected=xx"; }}
@@ -1331,7 +1331,7 @@ String Test_SrpcStreamParser1(const char* szText, const char* szData, List& lExp
   sp.parse(szData);
   Apollo::SrpcMessage* pM = sp.getNextMessage();
   if (pM == 0) {
-    s.appendf("%s: No message available", StringType(szText));
+    s.appendf("%s: No message available", _sz(szText));
   } else {
     List lParams = *pM;
     delete pM;
@@ -1347,7 +1347,7 @@ String Test_SrpcStreamParser_CheckNextMessage(const char* szText, Apollo::SrpcSt
 
   Apollo::SrpcMessage* pMessage = parser.getNextMessage();
   if (pMessage == 0) {
-    s.appendf("%s: No message available", StringType(szText));
+    s.appendf("%s: No message available", _sz(szText));
   } else {
     s = Apollo::Test_CompareLists(szText, *pMessage, lExpected);
     delete pMessage;
@@ -1834,11 +1834,11 @@ String Test_Tree()
         Test_Tree_Data* pReal = (Test_Tree_Data*) e->getPtr();
         StringTreeNode<Test_Tree_Data*>* node = st.Find(sKey);
         if (node == 0) {
-          s.appendf("Node not found: %s", StringType(sKey));
+          s.appendf("Node not found: %s", _sz(sKey));
         } else {
           Test_Tree_Data* pStored = node->Value(); 
           if (pStored != pReal) {
-            s.appendf("Node wrong value: %s", StringType(sKey));
+            s.appendf("Node wrong value: %s", _sz(sKey));
           } else {
             st.Unset(sKey);
             delete pStored;
@@ -2170,7 +2170,7 @@ int Test_XML_UTF8_Chinese()
       value2 = root->getAttribute("\xE7\x88\xB1\xE6\xAF\x94").getValue();
     }
     String all;
-    all.appendf("name=%s\ncdata=%s\nkey=%s\nvalue=%s", StringType(name), StringType(cdata), StringType(key), StringType(value));
+    all.appendf("name=%s\ncdata=%s\nkey=%s\nvalue=%s", _sz(name), _sz(cdata), _sz(key), _sz(value));
     //::MessageBox(NULL, all, _T(""), MB_OK);
 
     const unsigned short* pname = (const unsigned short*)name.w_str();
@@ -2548,7 +2548,7 @@ String Test_TimeValue_Benchmark()
 
   Apollo::TimeValue oneSec(1, 0);
   if (stopWatch.GetDuration() > oneSec) {
-    s.appendf("Apollo::TimeValue::getTime() x %d took %s sec", nCnt, StringType((String) stopWatch));
+    s.appendf("Apollo::TimeValue::getTime() x %d took %s sec", nCnt, _sz((String) stopWatch));
   }
 
   return s;

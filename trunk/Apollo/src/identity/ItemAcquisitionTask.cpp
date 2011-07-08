@@ -5,6 +5,5 @@
 // ============================================================================
 
 #include "Apollo.h"
-#include "ApLog.h"
 #include "Local.h"
 #include "ItemAcquisitionTask.h"

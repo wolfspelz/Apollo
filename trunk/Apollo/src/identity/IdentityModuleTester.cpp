@@ -5,11 +5,10 @@
 // ============================================================================
 
 #include "Apollo.h"
-#include "ApLog.h"
+#include "Local.h"
 #include "MsgDB.h"
 #include "IdentityModule.h"
 #include "IdentityModuleTester.h"
-#include "Local.h"
 #include "MsgNet.h"
 
 #if defined(AP_TEST)
@@ -18,7 +17,7 @@ static int g_bTest_Online = 0;
 
 static void Test_Identity_UnitTest_TokenEnd()
 {
-  apLog_Info((LOG_CHANNEL, "Test_Identity_UnitTest_TokenEnd", "Finished Test/Identity"));
+  apLog_Info((LOG_CHANNEL, LOG_CONTEXT, "Finished Test/Identity"));
   { ApAsyncMessage<Msg_UnitTest_Token> msg; msg.Post(); }
 }
 
@@ -26,7 +25,7 @@ static void Test_Identity_UnitTest_Token(Msg_UnitTest_Token* pMsg)
 {
   AP_UNUSED_ARG(pMsg);
   { Msg_UnitTest_Token msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_Identity_UnitTest_Token, 0); }
-  apLog_Info((LOG_CHANNEL, "Test_Identity_UnitTest_Token", "Starting Test/Identity"));
+  apLog_Info((LOG_CHANNEL, LOG_CONTEXT, "Starting Test/Identity"));
   int bTokenEndNow = 1;
 
   AP_UNITTEST_EXECUTE(IdentityModuleTester::test_CacheBasic);
@@ -289,7 +288,7 @@ String IdentityModuleTester::test_GetProperty()
       s = "Msg_Identity_GetProperty failed";
     } else {
       if (msg.sValue != Test_Identity_GetProperty_Value) {
-        s.appendf("got %s=%s, expected=%s", StringType(Test_Identity_GetProperty_Key), StringType(msg.sValue), StringType(Test_Identity_GetProperty_Value));
+        s.appendf("got %s=%s, expected=%s", _sz(Test_Identity_GetProperty_Key), _sz(msg.sValue), _sz(Test_Identity_GetProperty_Value));
       }
     }
   }
@@ -382,11 +381,11 @@ String IdentityModuleTester::test_GetItem()
     if (!msg.Request()) {
       s = "Msg_Identity_GetItem failed";
     } else {
-      if (!s) { if (msg.sType != Test_Identity_GetItem_ItemType) { s.appendf("Msg_Identity_GetItem: got %s=%s", StringType("sType"), StringType(msg.sType)); } }
-      if (!s) { if (msg.sDigest != Test_Identity_GetItem_ItemDigest) { s.appendf("Msg_Identity_GetItem: got %s=%s", StringType("sDigest"), StringType(msg.sDigest)); } }
-      if (!s) { if (msg.nOrder != Test_Identity_GetItem_ItemOrder) { s.appendf("Msg_Identity_GetItem: got %s=%d", StringType("nOrder"), StringType(msg.nOrder)); } }
-      if (!s) { if (msg.nSize != Test_Identity_GetItem_ItemSize) { s.appendf("Msg_Identity_GetItem: got %s=%d", StringType("nSize"), StringType(msg.nSize)); } }
-      if (!s) { if (msg.sSrc != Test_Identity_GetItem_ItemSrc) { s.appendf("Msg_Identity_GetItem: got %s=%s", StringType("sSrc"), StringType(msg.sSrc)); } }
+      if (!s) { if (msg.sType != Test_Identity_GetItem_ItemType) { s.appendf("Msg_Identity_GetItem: got %s=%s", _sz("sType"), _sz(msg.sType)); } }
+      if (!s) { if (msg.sDigest != Test_Identity_GetItem_ItemDigest) { s.appendf("Msg_Identity_GetItem: got %s=%s", _sz("sDigest"), _sz(msg.sDigest)); } }
+      if (!s) { if (msg.nOrder != Test_Identity_GetItem_ItemOrder) { s.appendf("Msg_Identity_GetItem: got %s=%d", _sz("nOrder"), _sz(msg.nOrder)); } }
+      if (!s) { if (msg.nSize != Test_Identity_GetItem_ItemSize) { s.appendf("Msg_Identity_GetItem: got %s=%d", _sz("nSize"), _sz(msg.nSize)); } }
+      if (!s) { if (msg.sSrc != Test_Identity_GetItem_ItemSrc) { s.appendf("Msg_Identity_GetItem: got %s=%s", _sz("sSrc"), _sz(msg.sSrc)); } }
     }
   }
 
@@ -440,7 +439,7 @@ String IdentityModuleTester::test_GetItem()
       s = "Msg_Identity_GetItemData failed";
     } else {
       if (msg.sMimeType != Test_Identity_GetItem_ItemMimeType) {
-        s.appendf("got mimetype=%s expected=%s", StringType(msg.sMimeType), StringType(Test_Identity_GetItem_ItemMimeType));
+        s.appendf("got mimetype=%s expected=%s", _sz(msg.sMimeType), _sz(Test_Identity_GetItem_ItemMimeType));
       } else {
         if (msg.sbData.Length() != sbImage.Length()) {
           s.appendf("got data length=%d expected=%d", msg.sbData.Length(), sbImage.Length());
@@ -483,7 +482,7 @@ String IdentityModuleTester::test_GetItem()
       s.appendf("Msg_Identity_GetItemData (%d) failed", __LINE__);
     } else {
       if (msg.sMimeType != Test_Identity_GetItem_ItemMimeType) {
-        s.appendf("(%d) got mimetype=%s expected=%s", __LINE__, StringType(msg.sMimeType), StringType(Test_Identity_GetItem_ItemMimeType));
+        s.appendf("(%d) got mimetype=%s expected=%s", __LINE__, _sz(msg.sMimeType), _sz(Test_Identity_GetItem_ItemMimeType));
       } else {
         if (msg.sbData.Length() != sbImage.Length()) {
           s.appendf("(%d) got data length=%d expected=%d", __LINE__, msg.sbData.Length(), sbImage.Length());
@@ -576,7 +575,7 @@ String IdentityModuleTester::test_GetItemData()
       String sData;
       msg.sbData.GetString(sData);
       if (sData != Test_Identity_GetItemData_ItemData) {
-        s.appendf("(Plain) got=%s expected=%s", StringType(sData), StringType(Test_Identity_GetItemData_ItemData));
+        s.appendf("(Plain) got=%s expected=%s", _sz(sData), _sz(Test_Identity_GetItemData_ItemData));
       }
     }
   }
@@ -591,7 +590,7 @@ String IdentityModuleTester::test_GetItemData()
       String sData;
       msg.sbData.GetString(sData);
       if (sData != Test_Identity_GetItemData_ItemData) {
-        s.appendf("(Base64) got=%s expected=%s", StringType(sData), StringType(Test_Identity_GetItemData_ItemData));
+        s.appendf("(Base64) got=%s expected=%s", _sz(sData), _sz(Test_Identity_GetItemData_ItemData));
       }
     }
   }
@@ -1075,14 +1074,14 @@ String IdentityModuleTester::test_selectItemId()
       msg.sDigest = e->sDigest;
       msg.sData = e->sData;
       if (!msg.Request()) {
-        s.appendf("Msg_Identity_SetContainer failed: %s", StringType(e->getName()));
+        s.appendf("Msg_Identity_SetContainer failed: %s", _sz(e->getName()));
       }
     }
 
     if (!s) {
       String sId = IdentityModuleInstance::Get()->selectItemId(e->sUrl, e->sType, e->sMimeType);
       if (sId != e->sId) {
-        s.appendf("%s: (selectItemId) %s!=%s", StringType(e->getName()), StringType(sId), StringType(e->sId));
+        s.appendf("%s: (selectItemId) %s!=%s", _sz(e->getName()), _sz(sId), _sz(e->sId));
       }
     }
 
@@ -1095,14 +1094,14 @@ String IdentityModuleTester::test_selectItemId()
       }
       msg.nMax = 1;
       if (!msg.Request()) {
-        s.appendf("%s: (Msg_Identity_GetItemIds) Msg_Identity_GetItemIds failed", StringType(e->getName()));
+        s.appendf("%s: (Msg_Identity_GetItemIds) Msg_Identity_GetItemIds failed", _sz(e->getName()));
       } else {
         ValueElem* ve = msg.vlIds.nextElem(0);
         if (ve == 0) {
-          s.appendf("%s: (Msg_Identity_GetItemIds) missing result", StringType(e->getName()));
+          s.appendf("%s: (Msg_Identity_GetItemIds) missing result", _sz(e->getName()));
         } else {
           if (ve->getString() != e->sId) {
-            s.appendf("%s: (Msg_Identity_GetItemIds) %s!=%s", StringType(e->getName()), StringType(ve->getString()), StringType(e->sId));
+            s.appendf("%s: (Msg_Identity_GetItemIds) %s!=%s", _sz(e->getName()), _sz(ve->getString()), _sz(e->sId));
           }
         }
       }
@@ -1139,7 +1138,7 @@ static int Test_Identity_RequestItemComplete(Msg_Identity_RequestContainerComple
     g_nTest_Identity_RequestItemCount++;
 
     if (!pMsg->bSuccess) {
-      s.appendf("Identity item request failed: %s", StringType(pMsg->sComment));
+      s.appendf("Identity item request failed: %s", _sz(pMsg->sComment));
     } else {
 
     }
@@ -1236,7 +1235,7 @@ static int Test_Identity_RequestContainerComplete(Msg_Identity_RequestContainerC
     g_nTest_Identity_RequestContainerCount++;
 
     if (!pMsg->bSuccess) {
-      s.appendf("Identity request failed: %s", StringType(pMsg->sComment));
+      s.appendf("Identity request failed: %s", _sz(pMsg->sComment));
     } else {
 
       if (pMsg->sXml.empty()) {
@@ -1251,7 +1250,7 @@ static int Test_Identity_RequestContainerComplete(Msg_Identity_RequestContainerC
             s = "Msg_Identity_GetProperty failed";
           } else {
             if (msg.sValue != Test_Identity_RequestContainer_Property_Value) {
-              s.appendf("Msg_Identity_GetProperty: got=%s expected=%s", StringType(msg.sValue), StringType(Test_Identity_RequestContainer_Property_Value));
+              s.appendf("Msg_Identity_GetProperty: got=%s expected=%s", _sz(msg.sValue), _sz(Test_Identity_RequestContainer_Property_Value));
             }
           }
         }
@@ -1332,10 +1331,7 @@ void IdentityModuleTester::begin()
     AP_UNITTEST_REGISTER(IdentityModuleTester::test_selectItemId);
 
     if (Apollo::isLoadedModule("Net")) {
-      Msg_Net_IsOnline msg;
-      if (msg.Request()) {
-        g_bTest_Online = msg.bIsOnline;
-      }
+      g_bTest_Online = Msg_Net_IsOnline::_();
     }
 
     if (g_bTest_Online) {

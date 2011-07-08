@@ -500,7 +500,7 @@ static int vpi_test_builtin_composelocation_for_xmpp(vpi_context context)
         if (sLocationUrl != sExpectedLocationUrl) {
           ok = 0;
           String s;
-          s.appendf("Got=%s Expected=%s", StringType(sLocationUrl), StringType(sExpectedLocationUrl));
+          s.appendf("Got=%s Expected=%s", _sz(sLocationUrl), _sz(sExpectedLocationUrl));
           pContext->SetError("vpi_test_builtin_composelocation_for_xmpp", VPI_ERROR_TEST_FAILED, s);
         }
       }
@@ -600,7 +600,7 @@ static int vpi_test_detailxml(vpi_context context)
       if (sXml != sExpected) {
         ok = 0;
         String s;
-        s.appendf("pContext->GetDetailXml() Wrong result for '%s'. Got:%s, expected:%s", StringType(sDetail), StringType(sXml), StringType(sExpected));
+        s.appendf("pContext->GetDetailXml() Wrong result for '%s'. Got:%s, expected:%s", _sz(sDetail), _sz(sXml), _sz(sExpected));
         pContext->SetError("vpi_test_detailxml", VPI_ERROR_TEST_FAILED, s);
       }
     }
@@ -616,7 +616,7 @@ static int vpi_test_detailxml(vpi_context context)
       if (sXml != sExpected) {
         ok = 0;
         String s;
-        s.appendf("pContext->GetDetailXml() Wrong result for '%s'. Got:%s, expected:%s", StringType(sDetail), StringType(sXml), StringType(sExpected));
+        s.appendf("pContext->GetDetailXml() Wrong result for '%s'. Got:%s, expected:%s", _sz(sDetail), _sz(sXml), _sz(sExpected));
         pContext->SetError("vpi_test_detailxml", VPI_ERROR_TEST_FAILED, s);
       }
     }
@@ -663,7 +663,7 @@ static int vpi_test_composelocation_callback(vpi_callback_ref ref, const char* p
     String sPart;
     sService.nextToken(":", sPart);
     String sLocationUrl;
-    sLocationUrl.appendf("%s:%s@%s", StringType(sProtocol), StringType(sName), StringType(sService));
+    sLocationUrl.appendf("%s:%s@%s", _sz(sProtocol), _sz(sName), _sz(sService));
     if (url == 0) {
       *url_len = sLocationUrl.bytes() + 1;
       ok = 1;
@@ -698,7 +698,7 @@ static int vpi_test_map_1(vpi_context context, const char* comment, const char* 
       s.appendf("pContext->GetLocationUrl failed");
     } else {
       if (sLocationUrl != expected_location_url) {
-        s.appendf("pContext->GetLocationUrl(%s) failed: got:%s, expected:%s", StringType(document_url), StringType(sLocationUrl), StringType(expected_location_url));
+        s.appendf("pContext->GetLocationUrl(%s) failed: got:%s, expected:%s", _sz(document_url), _sz(sLocationUrl), _sz(expected_location_url));
       }
     }
   }
@@ -854,7 +854,7 @@ static int vpi_test_delegate(vpi_context context)
       if (sLocationUrl == sExpectedLocationUrl) {
         ok = 1;
       } else {
-        String s; s.appendf("pContext->GetLocationUrl(%s) failed: got:%s, expected:%s", StringType(sDocumentUrl), StringType(sLocationUrl), StringType(sExpectedLocationUrl));
+        String s; s.appendf("pContext->GetLocationUrl(%s) failed: got:%s, expected:%s", _sz(sDocumentUrl), _sz(sLocationUrl), _sz(sExpectedLocationUrl));
         pContext->SetError("vpi_test_delegate", VPI_ERROR_TEST_FAILED, s);
       }
     }
@@ -904,7 +904,7 @@ static int vpi_test_suffix(vpi_context context)
       if (sLocationUrl == sExpectedLocationUrl) {
         ok = 1;
       } else {
-        String s; s.appendf("pContext->GetLocationUrl(%s) failed: got:%s, expected:%s", StringType(sDocumentUrl), StringType(sLocationUrl), StringType(sExpectedLocationUrl));
+        String s; s.appendf("pContext->GetLocationUrl(%s) failed: got:%s, expected:%s", _sz(sDocumentUrl), _sz(sLocationUrl), _sz(sExpectedLocationUrl));
         pContext->SetError("vpi_test_suffix", VPI_ERROR_TEST_FAILED, s);
       }
     }
@@ -915,7 +915,7 @@ static int vpi_test_suffix(vpi_context context)
   String sCheckSuffix;
   pContext->GetSuffix(sCheckSuffix);
   if (sCheckSuffix != sTmpSuffix) {
-    String s; s.appendf("Suffix Get/Set/Get failed: got:%s, expected:%s", StringType(sCheckSuffix), StringType(sTmpSuffix));
+    String s; s.appendf("Suffix Get/Set/Get failed: got:%s, expected:%s", _sz(sCheckSuffix), _sz(sTmpSuffix));
     pContext->SetError("vpi_test_suffix", VPI_ERROR_TEST_FAILED, s);
     ok = 0;
   }

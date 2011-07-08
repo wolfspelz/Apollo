@@ -842,7 +842,7 @@ int xFile::Rename(String& sNewPath)
 #if defined(WIN32) && defined(_UNICODE)
     ok = (0 == ::_wrename((const wchar_t*)sOldPath, (const wchar_t*)Path()));
 #else
-    ok = (0 == ::rename((const char*)sOldPath, StringType(Path())));
+    ok = (0 == ::rename((const char*) sOldPath, (const char*) Path()));
 #endif
   }
   

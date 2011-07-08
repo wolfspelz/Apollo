@@ -5,10 +5,9 @@
 // ============================================================================
 
 #include "Apollo.h"
-#include "ApLog.h"
+#include "Local.h"
 #include "VpModule.h"
 #include "VpModuleTester.h"
-#include "Local.h"
 
 #if defined(AP_TEST)
 
@@ -259,8 +258,8 @@ String VpModuleTester::test_ItemDataExternUrl()
   String sExpected;
   String sEscapedIdentityUrl = "http://ydentiti.org/test/Planta/identity.xml";
   sEscapedIdentityUrl.escape(String::EscapeURL);
-  sExpected.appendf("http://%s:%d/Vp?%s|avatar|", StringType(sHost), nPort, StringType(sEscapedIdentityUrl));
-  if (!sUrl.startsWith(sExpected)) { s.appendf("%s does not start with %s", StringType(sUrl), StringType(sExpected)); }
+  sExpected.appendf("http://%s:%d/Vp?%s|avatar|", _sz(sHost), nPort, _sz(sEscapedIdentityUrl));
+  if (!sUrl.startsWith(sExpected)) { s.appendf("%s does not start with %s", _sz(sUrl), _sz(sExpected)); }
 
   return s;
 }

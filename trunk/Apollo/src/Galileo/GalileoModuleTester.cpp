@@ -5,18 +5,17 @@
 // ============================================================================
 
 #include "Apollo.h"
-#include "ApLog.h"
+#include "Local.h"
 #include "GalileoModule.h"
 #include "GalileoModuleTester.h"
 #include "MsgConfig.h"
 #include "MsgDB.h"
-#include "Local.h"
 
 #if defined(AP_TEST)
 
 static void Test_Galileo_UnitTest_TokenEnd()
 {
-  apLog_Info((LOG_CHANNEL, "Test_Galileo_UnitTest_TokenEnd", "Finished Test/Galileo"));
+  apLog_Info((LOG_CHANNEL, LOG_CONTEXT, "Finished Test/Galileo"));
   { ApAsyncMessage<Msg_UnitTest_Token> msg; msg.Post(); }
 }
 
@@ -24,7 +23,7 @@ static void Test_Galileo_UnitTest_Token(Msg_UnitTest_Token* pMsg)
 {
   AP_UNUSED_ARG(pMsg);
   { Msg_UnitTest_Token msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_Galileo_UnitTest_Token, 0); }
-  apLog_Info((LOG_CHANNEL, "Test_Galileo_UnitTest_Token", "Starting Test/Galileo"));
+  apLog_Info((LOG_CHANNEL, LOG_CONTEXT, "Starting Test/Galileo"));
   int bTokenEndNow = 1;
 
   AP_UNITTEST_EXECUTE(GalileoModuleTester::Test_Parse);
@@ -170,7 +169,7 @@ String GalileoModuleTester::Test_SelectByGroup1(Group& g, int nRnd, const String
   if (pSequence) {
     if (sExpectedSequence) {
       if (pSequence->getName() != sExpectedSequence) {
-        s.appendf("Sequence got=%s expected=%s", StringType(pSequence->getName()), StringType(sExpectedSequence));
+        s.appendf("Sequence got=%s expected=%s", _sz(pSequence->getName()), _sz(sExpectedSequence));
       }
     } else {
       s = "Expected no sequence";
@@ -251,7 +250,7 @@ String GalileoModuleTester::Test_PlayStep(Item& i, Apollo::TimeValue& t, const S
 
   i.Step(t);
   if (i.pCurrentSequence_->Group() != sExpectedSequence) {
-    s.appendf("sequence=%s expected=%s", StringType(i.pCurrentSequence_->getName()), StringType(sExpectedSequence));
+    s.appendf("sequence=%s expected=%s", _sz(i.pCurrentSequence_->getName()), _sz(sExpectedSequence));
   } else if (i.nSpentInCurrentSequenceMSec_ != nExpectedTime) {
     s.appendf("time=%d expected=%d", i.nSpentInCurrentSequenceMSec_, nExpectedTime);
   //} else if (i.nX_ != nExpectedX) {

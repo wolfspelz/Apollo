@@ -5,10 +5,9 @@
 // ============================================================================
 
 #include "Apollo.h"
-#include "ApLog.h"
+#include "Local.h"
 #include "MsgConfig.h"
 #include "MsgDB.h"
-#include "Local.h"
 #include "URL.h"
 #include "GalileoModule.h"
 #include "GalileoModuleTester.h"
@@ -40,9 +39,9 @@ int GalileoModule::AnimationIsRequested(const String& sUrl)
 Item* GalileoModule::GetItem(const ApHandle& hItem)
 {
   ItemListNode* pNode = items_.Find(hItem);
-  if (pNode == 0) { throw ApException("Item not found: " ApHandleFormat "", ApHandleType(hItem)); }
+  if (pNode == 0) { throw ApException(LOG_CONTEXT, "Item not found: " ApHandleFormat "", ApHandlePrintf(hItem)); }
   Item* pItem = pNode->Value();
-  if (pItem == 0) { throw ApException("Node Value() empty: " ApHandleFormat "", ApHandleType(hItem)); }
+  if (pItem == 0) { throw ApException(LOG_CONTEXT, "Node Value() empty: " ApHandleFormat "", ApHandlePrintf(hItem)); }
   return pItem;
 }
 
@@ -57,10 +56,10 @@ AP_MSG_HANDLER_METHOD(GalileoModule, Animation_Create)
     return;
   }
 
-  if (items_.Find(pMsg->hItem) != 0) { throw ApException("hItem=" ApHandleFormat ", already exists", ApHandleType(pMsg->hItem)); }
+  if (items_.Find(pMsg->hItem) != 0) { throw ApException(LOG_CONTEXT, "hItem=" ApHandleFormat ", already exists", ApHandlePrintf(pMsg->hItem)); }
 
   Item* pItem = new Item(pMsg->hItem, this);
-  if (pItem == 0) { throw ApException("new Item() failed, hItem=" ApHandleFormat "", ApHandleType(pMsg->hItem)); }
+  if (pItem == 0) { throw ApException(LOG_CONTEXT, "new Item() failed, hItem=" ApHandleFormat "", ApHandlePrintf(pMsg->hItem)); }
 
   items_.Set(pMsg->hItem, pItem);
 
@@ -222,7 +221,7 @@ AP_MSG_HANDLER_METHOD(GalileoModule, Galileo_RequestAnimation)
 {
   int ok = 0;
 
-  apLog_Verbose((LOG_CHANNEL, "GalileoModule::Galileo_RequestAnimation", "%s", StringType(pMsg->sUrl)));
+  apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "%s", _sz(pMsg->sUrl)));
 
   if (!AnimationIsRequested(pMsg->sUrl)) {
 
@@ -230,7 +229,7 @@ AP_MSG_HANDLER_METHOD(GalileoModule, Galileo_RequestAnimation)
     if (pClient != 0) {
       ok = pClient->Get(pMsg->sUrl);
       if (!ok) {
-        apLog_Warning((LOG_CHANNEL, "GalileoModule::RequestAnimation", "pClient->Get() failed, src=%s", StringType(pMsg->sUrl)));
+        apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "pClient->Get() failed, src=%s", _sz(pMsg->sUrl)));
         delete pClient;
         pClient = 0;
       } else {
@@ -246,7 +245,7 @@ AP_MSG_HANDLER_METHOD(GalileoModule, Galileo_RequestAnimation)
 
 AP_MSG_HANDLER_METHOD(GalileoModule, Galileo_RequestAnimationComplete)
 {
-  apLog_Verbose((LOG_CHANNEL, "GalileoModule::Galileo_RequestAnimationComplete", "%s success=%d len=%d mimetype=%s", StringType(pMsg->sUrl), pMsg->bSuccess, pMsg->sbData.Length(), StringType(pMsg->sMimeType)));
+  apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "%s success=%d len=%d mimetype=%s", _sz(pMsg->sUrl), pMsg->bSuccess, pMsg->sbData.Length(), _sz(pMsg->sMimeType)));
 
   if (AnimationIsRequested(pMsg->sUrl)) {
     requestedAnimations_.Unset(pMsg->sUrl);
@@ -277,7 +276,7 @@ AP_MSG_HANDLER_METHOD(GalileoModule, Galileo_SetStorageName)
       msg.sName = pMsg->sPreviousName;
       int ok = msg.Request();
       if (!ok) {
-        apLog_Error((LOG_CHANNEL, "GalileoModule::Galileo_SetStorageName", "Msg_DB_Close %s failed", StringType(pMsg->sPreviousName)));
+        apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_DB_Close %s failed", _sz(pMsg->sPreviousName)));
       }
     }
 
@@ -286,7 +285,7 @@ AP_MSG_HANDLER_METHOD(GalileoModule, Galileo_SetStorageName)
       msg.sName = pMsg->sName;
       int ok = msg.Request();
       if (!ok) {
-        apLog_Error((LOG_CHANNEL, "GalileoModule::Galileo_SetStorageName", "Msg_DB_Open %s failed", StringType(pMsg->sName)));
+        apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_DB_Open %s failed", _sz(pMsg->sName)));
       }
     }
   }
@@ -298,15 +297,15 @@ AP_MSG_HANDLER_METHOD(GalileoModule, Galileo_SaveAnimationDataToStorage)
 {
   Msg_DB_SetBinary msgDSB;
   msgDSB.sName = sDb_;
-  msgDSB.sKey.appendf("%s data", StringType(PrepareDbKey(pMsg->sUrl)));
+  msgDSB.sKey.appendf("%s data", _sz(PrepareDbKey(pMsg->sUrl)));
   msgDSB.sbValue = pMsg->sbData;
-  if (!msgDSB.Request()) { throw ApException("Msg_DB_SetBinary failed: db=%s key=%s", StringType(msgDSB.sName), StringType(msgDSB.sKey)); }
+  if (!msgDSB.Request()) { throw ApException(LOG_CONTEXT, "Msg_DB_SetBinary failed: db=%s key=%s", _sz(msgDSB.sName), _sz(msgDSB.sKey)); }
 
   Msg_DB_Set msgDS;
   msgDS.sName = sDb_;
-  msgDS.sKey.appendf("%s mimetype", StringType(PrepareDbKey(pMsg->sUrl)));
+  msgDS.sKey.appendf("%s mimetype", _sz(PrepareDbKey(pMsg->sUrl)));
   msgDS.sValue = pMsg->sMimeType;
-  if (!msgDS.Request()) { throw ApException("Msg_DB_Set failed: db=%s key=%s", StringType(msgDS.sName), StringType(msgDS.sKey)); }
+  if (!msgDS.Request()) { throw ApException(LOG_CONTEXT, "Msg_DB_Set failed: db=%s key=%s", _sz(msgDS.sName), _sz(msgDS.sKey)); }
 
   pMsg->apStatus = ApMessage::Ok;
 }
@@ -318,8 +317,8 @@ AP_MSG_HANDLER_METHOD(GalileoModule, Galileo_IsAnimationDataInStorage)
   // Fetch mimetype from DB
   Msg_DB_HasKey msg;
   msg.sName = sDb_;
-  msg.sKey.appendf("%s data", StringType(PrepareDbKey(pMsg->sUrl)));
-  if (!msg.Request()) { throw ApException("Msg_DB_HasKey failed: db=%s key=%s", StringType(msg.sName), StringType(msg.sKey)); }
+  msg.sKey.appendf("%s data", _sz(PrepareDbKey(pMsg->sUrl)));
+  if (!msg.Request()) { throw ApException(LOG_CONTEXT, "Msg_DB_HasKey failed: db=%s key=%s", _sz(msg.sName), _sz(msg.sKey)); }
 
   pMsg->bAvailable = msg.bAvailable;
 
@@ -333,14 +332,14 @@ AP_MSG_HANDLER_METHOD(GalileoModule, Galileo_LoadAnimationDataFromStorage)
   // Fetch mimetype from DB
   Msg_DB_Get msgDG;
   msgDG.sName = sDb_;
-  msgDG.sKey.appendf("%s mimetype", StringType(PrepareDbKey(pMsg->sUrl)));
-  if (!msgDG.Request()) { throw ApException("Msg_DB_Get failed: db=%s key=%s", StringType(msgDG.sName), StringType(msgDG.sKey)); }
+  msgDG.sKey.appendf("%s mimetype", _sz(PrepareDbKey(pMsg->sUrl)));
+  if (!msgDG.Request()) { throw ApException(LOG_CONTEXT, "Msg_DB_Get failed: db=%s key=%s", _sz(msgDG.sName), _sz(msgDG.sKey)); }
 
   // Fetch data from DB
   Msg_DB_GetBinary msgDGB;
   msgDGB.sName = sDb_;
-  msgDGB.sKey.appendf("%s data", StringType(PrepareDbKey(pMsg->sUrl)));
-  if (!msgDGB.Request()) { throw ApException("Msg_DB_GetBinary failed: db=%s key=%s", StringType(msgDGB.sName), StringType(msgDGB.sKey)); }
+  msgDGB.sKey.appendf("%s data", _sz(PrepareDbKey(pMsg->sUrl)));
+  if (!msgDGB.Request()) { throw ApException(LOG_CONTEXT, "Msg_DB_GetBinary failed: db=%s key=%s", _sz(msgDGB.sName), _sz(msgDGB.sKey)); }
 
   pMsg->sbData = msgDGB.sbValue;
   pMsg->sMimeType = msgDG.sValue;
@@ -352,7 +351,7 @@ AP_MSG_HANDLER_METHOD(GalileoModule, Galileo_ClearAllStorage)
 {
   Msg_Galileo_ExpireAllStorage msg;
   msg.nAge = 0;
-  if (!msg.Request()) { throw ApException("Msg_Galileo_ExpireAllStorage failed: msg.nAge=%d", msg.nAge); }
+  if (!msg.Request()) { throw ApException(LOG_CONTEXT, "Msg_Galileo_ExpireAllStorage failed: msg.nAge=%d", msg.nAge); }
 
   pMsg->apStatus = ApMessage::Ok;
 }
@@ -362,7 +361,7 @@ AP_MSG_HANDLER_METHOD(GalileoModule, Galileo_ExpireAllStorage)
   Msg_DB_DeleteOlderThan msg;
   msg.sName = sDb_;
   msg.nAge = pMsg->nAge;
-  if (!msg.Request()) { throw ApException("Msg_DB_DeleteOlderThan failed: msg.nAge=%d", msg.nAge); }
+  if (!msg.Request()) { throw ApException(LOG_CONTEXT, "Msg_DB_DeleteOlderThan failed: msg.nAge=%d", msg.nAge); }
 
   pMsg->apStatus = ApMessage::Ok;
 }
@@ -383,7 +382,7 @@ AP_MSG_HANDLER_METHOD(GalileoModule, System_AfterLoadModules)
   msg.sName = sDb_;
   int ok = msg.Request();
   if (!ok) {
-    apLog_Error((LOG_CHANNEL, "GalileoModule::System_AfterLoadModules", "Msg_DB_Open %s failed", StringType(msg.sName)));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_DB_Open %s failed", _sz(msg.sName)));
   }
 }
 
@@ -397,7 +396,7 @@ AP_MSG_HANDLER_METHOD(GalileoModule, System_BeforeUnloadModules)
   msg.sName = sDb_;
   int ok = msg.Request();
   if (!ok) {
-    apLog_Error((LOG_CHANNEL, "GalileoModule::System_BeforeUnloadModules", "Msg_DB_Close %s failed", StringType(msg.sName)));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_DB_Close %s failed", _sz(msg.sName)));
   }
 }
 
@@ -465,14 +464,14 @@ AP_MSG_HANDLER_METHOD(GalileoModule, HttpServer_Request)
       } else if (sCmd == "menu") {
         Apollo::UriBuilder uri = baseUri;
         uri.setQueryParam("cmd", "cache");
-        sHtml.appendf("<a href=\"%s\">List cache</a>", StringType(uri()));
+        sHtml.appendf("<a href=\"%s\">List cache</a>", _sz(uri()));
 
       } else if (sCmd == "cache") {
         ItemListIterator iter(items_);
         for (ItemListNode* pNode = 0; (pNode = iter.Next()) != 0; ) {
           Item* pItem = pNode->Value();
           if (pItem) {
-            sHtml.appendf("%s <a href=\"%s\">%s</a>\n", StringType(pItem->apHandle().toString()), StringType(pItem->Src()), StringType(pItem->Src()));
+            sHtml.appendf("%s <a href=\"%s\">%s</a>\n", _sz(pItem->apHandle().toString()), _sz(pItem->Src()), _sz(pItem->Src()));
             for (Group* pGroup = 0; (pGroup = pItem->Groups().Next(pGroup)) != 0; ) {
               for (Sequence* pSequence = 0; (pSequence = pGroup->Next(pSequence)) != 0; ) {
 
@@ -485,12 +484,12 @@ AP_MSG_HANDLER_METHOD(GalileoModule, HttpServer_Request)
                 Animation* pAnimation = pSequence->First();
                 if (pAnimation) {
                   sHtml.appendf("  <a href=\"%s\">%s</a> %s %s <a href=\"%s\">%s</a>\n" 
-                    , StringType(sequenceUri())
-                    , StringType(pSequence->getName())
+                    , _sz(sequenceUri())
+                    , _sz(pSequence->getName())
                     , pAnimation->HasData() ? "mem" : ""
                     , pAnimation->HasDataInCache() ? "storage" : ""
-                    , StringType(pSequence->Src())
-                    , StringType(pSequence->Src())
+                    , _sz(pSequence->Src())
+                    , _sz(pSequence->Src())
                     );
                 } else {
                   sHtml.appendf("  tsnh: no animation\n");
@@ -507,24 +506,24 @@ AP_MSG_HANDLER_METHOD(GalileoModule, HttpServer_Request)
         String sName = lQuery["name"].getString();
 
         ApHandle hItem = Apollo::string2Handle(sId);
-        if (!ApIsHandle(hItem)) { throw ApException("No handle: id=%s", StringType(sId)); }
-        if (!sGroup) { throw ApException("No group"); }
-        if (!sName) { throw ApException("No name"); }
+        if (!ApIsHandle(hItem)) { throw ApException(LOG_CONTEXT, "No handle: id=%s", _sz(sId)); }
+        if (!sGroup) { throw ApException(LOG_CONTEXT, "No group"); }
+        if (!sName) { throw ApException(LOG_CONTEXT, "No name"); }
 
         ItemListNode* pItemNode = items_.Find(hItem);
-        if (pItemNode == 0) { throw ApException("No item for " ApHandleFormat "", ApHandleType(hItem)); }
+        if (pItemNode == 0) { throw ApException(LOG_CONTEXT, "No item for " ApHandleFormat "", ApHandlePrintf(hItem)); }
 
         Item* pItem = pItemNode->Value();
-        if (pItem == 0) { throw ApException("pItem == 0"); }
+        if (pItem == 0) { throw ApException(LOG_CONTEXT, "pItem == 0"); }
 
         Group* pGroup = pItem->Groups().FindByName(sGroup);
-        if (pGroup == 0) { throw ApException("No group for group=%s", StringType(sGroup)); }
+        if (pGroup == 0) { throw ApException(LOG_CONTEXT, "No group for group=%s", _sz(sGroup)); }
 
         Sequence* pSequence = pGroup->FindByName(sName);
-        if (pSequence == 0) { throw ApException("No group for sequence name=%s", StringType(sName)); }
+        if (pSequence == 0) { throw ApException(LOG_CONTEXT, "No group for sequence name=%s", _sz(sName)); }
 
         Animation* pAnimation = pSequence->First();
-        if (pAnimation == 0) { throw ApException("No first animation for sequence"); }
+        if (pAnimation == 0) { throw ApException(LOG_CONTEXT, "No first animation for sequence"); }
 
         int bLoadedForServer = 0;
         if (!pAnimation->HasData()) { 
@@ -536,7 +535,7 @@ AP_MSG_HANDLER_METHOD(GalileoModule, HttpServer_Request)
           }
         }
 
-        if (!pAnimation->HasData()) { throw ApException("Data not in memory"); }
+        if (!pAnimation->HasData()) { throw ApException(LOG_CONTEXT, "Data not in memory"); }
 
         String sMimeType;
         pAnimation->GetAnimationData(msgSHR.sbBody, sMimeType);
@@ -547,7 +546,7 @@ AP_MSG_HANDLER_METHOD(GalileoModule, HttpServer_Request)
         }
 
       } else {
-         throw ApException("Unknown cmd=%s", StringType(sCmd));
+         throw ApException(LOG_CONTEXT, "Unknown cmd=%s", _sz(sCmd));
       }
 
       if (!sHtml.empty()) {
@@ -561,14 +560,14 @@ AP_MSG_HANDLER_METHOD(GalileoModule, HttpServer_Request)
       //msgSHR.kvHeader.add("Cache-Control", "no-store, no-cache, must-revalidate, post-check=0, pre-check=0");
       //msgSHR.kvHeader.add("Expires", "Thu, 19 Nov 1981 08:52:00 GMT");
       msgSHR.kvHeader.add("Expires", Apollo::getNow().operator+=(Apollo::TimeValue(3600, 0)).toRFC2822());
-      if (!msgSHR.Request()) { throw ApException("Msg_HttpServer_SendResponse failed: conn=" ApHandleFormat "", ApHandleType(msgSHR.hConnection)); }
+      if (!msgSHR.Request()) { throw ApException(LOG_CONTEXT, "Msg_HttpServer_SendResponse failed: conn=" ApHandleFormat "", ApHandlePrintf(msgSHR.hConnection)); }
 
       pMsg->Stop();
       pMsg->apStatus = ApMessage::Ok;
 
     } catch (ApException& ex) {
 
-      apLog_Warning((LOG_CHANNEL, "GalileoModule::HttpServer_Request", "%s", StringType(ex.getText())));
+      apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "%s", _sz(ex.getText())));
 
       Msg_HttpServer_SendResponse msgSHR;
       msgSHR.hConnection = pMsg->hConnection;
@@ -581,7 +580,7 @@ AP_MSG_HANDLER_METHOD(GalileoModule, HttpServer_Request)
       String sBody = ex.getText();
       msgSHR.sbBody.SetData(sBody);
       if (!msgSHR.Request()) {
-        { throw ApException("Msg_HttpServer_SendResponse (for error message) failed: conn=" ApHandleFormat "", ApHandleType(msgSHR.hConnection)); }
+        { throw ApException(LOG_CONTEXT, "Msg_HttpServer_SendResponse (for error message) failed: conn=" ApHandleFormat "", ApHandlePrintf(msgSHR.hConnection)); }
       } else {
         pMsg->Stop();
         pMsg->apStatus = ApMessage::Ok;

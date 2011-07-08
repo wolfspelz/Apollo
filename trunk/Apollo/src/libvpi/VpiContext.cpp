@@ -147,7 +147,7 @@ int VpiFile::ParseXml()
     bXmlParsed_ = 1;
     if (!sXml_.empty()) {
       if (!xml_.XmlText(sXml_)) {
-        vpiLog_Verbose((VPI_LOGCHANNEL, "VpiFile::ParseXml", "xml.XmlText() failed err:%s, xml:%s", StringType(xml_.GetErrorString()), StringType(String::truncate(sXml_, 100))));
+        vpiLog_Verbose((VPI_LOGCHANNEL, VPI_LOGCONTEXT, "xml.XmlText() failed err:%s, xml:%s", _sz(xml_.GetErrorString()), _sz(String::truncate(sXml_, 100))));
       } else {
         ok = 1;
       }
@@ -243,11 +243,11 @@ void VpiContext::SetError(const String& sWhere, int nError, const String& sError
     {
       String s = "need ";
       s += sError;
-      vpiLog_VeryVerbose((VPI_LOGCHANNEL, sWhere, s));
+      vpiLog_VeryVerbose((VPI_LOGCHANNEL, sWhere, "%s", (const char*) s));
     }
     break;
   default:
-    vpiLog_Error((VPI_LOGCHANNEL, sWhere, sError));
+    vpiLog_Error((VPI_LOGCHANNEL, sWhere, "%s", (const char*) sError));
   }
 
   nError_ = nError;
@@ -387,7 +387,7 @@ int VpiContext::GetLocationXml(String& sUrl, String& sLocationXml)
 {
   int ok = 0;
   SetError("", VPI_ERROR_UNKNOWN, "");
-  vpiLog_VeryVerbose((VPI_LOGCHANNEL, "VpiContext::GetLocationXml", "for url=%s", StringType(sUrl)));
+  vpiLog_VeryVerbose((VPI_LOGCHANNEL, VPI_LOGCONTEXT, "for url=%s", _sz(sUrl)));
 
   IncrementStatusCounter("GetLocationXml");
   lTraversedFiles_.Empty();
@@ -399,15 +399,15 @@ int VpiContext::GetLocationXml(String& sUrl, String& sLocationXml)
   URL uOriginal(sUrl);
   if (uOriginal.protocol().empty() || uOriginal.host().empty()) {
     String s;
-    s.appendf("Invalid URL: %s", StringType(String::truncate(sUrl, 100)));
-    SetError("VpiContext::GetLocationXml", VPI_ERROR_INVALID_URL, s);
+    s.appendf("Invalid URL: %s", _sz(String::truncate(sUrl, 100)));
+    SetError(VPI_LOGCONTEXT, VPI_ERROR_INVALID_URL, s);
   } else {
 
     VpiSearchPhase nPhase = PhaseLocal;
 
     VpiSearchState state;
     state.sOriginalUrl_ = sUrl;
-    state.sVpiUrl_.appendf("%s://%s%s%s%s", StringType(uOriginal.protocol()), StringType(uOriginal.host()), StringType(uOriginal.port()), StringType(uOriginal.path()), StringType("_vpi.xml"));
+    state.sVpiUrl_.appendf("%s://%s%s%s%s", _sz(uOriginal.protocol()), _sz(uOriginal.host()), _sz(uOriginal.port()), _sz(uOriginal.path()), _sz("_vpi.xml"));
 
     while (!bDone) {
       VpiSearchResult nResult = CheckMatch(state);
@@ -421,7 +421,7 @@ int VpiContext::GetLocationXml(String& sUrl, String& sLocationXml)
           if (lRequestedFiles_.FindByName(state.sVpiUrl_) != 0) {
             // Already requested. Pretend to request it, because it will come anyway
 
-            SetError("VpiContext::GetLocationXml", VPI_ERROR_REQUESTED_DATA, state.sVpiUrl_);
+            SetError(VPI_LOGCONTEXT, VPI_ERROR_REQUESTED_DATA, state.sVpiUrl_);
 
           } else {
             // Not yet requested, then request now
@@ -431,13 +431,13 @@ int VpiContext::GetLocationXml(String& sUrl, String& sLocationXml)
               if (fpRequestFileCallback_(nRequestFileCallbackRef_, state.sVpiUrl_)) {
                 IncrementStatusCounter("FilesRequested");
 
-                SetError("VpiContext::GetLocationXml", VPI_ERROR_REQUESTED_DATA, state.sVpiUrl_);
+                SetError(VPI_LOGCONTEXT, VPI_ERROR_REQUESTED_DATA, state.sVpiUrl_);
               } else {
-                String s; s.appendf("RequestFileCallback returned error for url:%s", StringType(state.sVpiUrl_));
-                SetError("VpiContext::GetLocationXml", VPI_ERROR_REQUEST_DATA_FAILED, s);
+                String s; s.appendf("RequestFileCallback returned error for url:%s", _sz(state.sVpiUrl_));
+                SetError(VPI_LOGCONTEXT, VPI_ERROR_REQUEST_DATA_FAILED, s);
               }
             } else {
-              SetError("VpiContext::GetLocationXml", VPI_ERROR_NEED_DATA, state.sVpiUrl_);
+              SetError(VPI_LOGCONTEXT, VPI_ERROR_NEED_DATA, state.sVpiUrl_);
             }
 
           }
@@ -472,15 +472,15 @@ int VpiContext::GetLocationXml(String& sUrl, String& sLocationXml)
 
               // ResultNotApplicable in PhaseGlobal -> no way out, failed
               bDone = 1;
-              String s; s.appendf("Mapping stopped due to invalid or no data during global phase in url:%s", StringType(state.sVpiUrl_));
-              SetError("VpiContext::GetLocationXml", VPI_ERROR_INVALID_DATA, s);
+              String s; s.appendf("Mapping stopped due to invalid or no data during global phase in url:%s", _sz(state.sVpiUrl_));
+              SetError(VPI_LOGCONTEXT, VPI_ERROR_INVALID_DATA, s);
 
             }
             break;
           default:
             bDone = 1;
-            String s; s.appendf("Mapping stopped due to invalid phase:%d in url:%s", nPhase, StringType(state.sVpiUrl_));
-            SetError("VpiContext::GetLocationXml", VPI_ERROR_INTERNAL_ERROR, s);
+            String s; s.appendf("Mapping stopped due to invalid phase:%d in url:%s", nPhase, _sz(state.sVpiUrl_));
+            SetError(VPI_LOGCONTEXT, VPI_ERROR_INTERNAL_ERROR, s);
           }
 
 
@@ -507,8 +507,8 @@ int VpiContext::GetLocationXml(String& sUrl, String& sLocationXml)
       default:
         {
           bDone = 1;
-          String s; s.appendf("VpiContext::GetLocationXml", "Invalid result:%d, phase:%d, url:%s", (int) nResult,  (int) nPhase, StringType(sUrl));
-          SetError("VpiContext::GetLocationXml", VPI_ERROR_INTERNAL_ERROR, s);
+          String s; s.appendf(VPI_LOGCONTEXT, "Invalid result:%d, phase:%d, url:%s", (int) nResult,  (int) nPhase, _sz(sUrl));
+          SetError(VPI_LOGCONTEXT, VPI_ERROR_INTERNAL_ERROR, s);
         }
       } // case VpiSearchResult
 
@@ -527,8 +527,8 @@ int VpiContext::GetDetailXml(String& sXml, String& sPath, int nFlags, String& sD
   XMLProcessor xml;
   if (!xml.XmlText(sXml)) {
     String s;
-    s.appendf("xml.XmlText() failed err:%s, xml: %s", StringType(xml.GetErrorString()), StringType(String::truncate(sXml, 100)));
-    SetError("VpiContext::GetDetailXml", VPI_ERROR_XMLPARSER, s);
+    s.appendf("xml.XmlText() failed err:%s, xml: %s", _sz(xml.GetErrorString()), _sz(String::truncate(sXml, 100)));
+    SetError(VPI_LOGCONTEXT, VPI_ERROR_XMLPARSER, s);
   } else {
     if (xml.Root() != 0) {
 
@@ -576,8 +576,8 @@ int VpiContext::GetLocationUrl(String& sXml, String& sLocationUrl)
     XMLProcessor xml;
     if (!xml.XmlText(sNameXml)) {
       String s;
-      s.appendf("xml.XmlText() failed err:%s, xml:%s", StringType(xml.GetErrorString()), StringType(String::truncate(sXml, 100)));
-      SetError("VpiContext::GetLocationUrl", VPI_ERROR_XMLPARSER, s);
+      s.appendf("xml.XmlText() failed err:%s, xml:%s", _sz(xml.GetErrorString()), _sz(String::truncate(sXml, 100)));
+      SetError(VPI_LOGCONTEXT, VPI_ERROR_XMLPARSER, s);
     } else {
       if (xml.Root() != 0) {
         sName = xml.Root()->getCData();
@@ -607,8 +607,8 @@ int VpiContext::GetLocationUrl(String& sXml, String& sLocationUrl)
 
     if (sName.empty() || sService.empty() || sProtocol.empty()) {
       String s;
-      s.appendf("Missing name=%s || service=%s || protocol=%s", StringType(sName), StringType(sService), StringType(sProtocol));
-      SetError("VpiContext::GetLocationUrl", VPI_ERROR_ROOM_COMPONENT, s);
+      s.appendf("Missing name=%s || service=%s || protocol=%s", _sz(sName), _sz(sService), _sz(sProtocol));
+      SetError(VPI_LOGCONTEXT, VPI_ERROR_ROOM_COMPONENT, s);
     } else {
 
       sName += sSuffix_;
@@ -619,8 +619,8 @@ int VpiContext::GetLocationUrl(String& sXml, String& sLocationUrl)
         Flexbuf<char> buf(nLength);
         if (!fpComposeLocationCallback_(nComposeLocationCallbackRef_, sProtocol, sName, sService, (char*) buf, &nLength)) {
           String s;
-          s.appendf("ComposeLocationCallback returned error for name=%s || service=%s || protocol=%s", StringType(sName), StringType(sService), StringType(sProtocol));
-          SetError("VpiContext::GetLocationUrl", VPI_ERROR_ASSEMBLELOCATION, s);
+          s.appendf("ComposeLocationCallback returned error for name=%s || service=%s || protocol=%s", _sz(sName), _sz(sService), _sz(sProtocol));
+          SetError(VPI_LOGCONTEXT, VPI_ERROR_ASSEMBLELOCATION, s);
         } else {
           sLocationUrl = (char*) buf;
           ok = 1;
@@ -629,11 +629,11 @@ int VpiContext::GetLocationUrl(String& sXml, String& sLocationUrl)
 
       } else {
         if (sProtocol == "jabber" || sProtocol == "xmpp") {
-          sLocationUrl.appendf("xmpp:%s@%s", StringType(sName), StringType(sBareService));
+          sLocationUrl.appendf("xmpp:%s@%s", _sz(sName), _sz(sBareService));
           ok = 1;
           SetError("", VPI_SUCCESS, "");
         } else {
-          SetError("VpiContext::GetLocationUrl", VPI_SUCCESS, "No ComposeLocationCallback");
+          SetError(VPI_LOGCONTEXT, VPI_SUCCESS, "No ComposeLocationCallback");
         }
       }
 
@@ -651,8 +651,8 @@ int VpiContext::GetSelectOptions(String& sXml, List& lOptions)
   XMLProcessor xml;
   if (!xml.XmlText(sXml)) {
     String s;
-    s.appendf("xml.XmlText() failed err:%s, xml: %s", StringType(xml.GetErrorString()), StringType(String::truncate(sXml, 100)));
-    SetError("VpiContext::GetSelectOptions", VPI_ERROR_XMLPARSER, s);
+    s.appendf("xml.XmlText() failed err:%s, xml: %s", _sz(xml.GetErrorString()), _sz(String::truncate(sXml, 100)));
+    SetError(VPI_LOGCONTEXT, VPI_ERROR_XMLPARSER, s);
   } else {
     if (xml.Root() != 0) {
 
@@ -680,8 +680,8 @@ int VpiContext::GetSelectOptionProperties(String& sXml, String& sSuffix, List& l
   XMLProcessor xml;
   if (!xml.XmlText(sXml)) {
     String s;
-    s.appendf("xml.XmlText() failed err:%s, xml: %s", StringType(xml.GetErrorString()), StringType(String::truncate(sXml, 100)));
-    SetError("VpiContext::GetSelectOptionProperties", VPI_ERROR_XMLPARSER, s);
+    s.appendf("xml.XmlText() failed err:%s, xml: %s", _sz(xml.GetErrorString()), _sz(String::truncate(sXml, 100)));
+    SetError(VPI_LOGCONTEXT, VPI_ERROR_XMLPARSER, s);
   } else {
     if (xml.Root() != 0) {
 

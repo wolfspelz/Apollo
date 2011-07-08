@@ -44,7 +44,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     String sModule = "config";
     int ok = Apollo::loadModule("Config", sModule);
     if (!ok) {
-      apLog_Alert(("Main", "WinMain", "Could not load module %s", StringType(sModule)));
+      apLog_Alert(("Main", "WinMain", "Could not load module %s", _sz(sModule)));
     }
   }
 
@@ -57,7 +57,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     msg.sName = "boot";
     int ok = msg.Request();
     if (!ok) {
-      apLog_Alert(("Main", "WinMain", "%s/%s not found. Maybe wrong working directory?", StringType(msg.sDir), StringType(msg.sName)));
+      apLog_Alert(("Main", "WinMain", "%s/%s not found. Maybe wrong working directory?", _sz(msg.sDir), _sz(msg.sName)));
     }
   }
 
@@ -83,7 +83,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     msg.sName = "config";
     int ok = msg.Request();
     if (!ok) {
-      apLog_Alert(("Main", "WinMain", "%s/%s not found. Maybe wrong working directory?", StringType(msg.sDir), StringType(msg.sName)));
+      apLog_Alert(("Main", "WinMain", "%s/%s not found. Maybe wrong working directory?", _sz(msg.sDir), _sz(msg.sName)));
     }
   }
 

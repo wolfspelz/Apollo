@@ -5,16 +5,15 @@
 // ============================================================================
 
 #include "Apollo.h"
-#include "ApLog.h"
+#include "Local.h"
 #include "MsgAnimation.h"
 #include "MsgGalileo.h"
-#include "Local.h"
 #include "AnimationClient.h"
 
 int AnimationClient::OnConnected()
 {
   int ok = 1;
-  apLog_VeryVerbose((LOG_CHANNEL, "AnimationClient::OnConnected", "url=%s " ApHandleFormat, StringType(sUrl_), ApHandleType(hAp_)));
+  apLog_VeryVerbose((LOG_CHANNEL, LOG_CONTEXT, "url=%s " ApHandleFormat, _sz(sUrl_), ApHandlePrintf(hAp_)));
   return ok;
 }
 
@@ -28,7 +27,7 @@ int AnimationClient::OnHeader(int nStatus, KeyValueList& kvHeaders)
     if (String::toLower(e->getKey()) == "content-type") {
       sContentType_ = String::toLower(e->getString());
     }
-    apLog_VeryVerbose((LOG_CHANNEL, "AnimationClient::OnHeader", "url=%s " ApHandleFormat " header: [%s][%s]", StringType(sUrl_), ApHandleType(hAp_), (const char* )e->getKey(), StringType(e->getString())));
+    apLog_VeryVerbose((LOG_CHANNEL, LOG_CONTEXT, "url=%s " ApHandleFormat " header: [%s][%s]", _sz(sUrl_), ApHandlePrintf(hAp_), (const char* )e->getKey(), _sz(e->getString())));
   }
 
   return ok;
@@ -38,7 +37,7 @@ int AnimationClient::OnDataIn(unsigned char* pData, size_t nLen)
 {
   int ok = 1;
 
-  apLog_VeryVerbose((LOG_CHANNEL, "AnimationClient::OnDataIn", "url=%s " ApHandleFormat " nStatus=%d buflen=%d", StringType(sUrl_), ApHandleType(hAp_), nStatus_, sbData_.Length() + nLen));
+  apLog_VeryVerbose((LOG_CHANNEL, LOG_CONTEXT, "url=%s " ApHandleFormat " nStatus=%d buflen=%d", _sz(sUrl_), ApHandlePrintf(hAp_), nStatus_, sbData_.Length() + nLen));
   
   if (nStatus_ == 200 && sbData_.Length() + nLen < (unsigned int) Apollo::getModuleConfig(MODULE_NAME, "MaxAnimationFileSize", 200000)) {
     sbData_.Append(pData, nLen);

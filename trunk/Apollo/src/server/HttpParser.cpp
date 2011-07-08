@@ -6,7 +6,6 @@
 
 #include "Apollo.h"
 #include "Local.h"
-#include "ApLog.h"
 #include "ServerModule.h"
 #include "HttpParser.h"
 

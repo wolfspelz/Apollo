@@ -66,8 +66,12 @@ bool ApHandle::operator<(const ApHandle &h) const
 
 // ---------------------------------------------------------
 
-ApException::ApException(const char* szFmt, ...)
+ApException::ApException(const char* szContext, const char* szFmt, ...)
 {
+  if (szContext != 0) {
+    sContext_ = szContext;
+  }
+  
   if (szFmt != 0) {
     char szMessage[nMaxMessage]; szMessage[0] = '\0';
     va_list argp;
@@ -327,7 +331,7 @@ String Apollo::KeyValueList::toString()
   for (Apollo::KeyValueElem* e = 0; (e = nextElem(e)) != 0; ) {
     String sValue = e->getString();
     sValue.escape(String::EscapeCRLF);
-    sResult.appendf("%s=%s\n", StringType(e->getName()), StringType(sValue));
+    sResult.appendf("%s=%s\n", _sz(e->getName()), _sz(sValue));
   }
 
   return sResult;

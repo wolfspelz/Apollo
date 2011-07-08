@@ -7,7 +7,7 @@
 #include "net.h"
 
 #include "Apollo.h"
-
+#include "Local.h"
 #include "NetModule.h"
 
 #if defined(WIN32)

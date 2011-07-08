@@ -5,7 +5,6 @@
 // ============================================================================
 
 #include "Apollo.h"
-#include "ApLog.h"
 #include "Local.h"
 #include "BrowserInfoModule.h"
 
@@ -96,7 +95,7 @@ AP_MSG_HANDLER_METHOD(BrowserInfoModule, BrowserInfo_BeginTrackCoordinates)
   }
 
   if (!win.isValid()) {
-    apLog_Error((LOG_CHANNEL, "BrowserInfoModule::BrowserInfo_BeginTrackCoordinates", "No valid browser window, type=%s", StringType(sType)));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "No valid browser window, type=%s", _sz(sType)));
   } else {
 
     Browser* pBrowser = 0;
@@ -115,7 +114,7 @@ AP_MSG_HANDLER_METHOD(BrowserInfoModule, BrowserInfo_BeginTrackCoordinates)
       }
 
       if (pBrowser == 0) {
-        apLog_Error((LOG_CHANNEL, "BrowserInfoModule::BrowserInfo_BeginTrackCoordinates", "No browser for platformand type=%s", StringType(sType)));
+        apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "No browser for platformand type=%s", _sz(sType)));
       } else {
         browsers_.Set(win, pBrowser);
 
@@ -135,7 +134,7 @@ AP_MSG_HANDLER_METHOD(BrowserInfoModule, BrowserInfo_EndTrackCoordinates)
 {
   Browser* pBrowser = FindBrowserByContext(pMsg->hContext);
   if (pBrowser == 0) {
-    apLog_Error((LOG_CHANNEL, "BrowserInfoModule::BrowserInfo_EndTrackCoordinates", "No browser for ctxt=" ApHandleFormat "", ApHandleType(pMsg->hContext)));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "No browser for ctxt=" ApHandleFormat "", ApHandlePrintf(pMsg->hContext)));
   } else {
     pBrowser->RemoveContext(pMsg->hContext);
     
@@ -265,7 +264,7 @@ static HANDLE StartFirefox()
           &si,     // Pointer to si structure.
           &pi)     // Pointer to PROCESS_INFORMATION structure.
           ) {
-     //s.appendf("CreateProcess failed for command line: '%s %s', GetLastError=%d", StringType(sModule), StringType(sArgs), ::GetLastError());
+     //s.appendf("CreateProcess failed for command line: '%s %s', GetLastError=%d", _sz(sModule), _sz(sArgs), ::GetLastError());
   } else {
     hProcess = pi.hProcess;
   }

@@ -29,6 +29,7 @@ BOOL APIENTRY DllMain(HANDLE hModule, DWORD dwReason, LPVOID lpReserved)
 
 #define MODULE_NAME "Vpi"
 #define LOG_CHANNEL MODULE_NAME
+#define LOG_CONTEXT apLog_Context
 
 static AP_MODULE_INFO g_info = {
   sizeof(AP_MODULE_INFO),
@@ -60,7 +61,7 @@ public:
     :sDocumentUrl_(sDocumentUrl)
     ,hRequest_(hRequest)
     ,tStarted_(tStarted)
-  { apLog_Verbose((MODULE_NAME, "LocationTask::LocationTask", "url=%s " ApHandleFormat, StringType(sDocumentUrl_), ApHandleType(hRequest_))); }
+  { apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "url=%s " ApHandleFormat, _sz(sDocumentUrl_), ApHandlePrintf(hRequest_))); }
   virtual ~LocationTask() {}
 
 public:
@@ -126,7 +127,7 @@ int VpiModule::Init()
   pVpi_ = vpi_new();
   if (pVpi_ == 0) {
     ok = 0;
-    apLog_Error((LOG_CHANNEL, "VpiModule::Init", "vpi_new() failed"));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "vpi_new() failed"));
   } else {
 
     int nMask = apLog_SetMask(0);
@@ -259,7 +260,7 @@ public:
 int VpiClient::OnConnected()
 {
   int ok = 1;
-  apLog_VeryVerbose((MODULE_NAME, "VpiClient::OnConnected", "url=%s " ApHandleFormat "", StringType(sUrl_), ApHandleType(hAp_)));
+  apLog_VeryVerbose((LOG_CHANNEL, LOG_CONTEXT, "url=%s " ApHandleFormat "", _sz(sUrl_), ApHandlePrintf(hAp_)));
   return ok;
 }
 
@@ -273,7 +274,7 @@ int VpiClient::OnHeader(int nStatus, KeyValueList& kvHeaders)
     if (String::toLower(e->getKey()) == "content-type") {
       sContentType_ = String::toLower(e->getString());
     }
-    apLog_VeryVerbose((MODULE_NAME, "VpiClient::OnHeader", "url=%s " ApHandleFormat " header: [%s][%s]", StringType(sUrl_), ApHandleType(hAp_), StringType(e->getKey()), StringType(e->getString())));
+    apLog_VeryVerbose((LOG_CHANNEL, LOG_CONTEXT, "url=%s " ApHandleFormat " header: [%s][%s]", _sz(sUrl_), ApHandlePrintf(hAp_), _sz(e->getKey()), _sz(e->getString())));
   }
 
   if (ok) {
@@ -295,7 +296,7 @@ int VpiClient::OnHeader(int nStatus, KeyValueList& kvHeaders)
     sContentType_ = "text/xml";
   }
   
-  apLog_VeryVerbose((MODULE_NAME, "VpiClient::OnHeader", "url=%s " ApHandleFormat " bContentTypeOk_=%d", StringType(sUrl_), ApHandleType(hAp_), bContentTypeOk_));
+  apLog_VeryVerbose((LOG_CHANNEL, LOG_CONTEXT, "url=%s " ApHandleFormat " bContentTypeOk_=%d", _sz(sUrl_), ApHandlePrintf(hAp_), bContentTypeOk_));
   
   return ok;
 }
@@ -304,7 +305,7 @@ int VpiClient::OnDataIn(unsigned char* pData, size_t nLen)
 {
   int ok = 1;
   
-  apLog_VeryVerbose((MODULE_NAME, "VpiClient::OnDataIn", "url=%s " ApHandleFormat " nStatus=%d bContentTypeOk_=%d buflen=%d", StringType(sUrl_), ApHandleType(hAp_), nStatus_, bContentTypeOk_, sbData_.Length() + nLen));
+  apLog_VeryVerbose((LOG_CHANNEL, LOG_CONTEXT, "url=%s " ApHandleFormat " nStatus=%d bContentTypeOk_=%d buflen=%d", _sz(sUrl_), ApHandlePrintf(hAp_), nStatus_, bContentTypeOk_, sbData_.Length() + nLen));
   
   if (nStatus_ == 200 && bContentTypeOk_ && sbData_.Length() + nLen < (unsigned int) Apollo::getModuleConfig(MODULE_NAME, "MaxVpiFileSize", 100000)) {
     sbData_.Append(pData, nLen);
@@ -329,12 +330,12 @@ int VpiClient::OnClosed()
 
   if (nStatus_ == 200 && bContentTypeOk_ && !bCancelled_ && sbData_.Length() > 0) {
     if (pModule_ != 0) {
-      apLog_VeryVerbose((MODULE_NAME, "VpiClient::OnClosed", "url=%s " ApHandleFormat ": Writing valid data to file", StringType(sUrl_), ApHandleType(hAp_)));
+      apLog_VeryVerbose((LOG_CHANNEL, LOG_CONTEXT, "url=%s " ApHandleFormat ": Writing valid data to file", _sz(sUrl_), ApHandlePrintf(hAp_)));
       pModule_->ReceiveFile(sUrl_, sContentType_, sbData_);
     }
   } else {
     if (pModule_ != 0) {
-      apLog_VeryVerbose((MODULE_NAME, "VpiClient::OnClosed", "url=%s " ApHandleFormat ": Writing empty data to file", StringType(sUrl_), ApHandleType(hAp_)));
+      apLog_VeryVerbose((LOG_CHANNEL, LOG_CONTEXT, "url=%s " ApHandleFormat ": Writing empty data to file", _sz(sUrl_), ApHandlePrintf(hAp_)));
       String sEmptyString; Buffer sEmptyBuffer;
       pModule_->ReceiveFile(sUrl_, sEmptyString, sEmptyBuffer);
     }
@@ -358,7 +359,7 @@ int VpiModule::ReceiveFile(const String& sUrl, const String& sContentType, Buffe
     if (!xml.XmlText(sData)) {
       sData = String::truncate(sData, 100);
       sData.trim("\r\n");
-      apLog_Warning((LOG_CHANNEL, "VpiModule::ReceiveFile", "XML parser failed: url:%s, err:%s xml:%s", StringType(sUrl), StringType(xml.GetErrorString()), StringType(sData )));
+      apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "XML parser failed: url:%s, err:%s xml:%s", _sz(sUrl), _sz(xml.GetErrorString()), _sz(sData )));
       // Data broken, receive empty data
       sData = "";
     }
@@ -396,7 +397,7 @@ int VpiModule::RequestFile(const String& sUrl)
   if (pClient != 0){
     ok = pClient->Get(msg.sUrl);
     if (!ok) {
-      apLog_Error((LOG_CHANNEL, "VpiModule::RequestFile", "VpiClient::Get(%s) failed", StringType(msg.sUrl)));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "VpiClient::Get(%s) failed", _sz(msg.sUrl)));
     }
   }
 
@@ -456,7 +457,7 @@ void VpiModule::On_Vpi_LocationXmlRequest(Msg_Vpi_LocationXmlRequest* pMsg)
     // generate an async message, to simulate the behaviour of an async response
     // This is just to prevent users of this message from assuming that the response comes synchronously
 
-    apLog_VeryVerbose((LOG_CHANNEL, "VpiModule::On_Vpi_LocationXmlRequest", "vpi_get_location_xml success, " ApHandleFormat " url:%s", ApHandleType(pMsg->hRequest), StringType(pMsg->sDocumentUrl)));
+    apLog_VeryVerbose((LOG_CHANNEL, LOG_CONTEXT, "vpi_get_location_xml success, " ApHandleFormat " url:%s", ApHandlePrintf(pMsg->hRequest), _sz(pMsg->sDocumentUrl)));
     
     ApAsyncMessage<Msg_Vpi_LocationXmlResponse> msgVLXR;
     msgVLXR->sDocumentUrl = pMsg->sDocumentUrl;
@@ -489,7 +490,7 @@ void VpiModule::On_Vpi_GetLocationXml(Msg_Vpi_GetLocationXml* pMsg)
   char* location_xml = 0;
   int ok = vpi_get_location_xml(pVpi_, pMsg->sDocumentUrl, &location_xml);
   if (ok && location_xml != 0) {
-    apLog_VeryVerbose((LOG_CHANNEL, "VpiModule::On_Vpi_GetLocationXml", "vpi_get_location_xml success,  url:%s", StringType(pMsg->sDocumentUrl)));
+    apLog_VeryVerbose((LOG_CHANNEL, LOG_CONTEXT, "vpi_get_location_xml success,  url:%s", _sz(pMsg->sDocumentUrl)));
     pMsg->sLocationXml = location_xml;
   }
 
@@ -510,7 +511,7 @@ void VpiModule::On_Vpi_ReceiveFile(Msg_Vpi_ReceiveFile* pMsg)
     if (pMsg->sContentType == "text/xml") {
       (void) vpi_cache_add_xml(pVpi_, pMsg->sUrl, pMsg->sData);
     } else {
-      apLog_Error((LOG_CHANNEL, "VpiModule::On_Vpi_ReceiveFile", "Content-type:%s, not supported url:%s", StringType(pMsg->sContentType), StringType(pMsg->sUrl)));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Content-type:%s, not supported url:%s", _sz(pMsg->sContentType), _sz(pMsg->sUrl)));
     }
   }
 
@@ -523,7 +524,7 @@ void VpiModule::On_Vpi_ReceiveFile(Msg_Vpi_ReceiveFile* pMsg)
     if (ok && location_xml != 0) {
       bRemoveTask = 1;
 
-      apLog_Verbose((LOG_CHANNEL, "VpiModule::On_Vpi_ReceiveFile", "vpi_get_location_xml success, " ApHandleFormat " url:%s", ApHandleType(pTask->hRequest_), StringType(pTask->sDocumentUrl_)));
+      apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "vpi_get_location_xml success, " ApHandleFormat " url:%s", ApHandlePrintf(pTask->hRequest_), _sz(pTask->sDocumentUrl_)));
       Msg_Vpi_LocationXmlResponse msg;
       msg.sDocumentUrl = pTask->sDocumentUrl_;
       msg.hRequest = pTask->hRequest_;
@@ -535,7 +536,7 @@ void VpiModule::On_Vpi_ReceiveFile(Msg_Vpi_ReceiveFile* pMsg)
       TimeValue tvNow = TimeValue::getTime();
       TimeValue tv100Sec(100, 0);
       if (tvNow - pTask->tStarted_ > tv100Sec) {
-        apLog_Warning((LOG_CHANNEL, "VpiModule::On_Vpi_ReceiveFile", "LocationTask exceeded max time: cancelled, " ApHandleFormat " url:%s", ApHandleType(pTask->hRequest_), StringType(pTask->sDocumentUrl_)));
+        apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "LocationTask exceeded max time: cancelled, " ApHandleFormat " url:%s", ApHandlePrintf(pTask->hRequest_), _sz(pTask->sDocumentUrl_)));
         Msg_Vpi_LocationXmlResponse msg;
         msg.sDocumentUrl = pTask->sDocumentUrl_;
         msg.hRequest = pTask->hRequest_;
@@ -546,7 +547,7 @@ void VpiModule::On_Vpi_ReceiveFile(Msg_Vpi_ReceiveFile* pMsg)
     } else {
       bRemoveTask = 1;
 
-      apLog_Warning((LOG_CHANNEL, "VpiModule::On_Vpi_ReceiveFile", "vpi_get_location_xml returned error, err:%d, " ApHandleFormat " url:%s", vpi_get_last_error(pVpi_), ApHandleType(pTask->hRequest_), StringType(pTask->sDocumentUrl_)));
+      apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "vpi_get_location_xml returned error, err:%d, " ApHandleFormat " url:%s", vpi_get_last_error(pVpi_), ApHandlePrintf(pTask->hRequest_), _sz(pTask->sDocumentUrl_)));
       Msg_Vpi_LocationXmlResponse msg;
       msg.sDocumentUrl = pTask->sDocumentUrl_;
       msg.hRequest = pTask->hRequest_;
@@ -656,7 +657,7 @@ void VpiModule::On_Vpi_ComposeLocation(Msg_Vpi_ComposeLocation* pMsg)
     String sPart;
     sService.nextToken(":", sPart);
 
-    pMsg->sLocationUrl.appendf("%s:%s@%s", StringType(sProtocol), StringType(pMsg->sName), StringType(sService));
+    pMsg->sLocationUrl.appendf("%s:%s@%s", _sz(sProtocol), _sz(pMsg->sName), _sz(sService));
     pMsg->apStatus = ApMessage::Ok;
     pMsg->Stop();
   }
@@ -743,7 +744,7 @@ VPI_API int Load(AP_MODULE_CALL* pModuleData)
 
   if (!VpiModuleInstance::Get()->Init()) {
     ok = 0;
-    apLog_Error((LOG_CHANNEL, "Load", "Init() failed"));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Init() failed"));
   }
 
   if (ok) {

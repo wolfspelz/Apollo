@@ -22,8 +22,9 @@ BOOL APIENTRY DllMain(HANDLE hModule, DWORD dwReason, LPVOID lpReserved)
 }
 #endif // defined(WIN32)
 
-#define LOG_CHANNEL "NetAPI"
 #define MODULE_NAME "NetAPI"
+#define LOG_CHANNEL MODULE_NAME
+#define LOG_CONTEXT apLog_Context
 
 static AP_MODULE_INFO g_info = {
   sizeof(AP_MODULE_INFO),
@@ -77,7 +78,7 @@ NETAPI_API int Load(AP_MODULE_CALL* pModuleData)
   if (ok) {
     ok = NetAPIModuleInstance::Get()->Init();
     if (!ok) {
-      apLog_Error((LOG_CHANNEL, "Load", "NetAPIModuleInstance::Get()->Init failed"));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "NetAPIModuleInstance::Get()->Init failed"));
     }
   }
 

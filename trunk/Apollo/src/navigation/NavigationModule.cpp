@@ -5,7 +5,7 @@
 // ============================================================================
 
 #include "Apollo.h"
-#include "ApLog.h"
+#include "Local.h"
 #include "NavigationModule.h"
 #include "Context.h"
 
@@ -97,13 +97,13 @@ int NavigationModule::destroyContext(const ApHandle& hContext)
 
   Context* pContext = findContext(hContext);
   if (pContext == 0) {
-    apLog_Warning((LOG_CHANNEL, "NavigationModule::destroyContext", "Unknown context " ApHandleFormat "", ApHandleType(hContext)));
+    apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "Unknown context " ApHandleFormat "", ApHandlePrintf(hContext)));
   } else {
     try {
       pContext->destroy();
       ok = 1;
     } catch (ApException& ex) {
-      apLog_Error((LOG_CHANNEL, "NavigationModule::destroyContext", "pContext->close() failed: %s", StringType(ex.getText())));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "pContext->close() failed: %s", _sz(ex.getText())));
     }
 
     ApHandle hConnection = findConnectionHandleByContextHandle(hContext);
@@ -161,9 +161,9 @@ AP_MSG_HANDLER_METHOD(NavigationModule, TcpServer_Disconnected)
     }
 
     if (closeContexts.Count() == 0) {
-      apLog_Verbose((LOG_CHANNEL, "NavigationModule::removeConnection", "conn=" ApHandleFormat " no associated contexts", ApHandleType(hConnection)));
+      apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "conn=" ApHandleFormat " no associated contexts", ApHandlePrintf(hConnection)));
     } else {
-      apLog_Verbose((LOG_CHANNEL, "NavigationModule::removeConnection", "Closing %d associated contexts of conn=" ApHandleFormat "", closeContexts.Count(), ApHandleType(hConnection)));
+      apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "Closing %d associated contexts of conn=" ApHandleFormat "", closeContexts.Count(), ApHandlePrintf(hConnection)));
     }
 
     // Send Vp_CloseContext for all associated contexts
@@ -184,26 +184,26 @@ AP_MSG_HANDLER_METHOD(NavigationModule, TcpServer_Disconnected)
 
 AP_MSG_HANDLER_METHOD(NavigationModule, Navigation_NavigatorHello)
 {
-  apLog_Verbose((LOG_CHANNEL, "NavigationModule::Navigation_NavigatorHello", "conn=" ApHandleFormat "", ApHandleType(pMsg->hConnection)));
+  apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "conn=" ApHandleFormat "", ApHandlePrintf(pMsg->hConnection)));
   // do nothing
   pMsg->apStatus = ApMessage::Ok;
 }
 
 AP_MSG_HANDLER_METHOD(NavigationModule, Navigation_NavigatorBye)
 {
-  apLog_Verbose((LOG_CHANNEL, "NavigationModule::Navigation_NavigatorBye", "conn=" ApHandleFormat "", ApHandleType(pMsg->hConnection)));
+  apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "conn=" ApHandleFormat "", ApHandlePrintf(pMsg->hConnection)));
   // do nothing
   pMsg->apStatus = ApMessage::Ok;
 }
 
 AP_MSG_HANDLER_METHOD(NavigationModule, Navigation_ContextOpen)
 {
-  apLog_Verbose((LOG_CHANNEL, "NavigationModule::Navigation_ContextOpen", "conn=" ApHandleFormat " ctxt=" ApHandleFormat "", ApHandleType(pMsg->hConnection), ApHandleType(pMsg->hContext)));
+  apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "conn=" ApHandleFormat " ctxt=" ApHandleFormat "", ApHandlePrintf(pMsg->hConnection), ApHandlePrintf(pMsg->hContext)));
 
   Context* pContext = findContext(pMsg->hContext);
   if (pContext == 0) {
     pContext = createContext(pMsg->hContext);
-    if (pContext == 0) { throw ApException("createContext() failed conn=" ApHandleFormat " ctxt=" ApHandleFormat "", ApHandleType(pMsg->hConnection), ApHandleType(pMsg->hContext));}
+    if (pContext == 0) { throw ApException(LOG_CONTEXT, "createContext() failed conn=" ApHandleFormat " ctxt=" ApHandleFormat "", ApHandlePrintf(pMsg->hConnection), ApHandlePrintf(pMsg->hContext));}
 
     associateContextWithConnection(pMsg->hContext, pMsg->hConnection);
   }
@@ -213,12 +213,12 @@ AP_MSG_HANDLER_METHOD(NavigationModule, Navigation_ContextOpen)
 
 AP_MSG_HANDLER_METHOD(NavigationModule, Navigation_ContextNavigate)
 {
-  apLog_Verbose((LOG_CHANNEL, "NavigationModule::Navigation_ContextNavigate", "conn=" ApHandleFormat " ctxt=" ApHandleFormat ": %s", ApHandleType(pMsg->hConnection), ApHandleType(pMsg->hContext), StringType(pMsg->sUrl)));
+  apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "conn=" ApHandleFormat " ctxt=" ApHandleFormat ": %s", ApHandlePrintf(pMsg->hConnection), ApHandlePrintf(pMsg->hContext), _sz(pMsg->sUrl)));
 
   Context* pContext = findContext(pMsg->hContext);
   if (pContext == 0) {
     pContext = createContext(pMsg->hContext);
-    if (pContext == 0) { throw ApException("createContext() failed conn=" ApHandleFormat " ctxt=" ApHandleFormat ": %s", ApHandleType(pMsg->hConnection), ApHandleType(pMsg->hContext), StringType(pMsg->sUrl));}
+    if (pContext == 0) { throw ApException(LOG_CONTEXT, "createContext() failed conn=" ApHandleFormat " ctxt=" ApHandleFormat ": %s", ApHandlePrintf(pMsg->hConnection), ApHandlePrintf(pMsg->hContext), _sz(pMsg->sUrl));}
   }
 
   associateContextWithConnection(pMsg->hContext, pMsg->hConnection);
@@ -230,16 +230,16 @@ AP_MSG_HANDLER_METHOD(NavigationModule, Navigation_ContextNavigate)
 
 AP_MSG_HANDLER_METHOD(NavigationModule, Navigation_ContextClose)
 {
-  apLog_Verbose((LOG_CHANNEL, "NavigationModule::Navigation_ContextClose", "ctxt=" ApHandleFormat "", ApHandleType(pMsg->hContext)));
+  apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "ctxt=" ApHandleFormat "", ApHandlePrintf(pMsg->hContext)));
 
-  if (!destroyContext(pMsg->hContext)) { throw ApException("createContext() failed ctxt=" ApHandleFormat "", ApHandleType(pMsg->hContext));}
+  if (!destroyContext(pMsg->hContext)) { throw ApException(LOG_CONTEXT, "createContext() failed ctxt=" ApHandleFormat "", ApHandlePrintf(pMsg->hContext));}
 
   pMsg->apStatus = ApMessage::Ok;
 }
 
 AP_MSG_HANDLER_METHOD(NavigationModule, Navigation_ContextShow)
 {
-  apLog_Verbose((LOG_CHANNEL, "NavigationModule::Navigation_ContextShow", "ctxt=" ApHandleFormat "", ApHandleType(pMsg->hContext)));
+  apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "ctxt=" ApHandleFormat "", ApHandlePrintf(pMsg->hContext)));
 
   Context* pContext = findContext(pMsg->hContext);
   if (pContext != 0) {
@@ -251,7 +251,7 @@ AP_MSG_HANDLER_METHOD(NavigationModule, Navigation_ContextShow)
 
 AP_MSG_HANDLER_METHOD(NavigationModule, Navigation_ContextHide)
 {
-  apLog_Verbose((LOG_CHANNEL, "NavigationModule::Navigation_ContextHide", "ctxt=" ApHandleFormat "", ApHandleType(pMsg->hContext)));
+  apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "ctxt=" ApHandleFormat "", ApHandlePrintf(pMsg->hContext)));
 
   Context* pContext = findContext(pMsg->hContext);
   if (pContext != 0) {
@@ -263,7 +263,7 @@ AP_MSG_HANDLER_METHOD(NavigationModule, Navigation_ContextHide)
 
 AP_MSG_HANDLER_METHOD(NavigationModule, Navigation_ContextPosition)
 {
-  apLog_Verbose((LOG_CHANNEL, "NavigationModule::Navigation_ContextPosition", "ctxt=" ApHandleFormat "", ApHandleType(pMsg->hContext)));
+  apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "ctxt=" ApHandleFormat "", ApHandlePrintf(pMsg->hContext)));
 
   Context* pContext = findContext(pMsg->hContext);
   if (pContext != 0) {
@@ -275,7 +275,7 @@ AP_MSG_HANDLER_METHOD(NavigationModule, Navigation_ContextPosition)
 
 AP_MSG_HANDLER_METHOD(NavigationModule, Navigation_ContextSize)
 {
-  apLog_Verbose((LOG_CHANNEL, "NavigationModule::Navigation_ContextSize", "ctxt=" ApHandleFormat "", ApHandleType(pMsg->hContext)));
+  apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "ctxt=" ApHandleFormat "", ApHandlePrintf(pMsg->hContext)));
 
   Context* pContext = findContext(pMsg->hContext);
   if (pContext != 0) {
@@ -291,9 +291,9 @@ AP_MSG_HANDLER_METHOD(NavigationModule, Navigation_ContextNativeWindow)
     String sSignature;
     for (Apollo::KeyValueElem* e = 0; (e = pMsg->kvSignature.nextElem(e)) != 0; ) {
       if (!sSignature.empty()) { sSignature += " "; }
-      sSignature.appendf("%s=%s", StringType(e->getKey()), StringType(e->getString()));
+      sSignature.appendf("%s=%s", _sz(e->getKey()), _sz(e->getString()));
     }
-    apLog_Verbose((LOG_CHANNEL, "NavigationModule::Navigation_ContextNativeWindow", "ctxt=" ApHandleFormat " sig: %s", ApHandleType(pMsg->hContext), StringType(sSignature)));
+    apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "ctxt=" ApHandleFormat " sig: %s", ApHandlePrintf(pMsg->hContext), _sz(sSignature)));
   }
 
   Context* pContext = findContext(pMsg->hContext);

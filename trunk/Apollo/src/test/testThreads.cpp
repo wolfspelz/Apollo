@@ -45,7 +45,7 @@ public:
   {
     Apollo::Sleep(10);
     
-    apLog_Verbose((LOG_CHANNEL, "Task::Execute", "End: job=%s thread=0x%08x", StringType(getName()), Apollo::GetCurrentThreadId()));
+    apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "End: job=%s thread=0x%08x", _sz(getName()), Apollo::GetCurrentThreadId()));
     
     ApAsyncMessage<Msg_ThreadPool_Test_Threads_JobFinished> msg;
     msg->sName_ = getName();
@@ -69,7 +69,7 @@ static void Test_Threads_ThreadPool_On_Job_Finished(Msg_ThreadPool_Test_Threads_
       nPendingJobs--;
     } else if (eJob->getInt() > 1) {
       if (g_Test_Threads_ThreadPool_sError.empty()) {
-        g_Test_Threads_ThreadPool_sError.appendf("Multiple job result for job=%s", StringType(eJob->getName()));
+        g_Test_Threads_ThreadPool_sError.appendf("Multiple job result for job=%s", _sz(eJob->getName()));
       }
     }
   }

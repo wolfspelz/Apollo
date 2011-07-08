@@ -9,6 +9,9 @@
 #include "ApLib.h"
 //#include "ApMessage.h"
 
+#define LOG_CHANNEL APOLLO_NAME
+#define LOG_CONTEXT apLog_Context
+
 void ApNotificationMessage::Send()
 {
   int AP_UNUSED_VARIABLE bCalled = Apollo::callMsg(this, 0);
@@ -24,14 +27,14 @@ int ApRequestMessage::Request()
   #if defined(_DEBUG)
     AP_DEBUG_BREAK();
   #endif
-    apLog_Error((APOLLO_NAME, "ApMessage::Request", "Not handled for message type %s", StringType(getName())));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "No handler for message type=%s", _sz(Type())));
   }
 
   if (apStatus == Unknown) {
   #if defined(_DEBUG) 
     AP_DEBUG_BREAK();
   #endif
-    apLog_Error((APOLLO_NAME, "ApMessage::Request", "No status result for message type %s", StringType(getName())));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "No status result for message type=%s", _sz(Type())));
   }
 
   return apStatus == Ok;
@@ -65,7 +68,7 @@ int ApMessage::PostAsync()
 {
   int bCalled = Apollo::callMsg(this, Apollo::CF_ASYNC);
   if (!bCalled) {
-    apLog_Warning((APOLLO_NAME, "ApMessage::PostAsync", "Async Message (Type=%s) not handled, deleting self", StringType(Type())));
+    apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "Async Message (type=%s) not handled, deleting self", _sz(Type())));
     delete this;
   }
   return bCalled;

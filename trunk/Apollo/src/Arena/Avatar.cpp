@@ -84,7 +84,7 @@ void Avatar::Destroy()
     Msg_Animation_Stop msg;
     msg.hItem = hAnimatedItem_;
     if (!msg.Request()) {
-      apLog_Error((LOG_CHANNEL, "Avatar::Hide", "Msg_Animation_Stop failed: participant=" ApHandleFormat "", ApHandleType(hParticipant_)));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_Animation_Stop failed: participant=" ApHandleFormat "", ApHandlePrintf(hParticipant_)));
     }
   }
 
@@ -92,7 +92,7 @@ void Avatar::Destroy()
     Msg_Animation_Destroy msg;
     msg.hItem = hAnimatedItem_;
     if (!msg.Request()) {
-      apLog_Error((LOG_CHANNEL, "Avatar::Hide", "Msg_Animation_Destroy failed: participant=" ApHandleFormat "", ApHandleType(hParticipant_)));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_Animation_Destroy failed: participant=" ApHandleFormat "", ApHandlePrintf(hParticipant_)));
     }
   }
 
@@ -289,7 +289,7 @@ void Avatar::HandleImageData(const String& sMimeType, const String& sSource, Buf
     msgAC.hItem = Apollo::newHandle();
     msgAC.sMimeType = sMimeType;
     if (!msgAC.Request()) {
-      apLog_Error((LOG_CHANNEL, "Avatar::HandleImageData", "Msg_Animation_Create failed: participant=" ApHandleFormat "", ApHandleType(hParticipant_)));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_Animation_Create failed: participant=" ApHandleFormat "", ApHandlePrintf(hParticipant_)));
     } else {
       hAnimatedItem_ = msgAC.hItem;
     }
@@ -300,7 +300,7 @@ void Avatar::HandleImageData(const String& sMimeType, const String& sSource, Buf
     msgASR.hItem = hAnimatedItem_;
     msgASR.nMaxRate = 10;
     if (!msgASR.Request()) {
-      apLog_Error((LOG_CHANNEL, "Avatar::HandleImageData", "Msg_Animation_SetRate failed: participant=" ApHandleFormat "", ApHandleType(hParticipant_)));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_Animation_SetRate failed: participant=" ApHandleFormat "", ApHandlePrintf(hParticipant_)));
     }
   }
 
@@ -318,7 +318,7 @@ void Avatar::HandleImageData(const String& sMimeType, const String& sSource, Buf
     }
 
     if (!msgASD.Request()) {
-      apLog_Error((LOG_CHANNEL, "Avatar::HandleImageData", "Msg_Animation_SetData failed: participant=" ApHandleFormat " data:%d bytes, source=%s", ApHandleType(hParticipant_), sbData.Length(), StringType(sSource)));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_Animation_SetData failed: participant=" ApHandleFormat " data:%d bytes, source=%s", ApHandlePrintf(hParticipant_), sbData.Length(), _sz(sSource)));
     }
   }
 
@@ -331,7 +331,7 @@ void Avatar::HandleImageData(const String& sMimeType, const String& sSource, Buf
     Msg_Animation_Start msgAS;
     msgAS.hItem = hAnimatedItem_;
     if (!msgAS.Request()) {
-      apLog_Error((LOG_CHANNEL, "Avatar::HandleImageData", "Msg_Animation_Start failed: participant=" ApHandleFormat "", ApHandleType(hParticipant_)));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_Animation_Start failed: participant=" ApHandleFormat "", ApHandlePrintf(hParticipant_)));
     }
   }
 }
@@ -344,7 +344,7 @@ void Avatar::SuspendAnimation()
     //  msg.hItem = hAnimatedItem_;
     //  msg.bState = 1;
     //  if (!msg.Request()) {
-    //    apLog_Error((LOG_CHANNEL, "Avatar::SuspendAnimation", "%s failed: participant=" ApHandleFormat "", StringType(msg.Type()), ApHandleType(hParticipant_)));
+    //    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "%s failed: participant=" ApHandleFormat "", _sz(msg.Type()), ApHandlePrintf(hParticipant_)));
     //  }
     //}
 
@@ -353,7 +353,7 @@ void Avatar::SuspendAnimation()
       msg.hItem = hAnimatedItem_;
       msg.sActivity = Msg_Animation_Activity_Idle;
       if (!msg.Request()) {
-        apLog_Error((LOG_CHANNEL, "Avatar::SuspendAnimation", "%s failed: participant=" ApHandleFormat " activity=%s", StringType(msg.Type()), ApHandleType(hParticipant_), StringType(msg.sActivity)));
+        apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "%s failed: participant=" ApHandleFormat " activity=%s", _sz(msg.Type()), ApHandlePrintf(hParticipant_), _sz(msg.sActivity)));
       }
     }
 
@@ -361,7 +361,7 @@ void Avatar::SuspendAnimation()
       Msg_Animation_Stop msg;
       msg.hItem = hAnimatedItem_;
       if (!msg.Request()) {
-        apLog_Error((LOG_CHANNEL, "Avatar::SuspendAnimation", "%s failed: participant=" ApHandleFormat "", StringType(msg.Type()), ApHandleType(hParticipant_)));
+        apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "%s failed: participant=" ApHandleFormat "", _sz(msg.Type()), ApHandlePrintf(hParticipant_)));
       }
     }
   }
@@ -375,7 +375,7 @@ void Avatar::ResumeAnimation()
     //  msg.hItem = hAnimatedItem_;
     //  msg.bState = 0;
     //  if (!msg.Request()) {
-    //    apLog_Error((LOG_CHANNEL, "Avatar::ResumeAnimation", "%s failed: participant=" ApHandleFormat "", StringType(msg.Type()), ApHandleType(hParticipant_)));
+    //    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "%s failed: participant=" ApHandleFormat "", _sz(msg.Type()), ApHandlePrintf(hParticipant_)));
     //  }
     //}
 
@@ -384,7 +384,7 @@ void Avatar::ResumeAnimation()
       msg.hItem = hAnimatedItem_;
       msg.sActivity = "";
       if (!msg.Request()) {
-        apLog_Error((LOG_CHANNEL, "Avatar::ResumeAnimation", "%s failed: participant=" ApHandleFormat "", StringType(msg.Type()), ApHandleType(hParticipant_)));
+        apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "%s failed: participant=" ApHandleFormat "", _sz(msg.Type()), ApHandlePrintf(hParticipant_)));
       }
     }
 
@@ -392,7 +392,7 @@ void Avatar::ResumeAnimation()
       Msg_Animation_Start msg;
       msg.hItem = hAnimatedItem_;
       if (!msg.Request()) {
-        apLog_Error((LOG_CHANNEL, "Avatar::ResumeAnimation", "%s failed: participant=" ApHandleFormat "", StringType(msg.Type()), ApHandleType(hParticipant_)));
+        apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "%s failed: participant=" ApHandleFormat "", _sz(msg.Type()), ApHandlePrintf(hParticipant_)));
       }
     }
   }
@@ -408,7 +408,7 @@ void Avatar::BeginMove(int nDestX)
     msg.hItem = hAnimatedItem_;
     msg.sActivity = (nDestX > nX_ ? Msg_Animation_Activity_MoveRight : Msg_Animation_Activity_MoveLeft);
     if (!msg.Request()) {
-      apLog_Error((LOG_CHANNEL, "Avatar::BeginMove", "%s failed: participant=" ApHandleFormat " activity=%s", StringType(msg.Type()), ApHandleType(hParticipant_), StringType(msg.sActivity)));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "%s failed: participant=" ApHandleFormat " activity=%s", _sz(msg.Type()), ApHandlePrintf(hParticipant_), _sz(msg.sActivity)));
     }
 
   }
@@ -426,7 +426,7 @@ void Avatar::EndMove(int nDestX)
     msg.hItem = hAnimatedItem_;
     msg.sActivity = "";
     if (!msg.Request()) {
-      apLog_Error((LOG_CHANNEL, "Avatar::EndMove", "%s failed: participant=" ApHandleFormat "", StringType(msg.Type()), ApHandleType(hParticipant_)));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "%s failed: participant=" ApHandleFormat "", _sz(msg.Type()), ApHandlePrintf(hParticipant_)));
     }
 
   }
@@ -508,7 +508,7 @@ void Avatar::OnReceivePublicAction(const String& sAction)
     msg.hItem = hAnimatedItem_;
     msg.sEvent = sAction;
     if (!msg.Request()) {
-      apLog_Error((LOG_CHANNEL, "Avatar::OnReceivePublicAction", "Msg_Animation_Event failed: participant=" ApHandleFormat " event=%s", ApHandleType(hParticipant_), StringType(sAction)));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_Animation_Event failed: participant=" ApHandleFormat " event=%s", ApHandlePrintf(hParticipant_), _sz(sAction)));
     }
   }
 }
@@ -553,7 +553,7 @@ void Avatar::OnModuleCall(Apollo::SrpcMessage& request, Apollo::SrpcMessage& res
     OnAvatarPointerClosed();
 
   } else {
-    throw ApException("Avatar::OnModuleCall: Unknown Method=%s", StringType(sMethod));
+    throw ApException(LOG_CONTEXT, "Unknown Method=%s", _sz(sMethod));
   }
   
 }
@@ -581,7 +581,7 @@ void Avatar::OnAvatarDraggedBy(int nDiffX, int nDiffY)
   msg.hLocation = pDisplay_->GetLocation();
   msg.kvParams.add(Msg_Vp_Position_X, nNewX);
   if (!msg.Request()) {
-    apLog_Warning(( MODULE_NAME, "Avatar::OnAvatarDraggedBy", "%s failed: %s", StringType(msg.Type()), StringType(msg.sComment) ));
+    apLog_Warning(( MODULE_NAME, LOG_CONTEXT, "%s failed: %s", _sz(msg.Type()), _sz(msg.sComment) ));
   }
 }
 
@@ -713,7 +713,7 @@ void Avatar::DisplayMoveAvatarPosition(int nDestX)
       msg.hItem = hAnimatedItem_;
       msg.sGroup = (nDestX > nX_ ? Msg_Animation_Activity_MoveRight : Msg_Animation_Activity_MoveLeft);
       if (!msg.Request()) {
-        apLog_Error((LOG_CHANNEL, "Avatar::DisplayMoveAvatarPosition", "%s failed: participant=" ApHandleFormat " group=%s", StringType(msg.Type()), ApHandleType(hParticipant_), StringType(msg.sGroup)));
+        apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "%s failed: participant=" ApHandleFormat " group=%s", _sz(msg.Type()), ApHandlePrintf(hParticipant_), _sz(msg.sGroup)));
       } else {
         sSequence = msg.vlSequences.atIndex(0, (nDestX > nX_ ? Msg_Animation_Activity_MoveRight : Msg_Animation_Activity_MoveLeft));
       }
@@ -724,7 +724,7 @@ void Avatar::DisplayMoveAvatarPosition(int nDestX)
       msg.hItem = hAnimatedItem_;
       msg.sSequence = sSequence;
       if (!msg.Request()) {
-        apLog_Error((LOG_CHANNEL, "Avatar::DisplayMoveAvatarPosition", "%s failed: participant=" ApHandleFormat " sequence=%s", StringType(msg.Type()), ApHandleType(hParticipant_), StringType(msg.sSequence)));
+        apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "%s failed: participant=" ApHandleFormat " sequence=%s", _sz(msg.Type()), ApHandlePrintf(hParticipant_), _sz(msg.sSequence)));
       } else {
         if (msg.nDx != 0) {
           nSpeedX = abs(msg.nDx);

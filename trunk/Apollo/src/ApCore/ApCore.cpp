@@ -27,8 +27,9 @@ BOOL APIENTRY DllMain(HANDLE hModule, DWORD dwReason, LPVOID lpReserved)
 
 APCORE_API ApCore gApCore;
 
-#define LOG_CHANNEL "ApCore"
 #define APCORE_NAME "Apollo"
+#define LOG_CHANNEL "ApCore"
+#define LOG_CONTEXT apLog_Context
 
 // -------------------------------------------------------------------
 
@@ -46,7 +47,7 @@ int ApCore::loadModuleConfig(const String& sModuleName, const String& sModuleFil
   String sData;
   ok = Apollo::loadFile(sConfigFile, sData);
   if (ok) {
-    apLog_Verbose((LOG_CHANNEL, "ApCore::loadModuleConfig", "%s", StringType(sConfigFile)));
+    apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "%s", _sz(sConfigFile)));
 
     List lParams;
     KeyValueLfBlob2List(sData, lParams);
@@ -74,7 +75,7 @@ int ApCore::loadModule(const char* szModuleName, const char* szDllPath)
 
   sDllPath = sBasePath + sFileName;
 
-  apLog_Verbose((LOG_CHANNEL, "ApCore::loadModule", "%s", StringType(sDllPath)));
+  apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "%s", _sz(sDllPath)));
 
   int bDependenciesLoaded = 1;
   ListT<SupportDll, Elem> lSupportDlls;
@@ -101,7 +102,7 @@ int ApCore::loadModule(const char* szModuleName, const char* szDllPath)
     Apollo::ValueList vlUnsortedKeys;
     String sPath = "LoadDLL";    
     if (! Apollo::getModuleConfigKeys(szModuleName, sPath, vlUnsortedKeys)) {
-      apLog_Verbose((LOG_CHANNEL, "ApCore::loadModule", "Apollo::getModuleConfigKeys failed: Module=%s Path=%s", szModuleName, StringType(sPath)));
+      apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "Apollo::getModuleConfigKeys failed: Module=%s Path=%s", szModuleName, _sz(sPath)));
     } else {
 
       List lKeys;
@@ -134,7 +135,7 @@ int ApCore::loadModule(const char* szModuleName, const char* szDllPath)
           if (!sSupportDll.empty()) {
             HMODULE hDll = (HMODULE) Apollo::libraryLoad(sSupportDll);
             if (hDll == NULL) {
-              apLog_Error((LOG_CHANNEL, "ApCore::loadModule", "Apollo::libraryLoad(%s) failed", StringType(sSupportDll)));
+              apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Apollo::libraryLoad(%s) failed", _sz(sSupportDll)));
               bDependenciesLoaded = 0;
             } else {
               SupportDll* pSupportDll = new SupportDll(sSupportDll, hDll);
@@ -150,12 +151,12 @@ int ApCore::loadModule(const char* szModuleName, const char* szDllPath)
 
   // Load module dll
   if (!bDependenciesLoaded) {
-    apLog_Error((LOG_CHANNEL, "ApCore::loadModule", "Missing Dependencies for: %s", StringType(sDllPath)));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Missing Dependencies for: %s", _sz(sDllPath)));
 
   } else {
     HMODULE hDll = (HMODULE) Apollo::libraryLoad(sDllPath);
     if (hDll == NULL) {
-      apLog_Error((LOG_CHANNEL, "ApCore::loadModule", "LoadLibrary failed: %s", StringType(sDllPath)));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "LoadLibrary failed: %s", _sz(sDllPath)));
     } else {
       String sModuleName;
       List lModuleServices;
@@ -170,7 +171,7 @@ int ApCore::loadModule(const char* szModuleName, const char* szDllPath)
       ApModuleUnLoadF fnUnLoad = (ApModuleUnLoadF) Apollo::libraryGetProcAddress(hDll, sModUnloadSym);
 
       if (fnInfo == 0 || fnLoad == 0 || fnUnLoad == 0) {
-        apLog_Error((LOG_CHANNEL, "ApCore::loadModule", "Missing module function %s, Info()=0x%08x, Load()=0x%08x, UnLoad()=0x%08x", StringType(sDllPath), (unsigned long) fnInfo, (unsigned long) fnLoad, (unsigned long) fnUnLoad));
+        apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Missing module function %s, Info()=0x%08x, Load()=0x%08x, UnLoad()=0x%08x", _sz(sDllPath), (unsigned long) fnInfo, (unsigned long) fnLoad, (unsigned long) fnUnLoad));
       } else {
         AP_MODULE_CALL mcInfo;
         mcInfo.nSize = sizeof(mcInfo);
@@ -178,7 +179,7 @@ int ApCore::loadModule(const char* szModuleName, const char* szDllPath)
         //mcInfo.fpGetAddressByName = ApCore_GetAddressByName;
         AP_MODULE_INFO* pmi = fnInfo(&mcInfo);
         if (pmi == 0) {
-          apLog_Warning((LOG_CHANNEL, "ApCore::loadModule", "Info() returned 0, DLL: %s", StringType(sDllPath)));
+          apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "Info() returned 0, DLL: %s", _sz(sDllPath)));
         } else {
 
           sModuleName = pmi->szName;
@@ -212,14 +213,14 @@ int ApCore::loadModule(const char* szModuleName, const char* szDllPath)
           }
 
           if (isLoadedModule(sModuleName)) {
-            apLog_Warning((LOG_CHANNEL, "ApCore::loadModule", "Module %s already loaded: %s", StringType(sModuleName), StringType(sDllPath)));
+            apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "Module %s already loaded: %s", _sz(sModuleName), _sz(sDllPath)));
           } else {
             
             { Msg_Core_BeforeModuleLoaded msg; msg.sModuleName = sModuleName; msg.Send(); }
 
             int bLoadOk = fnLoad(&mcInfo);
             if (!bLoadOk) {
-              apLog_Warning((LOG_CHANNEL, "ApCore::loadModule", "Load() returned 0, DLL: %s", StringType(sDllPath)));
+              apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "Load() returned 0, DLL: %s", _sz(sDllPath)));
             } else {
               pMod = new ApModule(sModuleName);
               if (pMod) {
@@ -266,7 +267,7 @@ int ApCore::loadModule(const char* szModuleName, const char* szDllPath)
         msg.Send();
         ok = 1;
 
-        apLog_Info((LOG_CHANNEL, "ApCore::loadModule", "Module %s loaded from %s", StringType(sModuleName), StringType(sDllPath)));
+        apLog_Info((LOG_CHANNEL, LOG_CONTEXT, "Module %s loaded from %s", _sz(sModuleName), _sz(sDllPath)));
       }
     }
   }
@@ -281,7 +282,7 @@ int ApCore::unloadModule(const char* szModuleName)
   String sModuleName = szModuleName;
   ApModule* pMod = (ApModule*) lModules_.FindByName(szModuleName);
   if (pMod == 0) {
-    apLog_Warning((LOG_CHANNEL, "ApCore::unloadModule", "Module %s not loaded", StringType(sModuleName)));
+    apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "Module %s not loaded", _sz(sModuleName)));
   } else {
     AP_MODULE_CALL mcInfo;
     mcInfo.nSize = sizeof(mcInfo);
@@ -293,7 +294,7 @@ int ApCore::unloadModule(const char* szModuleName)
     int bUnLoadOk = 0;
     if (pMod->fnUnLoad_ != 0) {  bUnLoadOk = pMod->fnUnLoad_(&mcInfo); }
     if (!bUnLoadOk) {
-      apLog_Warning((LOG_CHANNEL, "ApCore::loadModule", "UnLoad() returned 0: %s", StringType(pMod->getName())));
+      apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "UnLoad() returned 0: %s", _sz(pMod->getName())));
     } else {
       // do it anyway;
     }
@@ -310,7 +311,7 @@ int ApCore::unloadModule(const char* szModuleName)
     msg.sShortName = sModuleName;
     msg.Send();
 
-    apLog_Info((LOG_CHANNEL, "ApCore::unloadModule", "Module %s unloaded", StringType(sModuleName)));
+    apLog_Info((LOG_CHANNEL, LOG_CONTEXT, "Module %s unloaded", _sz(sModuleName)));
 
     delete pMod;
     ok = 1;
@@ -412,7 +413,7 @@ int ApCore::unhookMsg(const char* szMsgType, const char* szModuleName, ApCallbac
       ok = 1;
     } else {
       // not found
-      apLog_Verbose((LOG_CHANNEL, "ApCore::unhookMsg", "Unhook failed szMsgType=%s, szModuleName=%s, pRef=&p"
+      apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "Unhook failed szMsgType=%s, szModuleName=%s, pRef=&p"
                                                 , szMsgType
                                                 , szModuleName
                                                 , pRef));
@@ -444,8 +445,8 @@ int ApCore::Call(ApMessage* pMsg)
 
   if (!bDoCall) {
     String sMessage;
-    sMessage.appendf("Msg delivery denied outside of main thread for %s", StringType(pMsg->getName()));
-    Apollo::sendLog(apLog_MaskWarning, LOG_CHANNEL, "ApCore::Call", sMessage);
+    sMessage.appendf("Msg delivery denied outside of main thread for %s", _sz(pMsg->getName()));
+    Apollo::sendLog(apLog_MaskWarning, LOG_CHANNEL, LOG_CONTEXT, sMessage);
     pMsg->apStatus = ApMessage::Error;
     AP_DEBUG_BREAK();
   } else {
@@ -459,14 +460,14 @@ int ApCore::Call(ApMessage* pMsg)
         ) {
           // Do not trace
       } else {
-        apLog_TraceI(LOG_CHANNEL, "ApCore::Call", "%s", StringType(pMsg->getName()));
+        apLog_TraceI(LOG_CHANNEL, LOG_CONTEXT, "%s", _sz(pMsg->getName()));
       }
     }
 
     ApCallQueue* pQueue = (ApCallQueue*) lMessageMap_.FindByName(pMsg->Type());
     if (pQueue == 0) {
       pMsg->apStatus = ApMessage::Error;
-      pMsg->sComment.appendf("No handler for message type=%s", StringType(pMsg->Type()));
+      pMsg->sComment.appendf("No handler for message type=%s", _sz(pMsg->Type()));
     } else {
 
       bool bContinue = true;
@@ -507,7 +508,7 @@ int ApCore::Call(ApMessage* pMsg)
           #endif
 
           } catch (ApException& ex) {
-            apLog_Error((pCurrent->ModuleName(), pMsg->Type(), ex.getText()));
+            apLog_Error((pCurrent->ModuleName(), ex.getContext(), "'%s' %s", _sz(pMsg->Type()), _sz(ex.getText())));
             if (pMsg->sComment.empty()) {
               pMsg->sComment = ex.getText();
             }
@@ -518,7 +519,7 @@ int ApCore::Call(ApMessage* pMsg)
               AP_DEBUG_BREAK();
             #else
               if (pMsg->Type() != "Log_Line" && pCurrent == iter.Current()) {
-                apLog_Fatal((LOG_CHANNEL, "ApCore::Call", "Exception in module:%s executing message:%s", StringType(pCurrent->ModuleName()), StringType(pMsg->Type())));
+                apLog_Fatal((LOG_CHANNEL, LOG_CONTEXT, "Exception in module:%s executing message:%s", _sz(pCurrent->ModuleName()), _sz(pMsg->Type())));
               }
             #endif
           } // catch
@@ -548,7 +549,7 @@ void ApCore::On_Core_Hook(Msg_Core_Hook* pMsg)
 {
   int ok = hookMsg(pMsg->sCallName, pMsg->sModuleName, pMsg->fnHandler, pMsg->nRef, pMsg->nPosition);
   if (!ok) {
-    apLog_Error((LOG_CHANNEL, "ApCore::On_Core_Hook", "hookMsg failed: %s %s", StringType(pMsg->sCallName), StringType(pMsg->sModuleName)));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "hookMsg failed: %s %s", _sz(pMsg->sCallName), _sz(pMsg->sModuleName)));
     ok = 0;
   }
 
@@ -560,7 +561,7 @@ void ApCore::On_Core_Unhook(Msg_Core_Unhook* pMsg)
 {
   int ok = unhookMsg(pMsg->sCallName, pMsg->sModuleName, pMsg->fnHandler, pMsg->nRef);
   if (!ok) {
-    apLog_Verbose((LOG_CHANNEL, "ApCore::On_Core_Unhook", "unhookMsg failed: %s %s", StringType(pMsg->sCallName), StringType(pMsg->sModuleName)));
+    apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "unhookMsg failed: %s %s", _sz(pMsg->sCallName), _sz(pMsg->sModuleName)));
     ok = 0;
   }
 
@@ -572,7 +573,7 @@ void ApCore::On_Core_LoadModule(Msg_Core_LoadModule* pMsg)
 {
   int ok = loadModule(pMsg->sModuleName, pMsg->sDllPath);
   if (!ok) {
-    apLog_Error((LOG_CHANNEL, "ApCore::On_Core_LoadModule", "loadModule failed: path=%s", StringType(pMsg->sDllPath)));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "loadModule failed: path=%s", _sz(pMsg->sDllPath)));
     ok = 0;
   }
 
@@ -584,7 +585,7 @@ void ApCore::On_Core_UnloadModule(Msg_Core_UnloadModule* pMsg)
 {
   int ok = unloadModule(pMsg->sModuleName);
   if (!ok) {
-    apLog_Error((LOG_CHANNEL, "ApCore::On_Core_UnloadModule", "unloadModule failed: name=%s", StringType(pMsg->sModuleName)));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "unloadModule failed: name=%s", _sz(pMsg->sModuleName)));
     ok = 0;
   }
 

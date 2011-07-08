@@ -5,9 +5,8 @@
 // ============================================================================
 
 #include "Apollo.h"
-#include "ApLog.h"
-#include "NetSimModule.h"
 #include "Local.h"
+#include "NetSimModule.h"
 /*
 void NetSimModule::closeConnection()
 {
@@ -57,7 +56,7 @@ AP_MSG_HANDLER_METHOD(NetSimModule, Net_TCP_Connect)
   int ok = 0;
 /*
   if (pMsg->sHost == (const char*) Apollo::getModuleConfig(MODULE_NAME, "Address", "") && pMsg->nPort == Apollo::getModuleConfig(MODULE_NAME, "Port", 5222)) {
-    apLog_Verbose((LOG_CHANNEL, "NetSimModule::On_Net_TCP_Connect", "Handling TCP connect to %s %d " ApHandleFormat "", StringType(pMsg->sHost), pMsg->nPort, ApHandleType(hConnection_)));
+    apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "Handling TCP connect to %s %d " ApHandleFormat "", _sz(pMsg->sHost), pMsg->nPort, ApHandlePrintf(hConnection_)));
 
     pMsg->Stop();
 
@@ -89,7 +88,7 @@ AP_MSG_HANDLER_METHOD(NetSimModule, Net_TCP_Close)
   pMsg->Stop();
 /*
   if (pMsg->hConnection == hConnection_) {
-    apLog_Verbose((LOG_CHANNEL, "NetSimModule::On_Net_TCP_Close", "Handling TCP close " ApHandleFormat "", ApHandleType(hConnection_)));
+    apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "Handling TCP close " ApHandleFormat "", ApHandlePrintf(hConnection_)));
 
     closeConnection();
   }
@@ -101,11 +100,11 @@ AP_MSG_HANDLER_METHOD(NetSimModule, Net_HTTP_Request)
 {
   int ok = 1;
   pMsg->Stop();
-  apLog_Verbose((LOG_CHANNEL, "NetSimModule::Net_HTTP_Request", "%s url=%s", StringType(pMsg->sMethod), StringType(pMsg->sUrl)));
+  apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "%s url=%s", _sz(pMsg->sMethod), _sz(pMsg->sUrl)));
 
   {
     String s;
-    s.appendf("[%s] %s", StringType(pMsg->sMethod), StringType(pMsg->sUrl));
+    s.appendf("[%s] %s", _sz(pMsg->sMethod), _sz(pMsg->sUrl));
     writeHttpLog(s);
   }
 
@@ -208,30 +207,30 @@ AP_MSG_HANDLER_METHOD(NetSimModule, NetSim_ContinueHttp)
 
     try {
       String sIndexFile = Apollo::getModuleConfig(MODULE_NAME, "HTTP/IndexFile", "");
-      if (!sIndexFile) { throw ApException("No index file name"); }
+      if (!sIndexFile) { throw ApException(LOG_CONTEXT, "No index file name"); }
 
       xFile fIndex(sIndexFile);
-      if (!fIndex.Load()) { throw ApException("f.Load(%s) failed", StringType(sIndexFile)); }
+      if (!fIndex.Load()) { throw ApException(LOG_CONTEXT, "f.Load(%s) failed", _sz(sIndexFile)); }
 
       String sIndex;
       fIndex.GetData(sIndex);
       List lDataFiles;
       KeyValueBlob2List(sIndex, lDataFiles, "\r\n", " ", "");
       Elem* e = lDataFiles.FindByName(pHttp->sUrl_);
-      if (!e) { throw ApException("No data file for url=%s", StringType(pHttp->sUrl_)); }
+      if (!e) { throw ApException(LOG_CONTEXT, "No data file for url=%s", _sz(pHttp->sUrl_)); }
       String sDataFilename = e->getString();
-      if (!sDataFilename) { throw ApException("No data file for url=%s", StringType(pHttp->sUrl_)); }
+      if (!sDataFilename) { throw ApException(LOG_CONTEXT, "No data file for url=%s", _sz(pHttp->sUrl_)); }
 
       String sDataFilepath = Apollo::getModuleConfig(MODULE_NAME, "HTTP/DataFilesBase", "");
       sDataFilepath += String::filenamePathSeparator();
       sDataFilepath += sDataFilename;
       xFile fData(sDataFilepath);
-      if (!fData.Load()) { throw ApException("f.Load(%s) failed", StringType(sDataFilepath)); }
+      if (!fData.Load()) { throw ApException(LOG_CONTEXT, "f.Load(%s) failed", _sz(sDataFilepath)); }
 
       String sHeaderFilename = sDataFilepath;
       sHeaderFilename += ".http";
       xFile fHeader(sHeaderFilename);
-      if (!fHeader.Load()) { throw ApException("f.Load(%s) failed", StringType(sHeaderFilename)); }
+      if (!fHeader.Load()) { throw ApException(LOG_CONTEXT, "f.Load(%s) failed", _sz(sHeaderFilename)); }
 
       {
         ApAsyncMessage<Msg_Net_HTTP_Connected> msg;
@@ -277,7 +276,7 @@ AP_MSG_HANDLER_METHOD(NetSimModule, NetSim_ContinueHttp)
       }
 
     } catch (ApException& ex) {
-      apLog_Error((LOG_CHANNEL, "NetSimModule::Net_HTTP_Request", "%s url=%s", StringType(ex.getText()), StringType(pHttp->sUrl_)));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "%s url=%s", _sz(ex.getText()), _sz(pHttp->sUrl_)));
 
       ApAsyncMessage<Msg_Net_HTTP_Failed> msg;
       msg->hClient = pHttp->hClient_;

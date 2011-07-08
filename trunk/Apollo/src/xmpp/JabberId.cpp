@@ -128,12 +128,12 @@ String JabberId::TestOne(const char* szJid, const char* szUser, const char* szHo
     || jid.resource() != szResource
     || jid.base() != szBase
     ) {
-    s.appendf("%s: user[%s %s] host[%s %s] port[%s %s] resource[%s %s] base[%s %s] ", StringType(szJid),
-      StringType(jid.user()), StringType(szUser), 
-      StringType(jid.host()), StringType(szHost), 
-      StringType(jid.port()), StringType(szPort), 
-      StringType(jid.resource()), StringType(szResource), 
-      StringType(jid.base()), StringType(szBase)
+    s.appendf("%s: user[%s %s] host[%s %s] port[%s %s] resource[%s %s] base[%s %s] ", _sz(szJid),
+      _sz(jid.user()), _sz(szUser), 
+      _sz(jid.host()), _sz(szHost), 
+      _sz(jid.port()), _sz(szPort), 
+      _sz(jid.resource()), _sz(szResource), 
+      _sz(jid.base()), _sz(szBase)
       );
   }
 

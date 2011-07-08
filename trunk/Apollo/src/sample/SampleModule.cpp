@@ -48,7 +48,7 @@ Sample* SampleModule::FindSample(const ApHandle& hSample)
 Sample* SampleModule::GetSample(const ApHandle& hSample)
 {
   Sample* pSample = FindSample(hSample);  
-  if (pSample == 0) { throw ApException("SampleModule::FindSample no Sample=" ApHandleFormat "", ApHandleType(hSample)); }
+  if (pSample == 0) { throw ApException(LOG_CONTEXT, "no Sample=" ApHandleFormat "", ApHandlePrintf(hSample)); }
   return pSample;
 }
 
@@ -56,7 +56,7 @@ Sample* SampleModule::GetSample(const ApHandle& hSample)
 
 AP_MSG_HANDLER_METHOD(SampleModule, Sample_Create)
 {
-  if (samples_.Find(pMsg->hSample) != 0) { throw ApException("SampleModule::Sample_Create: Sample=" ApHandleFormat " already exists", ApHandleType(pMsg->hSample)); }
+  if (samples_.Find(pMsg->hSample) != 0) { throw ApException(LOG_CONTEXT, "Sample=" ApHandleFormat " already exists", ApHandlePrintf(pMsg->hSample)); }
   Sample* pSample = NewSample(pMsg->hSample);
   pMsg->apStatus = ApMessage::Ok;
 }
@@ -84,13 +84,13 @@ AP_MSG_HANDLER_METHOD(SampleModule, Sample_Get)
   sSomeConfigValue = Apollo::getConfig("path", "default");
 
   // Logging example
-  apLog_Info((MODULE_NAME, "Context is the current function", "Format string %d", nTheAnswer_));
+  apLog_Info((LOG_CHANNEL, LOG_CONTEXT, "Format string %d", nTheAnswer_));
 
   String sKey = "TestKeyUsedByLoadModuleTest";
   if (pMsg->sKey == sKey) {
     pMsg->nValue = nTheAnswer_;
   } else {
-    throw ApException("Only have an answer for key=%s", StringType(sKey));
+    throw ApException(LOG_CONTEXT, "Only have an answer for key=%s", _sz(sKey));
   }
 
   pMsg->apStatus = ApMessage::Ok;
@@ -104,6 +104,7 @@ AP_MSG_HANDLER_METHOD(SampleModule, UnitTest_Begin)
 {
   AP_UNUSED_ARG(pMsg);
   if (Apollo::getConfig("Test/Sample", 0)) {
+    SampleModuleTester::Begin();
   }
 }
 
@@ -111,12 +112,16 @@ AP_MSG_HANDLER_METHOD(SampleModule, UnitTest_Execute)
 {
   AP_UNUSED_ARG(pMsg);
   if (Apollo::getConfig("Test/Sample", 0)) {
+    SampleModuleTester::Execute();
   }
 }
 
 AP_MSG_HANDLER_METHOD(SampleModule, UnitTest_End)
 {
   AP_UNUSED_ARG(pMsg);
+  if (Apollo::getConfig("Test/Sample", 0)) {
+    SampleModuleTester::End();
+  }
 }
 
 #endif // #if defined(AP_TEST)

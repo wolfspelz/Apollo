@@ -5,15 +5,14 @@
 // ============================================================================
 
 #include "Apollo.h"
-#include "ApLog.h"
-#include "MsgIdentity.h"
 #include "Local.h"
+#include "MsgIdentity.h"
 #include "ContainerClient.h"
 
 int ContainerClient::OnConnected()
 {
   int ok = 1;
-  apLog_VeryVerbose((LOG_CHANNEL, "ContainerClient::OnConnected", "url=%s " ApHandleFormat, StringType(sUrl_), ApHandleType(hAp_)));
+  apLog_VeryVerbose((LOG_CHANNEL, LOG_CONTEXT, "url=%s " ApHandleFormat, _sz(sUrl_), ApHandlePrintf(hAp_)));
   return ok;
 }
 
@@ -27,7 +26,7 @@ int ContainerClient::OnHeader(int nStatus, KeyValueList& kvHeaders)
     if (String::toLower(e->getKey()) == "content-type") {
       sContentType_ = String::toLower(e->getString());
     }
-    apLog_VeryVerbose((LOG_CHANNEL, "ContainerClient::OnHeader", "url=%s " ApHandleFormat " header: [%s][%s]", StringType(sUrl_), ApHandleType(hAp_), StringType(e->getKey()), StringType(e->getString())));
+    apLog_VeryVerbose((LOG_CHANNEL, LOG_CONTEXT, "url=%s " ApHandleFormat " header: [%s][%s]", _sz(sUrl_), ApHandlePrintf(hAp_), _sz(e->getKey()), _sz(e->getString())));
   }
 
   if (ok) {
@@ -49,7 +48,7 @@ int ContainerClient::OnHeader(int nStatus, KeyValueList& kvHeaders)
     sContentType_ = "text/xml";
   }
   
-  apLog_VeryVerbose((LOG_CHANNEL, "ContainerClient::OnHeader", "url=%s " ApHandleFormat " bContentTypeOk_=%d", StringType(sUrl_), ApHandleType(hAp_), bContentTypeOk_));
+  apLog_VeryVerbose((LOG_CHANNEL, LOG_CONTEXT, "url=%s " ApHandleFormat " bContentTypeOk_=%d", _sz(sUrl_), ApHandlePrintf(hAp_), bContentTypeOk_));
 
   return ok;
 }
@@ -58,7 +57,7 @@ int ContainerClient::OnDataIn(unsigned char* pData, size_t nLen)
 {
   int ok = 1;
 
-  apLog_VeryVerbose((LOG_CHANNEL, "ContainerClient::OnDataIn", "" ApHandleFormat " url=%s  nStatus=%d bContentTypeOk_=%d buflen=%d", ApHandleType(hAp_), StringType(sUrl_), nStatus_, bContentTypeOk_, sbData_.Length() + nLen));
+  apLog_VeryVerbose((LOG_CHANNEL, LOG_CONTEXT, "" ApHandleFormat " url=%s  nStatus=%d bContentTypeOk_=%d buflen=%d", ApHandlePrintf(hAp_), _sz(sUrl_), nStatus_, bContentTypeOk_, sbData_.Length() + nLen));
   
   if (nStatus_ == 200 && bContentTypeOk_ && sbData_.Length() + nLen < (unsigned int) Apollo::getModuleConfig(MODULE_NAME, "MaxIdentityFileSize", 100000)) {
     sbData_.Append(pData, nLen);
@@ -92,13 +91,13 @@ int ContainerClient::OnClosed()
   }
 
   if (sError_.empty()) {
-    msg.sComment.appendf("url=%s status=%d contenttype=%s buflen=%d", StringType(sUrl_), nStatus_, StringType(sContentType_), sbData_.Length());
+    msg.sComment.appendf("url=%s status=%d contenttype=%s buflen=%d", _sz(sUrl_), nStatus_, _sz(sContentType_), sbData_.Length());
   } else {
     msg.sComment = sError_;
   }
 
   if (!msg.Request()) {
-    apLog_Warning((LOG_CHANNEL, "ContainerClient::OnClosed", "Msg_Identity_ReceiveContainer failed, url=%s ", StringType(sUrl_)));
+    apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "Msg_Identity_ReceiveContainer failed, url=%s ", _sz(sUrl_)));
   }
 
   AutoDelete(1);

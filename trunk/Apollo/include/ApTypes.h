@@ -46,27 +46,29 @@ public:
 };
 
 #define ApNoHandle ApHandle::hNoHandle_
-#define ApIsHandle(__h__) (ApNoHandle != __h__)
+#define ApIsHandle(x) (ApNoHandle != x)
 
 //#define ApHandleFormat "[0x%016llx]" // format for printf
-//typedef unsigned long long ApHandleType; // extractor for printf
+//typedef unsigned long long ApHandlePrintf; // extractor for printf
 #define ApHandleFormat "%s" // format for printf
-//typedef unsigned long ApHandleType; // extractor for printf
-//#define ApHandleType((unsigned long)) // extractor for printf
-#define ApHandleType(__h__) (const char*) __h__.toString() // extractor for printf
+//typedef unsigned long ApHandlePrintf; // extractor for printf
+//#define ApHandlePrintf((unsigned long)) // extractor for printf
+#define ApHandlePrintf(x) (const char*) x.toString() // extractor for printf
 
 // ----------- Exception ------------------
 
 class APOLLO_API ApException
 {
 public:
-  ApException(const char* szFmt, ...);
+  ApException(const char* szContext, const char* szFmt, ...);
 
+  String& getContext() { return sContext_; }
   String& getText() { return sText_; }
 
   enum _Const { nMaxMessage = 2048 };
 
 protected:
+  String sContext_;
   String sText_;
 };
 

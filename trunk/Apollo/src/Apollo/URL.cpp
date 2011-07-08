@@ -921,7 +921,7 @@ String &URL::args(void)
 void URL::PrepareBase(void)
 {
   if (base_.empty()) {
-    base_.appendf("%s://%s%s/", StringType(protocol()), StringType(host()), StringType(port()));
+    base_.appendf("%s://%s%s/", _sz(protocol()), _sz(host()), _sz(port()));
   }
 }
 String &URL::base(void)
@@ -938,8 +938,8 @@ void URL::PrepareFileBase(void)
 //      cred = credentials();
 //      cred += "@";
 //    }
-//    filebase_.appendf("%s://%s%s%s%s", StringType(protocol()), StringType(cred), StringType(host()), StringType(port()), StringType(path()));
-    filebase_.appendf("%s://%s%s%s", StringType(protocol()), StringType(host()), StringType(port()), StringType(path()));
+//    filebase_.appendf("%s://%s%s%s%s", _sz(protocol()), _sz(cred), _sz(host()), _sz(port()), _sz(path()));
+    filebase_.appendf("%s://%s%s%s", _sz(protocol()), _sz(host()), _sz(port()), _sz(path()));
   }
 }
 String &URL::filebase(void)
@@ -951,7 +951,7 @@ String &URL::filebase(void)
 void URL::PrepareURI(void)
 {
   if (uri_.empty()) {
-    uri_.appendf("%s%s%s", StringType(path()), StringType(file()), StringType(args()));
+    uri_.appendf("%s%s%s", _sz(path()), _sz(file()), _sz(args()));
   }
 }
 String &URL::uri(void)
@@ -969,7 +969,7 @@ void URL::Normalize(void)
     proto_ == "https" || 
     proto_ == "ftp"
     ) {
-    normalized.appendf("%s://%s%s%s%s%s", StringType(protocol()), StringType(host()), StringType(port()), StringType(path()), StringType(file()), StringType(args()));
+    normalized.appendf("%s://%s%s%s%s%s", _sz(protocol()), _sz(host()), _sz(port()), _sz(path()), _sz(file()), _sz(args()));
     set(normalized);
   }
 }
