@@ -111,7 +111,7 @@ View::~View()
 
 void View::Create(int nLeft, int nTop, int nWidth, int nHeight)
 {
-  apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "" ApHandleFormat "", _szH(hAp_)));
+  apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "" ApHandleFormat "", ApHandlePrintf(hAp_)));
 
   nLeft_ = nLeft;
   nTop_ = nTop;
@@ -119,38 +119,38 @@ void View::Create(int nLeft, int nTop, int nWidth, int nHeight)
   nHeight_ = nHeight;
 
   AutoComPtr<IWebPreferences> tmpPreferences;
-  if (FAILED( WebKitCreateInstance(CLSID_WebPreferences, 0, IID_IWebPreferences, tmpPreferences) )) { throw ApException(LOG_CONTEXT + " WebKitCreateInstance(CLSID_WebPreferences) failed"); }
+  if (FAILED( WebKitCreateInstance(CLSID_WebPreferences, 0, IID_IWebPreferences, tmpPreferences) )) { throw ApException(LOG_CONTEXT, "WebKitCreateInstance(CLSID_WebPreferences) failed"); }
   AutoComPtr<IWebPreferences> standardPreferences;
-  if (FAILED( tmpPreferences->standardPreferences(standardPreferences) )) { throw ApException(LOG_CONTEXT + " tmpPreferences->standardPreferences() failed"); }
-  if (FAILED( standardPreferences->setAcceleratedCompositingEnabled(TRUE) )) { throw ApException(LOG_CONTEXT + " standardPreferences->setAcceleratedCompositingEnabled() failed"); }
+  if (FAILED( tmpPreferences->standardPreferences(standardPreferences) )) { throw ApException(LOG_CONTEXT, "tmpPreferences->standardPreferences() failed"); }
+  if (FAILED( standardPreferences->setAcceleratedCompositingEnabled(TRUE) )) { throw ApException(LOG_CONTEXT, "standardPreferences->setAcceleratedCompositingEnabled() failed"); }
 
   //AutoComPtr<IWebPreferencesPrivate> privatePreferences;
   //// How to get privatePreferences?
-  //if (FAILED( privatePreferences->setDeveloperExtrasEnabled(FALSE) )) { throw ApException(LOG_CONTEXT + " privatePreferences->setDeveloperExtrasEnabled() failed"); }
+  //if (FAILED( privatePreferences->setDeveloperExtrasEnabled(FALSE) )) { throw ApException(LOG_CONTEXT, "privatePreferences->setDeveloperExtrasEnabled() failed"); }
 
   // -----------------------------
 
-  if (FAILED( WebKitCreateInstance(CLSID_WebView, 0, IID_IWebView, reinterpret_cast<void**>(&pWebView_)) )) { throw ApException(LOG_CONTEXT + " WebKitCreateInstance(CLSID_WebView) failed"); }
-  if (FAILED( pWebView_->setUIDelegate(this) )) { throw ApException(LOG_CONTEXT + " pWebView_->setUIDelegate() failed"); }
-  if (FAILED( pWebView_->setFrameLoadDelegate(this) )) { throw ApException(LOG_CONTEXT + " pWebView_->setFrameLoadDelegate() failed"); }
-  if (FAILED( pWebView_->setResourceLoadDelegate(this) )) { throw ApException(LOG_CONTEXT + " pWebView_->setResourceLoadDelegate() failed"); }
-  if (FAILED( pWebView_->setPolicyDelegate(this) )) { throw ApException(LOG_CONTEXT + " pWebView_->setPolicyDelegate() failed"); }
-  if (FAILED( pWebView_->QueryInterface(IID_IWebViewPrivate, reinterpret_cast<void**>(&pWebViewPrivate_)) )) { throw ApException(LOG_CONTEXT + " QueryInterface(IID_IWebViewPrivate) failed"); }
+  if (FAILED( WebKitCreateInstance(CLSID_WebView, 0, IID_IWebView, reinterpret_cast<void**>(&pWebView_)) )) { throw ApException(LOG_CONTEXT, "WebKitCreateInstance(CLSID_WebView) failed"); }
+  if (FAILED( pWebView_->setUIDelegate(this) )) { throw ApException(LOG_CONTEXT, "pWebView_->setUIDelegate() failed"); }
+  if (FAILED( pWebView_->setFrameLoadDelegate(this) )) { throw ApException(LOG_CONTEXT, "pWebView_->setFrameLoadDelegate() failed"); }
+  if (FAILED( pWebView_->setResourceLoadDelegate(this) )) { throw ApException(LOG_CONTEXT, "pWebView_->setResourceLoadDelegate() failed"); }
+  if (FAILED( pWebView_->setPolicyDelegate(this) )) { throw ApException(LOG_CONTEXT, "pWebView_->setPolicyDelegate() failed"); }
+  if (FAILED( pWebView_->QueryInterface(IID_IWebViewPrivate, reinterpret_cast<void**>(&pWebViewPrivate_)) )) { throw ApException(LOG_CONTEXT, "QueryInterface(IID_IWebViewPrivate) failed"); }
 
   RECT r = { nLeft_, nTop_, nWidth_, nHeight_ };
-  if (FAILED( pWebView_->initWithFrame(r, 0, 0) )) { throw ApException(LOG_CONTEXT + " pWebView_->initWithFrame() failed"); }
+  if (FAILED( pWebView_->initWithFrame(r, 0, 0) )) { throw ApException(LOG_CONTEXT, "pWebView_->initWithFrame() failed"); }
 
   // -----------------------------
 
-  if (FAILED( pWebViewPrivate_->setFrameLoadDelegatePrivate(this) )) { throw ApException(LOG_CONTEXT + " pWebViewPrivate_->setFrameLoadDelegatePrivate() failed"); }
-  if (FAILED( pWebViewPrivate_->setTransparent(TRUE) )) { throw ApException(LOG_CONTEXT + " pWebViewPrivate_->setTransparent() failed"); }
-  if (FAILED( pWebViewPrivate_->setUsesLayeredWindow(TRUE) )) { throw ApException(LOG_CONTEXT + " pWebViewPrivate_->setUsesLayeredWindow() failed"); }
-  if (FAILED( pWebViewPrivate_->viewWindow(reinterpret_cast<OLE_HANDLE*>(&hWnd_))) ) { throw ApException(LOG_CONTEXT + " pWebViewPrivate_->viewWindow() failed"); }
-  if (hWnd_ == NULL) { throw ApException(LOG_CONTEXT + " pWebViewPrivate_->viewWindow() did not return hWnd"); }
+  if (FAILED( pWebViewPrivate_->setFrameLoadDelegatePrivate(this) )) { throw ApException(LOG_CONTEXT, "pWebViewPrivate_->setFrameLoadDelegatePrivate() failed"); }
+  if (FAILED( pWebViewPrivate_->setTransparent(TRUE) )) { throw ApException(LOG_CONTEXT, "pWebViewPrivate_->setTransparent() failed"); }
+  if (FAILED( pWebViewPrivate_->setUsesLayeredWindow(TRUE) )) { throw ApException(LOG_CONTEXT, "pWebViewPrivate_->setUsesLayeredWindow() failed"); }
+  if (FAILED( pWebViewPrivate_->viewWindow(reinterpret_cast<OLE_HANDLE*>(&hWnd_))) ) { throw ApException(LOG_CONTEXT, "pWebViewPrivate_->viewWindow() failed"); }
+  if (hWnd_ == NULL) { throw ApException(LOG_CONTEXT, "pWebViewPrivate_->viewWindow() did not return hWnd"); }
 
   // -----------------------------
 
-  if (FAILED( pWebView_->mainFrame(&pWebFrame_) )) { throw ApException(LOG_CONTEXT + " pWebView_->mainFrame() failed"); }
+  if (FAILED( pWebView_->mainFrame(&pWebFrame_) )) { throw ApException(LOG_CONTEXT, "pWebView_->mainFrame() failed"); }
 
   ::MoveWindow(hWnd_, nLeft_, nTop_ - 10000, nWidth_, nHeight_, TRUE);
   ::ShowWindow(hWnd_, SW_SHOW);
@@ -159,7 +159,7 @@ void View::Create(int nLeft, int nTop, int nWidth, int nHeight)
 
 void View::Destroy()  
 {
-  apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "" ApHandleFormat "", _szH(hAp_)));
+  apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "" ApHandleFormat "", ApHandlePrintf(hAp_)));
 
   //{
   //  Msg_WebView_Event_Closing msg;
@@ -190,7 +190,7 @@ void View::Destroy()
 
 void View::LoadHtml(const String& sHtml, const String& sBase)
 {
-  apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "" ApHandleFormat " base=%s", _szH(hAp_), _sz(sBase)));
+  apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "" ApHandleFormat " base=%s", ApHandlePrintf(hAp_), _sz(sBase)));
   serializedLoads_.LoadHtml(this, sHtml, sBase);
 }
 
@@ -199,7 +199,7 @@ void View::Load(const String& sUrl)
   if (sUrl.contains("arena")) {
     int x = 1;
   }
-  apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "" ApHandleFormat " url=%s", _szH(hAp_), _sz(sUrl)));
+  apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "" ApHandleFormat " url=%s", ApHandlePrintf(hAp_), _sz(sUrl)));
   serializedLoads_.Load(this, sUrl);
 }
 
@@ -217,12 +217,12 @@ void View::TryLoad()
 
 void View::SerializedLoadHtml(const String& sHtml, const String& sBase)
 {
-  if (!pWebFrame_) { throw ApException(LOG_CONTEXT + " pWebFrame_== 0"); }
+  if (!pWebFrame_) { throw ApException(LOG_CONTEXT, "pWebFrame_== 0"); }
 
   sUrl_ = sBase; 
 
   if (1) {
-    if (FAILED( pWebFrame_->loadHTMLString(::SysAllocString(sHtml), ::SysAllocString(sBase)) )) { throw ApException(LOG_CONTEXT + " pWebFrame_->loadRequest() failed"); }
+    if (FAILED( pWebFrame_->loadHTMLString(::SysAllocString(sHtml), ::SysAllocString(sBase)) )) { throw ApException(LOG_CONTEXT, "pWebFrame_->loadRequest() failed"); }
   }
   
   if (0) {
@@ -239,10 +239,10 @@ void View::SerializedLoad(const String& sUrl)
   sUrl_ = sUrl;
 
   AutoComPtr<IWebMutableURLRequest> request;
-  if (FAILED( WebKitCreateInstance(CLSID_WebMutableURLRequest, 0, IID_IWebMutableURLRequest, request) )) { throw ApException(LOG_CONTEXT + " WebKitCreateInstance(CLSID_WebMutableURLRequest) failed"); }
+  if (FAILED( WebKitCreateInstance(CLSID_WebMutableURLRequest, 0, IID_IWebMutableURLRequest, request) )) { throw ApException(LOG_CONTEXT, "WebKitCreateInstance(CLSID_WebMutableURLRequest) failed"); }
 
   if (1) {
-    if (FAILED( request->initWithURL(::SysAllocString(sUrl), WebURLRequestUseProtocolCachePolicy, 60) )) { throw ApException(LOG_CONTEXT + " request->initWithURL() failed"); }
+    if (FAILED( request->initWithURL(::SysAllocString(sUrl), WebURLRequestUseProtocolCachePolicy, 60) )) { throw ApException(LOG_CONTEXT, "request->initWithURL() failed"); }
   }
   
   if (0) {
@@ -269,17 +269,17 @@ void View::SerializedLoad(const String& sUrl)
       }
     }
 
-    if (FAILED( request->initWithURL(bstrUrl, WebURLRequestUseProtocolCachePolicy, 60) )) { throw ApException(LOG_CONTEXT + " request->initWithURL() failed"); }
+    if (FAILED( request->initWithURL(bstrUrl, WebURLRequestUseProtocolCachePolicy, 60) )) { throw ApException(LOG_CONTEXT, "request->initWithURL() failed"); }
   }
 
-  //if (FAILED( pWebFrame_->setAllowsScrolling(FALSE) )) { throw ApException(LOG_CONTEXT + " pWebFrame_->setAllowsScrolling() failed"); }
+  //if (FAILED( pWebFrame_->setAllowsScrolling(FALSE) )) { throw ApException(LOG_CONTEXT, "pWebFrame_->setAllowsScrolling() failed"); }
 
-  if (FAILED( pWebFrame_->loadRequest(request) )) { throw ApException(LOG_CONTEXT + " pWebFrame_->loadRequest() failed"); }
+  if (FAILED( pWebFrame_->loadRequest(request) )) { throw ApException(LOG_CONTEXT, "pWebFrame_->loadRequest() failed"); }
 }
 
 void View::Reload()
 {
-  if (FAILED( pWebFrame_->reloadFromOrigin() )) { throw ApException(LOG_CONTEXT + " pWebFrame_->reload() failed"); }
+  if (FAILED( pWebFrame_->reloadFromOrigin() )) { throw ApException(LOG_CONTEXT, "pWebFrame_->reload() failed"); }
 }
 
 //------------------------------------
@@ -428,7 +428,7 @@ void View::GetWin32Window(HWND& hWnd)
 String View::CallJsFunction(const String& sFramePath, const String& sFunction, List& lArgs)
 {
   if (!bLoaded_) {
-    throw ApException(LOG_CONTEXT + "('%s', %s): view=" ApHandleFormat " document not yet loaded", _sz(sFramePath), _sz(sFunction), _szH(hAp_));
+    throw ApException(LOG_CONTEXT, "('%s', %s): view=" ApHandleFormat " document not yet loaded", _sz(sFramePath), _sz(sFunction), ApHandlePrintf(hAp_));
   }
 
   String sResult;
@@ -471,7 +471,7 @@ String View::CallJsFunction(const String& sFramePath, const String& sFunction, L
     if (!sError) {
       sResult = CallJsFunction(frame, sFunction, lArgs);
     } else {
-      throw ApException(LOG_CONTEXT + "(%s, %s): %s", _sz(sFramePath), _sz(sFunction), _sz(sError));
+      throw ApException(LOG_CONTEXT, "(%s, %s): %s", _sz(sFramePath), _sz(sFunction), _sz(sError));
     }
   }
 
@@ -485,23 +485,23 @@ String View::CallJsFunction(IWebFrame* pFrame, const String& sFunction, List& lA
   AutoJSStringRef methodName = JSStringCreateWithUTF8CString(sFunction);
 
   JSGlobalContextRef runCtx = pFrame->globalContext();
-  if (runCtx == 0) { throw ApException(LOG_CONTEXT + " pFrame->globalContext() returned 0"); }
+  if (runCtx == 0) { throw ApException(LOG_CONTEXT, "pFrame->globalContext() returned 0"); }
 
   JSObjectRef global = JSContextGetGlobalObject(runCtx);
-  if (global == 0) { throw ApException(LOG_CONTEXT + " JSContextGetGlobalObject(runCtx) returned 0"); }
+  if (global == 0) { throw ApException(LOG_CONTEXT, "JSContextGetGlobalObject(runCtx) returned 0"); }
 
   JSValueRef* exception = 0;
   JSValueRef sampleFunction = JSObjectGetProperty(runCtx, global, methodName, exception);
-  if (exception) { throw ApException(LOG_CONTEXT + " JSObjectGetProperty(methodName) returned exception"); }
-  if (sampleFunction == 0) { throw ApException(LOG_CONTEXT + " JSObjectGetProperty(methodName) returned 0"); }
+  if (exception) { throw ApException(LOG_CONTEXT, "JSObjectGetProperty(methodName) returned exception"); }
+  if (sampleFunction == 0) { throw ApException(LOG_CONTEXT, "JSObjectGetProperty(methodName) returned 0"); }
 
   if (!JSValueIsObject(runCtx, sampleFunction)) {
-    throw ApException(LOG_CONTEXT + " no such function: '%s' url=%s", _sz(sFunction), _sz(sUrl_));
+    throw ApException(LOG_CONTEXT, "no such function: '%s' url=%s", _sz(sFunction), _sz(sUrl_));
   }
 
   JSObjectRef function = JSValueToObject(runCtx, sampleFunction, exception);
-  if (exception) { throw ApException(LOG_CONTEXT + " JSValueToObject(sampleFunction) returned exception"); }
-  if (function == 0) { throw ApException(LOG_CONTEXT + " JSValueToObject(sampleFunction) returned 0"); }
+  if (exception) { throw ApException(LOG_CONTEXT, "JSValueToObject(sampleFunction) returned exception"); }
+  if (function == 0) { throw ApException(LOG_CONTEXT, "JSValueToObject(sampleFunction) returned 0"); }
 
   JSValueRef result = 0;
 
@@ -518,13 +518,13 @@ String View::CallJsFunction(IWebFrame* pFrame, const String& sFunction, List& lA
 
     apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "%s", _sz(sLog)));
     result = JSObjectCallAsFunction (runCtx, function, global, lArgs.length(), args.get(), exception);
-    if (exception) { throw ApException(LOG_CONTEXT + " JSObjectCallAsFunction() returned exception"); }
+    if (exception) { throw ApException(LOG_CONTEXT, "JSObjectCallAsFunction() returned exception"); }
 
   } else {
 
     apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "%s", _sz(sLog)));
     result = JSObjectCallAsFunction (runCtx, function, global, 0, 0, exception);
-    if (exception) { throw ApException(LOG_CONTEXT + " JSObjectCallAsFunction() returned exception"); }
+    if (exception) { throw ApException(LOG_CONTEXT, "JSObjectCallAsFunction() returned exception"); }
 
   }
 
@@ -532,19 +532,19 @@ String View::CallJsFunction(IWebFrame* pFrame, const String& sFunction, List& lA
   if (result) {
     if (JSValueIsString(runCtx, result)) {
       AutoJSStringRef value = JSValueToStringCopy (runCtx, result, exception);
-      if (exception) { throw ApException(LOG_CONTEXT + " JSValueToStringCopy() returned exception"); }
+      if (exception) { throw ApException(LOG_CONTEXT, "JSValueToStringCopy() returned exception"); }
 
       sResult.set((PWSTR) JSStringGetCharactersPtr(value), JSStringGetLength(value));
 
     } else if (JSValueIsNumber(runCtx, result)) {
       double value = JSValueToNumber(runCtx, result, exception);
-      if (exception) { throw ApException(LOG_CONTEXT + " JSValueToNumber() returned exception"); }
+      if (exception) { throw ApException(LOG_CONTEXT, "JSValueToNumber() returned exception"); }
 
       sResult.appendf("%g", value);
 
     } else if (JSValueIsBoolean(runCtx, result))  {
       bool value = JSValueToBoolean(runCtx, result);
-      if (exception) { throw ApException(LOG_CONTEXT + " JSValueToBoolean() returned exception"); }
+      if (exception) { throw ApException(LOG_CONTEXT, "JSValueToBoolean() returned exception"); }
 
       sResult = value ? "true" : "false";
     }
@@ -559,13 +559,13 @@ void View::CallJsSrpc(const String& sFunction, Apollo::SrpcMessage& srpc, Apollo
   msg.hView = apHandle();
   msg.sFunction = sFunction;
   msg.lArgs.AddLast(srpc.toString());
-  if (!msg.Request()) { throw ApException(LOG_CONTEXT + " Msg_WebView_CallScriptFunction: %s", _sz(msg.sComment)); }
+  if (!msg.Request()) { throw ApException(LOG_CONTEXT, "Msg_WebView_CallScriptFunction: %s", _sz(msg.sComment)); }
 
   response.fromString(msg.sResult);
   if (response.length() > 0) {
     int nStatus = response.getInt(Srpc::Key::Status);
     if (nStatus != 1) {
-      throw ApException(LOG_CONTEXT + " Status=%d Message=%s", nStatus, _sz(response.getString(Srpc::Key::Message)));
+      throw ApException(LOG_CONTEXT, "Status=%d Message=%s", nStatus, _sz(response.getString(Srpc::Key::Message)));
     }
   }
 }
@@ -739,22 +739,22 @@ JSValueRef View::JS_Apollo_sendMessage(JSContextRef ctx, JSObjectRef function, J
 
 void View::MakeScriptObject(IWebFrame* pFrame)
 {
-  if (!pFrame) { throw ApException(LOG_CONTEXT + " pFrame== 0"); }
+  if (!pFrame) { throw ApException(LOG_CONTEXT, "pFrame== 0"); }
 
   JSGlobalContextRef runCtx = pFrame->globalContext();
-  if (runCtx == 0) { throw ApException(LOG_CONTEXT + " pFrame->globalContext() failed"); }
+  if (runCtx == 0) { throw ApException(LOG_CONTEXT, "pFrame->globalContext() failed"); }
 
   JSObjectRef pGlobal = JSContextGetGlobalObject(runCtx);
-  if (pGlobal == 0) { throw ApException(LOG_CONTEXT + " JSContextGetGlobalObject() failed"); }
+  if (pGlobal == 0) { throw ApException(LOG_CONTEXT, "JSContextGetGlobalObject() failed"); }
 
   JSClassRef apolloClass = JS_Apollo_class();
-  if (apolloClass == 0) { throw ApException(LOG_CONTEXT + " JS_Apollo_class() failed"); }
+  if (apolloClass == 0) { throw ApException(LOG_CONTEXT, "JS_Apollo_class() failed"); }
 
   pScriptObject_ = JSObjectMake(runCtx, apolloClass, reinterpret_cast<void*>(this));
-  if (pScriptObject_ == 0) { throw ApException(LOG_CONTEXT + " JSObjectMake() failed"); }
+  if (pScriptObject_ == 0) { throw ApException(LOG_CONTEXT, "JSObjectMake() failed"); }
 
   AutoJSStringRef apolloName = JSStringCreateWithUTF8CString("apollo");
-  if (!apolloName) { throw ApException(LOG_CONTEXT + " JSStringCreateWithUTF8CString() failed"); }
+  if (!apolloName) { throw ApException(LOG_CONTEXT, "JSStringCreateWithUTF8CString() failed"); }
 
   JSObjectSetProperty(runCtx, pGlobal, apolloName, pScriptObject_, kJSPropertyAttributeNone, 0);
 }
@@ -845,7 +845,7 @@ exit:
 HRESULT View::didFinishDocumentLoadForFrame(IWebView *webView, IWebFrame *frame)
 {
   if (pTopLoadingFrame_ == frame) {
-    apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "DocumentLoaded " ApHandleFormat " %s", _szH(hAp_), _sz(GetUrlFrom(frame))));
+    apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "DocumentLoaded " ApHandleFormat " %s", ApHandlePrintf(hAp_), _sz(GetUrlFrom(frame))));
     bLoaded_ = 1;
 
     ApAsyncMessage<Msg_WebView_Event_DocumentLoaded> msg;
@@ -856,7 +856,7 @@ HRESULT View::didFinishDocumentLoadForFrame(IWebView *webView, IWebFrame *frame)
   try {
     MakeScriptObject(frame);
   } catch (ApException& ex) {
-    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "MakeScriptObject() failed: " ApHandleFormat " %s", _szH(hAp_), _sz(ex.getText())));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "MakeScriptObject() failed: " ApHandleFormat " %s", ApHandlePrintf(hAp_), _sz(ex.getText())));
   }
 
   return S_OK;
@@ -865,7 +865,7 @@ HRESULT View::didFinishDocumentLoadForFrame(IWebView *webView, IWebFrame *frame)
 HRESULT View::didFinishLoadForFrame(IWebView* webView, IWebFrame* frame)
 {
   if (pTopLoadingFrame_ == frame) {
-    apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "DocumentComplete " ApHandleFormat " %s", _szH(hAp_), _sz(GetUrlFrom(frame))));
+    apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "DocumentComplete " ApHandleFormat " %s", ApHandlePrintf(hAp_), _sz(GetUrlFrom(frame))));
 
     ApAsyncMessage<Msg_WebView_Event_DocumentComplete> msg;
     msg->hView = apHandle();
@@ -882,7 +882,7 @@ HRESULT View::willSendRequest(IWebView *webView, unsigned long identifier, IWebU
   Msg_WebView_Event_BeforeRequest msg;
 
   if (pWebView_ == webView) {
-    apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "" ApHandleFormat " %s", _szH(hAp_), _sz(GetUrlFrom(request))));
+    apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "" ApHandleFormat " %s", ApHandlePrintf(hAp_), _sz(GetUrlFrom(request))));
 
     BSTR bstrUrl = 0;
     request->URL(&bstrUrl);
@@ -953,7 +953,7 @@ HRESULT View::decidePolicyForNavigationAction(IWebView *webView, IPropertyBag *a
     if (bNavigate) {
       listener->use();
     } else {
-      apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "" ApHandleFormat " deny %s", _szH(hAp_), _sz(GetUrlFrom(request))));
+      apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "" ApHandleFormat " deny %s", ApHandlePrintf(hAp_), _sz(GetUrlFrom(request))));
       listener->ignore();
     }
 

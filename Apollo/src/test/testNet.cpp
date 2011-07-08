@@ -62,7 +62,7 @@ int Test_Net_TCP_On_TCP_Connected(Msg_Net_TCP_Connected* pMsg)
     d->bConnected_ = 1;
 
     if (!pMsg->bSuccess) {
-      apLog_Warning((LOG_CHANNEL, "OnTCPConnected", "Not connected " ApHandleFormat " %s: %s", ApHandleType(pMsg->hConnection), StringType(d->sAddress_), StringType(pMsg->sComment)));
+      apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "Not connected " ApHandleFormat " %s: %s", ApHandlePrintf(pMsg->hConnection), _sz(d->sAddress_), _sz(pMsg->sComment)));
     } else {
       const char* pBuf = "GET / HTTP/1.0\r\nConnection: close\r\n\r\n";
       Msg_Net_TCP_DataOut msg;
@@ -655,7 +655,7 @@ int Test_Net_TCP_Simple_On_TCP_Connected(Msg_Net_TCP_Connected* pMsg)
     AP_UNITTEST_SUCCESS(Test_Net_TCP_Simple_Connected);
 
     if (!pMsg->bSuccess) {
-      apLog_Warning((LOG_CHANNEL, "Test_Net_TCP_Simple_On_TCP_Connected", "Not connected " ApHandleFormat ": %s", ApHandleType(pMsg->hConnection), StringType(pMsg->sComment)));
+      apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "Not connected " ApHandleFormat ": %s", ApHandlePrintf(pMsg->hConnection), _sz(pMsg->sComment)));
     } else {
       const char* pBuf = "GET / HTTP/1.0\r\nConnection: close\r\n\r\n";
       Msg_Net_TCP_DataOut msg;
@@ -910,7 +910,7 @@ static int Test_CompareTCPHTTPData_BothClosed()
     String sHTTP1; sHTTP1.set((const char*) pHTTP, nHTTPLen);
     String sTCP2; sTCP2.set((const char*) pTCP + nTCP - nTCPLen, nTCPLen);
     String sHTTP2; sHTTP2.set((const char*) pHTTP + nHTTP - nHTTPLen, nHTTPLen);
-    s.appendf("TCP=%s...%s HTTP=%s...%s", StringType(sTCP1), StringType(sTCP2), StringType(sHTTP1), StringType(sHTTP2));
+    s.appendf("TCP=%s...%s HTTP=%s...%s", _sz(sTCP1), _sz(sTCP2), _sz(sHTTP1), _sz(sHTTP2));
   } else {
     s.appendf("pTCP=%8x pHTTP=%8x nTCP=%d nHTTP=%d", pTCP, pHTTP, nTCP, nHTTP);
   }
@@ -1517,12 +1517,7 @@ void Test_Net_Register()
 {
 #if defined(AP_TEST_Net)
   if (Apollo::isLoadedModule("Net")) {
-    Msg_Net_IsOnline msg;
-    if (msg.Request()) {
-      if (msg.bIsOnline) {
-        g_bTest_Vpi_Online = 1;
-      }
-    }
+    g_bTest_Vpi_Online = Msg_Net_IsOnline::_();
   }
 
   if (Apollo::isLoadedModule("Net") && g_bTest_Vpi_Online) {

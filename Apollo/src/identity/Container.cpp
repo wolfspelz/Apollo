@@ -5,10 +5,9 @@
 // ============================================================================
 
 #include "Apollo.h"
-#include "ApLog.h"
+#include "Local.h"
 #include "XMLProcessor.h"
 #include "MsgIdentity.h"
-#include "Local.h"
 #include "Container.h"
 
 int Container::set(const String& sData, const String& sDigest)
@@ -23,7 +22,7 @@ int Container::set(const String& sData, const String& sDigest)
 
     ok = pXml->XmlText(sData_);
     if (!ok) {
-      apLog_Error((LOG_CHANNEL, "Container::parse", "xml.XmlText() failed err=%s, xml=%s", StringType(pXml->GetErrorString()), StringType(String::truncate(sData_, 100))));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "xml.XmlText() failed err=%s, xml=%s", _sz(pXml->GetErrorString()), _sz(String::truncate(sData_, 100))));
     } else {
       bValid_ = 1;
 
@@ -57,7 +56,7 @@ int Container::set(const String& sData, const String& sDigest)
           if (pItem != 0) {
             bItemOk = pItem->parseXmlNode(pNode);
             if (!bItemOk) {
-              apLog_Warning((LOG_CHANNEL, "Container::parse", "pItem->parseXmlNode() failed url=%s id=%s", StringType(sUrl_), StringType(sId)));
+              apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "pItem->parseXmlNode() failed url=%s id=%s", _sz(sUrl_), _sz(sId)));
             }
           }
 

@@ -23,8 +23,9 @@ BOOL APIENTRY DllMain(HANDLE hModule, DWORD dwReason, LPVOID lpReserved)
 }
 #endif // defined(WIN32)
 
-#define LOG_CHANNEL "Translation"
 #define MODULE_NAME "Translation"
+#define LOG_CHANNEL MODULE_NAME
+#define LOG_CONTEXT apLog_Context
 
 static AP_MODULE_INFO g_info = {
   sizeof(AP_MODULE_INFO),
@@ -185,7 +186,7 @@ AP_MSG_HANDLER_METHOD(BabelfishModule, Translation_Get)
   if (!ok && sCurrentLanguage_ != sDefaultLanguage_) {
     int iok = getText(sDefaultLanguage_, pMsg->sModule, pMsg->sContext, pMsg->sText, pMsg->sTranslated);
     if (!iok) {
-      apLog_Warning((LOG_CHANNEL, "BabelfishModule::Translation_Get", "No translation for lang=%s, mod=%s, ctxt=%s, txt=%s", StringType(sCurrentLanguage_), StringType(pMsg->sModule), StringType(pMsg->sContext), StringType(pMsg->sText)));
+      apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "No translation for lang=%s, mod=%s, ctxt=%s, txt=%s", _sz(sCurrentLanguage_), _sz(pMsg->sModule), _sz(pMsg->sContext), _sz(pMsg->sText)));
     }
   }
 
@@ -200,7 +201,7 @@ AP_MSG_HANDLER_METHOD(BabelfishModule, Translation_SetLanguage)
   if (ok) {
     ok = modulesMsg.Request();
     if (!ok) {
-      apLog_Error((LOG_CHANNEL, "BabelfishModule::On_Translation_SetLanguage", "Msg_Core_GetLoadedModules failed"));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_Core_GetLoadedModules failed"));
     }
   }
 
@@ -217,7 +218,7 @@ AP_MSG_HANDLER_METHOD(BabelfishModule, Translation_SetLanguage)
   Msg_Translation_CurrentLanguage msg; 
   msg.sLanguage = sCurrentLanguage_;
   msg.Send();
-  apLog_Info((LOG_CHANNEL, "BabelfishModule::On_Translation_SetLanguage", "Setting Language to %s", StringType(sCurrentLanguage_)));
+  apLog_Info((LOG_CHANNEL, LOG_CONTEXT, "Setting Language to %s", _sz(sCurrentLanguage_)));
 
   pMsg->apStatus = ok ? ApMessage::Ok : ApMessage::Error;
 }
@@ -230,7 +231,7 @@ AP_MSG_HANDLER_METHOD(BabelfishModule, Translation_GetLanguage)
 
 AP_MSG_HANDLER_METHOD(BabelfishModule, Translation_Clear)
 {
-  apLog_Verbose((LOG_CHANNEL, "BabelfishModule::On_Translation_Clear", ""));
+  apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, ""));
 
   TranslationPlane* pPlane = lPlanes_.FindByName(sCurrentPlane_);
   if (pPlane != 0) {
@@ -248,7 +249,7 @@ AP_MSG_HANDLER_METHOD(BabelfishModule, Translation_Clear)
 AP_MSG_HANDLER_METHOD(BabelfishModule, Translation_LoadModuleLanguageFile)
 {
   int ok = 1;
-  apLog_Verbose((LOG_CHANNEL, "BabelfishModule::On_Translation_LoadModuleLanguageFile", "module=%s lang=%s", StringType(pMsg->sModule), StringType(pMsg->sLanguage)));
+  apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "module=%s lang=%s", _sz(pMsg->sModule), _sz(pMsg->sLanguage)));
 
   String sSelector = "Language/";
   sSelector += pMsg->sLanguage;
@@ -258,7 +259,7 @@ AP_MSG_HANDLER_METHOD(BabelfishModule, Translation_LoadModuleLanguageFile)
     String sData;
     if (!Apollo::loadFile(sPath, sData)) {
       ok = 0;
-      apLog_Warning((LOG_CHANNEL, "BabelfishModule::On_Translation_LoadModuleLanguageFile", "file.Load(%s) failed", StringType(sPath)));
+      apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "file.Load(%s) failed", _sz(sPath)));
     } else {
       List lData;
       KeyValueBlob2List(sData, lData, "\r\n", "=", "");
@@ -325,7 +326,7 @@ AP_MSG_HANDLER_METHOD(BabelfishModule, Translation_LoadModuleLanguageFile)
 AP_MSG_HANDLER_METHOD(BabelfishModule, Translation_UnloadLanguage)
 {
   int ok = 1;
-  apLog_Verbose((LOG_CHANNEL, "BabelfishModule::On_Translation_UnloadLanguage", "lang=%s", StringType(pMsg->sLanguage)));
+  apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "lang=%s", _sz(pMsg->sLanguage)));
 
   String sLanguage = pMsg->sLanguage;
 
@@ -335,7 +336,7 @@ AP_MSG_HANDLER_METHOD(BabelfishModule, Translation_UnloadLanguage)
 AP_MSG_HANDLER_METHOD(BabelfishModule, Translation_Plane)
 {
   int ok = 1;
-  apLog_Verbose((LOG_CHANNEL, "BabelfishModule::On_Translation_Plane", "plane=%s", StringType(pMsg->sPlane)));
+  apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "plane=%s", _sz(pMsg->sPlane)));
 
   sCurrentPlane_ = pMsg->sPlane;
 
@@ -377,7 +378,7 @@ int BabelfishModule::init()
     Msg_Translation_SetLanguage msg;
     msg.sLanguage = Apollo::getModuleConfig(MODULE_NAME, "Language", "en");
     if (!msg.Request()) {
-      apLog_Error((LOG_CHANNEL, "BabelfishModule Load", "Msg_Translation_SetLanguage failed"));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_Translation_SetLanguage failed"));
     }
   }
 

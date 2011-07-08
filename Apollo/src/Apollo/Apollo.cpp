@@ -13,6 +13,9 @@
 #include "MsgTimer.h"
 #include "MsgFile.h"
 
+#define LOG_CHANNEL APOLLO_NAME
+#define LOG_CONTEXT apLog_Context
+
 #if defined(WIN32)
 BOOL APIENTRY DllMain(HANDLE hModule, DWORD dwReason, LPVOID lpReserved)
 {
@@ -66,7 +69,7 @@ int Apollo::hookMsg(const char* szCallName, const char* szModuleName, ApCallback
   msg.nRef = nRef;
   msg.nPosition = nPosition;
   if (!msg.Request()) {
-    apLog_Error((APOLLO_NAME, "Apollo::hookMsg", "Failed to Hook %s %s", StringType(szCallName), StringType(szModuleName)));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Failed to Hook %s %s", _sz(szCallName), _sz(szModuleName)));
   } else {
     ok = msg.apStatus == ApMessage::Ok;
   }
@@ -84,7 +87,7 @@ int Apollo::unhookMsg(const char* szCallName, const char* szModuleName, ApCallba
   msg.fnHandler = fnHandler;
   msg.nRef = nRef;
   if (!msg.Request()) {
-    apLog_Error((APOLLO_NAME, "Apollo::unhookMsg", "Failed to Unhook %s %s", StringType(szCallName), StringType(szModuleName)));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Failed to Unhook %s %s", _sz(szCallName), _sz(szModuleName)));
   } else {
     ok = msg.apStatus == ApMessage::Ok;
   }
@@ -136,7 +139,7 @@ int Apollo::loadModule(const char* szModuleName, const char* szDllPath)
   msg.sDllPath = szDllPath;
   msg.sModuleName = szModuleName;
   if (!msg.Request()) {
-    apLog_Error((APOLLO_NAME, "Apollo::loadModule", "Failed to load module from %s (%s)", StringType(szDllPath), StringType(szModuleName)));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Failed to load module from %s (%s)", _sz(szDllPath), _sz(szModuleName)));
   } else {
     ok = msg.apStatus == ApMessage::Ok;
   }
@@ -161,7 +164,7 @@ int Apollo::isLoadedModule(const char* szModuleName)
   Msg_Core_IsLoadedModule msg;
   msg.sModuleName = szModuleName;
   if (!msg.Request()) {
-    apLog_Error((APOLLO_NAME, "Apollo::isLoadedModule", "Failed to check if module loaded"));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Failed to check if module loaded"));
   } else {
     bLoaded = msg.bLoaded;
   }
@@ -173,7 +176,7 @@ int Apollo::unloadModules()
 {
   Msg_Core_GetLoadedModules msg;
   if (!msg.Request()) {
-    apLog_Error((APOLLO_NAME, "Apollo::unloadModules", "Failed to fetch modules"));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Failed to fetch modules"));
   } else {
 
     // Reverse module order for unload
@@ -191,7 +194,7 @@ int Apollo::unloadModules()
       Msg_Core_UnloadModule msg2;
       msg2.sModuleName = e->getName();
       if (!msg2.Request()) {
-        apLog_Error((APOLLO_NAME, "Apollo::unloadModules", "Failed to unload module %s", StringType(e->getString())));
+        apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Failed to unload module %s", _sz(e->getString())));
       }
     }
   }
@@ -214,15 +217,15 @@ int Apollo::loadModulesFromConfig(const char* szKey)
 
   {
     Msg_Config_GetKeys msgOrderKeys;
-    msgOrderKeys.sPath.appendf("%s/", StringType(sBase));
+    msgOrderKeys.sPath.appendf("%s/", _sz(sBase));
     if (msgOrderKeys.Request()) {
       for (ValueElem* eOrderKey = 0; (eOrderKey = msgOrderKeys.vlKeys.nextElem(eOrderKey)); ) {
         Msg_Config_GetKeys msgModKeys;
-        msgModKeys.sPath.appendf("%s/%s/", StringType(sBase), StringType(eOrderKey->getString()));
+        msgModKeys.sPath.appendf("%s/%s/", _sz(sBase), _sz(eOrderKey->getString()));
         if (msgModKeys.Request()) {
           for (ValueElem* eModKey = 0; (eModKey = msgModKeys.vlKeys.nextElem(eModKey)); ) {
             String sKey;
-            sKey.appendf("%s/%s/%s/Path", StringType(sBase), StringType(eOrderKey->getString()), StringType(eModKey->getString()));
+            sKey.appendf("%s/%s/%s/Path", _sz(sBase), _sz(eOrderKey->getString()), _sz(eModKey->getString()));
             String sPath = Apollo::getConfig(sKey, "");
             if (!sPath.empty()) {
               lModulePaths.AddLast(eModKey->getString(), sPath);
@@ -238,7 +241,7 @@ int Apollo::loadModulesFromConfig(const char* szKey)
     for (Elem* e = 0; (e = lModulePaths.Next(e)) != 0; ) {
       int iok = loadModule(e->getName(), e->getString());
       if (!iok) {
-        apLog_Warning((APOLLO_NAME, "Apollo::loadModulesFromConfig", "loadModule failed: %s %s", StringType(e->getName()), StringType(e->getString())));
+        apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "loadModule failed: %s %s", _sz(e->getName()), _sz(e->getString())));
       }
     }
   }
@@ -408,10 +411,10 @@ static String _getModuleConfigPath(const String& sModuleName, const String& sPat
   }
 
   //String sConfigKey = Apollo::getConfig("Core/ModuleConfig/ConfigKeyPrefix", "Module");
-  //sConfigKey.appendf("/%s/%s", StringType(sModuleName), StringType(sPath));
+  //sConfigKey.appendf("/%s/%s", _sz(sModuleName), _sz(sPath));
 
   String sConfigKey;
-  sConfigKey.appendf("%s/%s", StringType(sModuleName), StringType(sFixedPath));
+  sConfigKey.appendf("%s/%s", _sz(sModuleName), _sz(sFixedPath));
   return sConfigKey;
 }
 
@@ -558,7 +561,7 @@ ApHandle Apollo::startInterval(int nSec, int nMicroSec)
   msg.nCount = 0; // 0 means infinite
   if (!msg.Request()) {
     hTimer = ApNoHandle;
-    apLog_Error((APOLLO_NAME, "Apollo::startInterval", "Msg_Timer_Start failed"));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_Timer_Start failed"));
   }
 
   return hTimer;
@@ -575,7 +578,7 @@ ApHandle Apollo::startTimeout(int nSec, int nMicroSec)
   msg.nCount = 1;
   if (!msg.Request()) {
     hTimer = ApNoHandle;
-    apLog_Error((APOLLO_NAME, "Apollo::startTimeout", "Msg_Timer_Start failed"));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_Timer_Start failed"));
   }
 
   return hTimer;
@@ -590,7 +593,7 @@ int Apollo::cancelTimeout(const ApHandle& hTimer)
   msg.Request();
   ok = msg.Request();
   if (!ok) {
-    apLog_Error((APOLLO_NAME, "Apollo::cancelTimeout", "Msg_Timer_Cancel failed"));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_Timer_Cancel failed"));
   }
 
   return ok;
@@ -846,11 +849,11 @@ String Apollo::Test_CompareLists(const char* szText, List& lData, List& lExpecte
         e2 = lExpected.Next(e2);
       }
       if (e2 == 0) {
-        s.appendf("%s: missing expected for input: %s=%s", szText, StringType(e1->getName()), StringType(e1->getString()));
+        s.appendf("%s: missing expected for input: %s=%s", szText, _sz(e1->getName()), _sz(e1->getString()));
         break;
       } else {
         if (e1->getName() != e2->getName() || e1->getString() != e2->getString()) {
-          s.appendf("%s: mismatch got: %s=%s, expected: %s=%s", szText, StringType(e1->getName()), StringType(e1->getString()), StringType(e2->getName()), StringType(e2->getString()));
+          s.appendf("%s: mismatch got: %s=%s, expected: %s=%s", szText, _sz(e1->getName()), _sz(e1->getString()), _sz(e2->getName()), _sz(e2->getString()));
           break;
         }
       }
@@ -870,11 +873,11 @@ String Apollo::Test_CompareLists(const char* szText, List& lData, List& lExpecte
         e2 = lData.Next(e2);
       }
       if (e2 == 0) {
-        s.appendf("%s: missing input for expected: %s=%s", szText, StringType(e1->getName()), StringType(e1->getString()));
+        s.appendf("%s: missing input for expected: %s=%s", szText, _sz(e1->getName()), _sz(e1->getString()));
         break;
       } else {
         if (e1->getName() != e2->getName() || e1->getString() != e2->getString()) {
-          s.appendf("%s: mismatch expected: %s=%s, got: %s=%s", szText, StringType(e1->getName()), StringType(e1->getString()), StringType(e2->getName()), StringType(e2->getString()));
+          s.appendf("%s: mismatch expected: %s=%s, got: %s=%s", szText, _sz(e1->getName()), _sz(e1->getString()), _sz(e2->getName()), _sz(e2->getString()));
           break;
         }
       }

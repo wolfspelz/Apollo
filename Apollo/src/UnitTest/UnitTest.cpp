@@ -32,8 +32,9 @@
   }
 #endif // defined(WIN32)
 
-#define LOG_CHANNEL "WinUnitTest"
 #define MODULE_NAME "WinUnitTest"
+#define LOG_CHANNEL MODULE_NAME
+#define LOG_CONTEXT apLog_Context
 
 static AP_MODULE_INFO g_info = {
   sizeof(AP_MODULE_INFO),
@@ -154,6 +155,7 @@ public:
 protected:
   void Register(const char* szName);
   void Complete(const char* szName, int bSuccess, const char* szMessage);
+  void SendRunLevelNormal();
 
   static UnitTest* pInstance_;
 
@@ -170,7 +172,9 @@ protected:
   int nUnknown_;
 
   int bStarted_;
+  int bRunning_;
   int bInSendRunLevelNormal_;
+  int bInterseptedRunLevelNormal_;
 
   AP_MSG_REGISTRY_DECLARE;
 };
@@ -380,7 +384,9 @@ UnitTest::UnitTest()
 ,bSuccess_(1)
 ,nUnknown_(0)
 ,bStarted_(0)
+,bRunning_(0)
 ,bInSendRunLevelNormal_(0)
+,bInterseptedRunLevelNormal_(0)
 {
 }
 
@@ -471,7 +477,7 @@ void UnitTest::Evaluate()
   for (UnitTestItem* pItem = 0; (pItem = (UnitTestItem*) lTests_.Next(pItem)); ) {
     if (!pItem->bComplete_) {
       sText = "";
-      sText.appendf("%s missing", StringType(pItem->getName()));
+      sText.appendf("%s missing", _sz(pItem->getName()));
 #if defined(WIN32)
       if (Dialog() != 0) {
         Dialog()->WriteLine(sText);
@@ -479,7 +485,7 @@ void UnitTest::Evaluate()
 #else
       {
 #endif
-        apLog_Info((LOG_CHANNEL, "UnitTest", StringType(sText)));
+        apLog_Info((LOG_CHANNEL, LOG_CONTEXT, _sz(sText)));
       }
 
       { msg.vlMissingTests.add(pItem->getName()); }
@@ -495,7 +501,7 @@ void UnitTest::Evaluate()
 #else
   {
 #endif
-    apLog_Debug((LOG_CHANNEL, "UnitTest", "%s", StringType(sText)));
+    apLog_Debug((LOG_CHANNEL, LOG_CONTEXT, "%s", _sz(sText)));
   }
   
   { msg.nTotal = lTests_.length(); msg.nFailed = nFail_; msg.nUnknown = nUnknown_; msg.Send(); }
@@ -519,7 +525,7 @@ void UnitTest::Complete(const char* szName, int bSuccess, const char* szMessage)
     msg.bKnown = 0;
     nUnknown_++;
     bSuccess_ = 0;
-    sText.appendf("%s unknown: %s", StringType(szName), StringType(szMessage));
+    sText.appendf("%s unknown: %s", _sz(szName), _sz(szMessage));
   } else {
     msg.bKnown = 1;
     if (!pItem->bComplete_) {
@@ -532,7 +538,7 @@ void UnitTest::Complete(const char* szName, int bSuccess, const char* szMessage)
       bSuccess_ &= bSuccess;
 
       if (!bSuccess) {
-        sText.appendf("##### %s failed: %s", StringType(szName), StringType(szMessage));
+        sText.appendf("##### %s failed: %s", _sz(szName), _sz(szMessage));
       } else {
         sText = szName;
       }
@@ -550,7 +556,7 @@ void UnitTest::Complete(const char* szName, int bSuccess, const char* szMessage)
 #else
     {
 #endif
-      apLog_Debug((LOG_CHANNEL, "UnitTest::Complete", "%03d/%03d: %s", nComplete_, lTests_.length(), StringType(szName)));
+      apLog_Debug((LOG_CHANNEL, LOG_CONTEXT, "%03d/%03d: %s", nComplete_, lTests_.length(), _sz(szName)));
     }
   } else {
 #if defined(WIN32)
@@ -562,7 +568,7 @@ void UnitTest::Complete(const char* szName, int bSuccess, const char* szMessage)
 #else
     {
 #endif
-      apLog_Debug((LOG_CHANNEL, "UnitTest", "%s", StringType(sText)));
+      apLog_Debug((LOG_CHANNEL, LOG_CONTEXT, "%s", _sz(sText)));
     }
   }
 
@@ -587,7 +593,7 @@ int UnitTest::Start()
 {
   bStarted_ = 1;
 
-  apLog_Info((LOG_CHANNEL, "UnitTest::Start", "Register tests"));
+  apLog_Info((LOG_CHANNEL, LOG_CONTEXT, "Register tests"));
 
   { // Let modules register
     Msg_UnitTest_Begin msg;
@@ -600,15 +606,19 @@ int UnitTest::Start()
     msg.Send();
   }
 
-  apLog_Info((LOG_CHANNEL, "UnitTest::Start", "Execute synchronous tests"));
+  apLog_Info((LOG_CHANNEL, LOG_CONTEXT, "Execute synchronous tests"));
   apLog_User(("Testing"));
+
+  bRunning_ = 1; 
+  // Started before synchronous tests
+  // Will be finished when async token returns
 
   { // Execute synchronous tests
     Msg_UnitTest_Execute msg;
     msg.Send();
   }
 
-  apLog_Info((LOG_CHANNEL, "UnitTest::Start", "Start asynchronous test sequence"));
+  apLog_Info((LOG_CHANNEL, LOG_CONTEXT, "Start asynchronous test sequence"));
 
   { // Start asynchronous test sequence
     ApAsyncMessage<Msg_UnitTest_Token> msg;
@@ -622,7 +632,7 @@ int UnitTest::End()
 {
   if (bStarted_) {
     { Msg_UnitTest_End msg; msg.Send(); }
-    apLog_Info((LOG_CHANNEL, "UnitTest::On_MainLoop_EventLoopBeforeEnd", "End tests"));
+    apLog_Info((LOG_CHANNEL, LOG_CONTEXT, "End tests"));
     { Msg_UnitTest_Evaluate msg; msg.Send(); }
     bStarted_ = 0;
 
@@ -638,14 +648,29 @@ int UnitTest::End()
 
   return 1;
 }
+
+//----------------------------------------------------------
+
+void UnitTest::SendRunLevelNormal()
+{
+  bInSendRunLevelNormal_ = 1;
+
+  Msg_System_RunLevel msg; 
+  msg.sLevel = Msg_System_RunLevel_Normal; 
+  msg.Send();
+  
+  bInSendRunLevelNormal_ = 0;
+}
+
 //----------------------------------------------------------
 
 AP_MSG_HANDLER_METHOD(UnitTest, UnitTest_Token)
 {
   // Got the token, although registered "Late"
-  // So, we assume that everyone who registered for token got ist already
+  // So, we assume that everyone who registered for token got ist already  
+  apLog_Info((LOG_CHANNEL, LOG_CONTEXT, "Finished asynchronous test sequence"));
 
-  apLog_Info((LOG_CHANNEL, "UnitTest::UnitTest_Token", "Finished asynchronous test sequence"));
+  bRunning_ = 0;
 
   if (bSuccess_) {
     apLog_User(("Test successful"));
@@ -663,19 +688,21 @@ AP_MSG_HANDLER_METHOD(UnitTest, UnitTest_Token)
       sText.appendf(" / %d result(s) missing", nMissing);
     }
     
-    apLog_User(("%s", StringType(sText)));
+    apLog_User(("%s", _sz(sText)));
   }
 
-  bInSendRunLevelNormal_ = 1;
-  Msg_System_RunLevel msg; msg.sLevel = Msg_System_RunLevel_Normal; msg.Send();
-  bInSendRunLevelNormal_ = 0;
+  if (bInterseptedRunLevelNormal_) {
+    SendRunLevelNormal();
+  }
 }
 
 AP_MSG_HANDLER_METHOD(UnitTest, System_RunLevel)
 {
-  if (pMsg->sLevel == Msg_System_RunLevel_Normal && !bInSendRunLevelNormal_ && bStarted_) {
+  if (pMsg->sLevel == Msg_System_RunLevel_Normal && !bInSendRunLevelNormal_ && bRunning_) {
     // Stop the "Normal" run level until unit tests are done
     pMsg->Stop();
+
+    bInterseptedRunLevelNormal_ = 1;
   }
 }
 

@@ -5,11 +5,10 @@
 // ============================================================================
 
 #include "Apollo.h"
-#include "ApLog.h"
+#include "Local.h"
 #include "MsgVp.h"
 #include "MsgProtocol.h"
 #include "MsgVpView.h"
-#include "Local.h"
 #include "Location.h"
 
 Location::Location(const ApHandle& hLocation, const String& sLocationUrl)
@@ -76,14 +75,14 @@ int Location::addContext(const ApHandle& hContext)
     msg.hLocation = hAp_;
     ok = msg.Request();
     if (!ok) {
-      apLog_Error((LOG_CHANNEL, "Location::addContext", "Msg_Vp_EnterLocation failed for " ApHandleFormat " %s", ApHandleType(hAp_), StringType(sLocationUrl_)));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_Vp_EnterLocation failed for " ApHandleFormat " %s", ApHandlePrintf(hAp_), _sz(sLocationUrl_)));
     }
   }
 
   contexts_.Set(hContext, hContext);
 
   {
-    apLog_Verbose((LOG_CHANNEL, "Location::addContext", "" ApHandleFormat ".addContext(" ApHandleFormat ")", ApHandleType(apHandle()), ApHandleType(hContext)));
+    apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "" ApHandleFormat ".addContext(" ApHandleFormat ")", ApHandlePrintf(apHandle()), ApHandlePrintf(hContext)));
 
     Msg_VpView_LocationContextsChanged msg;
     msg.hLocation = apHandle();
@@ -102,9 +101,9 @@ int Location::removeContext(const ApHandle& hContext)
     msg.hLocation = hAp_;
     ok = msg.Request();
     if (!ok) {
-      apLog_Error((LOG_CHANNEL, "Location::addContext", "Msg_Vp_LeaveLocation failed for " ApHandleFormat " %s", ApHandleType(hAp_), StringType(sLocationUrl_)));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_Vp_LeaveLocation failed for " ApHandleFormat " %s", ApHandlePrintf(hAp_), _sz(sLocationUrl_)));
     } else {
-      apLog_Verbose((LOG_CHANNEL, "Location::removeContext", "" ApHandleFormat ".removeContext(" ApHandleFormat ")", ApHandleType(apHandle()), ApHandleType(hContext)));
+      apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "" ApHandleFormat ".removeContext(" ApHandleFormat ")", ApHandlePrintf(apHandle()), ApHandlePrintf(hContext)));
     }
   }
 
@@ -169,7 +168,7 @@ int Location::enter()
   String sRoom = room();
   String sProtocol = protocol();
   if (sProtocol.empty() || sRoom.empty()) {
-    apLog_Error((LOG_CHANNEL, "Location::enter", "protocol=%s or location=%s empty", StringType(sProtocol), StringType(sRoom)));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "protocol=%s or location=%s empty", _sz(sProtocol), _sz(sRoom)));
   } else {
 
     int bProtocolIsOnline = 0;
@@ -183,16 +182,16 @@ int Location::enter()
 
     if (!bProtocolIsOnline) {
       bEnterAfterProtocolOnline_ = 1;
-      apLog_Info((LOG_CHANNEL, "Location::enter", "protocol=%s not online, waiting for online before enter", StringType(sProtocol)));
+      apLog_Info((LOG_CHANNEL, LOG_CONTEXT, "protocol=%s not online, waiting for online before enter", _sz(sProtocol)));
     } else {
 
       if (nState_	== State_LeaveRequested) {
         bEnterAfterLeaveComplete_ = 1;
-        apLog_Info((LOG_CHANNEL, "Location::enter", "protocol=%s leave requested, waiting for leave complete before enter", StringType(sProtocol)));
+        apLog_Info((LOG_CHANNEL, LOG_CONTEXT, "protocol=%s leave requested, waiting for leave complete before enter", _sz(sProtocol)));
       } else {
 
         hRoom_ = Apollo::newHandle();
-        apLog_Verbose((LOG_CHANNEL, "Location::enter", "" ApHandleFormat " enter " ApHandleFormat "", ApHandleType(apHandle()), ApHandleType(hRoom_)));
+        apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "" ApHandleFormat " enter " ApHandleFormat "", ApHandlePrintf(apHandle()), ApHandlePrintf(hRoom_)));
 
         Msg_Protocol_EnterRoom msg;
         msg.sProtocol = sProtocol;
@@ -200,7 +199,7 @@ int Location::enter()
         msg.hRoom = hRoom_;
         ok = msg.Request();
         if (!ok) {
-          apLog_Error((LOG_CHANNEL, "Location::enter", "Msg_Protocol_EnterRoom failed, %s", StringType(sLocationUrl_)));
+          apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_Protocol_EnterRoom failed, %s", _sz(sLocationUrl_)));
         } else {
           setState(State_EnterRequested);
 
@@ -241,16 +240,16 @@ int Location::leave()
   String sRoom = room();
   String sProtocol = protocol();
   if (sProtocol.empty() || sRoom.empty()) {
-    apLog_Error((LOG_CHANNEL, "Location::leave", "protocol=%s or location=%s empty", StringType(sProtocol), StringType(sRoom)));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "protocol=%s or location=%s empty", _sz(sProtocol), _sz(sRoom)));
   } else {
-    apLog_Verbose((LOG_CHANNEL, "Location::leave", "" ApHandleFormat " leave " ApHandleFormat "", ApHandleType(apHandle()), ApHandleType(hRoom_)));
+    apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "" ApHandleFormat " leave " ApHandleFormat "", ApHandlePrintf(apHandle()), ApHandlePrintf(hRoom_)));
 
     Msg_Protocol_LeaveRoom msg;
     msg.sProtocol = sProtocol;
     msg.hRoom = hRoom_;
     ok = msg.Request();
     if (!ok) {
-      apLog_Error((LOG_CHANNEL, "Location::leave", "Msg_Protocol_LeaveRoom failed, %s", StringType(sLocationUrl_)));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_Protocol_LeaveRoom failed, %s", _sz(sLocationUrl_)));
     } else {
       setState(State_LeaveRequested);
 
@@ -304,7 +303,7 @@ int Location::onProtocolOnline()
 int Location::onProtocolOffline()
 {
   int ok = 1;
-  apLog_Verbose((LOG_CHANNEL, "Location::onProtocolOffline", "Cleaning up %d participants", participants_.Count()));
+  apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "Cleaning up %d participants", participants_.Count()));
 
   State nPreviousState = nState_;
 
@@ -331,7 +330,7 @@ int Location::onProtocolOffline()
 int Location::addParticipant(const ApHandle& hParticipant)
 {
   int ok = 0;
-  apLog_Verbose((LOG_CHANNEL, "Location::addParticipant", "" ApHandleFormat " add " ApHandleFormat "", ApHandleType(apHandle()), ApHandleType(hParticipant)));
+  apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "" ApHandleFormat " add " ApHandleFormat "", ApHandlePrintf(apHandle()), ApHandlePrintf(hParticipant)));
 
   Participant* pParticipant = new Participant(hParticipant, this);
   if (pParticipant != 0) {
@@ -371,7 +370,7 @@ int Location::addParticipant(const ApHandle& hParticipant)
 int Location::removeParticipant(const ApHandle& hParticipant)
 {
   int ok = 0;
-  apLog_Verbose((LOG_CHANNEL, "Location::removeParticipant", "" ApHandleFormat " remove " ApHandleFormat "", ApHandleType(apHandle()), ApHandleType(hParticipant)));
+  apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "" ApHandleFormat " remove " ApHandleFormat "", ApHandlePrintf(apHandle()), ApHandlePrintf(hParticipant)));
 
   {
     Msg_VpView_ParticipantRemoved msg;
@@ -388,7 +387,7 @@ int Location::removeParticipant(const ApHandle& hParticipant)
       pParticipant = 0;
     }
   } else {
-    apLog_Error((LOG_CHANNEL, "Location::removeParticipant", "participants_.Unset() failed, part=" ApHandleFormat " unknown", ApHandleType(hParticipant)));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "participants_.Unset() failed, part=" ApHandleFormat " unknown", ApHandlePrintf(hParticipant)));
   }
 
   if (ok) {
@@ -450,7 +449,7 @@ void Location::sendPublicChat(const String& sText)
   msg.sProtocol = protocol();
   msg.hRoom = hRoom_;
   msg.sText = sText;
-  if (!msg.Request()) { throw ApException("Location::sendPublicChat: Msg_Protocol_SendPublicChat failed, %s", StringType(sLocationUrl_)); }
+  if (!msg.Request()) { throw ApException(LOG_CONTEXT, "Msg_Protocol_SendPublicChat failed, %s", _sz(sLocationUrl_)); }
 }
 
 String Location::getNickname(const ApHandle& hParticipant)
@@ -657,7 +656,7 @@ void Location::getDetailString(const String& sKey, String& sValue, String& sMime
 {
   LocationThingy* pThingy = lThingys_.getOrCreate(sKey);
   if (!pThingy) {
-    throw ApException("Location::getDetailString: unknown key=%s", StringType(sKey));
+    throw ApException(LOG_CONTEXT, "unknown key=%s", _sz(sKey));
   } else {
     LocationThingyProvider* pProvider = pThingy->getProvider();
     if (pProvider) {
@@ -736,7 +735,7 @@ ThingyProvider* LocationThingyList::newProvider(const String& sKey)
   } else if (sKey == Msg_VpView_LocationDetail_LocationUrl) { pProvider = new LocationUrlLocationThingyProvider();
   } else if (sKey == Msg_VpView_LocationDetail_State) { pProvider = new StateLocationThingyProvider();
   } else {
-    apLog_Error((LOG_CHANNEL, "LocationThingyList::newThingy", "unknown key=%s", StringType(sKey)));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "unknown key=%s", _sz(sKey)));
   }
 
   if (pProvider) {

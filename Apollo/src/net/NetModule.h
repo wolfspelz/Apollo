@@ -20,9 +20,6 @@
 #include "Resolver.h"
 #include "HttpManager.h"
 
-#define LOG_CHANNEL "Net"
-#define MODULE_NAME "Net"
-
 class PostResolveConnectTask
 {
 public:

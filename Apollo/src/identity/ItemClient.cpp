@@ -5,15 +5,14 @@
 // ============================================================================
 
 #include "Apollo.h"
-#include "ApLog.h"
-#include "MsgIdentity.h"
 #include "Local.h"
+#include "MsgIdentity.h"
 #include "ItemClient.h"
 
 int ItemClient::OnConnected()
 {
   int ok = 1;
-  apLog_VeryVerbose((LOG_CHANNEL, "ItemClient::OnConnected", "url=%s " ApHandleFormat, StringType(sUrl_), ApHandleType(hAp_)));
+  apLog_VeryVerbose((LOG_CHANNEL, LOG_CONTEXT, "url=%s " ApHandleFormat, _sz(sUrl_), ApHandlePrintf(hAp_)));
   return ok;
 }
 
@@ -27,7 +26,7 @@ int ItemClient::OnHeader(int nStatus, KeyValueList& kvHeaders)
     if (String::toLower(e->getKey()) == "content-type") {
       sContentType_ = String::toLower(e->getString());
     }
-    apLog_VeryVerbose((LOG_CHANNEL, "ItemClient::OnHeader", "url=%s " ApHandleFormat " header: [%s][%s]", StringType(sUrl_), ApHandleType(hAp_), (const char* )e->getKey(), StringType(e->getString())));
+    apLog_VeryVerbose((LOG_CHANNEL, LOG_CONTEXT, "url=%s " ApHandleFormat " header: [%s][%s]", _sz(sUrl_), ApHandlePrintf(hAp_), (const char* )e->getKey(), _sz(e->getString())));
   }
 
   return ok;
@@ -37,7 +36,7 @@ int ItemClient::OnDataIn(unsigned char* pData, size_t nLen)
 {
   int ok = 1;
 
-  apLog_VeryVerbose((LOG_CHANNEL, "ItemClient::OnDataIn", "url=%s " ApHandleFormat " nStatus=%d buflen=%d", StringType(sUrl_), ApHandleType(hAp_), nStatus_, sbData_.Length() + nLen));
+  apLog_VeryVerbose((LOG_CHANNEL, LOG_CONTEXT, "url=%s " ApHandleFormat " nStatus=%d buflen=%d", _sz(sUrl_), ApHandlePrintf(hAp_), nStatus_, sbData_.Length() + nLen));
   
   if (nStatus_ == 200 && sbData_.Length() + nLen < (unsigned int) Apollo::getModuleConfig(MODULE_NAME, "MaxIdentityItemFileSize", 100000)) {
     sbData_.Append(pData, nLen);
@@ -73,7 +72,7 @@ int ItemClient::OnClosed()
   }
 
   if (!msg.Request()) {
-    apLog_Warning((LOG_CHANNEL, "ItemClient::OnClosed", "Msg_Identity_ReceiveItem failed, url=%s ", StringType(sUrl_)));
+    apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "Msg_Identity_ReceiveItem failed, url=%s ", _sz(sUrl_)));
   }
 
   AutoDelete(1);

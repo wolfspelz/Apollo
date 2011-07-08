@@ -7,7 +7,6 @@
 #include "Apollo.h"
 #include "Local.h"
 #include "xmpp.h"
-#include "ApLog.h"
 #include "XmppModule.h"
 
 #if defined(WIN32)

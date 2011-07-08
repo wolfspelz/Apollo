@@ -5,14 +5,13 @@
 // ============================================================================
 
 #include "Apollo.h"
-#include "ApLog.h"
+#include "Local.h"
 #include "URL.h"
 #include "MsgSystem.h"
 #include "MsgDB.h"
 #include "MsgProtocol.h"
 #include "VpModule.h"
 #include "VpModuleTester.h"
-#include "Local.h"
 
 //----------------------------------------------------------
 
@@ -293,7 +292,7 @@ AP_MSG_HANDLER_METHOD(VpModule, System_AfterLoadModules)
   msg.sName = DB_NAME;
   int ok = msg.Request();
   if (!ok) {
-    apLog_Error((LOG_CHANNEL, "VpModule::System_AfterLoadModules", "Msg_DB_Open %s failed", StringType(msg.sName)));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_DB_Open %s failed", _sz(msg.sName)));
   }
 
   sExternUrlAddress_ = Apollo::getConfig("Server/HTTP/Address", "localhost");
@@ -310,24 +309,24 @@ AP_MSG_HANDLER_METHOD(VpModule, System_BeforeUnloadModules)
   msg.sName = DB_NAME;
   int ok = msg.Request();
   if (!ok) {
-    apLog_Error((LOG_CHANNEL, "VpModule::System_BeforeUnloadModules", "Msg_DB_Close %s failed", StringType(msg.sName)));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_DB_Close %s failed", _sz(msg.sName)));
   }
 }
 
 AP_MSG_HANDLER_METHOD(VpModule, Vpi_LocationXmlResponse)
 {
   int ok = 0;
-  apLog_Verbose((LOG_CHANNEL, "VpModule::Vpi_LocationXmlResponse", "url=%s ", StringType(pMsg->sDocumentUrl)));
+  apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "url=%s ", _sz(pMsg->sDocumentUrl)));
 
   Context* pContext = findContextByMapping(pMsg->hRequest);
 
   if (pContext) {
     if (!pMsg->bSuccess) {
-      apLog_Warning((LOG_CHANNEL, "VpModule::Vpi_LocationXmlResponse", "Msg_Vpi_LocationXmlResponse not successful for %s", StringType(pMsg->sDocumentUrl)));
+      apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "Msg_Vpi_LocationXmlResponse not successful for %s", _sz(pMsg->sDocumentUrl)));
     } else {
       ok = pContext->setLocationXml(pMsg->sLocationXml);
       if (!ok) {
-        apLog_Error((LOG_CHANNEL, "VpModule::Vpi_LocationXmlResponse", "pContext->setLocationXml() failed for %s", StringType(pContext->getDocumentUrl())));
+        apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "pContext->setLocationXml() failed for %s", _sz(pContext->getDocumentUrl())));
       } else {
 
         Location* pNewLocation = findLocationByUrl(pContext->getLocationUrl());
@@ -340,14 +339,14 @@ AP_MSG_HANDLER_METHOD(VpModule, Vpi_LocationXmlResponse)
           msg.sLocationUrl = pContext->getLocationUrl();
           ok = msg.Request();
           if (!ok) {
-            apLog_Error((LOG_CHANNEL, "VpModule::Vpi_LocationXmlResponse", "Msg_Vp_CreateLocation failed for loc=%s url=%s", StringType(pContext->getLocationUrl()), StringType(pContext->getDocumentUrl())));
+            apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_Vp_CreateLocation failed for loc=%s url=%s", _sz(pContext->getLocationUrl()), _sz(pContext->getDocumentUrl())));
           } else {
             locations_.Get(hLocation, pNewLocation);
           }
         }
 
         if (pNewLocation == 0) {
-          apLog_Error((LOG_CHANNEL, "VpModule::Vpi_LocationXmlResponse", "No location for loc=%s url=%s", StringType(pContext->getLocationUrl()), StringType(pContext->getDocumentUrl())));
+          apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "No location for loc=%s url=%s", _sz(pContext->getLocationUrl()), _sz(pContext->getDocumentUrl())));
         } else {
 
           if (pNewLocation == pOldLocation) {
@@ -361,7 +360,7 @@ AP_MSG_HANDLER_METHOD(VpModule, Vpi_LocationXmlResponse)
               msg.hContext = pContext->apHandle();
               ok = msg.Request();
               if (!ok) {
-                apLog_Error((LOG_CHANNEL, "VpModule::Vpi_LocationXmlResponse", "Msg_Vp_RemoveLocationContext failed for loc=%s url=%s", StringType(pContext->getLocationUrl()), StringType(pContext->getDocumentUrl())));
+                apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_Vp_RemoveLocationContext failed for loc=%s url=%s", _sz(pContext->getLocationUrl()), _sz(pContext->getDocumentUrl())));
               }
             }
 
@@ -371,7 +370,7 @@ AP_MSG_HANDLER_METHOD(VpModule, Vpi_LocationXmlResponse)
               msg.hContext = pContext->apHandle();
               ok = msg.Request();
               if (!ok) {
-                apLog_Error((LOG_CHANNEL, "VpModule::Vpi_LocationXmlResponse", "Msg_Vp_AddLocationContext failed for loc=%s url=%s", StringType(pContext->getLocationUrl()), StringType(pContext->getDocumentUrl())));
+                apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_Vp_AddLocationContext failed for loc=%s url=%s", _sz(pContext->getLocationUrl()), _sz(pContext->getDocumentUrl())));
               }
             }
 
@@ -387,7 +386,7 @@ AP_MSG_HANDLER_METHOD(VpModule, Vpi_LocationXmlResponse)
 AP_MSG_HANDLER_METHOD(VpModule, Vp_OpenContext)
 {
   int ok = 1;
-  apLog_Verbose((LOG_CHANNEL, "VpModule::Vp_OpenContext", "ctxt=" ApHandleFormat "", ApHandleType(pMsg->hContext)));
+  apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "ctxt=" ApHandleFormat "", ApHandlePrintf(pMsg->hContext)));
 
   Context* pContext = 0;
   if (!contexts_.Get(pMsg->hContext, pContext)) {
@@ -395,7 +394,7 @@ AP_MSG_HANDLER_METHOD(VpModule, Vp_OpenContext)
     msg.hContext = pMsg->hContext;
     ok = msg.Request();
     if (!ok) {
-      apLog_Error((LOG_CHANNEL, "VpModule::Vp_OpenContext", "Msg_Vp_CreateContext failed for ctxt=" ApHandleFormat "", ApHandleType(pMsg->hContext)));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_Vp_CreateContext failed for ctxt=" ApHandleFormat "", ApHandlePrintf(pMsg->hContext)));
     }
   }
 
@@ -405,7 +404,7 @@ AP_MSG_HANDLER_METHOD(VpModule, Vp_OpenContext)
 AP_MSG_HANDLER_METHOD(VpModule, Vp_NavigateContext)
 {
   int ok = 1;
-  apLog_Verbose((LOG_CHANNEL, "VpModule::Vp_NavigateContext", "ctxt=" ApHandleFormat " url=%s", ApHandleType(pMsg->hContext), StringType(pMsg->sUrl)));
+  apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "ctxt=" ApHandleFormat " url=%s", ApHandlePrintf(pMsg->hContext), _sz(pMsg->sUrl)));
 
   Context* pContext = 0;
   if (contexts_.Get(pMsg->hContext, pContext)) {
@@ -415,7 +414,7 @@ AP_MSG_HANDLER_METHOD(VpModule, Vp_NavigateContext)
     msg.hContext = pMsg->hContext;
     ok = msg.Request();
     if (!ok) {
-      apLog_Error((LOG_CHANNEL, "VpModule::Vp_NavigateContext", "Msg_Vp_CreateContext failed for ctxt=" ApHandleFormat " url=%s", ApHandleType(pMsg->hContext), StringType(pMsg->sUrl)));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_Vp_CreateContext failed for ctxt=" ApHandleFormat " url=%s", ApHandlePrintf(pMsg->hContext), _sz(pMsg->sUrl)));
     } else {
       contexts_.Get(pMsg->hContext, pContext);
     }
@@ -424,7 +423,7 @@ AP_MSG_HANDLER_METHOD(VpModule, Vp_NavigateContext)
   if (pContext != 0) {
     ok = pContext->navigate(pMsg->sUrl); // resolves async
     if (!ok) {
-      apLog_Error((LOG_CHANNEL, "VpModule::Vp_NavigateContext", "pUrlContext->changeUrl failed for ctxt=" ApHandleFormat " url=%s", ApHandleType(pMsg->hContext), StringType(pMsg->sUrl)));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "pUrlContext->changeUrl failed for ctxt=" ApHandleFormat " url=%s", ApHandlePrintf(pMsg->hContext), _sz(pMsg->sUrl)));
     }
   }
 
@@ -434,7 +433,7 @@ AP_MSG_HANDLER_METHOD(VpModule, Vp_NavigateContext)
 AP_MSG_HANDLER_METHOD(VpModule, Vp_CloseContext)
 {
   int ok = 1;
-  apLog_Verbose((LOG_CHANNEL, "VpModule::Vp_CloseContext", "ctxt=" ApHandleFormat "", ApHandleType(pMsg->hContext)));
+  apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "ctxt=" ApHandleFormat "", ApHandlePrintf(pMsg->hContext)));
 
   Context* pContext = 0;
   if (contexts_.Get(pMsg->hContext, pContext)) {
@@ -443,11 +442,11 @@ AP_MSG_HANDLER_METHOD(VpModule, Vp_CloseContext)
     msg.hContext = pMsg->hContext;
     ok = msg.Request();
     if (!ok) {
-      apLog_Error((LOG_CHANNEL, "VpModule::Vpi_LocationXmlResponse", "Msg_Vp_DestroyContext failed for ctxt=" ApHandleFormat " previousurl=%s", ApHandleType(pMsg->hContext), StringType(pContext->getDocumentUrl())));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_Vp_DestroyContext failed for ctxt=" ApHandleFormat " previousurl=%s", ApHandlePrintf(pMsg->hContext), _sz(pContext->getDocumentUrl())));
     }
 
   } else {
-    apLog_Error((LOG_CHANNEL, "VpModule::Vp_CloseContext", "unknown ctxt=" ApHandleFormat "", ApHandleType(pMsg->hContext)));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "unknown ctxt=" ApHandleFormat "", ApHandlePrintf(pMsg->hContext)));
   }
 
   pMsg->apStatus = ok ? ApMessage::Ok : ApMessage::Error;
@@ -492,11 +491,11 @@ AP_MSG_HANDLER_METHOD(VpModule, VpView_ContextSize)
 AP_MSG_HANDLER_METHOD(VpModule, Vp_CreateContext)
 {
   int ok = 0;
-  apLog_Verbose((LOG_CHANNEL, "VpModule::Vp_CreateContext", "ctxt=" ApHandleFormat "", ApHandleType(pMsg->hContext)));
+  apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "ctxt=" ApHandleFormat "", ApHandlePrintf(pMsg->hContext)));
 
   Context* pContext = 0;
   if (contexts_.Get(pMsg->hContext, pContext)) {
-    apLog_Error((LOG_CHANNEL, "VpModule::Vp_CreateContext", "Context already exists, ctxt=" ApHandleFormat "", ApHandleType(pMsg->hContext)));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Context already exists, ctxt=" ApHandleFormat "", ApHandlePrintf(pMsg->hContext)));
   } else {
     pContext = new Context(pMsg->hContext);
     if (pContext != 0) {
@@ -511,7 +510,7 @@ AP_MSG_HANDLER_METHOD(VpModule, Vp_CreateContext)
 AP_MSG_HANDLER_METHOD(VpModule, Vp_DestroyContext)
 {
   int ok = 0;
-  apLog_Verbose((LOG_CHANNEL, "VpModule::Vp_DestroyContext", "ctxt=" ApHandleFormat "", ApHandleType(pMsg->hContext)));
+  apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "ctxt=" ApHandleFormat "", ApHandlePrintf(pMsg->hContext)));
 
   Context* pContext = 0;
   if (contexts_.Get(pMsg->hContext, pContext)) {
@@ -524,7 +523,7 @@ AP_MSG_HANDLER_METHOD(VpModule, Vp_DestroyContext)
         if (pLocation->hasContext(pMsg->hContext)) {
           int iok = pLocation->removeContext(pMsg->hContext);
           if (!iok) {
-            apLog_Error((LOG_CHANNEL, "VpModule::Vp_DestroyContext", "pLocation->removeContext() failed, ctxt=" ApHandleFormat "", ApHandleType(pMsg->hContext)));
+            apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "pLocation->removeContext() failed, ctxt=" ApHandleFormat "", ApHandlePrintf(pMsg->hContext)));
           }
         }
       }
@@ -536,7 +535,7 @@ AP_MSG_HANDLER_METHOD(VpModule, Vp_DestroyContext)
     }
     ok = 1;
   } else {
-    apLog_Error((LOG_CHANNEL, "VpModule::Vp_DestroyContext", "contexts_.Get() failed, ctxt=" ApHandleFormat "", ApHandleType(pMsg->hContext)));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "contexts_.Get() failed, ctxt=" ApHandleFormat "", ApHandlePrintf(pMsg->hContext)));
   }
 
   pMsg->apStatus = ok ? ApMessage::Ok : ApMessage::Error;
@@ -545,11 +544,11 @@ AP_MSG_HANDLER_METHOD(VpModule, Vp_DestroyContext)
 AP_MSG_HANDLER_METHOD(VpModule, Vp_CreateLocation)
 {
   int ok = 0;
-  apLog_Verbose((LOG_CHANNEL, "VpModule::Vp_CreateLocation", "loc=" ApHandleFormat "", ApHandleType(pMsg->hLocation)));
+  apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "loc=" ApHandleFormat "", ApHandlePrintf(pMsg->hLocation)));
 
   Location* pLocation = 0;
   if (locations_.Get(pMsg->hLocation, pLocation)) {
-    apLog_Error((LOG_CHANNEL, "VpModule::Vp_CreateLocation", "Location already exists, loc=" ApHandleFormat " url=%s", ApHandleType(pMsg->hLocation), StringType(pMsg->sLocationUrl)));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Location already exists, loc=" ApHandleFormat " url=%s", ApHandlePrintf(pMsg->hLocation), _sz(pMsg->sLocationUrl)));
   } else {
     pLocation = new Location(pMsg->hLocation, pMsg->sLocationUrl);
     if (pLocation != 0) {
@@ -567,7 +566,7 @@ AP_MSG_HANDLER_METHOD(VpModule, Vp_CreateLocation)
 AP_MSG_HANDLER_METHOD(VpModule, Vp_DestroyLocation)
 {
   int ok = 0;
-  apLog_Verbose((LOG_CHANNEL, "VpModule::Vp_DestroyLocation", "loc=" ApHandleFormat "", ApHandleType(pMsg->hLocation)));
+  apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "loc=" ApHandleFormat "", ApHandlePrintf(pMsg->hLocation)));
 
   Location* pLocation = 0;
   if (locations_.Get(pMsg->hLocation, pLocation)) {
@@ -575,7 +574,7 @@ AP_MSG_HANDLER_METHOD(VpModule, Vp_DestroyLocation)
     // Remove all contexts from destroyed location
     ok = pLocation->removeAllContexts();
     if (!ok) {
-      apLog_Error((LOG_CHANNEL, "VpModule::Vp_DestroyLocation", "pLocation->removeAllContexts() failed, loc=" ApHandleFormat "", ApHandleType(pMsg->hLocation)));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "pLocation->removeAllContexts() failed, loc=" ApHandleFormat "", ApHandlePrintf(pMsg->hLocation)));
     }
 
     if (locations_.Unset(pMsg->hLocation)) {
@@ -587,7 +586,7 @@ AP_MSG_HANDLER_METHOD(VpModule, Vp_DestroyLocation)
     Msg_VpView_LocationsChanged msg;
     msg.Send();
   } else {
-    apLog_Error((LOG_CHANNEL, "VpModule::Vp_DestroyLocation", "locations_.Get() failed, loc=" ApHandleFormat "", ApHandleType(pMsg->hLocation)));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "locations_.Get() failed, loc=" ApHandleFormat "", ApHandlePrintf(pMsg->hLocation)));
   }
 
   pMsg->apStatus = ok ? ApMessage::Ok : ApMessage::Error;
@@ -596,17 +595,17 @@ AP_MSG_HANDLER_METHOD(VpModule, Vp_DestroyLocation)
 AP_MSG_HANDLER_METHOD(VpModule, Vp_AddLocationContext)
 {
   int ok = 0;
-  apLog_Verbose((LOG_CHANNEL, "VpModule::Vp_AddLocationContext", "loc=" ApHandleFormat " ctxt=" ApHandleFormat "", ApHandleType(pMsg->hLocation), ApHandleType(pMsg->hContext)));
+  apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "loc=" ApHandleFormat " ctxt=" ApHandleFormat "", ApHandlePrintf(pMsg->hLocation), ApHandlePrintf(pMsg->hContext)));
 
   Location* pLocation = 0;
   locations_.Get(pMsg->hLocation, pLocation);
 
   if (pLocation == 0) {
-    apLog_Error((LOG_CHANNEL, "VpModule::Vp_AddLocationContext", "loc=" ApHandleFormat " invalid", ApHandleType(pMsg->hLocation)));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "loc=" ApHandleFormat " invalid", ApHandlePrintf(pMsg->hLocation)));
   } else {
     ok = pLocation->addContext(pMsg->hContext);
     if (!ok) {
-      apLog_Error((LOG_CHANNEL, "VpModule::Vp_AddLocationContext", "pLocation->addContext() failed loc=" ApHandleFormat " ctxt=" ApHandleFormat "", ApHandleType(pMsg->hLocation), ApHandleType(pMsg->hContext)));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "pLocation->addContext() failed loc=" ApHandleFormat " ctxt=" ApHandleFormat "", ApHandlePrintf(pMsg->hLocation), ApHandlePrintf(pMsg->hContext)));
     }
   }
 
@@ -616,17 +615,17 @@ AP_MSG_HANDLER_METHOD(VpModule, Vp_AddLocationContext)
 AP_MSG_HANDLER_METHOD(VpModule, Vp_RemoveLocationContext)
 {
   int ok = 0;
-  apLog_Verbose((LOG_CHANNEL, "VpModule::Vp_RemoveLocationContext", "loc=" ApHandleFormat "", ApHandleType(pMsg->hLocation)));
+  apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "loc=" ApHandleFormat "", ApHandlePrintf(pMsg->hLocation)));
 
   Location* pLocation = 0;  
   locations_.Get(pMsg->hLocation, pLocation);
 
   if (pLocation == 0) {
-    apLog_Error((LOG_CHANNEL, "VpModule::Vp_RemoveLocationContext", "loc=" ApHandleFormat " invalid", ApHandleType(pMsg->hLocation)));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "loc=" ApHandleFormat " invalid", ApHandlePrintf(pMsg->hLocation)));
   } else {
     ok = pLocation->removeContext(pMsg->hContext);
     if (!ok) {
-      apLog_Error((LOG_CHANNEL, "VpModule::Vp_RemoveLocationContext", "pLocation->removeContext() failed loc=" ApHandleFormat " ctxt=" ApHandleFormat "", ApHandleType(pMsg->hLocation), ApHandleType(pMsg->hContext)));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "pLocation->removeContext() failed loc=" ApHandleFormat " ctxt=" ApHandleFormat "", ApHandlePrintf(pMsg->hLocation), ApHandlePrintf(pMsg->hContext)));
     }
   }
 
@@ -636,18 +635,18 @@ AP_MSG_HANDLER_METHOD(VpModule, Vp_RemoveLocationContext)
 AP_MSG_HANDLER_METHOD(VpModule, Vp_EnterLocation)
 {
   int ok = 1;
-  apLog_Verbose((LOG_CHANNEL, "VpModule::Vp_EnterLocation", "" ApHandleFormat "", ApHandleType(pMsg->hLocation)));
+  apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "" ApHandleFormat "", ApHandlePrintf(pMsg->hLocation)));
 
   Location* pLocation = 0;  
   locations_.Get(pMsg->hLocation, pLocation);
 
   if (pLocation == 0) {
-    apLog_Error((LOG_CHANNEL, "VpModule::Vp_EnterLocation", "loc=" ApHandleFormat " invalid", ApHandleType(pMsg->hLocation)));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "loc=" ApHandleFormat " invalid", ApHandlePrintf(pMsg->hLocation)));
   } else {
 
     ok = pLocation->enter();
     if (!ok) {
-      apLog_Error((LOG_CHANNEL, "VpModule::Vp_EnterLocation", "pLocation->enter failed, %s", StringType(pLocation->getUrl())));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "pLocation->enter failed, %s", _sz(pLocation->getUrl())));
     }
 
   }
@@ -658,17 +657,17 @@ AP_MSG_HANDLER_METHOD(VpModule, Vp_EnterLocation)
 AP_MSG_HANDLER_METHOD(VpModule, Vp_LeaveLocation)
 {
   int ok = 1;
-  apLog_Verbose((LOG_CHANNEL, "VpModule::Vp_LeaveLocation", "" ApHandleFormat "", ApHandleType(pMsg->hLocation)));
+  apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "" ApHandleFormat "", ApHandlePrintf(pMsg->hLocation)));
 
   Location* pLocation = 0;  
   locations_.Get(pMsg->hLocation, pLocation);
 
   if (pLocation == 0) {
-    apLog_Error((LOG_CHANNEL, "VpModule::Vp_LeaveLocation", "loc=" ApHandleFormat " invalid", ApHandleType(pMsg->hLocation)));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "loc=" ApHandleFormat " invalid", ApHandlePrintf(pMsg->hLocation)));
   } else {
     ok = pLocation->leave();
     if (!ok) {
-      apLog_Error((LOG_CHANNEL, "VpModule::Vp_LeaveLocation", "pLocation->leave failed, %s", StringType(pLocation->getUrl())));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "pLocation->leave failed, %s", _sz(pLocation->getUrl())));
     }
 
   }
@@ -684,7 +683,7 @@ AP_MSG_HANDLER_METHOD(VpModule, Vp_FilterPublicChat)
   locations_.Get(pMsg->hLocation, pLocation);
 
   if (pLocation == 0) {
-    apLog_Error((LOG_CHANNEL, "VpModule::Vp_FilterPublicChat", "loc=" ApHandleFormat " invalid", ApHandleType(pMsg->hLocation)));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "loc=" ApHandleFormat " invalid", ApHandlePrintf(pMsg->hLocation)));
   } else {
     pLocation->onFilterPublicChat(pMsg->hParticipant, pMsg->sText);
   }
@@ -699,7 +698,7 @@ AP_MSG_HANDLER_METHOD(VpModule, Protocol_Online)
   lOnlineProtocols_[pMsg->sProtocol] = 1;
 
   if (locations_.Count() > 0) {
-    apLog_Info((LOG_CHANNEL, "VpModule::Protocol_Online", "re-enter %d locations", locations_.Count()));
+    apLog_Info((LOG_CHANNEL, LOG_CONTEXT, "re-enter %d locations", locations_.Count()));
 
     LocationListIterator iter(locations_);
     for (LocationListNode* pNode = 0; pNode = iter.Next(); ) {
@@ -716,7 +715,7 @@ AP_MSG_HANDLER_METHOD(VpModule, Protocol_Offline)
   lOnlineProtocols_[pMsg->sProtocol] = 0;
 
   if (locations_.Count() > 0) {
-    apLog_Info((LOG_CHANNEL, "VpModule::Protocol_Offline", "Setting %d locations to wait for online", locations_.Count()));
+    apLog_Info((LOG_CHANNEL, LOG_CONTEXT, "Setting %d locations to wait for online", locations_.Count()));
 
     LocationListIterator iter(locations_);
     for (LocationListNode* pNode = 0; pNode = iter.Next(); ) {
@@ -764,7 +763,7 @@ AP_MSG_HANDLER_METHOD(VpModule, Protocol_LeaveRoomComplete)
     if (pLocation->getState() == Location::State_NotEntered) {
       Msg_Vp_DestroyLocation msg;
       msg.hLocation = pLocation->apHandle();
-      if (!msg.Request()) { throw ApException("Msg_Vp_DestroyLocation failed loc=" ApHandleFormat "", ApHandleType(msg.hLocation)); }
+      if (!msg.Request()) { throw ApException(LOG_CONTEXT, "Msg_Vp_DestroyLocation failed loc=" ApHandleFormat "", ApHandlePrintf(msg.hLocation)); }
     }
   }
 }
@@ -775,7 +774,7 @@ AP_MSG_HANDLER_METHOD(VpModule, Protocol_ParticipantEntered)
   if (pLocation) {
     int ok = pLocation->addParticipant(pMsg->hParticipant);
     if (!ok) {
-      apLog_Error((LOG_CHANNEL, "VpModule::Protocol_ParticipantEntered", "" ApHandleFormat "->addParticipant(" ApHandleFormat ") failed", ApHandleType(pLocation->apHandle()), ApHandleType(pMsg->hParticipant)));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "" ApHandleFormat "->addParticipant(" ApHandleFormat ") failed", ApHandlePrintf(pLocation->apHandle()), ApHandlePrintf(pMsg->hParticipant)));
     } else {
       setParticipantLocationMapping(pMsg->hParticipant, pLocation->apHandle());
     }
@@ -799,12 +798,12 @@ AP_MSG_HANDLER_METHOD(VpModule, Protocol_ParticipantLeft)
   if (pLocation) {
     int ok = pLocation->removeParticipant(pMsg->hParticipant);
     if (!ok) {
-      apLog_Error((LOG_CHANNEL, "VpModule::Protocol_ParticipantLeft", "" ApHandleFormat "->removeParticipant(" ApHandleFormat ") failed", ApHandleType(pLocation->apHandle()), ApHandleType(pMsg->hParticipant)));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "" ApHandleFormat "->removeParticipant(" ApHandleFormat ") failed", ApHandlePrintf(pLocation->apHandle()), ApHandlePrintf(pMsg->hParticipant)));
     } else {
       unsetParticipantLocationMapping(pMsg->hParticipant, pLocation->apHandle());
     }
   } else {
-    apLog_Warning((LOG_CHANNEL, "VpModule::Protocol_ParticipantLeft", "No location for room=" ApHandleFormat "", ApHandleType(pMsg->hRoom)));
+    apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "No location for room=" ApHandleFormat "", ApHandlePrintf(pMsg->hRoom)));
   }
 }
 
@@ -1038,7 +1037,7 @@ AP_MSG_HANDLER_METHOD(VpModule, VpView_SubscribeLocationDetail)
 {
   Location* pLocation = findLocation(pMsg->hLocation);
   if (pLocation) {
-    if (!pLocation->subscribeDetail(pMsg->sKey, pMsg->sValue, pMsg->sMimeType)) { throw ApException("pLocation->subscribeDetail() failed: part=" ApHandleFormat " key=%s", ApHandleType(pMsg->hLocation), StringType(pMsg->sKey)); }
+    if (!pLocation->subscribeDetail(pMsg->sKey, pMsg->sValue, pMsg->sMimeType)) { throw ApException(LOG_CONTEXT, "pLocation->subscribeDetail() failed: part=" ApHandleFormat " key=%s", ApHandlePrintf(pMsg->hLocation), _sz(pMsg->sKey)); }
   }
   pMsg->apStatus = ApMessage::Ok;
 }
@@ -1047,7 +1046,7 @@ AP_MSG_HANDLER_METHOD(VpModule, VpView_UnsubscribeLocationDetail)
 {
   Location* pLocation = findLocation(pMsg->hLocation);
   if (pLocation) { 
-    if (!pLocation->unsubscribeDetail(pMsg->sKey)) { throw ApException("pLocation->unsubscribeDetail() failed: part=" ApHandleFormat " key=%s", ApHandleType(pMsg->hLocation), StringType(pMsg->sKey)); }
+    if (!pLocation->unsubscribeDetail(pMsg->sKey)) { throw ApException(LOG_CONTEXT, "pLocation->unsubscribeDetail() failed: part=" ApHandleFormat " key=%s", ApHandlePrintf(pMsg->hLocation), _sz(pMsg->sKey)); }
   }
   pMsg->apStatus = ApMessage::Ok;
 }
@@ -1074,7 +1073,7 @@ AP_MSG_HANDLER_METHOD(VpModule, VpView_SubscribeContextDetail)
 {
   Context* pContext = findContext(pMsg->hContext);
   if (pContext) {
-    if (!pContext->subscribeDetail(pMsg->sKey, pMsg->sValue, pMsg->sMimeType)) { throw ApException("pContext->subscribeDetail() failed: part=" ApHandleFormat " key=%s", ApHandleType(pMsg->hContext), StringType(pMsg->sKey)); }
+    if (!pContext->subscribeDetail(pMsg->sKey, pMsg->sValue, pMsg->sMimeType)) { throw ApException(LOG_CONTEXT, "pContext->subscribeDetail() failed: part=" ApHandleFormat " key=%s", ApHandlePrintf(pMsg->hContext), _sz(pMsg->sKey)); }
   }
   pMsg->apStatus = ApMessage::Ok;
 }
@@ -1083,7 +1082,7 @@ AP_MSG_HANDLER_METHOD(VpModule, VpView_UnsubscribeContextDetail)
 {
   Context* pContext = findContext(pMsg->hContext);
   if (pContext) { 
-    if (!pContext->unsubscribeDetail(pMsg->sKey)) { throw ApException("pContext->unsubscribeDetail() failed: part=" ApHandleFormat " key=%s", ApHandleType(pMsg->hContext), StringType(pMsg->sKey)); }
+    if (!pContext->unsubscribeDetail(pMsg->sKey)) { throw ApException(LOG_CONTEXT, "pContext->unsubscribeDetail() failed: part=" ApHandleFormat " key=%s", ApHandlePrintf(pMsg->hContext), _sz(pMsg->sKey)); }
   }
   pMsg->apStatus = ApMessage::Ok;
 }
@@ -1113,7 +1112,7 @@ AP_MSG_HANDLER_METHOD(VpModule, VpView_GetParticipantDetailString)
 {
   Participant* pParticipant = findParticipant(pMsg->hParticipant);
   if (pParticipant) {
-    if (!pParticipant->getDetailString(pMsg->sKey, pMsg->vlMimeTypes, pMsg->sValue, pMsg->sMimeType)) { throw ApException("Not available: part=" ApHandleFormat " key=%s", ApHandleType(pMsg->hParticipant), StringType(pMsg->sKey)); }
+    if (!pParticipant->getDetailString(pMsg->sKey, pMsg->vlMimeTypes, pMsg->sValue, pMsg->sMimeType)) { throw ApException(LOG_CONTEXT, "Not available: part=" ApHandleFormat " key=%s", ApHandlePrintf(pMsg->hParticipant), _sz(pMsg->sKey)); }
   }
   pMsg->apStatus = ApMessage::Ok;
 }
@@ -1122,7 +1121,7 @@ AP_MSG_HANDLER_METHOD(VpModule, VpView_GetParticipantDetailData)
 {
   Participant* pParticipant = findParticipant(pMsg->hParticipant);
   if (pParticipant) {
-    if (!pParticipant->getDetailData(pMsg->sKey, pMsg->vlMimeTypes, pMsg->sbData, pMsg->sMimeType, pMsg->sSource)) { throw ApException("Not available: part=" ApHandleFormat " key=%s", ApHandleType(pMsg->hParticipant), StringType(pMsg->sKey)); }
+    if (!pParticipant->getDetailData(pMsg->sKey, pMsg->vlMimeTypes, pMsg->sbData, pMsg->sMimeType, pMsg->sSource)) { throw ApException(LOG_CONTEXT, "Not available: part=" ApHandleFormat " key=%s", ApHandlePrintf(pMsg->hParticipant), _sz(pMsg->sKey)); }
   }
   pMsg->apStatus = ApMessage::Ok;
 }
@@ -1131,7 +1130,7 @@ AP_MSG_HANDLER_METHOD(VpModule, VpView_GetParticipantDetailUrl)
 {
   Participant* pParticipant = findParticipant(pMsg->hParticipant);
   if (pParticipant) {
-    if (!pParticipant->getDetailUrl(pMsg->sKey, pMsg->vlMimeTypes, pMsg->sUrl, pMsg->sMimeType)) { throw ApException("Not available: part=" ApHandleFormat " key=%s", ApHandleType(pMsg->hParticipant), StringType(pMsg->sKey)); }
+    if (!pParticipant->getDetailUrl(pMsg->sKey, pMsg->vlMimeTypes, pMsg->sUrl, pMsg->sMimeType)) { throw ApException(LOG_CONTEXT, "Not available: part=" ApHandleFormat " key=%s", ApHandlePrintf(pMsg->hParticipant), _sz(pMsg->sKey)); }
   }
   pMsg->apStatus = ApMessage::Ok;
 }
@@ -1140,7 +1139,7 @@ AP_MSG_HANDLER_METHOD(VpModule, VpView_SubscribeParticipantDetail)
 {
   Participant* pParticipant = findParticipant(pMsg->hParticipant);
   if (pParticipant) {
-    if (!pParticipant->subscribeDetail(pMsg->sKey, pMsg->vlMimeTypes)) { throw ApException("pParticipant->subscribeDetail() failed: part=" ApHandleFormat " key=%s", ApHandleType(pMsg->hParticipant), StringType(pMsg->sKey)); }
+    if (!pParticipant->subscribeDetail(pMsg->sKey, pMsg->vlMimeTypes)) { throw ApException(LOG_CONTEXT, "pParticipant->subscribeDetail() failed: part=" ApHandleFormat " key=%s", ApHandlePrintf(pMsg->hParticipant), _sz(pMsg->sKey)); }
     pMsg->bAvailable = pParticipant->isDetailAvailable(pMsg->sKey, pMsg->vlMimeTypes);
   }
   pMsg->apStatus = ApMessage::Ok;
@@ -1150,7 +1149,7 @@ AP_MSG_HANDLER_METHOD(VpModule, VpView_UnsubscribeParticipantDetail)
 {
   Participant* pParticipant = findParticipant(pMsg->hParticipant);
   if (pParticipant) { 
-    if (!pParticipant->unsubscribeDetail(pMsg->sKey, pMsg->vlMimeTypes)) { throw ApException("pParticipant->unsubscribeDetail() failed: part=" ApHandleFormat " key=%s", ApHandleType(pMsg->hParticipant), StringType(pMsg->sKey)); }
+    if (!pParticipant->unsubscribeDetail(pMsg->sKey, pMsg->vlMimeTypes)) { throw ApException(LOG_CONTEXT, "pParticipant->unsubscribeDetail() failed: part=" ApHandleFormat " key=%s", ApHandlePrintf(pMsg->hParticipant), _sz(pMsg->sKey)); }
   }
   pMsg->apStatus = ApMessage::Ok;
 }
@@ -1161,7 +1160,7 @@ AP_MSG_HANDLER_METHOD(VpModule, VpView_Profile_Create)
 {
   DisplayProfile* pProfile = 0;
   if (participantSubscriptionProfiles_.Get(pMsg->hProfile, pProfile)) {
-    throw ApException("profiles_.Get() profile=" ApHandleFormat " already exists", ApHandleType(pMsg->hProfile));
+    throw ApException(LOG_CONTEXT, "profiles_.Get() profile=" ApHandleFormat " already exists", ApHandlePrintf(pMsg->hProfile));
   }
 
   pProfile = new DisplayProfile(pMsg->hProfile);
@@ -1214,7 +1213,7 @@ AP_MSG_HANDLER_METHOD(VpModule, VpView_Profile_Delete)
 AP_MSG_HANDLER_METHOD(VpModule, Vp_SendPublicChat)
 {
   Location* pLocation = findLocation(pMsg->hLocation);
-  if (pLocation == 0)  { throw ApException("findLocation failed loc=" ApHandleFormat "", ApHandleType(pMsg->hLocation)); }
+  if (pLocation == 0)  { throw ApException(LOG_CONTEXT, "findLocation failed loc=" ApHandleFormat "", ApHandlePrintf(pMsg->hLocation)); }
   pLocation->sendPublicChat(pMsg->sText);
   pMsg->apStatus = ApMessage::Ok;
 }
@@ -1222,7 +1221,7 @@ AP_MSG_HANDLER_METHOD(VpModule, Vp_SendPublicChat)
 AP_MSG_HANDLER_METHOD(VpModule, Vp_SendPosition)
 {
   Location* pLocation = findLocation(pMsg->hLocation);
-  if (pLocation == 0)  { throw ApException("findLocation failed loc=" ApHandleFormat "", ApHandleType(pMsg->hLocation)); }
+  if (pLocation == 0)  { throw ApException(LOG_CONTEXT, "findLocation failed loc=" ApHandleFormat "", ApHandlePrintf(pMsg->hLocation)); }
   pLocation->setPosition(pMsg->kvParams);
   pMsg->apStatus = ApMessage::Ok;
 }
@@ -1230,7 +1229,7 @@ AP_MSG_HANDLER_METHOD(VpModule, Vp_SendPosition)
 AP_MSG_HANDLER_METHOD(VpModule, Vp_SendCondition)
 {
   Location* pLocation = findLocation(pMsg->hLocation);
-  if (pLocation == 0)  { throw ApException("findLocation failed loc=" ApHandleFormat "", ApHandleType(pMsg->hLocation)); }
+  if (pLocation == 0)  { throw ApException(LOG_CONTEXT, "findLocation failed loc=" ApHandleFormat "", ApHandlePrintf(pMsg->hLocation)); }
   pLocation->setCondition(pMsg->kvParams);
   pMsg->apStatus = ApMessage::Ok;
 }
@@ -1248,7 +1247,7 @@ String VpModule::getItemDataExternUrl(const String& sIdentityUrl, const String& 
   url.setFile(MODULE_NAME);
   
   String sQuery;
-  sQuery.appendf("%s|%s|%s", StringType(sIdentityUrl), StringType(sItemId), StringType(Apollo::getUniqueId()));
+  sQuery.appendf("%s|%s|%s", _sz(sIdentityUrl), _sz(sItemId), _sz(Apollo::getUniqueId()));
   url.setQuery(sQuery);
 
   return url();
@@ -1268,19 +1267,19 @@ AP_MSG_HANDLER_METHOD(VpModule, HttpServer_Request)
       sQuery.nextToken("|", sUrl);
       sQuery.nextToken("|", sId);
 
-      if (sUrl.empty() || sId.empty()) { throw ApException("url=%s or id=%s empty: uri=%s", StringType(sUrl), StringType(sId), StringType(pMsg->sUri)); }
+      if (sUrl.empty() || sId.empty()) { throw ApException(LOG_CONTEXT, "url=%s or id=%s empty: uri=%s", _sz(sUrl), _sz(sId), _sz(pMsg->sUri)); }
 
       Msg_Identity_IsItemDataAvailable msgIIDA;
       msgIIDA.sUrl = sUrl;
       msgIIDA.sId = sId;
-      if (!msgIIDA.Request()) { throw ApException("Msg_Identity_IsItemDataAvailable failed: url=%s id=%s", StringType(sUrl), StringType(sId)); }
+      if (!msgIIDA.Request()) { throw ApException(LOG_CONTEXT, "Msg_Identity_IsItemDataAvailable failed: url=%s id=%s", _sz(sUrl), _sz(sId)); }
       if (msgIIDA.bAvailable) {
 
         // Return data
         Msg_Identity_GetItemData msgIGID;
         msgIGID.sUrl = sUrl;
         msgIGID.sId = sId;
-        if (!msgIGID.Request()) { throw ApException("Msg_Identity_GetItemData failed: url=%s id=%s", StringType(sUrl), StringType(sId)); }
+        if (!msgIGID.Request()) { throw ApException(LOG_CONTEXT, "Msg_Identity_GetItemData failed: url=%s id=%s", _sz(sUrl), _sz(sId)); }
 
         Msg_HttpServer_SendResponse msgSHR;
         msgSHR.hConnection = pMsg->hConnection;
@@ -1289,7 +1288,7 @@ AP_MSG_HANDLER_METHOD(VpModule, HttpServer_Request)
         msgSHR.kvHeader.add("Cache-Control", "no-store, no-cache, must-revalidate, post-check=0, pre-check=0");
         msgSHR.kvHeader.add("Expires", "Thu, 19 Nov 1981 08:52:00 GMT");
         msgSHR.sbBody = msgIGID.sbData;
-        if (!msgSHR.Request()) { throw ApException("Msg_HttpServer_SendResponse failed: conn=" ApHandleFormat "", ApHandleType(msgSHR.hConnection)); }
+        if (!msgSHR.Request()) { throw ApException(LOG_CONTEXT, "Msg_HttpServer_SendResponse failed: conn=" ApHandleFormat "", ApHandlePrintf(msgSHR.hConnection)); }
 
       } else {
 
@@ -1297,14 +1296,14 @@ AP_MSG_HANDLER_METHOD(VpModule, HttpServer_Request)
         Msg_Identity_GetItem msgIGI;
         msgIGI.sUrl = sUrl;
         msgIGI.sId = sId;
-        if (!msgIGI.Request()) { throw ApException("Msg_Identity_GetItem failed: url=%s id=%s", StringType(sUrl), StringType(sId)); }
+        if (!msgIGI.Request()) { throw ApException(LOG_CONTEXT, "Msg_Identity_GetItem failed: url=%s id=%s", _sz(sUrl), _sz(sId)); }
 
         Msg_HttpServer_SendResponse msgSHR;
         msgSHR.hConnection = pMsg->hConnection;
         msgSHR.nStatus = 302;
         msgSHR.sMessage = "Found";
         msgSHR.kvHeader.add("Location", msgIGI.sSrc);
-        if (!msgSHR.Request()) { throw ApException("Msg_HttpServer_SendResponse failed: conn=" ApHandleFormat "", ApHandleType(msgSHR.hConnection)); }
+        if (!msgSHR.Request()) { throw ApException(LOG_CONTEXT, "Msg_HttpServer_SendResponse failed: conn=" ApHandleFormat "", ApHandlePrintf(msgSHR.hConnection)); }
 
       }
 
@@ -1313,7 +1312,7 @@ AP_MSG_HANDLER_METHOD(VpModule, HttpServer_Request)
 
     } catch (ApException& ex) {
 
-      apLog_Warning((LOG_CHANNEL, "VpModule::HttpServer_Request", "%s", StringType(ex.getText())));
+      apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "%s", _sz(ex.getText())));
   
       Msg_HttpServer_SendResponse msgSHR;
       msgSHR.hConnection = pMsg->hConnection;
@@ -1326,7 +1325,7 @@ AP_MSG_HANDLER_METHOD(VpModule, HttpServer_Request)
       String sBody = ex.getText();
       msgSHR.sbBody.SetData(sBody);
       if (!msgSHR.Request()) {
-        { throw ApException("Msg_HttpServer_SendResponse (for error message) failed: conn=" ApHandleFormat "", ApHandleType(msgSHR.hConnection)); }
+        { throw ApException(LOG_CONTEXT, "Msg_HttpServer_SendResponse (for error message) failed: conn=" ApHandleFormat "", ApHandlePrintf(msgSHR.hConnection)); }
       } else {
         pMsg->Stop();
         pMsg->apStatus = ApMessage::Ok;

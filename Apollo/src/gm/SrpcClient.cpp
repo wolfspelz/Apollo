@@ -5,9 +5,8 @@
 // ============================================================================
 
 #include "Apollo.h"
-#include "ApLog.h"
-#include "MsgIdentity.h"
 #include "Local.h"
+#include "MsgIdentity.h"
 #include "SrpcClient.h"
 
 int SrpcClient::Post(const String& sUrl, SrpcMessage& srpc)
@@ -20,7 +19,7 @@ int SrpcClient::Post(const String& sUrl, SrpcMessage& srpc)
 int SrpcClient::OnConnected()
 {
   int ok = 1;
-  apLog_Verbose((MODULE_NAME, "SrpcClient::OnConnected", "url=%s " ApHandleFormat "", StringType(sUrl_), ApHandleType(hAp_)));
+  apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "url=%s " ApHandleFormat "", _sz(sUrl_), ApHandlePrintf(hAp_)));
   return ok;
 }
 
@@ -34,14 +33,14 @@ int SrpcClient::OnHeader(int nStatus, Apollo::KeyValueList& kvHeaders)
     if (String::toLower(e->getKey()) == "content-type") {
       sContentType_ = String::toLower(e->getString());
     }
-    apLog_VeryVerbose((MODULE_NAME, "SrpcClient::OnHeader", "url=%s " ApHandleFormat " header: [%s][%s]", StringType(sUrl_), ApHandleType(hAp_), StringType(e->getKey()), StringType(e->getString())));
+    apLog_VeryVerbose((LOG_CHANNEL, LOG_CONTEXT, "url=%s " ApHandleFormat " header: [%s][%s]", _sz(sUrl_), ApHandlePrintf(hAp_), _sz(e->getKey()), _sz(e->getString())));
   }
 
   if (sContentType_.contains("text/plain")) {
     bContentTypeOk_ = 1;
   }
 
-  apLog_Verbose((MODULE_NAME, "SrpcClient::OnHeader", "url=%s " ApHandleFormat " sContentType_=%s", StringType(sUrl_), ApHandleType(hAp_), StringType(sContentType_)));
+  apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "url=%s " ApHandleFormat " sContentType_=%s", _sz(sUrl_), ApHandlePrintf(hAp_), _sz(sContentType_)));
   
   return ok;
 }
@@ -50,7 +49,7 @@ int SrpcClient::OnDataIn(unsigned char* pData, size_t nLen)
 {
   int ok = 1;
   
-  apLog_VeryVerbose((MODULE_NAME, "SrpcClient::OnDataIn", "url=%s " ApHandleFormat " nStatus=%d sContentType_=%s buflen=%d", StringType(sUrl_), ApHandleType(hAp_), nStatus_, StringType(sContentType_), sbData_.Length() + nLen));
+  apLog_VeryVerbose((LOG_CHANNEL, LOG_CONTEXT, "url=%s " ApHandleFormat " nStatus=%d sContentType_=%s buflen=%d", _sz(sUrl_), ApHandlePrintf(hAp_), nStatus_, _sz(sContentType_), sbData_.Length() + nLen));
   
   if (nStatus_ == 200 && bContentTypeOk_ && sbData_.Length() + nLen < (unsigned int) Apollo::getModuleConfig(MODULE_NAME, "Srpc/MaxDataSize", 30000)) {
     sbData_.Append(pData, nLen);
@@ -73,7 +72,7 @@ int SrpcClient::OnClosed()
 {
   int ok = 1;
 
-  apLog_Verbose((MODULE_NAME, "SrpcClient::OnClosed", "url=%s " ApHandleFormat "", StringType(sUrl_), ApHandleType(hAp_)));
+  apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "url=%s " ApHandleFormat "", _sz(sUrl_), ApHandlePrintf(hAp_)));
 
   int bSuccess = 0;
 
@@ -96,7 +95,7 @@ int SrpcClient::OnClosed()
       }
     }
   } else {
-    sError_.appendf("HTTP status=%d content-type=%s cancelled= data-length=%d", nStatus_, StringType(sContentType_), bCancelled_, sbData_.Length());
+    sError_.appendf("HTTP status=%d content-type=%s cancelled= data-length=%d", nStatus_, _sz(sContentType_), bCancelled_, sbData_.Length());
   }
 
   if (!bSuccess) {

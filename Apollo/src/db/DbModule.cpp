@@ -5,7 +5,6 @@
 // ============================================================================
 
 #include "Apollo.h"
-#include "ApLog.h"
 #include "Local.h"
 #include "DbModule.h"
 
@@ -16,7 +15,7 @@ AP_MSG_HANDLER_METHOD(DbModule, DB_Open)
   SQLiteFile* pFile = lFiles_.FindByName(pMsg->sName);
   if (pFile != 0) {
     ok = 1;
-    apLog_Warning((LOG_CHANNEL, "DbModule::On_DB_Open", "DB file already open: %s %s", StringType(pMsg->sName), StringType(pMsg->sFilePath)));
+    apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "DB file already open: %s %s", _sz(pMsg->sName), _sz(pMsg->sFilePath)));
   } else {
     String sFilePath = pMsg->sFilePath;
     if (sFilePath.empty()) {
@@ -27,21 +26,21 @@ AP_MSG_HANDLER_METHOD(DbModule, DB_Open)
     if (pFile != 0) {
       ok = pFile->open();
       if (!ok) {
-        apLog_Error((LOG_CHANNEL, "DbModule::On_DB_Open", "DB file open failed: %s %s", StringType(pMsg->sName), StringType(pMsg->sFilePath)));
+        apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "DB file open failed: %s %s", _sz(pMsg->sName), _sz(pMsg->sFilePath)));
       }
     }
 
     if (ok) {
       ok = pFile->check();
       if (!ok) {
-        apLog_Error((LOG_CHANNEL, "DbModule::On_DB_Open", "check() failed: %s %s", StringType(pMsg->sName), StringType(pMsg->sFilePath)));
+        apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "check() failed: %s %s", _sz(pMsg->sName), _sz(pMsg->sFilePath)));
       }
     }
 
     if (ok) {
       ok = pFile->beginTransaction();
       if (!ok) {
-        apLog_Error((LOG_CHANNEL, "DbModule::On_DB_Open", "beginTransaction() failed: %s %s", StringType(pMsg->sName), StringType(pMsg->sFilePath)));
+        apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "beginTransaction() failed: %s %s", _sz(pMsg->sName), _sz(pMsg->sFilePath)));
       }
     }
 
@@ -62,18 +61,18 @@ AP_MSG_HANDLER_METHOD(DbModule, DB_Close)
 
   SQLiteFile* pFile = lFiles_.FindByName(pMsg->sName);
   if (pFile == 0) {
-    apLog_Error((LOG_CHANNEL, "DbModule::On_DB_Close", "DB file not found: %s", StringType(pMsg->sName)));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "DB file not found: %s", _sz(pMsg->sName)));
   } else {
     ok = 1;
 
     ok = pFile->commitTransaction();
     if (!ok) {
-      apLog_Error((LOG_CHANNEL, "DbModule::On_DB_Open", "commitTransaction() failed: %s", StringType(pMsg->sName)));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "commitTransaction() failed: %s", _sz(pMsg->sName)));
     }
 
     ok = pFile->close();
     if (!ok) {
-      apLog_Error((LOG_CHANNEL, "DbModule::On_DB_Close", "DB file close failed: %s", StringType(pMsg->sName)));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "DB file close failed: %s", _sz(pMsg->sName)));
     } else {
       lFiles_.Remove(pFile);
       delete pFile;
@@ -90,7 +89,7 @@ AP_MSG_HANDLER_METHOD(DbModule, DB_Set)
 
   SQLiteFile* pFile = lFiles_.FindByName(pMsg->sName);
   if (pFile == 0) {
-    apLog_Error((LOG_CHANNEL, "DbModule::On_DB_Set", "DB file not found: %s", StringType(pMsg->sName)));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "DB file not found: %s", _sz(pMsg->sName)));
   } else {
     ok = pFile->setValue(pMsg->sKey, pMsg->sValue, pMsg->nLifeTime);
   }
@@ -104,7 +103,7 @@ AP_MSG_HANDLER_METHOD(DbModule, DB_SetBinary)
 
   SQLiteFile* pFile = lFiles_.FindByName(pMsg->sName);
   if (pFile == 0) {
-    apLog_Error((LOG_CHANNEL, "DbModule::On_DB_SetBinary", "DB file not found: %s", StringType(pMsg->sName)));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "DB file not found: %s", _sz(pMsg->sName)));
   } else {
     ok = pFile->setValue(pMsg->sKey, pMsg->sbValue.Data(), pMsg->sbValue.Length(), pMsg->nLifeTime);
   }
@@ -115,16 +114,16 @@ AP_MSG_HANDLER_METHOD(DbModule, DB_SetBinary)
 AP_MSG_HANDLER_METHOD(DbModule, DB_HasKey)
 {
   SQLiteFile* pFile = lFiles_.FindByName(pMsg->sName);
-  if (pFile == 0) { throw ApException("DB file not found: %s", StringType(pMsg->sName)); }
-  if (!pFile->hasValue(pMsg->sKey, pMsg->bAvailable)) { throw ApException("pFile->hasValue() failed"); }
+  if (pFile == 0) { throw ApException(LOG_CONTEXT, "DB file not found: %s", _sz(pMsg->sName)); }
+  if (!pFile->hasValue(pMsg->sKey, pMsg->bAvailable)) { throw ApException(LOG_CONTEXT, "pFile->hasValue() failed"); }
   pMsg->apStatus = ApMessage::Ok;
 }
 
 AP_MSG_HANDLER_METHOD(DbModule, DB_Get)
 {
   SQLiteFile* pFile = lFiles_.FindByName(pMsg->sName);
-  if (pFile == 0) { throw ApException("DB file not found: %s", StringType(pMsg->sName)); }
-  if (!pFile->getValue(pMsg->sKey, pMsg->sValue)) { throw ApException("pFile->getValue() failed"); }
+  if (pFile == 0) { throw ApException(LOG_CONTEXT, "DB file not found: %s", _sz(pMsg->sName)); }
+  if (!pFile->getValue(pMsg->sKey, pMsg->sValue)) { throw ApException(LOG_CONTEXT, "pFile->getValue() failed"); }
   pMsg->apStatus = ApMessage::Ok;
 }
 
@@ -134,7 +133,7 @@ AP_MSG_HANDLER_METHOD(DbModule, DB_GetBinary)
 
   SQLiteFile* pFile = lFiles_.FindByName(pMsg->sName);
   if (pFile == 0) {
-    apLog_Error((LOG_CHANNEL, "DbModule::On_DB_GetBinary", "DB file not found: %s", StringType(pMsg->sName)));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "DB file not found: %s", _sz(pMsg->sName)));
   } else {
     ok = pFile->getValue(pMsg->sKey, pMsg->sbValue);
   }
@@ -148,7 +147,7 @@ AP_MSG_HANDLER_METHOD(DbModule, DB_GetKeys)
 
   SQLiteFile* pFile = lFiles_.FindByName(pMsg->sName);
   if (pFile == 0) {
-    apLog_Error((LOG_CHANNEL, "DbModule::On_DB_GetKeys", "DB file not found: %s", StringType(pMsg->sName)));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "DB file not found: %s", _sz(pMsg->sName)));
   } else {
     ok = pFile->getKeys(pMsg->vlKeys);
   }
@@ -162,7 +161,7 @@ AP_MSG_HANDLER_METHOD(DbModule, DB_Delete)
 
   SQLiteFile* pFile = lFiles_.FindByName(pMsg->sName);
   if (pFile == 0) {
-    apLog_Error((LOG_CHANNEL, "DbModule::On_DB_Delete", "DB file not found: %s", StringType(pMsg->sName)));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "DB file not found: %s", _sz(pMsg->sName)));
   } else {
     ok = pFile->deleteValue(pMsg->sKey);
   }
@@ -246,7 +245,7 @@ AP_MSG_HANDLER_METHOD(DbModule, System_10SecTimer)
   for (SQLiteFile* pFile = 0; (pFile = lFiles_.Next(pFile)) != 0; ) {
     if (pFile->isChanged()) {
       if (! pFile->sync()) {
-        apLog_Warning((LOG_CHANNEL, "DbModule::On_System_10SecTimer", "pFile->sync() failed (%s)", StringType(pFile->getFilePath())));
+        apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "pFile->sync() failed (%s)", _sz(pFile->getFilePath())));
       }
     }
   }
@@ -276,16 +275,16 @@ static String Test_Db_String()
     msg.sName = "test";
     msg.sKey = "test-string";
     msg.sValue = sString;
-    if (!msg.Request()) { s.appendf("%s %s %s failed", StringType(msg.getName()), StringType(msg.sName), StringType(msg.sKey)); }
+    if (!msg.Request()) { s.appendf("%s %s %s failed", _sz(msg.getName()), _sz(msg.sName), _sz(msg.sKey)); }
     if (bSyncToDisk) { Msg_DB_Sync msg; msg.sName = "test"; msg.Request(); }
   }
   if (!s) {
     Msg_DB_Get msg;
     msg.sName = "test";
     msg.sKey = "test-string";
-    if (!msg.Request()) { s.appendf("%s %s %s failed", StringType(msg.getName()), StringType(msg.sName), StringType(msg.sKey)); }
+    if (!msg.Request()) { s.appendf("%s %s %s failed", _sz(msg.getName()), _sz(msg.sName), _sz(msg.sKey)); }
     String sValue = msg.sValue;
-    if (!s) { if (sValue != sString) { s.appendf("%s %s %s wrong value", StringType(msg.getName()), StringType(msg.sName), StringType(msg.sKey)); } }
+    if (!s) { if (sValue != sString) { s.appendf("%s %s %s wrong value", _sz(msg.getName()), _sz(msg.sName), _sz(msg.sKey)); } }
   }
 
   { Msg_DB_Close msg; msg.sName = "test"; msg.Request(); }
@@ -311,31 +310,31 @@ static String Test_Db_Binary()
     msg.sName = "test";
     msg.sKey = "test-binary";
     msg.sbValue.SetData((const unsigned char*) sBinary.c_str(), sBinary.bytes());
-    if (!msg.Request()) { s.appendf("%s %s %s failed", StringType(msg.getName()), StringType(msg.sName), StringType(msg.sKey)); }
+    if (!msg.Request()) { s.appendf("%s %s %s failed", _sz(msg.getName()), _sz(msg.sName), _sz(msg.sKey)); }
     if (bSyncToDisk) { Msg_DB_Sync msg; msg.sName = "test"; msg.Request(); }
   }
   if (!s) {
     Msg_DB_Get msg;
     msg.sName = "test";
     msg.sKey = "test-binary";
-    if (!msg.Request()) { s.appendf("%s %s %s failed", StringType(msg.getName()), StringType(msg.sName), StringType(msg.sKey)); }
+    if (!msg.Request()) { s.appendf("%s %s %s failed", _sz(msg.getName()), _sz(msg.sName), _sz(msg.sKey)); }
     String sValue = msg.sValue;
-    if (!s) { if (sValue != sBinary) { s.appendf("%s %s %s wrong value", StringType(msg.getName()), StringType(msg.sName), StringType(msg.sKey)); } }
+    if (!s) { if (sValue != sBinary) { s.appendf("%s %s %s wrong value", _sz(msg.getName()), _sz(msg.sName), _sz(msg.sKey)); } }
   }
   // Delete binary
   if (!s) {
     Msg_DB_Delete msg;
     msg.sName = "test";
     msg.sKey = "test-binary";
-    if (!msg.Request()) { s.appendf("%s %s %s failed", StringType(msg.getName()), StringType(msg.sName), StringType(msg.sKey)); }
+    if (!msg.Request()) { s.appendf("%s %s %s failed", _sz(msg.getName()), _sz(msg.sName), _sz(msg.sKey)); }
     if (bSyncToDisk) { Msg_DB_Sync msg; msg.sName = "test"; msg.Request(); }
   }
   if (!s) {
     Msg_DB_Get msg;
     msg.sName = "test";
     msg.sKey = "test-binary";
-    if (!msg.Request()) { s.appendf("%s %s %s failed", StringType(msg.getName()), StringType(msg.sName), StringType(msg.sKey)); }
-    if (!s) { if (msg.sValue != "") { s.appendf("%s %s %s wrong value", StringType(msg.getName()), StringType(msg.sName), StringType(msg.sKey)); } }
+    if (!msg.Request()) { s.appendf("%s %s %s failed", _sz(msg.getName()), _sz(msg.sName), _sz(msg.sKey)); }
+    if (!s) { if (msg.sValue != "") { s.appendf("%s %s %s wrong value", _sz(msg.getName()), _sz(msg.sName), _sz(msg.sKey)); } }
   }
 
   { Msg_DB_Close msg; msg.sName = "test"; msg.Request(); }
@@ -364,19 +363,19 @@ static String Test_Db_Bulk()
     msg.sName = "test";
     msg.sKey = "test-bulk";
     msg.sbValue.SetData(sbFile.Data(), sbFile.Length());
-    if (!msg.Request()) { s.appendf("%s %s %s failed", StringType(msg.getName()), StringType(msg.sName), StringType(msg.sKey)); }
+    if (!msg.Request()) { s.appendf("%s %s %s failed", _sz(msg.getName()), _sz(msg.sName), _sz(msg.sKey)); }
     if (bSyncToDisk) { Msg_DB_Sync msg; msg.sName = "test"; msg.Request(); }
   }
   if (!s) {
     Msg_DB_GetBinary msg;
     msg.sName = "test";
     msg.sKey = "test-bulk";
-    if (!msg.Request()) { s.appendf("%s %s %s failed", StringType(msg.getName()), StringType(msg.sName), StringType(msg.sKey)); }
+    if (!msg.Request()) { s.appendf("%s %s %s failed", _sz(msg.getName()), _sz(msg.sName), _sz(msg.sKey)); }
     if (!s) {
       int bEqual = (msg.sbValue.Length() == sbFile.Length());
       if (bEqual) { bEqual = !memcmp(sbFile.Data(), msg.sbValue.Data(), sbFile.Length()); }
       if (!bEqual) {
-        s.appendf("%s %s %s wrong value", StringType(msg.getName()), StringType(msg.sName), StringType(msg.sKey));
+        s.appendf("%s %s %s wrong value", _sz(msg.getName()), _sz(msg.sName), _sz(msg.sKey));
       }
     }
   }
@@ -404,16 +403,16 @@ static String Test_Db_UpdateString()
     msg.sName = "test";
     msg.sKey = "test-string";
     msg.sValue = sString;
-    if (!msg.Request()) { s.appendf("%s %s %s failed", StringType(msg.getName()), StringType(msg.sName), StringType(msg.sKey)); }
+    if (!msg.Request()) { s.appendf("%s %s %s failed", _sz(msg.getName()), _sz(msg.sName), _sz(msg.sKey)); }
     if (bSyncToDisk) { Msg_DB_Sync msg; msg.sName = "test"; msg.Request(); }
   }
   if (!s) {
     Msg_DB_Get msg;
     msg.sName = "test";
     msg.sKey = "test-string";
-    if (!msg.Request()) { s.appendf("%s %s %s failed", StringType(msg.getName()), StringType(msg.sName), StringType(msg.sKey)); }
+    if (!msg.Request()) { s.appendf("%s %s %s failed", _sz(msg.getName()), _sz(msg.sName), _sz(msg.sKey)); }
     String sValue = msg.sValue;
-    if (!s) { if (sValue != sString) { s.appendf("%s %s %s wrong value", StringType(msg.getName()), StringType(msg.sName), StringType(msg.sKey)); } }
+    if (!s) { if (sValue != sString) { s.appendf("%s %s %s wrong value", _sz(msg.getName()), _sz(msg.sName), _sz(msg.sKey)); } }
   }
   // Update string
   if (!s) {
@@ -421,30 +420,30 @@ static String Test_Db_UpdateString()
     msg.sName = "test";
     msg.sKey = "test-string";
     msg.sValue = sString2;
-    if (!msg.Request()) { s.appendf("%s %s %s failed", StringType(msg.getName()), StringType(msg.sName), StringType(msg.sKey)); }
+    if (!msg.Request()) { s.appendf("%s %s %s failed", _sz(msg.getName()), _sz(msg.sName), _sz(msg.sKey)); }
     if (bSyncToDisk) { Msg_DB_Sync msg; msg.sName = "test"; msg.Request(); }
   }
   if (!s) {
     Msg_DB_Get msg;
     msg.sName = "test";
     msg.sKey = "test-string";
-    if (!msg.Request()) { s.appendf("%s %s %s failed", StringType(msg.getName()), StringType(msg.sName), StringType(msg.sKey)); }
-    if (!s) { if (msg.sValue != sString2) { s.appendf("%s %s %s wrong value", StringType(msg.getName()), StringType(msg.sName), StringType(msg.sKey)); } }
+    if (!msg.Request()) { s.appendf("%s %s %s failed", _sz(msg.getName()), _sz(msg.sName), _sz(msg.sKey)); }
+    if (!s) { if (msg.sValue != sString2) { s.appendf("%s %s %s wrong value", _sz(msg.getName()), _sz(msg.sName), _sz(msg.sKey)); } }
   }
   // Delete string
   if (!s) {
     Msg_DB_Delete msg;
     msg.sName = "test";
     msg.sKey = "test-string";
-    if (!msg.Request()) { s.appendf("%s %s %s failed", StringType(msg.getName()), StringType(msg.sName), StringType(msg.sKey)); }
+    if (!msg.Request()) { s.appendf("%s %s %s failed", _sz(msg.getName()), _sz(msg.sName), _sz(msg.sKey)); }
     if (bSyncToDisk) { Msg_DB_Sync msg; msg.sName = "test"; msg.Request(); }
   }
   if (!s) {
     Msg_DB_Get msg;
     msg.sName = "test";
     msg.sKey = "test-string";
-    if (!msg.Request()) { s.appendf("%s %s %s failed", StringType(msg.getName()), StringType(msg.sName), StringType(msg.sKey)); }
-    if (!s) { if (msg.sValue != "") { s.appendf("%s %s %s wrong value", StringType(msg.getName()), StringType(msg.sName), StringType(msg.sKey)); } }
+    if (!msg.Request()) { s.appendf("%s %s %s failed", _sz(msg.getName()), _sz(msg.sName), _sz(msg.sKey)); }
+    if (!s) { if (msg.sValue != "") { s.appendf("%s %s %s wrong value", _sz(msg.getName()), _sz(msg.sName), _sz(msg.sKey)); } }
   }
 
   { Msg_DB_Close msg; msg.sName = "test"; msg.Request(); }
@@ -473,19 +472,19 @@ static String Test_Db_UpdateBulk()
     msg.sName = "test";
     msg.sKey = "test-bulk";
     msg.sbValue.SetData(sbFile.Data(), sbFile.Length());
-    if (!msg.Request()) { s.appendf("%s %s %s failed", StringType(msg.getName()), StringType(msg.sName), StringType(msg.sKey)); }
+    if (!msg.Request()) { s.appendf("%s %s %s failed", _sz(msg.getName()), _sz(msg.sName), _sz(msg.sKey)); }
     if (bSyncToDisk) { Msg_DB_Sync msg; msg.sName = "test"; msg.Request(); }
   }
   if (!s) {
     Msg_DB_GetBinary msg;
     msg.sName = "test";
     msg.sKey = "test-bulk";
-    if (!msg.Request()) { s.appendf("%s %s %s failed", StringType(msg.getName()), StringType(msg.sName), StringType(msg.sKey)); }
+    if (!msg.Request()) { s.appendf("%s %s %s failed", _sz(msg.getName()), _sz(msg.sName), _sz(msg.sKey)); }
     if (!s) {
       int bEqual = (msg.sbValue.Length() == sbFile.Length());
       if (bEqual) { bEqual = !memcmp(sbFile.Data(), msg.sbValue.Data(), sbFile.Length()); }
       if (!bEqual) {
-        s.appendf("%s %s %s wrong value", StringType(msg.getName()), StringType(msg.sName), StringType(msg.sKey));
+        s.appendf("%s %s %s wrong value", _sz(msg.getName()), _sz(msg.sName), _sz(msg.sKey));
       }
     }
   }
@@ -495,19 +494,19 @@ static String Test_Db_UpdateBulk()
     msg.sName = "test";
     msg.sKey = "test-bulk";
     msg.sbValue.SetData(sbFile2.Data(), sbFile2.Length());
-    if (!msg.Request()) { s.appendf("%s %s %s failed", StringType(msg.getName()), StringType(msg.sName), StringType(msg.sKey)); }
+    if (!msg.Request()) { s.appendf("%s %s %s failed", _sz(msg.getName()), _sz(msg.sName), _sz(msg.sKey)); }
     if (bSyncToDisk) { Msg_DB_Sync msg; msg.sName = "test"; msg.Request(); }
   }
   if (!s) {
     Msg_DB_GetBinary msg;
     msg.sName = "test";
     msg.sKey = "test-bulk";
-    if (!msg.Request()) { s.appendf("%s %s %s failed", StringType(msg.getName()), StringType(msg.sName), StringType(msg.sKey)); }
+    if (!msg.Request()) { s.appendf("%s %s %s failed", _sz(msg.getName()), _sz(msg.sName), _sz(msg.sKey)); }
     if (!s) {
       int bEqual = (msg.sbValue.Length() == sbFile2.Length());
       if (bEqual) { bEqual = !memcmp(sbFile2.Data(), msg.sbValue.Data(), sbFile2.Length()); }
       if (!bEqual) {
-        s.appendf("%s %s %s wrong value", StringType(msg.getName()), StringType(msg.sName), StringType(msg.sKey));
+        s.appendf("%s %s %s wrong value", _sz(msg.getName()), _sz(msg.sName), _sz(msg.sKey));
       }
     }
   }
@@ -516,7 +515,7 @@ static String Test_Db_UpdateBulk()
     Msg_DB_Delete msg;
     msg.sName = "test";
     msg.sKey = "test-bulk";
-    if (!msg.Request()) { s.appendf("%s %s %s failed", StringType(msg.getName()), StringType(msg.sName), StringType(msg.sKey)); }
+    if (!msg.Request()) { s.appendf("%s %s %s failed", _sz(msg.getName()), _sz(msg.sName), _sz(msg.sKey)); }
     if (bSyncToDisk) { Msg_DB_Sync msg; msg.sName = "test"; msg.Request(); }
   }
 
@@ -541,7 +540,7 @@ static String Test_Db_HasKey()
     msg.sName = "test";
     msg.sKey = "test-string";
     msg.sValue = "Hello World";
-    if (!msg.Request()) { s.appendf("%s %s %s failed", StringType(msg.getName()), StringType(msg.sName), StringType(msg.sKey)); }
+    if (!msg.Request()) { s.appendf("%s %s %s failed", _sz(msg.getName()), _sz(msg.sName), _sz(msg.sKey)); }
     if (bSyncToDisk) { Msg_DB_Sync msg; msg.sName = "test"; msg.Request(); }
   }
   // Check available
@@ -549,15 +548,15 @@ static String Test_Db_HasKey()
     Msg_DB_HasKey msg;
     msg.sName = "test";
     msg.sKey = "test-string";
-    if (!msg.Request()) { s.appendf("%s %s %s failed", StringType(msg.getName()), StringType(msg.sName), StringType(msg.sKey)); }
-    if (!s) { if (msg.bAvailable != 1) { s.appendf("%s %s %s expected available", StringType(msg.getName()), StringType(msg.sName), StringType(msg.sKey)); } }
+    if (!msg.Request()) { s.appendf("%s %s %s failed", _sz(msg.getName()), _sz(msg.sName), _sz(msg.sKey)); }
+    if (!s) { if (msg.bAvailable != 1) { s.appendf("%s %s %s expected available", _sz(msg.getName()), _sz(msg.sName), _sz(msg.sKey)); } }
   }
   // Delete string
   if (!s) {
     Msg_DB_Delete msg;
     msg.sName = "test";
     msg.sKey = "test-string";
-    if (!msg.Request()) { s.appendf("%s %s %s failed", StringType(msg.getName()), StringType(msg.sName), StringType(msg.sKey)); }
+    if (!msg.Request()) { s.appendf("%s %s %s failed", _sz(msg.getName()), _sz(msg.sName), _sz(msg.sKey)); }
     if (bSyncToDisk) { Msg_DB_Sync msg; msg.sName = "test"; msg.Request(); }
   }
   // Check available
@@ -565,8 +564,8 @@ static String Test_Db_HasKey()
     Msg_DB_HasKey msg;
     msg.sName = "test";
     msg.sKey = "test-string";
-    if (!msg.Request()) { s.appendf("%s %s %s failed", StringType(msg.getName()), StringType(msg.sName), StringType(msg.sKey)); }
-    if (!s) { if (msg.bAvailable != 0) { s.appendf("%s %s %s expected unavailable", StringType(msg.getName()), StringType(msg.sName), StringType(msg.sKey)); } }
+    if (!msg.Request()) { s.appendf("%s %s %s failed", _sz(msg.getName()), _sz(msg.sName), _sz(msg.sKey)); }
+    if (!s) { if (msg.bAvailable != 0) { s.appendf("%s %s %s expected unavailable", _sz(msg.getName()), _sz(msg.sName), _sz(msg.sKey)); } }
   }
 
   // Check availablity of not existing key
@@ -574,8 +573,8 @@ static String Test_Db_HasKey()
     Msg_DB_HasKey msg;
     msg.sName = "test";
     msg.sKey = "test-string-unavailable";
-    if (!msg.Request()) { s.appendf("%s %s %s failed", StringType(msg.getName()), StringType(msg.sName), StringType(msg.sKey)); }
-    if (!s) { if (msg.bAvailable != 0) { s.appendf("%s %s %s expected unavailable", StringType(msg.getName()), StringType(msg.sName), StringType(msg.sKey)); } }
+    if (!msg.Request()) { s.appendf("%s %s %s failed", _sz(msg.getName()), _sz(msg.sName), _sz(msg.sKey)); }
+    if (!s) { if (msg.bAvailable != 0) { s.appendf("%s %s %s expected unavailable", _sz(msg.getName()), _sz(msg.sName), _sz(msg.sKey)); } }
   }
 
   { Msg_DB_Close msg; msg.sName = "test"; msg.Request(); }
@@ -588,7 +587,7 @@ static String Test_Db_HasKey()
 
 void Test_Db_UnitTest_TokenEnd()
 {
-  apLog_Info((LOG_CHANNEL, "Test_Identity_Db_TokenEnd", "Finishing Test/Db"));
+  apLog_Info((LOG_CHANNEL, LOG_CONTEXT, "Finishing Test/Db"));
   { ApAsyncMessage<Msg_UnitTest_Token> msg; msg.Post(); }
 }
 
@@ -596,7 +595,7 @@ AP_MSG_HANDLER_METHOD(DbModule, UnitTest_Token)
 {
   AP_UNUSED_ARG(pMsg);
   { Msg_UnitTest_Token msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(DbModule, UnitTest_Token), this); }
-  apLog_Info((LOG_CHANNEL, "DbModule::UnitTest_Token", "Starting Test/Db"));
+  apLog_Info((LOG_CHANNEL, LOG_CONTEXT, "Starting Test/Db"));
   int bTokenEndNow = 1;
 
   if (Apollo::getConfig("Test/Db", 0)) {

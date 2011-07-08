@@ -4,6 +4,7 @@
 //
 // ============================================================================
 
+#include "Local.h"
 #include "MsgConfig.h"
 #include "MsgFile.h"
 #include "ApLog.h"
@@ -23,11 +24,11 @@ void HTTPRequestTask::ExecuteHTTP()
   int bSSL = 0;
   String sError;
   
-  apLog_Verbose((LOG_CHANNEL, "HTTPRequestTask::ExecuteHTTP", ApHandleFormat " Fetching url: %s...", ApHandleType(hAp_), StringType(sUrl_)));
+  apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, ApHandleFormat " Fetching url: %s...", ApHandlePrintf(hAp_), _sz(sUrl_)));
     
   if (url.protocol().empty() || url.host().empty() || url.portnum() == 0 || url.uri().empty()) {
-    sError.appendf("URL part missing: protocol=%s host=%s port=%d uri=%s", StringType(url.protocol()), StringType(url.host()), StringType(url.portnum()), StringType(url.uri()));
-    apLog_Warning((LOG_CHANNEL, "HTTPRequestTask::Execute", "%s", StringType(sError)));
+    sError.appendf("URL part missing: protocol=%s host=%s port=%d uri=%s", _sz(url.protocol()), _sz(url.host()), _sz(url.portnum()), _sz(url.uri()));
+    apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "%s", _sz(sError)));
     ok = 0;
   } else {
     if (0) {
@@ -36,23 +37,23 @@ void HTTPRequestTask::ExecuteHTTP()
     } else if (url.protocol() == "https") {
       bSSL = 1;
     } else {
-      sError.appendf("Protocol=%s not supported: url=%s", StringType(url.protocol()), StringType(url));
-      apLog_Warning((LOG_CHANNEL, "HTTPRequestTask::Execute", "%s", StringType(sError)));
+      sError.appendf("Protocol=%s not supported: url=%s", _sz(url.protocol()), _sz(url));
+      apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "%s", _sz(sError)));
       ok = 0;
     }
   }
 
   if (! (sMethod_ == "GET" || sMethod_ == "POST") ) {
-    sError.appendf("Method=%s not supported, url=%s", StringType(sMethod_), StringType(url));
-    apLog_Warning((LOG_CHANNEL, "HTTPRequestTask::Execute", "%s", StringType(sError)));
+    sError.appendf("Method=%s not supported, url=%s", _sz(sMethod_), _sz(url));
+    apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "%s", _sz(sError)));
     ok = 0;
   }
 
   ok = NetOS::HTTP_PerformRequest(ok, url, sMethod_, bSSL, sError, this);
   if (ok) {
-    apLog_Verbose((LOG_CHANNEL, "HTTPRequestTask::ExecuteHTTP", ApHandleFormat " ... Success", ApHandleType(hAp_)));
+    apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, ApHandleFormat " ... Success", ApHandlePrintf(hAp_)));
   } else {
-    apLog_Verbose((LOG_CHANNEL, "HTTPRequestTask::ExecuteHTTP", ApHandleFormat " ... Error: %s", ApHandleType(hAp_), StringType(sError)));
+    apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, ApHandleFormat " ... Error: %s", ApHandlePrintf(hAp_), _sz(sError)));
   }
 }
 
@@ -65,7 +66,7 @@ void HTTPRequestTask::ExecuteFile(String& sDataFilename)
     xFile fData(sDataFilename);
     if (!fData.Load()) {
       ok = 0;
-      sError.appendf("f.Load(%s) failed", StringType(sDataFilename));
+      sError.appendf("f.Load(%s) failed", _sz(sDataFilename));
     } else {
 
       {
@@ -164,7 +165,7 @@ void HTTPRequestTask::Execute()
 
     if (!NetModuleInstance::Get()->oHttp_.sHttpLog_.empty()) {
       String s;
-      s.appendf("[URL] %s\n", StringType(sUrl_));
+      s.appendf("[URL] %s\n", _sz(sUrl_));
 
       // Async because we are in a thread
       ApAsyncMessage<Msg_File_Append> msg;
@@ -241,7 +242,7 @@ int HttpManager::CancelRequest(const ApHandle& h)
       }
       if (pTask != 0) {
         if (pTask->GetHandle() != NULL) {
-          apLog_Error((LOG_CHANNEL, "HttpManager::CancelRequest", "pTask->hConnect != NULL: " ApHandleFormat "", ApHandleType(pTask->hAp_)));
+          apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "pTask->hConnect != NULL: " ApHandleFormat "", ApHandlePrintf(pTask->hAp_)));
           AP_DEBUG_BREAK();
         }
         lTasks_.Delete(pTask);

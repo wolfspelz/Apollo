@@ -5,7 +5,6 @@
 // ============================================================================
 
 #include "Apollo.h"
-#include "ApLog.h"
 #include "Local.h"
 #include "GmModule.h"
 #include "GmModuleTester.h"
@@ -16,7 +15,7 @@ static int g_bTest_Online = 0;
 
 static void Test_Gm_UnitTest_TokenEnd()
 {
-  apLog_Info((LOG_CHANNEL, "Test_Gm_UnitTest_TokenEnd", "Finished Test/Gm"));
+  apLog_Info((LOG_CHANNEL, LOG_CONTEXT, "Finished Test/Gm"));
   { ApAsyncMessage<Msg_UnitTest_Token> msg; msg.Post(); }
 }
 
@@ -24,7 +23,7 @@ static void Test_Gm_UnitTest_Token(Msg_UnitTest_Token* pMsg)
 {
   AP_UNUSED_ARG(pMsg);
   { Msg_UnitTest_Token msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_Gm_UnitTest_Token, 0); }
-  apLog_Info((LOG_CHANNEL, "Test_Gm_UnitTest_Token", "Starting Test/Gm"));
+  apLog_Info((LOG_CHANNEL, LOG_CONTEXT, "Starting Test/Gm"));
   int bTokenEndNow = 1;
 
   AP_UNITTEST_EXECUTE(GmModuleTester::test_Encryption);

@@ -4,6 +4,7 @@
 //
 // ============================================================================
 
+#include "Local.h"
 #include "NetModule.h"
 #include "NetOS.h"
 
@@ -17,7 +18,7 @@ int PostResolveConnectTask::Execute()
   msg.nPort = nPort_;
   ok = msg.Request();
   if (!ok) {
-    apLog_Error((LOG_CHANNEL, "PostResolveConnectTask::Execute", "Msg_Net_TCP_Connect failed " ApHandleFormat " %s %d", ApHandleType(hConnection_), StringType(sAddress_), nPort_));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_Net_TCP_Connect failed " ApHandleFormat " %s %d", ApHandlePrintf(hConnection_), _sz(sAddress_), nPort_));
   }
 
   return ok;
@@ -33,7 +34,7 @@ int PostResolveListenTask::Execute()
   msg.nPort = nPort_;
   ok = msg.Request();
   if (!ok) {
-    apLog_Error((LOG_CHANNEL, "PostResolveListenTask::Execute", "Msg_Net_TCP_Listen failed " ApHandleFormat " %s %d", ApHandleType(hServer_), StringType(sAddress_), nPort_));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_Net_TCP_Listen failed " ApHandleFormat " %s %d", ApHandlePrintf(hServer_), _sz(sAddress_), nPort_));
   }
 
   return ok;
@@ -100,7 +101,7 @@ void NetModule::On_Net_DNS_Resolve(Msg_Net_DNS_Resolve* pMsg)
 {
   int ok = 0;
 
-  apLog_VeryVerbose((LOG_CHANNEL, "On_Net_DNS_Resolve", ApHandleFormat " %s", ApHandleType(pMsg->hResolver), StringType(pMsg->sName)));
+  apLog_VeryVerbose((LOG_CHANNEL, LOG_CONTEXT, ApHandleFormat " %s", ApHandlePrintf(pMsg->hResolver), _sz(pMsg->sName)));
 
   DNSResolveTask* pTask = new DNSResolveTask(pMsg->hResolver, pMsg->sName);
   if (pTask != 0) {
@@ -116,7 +117,7 @@ void NetModule::On_Net_DNS_Resolved(Msg_Net_DNS_Resolved* pMsg)
   int ok = 0;
   int bHandled = 0;
 
-  apLog_VeryVerbose((LOG_CHANNEL, "On_Net_DNS_Resolved", ApHandleFormat " %s", ApHandleType(pMsg->hResolver), StringType(pMsg->sName)));
+  apLog_VeryVerbose((LOG_CHANNEL, LOG_CONTEXT, ApHandleFormat " %s", ApHandlePrintf(pMsg->hResolver), _sz(pMsg->sName)));
 
   if (0) {
   } else if (ApHandleTreeNode<PostResolveConnectTask>* pNode = postResolveConnectTasks_.Find(pMsg->hResolver)) {
@@ -170,7 +171,7 @@ void NetModule::On_Net_TCP_Connect(Msg_Net_TCP_Connect* pMsg)
 {
   int ok = 0;
 
-  apLog_Verbose((LOG_CHANNEL, "On_Net_TCP_Connect", ApHandleFormat " %s %d", ApHandleType(pMsg->hConnection), StringType(pMsg->sHost), pMsg->nPort));
+  apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, ApHandleFormat " %s %d", ApHandlePrintf(pMsg->hConnection), _sz(pMsg->sHost), pMsg->nPort));
 
   if (SocketAddress::isAddress(pMsg->sHost)) {
     // If it's an address, then connect directly
@@ -194,7 +195,7 @@ void NetModule::On_Net_TCP_Connect(Msg_Net_TCP_Connect* pMsg)
     msg.sType = Msg_Net_DNS_Resolve_Type_Default;
     ok = msg.Request();
     if (!ok) {
-      apLog_Error((LOG_CHANNEL, "On_Net_TCP_Connect", "Msg_Net_DNS_Resolve failed " ApHandleFormat " %s %d", ApHandleType(pMsg->hConnection), StringType(pMsg->sHost), pMsg->nPort));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_Net_DNS_Resolve failed " ApHandleFormat " %s %d", ApHandlePrintf(pMsg->hConnection), _sz(pMsg->sHost), pMsg->nPort));
     }
 
   }
@@ -234,7 +235,7 @@ void NetModule::On_Net_TCP_Listen(Msg_Net_TCP_Listen* pMsg)
 {
   int ok = 0;
 
-  apLog_Verbose((LOG_CHANNEL, "On_Net_TCP_Listen", ApHandleFormat " %s %d", ApHandleType(pMsg->hServer), StringType(pMsg->sAddress), pMsg->nPort));
+  apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, ApHandleFormat " %s %d", ApHandlePrintf(pMsg->hServer), _sz(pMsg->sAddress), pMsg->nPort));
 
   if (SocketAddress::isAddress(pMsg->sAddress)) {
     SocketAddress saAddress(pMsg->sAddress, pMsg->nPort);
@@ -256,7 +257,7 @@ void NetModule::On_Net_TCP_Listen(Msg_Net_TCP_Listen* pMsg)
     msg.sType = Msg_Net_DNS_Resolve_Type_Default;
     ok = msg.Request();
     if (!ok) {
-      apLog_Error((LOG_CHANNEL, "On_Net_TCP_Listen", "Msg_Net_DNS_Resolve failed " ApHandleFormat " %s %d", ApHandleType(pMsg->hServer), StringType(pMsg->sAddress), pMsg->nPort));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_Net_DNS_Resolve failed " ApHandleFormat " %s %d", ApHandlePrintf(pMsg->hServer), _sz(pMsg->sAddress), pMsg->nPort));
     }
 
   }
@@ -282,10 +283,10 @@ void NetModule::On_Net_TCP_ListenStop(Msg_Net_TCP_ListenStop* pMsg)
 void NetModule::On_Net_HTTP_Request(Msg_Net_HTTP_Request* pMsg)
 {
   int ok = 0;
-  apLog_Verbose((LOG_CHANNEL, "On_Net_HTTP_Request", ApHandleFormat " %s %s", ApHandleType(pMsg->hClient), StringType(pMsg->sMethod), StringType(pMsg->sUrl)));
+  apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, ApHandleFormat " %s %s", ApHandlePrintf(pMsg->hClient), _sz(pMsg->sMethod), _sz(pMsg->sUrl)));
 
   if (pMsg->sUrl.empty()) {
-    apLog_Warning((LOG_CHANNEL, "On_Net_HTTP_Request", ApHandleFormat " %s empty URL: %s", ApHandleType(pMsg->hClient), StringType(pMsg->sMethod), StringType(pMsg->sUrl)));
+    apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, ApHandleFormat " %s empty URL: %s", ApHandlePrintf(pMsg->hClient), _sz(pMsg->sMethod), _sz(pMsg->sUrl)));
   }
 
   HTTPRequestTask* pTask = new HTTPRequestTask();
@@ -307,7 +308,7 @@ void NetModule::On_Net_HTTP_Request(Msg_Net_HTTP_Request* pMsg)
 void NetModule::On_Net_HTTP_Cancel(Msg_Net_HTTP_Cancel* pMsg)
 {
   int ok = 0;
-  apLog_Verbose((LOG_CHANNEL, "On_Net_HTTP_Cancel", ApHandleFormat, ApHandleType(pMsg->hClient)));
+  apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, ApHandleFormat, ApHandlePrintf(pMsg->hClient)));
 
   ok = oHttp_.CancelRequest(pMsg->hClient);
 
@@ -317,7 +318,7 @@ void NetModule::On_Net_HTTP_Cancel(Msg_Net_HTTP_Cancel* pMsg)
 void NetModule::On_Net_HTTP_CancelAll(Msg_Net_HTTP_CancelAll* pMsg)
 {
   int ok = 0;
-  apLog_Verbose((LOG_CHANNEL, "On_Net_HTTP_CancelAll", ""));
+  apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, ""));
 
   ok = oHttp_.CancelAllRequests();
 
@@ -326,7 +327,7 @@ void NetModule::On_Net_HTTP_CancelAll(Msg_Net_HTTP_CancelAll* pMsg)
 
 void NetModule::On_MainLoop_EventLoopBeforeEnd(Msg_MainLoop_EventLoopBeforeEnd* pMsg)
 {
-  apLog_Verbose((LOG_CHANNEL, "On_MainLoop_EventLoopBeforeEnd", ""));
+  apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, ""));
 
   pMsg->nWaitCount++;
 
@@ -376,9 +377,9 @@ static String Test_SocketAddress_isAddress_1(const char* szAddress, int bIsAddre
   if (s.empty()) {
     if (SocketAddress::isAddress(szAddress) != bIsAddress) {
       if (bIsAddress) {
-        s.appendf("%s is no address, although it should be", StringType(szAddress));
+        s.appendf("%s is no address, although it should be", _sz(szAddress));
       } else {
-        s.appendf("%s is an address, although it should not be", StringType(szAddress));
+        s.appendf("%s is an address, although it should not be", _sz(szAddress));
       }
     }
   }
@@ -386,9 +387,9 @@ static String Test_SocketAddress_isAddress_1(const char* szAddress, int bIsAddre
   if (s.empty()) {
     if (SocketAddress::isIP4Address(szAddress) != bIsIP4Address) {
       if (bIsIP4Address) {
-        s.appendf("%s is no IP4 address, although it should be", StringType(szAddress));
+        s.appendf("%s is no IP4 address, although it should be", _sz(szAddress));
       } else {
-        s.appendf("%s is an IP4 address, although it should not be", StringType(szAddress));
+        s.appendf("%s is an IP4 address, although it should not be", _sz(szAddress));
       }
     }
   }
@@ -446,7 +447,7 @@ int NetModule::Init()
   if (ok) {
     ok = oHttp_.Init("Apollo");
     if (!ok) {
-      apLog_Error((LOG_CHANNEL, "Load", "oHttp.Init failed"));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "oHttp.Init failed"));
     } else {
       oHttp_.Run();
     }

@@ -54,7 +54,7 @@ String WebViewModuleTester::LoadHtml()
     "</style>\n"
     "<script>\n"
     "  function StartTimer() { window.setInterval('GetTime()', 1000); }\n"
-    "  function GetTime() { var sResponse = apollo.sendMessage('Method=System_GetTime\\nhView=' + apollo.viewHandle + '\\n'); document.getElementById('iLog').innerHTML = sResponse + ' ' + 'This is a linked Javascript'; }\n"
+    "  function GetTime() { var sResponse = apollo.sendMessage('Method=System_GetTime\\nhView=' + apollo.viewHandle + '\\n'); document.getElementById('iLog').innerHTML = sResponse + ' ' + GetLinkedJavascriptText(); }\n"
     "  function Concat(a, b) { return a + b; }\n"
     "</script>\n"
     "</head>\n"

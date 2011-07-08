@@ -5,7 +5,7 @@
 // ============================================================================
 
 #include "Apollo.h"
-#include "ApLog.h"
+#include "Local.h"
 #include "MsgSystem.h"
 #include "MsgDB.h"
 #include "URL.h"
@@ -42,7 +42,7 @@ String IdentityModule::selectItemId(const String& sUrl, const String& sType, con
   msgIGII.sType = sType;
   ok = msgIGII.Request();
   if (!ok) {
-    apLog_Error((LOG_CHANNEL, "IdentityModule::selectItemId", "Msg_Identity_GetItemIds failed url=%s type=%s", StringType(msgIGII.sUrl), StringType(msgIGII.sType)));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_Identity_GetItemIds failed url=%s type=%s", _sz(msgIGII.sUrl), _sz(msgIGII.sType)));
   } else {
     for (ValueElem* e = 0; (e = msgIGII.vlIds.nextElem(e)) != 0; ) {
       String sId = e->getString();
@@ -53,7 +53,7 @@ String IdentityModule::selectItemId(const String& sUrl, const String& sType, con
       msgIGI.sId = sId;
       ok = msgIGI.Request();
       if (!ok) {
-        apLog_Error((LOG_CHANNEL, "IdentityModule::selectItemId", "Msg_Identity_GetItem failed url=%s id=%s", StringType(msgIGI.sUrl), StringType(msgIGI.sId)));
+        apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_Identity_GetItem failed url=%s id=%s", _sz(msgIGI.sUrl), _sz(msgIGI.sId)));
       } else {
 
         int bApplicable = 0;
@@ -99,7 +99,7 @@ AP_MSG_HANDLER_METHOD(IdentityModule, System_AfterLoadModules)
   msg.sName = sDb_;
   int ok = msg.Request();
   if (!ok) {
-    apLog_Error((LOG_CHANNEL, "IdentityModule::System_AfterLoadModules", "Msg_DB_Open %s failed", StringType(msg.sName)));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_DB_Open %s failed", _sz(msg.sName)));
   }
 }
 
@@ -113,7 +113,7 @@ AP_MSG_HANDLER_METHOD(IdentityModule, System_BeforeUnloadModules)
   msg.sName = sDb_;
   int ok = msg.Request();
   if (!ok) {
-    apLog_Error((LOG_CHANNEL, "IdentityModule::System_BeforeUnloadModules", "Msg_DB_Close %s failed", StringType(msg.sName)));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_DB_Close %s failed", _sz(msg.sName)));
   }
 }
 
@@ -127,7 +127,7 @@ AP_MSG_HANDLER_METHOD(IdentityModule, Identity_RequestContainer)
   ContainerRequest* pRequest = lContainerRequests_.FindByName(pMsg->sUrl);
   if (pRequest != 0) {
     pRequest->addHandle(pMsg->hRequest);
-    apLog_Info((LOG_CHANNEL, "IdentityModule::Identity_RequestContainer", "Ignored, because already in progress, src=%s", StringType(pMsg->sUrl)));
+    apLog_Info((LOG_CHANNEL, LOG_CONTEXT, "Ignored, because already in progress, src=%s", _sz(pMsg->sUrl)));
     ok = 1;
 
   } else {
@@ -136,7 +136,7 @@ AP_MSG_HANDLER_METHOD(IdentityModule, Identity_RequestContainer)
     if (pClient != 0) {
       ok = pClient->Get(pMsg->sUrl);
       if (!ok) {
-        apLog_Verbose((LOG_CHANNEL, "IdentityModule::Identity_RequestContainer", "pClient->Get() failed, src=%s", StringType(pMsg->sUrl)));
+        apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "pClient->Get() failed, src=%s", _sz(pMsg->sUrl)));
         delete pClient;
         pClient = 0;
       } else {
@@ -160,7 +160,7 @@ AP_MSG_HANDLER_METHOD(IdentityModule, Identity_ReceiveContainer)
   String sError;
 
   if (pMsg->sbData.Length() == 0) {
-    sError.appendf("No data: %s", StringType(pMsg->sComment));
+    sError.appendf("No data: %s", _sz(pMsg->sComment));
   } else {
     if (ok) {
       Msg_Identity_SetContainer msg;
@@ -169,8 +169,8 @@ AP_MSG_HANDLER_METHOD(IdentityModule, Identity_ReceiveContainer)
       pMsg->sbData.GetString(msg.sData);
       ok = msg.Request();
       if (!ok) {
-        sError.appendf("Msg_Identity_SetContainer failed: %s, src=%s ", StringType(pMsg->sComment), StringType(pMsg->sUrl));
-        apLog_Error((LOG_CHANNEL, "IdentityModule::Identity_ReceiveContainer", sError));
+        sError.appendf("Msg_Identity_SetContainer failed: %s, src=%s ", _sz(pMsg->sComment), _sz(pMsg->sUrl));
+        apLog_Error((LOG_CHANNEL, LOG_CONTEXT, sError));
       } else {
         bSuccess = 1;
       }
@@ -181,8 +181,8 @@ AP_MSG_HANDLER_METHOD(IdentityModule, Identity_ReceiveContainer)
       msg.sUrl = pMsg->sUrl;
       ok = msg.Request();
       if (!ok) {
-        sError.appendf("Msg_Identity_SaveContainerToStorage failed: src=%s", StringType(pMsg->sUrl));
-        apLog_Error((LOG_CHANNEL, "IdentityModule::Identity_ReceiveContainer", sError));
+        sError.appendf("Msg_Identity_SaveContainerToStorage failed: src=%s", _sz(pMsg->sUrl));
+        apLog_Error((LOG_CHANNEL, LOG_CONTEXT, sError));
       }
     }
   } // pMsg->sbData.Length()
@@ -210,7 +210,7 @@ AP_MSG_HANDLER_METHOD(IdentityModule, Identity_ReceiveContainer)
               msgIIIDA.sId = sId;
               ok = msgIIIDA.Request();
               if (!ok) {
-                apLog_Error((LOG_CHANNEL, "IdentityModule::Identity_ReceiveContainer", "Msg_Identity_IsItemDataAvailable failed url=%s id=%s", StringType(msgIIIDA.sUrl), StringType(msgIIIDA.sId)));
+                apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_Identity_IsItemDataAvailable failed url=%s id=%s", _sz(msgIIIDA.sUrl), _sz(msgIIIDA.sId)));
               } else {
 
                 if (msgIIIDA.bAvailable) {
@@ -223,7 +223,7 @@ AP_MSG_HANDLER_METHOD(IdentityModule, Identity_ReceiveContainer)
                   msgIGI.sId = sId;
                   ok = msgIGI.Request();
                   if (!ok) {
-                    apLog_Error((LOG_CHANNEL, "IdentityModule::Identity_ReceiveContainer", "Msg_Identity_GetItem failed url=%s id=%s", StringType(msgIGI.sUrl), StringType(msgIGI.sId)));
+                    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_Identity_GetItem failed url=%s id=%s", _sz(msgIGI.sUrl), _sz(msgIGI.sId)));
                   } else {
 
                     // Fetch item data 
@@ -238,7 +238,7 @@ AP_MSG_HANDLER_METHOD(IdentityModule, Identity_ReceiveContainer)
                     msgIRI.sDigest = msgIGI.sDigest;
                     ok = msgIRI.Request();
                     if (!ok) {
-                      apLog_Error((LOG_CHANNEL, "IdentityModule::Identity_ReceiveContainer", "Msg_Identity_RequestItem failed url=%s id=%s", StringType(msgIRI.sUrl), StringType(msgIRI.sId)));
+                      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_Identity_RequestItem failed url=%s id=%s", _sz(msgIRI.sUrl), _sz(msgIRI.sId)));
                     } else {
                       bAcquisitionFinished = 0;
                     }
@@ -302,8 +302,8 @@ AP_MSG_HANDLER_METHOD(IdentityModule, Identity_SetContainer)
   if (pContainer != 0) {
     ok = pContainer->set(pMsg->sData, pMsg->sDigest);
     if (!ok) {
-      pMsg->sComment.appendf("pContainer->parse() failed src=%s", StringType(pMsg->sUrl));
-      apLog_Error((LOG_CHANNEL, "IdentityModule::Identity_SetContainer", pMsg->sComment));
+      pMsg->sComment.appendf("pContainer->parse() failed src=%s", _sz(pMsg->sUrl));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, pMsg->sComment));
       delete pContainer;
       pContainer = 0;
     } else {
@@ -320,29 +320,29 @@ AP_MSG_HANDLER_METHOD(IdentityModule, Identity_SaveContainerToStorage)
 
   Container* pContainer = 0;
   if (!data_.Get(pMsg->sUrl, pContainer)) {
-    apLog_Error((LOG_CHANNEL, "IdentityModule::Identity_SaveContainerToStorage", "data_.Get() failed: src=%s", StringType(pMsg->sUrl)));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "data_.Get() failed: src=%s", _sz(pMsg->sUrl)));
     ok = 0;
   }
 
   if (ok && pContainer != 0) {
     Msg_DB_Set msg;
     msg.sName = sDb_;
-    msg.sKey.appendf("%s data", StringType(prepareDbKey(pMsg->sUrl)));
+    msg.sKey.appendf("%s data", _sz(prepareDbKey(pMsg->sUrl)));
     msg.sValue = pContainer->getData();
     ok = msg.Request();
     if (!ok) {
-      apLog_Error((LOG_CHANNEL, "IdentityModule, Identity_SaveContainerToStorage", "Msg_DB_Set failed: db=%s key=%s", StringType(msg.sName), StringType(msg.sKey)));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_DB_Set failed: db=%s key=%s", _sz(msg.sName), _sz(msg.sKey)));
     }
   }
 
   if (ok && pContainer != 0) {
     Msg_DB_Set msg;
     msg.sName = sDb_;
-    msg.sKey.appendf("%s digest", StringType(prepareDbKey(pMsg->sUrl)));
+    msg.sKey.appendf("%s digest", _sz(prepareDbKey(pMsg->sUrl)));
     msg.sValue = pContainer->getDigest();
     ok = msg.Request();
     if (!ok) {
-      apLog_Error((LOG_CHANNEL, "IdentityModule::Identity_SaveContainerToStorage", "Msg_DB_Set failed: db=%s key=%s", StringType(msg.sName), StringType(msg.sKey)));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_DB_Set failed: db=%s key=%s", _sz(msg.sName), _sz(msg.sKey)));
     }
   }
 
@@ -364,9 +364,9 @@ AP_MSG_HANDLER_METHOD(IdentityModule, Identity_LoadContainerFromStorage)
       // Fetch digest from DB
       Msg_DB_Get msg;
       msg.sName = sDb_;
-      msg.sKey.appendf("%s digest", StringType(prepareDbKey(pMsg->sUrl)));
+      msg.sKey.appendf("%s digest", _sz(prepareDbKey(pMsg->sUrl)));
       if (!msg.Request()) {
-        apLog_Error((LOG_CHANNEL, "IdentityModule::Identity_LoadContainerFromStorage", "Msg_DB_Get failed: db=%s key=%s", StringType(msg.sName), StringType(msg.sKey)));
+        apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_DB_Get failed: db=%s key=%s", _sz(msg.sName), _sz(msg.sKey)));
       } else {
         sDigest = msg.sValue;
       }
@@ -376,9 +376,9 @@ AP_MSG_HANDLER_METHOD(IdentityModule, Identity_LoadContainerFromStorage)
       // Fetch data from DB
       Msg_DB_Get msg;
       msg.sName = sDb_;
-      msg.sKey.appendf("%s data", StringType(prepareDbKey(pMsg->sUrl)));
+      msg.sKey.appendf("%s data", _sz(prepareDbKey(pMsg->sUrl)));
       if (!msg.Request()) {
-        apLog_Error((LOG_CHANNEL, "IdentityModule::Identity_LoadContainerFromStorage", "Msg_DB_Get failed: db=%s key=%s", StringType(msg.sName), StringType(msg.sKey)));
+        apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_DB_Get failed: db=%s key=%s", _sz(msg.sName), _sz(msg.sKey)));
       } else {
         Msg_Identity_SetContainer msgCCI;
         msgCCI.sUrl = pMsg->sUrl;
@@ -386,7 +386,7 @@ AP_MSG_HANDLER_METHOD(IdentityModule, Identity_LoadContainerFromStorage)
         msgCCI.sData = msg.sValue;
         ok = msgCCI.Request();
         if (!ok) {
-          apLog_Error((LOG_CHANNEL, "IdentityModule::Identity_LoadContainerFromStorage", "Msg_Identity_SetContainer failed: src=%s", StringType(pMsg->sUrl)));
+          apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_Identity_SetContainer failed: src=%s", _sz(pMsg->sUrl)));
         }
       }
     }
@@ -406,7 +406,7 @@ AP_MSG_HANDLER_METHOD(IdentityModule, Identity_IsContainerAvailable)
   msg.sUrl = pMsg->sUrl;
   if (!msg.Request()) {
     // Could not be loaded: no error
-    apLog_Verbose((LOG_CHANNEL, "IdentityModule::Identity_IsContainerAvailable", "Msg_Identity_LoadContainerFromStorage failed: src=%s", StringType(pMsg->sUrl)));
+    apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "Msg_Identity_LoadContainerFromStorage failed: src=%s", _sz(pMsg->sUrl)));
   } else {
     Container* pContainer = 0;
     if (data_.Get(pMsg->sUrl, pContainer)) {
@@ -428,7 +428,7 @@ AP_MSG_HANDLER_METHOD(IdentityModule, Identity_DeleteContainer)
     msg.sUrl = pMsg->sUrl;
     ok = msg.Request();
     if (!ok) {
-      apLog_Error((LOG_CHANNEL, "IdentityModule::Identity_DeleteContainer", "Msg_Identity_DeleteContainerFromStorage failed: url=%s", StringType(msg.sUrl)));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_Identity_DeleteContainerFromStorage failed: url=%s", _sz(msg.sUrl)));
     }
   }
 
@@ -437,7 +437,7 @@ AP_MSG_HANDLER_METHOD(IdentityModule, Identity_DeleteContainer)
     msg.sUrl = pMsg->sUrl;
     ok = msg.Request();
     if (!ok) {
-      apLog_Error((LOG_CHANNEL, "IdentityModule::Identity_DeleteContainer", "Msg_Identity_DeleteContainerFromMemory failed: url=%s", StringType(msg.sUrl)));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_Identity_DeleteContainerFromMemory failed: url=%s", _sz(msg.sUrl)));
     }
   }
 
@@ -467,20 +467,20 @@ AP_MSG_HANDLER_METHOD(IdentityModule, Identity_DeleteContainerFromStorage)
   if (ok) {
     Msg_DB_Delete msg;
     msg.sName = sDb_;
-    msg.sKey.appendf("%s data", StringType(prepareDbKey(pMsg->sUrl)));
+    msg.sKey.appendf("%s data", _sz(prepareDbKey(pMsg->sUrl)));
     ok = msg.Request();
     if (!ok) {
-      apLog_Error((LOG_CHANNEL, "IdentityModule::Identity_DeleteContainerFromStorage", "Msg_DB_Delete failed: db=%s key=%s", StringType(msg.sName), StringType(msg.sKey)));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_DB_Delete failed: db=%s key=%s", _sz(msg.sName), _sz(msg.sKey)));
     }
   }
 
   if (ok) {
     Msg_DB_Delete msg;
     msg.sName = sDb_;
-    msg.sKey.appendf("%s digest", StringType(prepareDbKey(pMsg->sUrl)));
+    msg.sKey.appendf("%s digest", _sz(prepareDbKey(pMsg->sUrl)));
     ok = msg.Request();
     if (!ok) {
-      apLog_Error((LOG_CHANNEL, "IdentityModule::Identity_DeleteContainerFromStorage", "Msg_DB_Delete failed: db=%s key=%s", StringType(msg.sName), StringType(msg.sKey)));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_DB_Delete failed: db=%s key=%s", _sz(msg.sName), _sz(msg.sKey)));
     }
   }
 
@@ -501,7 +501,7 @@ AP_MSG_HANDLER_METHOD(IdentityModule, Identity_HasProperty)
   msg.sUrl = pMsg->sUrl;
   if (!msg.Request()) {
     // Could not be loaded
-    apLog_Warning((LOG_CHANNEL, "IdentityModule::Identity_HasProperty", "Msg_Identity_LoadContainerFromStorage failed: src=%s", StringType(pMsg->sUrl)));
+    apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "Msg_Identity_LoadContainerFromStorage failed: src=%s", _sz(pMsg->sUrl)));
   } else {
     Container* pContainer = 0;
     if (data_.Get(pMsg->sUrl, pContainer)) {
@@ -521,7 +521,7 @@ AP_MSG_HANDLER_METHOD(IdentityModule, Identity_GetProperty)
   msg.sUrl = pMsg->sUrl;
   if (!msg.Request()) {
     // Could not be loaded
-    apLog_Warning((LOG_CHANNEL, "IdentityModule::Identity_GetProperty", "Msg_Identity_LoadContainerFromStorage failed: src=%s", StringType(pMsg->sUrl)));
+    apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "Msg_Identity_LoadContainerFromStorage failed: src=%s", _sz(pMsg->sUrl)));
   } else {
     Container* pContainer = 0;
     if (data_.Get(pMsg->sUrl, pContainer)) {
@@ -541,7 +541,7 @@ AP_MSG_HANDLER_METHOD(IdentityModule, Identity_GetItemIds)
   msg.sUrl = pMsg->sUrl;
   if (!msg.Request()) {
     // Could not be loaded
-    apLog_Warning((LOG_CHANNEL, "IdentityModule::Identity_GetItemIds", "On_Identity_GetItemIds failed: src=%s", StringType(pMsg->sUrl)));
+    apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "On_Identity_GetItemIds failed: src=%s", _sz(pMsg->sUrl)));
   } else {
     Container* pContainer = 0;
     if (data_.Get(pMsg->sUrl, pContainer)) {
@@ -567,7 +567,7 @@ AP_MSG_HANDLER_METHOD(IdentityModule, Identity_GetItem)
   msg.sUrl = pMsg->sUrl;
   if (!msg.Request()) {
     // Could not be loaded
-    apLog_Warning((LOG_CHANNEL, "IdentityModule::Identity_GetItem", "On_Identity_GetItemIds failed: src=%s", StringType(pMsg->sUrl)));
+    apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "On_Identity_GetItemIds failed: src=%s", _sz(pMsg->sUrl)));
   } else {
     Container* pContainer = 0;
     if (data_.Get(pMsg->sUrl, pContainer)) {
@@ -608,7 +608,7 @@ AP_MSG_HANDLER_METHOD(IdentityModule, Identity_IsItemDataAvailable)
   msg.sUrl = pMsg->sUrl;
   if (!msg.Request()) {
     // Could not be loaded
-    apLog_Warning((LOG_CHANNEL, "IdentityModule::Identity_IsItemDataAvailable", "Msg_Identity_LoadContainerFromStorage failed: url=%s", StringType(pMsg->sUrl)));
+    apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "Msg_Identity_LoadContainerFromStorage failed: url=%s", _sz(pMsg->sUrl)));
   } else {
     Container* pContainer = 0;
     if (data_.Get(pMsg->sUrl, pContainer)) {
@@ -620,7 +620,7 @@ AP_MSG_HANDLER_METHOD(IdentityModule, Identity_IsItemDataAvailable)
         msg.sUrl = pMsg->sUrl;
         msg.sId = pMsg->sId;
         if (!msg.Request()) {
-          // not in db, ok, shit happnz
+          // not in db, ok, sht happnz
         } else {
           pMsg->bAvailable = pContainer->hasItemData(pMsg->sId);
         }
@@ -639,7 +639,7 @@ AP_MSG_HANDLER_METHOD(IdentityModule, Identity_GetItemData)
   msg.sUrl = pMsg->sUrl;
   if (!msg.Request()) {
     // Could not be loaded
-    apLog_Warning((LOG_CHANNEL, "IdentityModule::Identity_GetItemData", "Msg_Identity_LoadContainerFromStorage failed: url=%s id=%s", StringType(pMsg->sUrl), StringType(pMsg->sId)));
+    apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "Msg_Identity_LoadContainerFromStorage failed: url=%s id=%s", _sz(pMsg->sUrl), _sz(pMsg->sId)));
   } else {
     Container* pContainer = 0;
     if (data_.Get(pMsg->sUrl, pContainer)) {
@@ -652,11 +652,11 @@ AP_MSG_HANDLER_METHOD(IdentityModule, Identity_GetItemData)
         msg.sUrl = pMsg->sUrl;
         msg.sId = pMsg->sId;
         if (!msg.Request()) {
-          // not in db, ok, shit happnz
+          // not in db, ok, sht happnz
         } else {
           if (!pContainer->hasItemData(pMsg->sId)) {
             // Not an error, just means, that there is an identity in storage but not the item data
-            //apLog_Error((LOG_CHANNEL, "IdentityModule::Identity_GetItemData", "pContainer->hasItemData() failed although just loaded: url=%s id=%s", StringType(pMsg->sUrl), StringType(pMsg->sId)));
+            //apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "pContainer->hasItemData() failed although just loaded: url=%s id=%s", _sz(pMsg->sUrl), _sz(pMsg->sId)));
           } else {
             bGetIt = 1;
           }
@@ -680,7 +680,7 @@ AP_MSG_HANDLER_METHOD(IdentityModule, Identity_RequestItem)
   ItemRequest* pRequest = lItemRequests_.FindByName(pMsg->sSrc);
   if (pRequest != 0) {
     pRequest->addHandle(pMsg->hRequest);
-    apLog_Info((LOG_CHANNEL, "IdentityModule::Identity_RequestItem", "Ignored, because already in progress, src=%s", StringType(pMsg->sUrl)));
+    apLog_Info((LOG_CHANNEL, LOG_CONTEXT, "Ignored, because already in progress, src=%s", _sz(pMsg->sUrl)));
     ok = 1;
 
   } else {
@@ -689,7 +689,7 @@ AP_MSG_HANDLER_METHOD(IdentityModule, Identity_RequestItem)
     if (pClient != 0) {
       ok = pClient->Get(pMsg->sSrc);
       if (!ok) {
-        apLog_Verbose((LOG_CHANNEL, "IdentityModule::Identity_RequestItem", "pClient->Get() failed, src=%s", StringType(pMsg->sSrc)));
+        apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "pClient->Get() failed, src=%s", _sz(pMsg->sSrc)));
         delete pClient;
         pClient = 0;
       } else {
@@ -722,8 +722,8 @@ AP_MSG_HANDLER_METHOD(IdentityModule, Identity_ReceiveItem)
       msg.sbData = pMsg->sbData;
       ok = msg.Request();
       if (!ok) {
-        sError.appendf("Msg_Identity_SetItemData failed: %s, url=%s id=%s src=%s ", StringType(pMsg->sComment), StringType(pMsg->sUrl), StringType(pMsg->sId), StringType(pMsg->sSrc));
-        apLog_Error((LOG_CHANNEL, "IdentityModule::Identity_ReceiveItem", sError));
+        sError.appendf("Msg_Identity_SetItemData failed: %s, url=%s id=%s src=%s ", _sz(pMsg->sComment), _sz(pMsg->sUrl), _sz(pMsg->sId), _sz(pMsg->sSrc));
+        apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "%", _sz(sError)));
       } else {
         bSuccess = 1;
       }
@@ -735,8 +735,8 @@ AP_MSG_HANDLER_METHOD(IdentityModule, Identity_ReceiveItem)
       msg.sId = pMsg->sId;
       ok = msg.Request();
       if (!ok) {
-        sError.appendf("Msg_Identity_SaveItemDataToStorage failed: src=%s", StringType(pMsg->sUrl));
-        apLog_Error((LOG_CHANNEL, "IdentityModule::Identity_ReceiveItem", sError));
+        sError.appendf("Msg_Identity_SaveItemDataToStorage failed: src=%s", _sz(pMsg->sUrl));
+        apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "%", _sz(sError)));
       }
     }
   } // pMsg->sbData.Length()
@@ -764,7 +764,7 @@ AP_MSG_HANDLER_METHOD(IdentityModule, Identity_ReceiveItem)
               msgIIIDA.sId = sId;
               ok = msgIIIDA.Request();
               if (!ok) {
-                apLog_Error((LOG_CHANNEL, "IdentityModule::Identity_ReceiveItem", "Msg_Identity_IsItemDataAvailable failed url=%s id=%s", StringType(msgIIIDA.sUrl), StringType(msgIIIDA.sId)));
+                apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_Identity_IsItemDataAvailable failed url=%s id=%s", _sz(msgIIIDA.sUrl), _sz(msgIIIDA.sId)));
               } else {
 
                 if (msgIIIDA.bAvailable) {
@@ -821,7 +821,7 @@ AP_MSG_HANDLER_METHOD(IdentityModule, Identity_SetItemData)
   msg.sUrl = pMsg->sUrl;
   if (!msg.Request()) {
     // Could not be loaded
-    apLog_Warning((LOG_CHANNEL, "IdentityModule::Identity_GetItemData", "On_Identity_GetItemIds failed: src=%s", StringType(pMsg->sUrl)));
+    apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "On_Identity_GetItemIds failed: src=%s", _sz(pMsg->sUrl)));
   } else {
     Container* pContainer = 0;
     if (data_.Get(pMsg->sUrl, pContainer)) {
@@ -835,24 +835,24 @@ AP_MSG_HANDLER_METHOD(IdentityModule, Identity_SetItemData)
 AP_MSG_HANDLER_METHOD(IdentityModule, Identity_SaveItemDataToStorage)
 {
   Container* pContainer = 0;
-  if (!data_.Get(pMsg->sUrl, pContainer)) { throw ApException("data_.Get() failed: src=%s", StringType(pMsg->sUrl)); }
+  if (!data_.Get(pMsg->sUrl, pContainer)) { throw ApException(LOG_CONTEXT, "data_.Get() failed: src=%s", _sz(pMsg->sUrl)); }
 
   String sSrc = pContainer->getItemAttribute(pMsg->sId, "src");
-  if (!sSrc) { throw ApException("pContainer->getItemAttribute: no src for url=%s id=%s", StringType(pMsg->sUrl), StringType(pMsg->sId)); }
+  if (!sSrc) { throw ApException(LOG_CONTEXT, "pContainer->getItemAttribute: no src for url=%s id=%s", _sz(pMsg->sUrl), _sz(pMsg->sId)); }
 
   String sMimeType;
 
   Msg_DB_SetBinary msgDSB;
   msgDSB.sName = sDb_;
-  msgDSB.sKey.appendf("%s data", StringType(prepareDbKey(sSrc)));
+  msgDSB.sKey.appendf("%s data", _sz(prepareDbKey(sSrc)));
   pContainer->getItemData(pMsg->sId, sMimeType, msgDSB.sbValue);
-  if (!msgDSB.Request()) { throw ApException("Msg_DB_SetBinary failed: db=%s key=%s", StringType(msgDSB.sName), StringType(msgDSB.sKey)); }
+  if (!msgDSB.Request()) { throw ApException(LOG_CONTEXT, "Msg_DB_SetBinary failed: db=%s key=%s", _sz(msgDSB.sName), _sz(msgDSB.sKey)); }
 
   Msg_DB_Set msgDS;
   msgDS.sName = sDb_;
-  msgDS.sKey.appendf("%s mimetype", StringType(prepareDbKey(sSrc)));
+  msgDS.sKey.appendf("%s mimetype", _sz(prepareDbKey(sSrc)));
   msgDS.sValue = sMimeType;
-  if (!msgDS.Request()) { throw ApException("Msg_DB_Set failed: db=%s key=%s", StringType(msgDS.sName), StringType(msgDS.sKey)); }
+  if (!msgDS.Request()) { throw ApException(LOG_CONTEXT, "Msg_DB_Set failed: db=%s key=%s", _sz(msgDS.sName), _sz(msgDS.sKey)); }
 
   pMsg->apStatus = ApMessage::Ok;
 }
@@ -860,18 +860,18 @@ AP_MSG_HANDLER_METHOD(IdentityModule, Identity_SaveItemDataToStorage)
 AP_MSG_HANDLER_METHOD(IdentityModule, Identity_LoadItemDataFromStorage)
 {
   Container* pContainer = 0;
-  if (!data_.Get(pMsg->sUrl, pContainer)) { throw ApException("data_.Get() failed: src=%s", StringType(pMsg->sUrl)); }
+  if (!data_.Get(pMsg->sUrl, pContainer)) { throw ApException(LOG_CONTEXT, "data_.Get() failed: src=%s", _sz(pMsg->sUrl)); }
 
   String sSrc = pContainer->getItemAttribute(pMsg->sId, "src");
-  if (!sSrc) { throw ApException("pContainer->getItemAttribute: no src for url=%s id=%s", StringType(pMsg->sUrl), StringType(pMsg->sId)); }
+  if (!sSrc) { throw ApException(LOG_CONTEXT, "pContainer->getItemAttribute: no src for url=%s id=%s", _sz(pMsg->sUrl), _sz(pMsg->sId)); }
 
   String sMimeType;
 
   // Fetch mimetype from DB
   Msg_DB_Get msgDG;
   msgDG.sName = sDb_;
-  msgDG.sKey.appendf("%s mimetype", StringType(prepareDbKey(sSrc)));
-  if (!msgDG.Request()) { throw ApException("Msg_DB_Get failed: db=%s key=%s", StringType(msgDG.sName), StringType(msgDG.sKey)); }
+  msgDG.sKey.appendf("%s mimetype", _sz(prepareDbKey(sSrc)));
+  if (!msgDG.Request()) { throw ApException(LOG_CONTEXT, "Msg_DB_Get failed: db=%s key=%s", _sz(msgDG.sName), _sz(msgDG.sKey)); }
 
   sMimeType = msgDG.sValue;
   if (sMimeType) { // No MimeType, then do not fetch the data
@@ -879,15 +879,15 @@ AP_MSG_HANDLER_METHOD(IdentityModule, Identity_LoadItemDataFromStorage)
     // Fetch data from DB
     Msg_DB_GetBinary msgDGB;
     msgDGB.sName = sDb_;
-    msgDGB.sKey.appendf("%s data", StringType(prepareDbKey(sSrc)));
-    if (!msgDGB.Request()) { throw ApException("Msg_DB_GetBinary failed: db=%s key=%s", StringType(msgDGB.sName), StringType(msgDGB.sKey)); }
+    msgDGB.sKey.appendf("%s data", _sz(prepareDbKey(sSrc)));
+    if (!msgDGB.Request()) { throw ApException(LOG_CONTEXT, "Msg_DB_GetBinary failed: db=%s key=%s", _sz(msgDGB.sName), _sz(msgDGB.sKey)); }
 
     Msg_Identity_SetItemData msgISID;
     msgISID.sUrl = pMsg->sUrl;
     msgISID.sId = pMsg->sId;
     msgISID.sMimeType = sMimeType;
     msgISID.sbData = msgDGB.sbValue;
-    if (!msgISID.Request()) { throw ApException("Msg_Identity_SetItemData failed: url=%s id=%s", StringType(msgISID.sUrl), StringType(msgISID.sId)); }
+    if (!msgISID.Request()) { throw ApException(LOG_CONTEXT, "Msg_Identity_SetItemData failed: url=%s id=%s", _sz(msgISID.sUrl), _sz(msgISID.sId)); }
 
   } // sMimeType
 
@@ -899,12 +899,12 @@ AP_MSG_HANDLER_METHOD(IdentityModule, Identity_DeleteItemData)
   Msg_Identity_DeleteItemDataFromStorage msgIDIDFS;
   msgIDIDFS.sUrl = pMsg->sUrl;
   msgIDIDFS.sId = pMsg->sId;
-  if (!msgIDIDFS.Request()) { throw ApException("Msg_Identity_DeleteItemDataFromStorage failed: url=%s", StringType(msgIDIDFS.sUrl)); }
+  if (!msgIDIDFS.Request()) { throw ApException(LOG_CONTEXT, "Msg_Identity_DeleteItemDataFromStorage failed: url=%s", _sz(msgIDIDFS.sUrl)); }
 
   Msg_Identity_DeleteItemDataFromMemory msgIDIDFM;
   msgIDIDFM.sUrl = pMsg->sUrl;
   msgIDIDFM.sId = pMsg->sId;
-  if (!msgIDIDFM.Request()) { throw ApException("Msg_Identity_DeleteItemDataFromMemory failed: url=%s", StringType(msgIDIDFM.sUrl)); }
+  if (!msgIDIDFM.Request()) { throw ApException(LOG_CONTEXT, "Msg_Identity_DeleteItemDataFromMemory failed: url=%s", _sz(msgIDIDFM.sUrl)); }
 
   pMsg->apStatus = ApMessage::Ok;
 }
@@ -917,7 +917,7 @@ AP_MSG_HANDLER_METHOD(IdentityModule, Identity_DeleteItemDataFromMemory)
   if (!data_.Get(pMsg->sUrl, pContainer)) {
     // Tolerate if no container: nothing to do
     ok = 1;
-    apLog_Warning((LOG_CHANNEL, "IdentityModule::Identity_SaveContainerToStorage", "data_.Get() failed: src=%s", StringType(pMsg->sUrl)));
+    apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "data_.Get() failed: src=%s", _sz(pMsg->sUrl)));
   } else {
     ok = pContainer->deleteItemData(pMsg->sId);
   }
@@ -928,23 +928,23 @@ AP_MSG_HANDLER_METHOD(IdentityModule, Identity_DeleteItemDataFromMemory)
 AP_MSG_HANDLER_METHOD(IdentityModule, Identity_DeleteItemDataFromStorage)
 {
   Container* pContainer = 0;
-  if (!data_.Get(pMsg->sUrl, pContainer)) { throw ApException("data_.Get() failed: src=%s", StringType(pMsg->sUrl)); }
+  if (!data_.Get(pMsg->sUrl, pContainer)) { throw ApException(LOG_CONTEXT, "data_.Get() failed: src=%s", _sz(pMsg->sUrl)); }
 
   String sSrc = pContainer->getItemAttribute(pMsg->sId, "src");
-  if (!sSrc) { throw ApException("pContainer->getItemAttribute: no src for url=%s id=%s", StringType(pMsg->sUrl), StringType(pMsg->sId)); }
+  if (!sSrc) { throw ApException(LOG_CONTEXT, "pContainer->getItemAttribute: no src for url=%s id=%s", _sz(pMsg->sUrl), _sz(pMsg->sId)); }
 
   {
     Msg_DB_Delete msg;
     msg.sName = sDb_;
-    msg.sKey.appendf("%s data", StringType(prepareDbKey(sSrc)));
-    if (!msg.Request()) { throw ApException("Msg_DB_Delete failed: db=%s key=%s", StringType(msg.sName), StringType(msg.sKey)); }
+    msg.sKey.appendf("%s data", _sz(prepareDbKey(sSrc)));
+    if (!msg.Request()) { throw ApException(LOG_CONTEXT, "Msg_DB_Delete failed: db=%s key=%s", _sz(msg.sName), _sz(msg.sKey)); }
   }
 
   {
     Msg_DB_Delete msg;
     msg.sName = sDb_;
-    msg.sKey.appendf("%s mimetype", StringType(prepareDbKey(sSrc)));
-    if (!msg.Request()) { throw ApException("Msg_DB_Delete failed: db=%s key=%s", StringType(msg.sName), StringType(msg.sKey)); }
+    msg.sKey.appendf("%s mimetype", _sz(prepareDbKey(sSrc)));
+    if (!msg.Request()) { throw ApException(LOG_CONTEXT, "Msg_DB_Delete failed: db=%s key=%s", _sz(msg.sName), _sz(msg.sKey)); }
   }
 
   pMsg->apStatus = ApMessage::Ok;
@@ -962,7 +962,7 @@ AP_MSG_HANDLER_METHOD(IdentityModule, Identity_AcquireItemData)
   msgIICA.sDigest = pMsg->sDigest;
   ok = msgIICA.Request();
   if (!ok) {
-    apLog_Error((LOG_CHANNEL, "IdentityModule::Identity_AcquireItemData", "Msg_Identity_IsContainerAvailable failed url=%s", StringType(msgIICA.sUrl)));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_Identity_IsContainerAvailable failed url=%s", _sz(msgIICA.sUrl)));
   } else {
 
     if (!msgIICA.bAvailable) {
@@ -980,7 +980,7 @@ AP_MSG_HANDLER_METHOD(IdentityModule, Identity_AcquireItemData)
         msgIRC.sDigest = pMsg->sDigest;
         ok = msgIRC.Request();
         if (!ok) {
-          apLog_Error((LOG_CHANNEL, "IdentityModule::Identity_AcquireItemData", "Msg_Identity_RequestContainer failed url=%s", StringType(msgIRC.sUrl)));
+          apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_Identity_RequestContainer failed url=%s", _sz(msgIRC.sUrl)));
           if (itemTasks_.Unset(pTask->apHandle())) {
             delete pTask;
             pTask = 0;
@@ -1000,7 +1000,7 @@ AP_MSG_HANDLER_METHOD(IdentityModule, Identity_AcquireItemData)
         msgIIIDA.sId = sId;
         ok = msgIIIDA.Request();
         if (!ok) {
-          apLog_Error((LOG_CHANNEL, "IdentityModule::Identity_AcquireItemData", "Msg_Identity_IsItemDataAvailable failed url=%s id=%s", StringType(msgIIIDA.sUrl), StringType(msgIIIDA.sId)));
+          apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_Identity_IsItemDataAvailable failed url=%s id=%s", _sz(msgIIIDA.sUrl), _sz(msgIIIDA.sId)));
         } else {
 
           if (msgIIIDA.bAvailable) {
@@ -1013,7 +1013,7 @@ AP_MSG_HANDLER_METHOD(IdentityModule, Identity_AcquireItemData)
             msgIGI.sId = sId;
             ok = msgIGI.Request();
             if (!ok) {
-              apLog_Error((LOG_CHANNEL, "IdentityModule::Identity_AcquireItemData", "Msg_Identity_GetItem failed url=%s id=%s", StringType(msgIGI.sUrl), StringType(msgIGI.sId)));
+              apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_Identity_GetItem failed url=%s id=%s", _sz(msgIGI.sUrl), _sz(msgIGI.sId)));
             } else {
 
               // This should really check if we already tried and failed
@@ -1025,7 +1025,7 @@ AP_MSG_HANDLER_METHOD(IdentityModule, Identity_AcquireItemData)
               msgIRI.sDigest = msgIGI.sDigest;
               ok = msgIRI.Request();
               if (!ok) {
-                apLog_Error((LOG_CHANNEL, "IdentityModule::Identity_AcquireItemData", "Msg_Identity_GetItem failed url=%s id=%s", StringType(msgIRI.sUrl), StringType(msgIRI.sId)));
+                apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_Identity_GetItem failed url=%s id=%s", _sz(msgIRI.sUrl), _sz(msgIRI.sId)));
               } else {
                 bAcquisitionFinished = 0;
               }
@@ -1117,7 +1117,7 @@ AP_MSG_HANDLER_METHOD(IdentityModule, Identity_ExpireAllStorage)
   msg.nAge = pMsg->nAge;
   ok = msg.Request();
   if (!ok) {
-    apLog_Error((LOG_CHANNEL, "IdentityModule::Identity_ExpireAllStorage", "Msg_DB_DeleteOlderThan failed"));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_DB_DeleteOlderThan failed"));
   }
 
   pMsg->apStatus = ok ? ApMessage::Ok : ApMessage::Error;
@@ -1137,7 +1137,7 @@ AP_MSG_HANDLER_METHOD(IdentityModule, Identity_SetStorageName)
       msg.sName = pMsg->sPreviousName;
       int ok = msg.Request();
       if (!ok) {
-        apLog_Error((LOG_CHANNEL, "IdentityModule::Identity_SetStorageName", "Msg_DB_Close %s failed", StringType(pMsg->sPreviousName)));
+        apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_DB_Close %s failed", _sz(pMsg->sPreviousName)));
       }
     }
 
@@ -1146,7 +1146,7 @@ AP_MSG_HANDLER_METHOD(IdentityModule, Identity_SetStorageName)
       msg.sName = pMsg->sName;
       int ok = msg.Request();
       if (!ok) {
-        apLog_Error((LOG_CHANNEL, "IdentityModule::Identity_SetStorageName", "Msg_DB_Open %s failed", StringType(pMsg->sName)));
+        apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_DB_Open %s failed", _sz(pMsg->sName)));
       }
     }
   }
@@ -1190,7 +1190,7 @@ AP_MSG_HANDLER_METHOD(IdentityModule, HttpServer_Request)
       } else if (sCmd == "menu") {
         Apollo::UriBuilder uri = baseUri;
         uri.setQueryParam("cmd", "cache");
-        sHtml.appendf("<a href=\"%s\">List cache</a>", StringType(uri()));
+        sHtml.appendf("<a href=\"%s\">List cache</a>", _sz(uri()));
 
       } else if (sCmd == "cache") {
         IdentityIterator iter(data_);
@@ -1200,7 +1200,7 @@ AP_MSG_HANDLER_METHOD(IdentityModule, HttpServer_Request)
             Apollo::UriBuilder containerUri = baseUri;
             containerUri.setQueryParam("cmd", "data");
             containerUri.setQueryParam("url", pContainer->getUrl());
-            sHtml.appendf("<a href=\"%s\">%s</a>", StringType(containerUri()), StringType(pContainer->getUrl()));
+            sHtml.appendf("<a href=\"%s\">%s</a>", _sz(containerUri()), _sz(pContainer->getUrl()));
 
             Apollo::ValueList vlIds;
             if (pContainer->getItemIds(vlIds)) {
@@ -1209,12 +1209,12 @@ AP_MSG_HANDLER_METHOD(IdentityModule, HttpServer_Request)
                 if (pContainer->hasItemData(sItemId)) {
                   Apollo::UriBuilder itemUri = containerUri;
                   itemUri.setQueryParam("id", sItemId);
-                  sHtml.appendf(" <a href=\"%s\">%s</a>", StringType(itemUri()), StringType(sItemId));
+                  sHtml.appendf(" <a href=\"%s\">%s</a>", _sz(itemUri()), _sz(sItemId));
                 } else {
                   if (!pContainer->getItemAttribute(sItemId, "src").empty()) {
-                    sHtml.appendf(" <a href=\"%s\">%s</a>", StringType(pContainer->getItemAttribute(sItemId, "src")), StringType(sItemId));
+                    sHtml.appendf(" <a href=\"%s\">%s</a>", _sz(pContainer->getItemAttribute(sItemId, "src")), _sz(sItemId));
                   } else {
-                    sHtml.appendf(" %s", StringType(sItemId));
+                    sHtml.appendf(" %s", _sz(sItemId));
                   }
                 }
               }
@@ -1230,21 +1230,21 @@ AP_MSG_HANDLER_METHOD(IdentityModule, HttpServer_Request)
         sId = lQuery["id"].getString();
 
         // Return identity data or item data
-        if (sUrl.empty()) { throw ApException("url empty: uri=%s", StringType(sUrl), StringType(pMsg->sUri)); }
+        if (sUrl.empty()) { throw ApException(LOG_CONTEXT, "url empty: uri=%s", _sz(sUrl), _sz(pMsg->sUri)); }
 
         Container* pContainer = 0;
-        if (!data_.Get(sUrl, pContainer)) { throw ApException("Not found: url=%s", StringType(sUrl)); }
+        if (!data_.Get(sUrl, pContainer)) { throw ApException(LOG_CONTEXT, "Not found: url=%s", _sz(sUrl)); }
 
         if (sId.empty()) {
           msgSHR.sbBody.SetData(pContainer->getData());
           msgSHR.kvHeader.add("Content-type", "text/xml");
         } else {
           String sMimeType;
-          if (!pContainer->getItemData(sId, sMimeType, msgSHR.sbBody)) { throw ApException("Not found: url=%s: id=%s", StringType(sUrl), StringType(sId)); }
+          if (!pContainer->getItemData(sId, sMimeType, msgSHR.sbBody)) { throw ApException(LOG_CONTEXT, "Not found: url=%s: id=%s", _sz(sUrl), _sz(sId)); }
           msgSHR.kvHeader.add("Content-type", sMimeType);
         }
       } else {
-         throw ApException("Unknown cmd=%s", StringType(sCmd));
+         throw ApException(LOG_CONTEXT, "Unknown cmd=%s", _sz(sCmd));
       }
 
       if (!sHtml.empty()) {
@@ -1257,14 +1257,14 @@ AP_MSG_HANDLER_METHOD(IdentityModule, HttpServer_Request)
       msgSHR.kvHeader.add("Pragma", "no-cache");
       msgSHR.kvHeader.add("Cache-Control", "no-store, no-cache, must-revalidate, post-check=0, pre-check=0");
       msgSHR.kvHeader.add("Expires", "Thu, 19 Nov 1981 08:52:00 GMT");
-      if (!msgSHR.Request()) { throw ApException("Msg_HttpServer_SendResponse failed: conn=" ApHandleFormat "", ApHandleType(msgSHR.hConnection)); }
+      if (!msgSHR.Request()) { throw ApException(LOG_CONTEXT, "Msg_HttpServer_SendResponse failed: conn=" ApHandleFormat "", ApHandlePrintf(msgSHR.hConnection)); }
 
       pMsg->Stop();
       pMsg->apStatus = ApMessage::Ok;
 
     } catch (ApException& ex) {
 
-      apLog_Warning((LOG_CHANNEL, "IdentityModule::HttpServer_Request", "%s", StringType(ex.getText())));
+      apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "%s", _sz(ex.getText())));
 
       Msg_HttpServer_SendResponse msgSHR;
       msgSHR.hConnection = pMsg->hConnection;
@@ -1277,7 +1277,7 @@ AP_MSG_HANDLER_METHOD(IdentityModule, HttpServer_Request)
       String sBody = ex.getText();
       msgSHR.sbBody.SetData(sBody);
       if (!msgSHR.Request()) {
-        { throw ApException("Msg_HttpServer_SendResponse (for error message) failed: conn=" ApHandleFormat "", ApHandleType(msgSHR.hConnection)); }
+        { throw ApException(LOG_CONTEXT, "Msg_HttpServer_SendResponse (for error message) failed: conn=" ApHandleFormat "", ApHandlePrintf(msgSHR.hConnection)); }
       } else {
         pMsg->Stop();
         pMsg->apStatus = ApMessage::Ok;

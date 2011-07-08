@@ -186,6 +186,7 @@ int vpi_set_time(vpi_context context, time_t now);
 #define VPI_LOG_VERYVERBOSE   256
 
 #define VPI_LOGCHANNEL "libvpi"
+#define VPI_LOGCONTEXT __FUNCTION__
 
 typedef void (*vpi_log_callback) (int level, const char* channel, const char* method, const char* message);
 typedef const char* (*vpi_config_read_callback) (const char* path, const char* default_value, char* buf, size_t buf_len);

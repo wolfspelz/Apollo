@@ -25,7 +25,7 @@ static String Test_Vp_NotYet()
 
 static void Test_Vp_UnitTest_TokenEnd()
 {
-  apLog_Info((LOG_CHANNEL, "Test_Vp_UnitTest_TokenEnd", "Finished Test/Vp"));
+  apLog_Info((LOG_CHANNEL, LOG_CONTEXT, "Finished Test/Vp"));
   { ApAsyncMessage<Msg_UnitTest_Token> msg; msg.Post(); }
 }
 
@@ -33,7 +33,7 @@ static void Test_Vp_UnitTest_Token(Msg_UnitTest_Token* pMsg)
 {
   AP_UNUSED_ARG(pMsg);
   { Msg_UnitTest_Token msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_Vp_UnitTest_Token, 0); }
-  apLog_Info((LOG_CHANNEL, "Test_Vp_UnitTest_Token", "Starting Test/Vp"));
+  apLog_Info((LOG_CHANNEL, LOG_CONTEXT, "Starting Test/Vp"));
   int bTokenEndNow = 1;
 
   AP_UNITTEST_EXECUTE(Test_Vp_NotYet);
@@ -50,16 +50,11 @@ static void Test_Vp_UnitTest_Token(Msg_UnitTest_Token* pMsg)
 void Test_Vp_Register()
 {
 #if defined(AP_TEST_Vp)
-#if defined(AP_TEST_Net)
+  #if defined(AP_TEST_Net)
     if (Apollo::isLoadedModule("Net")) {
-      Msg_Net_IsOnline msg;
-      if (msg.Request()) {
-        if (msg.bIsOnline) {
-          g_bTest_Vp_Online = 1;
-        }
-      }
+      g_bTest_Vp_Online = Msg_Net_IsOnline::_();
     }
-  #endif // AP_TEST_Net_HTTP
+  #endif // AP_TEST_Net
 
   if (Apollo::isLoadedModule("Vp")) {
     AP_UNITTEST_REGISTER(Test_Vp_NotYet);

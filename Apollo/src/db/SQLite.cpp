@@ -5,7 +5,6 @@
 // ============================================================================
 
 #include "Apollo.h"
-#include "ApLog.h"
 #include "Local.h"
 #include "SQLite.h"
 #include "SAutoPtr.h"
@@ -40,7 +39,7 @@ SQLiteStatement::~SQLiteStatement()
   if (pStmt_ != 0) {
 		int nRet = sqlite3_finalize(pStmt_);
     if (nRet != SQLITE_OK) {
-      //throw SQLiteException(nRet, "SQLiteStatement::~SQLiteStatement", db_.getErrorMessage());
+      //throw SQLiteException(nRet, LOG_CONTEXT, db_.getErrorMessage());
     }
     pStmt_ = 0;
   }
@@ -48,31 +47,31 @@ SQLiteStatement::~SQLiteStatement()
 
 void SQLiteStatement::bindText(int nPos, const char* szText, int nLength)
 {
-  if (pStmt_ == 0) { throw SQLiteException(SQLITE_ERROR, "SQLiteStatement::bindText", "No statement"); }
+  if (pStmt_ == 0) { throw SQLiteException(SQLITE_ERROR, LOG_CONTEXT, "No statement"); }
 
   int nRet = sqlite3_bind_text(pStmt_, nPos, szText, nLength, SQLITE_TRANSIENT);
   if (nRet != SQLITE_OK) {
-    throw SQLiteException(nRet, "SQLiteStatement::bindText", db_.getErrorMessage());
+    throw SQLiteException(nRet, LOG_CONTEXT, db_.getErrorMessage());
   }
 }
 
 void SQLiteStatement::bindBlob(int nPos, const unsigned char* pData, int nLength)
 {
-  if (pStmt_ == 0) { throw SQLiteException(SQLITE_ERROR, "SQLiteStatement::bindBlob", "No statement"); }
+  if (pStmt_ == 0) { throw SQLiteException(SQLITE_ERROR, LOG_CONTEXT, "No statement"); }
 
   int nRet = sqlite3_bind_blob(pStmt_, 2, pData, nLength, SQLITE_TRANSIENT);
   if (nRet != SQLITE_OK) {
-    throw SQLiteException(nRet, "SQLiteStatement::bindBlob", db_.getErrorMessage());
+    throw SQLiteException(nRet, LOG_CONTEXT, db_.getErrorMessage());
   }
 }
 
 void SQLiteStatement::bindInt(int nPos, int nInt)
 {
-  if (pStmt_ == 0) { throw SQLiteException(SQLITE_ERROR, "SQLiteStatement::bindInt", "No statement"); }
+  if (pStmt_ == 0) { throw SQLiteException(SQLITE_ERROR, LOG_CONTEXT, "No statement"); }
 
   int nRet = sqlite3_bind_int(pStmt_, nPos, nInt);
   if (nRet != SQLITE_OK) {
-    throw SQLiteException(nRet, "SQLiteStatement::bindInt", db_.getErrorMessage());
+    throw SQLiteException(nRet, LOG_CONTEXT, db_.getErrorMessage());
   }
 }
 
@@ -80,7 +79,7 @@ SQLiteRow* SQLiteStatement::fetch()
 {
   SQLiteRow* pRow = 0;
 
-  if (pStmt_ == 0) { throw SQLiteException(SQLITE_ERROR, "SQLiteStatement::fetch", "No statement"); }
+  if (pStmt_ == 0) { throw SQLiteException(SQLITE_ERROR, LOG_CONTEXT, "No statement"); }
 
   int nRet = sqlite3_step(pStmt_);
   if (nRet == SQLITE_ROW){
@@ -124,7 +123,7 @@ SQLiteRow* SQLiteStatement::fetch()
             {
               String s;
               s.appendf("Unknown type: %d", nType);
-              throw SQLiteException(nRet, "SQLiteStatement::fetch", s);
+              throw SQLiteException(nRet, LOG_CONTEXT, s);
             } // default
           } // switch (nType)
 
@@ -138,7 +137,7 @@ SQLiteRow* SQLiteStatement::fetch()
     // do nothing
   } else {
     nRet = sqlite3_reset(pStmt_);
-    throw SQLiteException(nRet, "SQLiteStatement::fetch", db_.getErrorMessage());
+    throw SQLiteException(nRet, LOG_CONTEXT, db_.getErrorMessage());
   }
 
   return pRow;
@@ -205,7 +204,7 @@ int SQLiteFile::open()
   int nRet = sqlite3_open(sFilePath_, &pDb_);
 	if (nRet != SQLITE_OK) {
 		String sError = sqlite3_errmsg(pDb_);
-    apLog_Error((LOG_CHANNEL, "SQLiteFile::open", "sqlite3_open(%s) failed: %s", StringType(sFilePath_), StringType(sError)));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "sqlite3_open(%s) failed: %s", _sz(sFilePath_), _sz(sError)));
     (void) close();
   } else {
     ok = 1;
@@ -225,14 +224,14 @@ int SQLiteFile::close()
       int nRet = sqlite3_finalize(pStmt);
 	    if (nRet != SQLITE_OK) {
 		    String sError = sqlite3_errmsg(pDb_);
-        apLog_Warning((LOG_CHANNEL, "SQLiteFile::close", "sqlite3_finalize() failed: %s", StringType(sError)));
+        apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "sqlite3_finalize() failed: %s", _sz(sError)));
       }
     }
     */
     int nRet = sqlite3_close(pDb_);
 	  if (nRet != SQLITE_OK) {
 		  String sError = sqlite3_errmsg(pDb_);
-      apLog_Error((LOG_CHANNEL, "SQLiteFile::close", "sqlite3_close(%s) failed: %s", StringType(sFilePath_), StringType(sError)));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "sqlite3_close(%s) failed: %s", _sz(sFilePath_), _sz(sError)));
     } else {
       ok = 1;
 	  }
@@ -252,7 +251,7 @@ int SQLiteFile::beginTransaction()
       bTransaction_ = 1;
 
     } catch (SQLiteException& ex) {
-      apLog_Error((LOG_CHANNEL, "SQLiteFile::beginTransaction", "%s failed: %s (%s)", StringType(ex.getMethod()), StringType(ex.getMessage()), StringType(sFilePath_)));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "%s failed: %s (%s)", _sz(ex.getMethod()), _sz(ex.getMessage()), _sz(sFilePath_)));
       ok = 0;
     }
   }
@@ -270,7 +269,7 @@ int SQLiteFile::commitTransaction()
       bTransaction_ = 0;
 
     } catch (SQLiteException& ex) {
-      apLog_Error((LOG_CHANNEL, "SQLiteFile::commitTransaction", "%s failed: %s (%s)", StringType(ex.getMethod()), StringType(ex.getMessage()), StringType(sFilePath_)));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "%s failed: %s (%s)", _sz(ex.getMethod()), _sz(ex.getMessage()), _sz(sFilePath_)));
       ok = 0;
     }
   }
@@ -296,22 +295,22 @@ int SQLiteFile::check()
       } // tableExists
 
     } catch (SQLiteException& ex) {
-      apLog_Warning((LOG_CHANNEL, "SQLiteFile::check", "%s failed: %s (%s)", StringType(ex.getMethod()), StringType(ex.getMessage()), StringType(sFilePath_)));
+      apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "%s failed: %s (%s)", _sz(ex.getMethod()), _sz(ex.getMessage()), _sz(sFilePath_)));
       ok = 0;
     }
 
     if (nVersion < kVersion) {
-      apLog_Info((LOG_CHANNEL, "SQLiteFile::check", "old version, need=%d found=%d", kVersion, nVersion));
+      apLog_Info((LOG_CHANNEL, LOG_CONTEXT, "old version, need=%d found=%d", kVersion, nVersion));
 
       ok = migrateSchema(nVersion, kVersion);
       if (!ok) {
-        apLog_Error((LOG_CHANNEL, "SQLiteFile::check", "MigrateSchema(%d, %d) failed", nVersion, kVersion));
+        apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "MigrateSchema(%d, %d) failed", nVersion, kVersion));
       }
     } else if (nVersion > kVersion) {
-      apLog_Error((LOG_CHANNEL, "SQLiteFile::check", "version too new, need=%d found=%d", kVersion, nVersion));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "version too new, need=%d found=%d", kVersion, nVersion));
     } else {
       ok = 1;
-      apLog_Verbose((LOG_CHANNEL, "SQLiteFile::check", "version ok: %d", nVersion));
+      apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "version ok: %d", nVersion));
     }
   }
 
@@ -322,7 +321,7 @@ int SQLiteFile::createSchema()
 {
   int ok = 0;
 
-  apLog_Verbose((LOG_CHANNEL, "SQLiteFile::createSchema", "Creating DB schema (%s)", StringType(sFilePath_)));
+  apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "Creating DB schema (%s)", _sz(sFilePath_)));
 
   try {
     exec("CREATE TABLE Data (sKey TEXT UNIQUE, oValue BLOB, tCreated INT UNSIGNED, tLifetime INT UNSIGNED);");
@@ -332,14 +331,14 @@ int SQLiteFile::createSchema()
     ok = 1;
 
   } catch (SQLiteException& ex) {
-    apLog_Error((LOG_CHANNEL, "SQLiteFile::createSchema", "%s failed: %s (%s)", StringType(ex.getMethod()), StringType(ex.getMessage()), StringType(sFilePath_)));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "%s failed: %s (%s)", _sz(ex.getMethod()), _sz(ex.getMessage()), _sz(sFilePath_)));
     ok = 0;
   }
 
   if (ok) {
-    apLog_Verbose((LOG_CHANNEL, "SQLiteFile::createSchema", "Creating DB schema done (%s)", StringType(sFilePath_)));
+    apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "Creating DB schema done (%s)", _sz(sFilePath_)));
   } else {
-    apLog_Warning((LOG_CHANNEL, "SQLiteFile::createSchema", "Creating DB schema failed (%s)", StringType(sFilePath_)));
+    apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "Creating DB schema failed (%s)", _sz(sFilePath_)));
   }
 
   return ok;
@@ -349,7 +348,7 @@ int SQLiteFile::deleteSchema()
 {
   int ok = 0;
 
-  apLog_Verbose((LOG_CHANNEL, "SQLiteFile::deleteSchema", "Creating DB schema (%s)", StringType(sFilePath_)));
+  apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "Creating DB schema (%s)", _sz(sFilePath_)));
 
   try {
     if (tableExists("Data")) {
@@ -361,14 +360,14 @@ int SQLiteFile::deleteSchema()
     ok = 1;
 
   } catch (SQLiteException& ex) {
-    apLog_Error((LOG_CHANNEL, "SQLiteFile::deleteSchema", "%s failed: %s (%s)", StringType(ex.getMethod()), StringType(ex.getMessage()), StringType(sFilePath_)));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "%s failed: %s (%s)", _sz(ex.getMethod()), _sz(ex.getMessage()), _sz(sFilePath_)));
     ok = 0;
   }
 
   if (ok) {
-    apLog_Verbose((LOG_CHANNEL, "SQLiteFile::deleteSchema", "Deleting DB schema done (%s)", StringType(sFilePath_)));
+    apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "Deleting DB schema done (%s)", _sz(sFilePath_)));
   } else {
-    apLog_Warning((LOG_CHANNEL, "SQLiteFile::deleteSchema", "Deleting DB schema failed (%s)", StringType(sFilePath_)));
+    apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "Deleting DB schema failed (%s)", _sz(sFilePath_)));
   }
 
   return ok;
@@ -399,7 +398,7 @@ int SQLiteFile::expire()
 {
   int ok = 1;
 
-  apLog_Verbose((LOG_CHANNEL, "SQLiteFile::expire", "Expire DB (%s)", StringType(sFilePath_)));
+  apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "Expire DB (%s)", _sz(sFilePath_)));
 
   try {
     time_t tNow = Apollo::getNow().Sec();
@@ -409,12 +408,12 @@ int SQLiteFile::expire()
     ok = 1;
 
   } catch (SQLiteException& ex) {
-    apLog_Error((LOG_CHANNEL, "SQLiteFile::expire", "%s failed: %s (%s)", StringType(ex.getMethod()), StringType(ex.getMessage()), StringType(sFilePath_)));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "%s failed: %s (%s)", _sz(ex.getMethod()), _sz(ex.getMessage()), _sz(sFilePath_)));
     ok = 0;
   }
 
   if (!ok) {
-    apLog_Warning((LOG_CHANNEL, "SQLiteFile::expire", "Expire DB failed (%s)", StringType(sFilePath_)));
+    apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "Expire DB failed (%s)", _sz(sFilePath_)));
   }
 
   return ok;
@@ -424,7 +423,7 @@ int SQLiteFile::deleteOlderThan(int nAge)
 {
   int ok = 1;
 
-  apLog_Verbose((LOG_CHANNEL, "SQLiteFile::deleteOlderThan", "Expire DB (%s)", StringType(sFilePath_)));
+  apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "Expire DB (%s)", _sz(sFilePath_)));
 
   try {
     time_t tNow = Apollo::getNow().Sec();
@@ -434,12 +433,12 @@ int SQLiteFile::deleteOlderThan(int nAge)
     ok = 1;
 
   } catch (SQLiteException& ex) {
-    apLog_Error((LOG_CHANNEL, "SQLiteFile::deleteOlderThan", "%s failed: %s (%s)", StringType(ex.getMethod()), StringType(ex.getMessage()), StringType(sFilePath_)));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "%s failed: %s (%s)", _sz(ex.getMethod()), _sz(ex.getMessage()), _sz(sFilePath_)));
     ok = 0;
   }
 
   if (!ok) {
-    apLog_Warning((LOG_CHANNEL, "SQLiteFile::deleteOlderThan", "Expire DB failed (%s)", StringType(sFilePath_)));
+    apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "Expire DB failed (%s)", _sz(sFilePath_)));
   }
 
   return ok;
@@ -458,7 +457,7 @@ int SQLiteFile::sync()
     try {
       exec("VACUUM;");
     } catch (SQLiteException& ex) {
-      apLog_Error((LOG_CHANNEL, "SQLiteFile::sync", "compact db: %s failed: %s (%s)", StringType(ex.getMethod()), StringType(ex.getMessage()), StringType(sFilePath_)));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "compact db: %s failed: %s (%s)", _sz(ex.getMethod()), _sz(ex.getMessage()), _sz(sFilePath_)));
     }
   }
 
@@ -471,12 +470,12 @@ SQLiteStatement* SQLiteFile::prepareStatement(const String& sSql)
 {
   SQLiteStatement* pResult = 0;
 
-  if (!isOpen()) { throw SQLiteException(SQLITE_ERROR, "SQLiteFile::prepareStatement", "File not open"); }
+  if (!isOpen()) { throw SQLiteException(SQLITE_ERROR, LOG_CONTEXT, "File not open"); }
 
   sqlite3_stmt *pStmt = 0;
   int nRet = sqlite3_prepare(pDb_, sSql, -1, &pStmt, 0);
   if (nRet != SQLITE_OK || pStmt == 0) {
-    throw SQLiteException(nRet, "SQLiteFile::prepareStatement", getErrorMessage());
+    throw SQLiteException(nRet, LOG_CONTEXT, getErrorMessage());
   } else {
     pResult = new SQLiteStatement(*this, pStmt);
   }
@@ -498,7 +497,7 @@ bool SQLiteFile::tableExists(const String& sTable)
       }
 
     } catch (SQLiteException& ex) {
-      apLog_Error((LOG_CHANNEL, "SQLiteFile::tableExists", "%s failed: %s (%s)", StringType(ex.getMethod()), StringType(ex.getMessage()), StringType(sFilePath_)));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "%s failed: %s (%s)", _sz(ex.getMethod()), _sz(ex.getMessage()), _sz(sFilePath_)));
     }
   }
 
@@ -525,7 +524,7 @@ int SQLiteFile::setValue(const String& sKey, String& sValue, int nLifetime)
       bChanged_ = 1;
 
     } catch (SQLiteException& ex) {
-      apLog_Error((LOG_CHANNEL, "SQLiteFile::setValue", "%s failed: %s (%s)", StringType(ex.getMethod()), StringType(ex.getMessage()), StringType(sFilePath_)));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "%s failed: %s (%s)", _sz(ex.getMethod()), _sz(ex.getMessage()), _sz(sFilePath_)));
       ok = 0;
     }
   }
@@ -553,7 +552,7 @@ int SQLiteFile::setValue(const String& sKey, const unsigned char* pData, size_t 
       bChanged_ = 1;
 
     } catch (SQLiteException& ex) {
-      apLog_Error((LOG_CHANNEL, "SQLiteFile::setValue", "%s failed: %s (%s)", StringType(ex.getMethod()), StringType(ex.getMessage()), StringType(sFilePath_)));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "%s failed: %s (%s)", _sz(ex.getMethod()), _sz(ex.getMessage()), _sz(sFilePath_)));
       ok = 0;
     }
   }
@@ -574,7 +573,7 @@ int SQLiteFile::deleteValue(const String& sKey)
       AutoPtr<SQLiteRow> pRow(pStmt->fetch());
 
     } catch (SQLiteException& ex) {
-      apLog_Error((LOG_CHANNEL, "SQLiteFile::deleteValue", "%s failed: %s (%s)", StringType(ex.getMethod()), StringType(ex.getMessage()), StringType(sFilePath_)));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "%s failed: %s (%s)", _sz(ex.getMethod()), _sz(ex.getMessage()), _sz(sFilePath_)));
       ok = 0;
     }
   }
@@ -601,7 +600,7 @@ int SQLiteFile::hasValue(const String& sKey, int& bAvailable)
       }
 
     } catch (SQLiteException& ex) {
-      apLog_Error((LOG_CHANNEL, "SQLiteFile::hasValue", "%s failed: %s (%s)", StringType(ex.getMethod()), StringType(ex.getMessage()), StringType(sFilePath_)));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "%s failed: %s (%s)", _sz(ex.getMethod()), _sz(ex.getMessage()), _sz(sFilePath_)));
       ok = 0;
     }
   }
@@ -625,7 +624,7 @@ int SQLiteFile::getValue(const String& sKey, String& sValue)
       }
 
     } catch (SQLiteException& ex) {
-      apLog_Error((LOG_CHANNEL, "SQLiteFile::getValue", "%s failed: %s (%s)", StringType(ex.getMethod()), StringType(ex.getMessage()), StringType(sFilePath_)));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "%s failed: %s (%s)", _sz(ex.getMethod()), _sz(ex.getMessage()), _sz(sFilePath_)));
       ok = 0;
     }
   }
@@ -660,7 +659,7 @@ int SQLiteFile::getValue(const String& sKey, Buffer& sbValue)
       }
 
     } catch (SQLiteException& ex) {
-      apLog_Error((LOG_CHANNEL, "SQLiteFile::getValue", "%s failed: %s (%s)", StringType(ex.getMethod()), StringType(ex.getMessage()), StringType(sFilePath_)));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "%s failed: %s (%s)", _sz(ex.getMethod()), _sz(ex.getMessage()), _sz(sFilePath_)));
       ok = 0;
     }
   }
@@ -688,7 +687,7 @@ int SQLiteFile::getKeys(Apollo::ValueList& vlKeys)
       } // while !bDone
 
     } catch (SQLiteException& ex) {
-      apLog_Error((LOG_CHANNEL, "SQLiteFile::getKeys", "%s failed: %s (%s)", StringType(ex.getMethod()), StringType(ex.getMessage()), StringType(sFilePath_)));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "%s failed: %s (%s)", _sz(ex.getMethod()), _sz(ex.getMessage()), _sz(sFilePath_)));
       ok = 0;
     }
   }
@@ -698,10 +697,10 @@ int SQLiteFile::getKeys(Apollo::ValueList& vlKeys)
 
 void SQLiteFile::exec(const String& sSql)
 {
-  if (!isOpen()) { throw SQLiteException(SQLITE_ERROR, "SQLiteFile::prepareStatement", "File not open"); }
+  if (!isOpen()) { throw SQLiteException(SQLITE_ERROR, LOG_CONTEXT, "File not open"); }
 
   int nRet = sqlite3_exec(pDb_, sSql, 0, 0, 0);
   if (nRet != SQLITE_OK) {
-    throw SQLiteException(nRet, "SQLiteFile::exec", getErrorMessage());
+    throw SQLiteException(nRet, LOG_CONTEXT, getErrorMessage());
   }
 }

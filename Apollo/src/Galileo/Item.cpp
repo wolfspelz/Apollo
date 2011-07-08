@@ -5,10 +5,9 @@
 // ============================================================================
 
 #include "Apollo.h"
-#include "ApLog.h"
+#include "Local.h"
 #include "MsgAnimation.h"
 #include "MsgDB.h"
-#include "Local.h"
 #include "Item.h"
 #include "ximagif.h"
 #include "Image.h"
@@ -88,7 +87,7 @@ void Animation::SuspendRequest()
     }
   }
 
-  apLog_Verbose((LOG_CHANNEL, "Animation::SuspendRequest", "for %d sec (%s)", nRequestSuspendDelaySec_, StringType(sSrc_)));
+  apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "for %d sec (%s)", nRequestSuspendDelaySec_, _sz(sSrc_)));
 }
 
 int Animation::RequestData()
@@ -103,7 +102,7 @@ int Animation::RequestData()
     msg.sUrl = sSrc_;
     ok = msg.Request();
     if (!ok) {
-      apLog_Error((LOG_CHANNEL, "Animation::RequestData", "Msg_Galileo_RequestAnimation failed: url=%s", StringType(sSrc_)));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_Galileo_RequestAnimation failed: url=%s", _sz(sSrc_)));
     }
   }
 
@@ -119,7 +118,7 @@ int Animation::HasDataInCache()
     msg.sUrl = sSrc_;
     int ok = msg.Request();
     if (!ok) {
-      apLog_Error((LOG_CHANNEL, "Animation::HasDataInCache", "Msg_Galileo_IsAnimationDataInStorage failed: url=%s", StringType(sSrc_)));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_Galileo_IsAnimationDataInStorage failed: url=%s", _sz(sSrc_)));
     } else {
       bAvailable = msg.bAvailable;
     }
@@ -137,7 +136,7 @@ int Animation::GetDataFromCache()
     msg.sUrl = sSrc_;
     ok = msg.Request();
     if (!ok) {
-      apLog_Error((LOG_CHANNEL, "Animation::GetDataFromCache", "Msg_Galileo_LoadAnimationDataFromStorage failed: url=%s", StringType(sSrc_)));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_Galileo_LoadAnimationDataFromStorage failed: url=%s", _sz(sSrc_)));
     } else {
       sbData_ = msg.sbData;
       sMimeType_ = msg.sMimeType;
@@ -158,7 +157,7 @@ int Animation::SaveDataToCache()
     msg.sMimeType = sMimeType_;
     ok = msg.Request();
     if (!ok) {
-      apLog_Error((LOG_CHANNEL, "Animation::SaveDataToCache", "Msg_Galileo_SaveAnimationDataToStorage failed: url=%s", StringType(sSrc_)));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_Galileo_SaveAnimationDataToStorage failed: url=%s", _sz(sSrc_)));
     }
   }
 
@@ -175,9 +174,9 @@ int Animation::LoadData()
 	img.SetFrame(nFrames - 1);
 
   if (!img.Decode(sbData_.Data(), sbData_.Length(), CXIMAGE_FORMAT_GIF)) {
-    apLog_Warning((LOG_CHANNEL, "Animation::LoadData", "Decode failed"));
+    apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "Decode failed"));
   } else {
-    apLog_Verbose((LOG_CHANNEL, "Animation::LoadData", "Decode successful src=%s #frames=%d", StringType(sSrc_), nFrames));
+    apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "Decode successful src=%s #frames=%d", _sz(sSrc_), nFrames));
     bLoaded_ = 0;
 
     for (int i = 0; i < nFrames; i++) {
@@ -452,14 +451,14 @@ void Item::SetDelay(int nDelayMSec)
 void Item::SetData(Buffer& sbData, const String& sUrl)
 {
   Apollo::XMLProcessor xml;
-  if (!xml.XmlText((const char*) sbData.Data(), sbData.Length(), 1)) { throw ApException("xml.Parse() failed, hItem=" ApHandleFormat " %d bytes: %s", ApHandleType(hAp_), sbData.Length(), StringType(xml.GetErrorString())); }
+  if (!xml.XmlText((const char*) sbData.Data(), sbData.Length(), 1)) { throw ApException(LOG_CONTEXT, "xml.Parse() failed, hItem=" ApHandleFormat " %d bytes: %s", ApHandlePrintf(hAp_), sbData.Length(), _sz(xml.GetErrorString())); }
 
   Apollo::XMLNode* pRoot = xml.Root();
-  if (pRoot == 0) { throw ApException("xml.Root() == 0, hItem=" ApHandleFormat " %d bytes", ApHandleType(hAp_), sbData.Length()); }
+  if (pRoot == 0) { throw ApException(LOG_CONTEXT, "xml.Root() == 0, hItem=" ApHandleFormat " %d bytes", ApHandlePrintf(hAp_), sbData.Length()); }
 
   String sNs = pRoot->getAttribute("xmlns").getValue();
   String sVersion = pRoot->getAttribute("version").getValue();
-  if (sNs != "http://schema.bluehands.de/character-config" || sVersion != "1.0") { throw ApException("Wrong xmlns=%s or version=%s, hItem=" ApHandleFormat "", StringType(sNs), StringType(sVersion), ApHandleType(hAp_)); }
+  if (sNs != "http://schema.bluehands.de/character-config" || sVersion != "1.0") { throw ApException(LOG_CONTEXT, "Wrong xmlns=%s or version=%s, hItem=" ApHandleFormat "", _sz(sNs), _sz(sVersion), ApHandlePrintf(hAp_)); }
 
   ResetAnimations();
 
@@ -808,7 +807,7 @@ Sequence* Item::SelectNextSequence()
       sSequence = sNextSequence_;
       sNextSequence_ = "";
       bFinal = 1;
-      apLog_Verbose((LOG_CHANNEL, "Item::SelectNextSequence", "item=" ApHandleFormat " selecting next definitive seq=%s", ApHandleType(hAp_), StringType(sSequence)));
+      apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "item=" ApHandleFormat " selecting next definitive seq=%s", ApHandlePrintf(hAp_), _sz(sSequence)));
     }
   }
 
@@ -816,14 +815,14 @@ Sequence* Item::SelectNextSequence()
     if (sEvent_) {
       sSequence = sEvent_;
       sEvent_ = "";
-      apLog_Verbose((LOG_CHANNEL, "Item::SelectNextSequence", "item=" ApHandleFormat " selecting event seq=%s", ApHandleType(hAp_), StringType(sSequence)));
+      apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "item=" ApHandleFormat " selecting event seq=%s", ApHandlePrintf(hAp_), _sz(sSequence)));
     }
   }
 
   if (!sSequence) {
     if (sStatus_) {
       sSequence = sStatus_;
-      apLog_VeryVerbose((LOG_CHANNEL, "Item::SelectNextSequence", "item=" ApHandleFormat " selecting status seq=%s", ApHandleType(hAp_), StringType(sSequence)));
+      apLog_VeryVerbose((LOG_CHANNEL, LOG_CONTEXT, "item=" ApHandleFormat " selecting status seq=%s", ApHandlePrintf(hAp_), _sz(sSequence)));
     }
   }
 
@@ -836,7 +835,7 @@ Sequence* Item::SelectNextSequence()
           if (pTransitionSequence) {
             sNextSequence_ = sSequence;
             sSequence = sTransitionSequence;
-            apLog_Verbose((LOG_CHANNEL, "Item::SelectNextSequence", "item=" ApHandleFormat " selecting transition seq=%s", ApHandleType(hAp_), StringType(sSequence)));
+            apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "item=" ApHandleFormat " selecting transition seq=%s", ApHandlePrintf(hAp_), _sz(sSequence)));
           }
         }
       }
@@ -875,13 +874,13 @@ Sequence* Item::SelectNextSequence()
 
     if (sModified) {
       sSequence = sModified;
-      apLog_VeryVerbose((LOG_CHANNEL, "Item::SelectNextSequence", "item=" ApHandleFormat " selecting modified seq=%s", ApHandleType(hAp_), StringType(sSequence)));
+      apLog_VeryVerbose((LOG_CHANNEL, LOG_CONTEXT, "item=" ApHandleFormat " selecting modified seq=%s", ApHandlePrintf(hAp_), _sz(sSequence)));
     }
   }
 
   //if (!sSequence) {
   //  sSequence = GetDefaultSequenceName();
-  //  apLog_VeryVerbose((LOG_CHANNEL, "Item::SelectNextSequence", "item=" ApHandleFormat " selecting default seq=%s", ApHandleType(hAp_), StringType(sSequence)));
+  //  apLog_VeryVerbose((LOG_CHANNEL, LOG_CONTEXT, "item=" ApHandleFormat " selecting default seq=%s", ApHandlePrintf(hAp_), _sz(sSequence)));
   //}
 
   // Prepare return value, assert that there is one by all possible means
@@ -921,7 +920,7 @@ Sequence* Item::GetSequenceByGroup(const String& sGroup)
     int nRnd = Apollo::getRandom(nSum);
     pSequence = pGroup->GetRandomSequence(nRnd);
     if (pSequence) {
-      apLog_VeryVerbose((LOG_CHANNEL, "Item::GetSequenceByGroup", "item=" ApHandleFormat " sum=%d rnd=%d %s -> %s", ApHandleType(hAp_), nSum, nRnd, StringType(sGroup), StringType(pSequence->getName())));
+      apLog_VeryVerbose((LOG_CHANNEL, LOG_CONTEXT, "item=" ApHandleFormat " sum=%d rnd=%d %s -> %s", ApHandlePrintf(hAp_), nSum, nRnd, _sz(sGroup), _sz(pSequence->getName())));
     }
   }
 

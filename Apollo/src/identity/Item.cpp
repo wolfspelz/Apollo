@@ -5,9 +5,8 @@
 // ============================================================================
 
 #include "Apollo.h"
-#include "ApLog.h"
-#include "MsgIdentity.h"
 #include "Local.h"
+#include "MsgIdentity.h"
 #include "Item.h"
 #include "Container.h"
 
@@ -26,7 +25,7 @@ int Item::parseXmlNode(XMLNode* pNode)
   // Some checks
   if (getAttribute("id").empty() || getAttribute("digest").empty() || getAttribute("type").empty() && (getAttribute("src").empty() && sbData_.Length() == 0)) {
     ok = 0;
-    apLog_Warning((LOG_CHANNEL, "Item::parseXmlNode", "id=%s invalid: digest=%s type=%s src=%s data-len=%d", StringType(getAttribute("id")), StringType(getAttribute("digest")), StringType(getAttribute("type")), StringType(getAttribute("src")), sbData_.Length()));
+    apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "id=%s invalid: digest=%s type=%s src=%s data-len=%d", _sz(getAttribute("id")), _sz(getAttribute("digest")), _sz(getAttribute("type")), _sz(getAttribute("src")), sbData_.Length()));
   } else {
 
     if (getAttribute("src").empty()) {

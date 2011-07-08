@@ -25,6 +25,7 @@ BOOL APIENTRY DllMain(HANDLE hModule, DWORD dwReason, LPVOID lpReserved)
 
 #define MODULE_NAME "TrayIcon"
 #define LOG_CHANNEL MODULE_NAME
+#define LOG_CONTEXT apLog_Context
 
 static AP_MODULE_INFO g_info = {
   sizeof(AP_MODULE_INFO),
@@ -69,7 +70,7 @@ static void Handle_TcpServer_SrpcRequest(Msg_TcpServer_SrpcRequest* pMsg)
   String sMethod = pMsg->srpc.getString(Srpc::Key::Method);
   if (sMethod == msgTIH.Type()) {
     if (ApIsHandle(g_hConnection) && g_hConnection != pMsg->hConnection) {
-      apLog_Warning((LOG_CHANNEL, "Handle_TcpServer_SrpcRequest", "Received %s for conn=" ApHandleFormat " but already have conn=" ApHandleFormat ": replaced", StringType(sMethod), ApHandleType(pMsg->hConnection), ApHandleType(g_hConnection)));
+      apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "Received %s for conn=" ApHandleFormat " but already have conn=" ApHandleFormat ": replaced", _sz(sMethod), ApHandlePrintf(pMsg->hConnection), ApHandlePrintf(g_hConnection)));
     }
     g_hConnection = pMsg->hConnection;
 
@@ -170,7 +171,7 @@ static String Test_HelloXmppUpDownDisconnect()
     msg.hConnection = hConn;
     msg.srpc.set(Srpc::Key::Method, "TrayIcon_Hello");
     if (!msg.Request()) {
-      s.appendf("%s(%s) failed", StringType(msg.Type()), StringType(msg.srpc.getString(Srpc::Key::Method)));
+      s.appendf("%s(%s) failed", _sz(msg.Type()), _sz(msg.srpc.getString(Srpc::Key::Method)));
     }
   }
 

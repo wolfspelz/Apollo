@@ -5,7 +5,6 @@
 // ============================================================================
 
 #include "Apollo.h"
-#include "ApLog.h"
 #include "Local.h"
 #include "WebViewModule.h"
 
@@ -47,7 +46,7 @@ View* WebViewModule::FindView(const ApHandle& hView)
 
   views_.Get(hView, pView);
   if (pView == 0) {
-    throw ApException(LOG_CONTEXT + " no webview=" ApHandleFormat "", _szH(hView));
+    throw ApException(LOG_CONTEXT, "no view=" ApHandleFormat "", ApHandlePrintf(hView));
   }
 
   return pView;
@@ -57,7 +56,7 @@ View* WebViewModule::FindView(const ApHandle& hView)
 
 AP_MSG_HANDLER_METHOD(WebViewModule, WebView_Create)
 {
-  if (views_.Find(pMsg->hView) != 0) { throw ApException(LOG_CONTEXT + " view=" ApHandleFormat " already exists", _szH(pMsg->hView)); }
+  if (views_.Find(pMsg->hView) != 0) { throw ApException(LOG_CONTEXT, "view=" ApHandleFormat " already exists", ApHandlePrintf(pMsg->hView)); }
   View* pView = CreateView(pMsg->hView, pMsg->nLeft, pMsg->nTop, pMsg->nWidth, pMsg->nHeight);
   bWebKitUsed_ = 1;
   pMsg->apStatus = ApMessage::Ok;

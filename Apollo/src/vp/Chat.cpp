@@ -5,9 +5,8 @@
 // ============================================================================
 
 #include "Apollo.h"
-#include "ApLog.h"
-#include "MsgVpView.h"
 #include "Local.h"
+#include "MsgVpView.h"
 #include "Chat.h"
 
 Chat::Chat(const ApHandle& hLocation, const ApHandle& hParticipant, const ApHandle& hChat, const String& sNickname, const String& sText,Apollo::TimeValue& tvStamp)

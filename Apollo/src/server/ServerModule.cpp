@@ -5,9 +5,8 @@
 // ============================================================================
 
 #include "Apollo.h"
-#include "ApLog.h"
-#include "MsgConfig.h"
 #include "Local.h"
+#include "MsgConfig.h"
 #include "ServerModule.h"
 #include "HttpServer.h"
 #include "HttpConnection.h"
@@ -73,11 +72,11 @@ AP_MSG_HANDLER_METHOD(ServerModule, Server_StartHTTP)
 {
   if (pHttpServer_ == 0) {
     pHttpServer_ = new HttpServer();
-    if (!pHttpServer_) { throw ApException("new HttpServer failed"); }
+    if (!pHttpServer_) { throw ApException(LOG_CONTEXT, "new HttpServer failed"); }
 
     sHttpAddress_ = Apollo::getModuleConfig(MODULE_NAME, "HTTP/Address", "localhost");
     nHttpPort_ = Apollo::getModuleConfig(MODULE_NAME, "HTTP/Port", 23761);
-    if (!pHttpServer_->Start(sHttpAddress_, nHttpPort_)) { throw ApException("pServer_->Start(%s, %d) failed", StringType(sHttpAddress_), nHttpPort_); }
+    if (!pHttpServer_->Start(sHttpAddress_, nHttpPort_)) { throw ApException(LOG_CONTEXT, "pServer_->Start(%s, %d) failed", _sz(sHttpAddress_), nHttpPort_); }
   }
 
   pMsg->apStatus = ApMessage::Ok;
@@ -107,7 +106,7 @@ AP_MSG_HANDLER_METHOD(ServerModule, HttpServer_Request)
   msg.kvHeader.add("Content-length", String::from(msg.sbBody.Length()));
 
   if (!msg.Request()) {
-    apLog_Error((LOG_CHANNEL, "ServerModule::HttpServer_Request", "Msg_HttpServer_SendResponse failed conn=" ApHandleFormat "", ApHandleType(pMsg->hConnection)));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_HttpServer_SendResponse failed conn=" ApHandleFormat "", ApHandlePrintf(pMsg->hConnection)));
   }
 
   pMsg->apStatus = ApMessage::Ok;
@@ -116,7 +115,7 @@ AP_MSG_HANDLER_METHOD(ServerModule, HttpServer_Request)
 AP_MSG_HANDLER_METHOD(ServerModule, HttpServer_SendResponse)
 {
   HttpConnection* pConnection = findHttpConnection(pMsg->hConnection);
-  if (pConnection == 0) { throw ApException("findHttpConnection(" ApHandleFormat ") failed", ApHandleType(pMsg->hConnection)); }
+  if (pConnection == 0) { throw ApException(LOG_CONTEXT, "findHttpConnection(" ApHandleFormat ") failed", ApHandlePrintf(pMsg->hConnection)); }
 
   String sHeader;
 
@@ -136,11 +135,11 @@ AP_MSG_HANDLER_METHOD(ServerModule, HttpServer_SendResponse)
     }
   }
 
-  sHeader.appendf("%s %d %s\r\n", StringType(pMsg->sProtocol), pMsg->nStatus, StringType(pMsg->sMessage));
+  sHeader.appendf("%s %d %s\r\n", _sz(pMsg->sProtocol), pMsg->nStatus, _sz(pMsg->sMessage));
   
   {
     for (Apollo::KeyValueElem* e = 0; (e = pMsg->kvHeader.nextElem(e)) != 0; ) {
-      sHeader.appendf("%s: %s\r\n", StringType(e->getKey()), StringType(e->getString()));
+      sHeader.appendf("%s: %s\r\n", _sz(e->getKey()), _sz(e->getString()));
     }
   }
 
@@ -169,11 +168,11 @@ AP_MSG_HANDLER_METHOD(ServerModule, Server_StartTCP)
 {
   if (pTcpServer_ == 0) {
     pTcpServer_ = new TcpServer();
-    if (!pTcpServer_) { throw ApException("new TcpServer failed"); }
+    if (!pTcpServer_) { throw ApException(LOG_CONTEXT, "new TcpServer failed"); }
 
     sTcpAddress_ = Apollo::getModuleConfig(MODULE_NAME, "TCP/Address", "localhost");
     nTcpPort_ = Apollo::getModuleConfig(MODULE_NAME, "TCP/Port", 23761);
-    if (!pTcpServer_->Start(sTcpAddress_, nTcpPort_)) { throw ApException("pServer_->Start(%s, %d) failed", StringType(sTcpAddress_), nTcpPort_); }
+    if (!pTcpServer_->Start(sTcpAddress_, nTcpPort_)) { throw ApException(LOG_CONTEXT, "pServer_->Start(%s, %d) failed", _sz(sTcpAddress_), nTcpPort_); }
   }
 
   pMsg->apStatus = ApMessage::Ok;
@@ -216,14 +215,14 @@ AP_MSG_HANDLER_METHOD(ServerModule, TcpServer_SendSrpc)
   String sMsg = pMsg->srpc.toString();
 
   if (apLog_IsVerbose) {
-    apLog_Verbose((LOG_CHANNEL, "ServerModule, TcpServer_SendSrpc", "conn=" ApHandleFormat " send: %s", ApHandleType(pMsg->hConnection), StringType(sMsg)));
+    apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "conn=" ApHandleFormat " send: %s", ApHandlePrintf(pMsg->hConnection), _sz(sMsg)));
   }
 
   sMsg += "\n";
 
   TcpConnection* pConnection = findTcpConnection(pMsg->hConnection);
-  if (pConnection == 0) { throw ApException("findTcpConnection(" ApHandleFormat ") failed", ApHandleType(pMsg->hConnection)); }
-  if (! pConnection->DataOut((unsigned char*) sMsg.c_str(), sMsg.bytes()) ) { throw ApException("Connection " ApHandleFormat " DataOut() failed", ApHandleType(pMsg->hConnection)); }
+  if (pConnection == 0) { throw ApException(LOG_CONTEXT, "findTcpConnection(" ApHandleFormat ") failed", ApHandlePrintf(pMsg->hConnection)); }
+  if (! pConnection->DataOut((unsigned char*) sMsg.c_str(), sMsg.bytes()) ) { throw ApException(LOG_CONTEXT, "Connection " ApHandleFormat " DataOut() failed", ApHandlePrintf(pMsg->hConnection)); }
 
   pMsg->apStatus = ApMessage::Ok;
 }

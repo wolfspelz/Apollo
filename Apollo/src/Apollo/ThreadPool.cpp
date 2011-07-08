@@ -277,7 +277,7 @@ Apollo::ThreadList& Apollo::ThreadPool::threadList()
 void Apollo::ThreadPool::Run()
 {
   for (int i = 0; i < nConcurrency_; ++i) {
-    String sWorkerName; sWorkerName.appendf("%s-%d", StringType(sName_), i + 1);
+    String sWorkerName; sWorkerName.appendf("%s-%d", _sz(sName_), i + 1);
     Apollo::WorkerThread* pWorker = new Apollo::WorkerThread((const char*)sWorkerName, this);
     if (pWorker != 0) { 
       threadList().Push(pWorker);

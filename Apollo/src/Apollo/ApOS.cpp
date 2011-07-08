@@ -9,6 +9,7 @@
 #include "ApLog.h"
 
 #define LOG_CHANNEL "ApOS"
+#define LOG_CONTEXT apLog_Context
 
 AP_NAMESPACE_BEGIN
 
@@ -253,14 +254,14 @@ void Thread::Run()
                             0        //LPDWORD lpThreadId
                             );
   if (hThread_ == 0) {
-    apLog_Error((LOG_CHANNEL, "Thread::Run", "CreateThread failed %d", GetLastError()));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "CreateThread failed %d", GetLastError()));
   } else {
     bStarted_ = 1;
   }
 #else
   int nErr = ::pthread_create(&hThread_,  0, ThreadJumpIn, this);
   if (nErr != 0) {
-    apLog_Error((LOG_CHANNEL, "Thread::Run", "pthread_create failed %d", nErr));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "pthread_create failed %d", nErr));
   } else {
     bStarted_ = 1;
   }

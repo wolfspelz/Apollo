@@ -187,7 +187,7 @@ void XMLProcessor::startElement(const XML_Char* name, const XML_Char** atts)
     if (current_node != 0) {
       node = current_node->addChild(name);
       if (node == 0) {
-        error_.appendf("XMLProcessor::startElement, current_node.addChild(%s) failed", StringType(name));
+        error_.appendf("XMLProcessor::startElement, current_node.addChild(%s) failed", _sz(name));
       }
     }
   }
@@ -210,7 +210,7 @@ void XMLProcessor::startElement(const XML_Char* name, const XML_Char** atts)
       if (attr_key != 0 && attr_value != 0) {
         XMLAttr* attribute = node->addAttribute(attr_key, attr_value);
         if (attribute == 0) {
-          error_.appendf("XMLProcessor::startElement, current_node.addAttribute(%s=%s) failed", StringType(attr_key), StringType(attr_value));
+          error_.appendf("XMLProcessor::startElement, current_node.addAttribute(%s=%s) failed", _sz(attr_key), _sz(attr_value));
         }
       }
     }
@@ -518,7 +518,7 @@ static void AppendNodeAsText(String &_s, XMLNode* _node, int _depth, int _escape
     XMLChildList& cl = _node->getChildren();
 
     if (_include_outer_tag) {
-      _s.appendf("<%s", StringType(_node->getName()));
+      _s.appendf("<%s", _sz(_node->getName()));
 
       XMLAttr* a = 0;
       while ((a = (XMLAttr*) al.Next(a)) != 0) {
@@ -528,7 +528,7 @@ static void AppendNodeAsText(String &_s, XMLNode* _node, int _depth, int _escape
           name.escape(String::EscapeXML);
           value.escape(String::EscapeXML);
         }
-        _s.appendf(" %s='%s'", StringType(name), StringType(value));
+        _s.appendf(" %s='%s'", _sz(name), _sz(value));
       }
     
       if (cl.NumElem() > 0) {
@@ -545,7 +545,7 @@ static void AppendNodeAsText(String &_s, XMLNode* _node, int _depth, int _escape
   
     if (_include_outer_tag) {
       if (cl.NumElem() > 0) {
-        _s.appendf("</%s>", StringType(_node->getName()));
+        _s.appendf("</%s>", _sz(_node->getName()));
       }
     }
 

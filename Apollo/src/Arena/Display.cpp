@@ -39,24 +39,24 @@ int Display::Create()
   ApHandle hView = Apollo::newHandle();
 
   ok = Msg_WebView_Create::_(hView, 100, 100, 100, 100);
-  if (!ok) { apLog_Error((LOG_CHANNEL, "Display::Create", "Msg_WebView_Create(" ApHandleFormat ") failed", ApHandleType(hView))); }
+  if (!ok) { apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_WebView_Create(" ApHandleFormat ") failed", ApHandlePrintf(hView))); }
 
   if (ok) {
     Msg_WebView_SetWindowFlags msg;
     msg.hView = hView;
     msg.nFlags = Msg_WebView_SetWindowFlags::ToolWindow;
     ok = msg.Request();
-    if (!ok) { apLog_Error((LOG_CHANNEL, "Display::Create", "Msg_WebView_SetScriptAccessPolicy::Allow(" ApHandleFormat ") failed", ApHandleType(hView))); }
+    if (!ok) { apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_WebView_SetScriptAccessPolicy::Allow(" ApHandleFormat ") failed", ApHandlePrintf(hView))); }
   }
 
   if (ok) {
     ok = Msg_WebView_SetScriptAccessPolicy::Allow(hView);
-    if (!ok) { apLog_Error((LOG_CHANNEL, "Display::Create", "Msg_WebView_SetScriptAccessPolicy::Allow(" ApHandleFormat ") failed", ApHandleType(hView))); }
+    if (!ok) { apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_WebView_SetScriptAccessPolicy::Allow(" ApHandleFormat ") failed", ApHandlePrintf(hView))); }
   }
 
   if (ok) {
     ok = Msg_WebView_Load::_(hView, Apollo::getModuleConfig(MODULE_NAME, "File", "file://" + Apollo::getModuleResourcePath(MODULE_NAME) + "arena.html"));
-    if (!ok) { apLog_Error((LOG_CHANNEL, "Display::Create", "Msg_WebView_Load(" ApHandleFormat ") failed", ApHandleType(hView))); }
+    if (!ok) { apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_WebView_Load(" ApHandleFormat ") failed", ApHandlePrintf(hView))); }
   }
 
   if (ok) {
@@ -79,7 +79,7 @@ void Display::Destroy()
     Msg_WebView_Destroy msg;
     msg.hView = hView_;
     if (!msg.Request()) {
-      apLog_Error((LOG_CHANNEL, "Display::Destroy", "Msg_WebView_Destroy(" ApHandleFormat ") failed", ApHandleType(msg.hView)));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_WebView_Destroy(" ApHandleFormat ") failed", ApHandlePrintf(msg.hView)));
     }
   }
 }
@@ -138,7 +138,7 @@ void Display::SendVisibility()
     msg.hView = hView_;
     msg.bVisible = bVisible_;
     if (!msg.Request()) {
-      apLog_Error((LOG_CHANNEL, "Display::SendVisibility", "Msg_WebView_Visibility(" ApHandleFormat ") failed", ApHandleType(msg.hView)));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_WebView_Visibility(" ApHandleFormat ") failed", ApHandlePrintf(msg.hView)));
     }
   }
 }
@@ -165,7 +165,7 @@ void Display::SendPosition()
     msg.nWidth = nWidth_ + (nExtendLeft + nExtendRight);
     msg.nHeight = nHeight_ + (nExtendTop + nExtendBottom);
     if (!msg.Request()) {
-      apLog_Error((LOG_CHANNEL, "Display::SendPosition", "Msg_WebView_Position(" ApHandleFormat ") failed", ApHandleType(msg.hView)));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_WebView_Position(" ApHandleFormat ") failed", ApHandlePrintf(msg.hView)));
     }
   }
 }
@@ -204,21 +204,21 @@ void Display::DetachLocation(const ApHandle& hLocation)
 
 void Display::OnEnterRequested()
 {
-  apLog_Verbose((LOG_CHANNEL, "Display::OnEnterRequested", "ctxt=" ApHandleFormat " loc=" ApHandleFormat "", ApHandleType(hContext_), ApHandleType(hLocation_)));
+  apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "ctxt=" ApHandleFormat " loc=" ApHandleFormat "", ApHandlePrintf(hContext_), ApHandlePrintf(hLocation_)));
 
   tvEnterRequested_ = Apollo::TimeValue::getTime();
 }
 
 void Display::OnEnterBegin()
 {
-  apLog_Verbose((LOG_CHANNEL, "Display::OnEnterBegin", "ctxt=" ApHandleFormat " loc=" ApHandleFormat "", ApHandleType(hContext_), ApHandleType(hLocation_)));
+  apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "ctxt=" ApHandleFormat " loc=" ApHandleFormat "", ApHandlePrintf(hContext_), ApHandlePrintf(hLocation_)));
 
   tvEnterBegin_ = Apollo::TimeValue::getTime();
 }
 
 void Display::OnEnterComplete()
 {
-  apLog_Verbose((LOG_CHANNEL, "Display::OnEnterComplete", "ctxt=" ApHandleFormat " loc=" ApHandleFormat "", ApHandleType(hContext_), ApHandleType(hLocation_)));
+  apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "ctxt=" ApHandleFormat " loc=" ApHandleFormat "", ApHandlePrintf(hContext_), ApHandlePrintf(hLocation_)));
 
   if (ApIsHandle(hLocation_)) {
     ApAsyncMessage<Msg_VpView_ReplayLocationPublicChat> msg;
@@ -232,21 +232,21 @@ void Display::OnEnterComplete()
 
 void Display::OnLeaveRequested()
 {
-  apLog_Verbose((LOG_CHANNEL, "Display::OnLeaveRequested", "ctxt=" ApHandleFormat " loc=" ApHandleFormat "", ApHandleType(hContext_), ApHandleType(hLocation_)));
+  apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "ctxt=" ApHandleFormat " loc=" ApHandleFormat "", ApHandlePrintf(hContext_), ApHandlePrintf(hLocation_)));
 
   tvLeaveRequested_ = Apollo::TimeValue::getTime();
 }
 
 void Display::OnLeaveBegin()
 {
-  apLog_Verbose((LOG_CHANNEL, "Display::OnLeaveBegin", "ctxt=" ApHandleFormat " loc=" ApHandleFormat "", ApHandleType(hContext_), ApHandleType(hLocation_)));
+  apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "ctxt=" ApHandleFormat " loc=" ApHandleFormat "", ApHandlePrintf(hContext_), ApHandlePrintf(hLocation_)));
 
   tvLeaveBegin_ = Apollo::TimeValue::getTime();
 }
 
 void Display::OnLeaveComplete()
 {
-  apLog_Verbose((LOG_CHANNEL, "Display::OnLeaveComplete", "ctxt=" ApHandleFormat " loc=" ApHandleFormat "", ApHandleType(hContext_), ApHandleType(hLocation_)));
+  apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "ctxt=" ApHandleFormat " loc=" ApHandleFormat "", ApHandlePrintf(hContext_), ApHandlePrintf(hLocation_)));
 }
 
 //---------------------------------------------------
@@ -317,12 +317,12 @@ void Display::OnModuleCall(Apollo::SrpcMessage& request, Apollo::SrpcMessage& re
           Msg_Vp_SendPublicChat msg;
           msg.hLocation = hLocation_;
           msg.sText = sText;
-          if (!msg.Request()) { throw ApException("Msg_Vp_SendPublicChat failed  loc=" ApHandleFormat "", ApHandleType(hLocation_)); }
+          if (!msg.Request()) { throw ApException(LOG_CONTEXT, "Msg_Vp_SendPublicChat failed  loc=" ApHandleFormat "", ApHandlePrintf(hLocation_)); }
         }
       }
 
     } else {
-      throw ApException("Display::OnModuleCall: Unknown Method=%s", StringType(sMethod));
+      throw ApException(LOG_CONTEXT, "Unknown Method=%s", _sz(sMethod));
     }
   }
 }
@@ -334,7 +334,7 @@ void Display::OnShowChat(int bShow)
     msg.hChat = Apollo::newHandle();
     msg.hLocation = hLocation_;
     if (!msg.Request()) {
-      throw ApException("Display::OnShowChat: %s failed loc=" ApHandleFormat ": %s", StringType(msg.Type()), ApHandleType(msg.hLocation), StringType(msg.sComment));
+      throw ApException(LOG_CONTEXT, "%s failed loc=" ApHandleFormat ": %s", _sz(msg.Type()), ApHandlePrintf(msg.hLocation), _sz(msg.sComment));
     }
   }
 }
@@ -367,7 +367,7 @@ void Display::OnNavigatorCallDisplay(Apollo::SrpcMessage& request, Apollo::SrpcM
     OnShowDebug(bShow);
 
   } else {
-    throw ApException("Display::OnNavigatorCallDisplay: Unknown Method=%s", StringType(sMethod));
+    throw ApException(LOG_CONTEXT, "Unknown Method=%s", _sz(sMethod));
   }
 }
 
@@ -444,7 +444,7 @@ void Display::OnViewLoaded()
 {
   bViewLoaded_ = 1;
 
-  if (!Msg_WebView_SetNavigationPolicy::Deny(hView_)) { apLog_Error((LOG_CHANNEL, "Display::OnViewLoaded", "Msg_WebView_SetNavigationPolicy::Deny(" ApHandleFormat ") failed", ApHandleType(hView_))); }
+  if (!Msg_WebView_SetNavigationPolicy::Deny(hView_)) { apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_WebView_SetNavigationPolicy::Deny(" ApHandleFormat ") failed", ApHandlePrintf(hView_))); }
 
   if (bViewLoaded_ && ApIsHandle(hLocation_)) {
     StartDisplay();

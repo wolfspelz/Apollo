@@ -5,13 +5,12 @@
 // ============================================================================
 
 #include "Apollo.h"
-#include "ApLog.h"
+#include "Local.h"
 #include "MsgDB.h"
 #include "MsgVpi.h"
 #include "MsgVp.h"
 #include "MsgVpView.h"
 #include "URL.h"
-#include "Local.h"
 #include "Context.h"
 
 Context::Context(const ApHandle& hContext)
@@ -60,7 +59,7 @@ int Context::resolve()
   msg.hRequest = hMapping_;
   if (!msg.Request()) {
     ok = 0;
-    apLog_Error((LOG_CHANNEL, "Context::map", "Failed to map %s for display " ApHandleFormat "", StringType(sDocumentUrl_), ApHandleType(hAp_)));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Failed to map %s for display " ApHandleFormat "", _sz(sDocumentUrl_), ApHandlePrintf(hAp_)));
     hMapping_ = ApNoHandle;
   }
 
@@ -80,7 +79,7 @@ int Context::setLocationXml(const String& sLocationXml)
 int Context::resolved()
 {
   int ok = 1;
-  apLog_Verbose((LOG_CHANNEL, "Context::resolved", "" ApHandleFormat " for %s", ApHandleType(apHandle()), StringType(sDocumentUrl_)));
+  apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "" ApHandleFormat " for %s", ApHandlePrintf(apHandle()), _sz(sDocumentUrl_)));
 
   String sZone;
 
@@ -91,7 +90,7 @@ int Context::resolved()
     msg.sPath = "zone";
     msg.bInnerXml = 1;
     if (!msg.Request()) {
-      apLog_Verbose((LOG_CHANNEL, "Context::resolved", "Msg_Vpi_GetDetailXml(%s) failed: %s for %s", StringType(msg.sPath), StringType(msg.sComment), StringType(sDocumentUrl_)));
+      apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "Msg_Vpi_GetDetailXml(%s) failed: %s for %s", _sz(msg.sPath), _sz(msg.sComment), _sz(sDocumentUrl_)));
     } else {
       sZone = msg.sXml;
     }
@@ -104,7 +103,7 @@ int Context::resolved()
     msg.sPath = "destination";
     msg.bInnerXml = 1;
     if (!msg.Request()) {
-      apLog_Verbose((LOG_CHANNEL, "Context::resolved", "Msg_Vpi_GetDetailXml(%s) failed: %s for %s", StringType(msg.sPath), StringType(msg.sComment), StringType(sDocumentUrl_)));
+      apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "Msg_Vpi_GetDetailXml(%s) failed: %s for %s", _sz(msg.sPath), _sz(msg.sComment), _sz(sDocumentUrl_)));
     } else {
       sZone = msg.sXml;
     }
@@ -122,9 +121,9 @@ int Context::resolved()
     String sEscapedZone = sZone;
     sEscapedZone.escape(String::EscapeSlash);
     msg.sName = DB_NAME;
-    msg.sKey.appendf("zone/%s/suffix", StringType(sEscapedZone));
+    msg.sKey.appendf("zone/%s/suffix", _sz(sEscapedZone));
     if (!msg.Request()) {
-      apLog_Error((LOG_CHANNEL, "Context::resolved", "Msg_DB_Get failed: db=%s key=%s", StringType(msg.sName), StringType(msg.sKey)));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_DB_Get failed: db=%s key=%s", _sz(msg.sName), _sz(msg.sKey)));
     } else {
       sSuffix = msg.sValue;
     }
@@ -135,7 +134,7 @@ int Context::resolved()
   if (ok && !sSuffix.empty()) {
     Msg_Vpi_GetSuffix msg;
     if (!msg.Request()) {
-      apLog_Error((LOG_CHANNEL, "Context::resolved", "Msg_Vpi_GetSuffix"));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_Vpi_GetSuffix"));
     } else {
       sOldSuffix = msg.sSuffix;
       bOldSuffixSaved = 1;
@@ -146,7 +145,7 @@ int Context::resolved()
     Msg_Vpi_SetSuffix msg;
     msg.sSuffix = sSuffix;
     if (!msg.Request()) {
-      apLog_Error((LOG_CHANNEL, "Context::resolved", "Msg_Vpi_SetSuffix failed: suffix=%s", StringType(msg.sSuffix)));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_Vpi_SetSuffix failed: suffix=%s", _sz(msg.sSuffix)));
     }
   }
 
@@ -155,7 +154,7 @@ int Context::resolved()
     msg.sLocationXml = sLocationXml_;
     ok = msg.Request();
     if (!ok) {
-      apLog_Error((LOG_CHANNEL, "Context::resolved", "Msg_Vpi_GetLocationUrl failed: %s for %s", StringType(msg.sComment), StringType(sDocumentUrl_)));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_Vpi_GetLocationUrl failed: %s for %s", _sz(msg.sComment), _sz(sDocumentUrl_)));
     } else {      
       if (sLocationUrl_ == msg.sLocationUrl) {
         ok = sameLocation(msg.sLocationUrl);
@@ -169,7 +168,7 @@ int Context::resolved()
     Msg_Vpi_SetSuffix msg;
     msg.sSuffix = sOldSuffix;
     if (!msg.Request()) {
-      apLog_Error((LOG_CHANNEL, "Context::resolved", "Msg_Vpi_SetSuffix failed: suffix=%s", StringType(msg.sSuffix)));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_Vpi_SetSuffix failed: suffix=%s", _sz(msg.sSuffix)));
     }
   }
 
@@ -179,7 +178,7 @@ int Context::resolved()
 int Context::sameLocation(const String& sLocationUrl)
 {
   int ok = 1;
-  apLog_Info((LOG_CHANNEL, "Context::sameLocation", "%s -> %s", StringType(sDocumentUrl_), StringType(sLocationUrl)));
+  apLog_Info((LOG_CHANNEL, LOG_CONTEXT, "%s -> %s", _sz(sDocumentUrl_), _sz(sLocationUrl)));
 
   return ok;
 }
@@ -187,7 +186,7 @@ int Context::sameLocation(const String& sLocationUrl)
 int Context::changeLocation(const String& sLocationUrl)
 {
   int ok = 1;
-  apLog_Info((LOG_CHANNEL, "Context::changeLocation", "%s -> %s", StringType(sDocumentUrl_), StringType(sLocationUrl)));
+  apLog_Info((LOG_CHANNEL, LOG_CONTEXT, "%s -> %s", _sz(sDocumentUrl_), _sz(sLocationUrl)));
 
   lThingys_.beginChanges();
   sLocationUrl_ = sLocationUrl;
@@ -257,7 +256,7 @@ void Context::getDetailString(const String& sKey, String& sValue, String& sMimeT
 {
   ContextThingy* pThingy = lThingys_.getOrCreate(sKey);
   if (!pThingy) {
-    throw ApException("Context::getDetailString: unknown key=%s", StringType(sKey));
+    throw ApException(LOG_CONTEXT, "unknown key=%s", _sz(sKey));
   } else {
     ContextThingyProvider* pProvider = pThingy->getProvider();
     if (pProvider) {
@@ -416,7 +415,7 @@ ThingyProvider* ContextThingyList::newProvider(const String& sKey)
   } else if (sKey == Msg_VpView_ContextDetail_Position) { pProvider = new KeyValueContextThingyProvider();
   } else if (sKey == Msg_VpView_ContextDetail_Size) { pProvider = new KeyValueContextThingyProvider();
   } else {
-    apLog_Error((LOG_CHANNEL, "ContextThingyList::newThingy", "unknown key=%s", StringType(sKey)));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "unknown key=%s", _sz(sKey)));
   }
 
   if (pProvider) {

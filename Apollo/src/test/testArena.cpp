@@ -182,7 +182,7 @@ public:
 
 static void Test_Arena_UnitTest_TokenEnd()
 {
-  apLog_Info((LOG_CHANNEL, "Test_Arena_UnitTest_TokenEnd", "Finished Test/Arena"));
+  apLog_Info((LOG_CHANNEL, LOG_CONTEXT, "Finished Test/Arena"));
   { ApAsyncMessage<Msg_UnitTest_Token> msg; msg.Post(); }
 }
 
@@ -1022,7 +1022,7 @@ static void Test_Arena_UnitTest_Token(Msg_UnitTest_Token* pMsg)
 {
   AP_UNUSED_ARG(pMsg);
   { Msg_UnitTest_Token msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_Arena_UnitTest_Token, 0); }
-  apLog_Info((LOG_CHANNEL, "Test_Arena_UnitTest_Token", "Starting Test/Arena"));
+  apLog_Info((LOG_CHANNEL, LOG_CONTEXT, "Starting Test/Arena"));
   int bTokenEndNow = 0;
 
   gTest_InNavigateChatOut->Begin();

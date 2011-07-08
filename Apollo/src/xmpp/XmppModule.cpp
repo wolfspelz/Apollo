@@ -6,7 +6,6 @@
 
 #include "Apollo.h"
 #include "Local.h"
-#include "ApLog.h"
 #include "XmppModule.h"
 #include "JabberId.h"
 #include "Room.h"
@@ -86,12 +85,12 @@ AP_MSG_HANDLER_METHOD(XmppModule, Xmpp_StartClient)
 {
   int ok = 0;
 
-  if (pMsg->sJabberId.empty()) { throw ApException("XmppModule::Xmpp_StartClient sJabberId empty"); }
-  if (pMsg->sPassword.empty()) { throw ApException("XmppModule::Xmpp_StartClient sPassword empty"); }
+  if (pMsg->sJabberId.empty()) { throw ApException(LOG_CONTEXT, "sJabberId empty"); }
+  if (pMsg->sPassword.empty()) { throw ApException(LOG_CONTEXT, "sPassword empty"); }
 
   Client* pClient = FindClient(pMsg->hClient);
   if (pClient != 0) {
-    apLog_Warning((LOG_CHANNEL, "XmppModule::On_Xmpp_StartClient", "Client " ApHandleFormat " already exists", ApHandleType(pMsg->hClient)));
+    apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "Client " ApHandleFormat " already exists", ApHandlePrintf(pMsg->hClient)));
   } else {
 
     pClient = new Client(pMsg->hClient);
@@ -108,7 +107,7 @@ AP_MSG_HANDLER_METHOD(XmppModule, Xmpp_StartClient)
       pClient->netOnline(bNetOnline_);
       ok = pClient->start();
       if (!ok) {
-        apLog_Error((LOG_CHANNEL, "XmppModule::On_Xmpp_StartClient", "Client " ApHandleFormat " Client::Start() failed, jid=%s", ApHandleType(pMsg->hClient), StringType(pMsg->sJabberId)));
+        apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Client " ApHandleFormat " Client::Start() failed, jid=%s", ApHandlePrintf(pMsg->hClient), _sz(pMsg->sJabberId)));
         delete pClient;
         pClient = 0;
       } else {
@@ -119,7 +118,7 @@ AP_MSG_HANDLER_METHOD(XmppModule, Xmpp_StartClient)
         Msg_Xmpp_DefaultClient msg;
         msg.hClient = pMsg->hClient;
         if (!msg.Request()) {
-          apLog_Error((LOG_CHANNEL, "XmppModule::On_Xmpp_StartClient", "Msg_Xmpp_DefaultClient failed " ApHandleFormat "", ApHandleType(pMsg->hClient)));
+          apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_Xmpp_DefaultClient failed " ApHandleFormat "", ApHandlePrintf(pMsg->hClient)));
         }
       }
     }
@@ -135,7 +134,7 @@ AP_MSG_HANDLER_METHOD(XmppModule, Xmpp_StopClient)
 
   Client* pClient = FindClient(pMsg->hClient);
   if (pClient == 0) {
-    apLog_Warning((LOG_CHANNEL, "XmppModule::On_Xmpp_StopClient", "Client " ApHandleFormat " not found", ApHandleType(pMsg->hClient)));
+    apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "Client " ApHandleFormat " not found", ApHandlePrintf(pMsg->hClient)));
   } else {
     (void) pClient->stop();
     clients_.Unset(pMsg->hClient);
@@ -160,7 +159,7 @@ AP_MSG_HANDLER_METHOD(XmppModule, Xmpp_DefaultClient)
 
   Client* pClient = FindClient(pMsg->hClient);
   if (pClient == 0) {
-    apLog_Warning((LOG_CHANNEL, "XmppModule::On_Xmpp_DefaultClient", "Client " ApHandleFormat " not found", ApHandleType(pMsg->hClient)));
+    apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "Client " ApHandleFormat " not found", ApHandlePrintf(pMsg->hClient)));
   } else {
     pClient->setDefault(1);
     ok = 1;
@@ -174,12 +173,12 @@ AP_MSG_HANDLER_METHOD(XmppModule, Xmpp_DefaultClient)
 #define FORWARD_TO_CLIENT_PRE(_method_) \
   Client* pClient = FindClient(pMsg->hClient); \
   if (pClient == 0) { \
-    apLog_Warning((LOG_CHANNEL, _method_, "Client " ApHandleFormat " not found", ApHandleType(pMsg->hClient))); \
+    apLog_Warning((LOG_CHANNEL, _method_, "Client " ApHandleFormat " not found", ApHandlePrintf(pMsg->hClient))); \
   } else {
 
 #define FORWARD_TO_CLIENT_POST(_method_) \
     if (!ok) { \
-      apLog_Error((LOG_CHANNEL, _method_, "Client " ApHandleFormat " client call failed", ApHandleType(pMsg->hClient))); \
+      apLog_Error((LOG_CHANNEL, _method_, "Client " ApHandleFormat " client call failed", ApHandlePrintf(pMsg->hClient))); \
     } \
   }
 
@@ -189,13 +188,13 @@ AP_MSG_HANDLER_METHOD(XmppModule, Xmpp_Connect)
 {
   int ok = 0;
 
-  FORWARD_TO_CLIENT_PRE("XmppModule::On_Xmpp_Connect");
+  FORWARD_TO_CLIENT_PRE(LOG_CONTEXT);
   if (pMsg->nDelaySec == 0) {
     ok = pClient->connectNow();
   } else {
     ok = pClient->connectDeferred(pMsg->nDelaySec);
   }
-  FORWARD_TO_CLIENT_POST("XmppModule::On_Xmpp_Connect");
+  FORWARD_TO_CLIENT_POST(LOG_CONTEXT);
 
   pMsg->apStatus = ok ? ApMessage::Ok : ApMessage::Error;
 }
@@ -204,9 +203,9 @@ AP_MSG_HANDLER_METHOD(XmppModule, Xmpp_Disconnect)
 {
   int ok = 1;
 
-  FORWARD_TO_CLIENT_PRE("XmppModule::On_Xmpp_Disconnect");
+  FORWARD_TO_CLIENT_PRE(LOG_CONTEXT);
   ok = pClient->disconnect();
-  FORWARD_TO_CLIENT_POST("XmppModule::On_Xmpp_Disconnect");
+  FORWARD_TO_CLIENT_POST(LOG_CONTEXT);
 
   pMsg->apStatus = ok ? ApMessage::Ok : ApMessage::Error;
 }
@@ -215,9 +214,9 @@ AP_MSG_HANDLER_METHOD(XmppModule, Xmpp_DataIn)
 {
   int ok = 0;
 
-  FORWARD_TO_CLIENT_PRE("XmppModule::On_Xmpp_DataIn");
+  FORWARD_TO_CLIENT_PRE(LOG_CONTEXT);
   ok = pClient->dataIn(pMsg->sbData.Data(), pMsg->sbData.Length());
-  FORWARD_TO_CLIENT_POST("XmppModule::On_Xmpp_DataIn");
+  FORWARD_TO_CLIENT_POST(LOG_CONTEXT);
 
   pMsg->apStatus = ok ? ApMessage::Ok : ApMessage::Error;
 }
@@ -226,9 +225,9 @@ AP_MSG_HANDLER_METHOD(XmppModule, Xmpp_DataOut)
 {
   int ok = 0;
 
-  FORWARD_TO_CLIENT_PRE("XmppModule::On_Xmpp_DataOut");
+  FORWARD_TO_CLIENT_PRE(LOG_CONTEXT);
   ok = pClient->dataOut(pMsg->sbData.Data(), pMsg->sbData.Length());
-  FORWARD_TO_CLIENT_POST("XmppModule::On_Xmpp_DataOut");
+  FORWARD_TO_CLIENT_POST(LOG_CONTEXT);
 
   pMsg->apStatus = ok ? ApMessage::Ok : ApMessage::Error;
 }
@@ -237,9 +236,9 @@ AP_MSG_HANDLER_METHOD(XmppModule, Xmpp_StanzaIn)
 {
   int ok = 0;
 
-  FORWARD_TO_CLIENT_PRE("XmppModule::On_Xmpp_StanzaIn");
+  FORWARD_TO_CLIENT_PRE(LOG_CONTEXT);
   ok = pClient->stanzaIn(pMsg->sData);
-  FORWARD_TO_CLIENT_POST("XmppModule::On_Xmpp_StanzaIn");
+  FORWARD_TO_CLIENT_POST(LOG_CONTEXT);
 
   pMsg->apStatus = ok ? ApMessage::Ok : ApMessage::Error;
 }
@@ -248,9 +247,9 @@ AP_MSG_HANDLER_METHOD(XmppModule, Xmpp_StanzaOut)
 {
   int ok = 0;
 
-  FORWARD_TO_CLIENT_PRE("XmppModule::On_Xmpp_StanzaOut");
+  FORWARD_TO_CLIENT_PRE(LOG_CONTEXT);
   ok = pClient->stanzaOut(pMsg->sData);
-  FORWARD_TO_CLIENT_POST("XmppModule::On_Xmpp_StanzaOut");
+  FORWARD_TO_CLIENT_POST(LOG_CONTEXT);
   
   pMsg->apStatus = ok ? ApMessage::Ok : ApMessage::Error;
 }
@@ -259,9 +258,9 @@ AP_MSG_HANDLER_METHOD(XmppModule, Xmpp_EnterRoom)
 {
   int ok = 0;
 
-  FORWARD_TO_CLIENT_PRE("XmppModule::On_Xmpp_EnterRoom");
+  FORWARD_TO_CLIENT_PRE(LOG_CONTEXT);
   ok = pClient->enterRoom(pMsg->sRoomJid, pMsg->sNickname, pMsg->hRoom);
-  FORWARD_TO_CLIENT_POST("XmppModule::On_Xmpp_EnterRoom");
+  FORWARD_TO_CLIENT_POST(LOG_CONTEXT);
 
   pMsg->apStatus = ok ? ApMessage::Ok : ApMessage::Error;
 }
@@ -270,9 +269,9 @@ AP_MSG_HANDLER_METHOD(XmppModule, Xmpp_LeaveRoom)
 {
   int ok = 0;
 
-  FORWARD_TO_CLIENT_PRE("XmppModule::On_Xmpp_LeaveRoom");
+  FORWARD_TO_CLIENT_PRE(LOG_CONTEXT);
   ok = pClient->leaveRoom(pMsg->hRoom);
-  FORWARD_TO_CLIENT_POST("XmppModule::On_Xmpp_LeaveRoom");
+  FORWARD_TO_CLIENT_POST(LOG_CONTEXT);
 
   pMsg->apStatus = ok ? ApMessage::Ok : ApMessage::Error;
 }
@@ -281,12 +280,12 @@ AP_MSG_HANDLER_METHOD(XmppModule, Xmpp_GetRoomHandle)
 {
   int ok = 1;
 
-  FORWARD_TO_CLIENT_PRE("XmppModule::On_Xmpp_PublicChat");
+  FORWARD_TO_CLIENT_PRE(LOG_CONTEXT);
   pMsg->hRoom = pClient->getRoomHandle(pMsg->sRoomJid);
   if (!ApIsHandle(pMsg->hRoom)) {
     ok = 0;
   }
-  FORWARD_TO_CLIENT_POST("XmppModule::On_Xmpp_PublicChat");
+  FORWARD_TO_CLIENT_POST(LOG_CONTEXT);
 
   pMsg->apStatus = ok ? ApMessage::Ok : ApMessage::Error;
 }
@@ -295,9 +294,9 @@ AP_MSG_HANDLER_METHOD(XmppModule, Xmpp_SendGroupchat)
 {
   int ok = 0;
 
-  FORWARD_TO_CLIENT_PRE("XmppModule::On_Xmpp_SendGroupchat");
+  FORWARD_TO_CLIENT_PRE(LOG_CONTEXT);
   ok = pClient->sendGroupchat(pMsg->hRoom, pMsg->sText);
-  FORWARD_TO_CLIENT_POST("XmppModule::On_Xmpp_SendGroupchat");
+  FORWARD_TO_CLIENT_POST(LOG_CONTEXT);
 
   pMsg->apStatus = ok ? ApMessage::Ok : ApMessage::Error;
 }
@@ -306,9 +305,9 @@ AP_MSG_HANDLER_METHOD(XmppModule, Xmpp_SendRoomState)
 {
   int ok = 0;
 
-  FORWARD_TO_CLIENT_PRE("XmppModule::On_Xmpp_SendRoomState");
+  FORWARD_TO_CLIENT_PRE(LOG_CONTEXT);
   ok = pClient->sendRoomState(pMsg->hRoom);
-  FORWARD_TO_CLIENT_POST("XmppModule::On_Xmpp_SendRoomState");
+  FORWARD_TO_CLIENT_POST(LOG_CONTEXT);
 
   pMsg->apStatus = ok ? ApMessage::Ok : ApMessage::Error;
 }
@@ -323,7 +322,7 @@ AP_MSG_HANDLER_METHOD(XmppModule, Protocol_IsOnline)
     // ignore feature, just check for loggedin-ness
     Client* pClient = FindClient(ApNoHandle);
     if (pClient == 0) {
-      apLog_Warning((LOG_CHANNEL, "XmppModule::On_Protocol_IsOnline", "Default client not found"));
+      apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "Default client not found"));
     } else {
 
       pMsg->bOnline = pClient->isLoggedIn();
@@ -348,7 +347,7 @@ AP_MSG_HANDLER_METHOD(XmppModule, Protocol_EnterRoom)
     msg.sNickname = getNickname();
     ok = msg.Request();
     if (!ok) {
-      apLog_Error((LOG_CHANNEL, "XmppModule::On_Protocol_EnterRoom", "Msg_Xmpp_EnterRoom failed, room=" ApHandleFormat " jid=%s", ApHandleType(pMsg->hRoom), StringType(pMsg->sRoom)));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_Xmpp_EnterRoom failed, room=" ApHandleFormat " jid=%s", ApHandlePrintf(pMsg->hRoom), _sz(pMsg->sRoom)));
     }
 
     pMsg->apStatus = ok ? ApMessage::Ok : ApMessage::Error;
@@ -464,9 +463,9 @@ AP_MSG_HANDLER_METHOD(XmppModule, Xmpp_EnterRoomComplete)
 {
   int ok = 1;
 
-  FORWARD_TO_CLIENT_PRE("XmppModule::On_Xmpp_LeaveRoomComplete");
+  FORWARD_TO_CLIENT_PRE(LOG_CONTEXT);
   ok = pClient->enterRoomComplete(pMsg->hRoom);
-  FORWARD_TO_CLIENT_POST("XmppModule::On_Xmpp_LeaveRoomComplete");
+  FORWARD_TO_CLIENT_POST(LOG_CONTEXT);
 
   // Forward the notification in a protocol independent way
   Msg_Protocol_EnterRoomComplete msg;
@@ -486,7 +485,7 @@ AP_MSG_HANDLER_METHOD(XmppModule, Protocol_LeaveRoom)
     msg.hRoom = pMsg->hRoom;
     ok = msg.Request();
     if (!ok) {
-      apLog_Error((LOG_CHANNEL, "XmppModule::On_Protocol_LeaveRoom", "Msg_Xmpp_LeaveRoom failed, room=" ApHandleFormat "", ApHandleType(pMsg->hRoom)));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_Xmpp_LeaveRoom failed, room=" ApHandleFormat "", ApHandlePrintf(pMsg->hRoom)));
     }
 
     pMsg->apStatus = ok ? ApMessage::Ok : ApMessage::Error;
@@ -506,9 +505,9 @@ AP_MSG_HANDLER_METHOD(XmppModule, Xmpp_LeaveRoomComplete)
 {
   int ok = 1;
 
-  FORWARD_TO_CLIENT_PRE("XmppModule::On_Xmpp_LeaveRoomComplete");
+  FORWARD_TO_CLIENT_PRE(LOG_CONTEXT);
   ok = pClient->leaveRoomComplete(pMsg->hRoom);
-  FORWARD_TO_CLIENT_POST("XmppModule::On_Xmpp_LeaveRoomComplete");
+  FORWARD_TO_CLIENT_POST(LOG_CONTEXT);
 
   // Forward the notification in a protocol independent way
   Msg_Protocol_LeaveRoomComplete msg;
@@ -582,7 +581,7 @@ AP_MSG_HANDLER_METHOD(XmppModule, Protocol_SendPublicChat)
     msg.sText = pMsg->sText;
     ok = msg.Request();
     if (!ok) {
-      apLog_Error((LOG_CHANNEL, "XmppModule::On_Protocol_SendPublicChat", "Msg_Xmpp_SendGroupchat failed, room=" ApHandleFormat "", ApHandleType(pMsg->hRoom)));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_Xmpp_SendGroupchat failed, room=" ApHandleFormat "", ApHandlePrintf(pMsg->hRoom)));
     }
 
     pMsg->apStatus = ok ? ApMessage::Ok : ApMessage::Error;
@@ -600,7 +599,7 @@ AP_MSG_HANDLER_METHOD(XmppModule, Protocol_Room_CommitState)
     msg.hRoom = pMsg->hRoom;
     ok = msg.Request();
     if (!ok) {
-      apLog_Error((LOG_CHANNEL, "XmppModule::On_Protocol_Room_CommitState", "Msg_Xmpp_SendRoomState failed, room=" ApHandleFormat "", ApHandleType(pMsg->hRoom)));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_Xmpp_SendRoomState failed, room=" ApHandleFormat "", ApHandlePrintf(pMsg->hRoom)));
     }
 
     pMsg->apStatus = ok ? ApMessage::Ok : ApMessage::Error;
@@ -620,7 +619,7 @@ AP_MSG_HANDLER_METHOD(XmppModule, System_RunLevel)
       msg.sPassword = Apollo::getModuleConfig(MODULE_NAME, "Connection/Password", "");
       msg.sResource = Apollo::getModuleConfig(MODULE_NAME, "Connection/Resource", "");
       if (!msg.Request()) {
-        apLog_Error((LOG_CHANNEL, "XmppModule::On_System_RunLevel", "Failed to start client"));
+        apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Failed to start client"));
       }
     }
 
@@ -651,7 +650,7 @@ AP_MSG_HANDLER_METHOD(XmppModule, Net_Online)
     for (ClientIterator iter(clients_); (node = iter.Next()); ) {
       Client* pClient = node->Value();
       if (!pClient->netOnline(1)) {
-        apLog_Error((LOG_CHANNEL, "XmppModule::On_Net_Online", "pClient->netOnline() failed"));
+        apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "pClient->netOnline() failed"));
       }
     }
   }
@@ -672,7 +671,7 @@ AP_MSG_HANDLER_METHOD(XmppModule, Net_Offline)
     for (ClientIterator iter(clients_); (node = iter.Next()); ) {
       Client* pClient = node->Value();
       if (!pClient->netOnline(0)) {
-        apLog_Error((LOG_CHANNEL, "XmppModule::On_Net_Online", "pClient->netOnline() failed"));
+        apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "pClient->netOnline() failed"));
       }
     }
   }

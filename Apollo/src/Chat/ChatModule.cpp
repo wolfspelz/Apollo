@@ -43,7 +43,7 @@ ChatWindow* ChatModule::FindChat(const ApHandle& hChat)
 ChatWindow* ChatModule::GetChat(const ApHandle& hChat)
 {
   ChatWindow* pChat = FindChat(hChat);  
-  if (pChat == 0) { throw ApException("ChatModule::FindChat no ChatWindow=" ApHandleFormat "", ApHandleType(hChat)); }
+  if (pChat == 0) { throw ApException(LOG_CONTEXT, "no ChatWindow=" ApHandleFormat "", ApHandlePrintf(hChat)); }
   return pChat;
 }
 
@@ -51,10 +51,10 @@ ChatWindow* ChatModule::GetChat(const ApHandle& hChat)
 
 AP_MSG_HANDLER_METHOD(ChatModule, ChatWindow_OpenForLocation)
 {
-  if (chats_.Find(pMsg->hChat) != 0) { throw ApException("ChatWindow=" ApHandleFormat " already exists", ApHandleType(pMsg->hChat)); }
+  if (chats_.Find(pMsg->hChat) != 0) { throw ApException(LOG_CONTEXT, "ChatWindow=" ApHandleFormat " already exists", ApHandlePrintf(pMsg->hChat)); }
 
   ChatWindow* pChat = NewChat(pMsg->hChat);
-  if (pChat == 0) { throw ApException("NewChat failed"); }
+  if (pChat == 0) { throw ApException(LOG_CONTEXT, "NewChat failed"); }
 
   pChat->Open();
   pChat->AttachToLocation(pMsg->hLocation);

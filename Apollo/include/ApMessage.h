@@ -138,13 +138,14 @@ public:
 
 #define ApCallbackPosSegment 1000
 #define ApCallbackPosNormal 0
-#define ApCallbackPosEarly (-1000 * ApCallbackPosSegment)
-#define ApCallbackPosLate (1000 * ApCallbackPosSegment)
-#define ApCallbackPosVeryEarly (-2000 * ApCallbackPosSegment)
-#define ApCallbackPosIncrediblyEarly (-3000 * ApCallbackPosSegment)
-#define ApCallbackPosBreathtakinglyEarly (-4000 * ApCallbackPosSegment)
-#define ApCallbackPosOverwhelminglyEarly (-5000 * ApCallbackPosSegment)
-#define ApCallbackPosRidiculouslyEarly (-6000 * ApCallbackPosSegment)
+#define ApCallbackPosEarly (-ApCallbackPosSegment * ApCallbackPosSegment)
+#define ApCallbackPosLate (ApCallbackPosSegment * ApCallbackPosSegment)
+#define ApCallbackPosVeryEarly (-2 * ApCallbackPosSegment * ApCallbackPosSegment)
+#define ApCallbackPosIncrediblyEarly (-3 * ApCallbackPosSegment * ApCallbackPosSegment)
+#define ApCallbackPosBreathtakinglyEarly (-4 * ApCallbackPosSegment * ApCallbackPosSegment)
+#define ApCallbackPosOverwhelminglyEarly (-5 * ApCallbackPosSegment * ApCallbackPosSegment)
+#define ApCallbackPosRidiculouslyEarly (-6 * ApCallbackPosSegment * ApCallbackPosSegment)
+#define ApCallbackPosBigBang (-100 * ApCallbackPosSegment * ApCallbackPosSegment)
 
 #define AP_MSG_HANDLER_METHOD(_class_, _msgtype_) \
 void _class_ ## _On_ ## _msgtype_(Msg_ ## _msgtype_* pMsg) \

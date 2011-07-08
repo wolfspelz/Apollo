@@ -5,7 +5,6 @@
 // ============================================================================
 
 #include "Apollo.h"
-#include "ApLog.h"
 #include "Local.h"
 #include "ServerModule.h"
 #include "HttpServer.h"

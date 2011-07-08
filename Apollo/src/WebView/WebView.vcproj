@@ -247,6 +247,22 @@
 				RelativePath="..\..\bin\Win32\Debug\modules\WebView\test\LoadHtml.js"
 				>
 			</File>
+			<File
+				RelativePath="..\..\bin\Win32\Debug\modules\WebView\test\StartAutomaticallySerialized1.html"
+				>
+			</File>
+			<File
+				RelativePath="..\..\bin\Win32\Debug\modules\WebView\test\StartAutomaticallySerialized2.html"
+				>
+			</File>
+			<File
+				RelativePath="..\..\bin\Win32\Debug\modules\WebView\test\StartManuallySerialized1.html"
+				>
+			</File>
+			<File
+				RelativePath="..\..\bin\Win32\Debug\modules\WebView\test\StartManuallySerialized2.html"
+				>
+			</File>
 		</Filter>
 		<File
 			RelativePath="..\..\bin\Win32\Debug\modules\WebView\config.txt"

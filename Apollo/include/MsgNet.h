@@ -30,6 +30,15 @@ class Msg_Net_IsOnline: public ApRequestMessage
 public:
   Msg_Net_IsOnline() : ApRequestMessage("Net_IsOnline"), bIsOnline(0) {}
   ApOUT int bIsOnline;
+  static int _()
+  {
+    Msg_Net_IsOnline msg;
+    int bResult = 0;
+    if (msg.Request()) {
+      bResult = msg.bIsOnline;
+    }
+    return bResult;
+  }
 };
 
 // ------------------------------

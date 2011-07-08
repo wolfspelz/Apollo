@@ -90,7 +90,7 @@ void DNSResolveTask::Execute()
         NetModuleInstance::Get()->oSocketIO_.AddTask(pTask);
       }
     } else {
-      apLog_Warning((LOG_CHANNEL, "DNSResolveTask::Execute", "getaddrinfo failed %s %s: %s", StringType(sAddress), StringType(sPort), StringType(sError)));
+      apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "getaddrinfo failed %s %s: %s", _sz(sAddress), _sz(sPort), _sz(sError)));
 
       Msg_Net_TCP_Connected* pMsg = new Msg_Net_TCP_Connected();
       if (pMsg !=0) {

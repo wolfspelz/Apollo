@@ -5,14 +5,13 @@
 // ============================================================================
 
 #include "Apollo.h"
-#include "ApLog.h"
+#include "Local.h"
 #include "Crypto.h"
 #include "MsgConfig.h"
 #include "MsgNet.h"
 #include "MsgCore.h"
 #include "MsgXmpp.h"
 #include "SrpcMessage.h"
-#include "Local.h"
 #include "GmModule.h"
 #include "GmModuleTester.h"
 
@@ -24,7 +23,7 @@ void RegisterClient::OnResult(SrpcMessage& srpc)
   if (!sPassword.empty()) {
     srpc.set("sPassword", "********");
   }
-  apLog_Info((MODULE_NAME, "RegisterClient::OnResult", "%s", StringType(srpc.toString())));
+  apLog_Info((LOG_CHANNEL, LOG_CONTEXT, "%s", _sz(srpc.toString())));
   srpc.set("sPassword", sPassword);
 
   if (pModule_) {
@@ -34,7 +33,7 @@ void RegisterClient::OnResult(SrpcMessage& srpc)
 
 void RegisterClient::OnError(const String sError)
 {
-  apLog_Warning((MODULE_NAME, "RegisterClient::OnError", "%s", StringType(sError)));
+  apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "%s", _sz(sError)));
 
   if (pModule_) {
     pModule_->onRegisterError(sError);
@@ -45,7 +44,7 @@ void RegisterClient::OnError(const String sError)
 
 void LoginClient::OnResult(SrpcMessage& srpc)
 {
-  apLog_Info((MODULE_NAME, "LoginClient::OnResult", "%s", StringType(srpc.toString())));
+  apLog_Info((LOG_CHANNEL, LOG_CONTEXT, "%s", _sz(srpc.toString())));
 
   if (pModule_) {
     pModule_->onLoginResult(srpc);
@@ -54,7 +53,7 @@ void LoginClient::OnResult(SrpcMessage& srpc)
 
 void LoginClient::OnError(const String sError)
 {
-  apLog_Warning((MODULE_NAME, "LoginClient::OnError", "%s", StringType(sError)));
+  apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "%s", _sz(sError)));
 
   if (pModule_) {
     pModule_->onLoginError(sError);
@@ -65,7 +64,7 @@ void LoginClient::OnError(const String sError)
 
 void SetPropertyClient::OnResult(SrpcMessage& srpc)
 {
-  apLog_Info((MODULE_NAME, "SetPropertyClient::OnResult", "%s", StringType(srpc.toString())));
+  apLog_Info((LOG_CHANNEL, LOG_CONTEXT, "%s", _sz(srpc.toString())));
 
   //if (pModule_) {
   //  pModule_->onLoginResult(srpc);
@@ -74,7 +73,7 @@ void SetPropertyClient::OnResult(SrpcMessage& srpc)
 
 void SetPropertyClient::OnError(const String sError)
 {
-  apLog_Warning((MODULE_NAME, "SetPropertyClient::OnError", "%s", StringType(sError)));
+  apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "%s", _sz(sError)));
 
   //if (pModule_) {
   //  pModule_->onLoginError(sError);
@@ -129,7 +128,7 @@ String GmModule::encrypt(const String& sIn)
 
   Buffer b;
   if (!data.encryptWithLoginCredentials(b)) {
-    apLog_Error((LOG_CHANNEL, "GmModule::encrypt", "encryptWithLoginCredentials() failed"));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "encryptWithLoginCredentials() failed"));
   }
 
   String sCryptedBase64;
@@ -145,7 +144,7 @@ String GmModule::decrypt(const String& sIn)
 
   Apollo::Crypto data;
   if (!data.decryptWithLoginCredentials(b)) {
-    apLog_Error((LOG_CHANNEL, "GmModule::encrypt", "decryptWithLoginCredentials() failed"));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "decryptWithLoginCredentials() failed"));
   }
 
   String sDecrypted;
@@ -221,7 +220,7 @@ int GmModule::doXmppStart()
   Msg_Gm_StartXmpp msg;
   ok = msg.Request();
   if (!ok) {
-    apLog_Error((LOG_CHANNEL, "GmModule::doXmppStart", "Msg_Gm_StartXmpp failed"));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_Gm_StartXmpp failed"));
   }
 
   return ok;
@@ -232,14 +231,14 @@ void GmModule::onRegisterResult(SrpcMessage& srpc)
   String sUser = srpc.getString("User");
   String sPassword = srpc.getString("Password");
 
-  apLog_Verbose((LOG_CHANNEL, "GmModule::onRegisterResult", "Success user=%s", StringType(sUser)));
+  apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "Success user=%s", _sz(sUser)));
 
   Apollo::setModuleConfig(MODULE_NAME, "User", sUser);
   Apollo::setModuleConfig(MODULE_NAME, "EncryptedPassword", encrypt(sPassword));
 
   if (bLoginOnRegister_) {
     if (!doLogin()) {
-      apLog_Error((LOG_CHANNEL, "GmModule::onRegisterResult", "doLogin() failed"));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "doLogin() failed"));
     } else {
       bLoginOnRegister_ = 0;
     }
@@ -248,16 +247,16 @@ void GmModule::onRegisterResult(SrpcMessage& srpc)
 
 void GmModule::onRegisterError(const String sError)
 {
-  apLog_Warning((LOG_CHANNEL, "GmModule::onRegisterError", "%s", StringType(sError)));
+  apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "%s", _sz(sError)));
 
   if (nRegisterRequests_ >= Apollo::getModuleConfig(MODULE_NAME, "Register/MaxRetries", 3)) {
-    apLog_Error((LOG_CHANNEL, "GmModule::onRegisterError", "Register/MaxRetries=%d exceeded, giving up", nRegisterRequests_));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Register/MaxRetries=%d exceeded, giving up", nRegisterRequests_));
   } else {
     if (ApIsHandle(hRegisterTimer_)) {
-      apLog_Error((LOG_CHANNEL, "GmModule::onRegisterError", "Skipping timer, because already active"));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Skipping timer, because already active"));
     } else {
       int nDelay = Apollo::getModuleConfig(MODULE_NAME, "Register/RetryDelay", 10) + Apollo::getRandom(Apollo::getModuleConfig(MODULE_NAME, "Register/RetryRandomDelay", 10));
-      apLog_Info((LOG_CHANNEL, "GmModule::onRegisterError", "Scheduling timer in %d sec", nDelay));
+      apLog_Info((LOG_CHANNEL, LOG_CONTEXT, "Scheduling timer in %d sec", nDelay));
       hRegisterTimer_ = Apollo::startTimeout(nDelay, 0);
     }
   }
@@ -266,16 +265,16 @@ void GmModule::onRegisterError(const String sError)
 int GmModule::doRegister()
 {
   int ok = 0;
-  apLog_Verbose((LOG_CHANNEL, "GmModule::doRegister", ""));
+  apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, ""));
 
   if (nRegisterRequests_ > Apollo::getModuleConfig(MODULE_NAME, "Register/MaxRetries", 3)) {
-    apLog_Error((LOG_CHANNEL, "GmModule::doRegister", "Register/MaxRetries=%d exceeded, giving up", nRegisterRequests_));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Register/MaxRetries=%d exceeded, giving up", nRegisterRequests_));
   } else {
 
     String sUrl = Apollo::getModuleConfig(MODULE_NAME, "Srpc/Url", "");
 
     if (sUrl.empty()) {
-      apLog_Error((LOG_CHANNEL, "GmModule::doRegister", "Missing Srpc/Url"));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Missing Srpc/Url"));
     } else {
 
       SrpcMessage srpc;
@@ -295,7 +294,7 @@ int GmModule::doRegister()
       if (pClient != 0) {
         ok = pClient->Post(sUrl, srpc);
         if (!ok) {
-          apLog_Error((LOG_CHANNEL, "GmModule::doRegister", "RegisterClient::Post(%s) failed", StringType(sUrl)));
+          apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "RegisterClient::Post(%s) failed", _sz(sUrl)));
         } else {
           nRegisterRequests_++;
         }
@@ -308,7 +307,7 @@ int GmModule::doRegister()
 
 void GmModule::onLoginResult(SrpcMessage& srpc)
 {
-  apLog_Verbose((LOG_CHANNEL, "GmModule::onLoginResult", "Success"));
+  apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "Success"));
   bLoggedIn_ = 1;
 
   int nCnt = 0;
@@ -326,7 +325,7 @@ void GmModule::onLoginResult(SrpcMessage& srpc)
       for (Apollo::KeyValueElem* e = 0; (e = kvCommand.nextElem(e)) != 0; ) {
         msg.srpc.set(e->getKey(), e->getString());
       }
-      apLog_Info((LOG_CHANNEL, "GmModule::onLoginResult", "Execute %s", StringType(msg.srpc.toString())));
+      apLog_Info((LOG_CHANNEL, LOG_CONTEXT, "Execute %s", _sz(msg.srpc.toString())));
       msg.Call();
       nCnt++;
     }
@@ -335,16 +334,16 @@ void GmModule::onLoginResult(SrpcMessage& srpc)
 
 void GmModule::onLoginError(const String sError)
 {
-  apLog_Warning((LOG_CHANNEL, "GmModule::onLoginError", "%s", StringType(sError)));
+  apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "%s", _sz(sError)));
 
   if (nLoginRequests_ >= Apollo::getModuleConfig(MODULE_NAME, "Login/MaxRetries", 1000000000)) {
-    apLog_Error((LOG_CHANNEL, "GmModule::onLoginError", "Login/MaxRetries=%d exceeded, giving up", nLoginRequests_));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Login/MaxRetries=%d exceeded, giving up", nLoginRequests_));
   } else {
     if (ApIsHandle(hLoginTimer_)) {
-      apLog_Error((LOG_CHANNEL, "GmModule::onLoginError", "Skipping timer, because already active"));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Skipping timer, because already active"));
     } else {
       int nDelay = Apollo::getModuleConfig(MODULE_NAME, "Login/RetryDelay", 30) + Apollo::getRandom(Apollo::getModuleConfig(MODULE_NAME, "Login/RetryRandomDelay", 30));
-      apLog_Info((LOG_CHANNEL, "GmModule::onLoginError", "Scheduling timer in %d sec", nDelay));
+      apLog_Info((LOG_CHANNEL, LOG_CONTEXT, "Scheduling timer in %d sec", nDelay));
       hLoginTimer_ = Apollo::startTimeout(nDelay, 0);
     }
   }
@@ -353,7 +352,7 @@ void GmModule::onLoginError(const String sError)
 int GmModule::doLogin()
 {
   int ok = 0;
-  apLog_Verbose((LOG_CHANNEL, "GmModule::doLogin", ""));
+  apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, ""));
 
   if (!hasGmLoginData()) {
     bLoginOnRegister_ = 1;
@@ -361,12 +360,12 @@ int GmModule::doLogin()
   } else {
 
     if (nLoginRequests_ > Apollo::getModuleConfig(MODULE_NAME, "Login/MaxRetries", 1000000000)) {
-      apLog_Error((LOG_CHANNEL, "GmModule::doLogin", "Login/MaxRetries=%d exceeded, giving up", nLoginRequests_));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Login/MaxRetries=%d exceeded, giving up", nLoginRequests_));
     } else {
       String sUrl = Apollo::getModuleConfig(MODULE_NAME, "Srpc/Url", "");
 
       if (sUrl.empty()) {
-        apLog_Error((LOG_CHANNEL, "GmModule::doLogin", "Missing Srpc/Url"));
+        apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Missing Srpc/Url"));
       } else {
 
         Apollo::KeyValueList kvClientInfo;
@@ -400,7 +399,7 @@ int GmModule::doLogin()
         if (pClient != 0) {
           ok = pClient->Post(sUrl, srpc);
           if (!ok) {
-            apLog_Error((LOG_CHANNEL, "GmModule::doLogin", "LoginClient::Post(%s) failed", StringType(sUrl)));
+            apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "LoginClient::Post(%s) failed", _sz(sUrl)));
           } else {
             nLoginRequests_++;
           }
@@ -444,7 +443,7 @@ AP_MSG_HANDLER_METHOD(GmModule, Gm_Start)
 
   ok = doLogin();
   if (!ok) {
-    apLog_Error((LOG_CHANNEL, "GmModule::Gm_Start", "doLogin() failed"));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "doLogin() failed"));
   }
 
   pMsg->apStatus = ok ? ApMessage::Ok : ApMessage::Error;
@@ -458,7 +457,7 @@ AP_MSG_HANDLER_METHOD(GmModule, Gm_Stop)
 
   ok = doLogout();
   if (!ok) {
-    apLog_Error((LOG_CHANNEL, "GmModule::Gm_Stop", "doLogout() failed"));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "doLogout() failed"));
   }
 
   pMsg->apStatus = ok ? ApMessage::Ok : ApMessage::Error;
@@ -477,7 +476,7 @@ AP_MSG_HANDLER_METHOD(GmModule, Gm_StartXmpp)
   msg.sResource = Apollo::getModuleConfig(MODULE_NAME, "Xmpp/Resource", "");
   ok = msg.Request();
   if (!ok) {
-    apLog_Error((LOG_CHANNEL, "GmModule::Gm_StartXmpp", "Msg_Xmpp_StartClient failed"));
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_Xmpp_StartClient failed"));
   }
 
   pMsg->apStatus = ok ? ApMessage::Ok : ApMessage::Error;
@@ -515,7 +514,7 @@ AP_MSG_HANDLER_METHOD(GmModule, System_RunLevel)
         Msg_Gm_Start msg;
         int ok = msg.Request();
         if (!ok) {
-          apLog_Error((LOG_CHANNEL, "GmModule::System_RunLevel", "Msg_Gm_Start failed"));
+          apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_Gm_Start failed"));
         }
       }
     } // bActive_
@@ -527,7 +526,7 @@ AP_MSG_HANDLER_METHOD(GmModule, System_RunLevel)
         Msg_Gm_Stop msg;
         int ok = msg.Request();
         if (!ok) {
-          apLog_Error((LOG_CHANNEL, "GmModule::System_RunLevel", "Msg_Gm_Stop failed"));
+          apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_Gm_Stop failed"));
         }
       }
     } // bActive_
@@ -540,14 +539,14 @@ AP_MSG_HANDLER_METHOD(GmModule, Timer_Event)
   if (pMsg->hTimer == hRegisterTimer_) {
     hRegisterTimer_ = ApNoHandle;
     if (!doRegister()) {
-      apLog_Error((LOG_CHANNEL, "GmModule::Timer_Event", "doRegister() failed"));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "doRegister() failed"));
     }
   }
 
   if (pMsg->hTimer == hLoginTimer_) {
     hLoginTimer_ = ApNoHandle;
     if (!doLogin()) {
-      apLog_Error((LOG_CHANNEL, "GmModule::Timer_Event", "doLogin() failed"));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "doLogin() failed"));
     }
   }
 }
@@ -564,9 +563,9 @@ AP_MSG_HANDLER_METHOD(GmModule, IdentityMgmt_SetProperty)
 
   int ok = 0;
 
-  if (!hasGmLoginData()) { throw ApException("Missing login data"); }
+  if (!hasGmLoginData()) { throw ApException(LOG_CONTEXT, "Missing login data"); }
   String sUrl = Apollo::getModuleConfig(MODULE_NAME, "Srpc/Url", "");
-  if (sUrl.empty()) { throw ApException("Missing Srpc/Url"); }
+  if (sUrl.empty()) { throw ApException(LOG_CONTEXT, "Missing Srpc/Url"); }
 
   SrpcMessage srpc;
   srpc.set(Srpc::Key::Method, GmService_Method_SetProperty);
@@ -580,7 +579,7 @@ AP_MSG_HANDLER_METHOD(GmModule, IdentityMgmt_SetProperty)
   if (pClient != 0) {
     ok = pClient->Post(sUrl, srpc);
     if (!ok) {
-      apLog_Error((LOG_CHANNEL, "GmModule::IdentityMgmt_SetProperty", "SetPropertyClient::Post(%s) failed", StringType(sUrl)));
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "SetPropertyClient::Post(%s) failed", _sz(sUrl)));
     }
   }
 

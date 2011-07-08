@@ -23,8 +23,9 @@ BOOL APIENTRY DllMain(HANDLE hModule, DWORD dwReason, LPVOID lpReserved)
 }
 #endif // defined(WIN32)
 
-#define LOG_CHANNEL "SrpcGate"
 #define MODULE_NAME "SrpcGate"
+#define LOG_CHANNEL MODULE_NAME
+#define LOG_CONTEXT apLog_Context
 
 static AP_MODULE_INFO g_info = {
   sizeof(AP_MODULE_INFO),
@@ -194,14 +195,14 @@ AP_MSG_HANDLER_METHOD(SrpcGateModule, HttpServer_Request)
       msgSHR.kvHeader.add("Pragma", "no-cache");
       msgSHR.kvHeader.add("Cache-Control", "no-store, no-cache, must-revalidate, post-check=0, pre-check=0");
       msgSHR.kvHeader.add("Expires", "Thu, 19 Nov 1981 08:52:00 GMT");
-      if (!msgSHR.Request()) { throw ApException("Msg_HttpServer_SendResponse failed: conn=" ApHandleFormat "", ApHandleType(msgSHR.hConnection)); }
+      if (!msgSHR.Request()) { throw ApException(LOG_CONTEXT, "Msg_HttpServer_SendResponse failed: conn=" ApHandleFormat "", ApHandlePrintf(msgSHR.hConnection)); }
 
       pMsg->Stop();
       pMsg->apStatus = ApMessage::Ok;
 
     } catch (ApException& ex) {
 
-      apLog_Warning((LOG_CHANNEL, "SrpcGateModule::HttpServer_Request", "%s", StringType(ex.getText())));
+      apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "%s", _sz(ex.getText())));
 
       Msg_HttpServer_SendResponse msgSHR;
       msgSHR.hConnection = pMsg->hConnection;
@@ -214,7 +215,7 @@ AP_MSG_HANDLER_METHOD(SrpcGateModule, HttpServer_Request)
       String sBody = ex.getText();
       msgSHR.sbBody.SetData(sBody);
       if (!msgSHR.Request()) {
-        { throw ApException("Msg_HttpServer_SendResponse (for error message) failed: conn=" ApHandleFormat "", ApHandleType(msgSHR.hConnection)); }
+        { throw ApException(LOG_CONTEXT, "Msg_HttpServer_SendResponse (for error message) failed: conn=" ApHandleFormat "", ApHandlePrintf(msgSHR.hConnection)); }
       } else {
         pMsg->Stop();
         pMsg->apStatus = ApMessage::Ok;
