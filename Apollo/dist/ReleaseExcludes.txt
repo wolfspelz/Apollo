@@ -35,6 +35,7 @@ net.pdb
 netapi.pdb
 netsim.pdb
 sample.pdb
+Setup.pdb
 server.pdb
 sqlite3.pdb
 srpcgate.pdb

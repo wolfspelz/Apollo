@@ -189,6 +189,10 @@
 			UniqueIdentifier="{DAA094DD-969B-4909-8A76-93BFA54678B6}"
 			>
 		</Filter>
+		<File
+			RelativePath="..\..\bin\Win32\Debug\modules\Setup\config.txt"
+			>
+		</File>
 	</Files>
 	<Globals>
 	</Globals>

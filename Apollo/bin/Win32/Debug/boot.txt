@@ -25,6 +25,7 @@ Core/Modules/02800/Arena/Path=Arena
 Core/Modules/02900/Chat/Path=Chat
 Core/Modules/03000/Dialog/Path=Dialog
 Core/Modules/03100/TestDialog/Path=TestDialog
+Core/Modules/03200/Setup/Path=Setup
 
 Core/ModulesDirectory=modules
 

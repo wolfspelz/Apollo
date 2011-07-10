@@ -7,11 +7,14 @@
 #if !defined(Local_H_INCLUDED)
 #define Local_H_INCLUDED
 
-#define MODULE_NAME "Setup"
-#define LOG_CHANNEL MODULE_NAME
-
 #include "ApLog.h"
 #include "MsgSetup.h"
+#include "MsgSystem.h"
+#include "MsgDialog.h"
 #include "SetupModule.h"
+
+#define MODULE_NAME "Setup"
+#define LOG_CHANNEL MODULE_NAME
+#define LOG_CONTEXT apLog_Context
 
 #endif // Local_H_INCLUDED

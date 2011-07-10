@@ -15,13 +15,18 @@ class SetupModule
 {
 public:
   SetupModule()
-    :nTheAnswer_(42)
+    :bInSendRunLevelNormal_(0)
+    ,bInterseptedRunLevelNormal_(0)
     {}
 
   int Init();
   void Exit();
 
-  void On_Setup_Get(Msg_Setup_Get* pMsg);
+  void On_Setup_Open(Msg_Setup_Open* pMsg);
+  void On_Setup_Close(Msg_Setup_Close* pMsg);
+  void On_Dialog_OnOpened(Msg_Dialog_OnOpened* pMsg);
+  void On_Dialog_OnClosed(Msg_Dialog_OnClosed* pMsg);
+  void On_System_RunLevel(Msg_System_RunLevel* pMsg);
 
 #if defined(AP_TEST)
   void On_UnitTest_Begin(Msg_UnitTest_Begin* pMsg);
@@ -31,7 +36,12 @@ public:
 #endif
 
 protected:
-  int nTheAnswer_;
+  void SendRunLevelNormal();
+
+protected:
+  int bInSendRunLevelNormal_;
+  int bInterseptedRunLevelNormal_;
+  ApHandle hDialog_;
 
   AP_MSG_REGISTRY_DECLARE;
 };
@@ -49,7 +59,7 @@ public:
   static void Execute();
   static void End();
 
-  static String Test1();
+  static String Dev();
 };
 
 #endif

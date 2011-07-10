@@ -68,6 +68,8 @@ npTestNetscapePlugin_debug.ilk
 npTestNetscapePlugin_debug.pdb
 sample.dll
 sample.ilk
+Setup.dll
+Setup.ilk
 server.dll
 server.ilk
 sqlite3.dll
