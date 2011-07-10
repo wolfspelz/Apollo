@@ -11,6 +11,7 @@
 #include "MsgSetup.h"
 #include "MsgSystem.h"
 #include "MsgDialog.h"
+#include "MsgWebView.h"
 #include "SetupModule.h"
 
 #define MODULE_NAME "Setup"
