@@ -2,24 +2,27 @@
 <html>
 <head>
 <script type="text/javascript" src="../WebView/apollo.js"></script>
-<script type="text/javascript" src="../Dialog/apollo.dialog.js"></script>
 <link type='text/css' rel='stylesheet' href='Setup.css' media='all' />
 
 <script type="text/javascript">
+var api = null;
+
+function Start()
+{
+  api = new ApolloApi();
+  api.ModuleName('Setup');
+  api.Log.Debug('xx');
+}
+
 </script>
 
 </head>
 
 <body>
 <div id="Wrapper">
-xx
+<input type="button" value="Install Firefox Extension" onclick="api.ModuleCall('InstallFirefoxExtension').send();" />
 
 </div>
 </body>
-
-<script type="text/javascript">
-  var api = new ApolloApi();
-  api.ModuleName('Setup');
-</script>
 
 </html>

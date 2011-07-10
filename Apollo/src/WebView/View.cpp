@@ -1065,9 +1065,9 @@ HRESULT View::webViewAddMessageToConsole(IWebView *webView, BSTR message, int li
   String sMessage = StringFromBSTR(message);
 
   if (isError) {
-    apLog_Error((LOG_CHANNEL, "Javascript:", "" ApHandleFormat " %s %s line %d: %s", ApHandlePrintf(hAp_), _sz(sUrl_), _sz(sFile), lineNumber, _sz(sMessage)));
+    apLog_Error((LOG_CHANNEL, "Javascript:", "" ApHandleFormat " %s line %d: %s", ApHandlePrintf(hAp_), _sz(sFile), lineNumber, _sz(sMessage)));
   } else {
-    apLog_Warning((LOG_CHANNEL, "Javascript:", "" ApHandleFormat " %s %s line %d: %s", ApHandlePrintf(hAp_), _sz(sUrl_), _sz(sFile), lineNumber, _sz(sMessage)));
+    apLog_Warning((LOG_CHANNEL, "Javascript:", "" ApHandleFormat " %s line %d: %s", ApHandlePrintf(hAp_), _sz(sFile), lineNumber, _sz(sMessage)));
   }
 
   return S_OK;

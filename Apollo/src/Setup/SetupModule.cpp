@@ -59,7 +59,10 @@ AP_MSG_HANDLER_METHOD(SetupModule, Setup_Close)
 AP_MSG_HANDLER_METHOD(SetupModule, Dialog_OnOpened)
 {
   if (pMsg->hDialog == hDialog_) {
-    int x = 1;
+    Msg_Dialog_ContentCall msg;
+    msg.hDialog = hDialog_;
+    msg.sFunction = "Start";
+    msg.Request();
   }
 }
 
@@ -92,6 +95,29 @@ AP_MSG_HANDLER_METHOD(SetupModule, System_RunLevel)
 
       }
     }
+  }
+}
+
+AP_MSG_HANDLER_METHOD(SetupModule, System_BeforeEventLoop)
+{
+  if (Apollo::getModuleConfig(MODULE_NAME, "AlwaysFirstStart", 0)) {
+    Apollo::setModuleConfig(MODULE_NAME, "FirstStart", 1);
+  }
+}
+
+AP_MSG_HANDLER_METHOD(SetupModule, WebView_ModuleCall)
+{
+  if (pMsg->hView == hDialog_) {
+    String sMethod = pMsg->srpc.getString(Srpc::Key::Method);
+
+    if (0){
+    } else if (sMethod == "InstallFirefoxExtension") {
+
+    } else {
+      throw ApException(LOG_CONTEXT, "Unknown Method=%s", _sz(sMethod));
+    }
+
+    pMsg->apStatus = ApMessage::Ok;
   }
 }
 
@@ -136,6 +162,8 @@ int SetupModule::Init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SetupModule, Dialog_OnOpened, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SetupModule, Dialog_OnClosed, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SetupModule, System_RunLevel, this, ApCallbackPosVeryEarly);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, SetupModule, System_BeforeEventLoop, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, SetupModule, WebView_ModuleCall, this, ApCallbackPosNormal);
 
   AP_UNITTEST_HOOK(SetupModule, this);
 

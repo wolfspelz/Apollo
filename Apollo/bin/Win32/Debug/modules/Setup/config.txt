@@ -1,4 +1,5 @@
 FirstStart=1
+#AlwaysFirstStart=1
 
 Language/en=[[MODULE_RESOURCE_PATH]]/en.txt
 Language/de=[[MODULE_RESOURCE_PATH]]/de.txt

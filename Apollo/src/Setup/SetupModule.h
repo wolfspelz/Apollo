@@ -27,6 +27,8 @@ public:
   void On_Dialog_OnOpened(Msg_Dialog_OnOpened* pMsg);
   void On_Dialog_OnClosed(Msg_Dialog_OnClosed* pMsg);
   void On_System_RunLevel(Msg_System_RunLevel* pMsg);
+  void On_System_BeforeEventLoop(Msg_System_BeforeEventLoop* pMsg);
+  void On_WebView_ModuleCall(Msg_WebView_ModuleCall* pMsg);
 
 #if defined(AP_TEST)
   void On_UnitTest_Begin(Msg_UnitTest_Begin* pMsg);
