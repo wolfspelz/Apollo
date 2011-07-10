@@ -3,10 +3,9 @@
 <head>
 <script type="text/javascript" src="../../WebView/apollo.js"></script>
 <script type="text/javascript" src="../apollo.dialog.js"></script>
-<script type="text/javascript" src="../apollo.dialog.content.js"></script>
 <script type="text/javascript">
 
-var api = new ApDialogContent();
+var api = new ApolloApi();
 api.ModuleName('CallContentScript Test');
 
 function SetText(sText1, sText2)
@@ -17,7 +16,7 @@ function SetText(sText1, sText2)
 
 </script>
 </head>
-<body onload="api.Ready();">
+<body>
 <div id="iText"></div>
 <input type="button" value="test" onclick="SetText('xx');" />Expect: 1=xx 2=undefined
 </body>

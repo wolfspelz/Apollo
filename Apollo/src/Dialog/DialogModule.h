@@ -37,7 +37,7 @@ public:
   void On_WebView_Event_ReceivedFocus(Msg_WebView_Event_ReceivedFocus* pMsg);
   void On_WebView_Event_LostFocus(Msg_WebView_Event_LostFocus* pMsg);
   void On_WebView_Event_Closing(Msg_WebView_Event_Closing* pMsg);
-  void On_Dialog_ContentLoaded(Msg_Dialog_ContentLoaded* pMsg);
+  void On_WebView_Event_EmbeddedDocumentLoaded(Msg_WebView_Event_EmbeddedDocumentLoaded* pMsg);
 
 #if defined(AP_TEST)
   void On_UnitTest_Begin(Msg_UnitTest_Begin* pMsg);
@@ -76,8 +76,10 @@ public:
   static String CreateWaitCloseByContent();
   static String CallContentScript();
   static String CallContentSrpc();
-  static String ContentLoadedFromHtml();
-  static String ExternalUrl();
+  static String GenerateOpenedEvent();
+  static String ExternalUrlOpenClose();
+  static String ExternalUrlEmbeddedDocumentEvents();
+  static String ExternalUrlDomElementProperty();
   static String SetCaption();
 };
 

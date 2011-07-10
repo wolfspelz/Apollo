@@ -82,8 +82,11 @@ void ChatWindow::AttachToLocation(const ApHandle& hLocation)
 
 //---------------------------------------------------
 
-void ChatWindow::OnLoaded()
+void ChatWindow::OnOpened()
 {
+  ViewCall vc(this, "Start");
+  vc.Request();
+
   { Msg_VpView_SubscribeLocationDetail msg; msg.hLocation = hLocation_; msg.sKey = Msg_VpView_LocationDetail_State; msg.Request(); }
   { Msg_VpView_GetLocationDetail msg; msg.hLocation = hLocation_; msg.sKey = Msg_VpView_LocationDetail_State; if (msg.Request()) { ShowLocationDetailState(msg.sValue); } }
 
@@ -103,7 +106,7 @@ void ChatWindow::OnLoaded()
 
 //---------------------------------------------------
 
-void ChatWindow::OnUnload()
+void ChatWindow::OnClosed()
 {
   Msg_Vp_DestroyContext msg;
   msg.hContext = hContext_;

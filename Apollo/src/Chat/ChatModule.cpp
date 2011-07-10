@@ -75,7 +75,7 @@ AP_MSG_HANDLER_METHOD(ChatModule, Dialog_OnOpened)
 {
   ChatWindow* pChat = FindChat(pMsg->hDialog);
   if (pChat != 0) {
-    pChat->OnLoaded();
+    pChat->OnOpened();
   }
 }
 
@@ -83,7 +83,7 @@ AP_MSG_HANDLER_METHOD(ChatModule, Dialog_OnClosed)
 {
   ChatWindow* pChat = FindChat(pMsg->hDialog);
   if (pChat != 0) {
-    pChat->OnUnload();
+    pChat->OnClosed();
     DeleteChat(pChat->apHandle());
   }
 }

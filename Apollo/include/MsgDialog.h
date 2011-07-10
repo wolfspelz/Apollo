@@ -99,14 +99,4 @@ public:
   ApIN ApHandle hDialog;
 };
 
-// ------------------------------------
-// Dialog HTML -> Dialog
-
-class Msg_Dialog_ContentLoaded: public ApNotificationMessage
-{
-public:
-  Msg_Dialog_ContentLoaded() : ApNotificationMessage("Dialog_ContentLoaded") {}
-  ApIN ApHandle hView;
-};
-
 #endif // !defined(MsgSample_h_INCLUDED)

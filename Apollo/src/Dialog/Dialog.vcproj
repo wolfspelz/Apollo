@@ -201,10 +201,6 @@
 			Name="HTML"
 			>
 			<File
-				RelativePath="..\..\bin\Win32\Debug\modules\Dialog\apollo.dialog.content.js"
-				>
-			</File>
-			<File
 				RelativePath="..\..\bin\Win32\Debug\modules\Dialog\apollo.dialog.js"
 				>
 			</File>
@@ -217,11 +213,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\bin\Win32\Debug\modules\Dialog\test\ContentLoadedFromHtml.html"
+				RelativePath="..\..\bin\Win32\Debug\modules\Dialog\test\CreateWaitCloseByContent.html"
 				>
 			</File>
 			<File
-				RelativePath="..\..\bin\Win32\Debug\modules\Dialog\test\CreateWaitCloseByContent.html"
+				RelativePath="..\..\bin\Win32\Debug\modules\Dialog\test\GenerateOpenedEvent.html"
 				>
 			</File>
 			<Filter

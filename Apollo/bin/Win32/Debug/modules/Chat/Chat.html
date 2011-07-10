@@ -5,11 +5,11 @@
 <script type="text/javascript" src="jquery-ui-latest.js"></script>
 <script type="text/javascript" src="jquery.layout-latest.js"></script>
 <script type="text/javascript" src="../WebView/apollo.js"></script>
-<script type="text/javascript" src="../Dialog/apollo.dialog.js"></script>
-<script type="text/javascript" src="../Dialog/apollo.dialog.content.js"></script>
 <link type="text/css" rel="stylesheet" href="layout-default-latest.css" /><link type='text/css' rel='stylesheet' href='Chat.css' media='all' />
 
 <script type="text/javascript">
+
+var api = null;
 
 function ReceiveMessageFromModule(sMsg)
 {
@@ -21,6 +21,7 @@ function ReceiveMessageFromModule(sMsg)
   
     var sMethod = msg.getString('Method');
     switch (sMethod) {
+      case 'Start': return Start(); break;
       case 'AddParticipant': AddParticipant(msg.getString('hParticipant'), msg.getString('sNickname'), msg.getInt('bSelf')); break;
       case 'RemoveParticipant': RemoveParticipant(msg.getString('hParticipant')); break;   
       case 'SetNickname': SetNickname(msg.getString('hParticipant'), msg.getString('sNickname')); break;
@@ -40,7 +41,28 @@ function ReceiveMessageFromModule(sMsg)
     return sResponse;
   }
 }
-function SendChat(sText)
+function Start()
+{    api = new ApolloApi();
+  api.ModuleName('Chat');
+  var gLayout = $('#Wrapper').layout({    south__size: 42,//    east__size: Math.floor( $('body').clientWidth / 3),    east__size: 150,    south__spacing_open: 4,    east__spacing_open: 4  });//  $.each('south,east'.split(','), function (i, pane) {//    var opts = myLayout.options[pane].resizeWhileDragging = true;
+//  });  $('#ChatIn').bind("keydown", 
+    function(ev) {
+      var keycode = (ev.keyCode ? ev.keyCode : (ev.which ? ev.which : ev.charCode));
+      switch (keycode) {
+      case 13:
+        if (!ev.ctrlKey && !ev.shiftKey) {
+          SendChatIn();
+          return false;
+        }
+        break;
+
+      default:
+        return true;
+      }
+    }
+  ).focus();
+  $('.cTranslate').each( function () { api.TranslateElement(this, null); } );}
+function SendChat(sText)
 {
   api.ModuleCall('SendChat')
     .setString('sText', sText)
@@ -143,26 +165,7 @@ function AddChatline(hParticipant, sNickname, sText)
 }
 
 function SetLocationState(sState){  //api.Log.Debug('SetLocationState ' + sState);
-}$(document).ready(function () {  var gLayout = $('#Wrapper').layout({    south__size: 42,//    east__size: Math.floor( $('body').clientWidth / 3),    east__size: 150,    south__spacing_open: 4,    east__spacing_open: 4  });//  $.each('south,east'.split(','), function (i, pane) {//    var opts = myLayout.options[pane].resizeWhileDragging = true;
-//  });  $('#ChatIn').bind("keydown", 
-    function(ev) {
-      var keycode = (ev.keyCode ? ev.keyCode : (ev.which ? ev.which : ev.charCode));
-      switch (keycode) {
-      case 13:
-        if (!ev.ctrlKey && !ev.shiftKey) {
-          SendChatIn();
-          return false;
-        }
-        break;
-
-      default:
-        return true;
-      }
-    }
-  ).focus();
-  $('.cTranslate').each( function () { api.TranslateElement(this, null); } );
-});
-</script>
+}</script>
 
 </head>
 
@@ -175,11 +178,5 @@ function SetLocationState(sState){  //api.Log.Debug('SetLocationState ' + sSta
   </div>
 </div>
 </body>
-
-<script type="text/javascript">
-  var api = new ApDialogContent();
-  api.ModuleName('Chat');
-  api.Ready();
-</script>
 
 </html>
