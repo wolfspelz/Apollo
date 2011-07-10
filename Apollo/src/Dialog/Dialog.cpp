@@ -74,11 +74,11 @@ void Dialog::SetIcon(const String& sIconUrl)
 
 String Dialog::CallScriptFunction(const String& sFunction, List& lArgs)
 {
-  // document.getElementById('Content').contentWindow.eval("SetText('zz')")
+  // document.getElementById('iApContent').contentWindow.eval("SetText('zz')")
 
   Msg_WebView_CallScriptFunction msg;
   msg.hView = GetView();
-  msg.sFrame = "Content";
+  msg.sFrame = "iApContent";
   msg.sFunction = sFunction;
   for (Elem* e = 0; (e = lArgs.Next(e)) != 0; ) {
     msg.lArgs.AddLast(e->getName());

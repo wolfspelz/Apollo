@@ -101,6 +101,7 @@ public:
 
 // ------------------------------------
 // Dialog HTML -> Dialog
+
 class Msg_Dialog_ContentLoaded: public ApNotificationMessage
 {
 public:

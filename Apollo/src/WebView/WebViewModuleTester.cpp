@@ -312,6 +312,47 @@ void WebViewModuleTester_FrameIO_On_WebView_Event_DocumentComplete(Msg_WebView_E
     AP_UNITTEST_RESULT(WebViewModuleTester::FrameIO_Result2, ok, s);
   }
 
+  //{
+  //  Msg_WebView_CallScriptFunction msg;
+  //  msg.hView = pMsg->hView;
+  //  msg.sFrame = "/iFrame1/iFrame2";
+  //  msg.sFunction = "TestEcho2";
+  //  msg.lArgs.AddLast("42");
+  //  msg.Request();
+  //}
+  //{
+  //  Msg_WebView_CallScriptFunction msg;
+  //  msg.hView = pMsg->hView;
+  //  msg.sFrame = "/iFrame1/iFrame2";
+  //  msg.sFunction = "TestEcho2";
+  //  msg.lArgs.AddLast("42");
+  //  msg.Request();
+  //}
+  //{
+  //  Msg_WebView_CallScriptFunction msg;
+  //  msg.hView = pMsg->hView;
+  //  msg.sFrame = "/iFrame1/iFrame2";
+  //  msg.sFunction = "TestEcho2";
+  //  msg.lArgs.AddLast("42");
+  //  msg.Request();
+  //}
+  //{
+  //  Msg_WebView_CallScriptFunction msg;
+  //  msg.hView = pMsg->hView;
+  //  msg.sFrame = "/iFrame1/iFrame2";
+  //  msg.sFunction = "TestEcho2";
+  //  msg.lArgs.AddLast("42");
+  //  msg.Request();
+  //}
+  //{
+  //  Msg_WebView_CallScriptFunction msg;
+  //  msg.hView = pMsg->hView;
+  //  msg.sFrame = "/iFrame1/iFrame2";
+  //  msg.sFunction = "TestEcho2";
+  //  msg.lArgs.AddLast("42");
+  //  msg.Request();
+  //}
+
   Msg_WebView_Destroy::_(pMsg->hView);
   { Msg_WebView_Event_DocumentComplete msg; msg.Unhook(MODULE_NAME, (ApCallback) WebViewModuleTester_FrameIO_On_WebView_Event_DocumentComplete, 0); }
   { Msg_WebView_ModuleCall msg; msg.Unhook(MODULE_NAME, (ApCallback) WebViewModuleTester_FrameIO_On_WebView_ModuleCall, 0); }
@@ -471,6 +512,56 @@ String WebViewModuleTester::StartAutomaticallySerialized()
 }
 
 //----------------------------------------------------------
+// Fetch value from DOM element
+
+static ApHandle g_GetDomElement_hView;
+
+void WebViewModuleTester_GetDomElement_On_WebView_Event_DocumentLoaded(Msg_WebView_Event_DocumentLoaded* pMsg)
+{
+  if (pMsg->hView != g_GetDomElement_hView) { return; }
+
+  String s;
+
+  if (!s) {
+    String sExpected = "Div2Value";
+    String sResult = Msg_WebView_GetElementValue::_(pMsg->hView, "", "#iDiv2", "innerHTML");
+    if (sResult != sExpected) {
+      s.appendf("got=%s expected=%s", _sz(sResult), _sz(sExpected));
+    }
+  }
+
+  if (!s) {
+    String sExpected = "http://webkit.org/images/icon-gold.png";
+    String sResult = Msg_WebView_GetElementValue::_(pMsg->hView, "", "#iImg", "src");
+    if (sResult != sExpected) {
+      s.appendf("got=%s expected=%s", _sz(sResult), _sz(sExpected));
+    }
+  }
+
+  AP_UNITTEST_RESULT(WebViewModuleTester::GetDomElement_Result, s.empty(), s);
+
+  Msg_WebView_Destroy::_(pMsg->hView);  
+  { Msg_WebView_Event_DocumentLoaded msg; msg.Unhook(MODULE_NAME, (ApCallback) WebViewModuleTester_GetDomElement_On_WebView_Event_DocumentLoaded, 0); }
+}
+
+String WebViewModuleTester::GetDomElement()
+{
+  String s;
+
+  ApHandle hView = Apollo::newHandle();
+  g_GetDomElement_hView = hView;
+
+  { Msg_WebView_Event_DocumentLoaded msg; msg.Hook(MODULE_NAME, (ApCallback) WebViewModuleTester_GetDomElement_On_WebView_Event_DocumentLoaded, 0, ApCallbackPosNormal); }
+
+  if (!s) { if (!Msg_WebView_Create::_(hView, 100, 500, 400, 300)) { s = "Msg_WebView_Create failed"; }}
+  if (!s) { if (!Msg_WebView_SetScriptAccessPolicy::Allow(hView)) { s = "Msg_WebView_SetScriptAccessPolicy failed"; }}
+  if (!s) { if (!Msg_WebView_Load::_(hView, "file://" + Apollo::getModuleResourcePath(MODULE_NAME) + "test/GetDomElement.html")) { s = "Msg_WebView_LoadHtml failed"; }}
+  if (!s) { if (!Msg_WebView_Visibility::_(hView, 1)) { s = "Msg_WebView_Visibility failed"; }}
+
+  return s;
+}
+
+//----------------------------------------------------------
 
 String WebViewModuleTester::Dev()
 {
@@ -509,34 +600,37 @@ String WebViewModuleTester::Dev()
 
 void WebViewModuleTester::Begin()
 {
-  AP_UNITTEST_REGISTER(WebViewModuleTester::LoadHtml);
-  AP_UNITTEST_REGISTER(WebViewModuleTester::CallJSEcho);
-  AP_UNITTEST_REGISTER(WebViewModuleTester::CallJSEcho_Result);
-  AP_UNITTEST_REGISTER(WebViewModuleTester::CallSystemEcho);
-  AP_UNITTEST_REGISTER(WebViewModuleTester::CallSystemEcho_Result);
-  AP_UNITTEST_REGISTER(WebViewModuleTester::CallCustomEcho);
-  AP_UNITTEST_REGISTER(WebViewModuleTester::CallCustomEcho_Result);
-  AP_UNITTEST_REGISTER(WebViewModuleTester::FrameIO);
-  AP_UNITTEST_REGISTER(WebViewModuleTester::FrameIO_Result0);
-  AP_UNITTEST_REGISTER(WebViewModuleTester::FrameIO_Result1);
-  AP_UNITTEST_REGISTER(WebViewModuleTester::FrameIO_Result2);
-  AP_UNITTEST_REGISTER(WebViewModuleTester::StartManuallySerialized);
-  AP_UNITTEST_REGISTER(WebViewModuleTester::StartManuallySerialized_Result1);
-  AP_UNITTEST_REGISTER(WebViewModuleTester::StartManuallySerialized_Result2);
-  AP_UNITTEST_REGISTER(WebViewModuleTester::StartAutomaticallySerialized);
-  AP_UNITTEST_REGISTER(WebViewModuleTester::StartAutomaticallySerialized_Result1);
-  AP_UNITTEST_REGISTER(WebViewModuleTester::StartAutomaticallySerialized_Result2);
+  //AP_UNITTEST_REGISTER(WebViewModuleTester::LoadHtml);
+  //AP_UNITTEST_REGISTER(WebViewModuleTester::CallJSEcho);
+  //AP_UNITTEST_REGISTER(WebViewModuleTester::CallJSEcho_Result);
+  //AP_UNITTEST_REGISTER(WebViewModuleTester::CallSystemEcho);
+  //AP_UNITTEST_REGISTER(WebViewModuleTester::CallSystemEcho_Result);
+  //AP_UNITTEST_REGISTER(WebViewModuleTester::CallCustomEcho);
+  //AP_UNITTEST_REGISTER(WebViewModuleTester::CallCustomEcho_Result);
+  //AP_UNITTEST_REGISTER(WebViewModuleTester::FrameIO);
+  //AP_UNITTEST_REGISTER(WebViewModuleTester::FrameIO_Result0);
+  //AP_UNITTEST_REGISTER(WebViewModuleTester::FrameIO_Result1);
+  //AP_UNITTEST_REGISTER(WebViewModuleTester::FrameIO_Result2);
+  //AP_UNITTEST_REGISTER(WebViewModuleTester::StartManuallySerialized);
+  //AP_UNITTEST_REGISTER(WebViewModuleTester::StartManuallySerialized_Result1);
+  //AP_UNITTEST_REGISTER(WebViewModuleTester::StartManuallySerialized_Result2);
+  //AP_UNITTEST_REGISTER(WebViewModuleTester::StartAutomaticallySerialized);
+  //AP_UNITTEST_REGISTER(WebViewModuleTester::StartAutomaticallySerialized_Result1);
+  //AP_UNITTEST_REGISTER(WebViewModuleTester::StartAutomaticallySerialized_Result2);
+  AP_UNITTEST_REGISTER(WebViewModuleTester::GetDomElement);
+  AP_UNITTEST_REGISTER(WebViewModuleTester::GetDomElement_Result);
 }
 
 void WebViewModuleTester::Execute()
 {
-  AP_UNITTEST_EXECUTE(WebViewModuleTester::LoadHtml);
-  AP_UNITTEST_EXECUTE(WebViewModuleTester::CallJSEcho);
-  AP_UNITTEST_EXECUTE(WebViewModuleTester::CallSystemEcho);
-  AP_UNITTEST_EXECUTE(WebViewModuleTester::CallCustomEcho);
-  AP_UNITTEST_EXECUTE(WebViewModuleTester::FrameIO);
-  AP_UNITTEST_EXECUTE(WebViewModuleTester::StartManuallySerialized);
-  AP_UNITTEST_EXECUTE(WebViewModuleTester::StartAutomaticallySerialized);
+  //AP_UNITTEST_EXECUTE(WebViewModuleTester::LoadHtml);
+  //AP_UNITTEST_EXECUTE(WebViewModuleTester::CallJSEcho);
+  //AP_UNITTEST_EXECUTE(WebViewModuleTester::CallSystemEcho);
+  //AP_UNITTEST_EXECUTE(WebViewModuleTester::CallCustomEcho);
+  //AP_UNITTEST_EXECUTE(WebViewModuleTester::FrameIO);
+  //AP_UNITTEST_EXECUTE(WebViewModuleTester::StartManuallySerialized);
+  //AP_UNITTEST_EXECUTE(WebViewModuleTester::StartAutomaticallySerialized);
+  AP_UNITTEST_EXECUTE(WebViewModuleTester::GetDomElement);
   
   //(void) WebViewModuleTester::Dev();
 }

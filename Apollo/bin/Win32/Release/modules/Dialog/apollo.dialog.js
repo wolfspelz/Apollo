@@ -3,22 +3,21 @@
 
 ApSetContent = function(sUrl)
 {
-  $('#Content').attr('src', sUrl);
+  $('#iApContent').attr('src', sUrl);
 }
 
 ApSetCaption = function(sCaption)
 {
-  $('#Caption').html(sCaption);
+  $('#iApCaption').html(sCaption);
 }
 
 ApSetIcon = function(sUrl)
 {
-  $('#Icon').attr('src', sUrl);
+  $('#iApIcon').attr('src', sUrl);
 }
 
-ApContentEval = function(sCode)
-{
-  //api.Log.Debug('ApContentEval ' +sCode);
-  return document.getElementById('Content').contentWindow.ApEval(sCode);
-}
+//ApContentEval = function(sCode)
+//{
+//  return document.getElementById('iApContent').contentWindow.ApEval(sCode);
+//}
 

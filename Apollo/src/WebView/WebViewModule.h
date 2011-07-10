@@ -35,6 +35,7 @@ public:
   void On_WebView_Load(Msg_WebView_Load* pMsg);
   void On_WebView_Reload(Msg_WebView_Reload* pMsg);
   void On_WebView_CallScriptFunction(Msg_WebView_CallScriptFunction* pMsg);
+  void On_WebView_GetElementValue(Msg_WebView_GetElementValue* pMsg);
   void On_WebView_ViewCall(Msg_WebView_ViewCall* pMsg);
   void On_WebView_SetScriptAccessPolicy(Msg_WebView_SetScriptAccessPolicy* pMsg);
   void On_WebView_SetNavigationPolicy(Msg_WebView_SetNavigationPolicy* pMsg);

@@ -21,12 +21,27 @@ public:
   AutoComPtr(const AutoComPtr& o) : p_(o.p_) { if (T* p = p_) p->AddRef(); }
   ~AutoComPtr() { if (p_) p_->Release(); }
 
+  // Handover
+  inline AutoComPtr& operator=(AutoComPtr& o)
+  {
+    // Decrement old if already occupied
+    if (p_) { p_->Release(); }
+    p_ = o.p_;
+    // Increment because additional pointer
+    p_->AddRef();
+    return *this;
+  }
+
   inline T* get() const { return p_; }
   inline T& operator*() const { return *p_; }
   inline T* operator->() const { return p_; }
   inline operator T* () { return p_; }
-  inline operator T** () { return &p_; }
-  inline operator void** () { return (void**) &p_; }
+
+  // These 2 are dangerous, because they allow overwriting the pointer 
+  // without Release. They must not be used if already occupied. 
+  inline operator T** () { if (p_) { AP_DEBUG_BREAK(); } return &p_; }
+  inline operator void** () { if (p_) { AP_DEBUG_BREAK(); } return (void**) &p_; }
+
   inline bool operator!() const { return !p_; }
   inline bool operator==(const AutoComPtr<T>& o) { return get() == o.get(); }
 
@@ -122,7 +137,8 @@ public:
   void LoadHtml(const String& sHtml, const String& sBase) throw(ApException);
   void Load(const String& sUrl) throw(ApException);
   void Reload() throw(ApException);
-  String CallJsFunction(const String& sFramePath, const String& sFunction, List& lArgs);
+  String CallScriptFunction(const String& sFramePath, const String& sFunction, List& lArgs) throw(ApException);
+  String GetElementValue(const String& sFramePath, const String& sElement, const String& sProperty) throw(ApException);
   void CallJsSrpc(const String& sFunction, Apollo::SrpcMessage& srpc, Apollo::SrpcMessage& response) throw(ApException);
 
   static void LoadDone();
@@ -150,12 +166,15 @@ public:
 protected:
   void SerializedLoadHtml(const String& sHtml, const String& sBase) throw(ApException);
   void SerializedLoad(const String& sUrl) throw(ApException);
-  void MoveWindowRoCurrentRect();
   void MakeScriptObject(IWebFrame* pFrame) throw(ApException);
+  IWebFrame* GetFrameByPath(const String& sFramePath) throw(ApException);
+  String CallScriptFunction(IWebFrame* pFrame, const String& sFunction, List& lArgs) throw(ApException);
+  String GetElementValue(IWebFrame* pFrame, const String& sElement, const String& sProperty) throw(ApException);
+
+  void MoveWindowRoCurrentRect();
   static String StringFromBSTR(BSTR bStr);
   static String GetUrlFrom(IWebFrame *frame);
   static String GetUrlFrom(IWebURLRequest *request);
-  String CallJsFunction(IWebFrame* pFrame, const String& sFunction, List& lArgs) throw(ApException);
 
 protected:
   ApHandle hAp_;

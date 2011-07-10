@@ -44,7 +44,7 @@ class Action: public Elem
 {
 public:
   Action()
-    :nDelayMSec_(100)
+    :nDelayMSec_(10)
   {}
   virtual void SetList(ActionList* pList) {}
   virtual void Execute() {}
@@ -956,7 +956,7 @@ void Test_InNavigateChatOut::Begin()
   Append(new Test_InNavigateChatOut_ParticipantsChanged1());
   Append(new Test_InNavigateChatOut_EnterLocationComplete1());
 
-  Append(new Test_InNavigateChatOut_Wait(500));
+  Append(new Test_InNavigateChatOut_Wait(300));
   Append(new Test_InNavigateChatOut_LeaveLocationRequested1());
   Append(new Test_InNavigateChatOut_ContextDetailsChanged_LocationUrl());
   Append(new Test_InNavigateChatOut_LocationContextsChanged1b());
@@ -971,14 +971,14 @@ void Test_InNavigateChatOut::Begin()
   Append(new Test_InNavigateChatOut_LeaveLocationComplete1());
   Append(new Test_InNavigateChatOut_ParticipantsChanged2a());
   Append(new Test_InNavigateChatOut_EnterLocationComplete2());
-  Append(new Test_InNavigateChatOut_Wait(500));
+  Append(new Test_InNavigateChatOut_Wait(300));
   Append(new Test_InNavigateChatOut_Chat2a());
 
-  Append(new Test_InNavigateChatOut_Wait(500));
+  Append(new Test_InNavigateChatOut_Wait(300));
   Append(new Test_InNavigateChatOut_Chat2b());
-  Append(new Test_InNavigateChatOut_Wait(500));
+  Append(new Test_InNavigateChatOut_Wait(300));
   Append(new Test_InNavigateChatOut_Chat2c());
-  Append(new Test_InNavigateChatOut_Wait(500));
+  Append(new Test_InNavigateChatOut_Wait(300));
   Append(new Test_InNavigateChatOut_LeaveLocationRequested2());
   Append(new Test_InNavigateChatOut_ContextDetailsChanged_LocationUrl());
   Append(new Test_InNavigateChatOut_LocationContextsChanged2b());

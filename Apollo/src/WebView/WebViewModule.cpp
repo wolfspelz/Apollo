@@ -114,7 +114,14 @@ AP_MSG_HANDLER_METHOD(WebViewModule, WebView_Reload)
 AP_MSG_HANDLER_METHOD(WebViewModule, WebView_CallScriptFunction)
 {
   View* pView = FindView(pMsg->hView);
-  pMsg->sResult = pView->CallJsFunction(pMsg->sFrame, pMsg->sFunction, pMsg->lArgs);
+  pMsg->sResult = pView->CallScriptFunction(pMsg->sFrame, pMsg->sFunction, pMsg->lArgs);
+  pMsg->apStatus = ApMessage::Ok;
+}
+
+AP_MSG_HANDLER_METHOD(WebViewModule, WebView_GetElementValue)
+{
+  View* pView = FindView(pMsg->hView);
+  pMsg->sResult = pView->GetElementValue(pMsg->sFrame, pMsg->sElement, pMsg->sProperty);
   pMsg->apStatus = ApMessage::Ok;
 }
 
@@ -377,6 +384,7 @@ int WebViewModule::Init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, WebViewModule, WebView_Load, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, WebViewModule, WebView_Reload, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, WebViewModule, WebView_CallScriptFunction, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, WebViewModule, WebView_GetElementValue, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, WebViewModule, WebView_ViewCall, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, WebViewModule, WebView_SetScriptAccessPolicy, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, WebViewModule, WebView_SetNavigationPolicy, this, ApCallbackPosNormal);
