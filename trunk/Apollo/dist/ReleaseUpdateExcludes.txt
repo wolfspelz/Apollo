@@ -1,5 +1,6 @@
 \svn\
 .svn
+\inspector\
 
 Avatar.exe
 Avatar.ilk
@@ -49,6 +50,7 @@ gm.ilk
 hw.html
 HttpIndex.txt
 http.log
+icudt40.dll
 identity.dll
 identity.ilk
 Identity.sqlite3
