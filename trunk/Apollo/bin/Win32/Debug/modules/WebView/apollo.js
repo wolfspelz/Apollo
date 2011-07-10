@@ -203,12 +203,12 @@ ApolloApi.prototype =
 
   ModuleName: function(sModule)
   {
-    api.moduleName = sModule; 
+    api.moduleName = sModule;
   },
 
   GetViewHandle: function()
   {
-    return apollo.viewHandle; 
+    return apollo.viewHandle;
   },
   
   // ------------------------------------------------

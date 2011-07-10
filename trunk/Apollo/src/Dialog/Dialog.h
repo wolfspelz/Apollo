@@ -32,7 +32,7 @@ public:
   void ContentCall(const String& sFunction, Apollo::SrpcMessage& srpc, Apollo::SrpcMessage& response);
 
   void OnDocumentLoaded();
-  void OnContentLoaded();
+  void OnContentLoaded(const String& sUrl);
   void OnReceivedFocus();
   void OnLostFocus();
   void OnUnload();

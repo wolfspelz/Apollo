@@ -41,8 +41,8 @@ public:
   void Open();
   void Close();
 
-  void OnLoaded();
-  void OnUnload();
+  void OnOpened();
+  void OnClosed();
   void OnModuleCall(Apollo::SrpcMessage& request, Apollo::SrpcMessage& response);
 
   void OnParticipantAdded(const ApHandle& hParticipant, int bSelf);
