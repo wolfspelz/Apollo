@@ -12,6 +12,7 @@
 #include "MsgWebView.h"
 #include "MsgDialog.h"
 #include "MsgNet.h"
+#include "MsgTimer.h"
 
 #define MODULE_NAME "Dialog"
 #define LOG_CHANNEL MODULE_NAME

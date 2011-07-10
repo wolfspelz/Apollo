@@ -255,37 +255,45 @@ public:
   ApIN String sFunction;
   ApIN List lArgs;
   ApOUT String sResult;
-  static String _(const ApHandle& hView, const String& sFunction, List& lArgs)
+  static String _(const ApHandle& hView, const String& sFrame, const String& sFunction, List& lArgs)
   {
     Msg_WebView_CallScriptFunction msg;
     msg.hView = hView;
+    msg.sFrame = sFrame;
     msg.sFunction = sFunction;
     for (Elem* e = 0; (e = lArgs.Next(e)) != 0; ) {
       msg.lArgs.AddLast(e->getName());
     }
-    msg.Request();
+    (void) msg.Request();
     return msg.sResult;
   }
-  static String _(const ApHandle& hView, const String& sFunction, const String& sArg1)
+  static String _(const ApHandle& hView, const String& sFrame, const String& sFunction, const String& sArg1)
   {
     List lArgs;
     lArgs.AddLast(sArg1);
-    return _(hView, sFunction, lArgs);
+    return _(hView, sFrame, sFunction, lArgs);
   }
-  static String _(const ApHandle& hView, const String& sFunction, const String& sArg1, const String& sArg2)
+};
+
+// -> WebView
+class Msg_WebView_GetElementValue: public ApRequestMessage
+{
+public:
+  Msg_WebView_GetElementValue() : ApRequestMessage("WebView_GetElementValue") {}
+  ApIN ApHandle hView;
+  ApIN String sFrame;
+  ApIN String sElement;
+  ApIN String sProperty;
+  ApOUT String sResult;
+  static String _(const ApHandle& hView, const String& sFrame, const String& sElement, const String& sProperty)
   {
-    List lArgs;
-    lArgs.AddLast(sArg1);
-    lArgs.AddLast(sArg2);
-    return _(hView, sFunction, lArgs);
-  }
-  static String _(const ApHandle& hView, const String& sFunction, const String& sArg1, const String& sArg2, const String& sArg3)
-  {
-    List lArgs;
-    lArgs.AddLast(sArg1);
-    lArgs.AddLast(sArg2);
-    lArgs.AddLast(sArg3);
-    return _(hView, sFunction, lArgs);
+    Msg_WebView_GetElementValue msg;
+    msg.hView = hView;
+    msg.sFrame = sFrame;
+    msg.sElement = sElement;
+    msg.sProperty = sProperty;
+    (void) msg.Request();
+    return msg.sResult;
   }
 };
 
@@ -338,6 +346,24 @@ class Msg_WebView_Event_DocumentComplete: public ApNotificationMessage
 public:
   Msg_WebView_Event_DocumentComplete() : ApNotificationMessage("WebView_Event_DocumentComplete") {}
   ApIN ApHandle hView;
+};
+
+// WebView ->
+class Msg_WebView_Event_EmbeddedDocumentLoaded: public ApNotificationMessage
+{
+public:
+  Msg_WebView_Event_EmbeddedDocumentLoaded() : ApNotificationMessage("WebView_Event_EmbeddedDocumentLoaded") {}
+  ApIN ApHandle hView;
+  ApIN String sUrl;
+};
+
+// WebView ->
+class Msg_WebView_Event_EmbeddedDocumentComplete: public ApNotificationMessage
+{
+public:
+  Msg_WebView_Event_EmbeddedDocumentComplete() : ApNotificationMessage("WebView_Event_EmbeddedDocumentComplete") {}
+  ApIN ApHandle hView;
+  ApIN String sUrl;
 };
 
 // WebView ->

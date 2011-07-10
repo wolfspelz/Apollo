@@ -293,26 +293,31 @@ void DialogModuleTester::Begin()
 {
   //AP_UNITTEST_REGISTER(DialogModuleTester::CreateWaitCloseByContent);
   //AP_UNITTEST_REGISTER(DialogModuleTester::ContentLoadedFromHtml);
-  AP_UNITTEST_REGISTER(DialogModuleTester::CallContentScript);
+  //AP_UNITTEST_REGISTER(DialogModuleTester::CallContentScript);
   //AP_UNITTEST_REGISTER(DialogModuleTester::CallContentSrpc);
   //AP_UNITTEST_REGISTER(DialogModuleTester::SetCaption);
 
-  //if (Apollo::isLoadedModule("Net") && Msg_Net_IsOnline::_()) {
-  //  AP_UNITTEST_REGISTER(DialogModuleTester::ExternalUrl);
-  //}
+  if (Apollo::isLoadedModule("Net") && Msg_Net_IsOnline::_()) {
+    AP_UNITTEST_REGISTER(DialogModuleTester::ExternalUrl);
+    AP_UNITTEST_REGISTER(DialogModuleTester::ExternalUrlLoaded);
+    AP_UNITTEST_REGISTER(DialogModuleTester::ExternalUrlEmbeddedDocumentLoaded);
+    AP_UNITTEST_REGISTER(DialogModuleTester::ExternalUrlEmbeddedDocumentComplete);
+    AP_UNITTEST_REGISTER(DialogModuleTester::ExternalUrlDomElementProperty);
+    AP_UNITTEST_REGISTER(DialogModuleTester::ExternalUrlClosing);
+  }
 }
 
 void DialogModuleTester::Execute()
 {
   //DialogModuleTester::CreateWaitCloseByContent();
   //DialogModuleTester::ContentLoadedFromHtml();
-  DialogModuleTester::CallContentScript();
+  //DialogModuleTester::CallContentScript();
   //DialogModuleTester::CallContentSrpc();
   //DialogModuleTester::SetCaption();
 
-  //if (Apollo::isLoadedModule("Net") && Msg_Net_IsOnline::_()) {
-  //  DialogModuleTester::ExternalUrl();
-  //}
+  if (Apollo::isLoadedModule("Net") && Msg_Net_IsOnline::_()) {
+    AP_UNITTEST_EXECUTE(DialogModuleTester::ExternalUrl);
+  }
 }
 
 void DialogModuleTester::End()
@@ -401,7 +406,7 @@ void DialogModuleTester_CallContentScript_Dialog_ContentLoaded(Msg_Dialog_Conten
   String s;
 
   if (!s) {
-    // document.getElementById('Content').contentWindow.eval("SetText('zz')")
+    // document.getElementById('iApContent').contentWindow.eval("SetText('zz')")
     Msg_Dialog_CallScriptFunction msg;
     msg.hDialog = pMsg->hView;
     msg.sFunction = "SetText";
@@ -414,17 +419,15 @@ void DialogModuleTester_CallContentScript_Dialog_ContentLoaded(Msg_Dialog_Conten
 
   if (!s) {
     String sExpected = "1=CallContentScript Text1 2=42";
-    String sResult = Msg_WebView_CallScriptFunction::_(pMsg->hView, "", "ApContentEval", "document.getElementById('iText').innerHTML");
+    String sResult = Msg_WebView_CallScriptFunction::_(pMsg->hView, "iApContent", "ApEval", "document.getElementById('iText').innerHTML");
     if (sResult != sExpected) {
       s = "Wrong text expected=" + sExpected + " got=" + sResult;
     }
   }
 
   AP_UNITTEST_RESULT(DialogModuleTester::CallContentScript, s.empty(), s);
-
   { Msg_Dialog_ContentLoaded msg; msg.Unhook(MODULE_NAME, (ApCallback) DialogModuleTester_CallContentScript_Dialog_ContentLoaded, 0); }
-
-//  { ApAsyncMessage<Msg_Dialog_Destroy> msg; msg->hDialog = DialogModuleTester_CallContentScript_hDialog; msg.Post(); }
+  { ApAsyncMessage<Msg_Dialog_Destroy> msg; msg->hDialog = pMsg->hView; msg.Post(); }
 }
 
 String DialogModuleTester::CallContentScript()
@@ -461,7 +464,7 @@ void DialogModuleTester_CallContentSrpc_Dialog_ContentLoaded(Msg_Dialog_ContentL
   String s;
 
   if (!s) {
-    // document.getElementById('Content').contentWindow.eval("SetText('zz')")
+    // document.getElementById('iApContent').contentWindow.eval("SetText('zz')")
     Msg_Dialog_ContentCall msg;
     msg.hDialog = pMsg->hView;
     msg.sFunction = "SetText";
@@ -474,7 +477,7 @@ void DialogModuleTester_CallContentSrpc_Dialog_ContentLoaded(Msg_Dialog_ContentL
 
   if (!s) {
     String sExpected = "String=41\nInt=42\n";
-    String sResult = Msg_WebView_CallScriptFunction::_(pMsg->hView, "", "ApContentEval", "document.getElementById('iText').innerHTML");
+    String sResult = Msg_WebView_CallScriptFunction::_(pMsg->hView, "iApContent", "ApEval", "document.getElementById('iText').innerHTML");
     if (sResult != sExpected) {
       s = "Wrong text expected=" + sExpected + " got=" + sResult;
     }
@@ -513,25 +516,59 @@ String DialogModuleTester::CallContentSrpc()
 //----------------------------
 
 static ApHandle DialogModuleTester_ExternalUrl_hDialog;
+static String DialogModuleTester_ExternalUrl_sUrl;
 
 void DialogModuleTester_ExternalUrl_WebView_Event_DocumentLoaded(Msg_WebView_Event_DocumentLoaded* pMsg)
 {
   if (pMsg->hView != DialogModuleTester_ExternalUrl_hDialog) { return; }
-  AP_UNITTEST_SUCCESS(DialogModuleTester::ExternalUrl);
+  AP_UNITTEST_SUCCESS(DialogModuleTester::ExternalUrlLoaded);
   { Msg_WebView_Event_DocumentLoaded msg; msg.Unhook(MODULE_NAME, (ApCallback) DialogModuleTester_ExternalUrl_WebView_Event_DocumentLoaded, 0); }
+}
+
+void DialogModuleTester_ExternalUrl_WebView_Event_EmbeddedDocumentLoaded(Msg_WebView_Event_EmbeddedDocumentLoaded* pMsg)
+{
+  if (pMsg->hView != DialogModuleTester_ExternalUrl_hDialog) { return; }
+
+  String s;
+  if (pMsg->sUrl != DialogModuleTester_ExternalUrl_sUrl) {
+    s.appendf("got=%s expected=%s", _sz(pMsg->sUrl), _sz(DialogModuleTester_ExternalUrl_sUrl));
+  }
+
+  AP_UNITTEST_RESULT(DialogModuleTester::ExternalUrlEmbeddedDocumentLoaded, s.empty(), s);
+  { Msg_WebView_Event_EmbeddedDocumentLoaded msg; msg.Unhook(MODULE_NAME, (ApCallback) DialogModuleTester_ExternalUrl_WebView_Event_EmbeddedDocumentLoaded, 0); }
+}
+
+void DialogModuleTester_ExternalUrl_WebView_Event_EmbeddedDocumentComplete(Msg_WebView_Event_EmbeddedDocumentComplete* pMsg)
+{
+  if (pMsg->hView != DialogModuleTester_ExternalUrl_hDialog) { return; }
+
+  if (pMsg->sUrl == DialogModuleTester_ExternalUrl_sUrl) {
+    String s;
+    String sExpectedSubstring = "background-image";
+    String sResult = Msg_WebView_GetElementValue::_(DialogModuleTester_ExternalUrl_hDialog, "iApContent", "#p-logo", "innerHTML");
+    if (!sResult.contains(sExpectedSubstring)) {
+      s.appendf("got=%s expected=%s", _sz(sResult), _sz(sExpectedSubstring));
+    }
+    AP_UNITTEST_RESULT(DialogModuleTester::ExternalUrlDomElementProperty, s.empty(), s);
+  }
+
+  AP_UNITTEST_SUCCESS(DialogModuleTester::ExternalUrlEmbeddedDocumentComplete);
+  { Msg_WebView_Event_EmbeddedDocumentComplete msg; msg.Unhook(MODULE_NAME, (ApCallback) DialogModuleTester_ExternalUrl_WebView_Event_EmbeddedDocumentComplete, 0); }
+
+  { ApAsyncMessage<Msg_Dialog_Destroy> msg; msg->hDialog = pMsg->hView; msg.Post(); }
 }
 
 void DialogModuleTester_ExternalUrl_WebView_Event_DocumentComplete(Msg_WebView_Event_DocumentComplete* pMsg)
 {
   if (pMsg->hView != DialogModuleTester_ExternalUrl_hDialog) { return; }
-  AP_UNITTEST_SUCCESS(DialogModuleTester::ExternalUrl);
+  AP_UNITTEST_SUCCESS(DialogModuleTester::ExternalUrlDomElementProperty);
   { Msg_WebView_Event_DocumentComplete msg; msg.Unhook(MODULE_NAME, (ApCallback) DialogModuleTester_ExternalUrl_WebView_Event_DocumentComplete, 0); }
 }
 
 void DialogModuleTester_ExternalUrl_WebView_Event_Closing(Msg_WebView_Event_Closing* pMsg)
 {
   if (pMsg->hView != DialogModuleTester_ExternalUrl_hDialog) { return; }
-  AP_UNITTEST_SUCCESS(DialogModuleTester::ExternalUrl);
+  AP_UNITTEST_SUCCESS(DialogModuleTester::ExternalUrlClosing);
   { Msg_WebView_Event_Closing msg; msg.Unhook(MODULE_NAME, (ApCallback) DialogModuleTester_ExternalUrl_WebView_Event_Closing, 0); }
 }
 
@@ -541,10 +578,13 @@ String DialogModuleTester::ExternalUrl()
 
   { Msg_WebView_Event_DocumentLoaded msg; msg.Hook(MODULE_NAME, (ApCallback) DialogModuleTester_ExternalUrl_WebView_Event_DocumentLoaded, 0, ApCallbackPosNormal); }
   { Msg_WebView_Event_DocumentComplete msg; msg.Hook(MODULE_NAME, (ApCallback) DialogModuleTester_ExternalUrl_WebView_Event_DocumentComplete, 0, ApCallbackPosNormal); }
+  { Msg_WebView_Event_EmbeddedDocumentLoaded msg; msg.Hook(MODULE_NAME, (ApCallback) DialogModuleTester_ExternalUrl_WebView_Event_EmbeddedDocumentLoaded, 0, ApCallbackPosNormal); }
+  { Msg_WebView_Event_EmbeddedDocumentComplete msg; msg.Hook(MODULE_NAME, (ApCallback) DialogModuleTester_ExternalUrl_WebView_Event_EmbeddedDocumentComplete, 0, ApCallbackPosNormal); }
   { Msg_WebView_Event_Closing msg; msg.Hook(MODULE_NAME, (ApCallback) DialogModuleTester_ExternalUrl_WebView_Event_Closing, 0, ApCallbackPosNormal); }
 
   ApHandle hDialog = Apollo::newHandle();
   DialogModuleTester_ExternalUrl_hDialog = hDialog;
+  DialogModuleTester_ExternalUrl_sUrl = "http://en.wikipedia.org/wiki/Main_Page";
 
   Msg_Dialog_Create msg;
   msg.hDialog = hDialog;
@@ -553,8 +593,8 @@ String DialogModuleTester::ExternalUrl()
   msg.nWidth = 800;
   msg.nHeight = 500;
   msg.bVisible = 1;
-  msg.sCaption = "Wikipedia";
-  msg.sContentUrl = "http://en.wikipedia.org/wiki/Main_Page";
+  msg.sCaption = "ExternalUrl";
+  msg.sContentUrl = DialogModuleTester_ExternalUrl_sUrl;
   if (!s) { if (!msg.Request()) { s = "Msg_Dialog_Create failed"; }}
 
   return s;
@@ -586,14 +626,14 @@ void DialogModuleTester_SetCaption_WebView_Event_DocumentLoaded(Msg_WebView_Even
   }
 
   if (!s) {
-    String sResult = Msg_WebView_CallScriptFunction::_(pMsg->hView, "", "ApEval", "$('#Caption').text()");
+    String sResult = Msg_WebView_CallScriptFunction::_(pMsg->hView, "", "ApEval", "$('#iApCaption').text()");
     if (sResult != "Final Window Caption") {
       s = "Caption wrong";
     }
   }
 
   if (!s) {
-    String sResult = Msg_WebView_CallScriptFunction::_(pMsg->hView, "", "ApEval", "$('#Icon').attr('src')");
+    String sResult = Msg_WebView_CallScriptFunction::_(pMsg->hView, "", "ApEval", "$('#iApIcon').attr('src')");
     if (sResult != "file://" + Apollo::getModuleResourcePath(MODULE_NAME) + "test/SetCaptionFinalIcon.png") {
       s = "IconUrl wrong";
     }
@@ -601,6 +641,7 @@ void DialogModuleTester_SetCaption_WebView_Event_DocumentLoaded(Msg_WebView_Even
 
   AP_UNITTEST_RESULT(DialogModuleTester::SetCaption, s.empty(), s);
   { Msg_WebView_Event_DocumentLoaded msg; msg.Unhook(MODULE_NAME, (ApCallback) DialogModuleTester_SetCaption_WebView_Event_DocumentLoaded, 0); }
+  { ApAsyncMessage<Msg_Dialog_Destroy> msg; msg->hDialog = pMsg->hView; msg.Post(); }
 }
 
 String DialogModuleTester::SetCaption()

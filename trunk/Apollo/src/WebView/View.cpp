@@ -425,25 +425,21 @@ void View::GetWin32Window(HWND& hWnd)
 //------------------------------------
 // Call JS
 
-String View::CallJsFunction(const String& sFramePath, const String& sFunction, List& lArgs)
+IWebFrame* View::GetFrameByPath(const String& sFramePath)
 {
-  if (!bLoaded_) {
-    throw ApException(LOG_CONTEXT, "('%s', %s): view=" ApHandleFormat " document not yet loaded", _sz(sFramePath), _sz(sFunction), ApHandlePrintf(hAp_));
-  }
-
-  String sResult;
-  String sError;
+  IWebFrame* pResult;
 
   String sPath = sFramePath;
   sPath.trim("/");
 
   if (sPath.empty()) {
-    sResult = CallJsFunction(pWebFrame_, sFunction, lArgs);
+    pResult = pWebFrame_;
   } else {
 
     AutoComPtr<IWebFrame> frame = pWebFrame_;
-    String sFrameId;
+    String sError;
 
+    String sFrameId;
     while (sPath.nextToken("/", sFrameId) && sError.empty()) {
       AutoComPtr<IDOMDocument> doc;
       frame->DOMDocument(doc);
@@ -461,24 +457,98 @@ String View::CallJsFunction(const String& sFramePath, const String& sFunction, L
           if (frameElem.get() == 0) {
             sError.appendf("element '%s' is not an IFRAME", _sz(sFrameId));
           } else {
-            frameElem->contentFrame(frame);
+            AutoComPtr<IWebFrame> nextFrame;
+            frameElem->contentFrame(nextFrame);
+            frame = nextFrame;
           }
         }
         ::SysFreeString(bstrId);
       }
     }
 
-    if (!sError) {
-      sResult = CallJsFunction(frame, sFunction, lArgs);
+    if (sError) {
+      throw ApException(LOG_CONTEXT, "%s: %s", _sz(sFramePath), _sz(sError));
     } else {
-      throw ApException(LOG_CONTEXT, "(%s, %s): %s", _sz(sFramePath), _sz(sFunction), _sz(sError));
+      pResult = frame.get();
     }
+  }
+
+  return pResult;
+}
+
+String View::GetElementValue(const String& sFramePath, const String& sElement, const String& sProperty)
+{
+  if (!bLoaded_) { throw ApException(LOG_CONTEXT, "('%s', %s.%s): view=" ApHandleFormat " document not yet loaded", _sz(sFramePath), _sz(sElement), _sz(sProperty), ApHandlePrintf(hAp_)); }
+  String sResult;
+
+  IWebFrame* pFrame = GetFrameByPath(sFramePath);
+  if (pFrame != 0) {
+    sResult = GetElementValue(pFrame, sElement, sProperty);
   }
 
   return sResult;
 }
 
-String View::CallJsFunction(IWebFrame* pFrame, const String& sFunction, List& lArgs)
+String View::CallScriptFunction(const String& sFramePath, const String& sFunction, List& lArgs)
+{
+  if (!bLoaded_) { throw ApException(LOG_CONTEXT, "('%s', %s): view=" ApHandleFormat " document not yet loaded", _sz(sFramePath), _sz(sFunction), ApHandlePrintf(hAp_)); }
+  String sResult;
+
+  IWebFrame* pFrame = GetFrameByPath(sFramePath);
+  if (pFrame != 0) {
+    sResult = CallScriptFunction(pFrame, sFunction, lArgs);
+  }
+
+  return sResult;
+}
+
+String View::GetElementValue(IWebFrame* pFrame, const String& sElement, const String& sProperty)
+{
+  String sResult;
+
+  JSGlobalContextRef runCtx = pFrame->globalContext();
+  if (runCtx == 0) { throw ApException(LOG_CONTEXT, "pFrame->globalContext() returned 0"); }
+
+  JSValueRef* exception = 0;
+
+  JSObjectRef global = JSContextGetGlobalObject(runCtx);
+  if (global == 0) { throw ApException(LOG_CONTEXT, "JSContextGetGlobalObject(runCtx) returned 0"); }
+
+  // Support only element id like '#ID'
+  if (!sElement.startsWith("#")) { throw ApException(LOG_CONTEXT, "Only CSS selectors with element Ids are supported, e.g. #id"); }
+
+  String sName = sElement;
+  sName.trim("#");
+
+  AutoJSStringRef elementName = JSStringCreateWithUTF8CString(sName);
+
+  JSValueRef elementValue = JSObjectGetProperty(runCtx, global, elementName, exception);
+  if (exception) { throw ApException(LOG_CONTEXT, "JSObjectGetProperty('%s') returned exception", _sz(sName)); }
+  if (elementValue == 0) { throw ApException(LOG_CONTEXT, "JSObjectGetProperty('%s') returned 0", _sz(sName)); }
+
+  JSObjectRef element = JSValueToObject(runCtx, elementValue, exception);
+  if (exception) { throw ApException(LOG_CONTEXT, "JSValueToObject('%s') returned exception", _sz(sName)); }
+  if (element == 0) { throw ApException(LOG_CONTEXT, "JSValueToObject('%s') returned 0", _sz(sName)); }
+
+  AutoJSStringRef propertyName = JSStringCreateWithUTF8CString(sProperty);
+
+  JSValueRef propertyValue = JSObjectGetProperty(runCtx, element, propertyName, exception);
+  if (exception) { throw ApException(LOG_CONTEXT, "JSObjectGetProperty('%s') returned exception", _sz(sName)); }
+  if (propertyValue == 0) { throw ApException(LOG_CONTEXT, "JSObjectGetProperty('%s') returned 0", _sz(sName)); }
+
+  // Convert the value into a string
+  if (propertyValue) {
+    AutoJSStringRef value = JSValueToStringCopy (runCtx, propertyValue, exception);
+    if (exception) { throw ApException(LOG_CONTEXT, "JSValueToStringCopy() returned exception"); }
+    if (((JSStringRef) value) == 0) { throw ApException(LOG_CONTEXT, "JSValueToStringCopy() returned 0"); }
+
+    sResult.set((PWSTR) JSStringGetCharactersPtr(value), JSStringGetLength(value));
+  }
+
+  return sResult;
+}
+
+String View::CallScriptFunction(IWebFrame* pFrame, const String& sFunction, List& lArgs)
 {
   String sResult;
 
@@ -491,17 +561,17 @@ String View::CallJsFunction(IWebFrame* pFrame, const String& sFunction, List& lA
   if (global == 0) { throw ApException(LOG_CONTEXT, "JSContextGetGlobalObject(runCtx) returned 0"); }
 
   JSValueRef* exception = 0;
-  JSValueRef sampleFunction = JSObjectGetProperty(runCtx, global, methodName, exception);
+  JSValueRef functionProperty = JSObjectGetProperty(runCtx, global, methodName, exception);
   if (exception) { throw ApException(LOG_CONTEXT, "JSObjectGetProperty(methodName) returned exception"); }
-  if (sampleFunction == 0) { throw ApException(LOG_CONTEXT, "JSObjectGetProperty(methodName) returned 0"); }
+  if (functionProperty == 0) { throw ApException(LOG_CONTEXT, "JSObjectGetProperty(methodName) returned 0"); }
 
-  if (!JSValueIsObject(runCtx, sampleFunction)) {
-    throw ApException(LOG_CONTEXT, "no such function: '%s' url=%s", _sz(sFunction), _sz(sUrl_));
+  if (!JSValueIsObject(runCtx, functionProperty)) {
+    throw ApException(LOG_CONTEXT, "no such callableFunction: '%s' url=%s", _sz(sFunction), _sz(sUrl_));
   }
 
-  JSObjectRef function = JSValueToObject(runCtx, sampleFunction, exception);
-  if (exception) { throw ApException(LOG_CONTEXT, "JSValueToObject(sampleFunction) returned exception"); }
-  if (function == 0) { throw ApException(LOG_CONTEXT, "JSValueToObject(sampleFunction) returned 0"); }
+  JSObjectRef callableFunction = JSValueToObject(runCtx, functionProperty, exception);
+  if (exception) { throw ApException(LOG_CONTEXT, "JSValueToObject(functionProperty) returned exception"); }
+  if (callableFunction == 0) { throw ApException(LOG_CONTEXT, "JSValueToObject(functionProperty) returned 0"); }
 
   JSValueRef result = 0;
 
@@ -513,22 +583,22 @@ String View::CallJsFunction(IWebFrame* pFrame, const String& sFunction, List& lA
     int nCnt = 0;
     for (Elem* e = 0; (e = lArgs.Next(e)) != 0; ) {
       if (apLog_IsVerbose) { sLog += " " + e->getName(); }
-      args[nCnt++] = JSValueMakeString (runCtx, JSStringCreateWithCharacters((LPCTSTR) e->getName(), e->getName().chars()));
+      args[nCnt++] = JSValueMakeString(runCtx, JSStringCreateWithCharacters((LPCTSTR) e->getName(), e->getName().chars()));
     }
 
     apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "%s", _sz(sLog)));
-    result = JSObjectCallAsFunction (runCtx, function, global, lArgs.length(), args.get(), exception);
+    result = JSObjectCallAsFunction(runCtx, callableFunction, global, lArgs.length(), args.get(), exception);
     if (exception) { throw ApException(LOG_CONTEXT, "JSObjectCallAsFunction() returned exception"); }
 
   } else {
 
     apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "%s", _sz(sLog)));
-    result = JSObjectCallAsFunction (runCtx, function, global, 0, 0, exception);
+    result = JSObjectCallAsFunction (runCtx, callableFunction, global, 0, 0, exception);
     if (exception) { throw ApException(LOG_CONTEXT, "JSObjectCallAsFunction() returned exception"); }
 
   }
 
-  // Convert the result into a string.
+  // Convert the result into a string
   if (result) {
     if (JSValueIsString(runCtx, result)) {
       AutoJSStringRef value = JSValueToStringCopy (runCtx, result, exception);
@@ -633,7 +703,7 @@ JSValueRef View::JS_Apollo_getSharedValue(JSContextRef ctx, JSObjectRef thisObje
   return value;
 }
 
-JSValueRef View::JS_Apollo_echoString(JSContextRef ctx, JSObjectRef function, JSObjectRef thisObject, size_t argumentCount, const JSValueRef* arguments, JSValueRef* exception)
+JSValueRef View::JS_Apollo_echoString(JSContextRef ctx, JSObjectRef callableFunction, JSObjectRef thisObject, size_t argumentCount, const JSValueRef* arguments, JSValueRef* exception)
 {
   if (!JSValueIsObjectOfClass(ctx, thisObject, JS_Apollo_class())) return JSValueMakeUndefined(ctx);
 
@@ -659,7 +729,7 @@ JSValueRef View::JS_Apollo_echoString(JSContextRef ctx, JSObjectRef function, JS
   return value;
 }
 
-JSValueRef View::JS_Apollo_sendMessage(JSContextRef ctx, JSObjectRef function, JSObjectRef thisObject, size_t argumentCount, const JSValueRef* arguments, JSValueRef* exception)
+JSValueRef View::JS_Apollo_sendMessage(JSContextRef ctx, JSObjectRef callableFunction, JSObjectRef thisObject, size_t argumentCount, const JSValueRef* arguments, JSValueRef* exception)
 {
   if (!JSValueIsObjectOfClass(ctx, thisObject, JS_Apollo_class())) return JSValueMakeUndefined(ctx);
 
@@ -844,12 +914,21 @@ exit:
 
 HRESULT View::didFinishDocumentLoadForFrame(IWebView *webView, IWebFrame *frame)
 {
+  String sUrl = GetUrlFrom(frame);
+
   if (pTopLoadingFrame_ == frame) {
-    apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "DocumentLoaded " ApHandleFormat " %s", ApHandlePrintf(hAp_), _sz(GetUrlFrom(frame))));
+    apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "DocumentLoaded " ApHandleFormat " %s", ApHandlePrintf(hAp_), _sz(sUrl)));
     bLoaded_ = 1;
 
     ApAsyncMessage<Msg_WebView_Event_DocumentLoaded> msg;
     msg->hView = apHandle();
+    msg.Post();
+  } else {
+    apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "EmbeddedDocumentLoaded " ApHandleFormat " %s", ApHandlePrintf(hAp_), _sz(sUrl)));
+
+    ApAsyncMessage<Msg_WebView_Event_EmbeddedDocumentLoaded> msg;
+    msg->hView = apHandle();
+    msg->sUrl = sUrl;
     msg.Post();
   }
 
@@ -864,11 +943,20 @@ HRESULT View::didFinishDocumentLoadForFrame(IWebView *webView, IWebFrame *frame)
 
 HRESULT View::didFinishLoadForFrame(IWebView* webView, IWebFrame* frame)
 {
+  String sUrl = GetUrlFrom(frame);
+
   if (pTopLoadingFrame_ == frame) {
-    apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "DocumentComplete " ApHandleFormat " %s", ApHandlePrintf(hAp_), _sz(GetUrlFrom(frame))));
+    apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "DocumentComplete " ApHandleFormat " %s", ApHandlePrintf(hAp_), _sz(sUrl)));
 
     ApAsyncMessage<Msg_WebView_Event_DocumentComplete> msg;
     msg->hView = apHandle();
+    msg.Post();
+  } else {
+    apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "EmbeddedDocumentLoaded " ApHandleFormat " %s", ApHandlePrintf(hAp_), _sz(sUrl)));
+
+    ApAsyncMessage<Msg_WebView_Event_EmbeddedDocumentComplete> msg;
+    msg->hView = apHandle();
+    msg->sUrl = sUrl;
     msg.Post();
   }
 
@@ -975,9 +1063,9 @@ HRESULT View::webViewAddMessageToConsole(IWebView *webView, BSTR message, int li
   String sMessage = StringFromBSTR(message);
 
   if (isError) {
-    apLog_Error((LOG_CHANNEL, LOG_CONTEXT + "JS:", "%s(%d): %s", _sz(sUrl), lineNumber, _sz(sMessage)));
+    apLog_Error((LOG_CHANNEL, "Javascript:", "%s line %d: %s", _sz(sUrl), lineNumber, _sz(sMessage)));
   } else {
-    apLog_Warning((LOG_CHANNEL, LOG_CONTEXT + "JS:", "%s(%d): %s", _sz(sUrl), lineNumber, _sz(sMessage)));
+    apLog_Warning((LOG_CHANNEL, "Javascript:", "%s line %d: %s", _sz(sUrl), lineNumber, _sz(sMessage)));
   }
 
   return S_OK;

@@ -25,6 +25,7 @@ public:
   static String FrameIO();
   static String StartManuallySerialized();
   static String StartAutomaticallySerialized();
+  static String GetDomElement();
   static String Dev();
 };
 #endif

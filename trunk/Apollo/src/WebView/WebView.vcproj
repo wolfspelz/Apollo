@@ -244,6 +244,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\bin\Win32\Debug\modules\WebView\test\GetDomElement.html"
+				>
+			</File>
+			<File
 				RelativePath="..\..\bin\Win32\Debug\modules\WebView\test\LoadHtml.js"
 				>
 			</File>
