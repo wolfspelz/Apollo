@@ -193,18 +193,14 @@ Function.prototype.bind = function(fn)
 
 function ApEval(sText) { return eval(sText); }
 
-function ApolloApi()
+function ApolloApi(sModule)
 {
+  this.moduleName = sModule;
 }
 
 ApolloApi.prototype = 
 {
   moduleName: 'Unknown',
-
-  ModuleName: function(sModule)
-  {
-    api.moduleName = sModule;
-  },
 
   GetViewHandle: function()
   {

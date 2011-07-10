@@ -11,6 +11,8 @@ input[type="button"] { padding-top:1px; padding-bottom:1px; padding-left:5px; pa
 input[type="text"] { border:1px solid #808080; }
 </style>
 <script type="text/javascript">
+  var api = new ApolloApi('TestDialog');
+
   function Elem(sDomId) { return document.getElementById(sDomId); }
 
   function SetConfig()
@@ -117,10 +119,5 @@ input[type="text"] { border:1px solid #808080; }
 
 </div>
 </body>
-
-<script type="text/javascript">
-  var api = new ApolloApi();
-  api.ModuleName('TestDialog');
-</script>
 
 </html>
