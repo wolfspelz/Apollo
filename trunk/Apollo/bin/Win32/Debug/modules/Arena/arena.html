@@ -83,8 +83,7 @@ function ShowDebug(bShow)
   }
 }
 
-var api = new ApolloApi();
-api.ModuleName('Arena');
+var api = new ApolloApi('Arena');
 api.OnDispatchMessage = DispatchMessage;
 api.Init();
 

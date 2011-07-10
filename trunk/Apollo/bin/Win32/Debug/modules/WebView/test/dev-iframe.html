@@ -8,9 +8,7 @@ function Elem(sId) { return document.getElementById(sId); }
 function SetText(sText) { Elem('iText').innerHTML = sText; }
 function Concat(a, b) { var c = a + b; SetText(c); return c; }
 
-var api = new ApolloApi();
-api.ModuleName('WebView');
-api.Init();
+var api = new ApolloApi('WebView');
 
 </script>
 
