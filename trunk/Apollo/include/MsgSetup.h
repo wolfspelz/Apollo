@@ -9,13 +9,16 @@
 
 #include "ApMessage.h"
 
-class Msg_Setup_Get: public ApRequestMessage
+class Msg_Setup_Open: public ApRequestMessage
 {
 public:
-  Msg_Setup_Get() : ApRequestMessage("Setup_Get"), nValue(0) {}
-  ApIN ApHandle hSetup;
-  ApIN String sKey;
-  ApOUT int nValue;
+  Msg_Setup_Open() : ApRequestMessage("Setup_Open") {}
+};
+
+class Msg_Setup_Close: public ApRequestMessage
+{
+public:
+  Msg_Setup_Close() : ApRequestMessage("Setup_Close") {}
 };
 
 #endif // !defined(MsgSetup_h_INCLUDED)
