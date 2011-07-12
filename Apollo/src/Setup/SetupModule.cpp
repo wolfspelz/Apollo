@@ -6,6 +6,15 @@
 
 #include "Apollo.h"
 #include "Local.h"
+#include "SRegistry.h"
+
+void SetupModule::SetupDone()
+{
+  if (bInterseptedRunLevelNormal_) {
+    bInterseptedRunLevelNormal_ = 0;
+    SendRunLevelNormal();
+  }
+}
 
 void SetupModule::SendRunLevelNormal()
 {
@@ -16,6 +25,90 @@ void SetupModule::SendRunLevelNormal()
   msg.Send();
   
   bInSendRunLevelNormal_ = 0;
+}
+
+#include "ShellAPI.h"
+
+String SetupModule::GetInstallFirefoxExtensionCommandline()
+{
+  String sCmdline;
+
+  // "C:\Program Files\Mozilla Firefox\firefox.exe" -requestPending -osint -url "%1"
+  String sFirefoxCmd;
+  if (!sFirefoxCmd) { sFirefoxCmd = SRegistry::GetString(HKEY_CLASSES_ROOT, "FirefoxHTML\\shell\\open\\command", "", ""); }
+  if (!sFirefoxCmd) { sFirefoxCmd = SRegistry::GetString(HKEY_CLASSES_ROOT, "FirefoxURL\\shell\\open\\command", "", ""); }
+  if (!sFirefoxCmd) { sFirefoxCmd = SRegistry::GetString(HKEY_CURRENT_USER, "Software\\Classes\\FirefoxHTML\\shell\\open\\command", "", ""); }
+  if (!sFirefoxCmd) { sFirefoxCmd = SRegistry::GetString(HKEY_LOCAL_MACHINE, "SOFTWARE\\Classes\\FirefoxHTML\\shell\\open\\command", "", ""); }
+
+  String sUrl = Apollo::getModuleConfig("Navigation", "FirefoxExtensionInstallUrl", "");
+  //if (!sUrl.startsWith("http:") && !sUrl.startsWith("https:")) {
+  //  if (sUrl.subString(1, 1) == ":") {
+  //    sUrl = "file://" + sUrl;
+  //  }
+  //}
+
+  sCmdline = sFirefoxCmd;
+  sCmdline.replace("%1", sUrl);
+
+  return sCmdline;
+}
+
+void SetupModule::GetInstallFirefoxExtensionParams(const String& sCmdline, String& sPath, String& sArgs)
+{
+  int nChars = sCmdline.chars();
+  int bInQuotes = 0;
+  String sBuf;
+  List lParts;
+  for (int i = 0; i < nChars; ++i) {
+    String sChar = sCmdline.subString(i, 1);
+    switch (String::UTF8_Char(sChar)) {
+      case '"': 
+        bInQuotes = !bInQuotes;
+        break;
+      case ' ': 
+        if (bInQuotes) {
+          sBuf += sChar;
+        } else {
+          if (sBuf) {
+            lParts.AddLast(sBuf);
+            sBuf = "";
+          }
+        }
+        break;
+      default: 
+        sBuf += sChar;
+        break;
+    }
+  }
+  if (sBuf) {
+    lParts.AddLast(sBuf);
+  }
+
+  int nCnt = 0;
+  for (Elem* e = 0; (e = lParts.Next(e)) != 0; nCnt++) {
+    if (nCnt == 0) {
+      sPath = e->getName();
+    } else {
+      if (sArgs) { sArgs += " "; }
+      int bAddQuotes = 0;
+      if (e->getName().contains(" ")) { bAddQuotes = 1; }
+      if (bAddQuotes) { sArgs += "\""; }
+      sArgs += e->getName();
+      if (bAddQuotes) { sArgs += "\""; }
+    }
+  }
+}
+
+void SetupModule::InstallFirefoxExtension()
+{
+  String sCmdline = GetInstallFirefoxExtensionCommandline();
+  if (!sCmdline) { throw ApException(LOG_CONTEXT, "No commandline"); }
+
+  String sPath;
+  String sArgs;
+  GetInstallFirefoxExtensionParams(sCmdline, sPath, sArgs);
+
+  ::ShellExecute(NULL, _T("open"), sPath, sArgs, String::filenameBasePath(sPath), SW_SHOW);
 }
 
 //----------------------------------------------------------
@@ -71,10 +164,7 @@ AP_MSG_HANDLER_METHOD(SetupModule, Dialog_OnClosed)
   if (pMsg->hDialog == hDialog_) {
     hDialog_ = ApNoHandle;
 
-    if (bInterseptedRunLevelNormal_) {
-      bInterseptedRunLevelNormal_ = 0;
-      SendRunLevelNormal();
-    }
+    SetupDone();
   }
 }
 
@@ -112,6 +202,9 @@ AP_MSG_HANDLER_METHOD(SetupModule, WebView_ModuleCall)
 
     if (0){
     } else if (sMethod == "InstallFirefoxExtension") {
+      InstallFirefoxExtension();
+
+    } else if (sMethod == "InstallInternetExplorerExtension") {
 
     } else {
       throw ApException(LOG_CONTEXT, "Unknown Method=%s", _sz(sMethod));
@@ -124,6 +217,18 @@ AP_MSG_HANDLER_METHOD(SetupModule, WebView_ModuleCall)
 //----------------------------------------------------------
 
 #if defined(AP_TEST)
+
+class SetupModuleTester
+{
+public:
+  static void Begin();
+  static void Execute();
+  static void End();
+
+  static String GetInstallFirefoxExtensionCommandline();
+  static String GetInstallFirefoxExtensionParams();
+  static String Dev();
+};
 
 AP_MSG_HANDLER_METHOD(SetupModule, UnitTest_Begin)
 {
@@ -180,14 +285,54 @@ void SetupModule::Exit()
 
 #if defined(AP_TEST)
 
+String SetupModuleTester::GetInstallFirefoxExtensionCommandline()
+{
+  String s;
+
+  if (!s) {
+    SetupModule m;
+    String sSub1 = "firefox.exe";
+    String sSub2 = "avatarnavigator.xpi";
+    String sResult = String::toLower(m.GetInstallFirefoxExtensionCommandline());
+    if (!sResult.contains(sSub1)) {
+      s.appendf("got=%s expected substring=%s", _sz(sResult), _sz(sSub1));
+    }
+    if (!sResult.contains(sSub2)) {
+      s.appendf("got=%s expected substring=%s", _sz(sResult), _sz(sSub2));
+    }
+  }
+
+  return s;
+}
+
+String SetupModuleTester::GetInstallFirefoxExtensionParams()
+{
+  String s;
+
+  if (!s) {
+    String sCmdline = "\"abs def\" -ghi \"jkl mno\" pqr stu";
+    String sPath;
+    String sArgs;
+    SetupModule m;
+    m.GetInstallFirefoxExtensionParams(sCmdline, sPath, sArgs);
+    if (sPath != "abs def") { s += String::from(__LINE__); }
+    if (sArgs != "-ghi \"jkl mno\" pqr stu") { s += String::from(__LINE__); }
+  }
+
+  return s;
+}
+
 void SetupModuleTester::Begin()
 {
-  AP_UNITTEST_REGISTER(SetupModuleTester::Dev);
+  AP_UNITTEST_REGISTER(SetupModuleTester::GetInstallFirefoxExtensionCommandline);
+  AP_UNITTEST_REGISTER(SetupModuleTester::GetInstallFirefoxExtensionParams);
 }
 
 void SetupModuleTester::Execute()
 {
-  AP_UNITTEST_EXECUTE(SetupModuleTester::Dev);
+  AP_UNITTEST_EXECUTE(SetupModuleTester::GetInstallFirefoxExtensionCommandline);
+  AP_UNITTEST_EXECUTE(SetupModuleTester::GetInstallFirefoxExtensionParams);
+  SetupModuleTester::Dev();
 }
 
 void SetupModuleTester::End()

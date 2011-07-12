@@ -103,6 +103,14 @@ int NetOS::GetLocalIPAddressList(List &lList)
 		for (UINT i = 0; i< aIPAddressesSize; ++i) {
 			long ip = htonl(aIPAddresses[i]);
 			if ((ip != 0x7F000001) && (ip != 0)) {
+
+         // exclude private ip spaces from rfc1918
+         //|| ( ((ip & 0xff000000) >> 24) == (10) ) // 10.0.0.0 - 10.255.255.255 (10/8 prefix)
+         //|| ( ((ip & 0xfff00000) >> 20) == (172 * 16 + 1) ) // 172.16.0.0 - 172.31.255.255  (172.16/12 prefix)
+         //|| ( ((ip & 0xffff0000) >> 16) == (192 * 256 + 168) ) // 192.168.0.0 - 192.168.255.255 (192.168/16 prefix)
+         //|| ( ((ip & 0xffff0000) >> 16) == (169 * 256 + 254) ) // 169.254.0.0 - 169.255.255.255 (169.254/16 prefix)
+         //|| ( ((ip & 0xffffff00) >>  8) == (192 * 256 * 256 + 0 * 256 + 2) ) // 192.0.2.0 - 192.0.2.255 (192.0.2/24 prefix)
+
         String sAddress = NetModule::ip4_LongtoStr(aIPAddresses[i]);
         apLog_VeryVerbose((LOG_CHANNEL, LOG_CONTEXT, "IP address found: %s", _sz(sAddress)));
 

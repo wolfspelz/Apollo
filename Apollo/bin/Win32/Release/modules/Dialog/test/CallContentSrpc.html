@@ -3,11 +3,9 @@
 <head>
 <script type="text/javascript" src="../../WebView/apollo.js"></script>
 <script type="text/javascript" src="../apollo.dialog.js"></script>
-<script type="text/javascript" src="../apollo.dialog.content.js"></script>
 <script type="text/javascript">
 
-var api = new ApDialogContent();
-api.ModuleName('CallContentSrpc Test');
+var api = new ApolloApi('CallContentSrpc Test');
 
 function SetText(sMessage)
 {
@@ -16,7 +14,7 @@ function SetText(sMessage)
 
 </script>
 </head>
-<body onload="api.Ready();">
+<body>
 <div id="iText"></div>
 <input type="button" value="test" onclick="SetText('xx');" />
 </body>

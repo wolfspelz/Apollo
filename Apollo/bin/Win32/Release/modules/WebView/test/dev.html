@@ -7,8 +7,7 @@
 function Elem(sId) { return document.getElementById(sId); }
 function SetText(sText) { Elem('iText').innerHTML = sText; }
 
-var api = new ApolloApi();
-api.ModuleName('WebView');
+var api = new ApolloApi('WebView');
 api.nMinWidth = 150;
 api.nMinHeight = 22;
 api.Init();

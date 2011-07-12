@@ -39,6 +39,10 @@ public:
 
 protected:
   void SendRunLevelNormal();
+  void SetupDone();
+  String GetInstallFirefoxExtensionCommandline();
+  void GetInstallFirefoxExtensionParams(const String& sCmdline, String& sPath, String& sArgs);
+  void InstallFirefoxExtension();
 
 protected:
   int bInSendRunLevelNormal_;
@@ -49,21 +53,5 @@ protected:
 };
 
 typedef ApModuleSingleton<SetupModule> SetupModuleInstance;
-
-//----------------------------------------------------------
-
-#if defined(AP_TEST)
-
-class SetupModuleTester
-{
-public:
-  static void Begin();
-  static void Execute();
-  static void End();
-
-  static String Dev();
-};
-
-#endif
 
 #endif // SetupModule_H_INCLUDED

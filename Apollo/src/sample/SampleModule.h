@@ -54,20 +54,4 @@ protected:
 
 typedef ApModuleSingleton<SampleModule> SampleModuleInstance;
 
-//----------------------------------------------------------
-
-#if defined(AP_TEST)
-
-class SampleModuleTester
-{
-public:
-  static void Begin();
-  static void Execute();
-  static void End();
-
-  static String Test1();
-};
-
-#endif
-
 #endif // SampleModule_H_INCLUDED

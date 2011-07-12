@@ -20,7 +20,8 @@ function Start()
 
 <body>
 <div id="Wrapper">
-<input type="button" value="Install Firefox Extension" class="cTranslate" onclick="api.ModuleCall('InstallFirefoxExtension').send();" />
+<p id="iInstallFirefoxExtension"><span class="Label cTranslate">Avatar for Firefox</span>: <input type="button" value="Install" class="Button cTranslate" onclick="api.ModuleCall('InstallFirefoxExtension').send();" /></p>
+<p id="iInstallInternetExplorerExtension"><span class="Label cTranslate">Avatar for Internet Explorer</span>: <input type="button" value="Install" class="Button cTranslate" onclick="api.ModuleCall('InstallInternetExplorerExtension').send();" /></p>
 
 </div>
 </body>

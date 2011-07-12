@@ -100,6 +100,16 @@ AP_MSG_HANDLER_METHOD(SampleModule, Sample_Get)
 
 #if defined(AP_TEST)
 
+class SampleModuleTester
+{
+public:
+  static void Begin();
+  static void Execute();
+  static void End();
+
+  static String Test1();
+};
+
 AP_MSG_HANDLER_METHOD(SampleModule, UnitTest_Begin)
 {
   AP_UNUSED_ARG(pMsg);

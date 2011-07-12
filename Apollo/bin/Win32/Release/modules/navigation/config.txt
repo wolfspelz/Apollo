@@ -1,0 +1,1 @@
+FirefoxExtensionInstallUrl=[[MODULE_RESOURCE_PATH]]/AvatarNavigator.xpi

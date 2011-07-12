@@ -1,45 +1,46 @@
-@ECHO OFF
+@echo OFF
 
-SET VERSION=latest
-rem SET VERSION=3.0.4
-rem SET RC_VERSION=1
+set VERSION=latest
+rem set VERSION=3.0.4
+rem set RC_VERSION=1
 
-PATH=%PATH%;"%CD%\bin"
+PATH=%PATH%;%CD%\bin
 
-SET BASE_DIR="%CD%"
-SET DEBUG_SRC_DIR="%CD%\..\bin\Win32\Debug"
-SET RELEASE_SRC_DIR="%CD%\..\bin\Win32\Release"
-SET RELEASE_DEST_DIR="%CD%\package"
-SET BUILD_NAME=apollo-win-%VERSION%
-SET RELEASE_DIR=%RELEASE_DEST_DIR%\%BUILD_NAME%
-SET ARCHIVE_PATH=%RELEASE_DEST_DIR%
-SET ARCHIVE_NAME=%BUILD_NAME%.zip
+set PRODUCT_NAME=apollo-win-%VERSION%
+set DEST_FILE=%PRODUCT_NAME%.zip
 
-ECHO ---------------------------------------------------------------------------
-ECHO Cleaning up
-rmdir %RELEASE_DIR%\ /s /q
-del %ARCHIVE_PATH%\%ARCHIVE_NAME%
+set WORK_DIR=%CD%
+set BASE_DIR=%WORK_DIR%\..
+set DEBUG_SRC_DIR=%BASE_DIR%\bin\Win32\Debug
+set RELEASE_SRC_DIR=%BASE_DIR%\bin\Win32\Release
+set BUILD_DIR=%WORK_DIR%\build
+set DEST_DIR=%WORK_DIR%\package
 
-ECHO ---------------------------------------------------------------------------
-ECHO Updating release with debug files
-xcopy %DEBUG_SRC_DIR% %RELEASE_SRC_DIR% /E /H /R /Y /EXCLUDE:ReleaseUpdateExcludes.txt
+echo ---------------------------------------------------------------------------
+echo Cleaning up
+del %BUILD_DIR%\%DEST_FILE%
+rmdir %BUILD_DIR%\%PRODUCT_NAME% /s /q
 
-ECHO ---------------------------------------------------------------------------
-ECHO Copying release files
-xcopy %RELEASE_SRC_DIR% %RELEASE_DIR%\ /E /H /R /Y /EXCLUDE:ReleaseExcludes.txt
+echo ---------------------------------------------------------------------------
+echo Building components
+rem call BUILD_FirefoxExtension.bat
 
-ECHO ---------------------------------------------------------------------------
-ECHO Zipping release files
-cd %RELEASE_DIR%
-7za a -y -tzip %ARCHIVE_PATH%\%ARCHIVE_NAME% *
-cd %BASE_DIR%
+echo ---------------------------------------------------------------------------
+echo Updating release with debug files
+xcopy %DEBUG_SRC_DIR% %RELEASE_SRC_DIR% /E /H /R /Y /EXCLUDE:%BASE_DIR%\dist\ReleaseUpdateExcludes.txt
 
-ECHO ---------------------------------------------------------------------------
-ECHO Cleaning up
-rmdir %RELEASE_DIR%\ /s /q
+echo ---------------------------------------------------------------------------
+echo Copying release files
+xcopy %RELEASE_SRC_DIR% %BUILD_DIR%\%PRODUCT_NAME%\ /E /H /R /Y /EXCLUDE:ReleaseExcludes.txt
 
-ECHO ---------------------------------------------------------------------------
-ECHO Done ...
-@ECHO ON
+echo ---------------------------------------------------------------------------
+echo Zipping release files
+cd %BUILD_DIR%
+7za a -y -tzip %BUILD_DIR%\%DEST_FILE% %PRODUCT_NAME%
+cd %WORK_DIR%
+
+echo ---------------------------------------------------------------------------
+echo Copying result to destination
+xcopy %BUILD_DIR%\%DEST_FILE% %DEST_DIR%\ /R /Y
 
 cmd
