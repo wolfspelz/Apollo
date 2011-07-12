@@ -5,18 +5,11 @@
 <script type="text/javascript" src="../apollo.dialog.js"></script>
 <script type="text/javascript">
 
-var api = new ApolloApi('CallContentScript Test');
-
-function SetText(sText1, sText2)
-{
-  api.Log.Debug('SetText ' + sText1 + ' ' + sText2);
-  document.getElementById('iText').innerHTML = '1=' + sText1 + ' 2=' + sText2;
-}
+var api = new ApolloApi('GenerateOpenedEvent');
 
 </script>
 </head>
 <body>
 <div id="iText"></div>
-<input type="button" value="test" onclick="SetText('xx');" />Expect: 1=xx 2=undefined
 </body>
 </html>

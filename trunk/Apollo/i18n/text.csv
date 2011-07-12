@@ -15,3 +15,6 @@
 ;"AvatarTray";;"Avatar connected";;"Tray Icon tooltip";50;"Avatar connected";;"Avatar verbunden";;;;;;"Avatar 接続され";;;;;
 ;"AvatarTray";;"Avatar not connected";;"Tray Icon tooltip";50;"Avatar not connected";;"Avatar nicht verbunden";;;;;;"Avatar 接続していない";;;;;
 ;"Setup";;"Setup";;"Setup dialog caption";15;"Setup";;"Einrichten";;;;;;"チャット";;;;;
+;"Setup";;"Avatar for Firefox";;"Setup dialog label before Install-button: Avatar for Firefox [Install]";30;"Avatar for Firefox";;"Avatar für Firefox";;;;;;;;;;;
+;"Setup";;"Avatar for Internet Explorer";;"Setup dialog label before Install-button: Avatar for Internet Explorer [Install]";30;"Avatar for Internet Explorer";;"Avatar für Internet Explorer";;;;;;;;;;;
+;"Setup";;"Install";;;20;"Install";;"Installieren";;;;;;;;;;;

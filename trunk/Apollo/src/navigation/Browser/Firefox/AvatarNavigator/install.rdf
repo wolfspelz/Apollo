@@ -8,7 +8,7 @@
     <em:type>2</em:type>
     <em:description>Supports avatars on web pages</em:description>
     <em:creator>Heiner Wolf</em:creator>
-    <em:homepageURL>http://avatar.io/</em:homepageURL>
+    <em:homepageURL>http://web-avatar.com/</em:homepageURL>
     <em:iconURL>chrome://avatarnav/content/images/logo32.png</em:iconURL>
 
     <em:targetApplication>

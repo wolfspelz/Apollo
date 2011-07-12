@@ -145,7 +145,7 @@ namespace OVW
                             string sTitle = process.MainWindowTitle;
                             Log("Window: " + sWnd + " " + sTitle);
 
-                            // Creeate custom element for DOM event for ContentBrowser-Extension communication
+                            // Create custom element for DOM event for ContentBrowser-Extension communication
                             mshtml.IHTMLWindow2 parentWindow = htmlDoc.parentWindow;
                             if (parentWindow != null)
                             {
