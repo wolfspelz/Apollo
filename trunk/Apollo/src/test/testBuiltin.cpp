@@ -29,6 +29,7 @@
   #define AP_TEST_AutoPtr
   #define AP_TEST_TimeValue
   #define AP_TEST_ColorString
+  #define AP_TEST_Lib
 #endif
 
 #if defined(AP_TEST_String)
@@ -2602,6 +2603,55 @@ String Test_ColorString()
 
 //----------------------------------------------------------
 
+#if defined(AP_TEST_Lib)
+
+void Apollo_splitCommandlineArguments(const String& sCmdline, Apollo::ValueList& vlArgs)
+{
+}
+String Test_Apollo_splitCommandlineArguments()
+{
+  String s;
+
+  if (!s) {
+    String sCmdline = "\"abs def\" -ghi \"jkl m\\no\" p\\\"qr \"s\\\" tu\"";
+    Apollo::ValueList vlParts;
+    Apollo::splitCommandlineArguments(sCmdline, vlParts);
+
+    Apollo::ValueElem* e = 0;
+    if (!s) { e = vlParts.nextElem(e); if (e->getString() != "abs def") { s += String::from(__LINE__); }}
+    if (!s) { e = vlParts.nextElem(e); if (e->getString() != "-ghi") { s += String::from(__LINE__); }}
+    if (!s) { e = vlParts.nextElem(e); if (e->getString() != "jkl m\\no") { s += String::from(__LINE__); }}
+    if (!s) { e = vlParts.nextElem(e); if (e->getString() != "p\"qr") { s += String::from(__LINE__); }}
+    if (!s) { e = vlParts.nextElem(e); if (e->getString() != "s\" tu") { s += String::from(__LINE__); }}
+  }
+
+  return s;
+}
+
+String Test_Apollo_joinCommandlineArguments()
+{
+  String s;
+
+  if (!s) {
+    Apollo::ValueList vlParts;
+    vlParts.add("abs def");
+    vlParts.add("-ghi");
+    vlParts.add("jkl m\\no");
+    vlParts.add("p\"qr");
+    vlParts.add("s\" tu");
+    String sCmdline = Apollo::joinCommandlineArguments(vlParts);
+
+    String sExpected = "\"abs def\" -ghi \"jkl m\\no\" p\\\"qr \"s\\\" tu\"";
+    if (sCmdline != sExpected) { s += String::from(__LINE__); }
+  }
+
+  return s;
+}
+
+#endif // AP_TEST_Lib
+
+//----------------------------------------------------------
+
 void Test_Builtin_Register()
 {
 #if defined(AP_TEST_String)
@@ -2714,6 +2764,11 @@ void Test_Builtin_Register()
   AP_UNITTEST_REGISTER(Test_UriBuilder);
   AP_UNITTEST_REGISTER(Test_UrlBuilder);
 #endif // AP_TEST_Url
+
+#if defined(AP_TEST_Lib)
+  AP_UNITTEST_REGISTER(Test_Apollo_splitCommandlineArguments);
+  AP_UNITTEST_REGISTER(Test_Apollo_joinCommandlineArguments);
+#endif // AP_TEST_Lib
 }
 
 void Test_Builtin_Execute()
@@ -2828,4 +2883,9 @@ void Test_Builtin_Execute()
   AP_UNITTEST_EXECUTE(Test_UriBuilder);
   AP_UNITTEST_EXECUTE(Test_UrlBuilder);
 #endif
+
+#if defined(AP_TEST_Lib)
+  AP_UNITTEST_EXECUTE(Test_Apollo_splitCommandlineArguments);
+  AP_UNITTEST_EXECUTE(Test_Apollo_joinCommandlineArguments);
+#endif // AP_TEST_Lib
 }

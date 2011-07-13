@@ -15,7 +15,7 @@ public:
   Msg_OS_StartProcess() : ApRequestMessage("OS_StartProcess"), nPid(0) {}
   ApIN String sExePath;
   ApIN String sCwdPath;
-  ApIN String sArgs;
+  ApIN Apollo::ValueList vlArgs;
   ApOUT int nPid;
 };
 

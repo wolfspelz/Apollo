@@ -27,8 +27,6 @@ void SetupModule::SendRunLevelNormal()
   bInSendRunLevelNormal_ = 0;
 }
 
-#include "ShellAPI.h"
-
 String SetupModule::GetInstallFirefoxExtensionCommandline()
 {
   String sCmdline;
@@ -53,62 +51,32 @@ String SetupModule::GetInstallFirefoxExtensionCommandline()
   return sCmdline;
 }
 
-void SetupModule::GetShellExecuteParamsFromCommandline(const String& sCmdline, String& sPath, String& sArgs)
-{
-  int nChars = sCmdline.chars();
-  int bInQuotes = 0;
-  String sBuf;
-  List lParts;
-  for (int i = 0; i < nChars; ++i) {
-    String sChar = sCmdline.subString(i, 1);
-    switch (String::UTF8_Char(sChar)) {
-      case '"': 
-        bInQuotes = !bInQuotes;
-        break;
-      case ' ': 
-        if (bInQuotes) {
-          sBuf += sChar;
-        } else {
-          if (sBuf) {
-            lParts.AddLast(sBuf);
-            sBuf = "";
-          }
-        }
-        break;
-      default: 
-        sBuf += sChar;
-        break;
-    }
-  }
-  if (sBuf) {
-    lParts.AddLast(sBuf);
-  }
-
-  int nCnt = 0;
-  for (Elem* e = 0; (e = lParts.Next(e)) != 0; nCnt++) {
-    if (nCnt == 0) {
-      sPath = e->getName();
-    } else {
-      if (sArgs) { sArgs += " "; }
-      int bAddQuotes = 0;
-      if (e->getName().contains(" ")) { bAddQuotes = 1; }
-      if (bAddQuotes) { sArgs += "\""; }
-      sArgs += e->getName();
-      if (bAddQuotes) { sArgs += "\""; }
-    }
-  }
-}
+//#include "ShellAPI.h"
 
 void SetupModule::InstallFirefoxExtensionByFirefox()
 {
   String sCmdline = GetInstallFirefoxExtensionCommandline();
-  if (!sCmdline) { throw ApException(LOG_CONTEXT, "No commandline"); }
+  if (!sCmdline) { throw ApException(LOG_CONTEXT, "No command line"); }
 
-  String sPath;
-  String sArgs;
-  GetShellExecuteParamsFromCommandline(sCmdline, sPath, sArgs);
+  Apollo::ValueList vlParts;
+  Apollo::splitCommandlineArguments(sCmdline, vlParts);
 
-  ::ShellExecute(NULL, _T("open"), sPath, sArgs, String::filenameBasePath(sPath), SW_SHOW);
+  String sExe;
+  Apollo::ValueElem* eFirst = vlParts.nextElem(0);
+  if (eFirst == 0) { throw ApException(LOG_CONTEXT, "No parts in command line"); }
+  sExe = eFirst->getString();
+  vlParts.removeElem(eFirst);
+  delete eFirst;
+  eFirst = 0;
+
+  {
+    Msg_OS_StartProcess msg;
+    msg.sExePath = sExe;
+    msg.vlArgs = vlParts;
+    msg.sCwdPath = String::filenameBasePath(sExe);
+    if (!msg.Request()) { throw ApException(LOG_CONTEXT, "%s failed to start %s: %s", _sz(msg.Type()), _sz(msg.sExePath), _sz(msg.sComment)); }
+  }
+  //::ShellExecute(NULL, _T("open"), sPath, sArgs, String::filenameBasePath(sPath), SW_SHOW);
 }
 
 //----------------------------------------------------------
@@ -226,7 +194,6 @@ public:
   static void End();
 
   static String GetInstallFirefoxExtensionCommandline();
-  static String GetShellExecuteParamsFromCommandline();
   static String Dev();
 };
 
@@ -304,32 +271,14 @@ String SetupModuleTester::GetInstallFirefoxExtensionCommandline()
   return s;
 }
 
-String SetupModuleTester::GetShellExecuteParamsFromCommandline()
-{
-  String s;
-
-  if (!s) {
-    String sCmdline = "\"abs def\" -ghi \"jkl mno\" pqr stu";
-    String sPath;
-    String sArgs;
-    SetupModule::GetShellExecuteParamsFromCommandline(sCmdline, sPath, sArgs);
-    if (sPath != "abs def") { s += String::from(__LINE__); }
-    if (sArgs != "-ghi \"jkl mno\" pqr stu") { s += String::from(__LINE__); }
-  }
-
-  return s;
-}
-
 void SetupModuleTester::Begin()
 {
   AP_UNITTEST_REGISTER(SetupModuleTester::GetInstallFirefoxExtensionCommandline);
-  AP_UNITTEST_REGISTER(SetupModuleTester::GetShellExecuteParamsFromCommandline);
 }
 
 void SetupModuleTester::Execute()
 {
   AP_UNITTEST_EXECUTE(SetupModuleTester::GetInstallFirefoxExtensionCommandline);
-  AP_UNITTEST_EXECUTE(SetupModuleTester::GetShellExecuteParamsFromCommandline);
   SetupModuleTester::Dev();
 }
 
