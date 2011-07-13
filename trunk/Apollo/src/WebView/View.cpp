@@ -284,7 +284,7 @@ void View::Reload()
 
 //------------------------------------
 
-void View::MoveWindowRoCurrentRect()
+void View::MoveWindowToCurrentRect()
 {
 #if defined(WIN32)
   ::MoveWindow(hWnd_, nLeft_, nTop_ - (bVisible_ ? 0 : 10000), nWidth_, nHeight_, FALSE);
@@ -300,7 +300,7 @@ void View::SetPosition(int nLeft, int nTop, int nWidth, int nHeight)
   nWidth_ = nWidth;
   nHeight_ = nHeight;
 
-  MoveWindowRoCurrentRect();
+  MoveWindowToCurrentRect();
 }
 
 void View::SetVisibility(int bVisible)
@@ -311,7 +311,7 @@ void View::SetVisibility(int bVisible)
   bVisible_ = bVisible;
 
   if (bChanged) {
-    MoveWindowRoCurrentRect();
+    MoveWindowToCurrentRect();
 
 #if defined(WIN32)
     if (bVisible_) {
@@ -368,7 +368,7 @@ void View::MoveBy(int nX, int nY)
   nLeft_ += nX;
   nTop_ += nY;
 
-  MoveWindowRoCurrentRect();
+  MoveWindowToCurrentRect();
 }
   
 void View::SizeBy(int nX, int nY, int nDirection)
@@ -391,7 +391,7 @@ void View::SizeBy(int nX, int nY, int nDirection)
   if (nWidth_ < 1) { nWidth_ = 1; }
   if (nHeight_ < 1) { nHeight_ = 1; }
 
-  MoveWindowRoCurrentRect();
+  MoveWindowToCurrentRect();
 }
 
 void View::MouseCapture()

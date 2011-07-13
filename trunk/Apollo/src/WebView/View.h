@@ -171,7 +171,7 @@ protected:
   String CallScriptFunction(IWebFrame* pFrame, const String& sFunction, List& lArgs) throw(ApException);
   String GetElementValue(IWebFrame* pFrame, const String& sElement, const String& sProperty) throw(ApException);
 
-  void MoveWindowRoCurrentRect();
+  void MoveWindowToCurrentRect();
   static String StringFromBSTR(BSTR bStr);
   static String GetUrlFrom(IWebFrame *frame);
   static String GetUrlFrom(IWebURLRequest *request);
