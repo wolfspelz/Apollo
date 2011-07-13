@@ -201,7 +201,7 @@ AP_MSG_HANDLER_METHOD(SetupModule, WebView_ModuleCall)
     String sMethod = pMsg->srpc.getString(Srpc::Key::Method);
 
     if (0){
-    } else if (sMethod == "InstallFirefoxExtensionByFirefox") {
+    } else if (sMethod == "InstallFirefoxExtension") {
       InstallFirefoxExtensionByFirefox();
 
     } else if (sMethod == "InstallInternetExplorerExtension") {
