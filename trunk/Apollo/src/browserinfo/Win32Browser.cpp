@@ -58,6 +58,24 @@ void Win32Browser::AdjustStackingOrder()
   HWND hWndPrev = NULL;
 
   // Find previous (foreign) window, which is not one of the contexts
+  //{
+  //  HWND hWndCurrent = win_;
+  //  int bFoundPreviousWindowOrTop = 0;
+  //  int nCntContextsAboveBrowser = 0;
+  //  while (!bFoundPreviousWindowOrTop && nCntContextsAboveBrowser < contextWindows.Count()) {
+  //    hWndPrev = ::GetNextWindow(hWndCurrent, GW_HWNDPREV);
+  //    if (hWndPrev == NULL || contextWindows.Find(hWndPrev) == 0) {
+  //      bFoundPreviousWindowOrTop = 1;
+  //    } else {
+  //      nCntContextsAboveBrowser++;
+  //      hWndCurrent = hWndPrev;
+  //    }
+  //  }
+  //  if (nCntContextsAboveBrowser == contextWindows.Count()) {
+  //    bAllContextsAboveBrowser = 1;
+  //  }
+  //}
+
   {
     HWND hWndCurrent = win_;
     int bFoundPreviousWindowOrTop = 0;
@@ -65,7 +83,20 @@ void Win32Browser::AdjustStackingOrder()
     while (!bFoundPreviousWindowOrTop && nCntContextsAboveBrowser < contextWindows.Count()) {
       hWndPrev = ::GetNextWindow(hWndCurrent, GW_HWNDPREV);
       if (hWndPrev == NULL || contextWindows.Find(hWndPrev) == 0) {
-        bFoundPreviousWindowOrTop = 1;
+        if (hWndPrev == NULL) {
+          bFoundPreviousWindowOrTop = 1;
+        } else {
+          Flexbuf<TCHAR> buf(10240);
+          ::GetClassName(hWndPrev, (TCHAR*) buf, 10240);
+          String sClass = (TCHAR*) buf;
+          if (sClass == "SWindow_Floating_Image" || sClass == "FancyBaseWin_WINDOWCLASS") {
+            // Skip weblin windows
+            //bFoundPreviousWindowOrTop = 1;
+            hWndCurrent = hWndPrev;
+          } else {
+            bFoundPreviousWindowOrTop = 1;
+          }
+        }
       } else {
         nCntContextsAboveBrowser++;
         hWndCurrent = hWndPrev;

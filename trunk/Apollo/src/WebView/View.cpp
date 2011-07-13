@@ -111,7 +111,7 @@ View::~View()
 
 void View::Create(int nLeft, int nTop, int nWidth, int nHeight)
 {
-  apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "" ApHandleFormat "", ApHandlePrintf(hAp_)));
+  apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "" ApHandleFormat " %d,%d %dx%d", ApHandlePrintf(hAp_), nLeft, nTop, nWidth, nHeight));
 
   nLeft_ = nLeft;
   nTop_ = nTop;
@@ -293,6 +293,8 @@ void View::MoveWindowRoCurrentRect()
 
 void View::SetPosition(int nLeft, int nTop, int nWidth, int nHeight)
 {
+  apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "" ApHandleFormat " %d,%d %dx%d", ApHandlePrintf(hAp_), nLeft, nTop, nWidth, nHeight));
+
   nLeft_ = nLeft;
   nTop_ = nTop;
   nWidth_ = nWidth;
@@ -303,6 +305,8 @@ void View::SetPosition(int nLeft, int nTop, int nWidth, int nHeight)
 
 void View::SetVisibility(int bVisible)
 {
+  apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "" ApHandleFormat " %d", ApHandlePrintf(hAp_), bVisible));
+
   int bChanged = (bVisible_ != bVisible);
   bVisible_ = bVisible;
 
