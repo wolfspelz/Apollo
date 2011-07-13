@@ -167,6 +167,12 @@ namespace OVW
             _bHasContext = true;
 
             SendContextOpen();
+
+            // Before Show, so that the browser window is known and can manage the Show
+            if (_nNativeHWND != 0) {
+                SendContextNativeWindow(_sNativeVersion, _nNativeHWND);
+            }
+
             if (_bShow)
             {
                 SendContextShow();
@@ -176,10 +182,6 @@ namespace OVW
                 SendContextHide();
             }
 
-            if (_nNativeHWND != 0)
-            {
-                SendContextNativeWindow(_sNativeVersion, _nNativeHWND);
-            }
             //SendContextPosition(200, 800);
             //SendContextSize(600, 400);
         }
