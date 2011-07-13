@@ -433,7 +433,7 @@ IWebFrame* View::GetFrameByPath(const String& sFramePath)
 {
   if (pWebFrame_ == 0) { throw ApException(LOG_CONTEXT, "" ApHandleFormat " no main frame", ApHandlePrintf(hAp_)); }
 
-  IWebFrame* pResult;
+  IWebFrame* pResult = 0;
 
   String sPath = sFramePath;
   sPath.trim("/");
