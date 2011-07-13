@@ -40,9 +40,10 @@ public:
 protected:
   void SendRunLevelNormal();
   void SetupDone();
-  String GetInstallFirefoxExtensionCommandline();
-  void GetInstallFirefoxExtensionParams(const String& sCmdline, String& sPath, String& sArgs);
-  void InstallFirefoxExtensionByFirefox();
+
+  static String GetInstallFirefoxExtensionCommandline();
+  static void GetShellExecuteParamsFromCommandline(const String& sCmdline, String& sPath, String& sArgs);
+  static void InstallFirefoxExtensionByFirefox();
 
 protected:
   int bInSendRunLevelNormal_;

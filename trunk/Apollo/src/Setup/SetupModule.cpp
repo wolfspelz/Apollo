@@ -53,7 +53,7 @@ String SetupModule::GetInstallFirefoxExtensionCommandline()
   return sCmdline;
 }
 
-void SetupModule::GetInstallFirefoxExtensionParams(const String& sCmdline, String& sPath, String& sArgs)
+void SetupModule::GetShellExecuteParamsFromCommandline(const String& sCmdline, String& sPath, String& sArgs)
 {
   int nChars = sCmdline.chars();
   int bInQuotes = 0;
@@ -106,7 +106,7 @@ void SetupModule::InstallFirefoxExtensionByFirefox()
 
   String sPath;
   String sArgs;
-  GetInstallFirefoxExtensionParams(sCmdline, sPath, sArgs);
+  GetShellExecuteParamsFromCommandline(sCmdline, sPath, sArgs);
 
   ::ShellExecute(NULL, _T("open"), sPath, sArgs, String::filenameBasePath(sPath), SW_SHOW);
 }
@@ -226,7 +226,7 @@ public:
   static void End();
 
   static String GetInstallFirefoxExtensionCommandline();
-  static String GetInstallFirefoxExtensionParams();
+  static String GetShellExecuteParamsFromCommandline();
   static String Dev();
 };
 
@@ -290,10 +290,9 @@ String SetupModuleTester::GetInstallFirefoxExtensionCommandline()
   String s;
 
   if (!s) {
-    SetupModule m;
     String sSub1 = "firefox.exe";
     String sSub2 = "avatarnavigator.xpi";
-    String sResult = String::toLower(m.GetInstallFirefoxExtensionCommandline());
+    String sResult = String::toLower(SetupModule::GetInstallFirefoxExtensionCommandline());
     if (!sResult.contains(sSub1)) {
       s.appendf("got=%s expected substring=%s", _sz(sResult), _sz(sSub1));
     }
@@ -305,7 +304,7 @@ String SetupModuleTester::GetInstallFirefoxExtensionCommandline()
   return s;
 }
 
-String SetupModuleTester::GetInstallFirefoxExtensionParams()
+String SetupModuleTester::GetShellExecuteParamsFromCommandline()
 {
   String s;
 
@@ -313,8 +312,7 @@ String SetupModuleTester::GetInstallFirefoxExtensionParams()
     String sCmdline = "\"abs def\" -ghi \"jkl mno\" pqr stu";
     String sPath;
     String sArgs;
-    SetupModule m;
-    m.GetInstallFirefoxExtensionParams(sCmdline, sPath, sArgs);
+    SetupModule::GetShellExecuteParamsFromCommandline(sCmdline, sPath, sArgs);
     if (sPath != "abs def") { s += String::from(__LINE__); }
     if (sArgs != "-ghi \"jkl mno\" pqr stu") { s += String::from(__LINE__); }
   }
@@ -325,13 +323,13 @@ String SetupModuleTester::GetInstallFirefoxExtensionParams()
 void SetupModuleTester::Begin()
 {
   AP_UNITTEST_REGISTER(SetupModuleTester::GetInstallFirefoxExtensionCommandline);
-  AP_UNITTEST_REGISTER(SetupModuleTester::GetInstallFirefoxExtensionParams);
+  AP_UNITTEST_REGISTER(SetupModuleTester::GetShellExecuteParamsFromCommandline);
 }
 
 void SetupModuleTester::Execute()
 {
   AP_UNITTEST_EXECUTE(SetupModuleTester::GetInstallFirefoxExtensionCommandline);
-  AP_UNITTEST_EXECUTE(SetupModuleTester::GetInstallFirefoxExtensionParams);
+  AP_UNITTEST_EXECUTE(SetupModuleTester::GetShellExecuteParamsFromCommandline);
   SetupModuleTester::Dev();
 }
 

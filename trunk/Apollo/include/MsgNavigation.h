@@ -10,6 +10,7 @@
 #include "ApMessage.h"
 
 // navigator connection -> navigation
+// May be used to check if the comunication is established before issuing other requests
 class Msg_Navigation_NavigatorHello: public ApRequestMessage
 {
 public:
