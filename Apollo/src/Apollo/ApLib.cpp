@@ -705,8 +705,9 @@ AP_MSG_HANDLER_METHOD(ApLib, OS_StartProcess)
   //  }
   //}
 
+  String sArgs = Apollo::joinCommandlineArguments(pMsg->vlArgs);
   String sCmdLine;
-  sCmdLine.appendf("\"%s\" %s", _sz(pMsg->sExePath), _sz(pMsg->sArgs));
+  sCmdLine.appendf("\"%s\" %s", _sz(pMsg->sExePath), _sz(sArgs));
 
   STARTUPINFO si; 
   memset(&si, '\0', sizeof STARTUPINFO);

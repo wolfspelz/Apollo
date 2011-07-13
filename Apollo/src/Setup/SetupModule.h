@@ -42,7 +42,6 @@ protected:
   void SetupDone();
 
   static String GetInstallFirefoxExtensionCommandline();
-  static void GetShellExecuteParamsFromCommandline(const String& sCmdline, String& sPath, String& sArgs);
   static void InstallFirefoxExtensionByFirefox();
 
 protected:

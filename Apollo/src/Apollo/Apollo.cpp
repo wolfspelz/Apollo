@@ -716,6 +716,84 @@ String Apollo::getUserProfilePath()
   return gApLib.getUserProfilePath();
 }
 
+void Apollo::splitCommandlineArguments(const String& sCmdline, Apollo::ValueList& vlArgs)
+{
+  int nChars = sCmdline.chars();
+  int bInQuotes = 0;
+  int bEscape = 0;
+  String sAccumulator;
+
+  for (int i = 0; i < nChars; ++i) {
+
+    String sChar = sCmdline.subString(i, 1);
+    switch (String::UTF8_Char(sChar)) {
+      case '\\':
+        bEscape = 1;
+        break;
+      case '"':
+        if (bEscape) {
+          bEscape = 0;
+          sAccumulator += sChar;
+        } else {
+          bInQuotes = !bInQuotes;
+        }
+        break;
+      case ' ':
+        if (bEscape) {
+          bEscape = 0;
+          sAccumulator += "\\";
+        }
+        if (bInQuotes) {
+          sAccumulator += sChar;
+        } else {
+          if (sAccumulator) {
+            vlArgs.add(sAccumulator);
+            sAccumulator = "";
+          }
+        }
+        break;
+      default:
+        if (bEscape) {
+          bEscape = 0;
+          sAccumulator += "\\";
+        }
+        sAccumulator += sChar;
+        break;
+    }
+
+  }
+
+  if (sAccumulator) {
+    vlArgs.add(sAccumulator);
+  }
+}
+
+String Apollo::joinCommandlineArguments(Apollo::ValueList& vlArgs)
+{
+  String sResult;
+
+  for (Apollo::ValueElem* e = 0; (e = vlArgs.nextElem(e)) != 0; ) {
+    String sPart = e->getString();
+    int bAddQuotes = 0;
+    int bEscapeQuote = 0;
+
+    if (sPart.contains(" ")) {
+      bAddQuotes = 1;
+    }
+
+    if (sPart.contains("\"")) {
+      sPart.replace("\"", "\\\"");
+    }
+
+    if (sResult) { sResult += " "; }
+    if (bAddQuotes) { sResult += "\""; }
+    sResult += sPart;
+    if (bAddQuotes) { sResult += "\""; }
+  }
+
+  return sResult;
+}
+
 // --------------------------------
 
 // --------------------------------
