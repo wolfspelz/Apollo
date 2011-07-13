@@ -99,7 +99,7 @@ void SetupModule::GetInstallFirefoxExtensionParams(const String& sCmdline, Strin
   }
 }
 
-void SetupModule::InstallFirefoxExtension()
+void SetupModule::InstallFirefoxExtensionByFirefox()
 {
   String sCmdline = GetInstallFirefoxExtensionCommandline();
   if (!sCmdline) { throw ApException(LOG_CONTEXT, "No commandline"); }
@@ -201,8 +201,8 @@ AP_MSG_HANDLER_METHOD(SetupModule, WebView_ModuleCall)
     String sMethod = pMsg->srpc.getString(Srpc::Key::Method);
 
     if (0){
-    } else if (sMethod == "InstallFirefoxExtension") {
-      InstallFirefoxExtension();
+    } else if (sMethod == "InstallFirefoxExtensionByFirefox") {
+      InstallFirefoxExtensionByFirefox();
 
     } else if (sMethod == "InstallInternetExplorerExtension") {
 
