@@ -44,8 +44,9 @@
   <ItemGroup>
     <Reference Include="Interop.SHDocVw, Version=1.1.0.0, Culture=neutral, PublicKeyToken=c7066b1a7ed5618f, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <EmbedInteropTypes>False</EmbedInteropTypes>
-      <HintPath>..\..\..\Program Files\SpicIE\Interop.SHDocVw.dll</HintPath>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+      <HintPath>..\Dependencies\Interop.SHDocVw.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.mshtml, Version=7.0.3300.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <SpecificVersion>False</SpecificVersion>
@@ -53,12 +54,15 @@
       <HintPath>..\..\..\..\..\Program Files\Microsoft.NET\Primary Interop Assemblies\Microsoft.mshtml.dll</HintPath>
     </Reference>
     <Reference Include="SpicIE, Version=1.0.0.0, Culture=neutral, PublicKeyToken=c7066b1a7ed5618f, processorArchitecture=MSIL">
-      <HintPath>..\..\..\..\..\Program Files\SpicIE\SpicIE.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Dependencies\SpicIE.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration.Install" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Management" />
     <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
@@ -68,6 +72,12 @@
       <DependentUpon>App.config</DependentUpon>
     </Compile>
     <Compile Include="Client.cs" />
+    <Compile Include="clsRegisterDll.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="clsRegisterDll.Designer.cs">
+      <DependentUpon>clsRegisterDll.cs</DependentUpon>
+    </Compile>
     <Compile Include="Controller.cs" />
     <Compile Include="AvatarNavigator.cs">
       <SubType>Component</SubType>
