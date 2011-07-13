@@ -42,7 +42,7 @@ protected:
   void SetupDone();
   String GetInstallFirefoxExtensionCommandline();
   void GetInstallFirefoxExtensionParams(const String& sCmdline, String& sPath, String& sArgs);
-  void InstallFirefoxExtension();
+  void InstallFirefoxExtensionByFirefox();
 
 protected:
   int bInSendRunLevelNormal_;
