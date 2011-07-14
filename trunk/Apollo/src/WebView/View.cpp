@@ -137,7 +137,7 @@ void View::Create(int nLeft, int nTop, int nWidth, int nHeight)
   if (FAILED( pWebView_->setPolicyDelegate(this) )) { throw ApException(LOG_CONTEXT, "" ApHandleFormat " pWebView_->setPolicyDelegate() failed", ApHandlePrintf(hAp_)); }
   if (FAILED( pWebView_->QueryInterface(IID_IWebViewPrivate, reinterpret_cast<void**>(&pWebViewPrivate_)) )) { throw ApException(LOG_CONTEXT, "" ApHandleFormat " QueryInterface(IID_IWebViewPrivate) failed", ApHandlePrintf(hAp_)); }
 
-  RECT r = { nLeft_, nTop_, nWidth_, nHeight_ };
+  RECT r = { nLeft_, nTop_, nWidth_ + nLeft_, nHeight_ + nTop_ };
   if (FAILED( pWebView_->initWithFrame(r, 0, 0) )) { throw ApException(LOG_CONTEXT, "" ApHandleFormat " pWebView_->initWithFrame() failed", ApHandlePrintf(hAp_)); }
 
   // -----------------------------
