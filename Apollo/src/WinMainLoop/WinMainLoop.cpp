@@ -6,7 +6,6 @@
 
 #include "Apollo.h"
 #include "WinMainLoop.h"
-//#include "AutoWindowsMessage.h"
 #include "ApLog.h"
 #include "ApOS.h"
 #include "MsgLog.h"
@@ -15,6 +14,7 @@
 #include "MsgTimer.h"
 #include "MsgMainLoop.h"
 #include "MsgSystem.h"
+#include "MsgSetup.h"
 
 #if defined(WIN32)
 static HINSTANCE g_hDllInstance = NULL;
@@ -183,7 +183,8 @@ int MainLoopModule::Handle_WM_COMMAND_TOOLS_DISPLAY(HWND hWnd, UINT message, WPA
 {
   AP_UNUSED_ARG(hWnd); AP_UNUSED_ARG(message); AP_UNUSED_ARG(wParam); AP_UNUSED_ARG(lParam);
 
-  // Unused 
+  Msg_Setup_Open msg;
+  msg.Request();
 
   return 1;
 }
