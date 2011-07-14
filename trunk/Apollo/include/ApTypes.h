@@ -169,8 +169,9 @@ public:
 
   ValueElem* findString(const String& s) { return (ValueElem*) List::FindByString(s); }
 
-  inline void addElem(ValueElem* e) { List::AddLast((Elem*) e); }
-  inline void removeElem(ValueElem* e) { List::Remove((Elem*) e); }
+  inline void addElem(ValueElem* e) { if (e) { List::AddLast((Elem*) e); } }
+  inline void removeElem(ValueElem* e) { if (e) { List::Remove((Elem*) e); } }
+  inline void deleteElem(ValueElem* e) { if (e) { List::Remove((Elem*) e); delete e; } }
   inline ValueElem* nextElem(ValueElem* e) { return (ValueElem*) List::Next((Elem*) e); }
 
   Apollo::ValueElem* elemAtIndex(int nIndex);

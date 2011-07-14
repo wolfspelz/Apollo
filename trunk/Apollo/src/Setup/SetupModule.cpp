@@ -61,13 +61,9 @@ void SetupModule::InstallFirefoxExtensionByFirefox()
   Apollo::ValueList vlParts;
   Apollo::splitCommandlineArguments(sCmdline, vlParts);
 
-  String sExe;
-  Apollo::ValueElem* eFirst = vlParts.nextElem(0);
-  if (eFirst == 0) { throw ApException(LOG_CONTEXT, "No parts in command line"); }
-  sExe = eFirst->getString();
-  vlParts.removeElem(eFirst);
-  delete eFirst;
-  eFirst = 0;
+  String sExe = vlParts.atIndex(0, "");
+  vlParts.deleteElem(vlParts.elemAtIndex(0));
+  if (!sExe) { throw ApException(LOG_CONTEXT, "No exe path"); }
 
   {
     Msg_OS_StartProcess msg;
