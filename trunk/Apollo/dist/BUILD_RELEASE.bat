@@ -35,8 +35,8 @@ xcopy %RELEASE_SRC_DIR% %BUILD_DIR%\%PRODUCT_NAME%\ /E /H /R /Y /EXCLUDE:Release
 
 echo ---------------------------------------------------------------------------
 echo Zipping release files
-cd %BUILD_DIR%
-7za a -y -tzip %BUILD_DIR%\%DEST_FILE% %PRODUCT_NAME%
+cd %BUILD_DIR%\%PRODUCT_NAME%
+7za a -y -tzip %BUILD_DIR%\%DEST_FILE% *
 cd %WORK_DIR%
 
 echo ---------------------------------------------------------------------------
