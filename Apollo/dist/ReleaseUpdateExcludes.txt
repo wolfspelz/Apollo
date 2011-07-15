@@ -1,6 +1,7 @@
 \svn\
 .svn
 \inspector\
+\TestNetscapePlugin_debug\
 
 Avatar.exe
 Avatar.ilk
