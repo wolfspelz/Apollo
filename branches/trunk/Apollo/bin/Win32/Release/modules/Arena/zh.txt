@@ -1,0 +1,3 @@
+#ässert utf-8
+Hello World=世界您好
+Send=發送

@@ -1,0 +1,55 @@
+from Apollo.h
+
+// -------------------------------------------------------------------
+// String
+
+#if defined(_MSC_VER) && _MSC_VER < 1300
+  #pragma warning(disable:4786 4251 4275) // 
+  #define STRSAFE_NO_DEPRECATE
+#endif
+
+#include <string>
+#include <list>
+#include <map>
+#if defined(UNICODE)
+  typedef std::wstring tstring;
+#else
+  typedef std::string tstring;
+#endif
+
+class APOLLO_API string: public tstring
+{
+public:
+  string() {}
+  string(const TCHAR* s) : tstring(s) {}
+  ~string() {}
+
+  const char* c_str() 
+  { 
+#if defined(UNICODE)
+    return "c_str"; 
+#else
+    return tstring::c_str(); 
+#endif
+  }
+  operator char*() { return (char*) c_str(); }
+
+  const wchar_t* w_str()
+  { 
+#if defined(UNICODE)
+    return tstring::c_str(); 
+#else
+    return L"wstr"; 
+#endif
+  }
+
+  const TCHAR* t_str() { return tstring::c_str(); }
+  operator const TCHAR*() { return tstring::c_str(); }
+
+  int strcatf(const TCHAR* fmt, ...);
+
+  static int atoi(const TCHAR* arg);
+};
+
+typedef std::list<string> ApStringList;
+

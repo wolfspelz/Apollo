@@ -1,0 +1,16 @@
+Dun/OnLoad/DeleteDbFiles=Identity
+
+# Fatal       3
+# Error       7
+# Warning     15
+# User        31
+# Debug       63
+# Info        127
+# Verbose     255
+# Trace       511
+# VeryVerbose 1023
+
+#LogMask=63
+LogMask=255
+Debug/ShowConsole=0
+Translation/Language=de

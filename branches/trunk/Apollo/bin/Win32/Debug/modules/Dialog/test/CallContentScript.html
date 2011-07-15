@@ -1,0 +1,22 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<script type="text/javascript" src="../../WebView/apollo.js"></script>
+<script type="text/javascript" src="../apollo.dialog.js"></script>
+<script type="text/javascript">
+
+var api = new ApolloApi('CallContentScript Test');
+
+function SetText(sText1, sText2)
+{
+  api.Log.Debug('SetText ' + sText1 + ' ' + sText2);
+  document.getElementById('iText').innerHTML = '1=' + sText1 + ' 2=' + sText2;
+}
+
+</script>
+</head>
+<body>
+<div id="iText"></div>
+<input type="button" value="test" onclick="SetText('xx');" />Expect: 1=xx 2=undefined
+</body>
+</html>

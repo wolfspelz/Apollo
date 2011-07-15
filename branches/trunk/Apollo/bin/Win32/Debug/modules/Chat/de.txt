@@ -1,0 +1,4 @@
+#ässert utf-8
+Chat=Chat
+Send=Senden
+Clear=Löschen

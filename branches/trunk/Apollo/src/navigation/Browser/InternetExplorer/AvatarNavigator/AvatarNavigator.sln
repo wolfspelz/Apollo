@@ -1,0 +1,27 @@
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AvatarNavigator", "AvatarNavigator.csproj", "{853F9DF2-BE34-4913-B8A3-1E9BC2D265EE}"
+EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Setup", "..\Setup\Setup.vdproj", "{4E77E889-149C-46C3-9646-6A5DC3DAC49C}"
+	ProjectSection(ProjectDependencies) = postProject
+		{853F9DF2-BE34-4913-B8A3-1E9BC2D265EE} = {853F9DF2-BE34-4913-B8A3-1E9BC2D265EE}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{853F9DF2-BE34-4913-B8A3-1E9BC2D265EE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{853F9DF2-BE34-4913-B8A3-1E9BC2D265EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{853F9DF2-BE34-4913-B8A3-1E9BC2D265EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{853F9DF2-BE34-4913-B8A3-1E9BC2D265EE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4E77E889-149C-46C3-9646-6A5DC3DAC49C}.Debug|Any CPU.ActiveCfg = Debug
+		{4E77E889-149C-46C3-9646-6A5DC3DAC49C}.Release|Any CPU.ActiveCfg = Release
+		{4E77E889-149C-46C3-9646-6A5DC3DAC49C}.Release|Any CPU.Build.0 = Release
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

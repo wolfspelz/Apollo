@@ -1,0 +1,25 @@
+﻿<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<script type="text/javascript" src="../apollo.js"></script>
+
+<script type="text/javascript">
+function Elem(sId) { return document.getElementById(sId); }
+function SetText(sText) { Elem('iText').innerHTML = sText; }
+function Concat(a, b) { var c = a + b; SetText(c); return c; }
+
+var api = new ApolloApi('WebView');
+
+</script>
+
+<style type="text/css">
+* { margin:0; padding:0; }
+</style>
+
+</head>
+<body style="background-color:#ffcccc; border:solid 1px #000000;" onload="api.Log.User('Developer HTML IFRAME loading')" onunload="api.Log.User('Developer HTML IFRAME unloading')">
+  <p>IFRAME</p>
+  <p id="iText" style="border:1px solid #0000ff; background:white;" contenteditable="true">--</p>
+  <input type="button" value="System_Echo" onclick="SetText(api.Message('System_Echo').setInt('nIn', 42).send().toString());"/>
+</body>
+</html>

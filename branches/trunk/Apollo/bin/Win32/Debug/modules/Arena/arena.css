@@ -1,0 +1,217 @@
+
+* { margin:0; padding:0; }
+
+*
+{
+  font-family:Verdana, Arial, Sans-Serif;
+  font-size:9px;
+}
+
+#iMeta
+{
+  position:absolute;
+  top:1px;
+  left:1px;
+  padding:2px;
+  background-color:#FFFFFF;
+  border:1px solid #c0c0c0;
+}
+
+#iMeta div
+{
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.cParticipant
+{
+  position:absolute;
+  bottom:0px;
+  width:2px;
+  height:100px;
+  x-webkit-box-shadow:inset 0 0 1px #000000;
+}
+
+.cCenter
+{
+  position:relative;
+  left:-49px;
+  width:100px;
+  height:100px;
+  x-webkit-box-shadow:inset 0 0 1px #000000;
+}
+
+.cImageWrapper
+{
+  position:absolute;
+  left:0px;
+  top:0px;
+  width:100px;
+  height:100px;
+}
+
+.cImage
+{
+  position:absolute;
+  left:0px;
+  top:0px;
+  width:100px;
+  height:100px;
+  background-image:url('img/DefaultAvatar.png');
+  background-repeat:no-repeat;
+  background-position-x:center; 
+  background-position-y:bottom; 
+}
+
+.cNickname
+{
+  position:absolute;
+  bottom:10px;
+  left:70px;
+  padding:1px;
+  background-color:#F5F5F5;
+  max-width:80px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.cSelf .cNickname
+{
+  border:1px solid #7CC100;
+  -webkit-box-shadow:0 0 6px #7CC100;
+}
+
+.cPeer .cNickname
+{
+  border:1px solid #CCCCCC;
+  -webkit-box-shadow:0 0 6px #808080;
+}
+
+.cCommunity
+{
+  position:absolute;
+  top:31px;
+  left:90px;
+  max-width:32px;
+  max-height:32px;
+  overflow:hidden;
+  cursor:pointer;
+}
+
+.cIcon
+{
+  position:absolute;
+  top:5px;
+  left:90px;
+  max-width:24px;
+  max-height:24px;
+  overflow:hidden;
+}
+
+.cImageSensor
+{
+  position:absolute;
+  left:25px;
+  top:25px;
+  width:50px;
+  height:50px;
+  background-color:rgba(255, 255, 255, 0.01);
+  -webkit-box-shadow:inset 0 0 1px #000000;
+}
+
+.cMenu
+{
+  position:absolute;
+  left:25px;
+  top:25px;
+  -webkit-box-shadow:inset 0 0 1px #000000;
+}
+
+.cChatIn
+{
+  position:absolute;
+  left:-10px;
+  bottom:10px;
+  background-color:#FFFFFF;
+  padding:8px;
+  -webkit-border-radius:5px;
+  -webkit-box-shadow:0 0 6px #333333;
+}
+
+.cChatIn .cCloseButton
+{
+  margin-left:8px;
+  -webkit-box-shadow:0 0 4px #333333;
+}
+
+.cChatIn .cText
+{
+  width:100px;
+  font-size:11px;
+  height:16px;
+  border:1px solid #b0b0b0;
+}
+
+.cChatIn .cSend
+{
+  margin-left:8px;
+  font-size:11px;
+  padding:2px;
+}
+
+.cChatWrapper
+{
+  width:100px;
+  height:100px;
+}
+
+.cChatContainer
+{
+  position:absolute;
+  left:-15px;
+  bottom:105px;
+  width:130px;
+  vertical-align:bottom;
+}
+
+.cChatBubble
+{
+  position:relative;
+  text-align:center;
+  background-color:#FFFFFF;
+  margin:4px auto;
+  padding:4px;
+  display:table;
+  max-width:130px;
+  -webkit-border-radius:4px;
+  -webkit-box-shadow:0 0 6px #333333;
+}
+
+.cChatBubble .cText
+{
+}
+
+.cChatBubble .cCloseButton
+{
+  float:right;
+  margin:0px 0px 3px 5px;
+}
+
+.cPointer
+{
+  position:absolute;
+  left:32px;
+  top:-40px;
+  width:37px;
+  height:36px;
+  background-image:url('img/Arrow.png');
+}
+
+.cPointer .cCloseButton
+{
+  position:absolute;
+  right:6px;
+  top:-2px;
+}
+

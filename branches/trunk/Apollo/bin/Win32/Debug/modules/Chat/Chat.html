@@ -1,0 +1,181 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<script type="text/javascript" src="../WebView/jquery-1.5.1.min.js"></script>
+<script type="text/javascript" src="jquery-ui-latest.js"></script>
+<script type="text/javascript" src="jquery.layout-latest.js"></script>
+<script type="text/javascript" src="../WebView/apollo.js"></script>
+<link type="text/css" rel="stylesheet" href="layout-default-latest.css" /><link type='text/css' rel='stylesheet' href='Chat.css' media='all' />
+
+<script type="text/javascript">
+
+var api = null;
+
+function ReceiveMessageFromModule(sMsg)
+{
+  //api.Log.Debug('ReceiveMessageFromModule ' + sMsg)
+  var msg = new ApMessage().fromString(sMsg);
+  var resp = null;
+
+  try {
+  
+    var sMethod = msg.getString('Method');
+    switch (sMethod) {
+      case 'Start': return Start(); break;
+      case 'AddParticipant': AddParticipant(msg.getString('hParticipant'), msg.getString('sNickname'), msg.getInt('bSelf')); break;
+      case 'RemoveParticipant': RemoveParticipant(msg.getString('hParticipant')); break;   
+      case 'SetNickname': SetNickname(msg.getString('hParticipant'), msg.getString('sNickname')); break;
+      case 'SetImage': SetImage(msg.getString('hParticipant'), msg.getString('sUrl')); break;
+      case 'SetOnlineStatus': SetOnlineStatus(msg.getString('hParticipant'), msg.getString('sStatus')); break;
+      case 'AddChatline': AddChatline(msg.getString('hParticipant'), msg.getString('sNickname'), msg.getString('sText')); break;
+      case 'SetLocationState': SetLocationState(msg.getString('sState')); break;
+      default: throw 'Unknown method: ' + sMethod;
+    }
+
+  } catch (ex) {
+    resp = new ApMessage().setInt('Status', 0).setString('Message', String(ex));
+  }
+
+  if (resp != null) {
+    var sResponse = resp.toString();
+    return sResponse;
+  }
+}
+function Start()
+{    api = new ApolloApi('Chat');
+  var gLayout = $('#Wrapper').layout({    south__size: 42,//    east__size: Math.floor( $('body').clientWidth / 3),    east__size: 150,    south__spacing_open: 4,    east__spacing_open: 4  });//  $.each('south,east'.split(','), function (i, pane) {//    var opts = myLayout.options[pane].resizeWhileDragging = true;
+//  });  $('#ChatIn').bind("keydown", 
+    function(ev) {
+      var keycode = (ev.keyCode ? ev.keyCode : (ev.which ? ev.which : ev.charCode));
+      switch (keycode) {
+      case 13:
+        if (!ev.ctrlKey && !ev.shiftKey) {
+          SendChatIn();
+          return false;
+        }
+        break;
+
+      default:
+        return true;
+      }
+    }
+  ).focus();
+  $('.cTranslate').each( function () { api.TranslateElement(this, null); } );}
+function SendChat(sText)
+{
+  api.ModuleCall('SendChat')
+    .setString('sText', sText)
+    .send();
+}
+
+function SendChatIn()
+{
+  var sText = document.getElementById('ChatIn').value;
+  SendChat(sText);
+  document.getElementById('ChatIn').value = '';
+}
+
+function ClearChatOut()
+{
+  document.getElementById('ChatOut').innerHTML = '';
+}
+
+// -----------------------------------------------
+
+function EscapeHTML(s)
+{
+  return s.replace(/&/ig, '&amp;').replace(/</ig, '&lt;').replace(/>/ig, '&gt;');
+}
+
+function StringApHandleBrackets(sValue)
+{
+  var sResult = '';
+  if (sValue) {
+    for (var i = 0; i < sValue.length; i++) {
+	    switch (sValue.charAt(i)) {
+		    case '[': break;
+		    case ']': break;
+		    default: sResult += sValue.charAt(i);
+	    }
+    }
+  }
+  return sResult;
+}
+
+function GetParticipantDomId(hParticipant)
+{
+  return 'iP' + StringApHandleBrackets(hParticipant);
+}
+
+function LimitText(sText, nMaxLength)
+{
+  if (nMaxLength == null) { nMaxLength = 1000; }
+  var sNewText = sText;
+  sNewText = sText.substring(0, nMaxLength);
+  if (sNewText.length != sText.length) {
+    sNewText += '...';
+  }
+  return sNewText;
+}
+
+// -----------------------------------------------
+
+function AddParticipant(hParticipant, sNickname, bSelf)
+{
+  //api.Log.Debug('AddParticipant ' + hParticipant + ' ' + sNickname + ' ' + bSelf);
+  $('#ParticipantList').append(''
+    + '<div id="' + GetParticipantDomId(hParticipant) + '" class="cParticipant">'
+    + '  <span class="cNickname">' + LimitText(sNickname, 20) + '</span>'
+    + '</div>'
+  );
+}
+
+function RemoveParticipant(hParticipant)
+{
+  //api.Log.Debug('RemoveParticipant ' + hParticipant);
+  $('#' + GetParticipantDomId(hParticipant)).remove();
+}
+
+function SetNickname(hParticipant, sNickname)
+{
+  //api.Log.Debug('SetNickname' + hParticipant + ' ' + sNickname);
+  $('#' + GetParticipantDomId(hParticipant) + ' .cNickname').html(EscapeHTML(LimitText(sNickname, 20)));
+}
+
+function SetImage(hParticipant, sUrl)
+{
+  //api.Log.Debug('SetImage ' + hParticipant + ' ' + sUrl);
+}
+
+function SetOnlineStatus(hParticipant, sStatus)
+{
+  //api.Log.Debug('SetOnlineStatus ' + hParticipant + ' ' + sStatus);
+}
+
+function AddChatline(hParticipant, sNickname, sText)
+{
+  //api.Log.Debug('AddChatline ' + hParticipant + ' ' + sNickname + ' ' + sText);
+  $('#ChatOut').append(''
+    + '<div class="cLine">'
+    + '  <span class="cNickname">' + EscapeHTML(LimitText(sNickname, 20)) + ':</span>'
+    + '  <span class="cText">' + EscapeHTML(LimitText(sText, 1000)) + '</span>'
+    + '</div>'
+  ).scrollTop($("#ChatOut")[0].scrollHeight);
+}
+
+function SetLocationState(sState){  //api.Log.Debug('SetLocationState ' + sState);
+}</script>
+
+</head>
+
+<body>
+<div id="Wrapper">
+  <div id="ChatInPane" class="ui-layout-south">    <table style="width:100%; height:100%;"><tr>      <td width="99%" style="padding:5px;"><textarea id="ChatIn"></textarea></td>
+      <td style="vertical-align:top; padding:2px;"><input type="button" id="ChatSend" value="Send" class="cTranslate" onclick="SendChatIn();" /></td>
+    </tr></table>
+  </div>    <div id="ParticipantList" class="ui-layout-east">  </div>    <div id="ChatOutPane" class="ui-layout-center">    <div id="ChatOut" contenteditable="true"></div>    <input type="button" id="Clear" value="Clear" class="cTranslate" onclick="ClearChatOut();" />
+  </div>
+</div>
+</body>
+
+</html>

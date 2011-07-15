@@ -1,0 +1,15 @@
+#Connection/JabberId=
+#Connection/Password=
+#Room/Nickname=
+Connection/AutoConnect=1
+Connection/Resource=ApolloTest
+Room/NicknameConflictRetry=20
+Room/DropDelayedChat=0
+Room/DropDelayedChatSec=60
+Room/SendJidInIdentityExtension=1
+ClientInfo/Name=Apollo
+ClientInfo/Version=0.2
+ClientInfo/OS=Unknown
+ReconnectMinDelay=3
+ReconnectRandomDelay=10
+HeartbeatDelay=30

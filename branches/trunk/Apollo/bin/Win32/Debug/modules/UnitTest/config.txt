@@ -1,0 +1,11 @@
+#Enable/disable start of test sequence
+Test=0
+
+# Delay before initial dialog show [seconds]
+#ShowTimeout=0
+
+# Close dialog on success [seconds] (disable close: -1)
+#SuccessCloseTimeout=0
+
+Dialog/Left=400
+Dialog/Top=100

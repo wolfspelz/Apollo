@@ -1,0 +1,10 @@
+#version=1
+#ässert UTF-8
+text1=translated1
+text2withlf=translated2\nwithlf\n   
+context3.text3=context3translated3
+
+text5=ä5ö
+text6=translated6
+context7.text7=context7translated7
+context8.text8=äcontext8translated8

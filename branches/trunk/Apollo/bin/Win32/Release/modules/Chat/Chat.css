@@ -1,0 +1,80 @@
+
+* { margin:0; padding:0; }
+
+*
+{
+  font-family:Verdana, Arial, Sans-Serif;
+  font-size:11px;
+}
+
+#Wrapper
+{
+  position:absolute;
+  left:4px;
+  top:4px;
+  right:4px;
+  bottom:4px;
+}
+
+#ChatInPane
+{
+  padding:0;
+}
+
+#ChatIn
+{
+  width:100%;
+  height:100%;
+  padding:2px;
+  border:none;
+  position:relative;
+  z-index:99;
+}
+
+#ChatSend
+{
+  padding:2px;
+}
+
+#ChatOut
+{
+  position:absolute;
+  left:0px;
+  right:0px;
+  bottom:0px;
+  top:0px;
+  overflow:auto;
+  padding:4px;
+}
+
+#ChatOut .cLine
+{
+  padding-left:10px;
+  text-indent:-10px;
+  margin-bottom:2px;
+}
+
+#ChatOut, #ParticipantList, #ChatIn
+{
+  background-color:rgba(255, 255, 255, 0.99);
+}
+
+#ChatOut .cNickname
+{
+  font-weight:bold;
+}
+
+#ParticipantList .cParticipant
+{
+  padding-bottom:2px;
+  margin-bottom:2px;
+  border-bottom:solid 1px #BBB;
+}
+
+#ChatOutPane #Clear
+{
+  position:absolute;
+  right:4px;
+  bottom:4px;
+  padding:2px;
+}

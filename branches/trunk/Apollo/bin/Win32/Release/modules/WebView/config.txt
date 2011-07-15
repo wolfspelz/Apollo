@@ -1,0 +1,23 @@
+  LoadDLL/0200=[[MODULE_LIBRARY_PATH]]/icudt40.dll
+  LoadDLL/0300=[[MODULE_LIBRARY_PATH]]/icuuc40.dll
+  LoadDLL/0400=[[MODULE_LIBRARY_PATH]]/icuin40.dll
+  LoadDLL/0500=[[MODULE_LIBRARY_PATH]]/libeay32.dll
+  LoadDLL/0550=[[MODULE_LIBRARY_PATH]]/zlib1.dll
+  LoadDLL/0600=[[MODULE_LIBRARY_PATH]]/libcurl.dll
+  #LoadDLL/0700=[[MODULE_LIBRARY_PATH]]/libtidy.dll
+  LoadDLL/0800=[[MODULE_LIBRARY_PATH]]/libxml2.dll
+  LoadDLL/0900=[[MODULE_LIBRARY_PATH]]/libxslt.dll
+  LoadDLL/1000=[[MODULE_LIBRARY_PATH]]/objc.dll
+  LoadDLL/1100=[[MODULE_LIBRARY_PATH]]/pthreadVC2.dll
+  LoadDLL/1200=[[MODULE_LIBRARY_PATH]]/ssleay32.dll
+  # Does not want to load from the original folder. Added to the app base folder
+  LoadDLL/1500=[[APP_LIBRARY_PATH]]/JavaScriptCore.dll
+  # Does not want to load from the original folder. Added to the app base folder
+  LoadDLL/1700=[[APP_LIBRARY_PATH]]/CFLite.dll
+  LoadDLL/1750=[[MODULE_LIBRARY_PATH]]/cairo.dll
+  LoadDLL/1751=[[MODULE_LIBRARY_PATH]]/sqlite.dll
+  LoadDLL/1800=[[MODULE_LIBRARY_PATH]]/WebKit.dll
+
+Language/en=[[MODULE_RESOURCE_PATH]]/en.txt
+Language/de=[[MODULE_RESOURCE_PATH]]/de.txt
+Language/ja=[[MODULE_RESOURCE_PATH]]/ja.txt

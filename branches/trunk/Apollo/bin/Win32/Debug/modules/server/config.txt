@@ -1,0 +1,7 @@
+LoadDLL/1=[[MODULE_LIBRARY_PATH]]/../netapi/netapi
+HTTP/Enabled=1
+HTTP/Port=23761
+HTTP/Address=127.0.0.1
+TCP/Enabled=1
+TCP/Port=23763
+TCP/Address=127.0.0.1

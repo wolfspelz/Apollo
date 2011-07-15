@@ -1,0 +1,29 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<script type="text/javascript" src="../WebView/jquery-1.5.1.min.js"></script>
+<script type="text/javascript" src="../WebView/apollo.js"></script>
+<link type='text/css' rel='stylesheet' href='Setup.css' media='all' />
+
+<script type="text/javascript">
+var api = null;
+
+function Start()
+{
+  api = new ApolloApi('Setup');
+
+  $('.cTranslate').each( function () { api.TranslateElement(this, null); } );}
+
+</script>
+
+</head>
+
+<body>
+<div id="Wrapper">
+<p id="iInstallFirefoxExtension"><span class="Label cTranslate">Avatar for Firefox</span>: <input type="button" value="Install" class="Button cTranslate" onclick="api.ModuleCall('InstallFirefoxExtension').send();" /></p>
+<p id="iInstallInternetExplorerExtension"><span class="Label cTranslate">Avatar for Internet Explorer</span>: <input type="button" value="Install" class="Button cTranslate" onclick="api.ModuleCall('InstallInternetExplorerExtension').send();" /></p>
+
+</div>
+</body>
+
+</html>
