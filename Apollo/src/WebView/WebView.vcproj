@@ -38,7 +38,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="C:\cygwin\home\wolf\WebKit\WebKitBuild\Debug_Cairo_CFLite\include\"
+				AdditionalIncludeDirectories="&quot;C:\Heiner\ApolloWebKitSDK\Win32\Debug\include\&quot;"
 				PreprocessorDefinitions="WEBVIEW_EXPORTS"
 				DebugInformationFormat="4"
 			/>
@@ -54,7 +54,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="Shlwapi.lib Apollo.lib WebKitGUID_debug.lib WebKit_debug.lib"
-				AdditionalLibraryDirectories="C:\cygwin\home\wolf\WebKit\WebKitBuild\Debug_Cairo_CFLite\lib"
+				AdditionalLibraryDirectories="&quot;C:\Heiner\ApolloWebKitSDK\Win32\Debug\lib\&quot;"
 				IgnoreDefaultLibraryNames="MSVCRT"
 			/>
 			<Tool
@@ -106,7 +106,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="C:\cygwin\home\wolf\WebKit\WebKitBuild\Release_Cairo_CFLite\include"
+				AdditionalIncludeDirectories="&quot;C:\Heiner\ApolloWebKitSDK\Win32\Release\include&quot;"
 				PreprocessorDefinitions="WEBVIEW_EXPORTS"
 				DebugInformationFormat="3"
 			/>
@@ -122,7 +122,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="Shlwapi.lib Apollo.lib WebKitGUID.lib WebKit.lib"
-				AdditionalLibraryDirectories="C:\cygwin\home\wolf\WebKit\WebKitBuild\Release_Cairo_CFLite\lib"
+				AdditionalLibraryDirectories="&quot;C:\Heiner\ApolloWebKitSDK\Win32\Release\lib&quot;"
 				GenerateDebugInformation="true"
 			/>
 			<Tool
