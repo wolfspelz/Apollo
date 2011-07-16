@@ -64,13 +64,13 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_602EC69744151EE325F6B0CC62EA6A49"
+        "OwnerKey" = "8:_82C4B7EC4F093918A67290B8B7BA36E8"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_82C4B7EC4F093918A67290B8B7BA36E8"
+        "OwnerKey" = "8:_602EC69744151EE325F6B0CC62EA6A49"
         "MsmSig" = "8:_UNDEFINED"
         }
     }
@@ -430,7 +430,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:AvatarNavigator"
         "ProductCode" = "8:{A2041D9A-DD57-4BA5-BF83-B7B30D467E57}"
-        "PackageCode" = "8:{182ACE45-AF1D-4D03-A0F0-0B4ED20C7E68}"
+        "PackageCode" = "8:{B3834493-2249-41A6-86A7-7C68628B8FD5}"
         "UpgradeCode" = "8:{523E4994-CD6F-4327-8FB2-A48C5E751F08}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
