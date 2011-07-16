@@ -34,8 +34,8 @@ ConsoleApp.exe
 ConsoleApp.ilk
 ConsoleLoop.dll
 ConsoleLoop.ilk
-cximagecrtdu.dll
-cximagecrtdu.ilk
+cximage.dll
+cximage.ilk
 db.dll
 db.ilk
 dbghelp.dll
