@@ -3,7 +3,7 @@
 PATH=%PATH%;%CD%\bin
 
 set PRODUCT_NAME=AvatarNavigator
-set DEST_FILE=AvatarNavigator.xpi
+set DEST_FILE=%PRODUCT_NAME%.xpi
 
 set WORK_DIR=%CD%
 set BASE_DIR=%WORK_DIR%\..

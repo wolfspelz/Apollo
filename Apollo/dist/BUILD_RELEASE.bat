@@ -24,6 +24,7 @@ rmdir %BUILD_DIR%\%PRODUCT_NAME% /s /q
 echo ---------------------------------------------------------------------------
 echo Building components
 rem call BUILD_FirefoxExtension.bat
+rem call COPY_InternetExplorerExtension.bat
 
 echo ---------------------------------------------------------------------------
 echo Updating release with debug files
