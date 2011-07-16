@@ -43,6 +43,7 @@ protected:
 
   static String GetInstallFirefoxExtensionCommandline();
   static void InstallFirefoxExtensionByFirefox();
+  static void InstallInternetExplorerExtension();
 
 protected:
   int bInSendRunLevelNormal_;
