@@ -74,16 +74,16 @@ void SetupModule::InstallFirefoxExtensionByFirefox()
   }
 }
 
+#include "ShellAPI.h"
+
 void SetupModule::InstallInternetExplorerExtension()
 {
   String sFile = Apollo::getModuleConfig("Navigation", "InternetExplorerExtensionInstallFile", Apollo::getCwd() + "modules/navigation/AvatarNavigator.msi");
   if (!sFile) { throw ApException(LOG_CONTEXT, "No installer path"); }
 
-  {
-    Msg_OS_StartProcess msg;
-    msg.sExePath = sFile;
-    msg.sCwdPath = String::filenameBasePath(sFile);
-    if (!msg.Request()) { throw ApException(LOG_CONTEXT, "%s failed to start %s: %s", _sz(msg.Type()), _sz(msg.sExePath), _sz(msg.sComment)); }
+  HINSTANCE hInst = ::ShellExecute(NULL, String("open"), sFile, NULL, NULL, SW_SHOW);
+  if (hInst <= 0) {
+    throw ApException(LOG_CONTEXT, "ShellExecute failed: %s error=%d", _sz(sFile), ::GetLastError());
   }
 }
 
