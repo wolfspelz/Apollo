@@ -38,7 +38,7 @@ String SetupModule::GetInstallFirefoxExtensionCommandline()
   if (!sFirefoxCmd) { sFirefoxCmd = SRegistry::GetString(HKEY_CURRENT_USER, "Software\\Classes\\FirefoxHTML\\shell\\open\\command", "", ""); }
   if (!sFirefoxCmd) { sFirefoxCmd = SRegistry::GetString(HKEY_LOCAL_MACHINE, "SOFTWARE\\Classes\\FirefoxHTML\\shell\\open\\command", "", ""); }
 
-  String sUrl = Apollo::getModuleConfig("Navigation", "FirefoxExtensionInstallUrl", "");
+  String sUrl = Apollo::getModuleConfig("Navigation", "FirefoxExtensionInstallUrl", "modules/navigation/AvatarNavigator.xpi");
   //if (!sUrl.startsWith("http:") && !sUrl.startsWith("https:")) {
   //  if (sUrl.subString(1, 1) == ":") {
   //    sUrl = "file://" + sUrl;
@@ -72,7 +72,19 @@ void SetupModule::InstallFirefoxExtensionByFirefox()
     msg.sCwdPath = String::filenameBasePath(sExe);
     if (!msg.Request()) { throw ApException(LOG_CONTEXT, "%s failed to start %s: %s", _sz(msg.Type()), _sz(msg.sExePath), _sz(msg.sComment)); }
   }
-  //::ShellExecute(NULL, _T("open"), sPath, sArgs, String::filenameBasePath(sPath), SW_SHOW);
+}
+
+void SetupModule::InstallInternetExplorerExtension()
+{
+  String sFile = Apollo::getModuleConfig("Navigation", "InternetExplorerExtensionInstallFile", Apollo::getCwd() + "modules/navigation/AvatarNavigator.msi");
+  if (!sFile) { throw ApException(LOG_CONTEXT, "No installer path"); }
+
+  {
+    Msg_OS_StartProcess msg;
+    msg.sExePath = sFile;
+    msg.sCwdPath = String::filenameBasePath(sFile);
+    if (!msg.Request()) { throw ApException(LOG_CONTEXT, "%s failed to start %s: %s", _sz(msg.Type()), _sz(msg.sExePath), _sz(msg.sComment)); }
+  }
 }
 
 //----------------------------------------------------------
@@ -169,6 +181,7 @@ AP_MSG_HANDLER_METHOD(SetupModule, WebView_ModuleCall)
       InstallFirefoxExtensionByFirefox();
 
     } else if (sMethod == "InstallInternetExplorerExtension") {
+      InstallInternetExplorerExtension();
 
     } else {
       throw ApException(LOG_CONTEXT, "Unknown Method=%s", _sz(sMethod));
