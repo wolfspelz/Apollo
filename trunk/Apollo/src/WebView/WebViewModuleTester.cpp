@@ -64,6 +64,7 @@ String WebViewModuleTester::LoadHtml()
     "  <p id=\"iLog\">--</p>\n"
     "  <img src='http://webkit.org/images/icon-gold.png' />\n"
     "  <img src='test1.png' />\n"
+    "  <input type=\"button\" value=\"Quit\" onclick=\"apollo.sendMessage('Method=MainLoop_EndLoop\\nhView=' + apollo.viewHandle + '\\n');\"/>\n"
     "  <div style=\"border: solid blue; background: white;\" contenteditable=\"true\">div with blue border</div>"
   "    <iframe id=\"iFrame\" src=\"dev-iframe.html\" frameborder=\"0\" style=\"width:250px; height:100px;\"></iframe>\n"
   //"    <iframe src='http://www.wolfspelz.de'></iframe>\n"
