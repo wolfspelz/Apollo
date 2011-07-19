@@ -38,6 +38,7 @@ cximagecrtdu.dll
 cximagecrtdu.ilk
 cximage.dll
 cximage.ilk
+CxImage.pdb
 db.dll
 db.ilk
 dbghelp.dll
@@ -85,6 +86,7 @@ test.dll
 test.ilk
 test.sqlite3
 thumbs.db
+TrayApp.pdb
 TrayIcon.dll
 TrayIcon.ilk
 TrayIcon.pdb
