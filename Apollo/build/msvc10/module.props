@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.40219.1</_ProjectFileVersion>
+    <OutDir>$(BinDir)\modules\$(ProjectName)\</OutDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <Link>
+      <OutputFile>$(BinDir)\modules\$(ProjectName)\$(ProjectName).dll</OutputFile>
+    </Link>
+    <PostBuildEvent>
+      <Command>
+      </Command>
+    </PostBuildEvent>
+    <PreBuildEvent>
+      <Message>Create "$(ProjectName)" module directory if needed</Message>
+      <Command>IF NOT EXIST $(BinDir)\modules MKDIR $(BinDir)\modules
+IF NOT EXIST $(BinDir)\modules\$(ProjectName) MKDIR $(BinDir)\modules\$(ProjectName)</Command>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+</Project>
