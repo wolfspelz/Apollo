@@ -742,13 +742,26 @@ String String::filenameBasePath(const char* szText)
 {
   String sPath = szText;
   String sPart;
-  if (sPath.reverseToken("/" 
-#if defined(WIN32)
-    "\\"
-#endif
-    , sPart)) {
-    sPath.append(szText + sPath.bytes(), ::strlen(szText) - (sPath.bytes() + sPart.bytes()));
+
+  if (sPath.endsWith("/")
+    #if defined(WIN32)
+    || sPath.endsWith("\\")
+    #endif
+    )
+  {
+      // Already is a base path
   }
+  else
+  {
+    if (sPath.reverseToken("/" 
+      #if defined(WIN32)
+      "\\"
+      #endif
+      , sPart)) {
+      sPath.append(szText + sPath.bytes(), ::strlen(szText) - (sPath.bytes() + sPart.bytes()));
+    }
+  }
+
   return sPath;
 }
 
@@ -781,15 +794,23 @@ String String::filenamePathSeparator()
   return String_FILEPATHSEPARATOR;
 }
 
-void String::makeTrailingSlash()
+String& String::makeTrailingSlash(const char* szAppend)
 {
 #if defined(WIN32)
   if (!endsWith("\\") && !endsWith("/")) {
 #else
   if (!endsWith("/")) {
 #endif
-    append(filenamePathSeparator());
+    String sAppend;
+    if (szAppend != 0) {
+      sAppend = szAppend;
+    } else {
+      sAppend = filenamePathSeparator();
+    }
+    append(sAppend);
   }
+
+  return *this;
 }
 
 String String::reverse(const char* szText)
@@ -836,6 +857,22 @@ String String::toLower(const char* szText)
     int n = UTF8_CharSize(p);
     if (n == 1) {
       *p = ::tolower(*p);
+    }
+    p += n;
+  }
+
+  return sLower;
+}
+
+String String::toUpper(const char* szText)
+{
+  String sLower = szText;
+
+  char* p = (char*) sLower.c_str();
+  while (*p != 0) {
+    int n = UTF8_CharSize(p);
+    if (n == 1) {
+      *p = ::toupper(*p);
     }
     p += n;
   }

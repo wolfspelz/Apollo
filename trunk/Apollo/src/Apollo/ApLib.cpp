@@ -892,7 +892,7 @@ int ApLib::Init(int nArgc, char** pszArgv)
 
   String sApCoreDll = "ApCore"; 
   sApCoreDll = Apollo::normalizeLibraryName(sApCoreDll);
-  sApCoreDll = Apollo::getAppLibraryPath().append(sApCoreDll);
+  sApCoreDll = Apollo::getAppLibraryPath().makeTrailingSlash().append(sApCoreDll);
   
   hCoreDll_ = Apollo::libraryLoad(sApCoreDll);
   if (hCoreDll_ == 0) {

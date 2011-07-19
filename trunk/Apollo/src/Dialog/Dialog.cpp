@@ -147,12 +147,8 @@ void Dialog::OnDocumentLoaded()
 void Dialog::OnContentLoaded(const String& sUrl)
 {
   // Poor man's canonicalize
-  String sUrl1 = String::toLower(sUrl);
-  String sUrl2 = String::toLower(sContentUrl_);
-  sUrl1.replace("\\", "/");
-  sUrl2.replace("\\", "/");
-  sUrl1.replace(":/", "/"); // file://c:/
-  sUrl2.replace(":/", "/");
+  String sUrl1 = String::toLower(Apollo::canonicalizeUrl(sUrl));
+  String sUrl2 = String::toLower(Apollo::canonicalizeUrl(sContentUrl_));
 
   if (sUrl1 == sUrl2) {
     Msg_Dialog_OnOpened msg;
