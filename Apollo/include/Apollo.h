@@ -152,6 +152,7 @@ APOLLO_API String getUserProfilePath();
 APOLLO_API void splitCommandlineArguments(const String& sCmdline, Apollo::ValueList& vlArgs);
 APOLLO_API String joinCommandlineArguments(Apollo::ValueList& vlArgs);
 
+APOLLO_API String canonicalizeUrl(const String& sUrl);
 
 
 
