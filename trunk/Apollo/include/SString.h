@@ -93,11 +93,13 @@ public:
   static String filenameBasePath(const char* szText);
   static String filenameFile(const char* szText);
   static String filenamePathSeparator();
-  void makeTrailingSlash();
+  
+  String& makeTrailingSlash(const char* szAppend = 0);
 
   static String reverse(const char* szText);
   static String truncate(const char* szText, int nLen, const char* szTail = "...");
   static String toLower(const char* szText);
+  static String toUpper(const char* szText);
   static int isDigit(const char* szText);
   static int isPunct(const char* szText);
   static String from(int n);

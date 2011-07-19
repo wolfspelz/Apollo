@@ -101,6 +101,7 @@ private:
 #endif
 
   //char* SimplifyPath(char* url);
+  static String canonicalize(const String& sUrl);
 
   void Prepare(void);
   void PrepareBase(void);
