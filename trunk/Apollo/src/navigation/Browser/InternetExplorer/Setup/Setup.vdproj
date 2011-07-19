@@ -430,7 +430,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:AvatarNavigator"
         "ProductCode" = "8:{A2041D9A-DD57-4BA5-BF83-B7B30D467E57}"
-        "PackageCode" = "8:{B3834493-2249-41A6-86A7-7C68628B8FD5}"
+        "PackageCode" = "8:{BCA06D7E-914D-465C-BB4B-49933701B524}"
         "UpgradeCode" = "8:{523E4994-CD6F-4327-8FB2-A48C5E751F08}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
