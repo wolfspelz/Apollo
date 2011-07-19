@@ -1,0 +1,273 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{FBB095A4-AE42-46cd-913E-BF0AB8BE04DC}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{01D3F3BE-0954-4e63-9DD4-6FB08DBF8295}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{A0F43DB2-E466-4b88-9BBC-95F2D1F4AC82}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="alter.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="analyze.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="attach.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="auth.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="bitvec.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="btmutex.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="btree.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="build.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="callback.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="complete.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="date.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="delete.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="expr.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="fault.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="fts3.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="fts3_hash.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="fts3_icu.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="fts3_porter.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="fts3_tokenizer.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="fts3_tokenizer1.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="func.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="hash.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="insert.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="journal.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="legacy.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="loadext.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="main.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="malloc.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="mem1.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="mem2.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="mem3.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="mem4.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="mem5.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="mutex.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="mutex_os2.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="mutex_unix.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="mutex_w32.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="opcodes.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="os.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="os_os2.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="os_unix.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="os_win.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="pager.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="parse.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="pragma.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="prepare.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="printf.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="random.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="select.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="table.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tokenize.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="trigger.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="update.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="utf.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="util.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="vacuum.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="vdbe.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="vdbeapi.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="vdbeaux.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="vdbeblob.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="vdbefifo.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="vdbemem.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="vtab.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="where.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="btree.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="btreeInt.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="fts3.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="fts3_hash.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="fts3_tokenizer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="hash.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="keywordhash.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="mutex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="opcodes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="os_common.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="pager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="parse.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sqlite3.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sqlite3ext.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sqliteInt.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sqliteLimit.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vdbe.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vdbeInt.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

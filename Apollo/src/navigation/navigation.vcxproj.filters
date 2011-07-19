@@ -1,0 +1,86 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{980625B7-1C5C-40d7-884B-99AEA90B4DBB}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{BCA9D879-6710-43ba-93E6-61A343C690E7}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{33215DF1-C4A8-4a91-8DBA-69C7B3F19712}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
+    </Filter>
+    <Filter Include="Browser">
+      <UniqueIdentifier>{6f3f9e98-5dc5-43a9-ba46-bcb6bdc50069}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Browser\Firefox">
+      <UniqueIdentifier>{06a4e540-75f6-4921-90bb-f4389ed395a9}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Context.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="navigation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="NavigationModule.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Context.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Local.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="navigation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="NavigationModule.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\bin\win32\debug\modules\navigation\config.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuildStep Include="Browser\Firefox\AvatarNavigator\chrome\chromeFiles\locale\en-US\avatarnav\avatarnav.dtd">
+      <Filter>Browser\Firefox</Filter>
+    </CustomBuildStep>
+    <CustomBuildStep Include="Browser\Firefox\AvatarNavigator\chrome\chromeFiles\content\AvatarNavigator.js">
+      <Filter>Browser\Firefox</Filter>
+    </CustomBuildStep>
+    <CustomBuildStep Include="Browser\Firefox\AvatarNavigator\chrome\chromeFiles\content\browser.js">
+      <Filter>Browser\Firefox</Filter>
+    </CustomBuildStep>
+    <CustomBuildStep Include="Browser\Firefox\AvatarNavigator\chrome\chromeFiles\content\browser.xul">
+      <Filter>Browser\Firefox</Filter>
+    </CustomBuildStep>
+    <CustomBuildStep Include="Browser\Firefox\AvatarNavigator\chrome.manifest">
+      <Filter>Browser\Firefox</Filter>
+    </CustomBuildStep>
+    <CustomBuildStep Include="Browser\Firefox\AvatarNavigator\install.rdf">
+      <Filter>Browser\Firefox</Filter>
+    </CustomBuildStep>
+    <CustomBuildStep Include="Browser\Firefox\AvatarNavigator\chrome\chromeFiles\content\Log.js">
+      <Filter>Browser\Firefox</Filter>
+    </CustomBuildStep>
+    <CustomBuildStep Include="Browser\Firefox\AvatarNavigator\defaults\preferences\settings.js">
+      <Filter>Browser\Firefox</Filter>
+    </CustomBuildStep>
+    <CustomBuildStep Include="Browser\Firefox\AvatarNavigator\chrome\chromeFiles\content\Socket.js">
+      <Filter>Browser\Firefox</Filter>
+    </CustomBuildStep>
+    <CustomBuildStep Include="Browser\Firefox\AvatarNavigator\chrome\chromeFiles\content\SrpcMessage.js">
+      <Filter>Browser\Firefox</Filter>
+    </CustomBuildStep>
+    <CustomBuildStep Include="Browser\Firefox\AvatarNavigator\chrome\chromeFiles\content\SrpcProtocol.js">
+      <Filter>Browser\Firefox</Filter>
+    </CustomBuildStep>
+  </ItemGroup>
+</Project>

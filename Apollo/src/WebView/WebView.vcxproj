@@ -1,0 +1,113 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{4AC6E41F-A2DF-44E6-A354-D29727770396}</ProjectGuid>
+    <RootNamespace>WebView</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\build\msvc10\global.props" />
+    <Import Project="..\..\build\msvc10\dll.props" />
+    <Import Project="..\..\build\msvc10\module.props" />
+    <Import Project="..\..\build\msvc10\release.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\build\msvc10\global.props" />
+    <Import Project="..\..\build\msvc10\dll.props" />
+    <Import Project="..\..\build\msvc10\module.props" />
+    <Import Project="..\..\build\msvc10\debug.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.40219.1</_ProjectFileVersion>
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Heiner\ApolloWebKitSDK\Win32\Debug\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WEBVIEW_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>Shlwapi.lib;Apollo.lib;WebKitGUID_debug.lib;WebKit_debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Heiner\ApolloWebKitSDK\Win32\Debug\lib\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <IgnoreSpecificDefaultLibraries>MSVCRT;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Heiner\ApolloWebKitSDK\Win32\Release\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WEBVIEW_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>Shlwapi.lib;Apollo.lib;WebKitGUID.lib;WebKit.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Heiner\ApolloWebKitSDK\Win32\Release\lib\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="dll.cpp" />
+    <ClCompile Include="View.cpp" />
+    <ClCompile Include="WebViewModule.cpp" />
+    <ClCompile Include="WebViewModuleTester.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="dll.h" />
+    <ClInclude Include="Local.h" />
+    <ClInclude Include="View.h" />
+    <ClInclude Include="WebViewModule.h" />
+    <ClInclude Include="WebViewModuleTester.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\bin\Win32\Debug\modules\WebView\apollo.js" />
+    <None Include="..\..\bin\Win32\Debug\modules\WebView\test\CallCustomEcho.html" />
+    <None Include="..\..\bin\Win32\Debug\modules\WebView\test\CallJSEcho.html" />
+    <None Include="..\..\bin\Win32\Debug\modules\WebView\test\CallSystemEcho.html" />
+    <None Include="..\..\bin\Win32\Debug\modules\WebView\test\dev-iframe.html" />
+    <None Include="..\..\bin\Win32\Debug\modules\WebView\test\dev.html" />
+    <None Include="..\..\bin\Win32\Debug\modules\WebView\test\FrameIO.html" />
+    <None Include="..\..\bin\Win32\Debug\modules\WebView\test\FrameIO1.html" />
+    <None Include="..\..\bin\Win32\Debug\modules\WebView\test\FrameIO2.html" />
+    <None Include="..\..\bin\Win32\Debug\modules\WebView\test\GetDomElement.html" />
+    <None Include="..\..\bin\Win32\Debug\modules\WebView\test\LoadHtml.js" />
+    <None Include="..\..\bin\Win32\Debug\modules\WebView\test\StartAutomaticallySerialized1.html" />
+    <None Include="..\..\bin\Win32\Debug\modules\WebView\test\StartAutomaticallySerialized2.html" />
+    <None Include="..\..\bin\Win32\Debug\modules\WebView\test\StartManuallySerialized1.html" />
+    <None Include="..\..\bin\Win32\Debug\modules\WebView\test\StartManuallySerialized2.html" />
+    <None Include="..\..\bin\Win32\Debug\modules\WebView\config.txt" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
