@@ -31,3 +31,4 @@ echo ---------------------------------------------------------------------------
 echo Copying result to destination
 xcopy %BUILD_DIR%\Firefox\%DEST_FILE% %DEST_DIR%\ /R /Y
 
+pause
