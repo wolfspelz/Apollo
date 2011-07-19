@@ -81,6 +81,8 @@ void URL::Prepare(void)
         proto_ = "https";
       } else if (uc.nScheme == INTERNET_SCHEME_FTP) {
         proto_ = "ftp";
+      } else if (uc.nScheme == INTERNET_SCHEME_FILE) {
+        proto_ = "file";
       } else {
         proto_ = sScheme;
       }
@@ -102,6 +104,9 @@ void URL::Prepare(void)
       } else if (uc.nScheme == INTERNET_SCHEME_FTP && uc.nPort == INTERNET_DEFAULT_FTP_PORT) {
         port_ = "";
         portnum_ = INTERNET_DEFAULT_FTP_PORT;
+      } else if (uc.nScheme == INTERNET_SCHEME_FILE) {
+        port_ = "";
+        portnum_ = -1;
       } else {
         port_.appendf(":%d", uc.nPort);
         portnum_ = uc.nPort;
@@ -110,10 +115,15 @@ void URL::Prepare(void)
       if (sUrlPath.empty() || sUrlPath == "/") {
         path_ = "/";
       } else {
-        path_ = String::filenameBasePath(sUrlPath);
+        int bIsFolder = sUrlPath.endsWith("/");
+        if (!bIsFolder && sScheme == "file") { bIsFolder = sUrlPath.endsWith("\\"); }
+        if (bIsFolder) {
+          path_ = sUrlPath;
+        } else {
+          path_ = String::filenameBasePath(sUrlPath);
+          file_ = String::filenameFile(sUrlPath);
+        }
       }
-      
-      sUrlPath.reverseToken("/", file_);
       
       arg_ = sExtraInfo;
 

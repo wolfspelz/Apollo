@@ -12,6 +12,7 @@
 #include "MsgTranslation.h"
 #include "MsgTimer.h"
 #include "MsgFile.h"
+#include "URL.h"
 
 #define LOG_CHANNEL APOLLO_NAME
 #define LOG_CONTEXT apLog_Context
@@ -792,6 +793,81 @@ String Apollo::joinCommandlineArguments(Apollo::ValueList& vlArgs)
   }
 
   return sResult;
+}
+
+String Apollo::canonicalizeUrl(const String& sUrl)
+{
+  Apollo::URL url = sUrl;
+  String sPath = url.path();
+  String sFile = url.file();
+
+  if (sFile == "." || sFile == ".."){
+    sPath += sFile;
+    sFile = "";
+  }
+
+  int bTrailingSlash = sPath.endsWith("/") || sPath.endsWith("\\");
+  sPath.trim("/\\");
+  
+  Apollo::ValueList vlSegments;
+  String sSegment;
+  while (sPath.nextToken("/\\", sSegment)) {
+    vlSegments.add(sSegment);
+  }
+
+  Apollo::ValueList vlResult;
+  for (Apollo::ValueElem* e = 0; (e = vlSegments.nextElem(e)) != 0; ) {
+    if (e->getString() == ".") {
+      // Skip
+    } else if (e->getString() == "..") {
+      // Remove previous segment
+      int nMinSegements = 0;
+      if (url.protocol() == "file") { nMinSegements = 1; }
+      if (vlResult.length() > nMinSegements) {
+        vlResult.deleteElem(vlResult.elemAtIndex(vlResult.length() - 1));
+      }
+    } else {
+      vlResult.add(e->getString());
+    }
+  }
+
+  sPath = "";
+  if (url.protocol() == "file") {
+    for (Apollo::ValueElem* e = 0; (e = vlResult.nextElem(e)) != 0; ) {
+      if (sPath) { sPath += String::filenamePathSeparator(); }
+      int bDriveLetter = 0;
+      #if defined(WIN32)
+      if (sPath.empty()) {
+        if (e->getString().chars() == 1) {
+          bDriveLetter = 1;
+        }
+      }
+      #endif
+      if (bDriveLetter) {
+        sPath += String::toUpper(e->getString());
+        sPath += ":";
+      } else {
+        sPath += e->getString();
+      }
+    }
+    if (bTrailingSlash) { sPath += String::filenamePathSeparator(); }
+  } else {
+    for (Apollo::ValueElem* e = 0; (e = vlResult.nextElem(e)) != 0; ) {
+      sPath += "/";
+      sPath += e->getString();
+    }
+    if (bTrailingSlash) { sPath += "/"; }
+    if (sPath == "") { sPath = "/"; }
+  }
+
+  String sOut;
+  if (url.protocol() == "http" || url.protocol() == "https") {
+    sOut.appendf("%s://%s%s%s%s%s", _sz(url.protocol()), _sz(url.host()), _sz(url.port()), _sz(sPath), _sz(sFile), _sz(url.args()));
+  } else {
+    sOut.appendf("%s://%s%s", _sz(url.protocol()), _sz(sPath), _sz(sFile));
+  }
+
+  return sOut;
 }
 
 // --------------------------------

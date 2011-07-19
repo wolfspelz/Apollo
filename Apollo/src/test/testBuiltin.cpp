@@ -844,47 +844,47 @@ String Test_String_Filename()
 {
   String err;
 
-  if (!err) { err = Test_String_FilenameBasePath_One (String::from(__LINE__), "abc.", ""); }
-  if (!err) { err = Test_String_FilenameBasePath_One (String::from(__LINE__), "abc.xyz", ""); }
-  if (!err) { err = Test_String_FilenameBasePath_One (String::from(__LINE__), "/abc.xyz", "/"); }
-  if (!err) { err = Test_String_FilenameBasePath_One (String::from(__LINE__), "dir/abc.xyz", "dir/"); }
-  if (!err) { err = Test_String_FilenameBasePath_One (String::from(__LINE__), "C:\\dir1\\dir2/dir3\\abc.xyz", 
+  if (!err) { err = Test_String_FilenameBasePath_One(String::from(__LINE__), "abc.", ""); }
+  if (!err) { err = Test_String_FilenameBasePath_One(String::from(__LINE__), "abc.xyz", ""); }
+  if (!err) { err = Test_String_FilenameBasePath_One(String::from(__LINE__), "/abc.xyz", "/"); }
+  if (!err) { err = Test_String_FilenameBasePath_One(String::from(__LINE__), "dir/abc.xyz", "dir/"); }
+  if (!err) { err = Test_String_FilenameBasePath_One(String::from(__LINE__), "C:\\dir1\\dir2/dir3\\abc.xyz", 
 #if defined(WIN32)
   "C:\\dir1\\dir2/dir3\\"
 #else
   "C:\\dir1\\dir2/"
 #endif
   ); }
-  if (!err) { err = Test_String_FilenameBasePath_One (String::from(__LINE__), "C:\\dir1\\dir2/dir3/abc.xyz", "C:\\dir1\\dir2/dir3/"); }
-  if (!err) { err = Test_String_FilenameBasePath_One (String::from(__LINE__), "http://www.bluehands.de/dir1/dir3/abc.gif", "http://www.bluehands.de/dir1/dir3/"); }
-  if (!err) { err = Test_String_FilenameBasePath_One (String::from(__LINE__), "\xE9\xA6\x96" "b" "\xC3\xA4" "." "\xC3\xB6" "y" "\xE9\xA0\x81", ""); }
-  if (!err) { err = Test_String_FilenameBasePath_One (String::from(__LINE__), "/" "\xE9\xA6\x96" "b" "\xC3\xA4" "." "\xC3\xB6" "y" "\xE9\xA0\x81", "/"); }
-  if (!err) { err = Test_String_FilenameBasePath_One (String::from(__LINE__), "dir/" "\xE9\xA6\x96" "b" "\xC3\xA4" "." "\xC3\xB6" "y" "\xE9\xA0\x81", "dir/"); }
-  if (!err) { err = Test_String_FilenameBasePath_One (String::from(__LINE__), "C:\\dir1\\dir2/dir3\\" "\xE9\xA6\x96" "b" "\xC3\xA4" "." "\xC3\xB6" "y" "\xE9\xA0\x81", 
+  if (!err) { err = Test_String_FilenameBasePath_One(String::from(__LINE__), "C:\\dir1\\dir2/dir3/abc.xyz", "C:\\dir1\\dir2/dir3/"); }
+  if (!err) { err = Test_String_FilenameBasePath_One(String::from(__LINE__), "http://www.bluehands.de/dir1/dir3/abc.gif", "http://www.bluehands.de/dir1/dir3/"); }
+  if (!err) { err = Test_String_FilenameBasePath_One(String::from(__LINE__), "\xE9\xA6\x96" "b" "\xC3\xA4" "." "\xC3\xB6" "y" "\xE9\xA0\x81", ""); }
+  if (!err) { err = Test_String_FilenameBasePath_One(String::from(__LINE__), "/" "\xE9\xA6\x96" "b" "\xC3\xA4" "." "\xC3\xB6" "y" "\xE9\xA0\x81", "/"); }
+  if (!err) { err = Test_String_FilenameBasePath_One(String::from(__LINE__), "dir/" "\xE9\xA6\x96" "b" "\xC3\xA4" "." "\xC3\xB6" "y" "\xE9\xA0\x81", "dir/"); }
+  if (!err) { err = Test_String_FilenameBasePath_One(String::from(__LINE__), "C:\\dir1\\dir2/dir3\\" "\xE9\xA6\x96" "b" "\xC3\xA4" "." "\xC3\xB6" "y" "\xE9\xA0\x81", 
 #if defined(WIN32)
   "C:\\dir1\\dir2/dir3\\"
 #else
   "C:\\dir1\\dir2/"
 #endif
   ); }
-  if (!err) { err = Test_String_FilenameBasePath_One (String::from(__LINE__), "C:\\dir1\\dir2/dir3/" "\xE9\xA6\x96" "b" "\xC3\xA4" "." "\xC3\xB6" "y" "\xE9\xA0\x81", "C:\\dir1\\dir2/dir3/"); }
-  if (!err) { err = Test_String_FilenameBasePath_One (String::from(__LINE__), "http://www.bluehands.de/dir1/dir3/" "\xE9\xA6\x96" "b" "\xC3\xA4" "." "g" "i" "f", "http://www.bluehands.de/dir1/dir3/"); }
+  if (!err) { err = Test_String_FilenameBasePath_One(String::from(__LINE__), "C:\\dir1\\dir2/dir3/" "\xE9\xA6\x96" "b" "\xC3\xA4" "." "\xC3\xB6" "y" "\xE9\xA0\x81", "C:\\dir1\\dir2/dir3/"); }
+  if (!err) { err = Test_String_FilenameBasePath_One(String::from(__LINE__), "http://www.bluehands.de/dir1/dir3/" "\xE9\xA6\x96" "b" "\xC3\xA4" "." "g" "i" "f", "http://www.bluehands.de/dir1/dir3/"); }
 
 //----
 
-  if (!err) { err = Test_String_FilenameFile_One (String::from(__LINE__), "abc.", "abc."); }
-  if (!err) { err = Test_String_FilenameFile_One (String::from(__LINE__), "abc.xyz", "abc.xyz"); }
-  if (!err) { err = Test_String_FilenameFile_One (String::from(__LINE__), "/abc.xyz", "abc.xyz"); }
-  if (!err) { err = Test_String_FilenameFile_One (String::from(__LINE__), "dir/abc.xyz", "abc.xyz"); }
-  if (!err) { err = Test_String_FilenameFile_One (String::from(__LINE__), "C:\\dir1\\dir2/dir3\\abc.xyz", "abc.xyz"); }
-  if (!err) { err = Test_String_FilenameFile_One (String::from(__LINE__), "C:\\dir1\\dir2/dir3/abc.xyz", "abc.xyz"); }
-  if (!err) { err = Test_String_FilenameFile_One (String::from(__LINE__), "http://www.bluehands.de/dir1/dir3/abc.gif", "abc.gif"); }
-  if (!err) { err = Test_String_FilenameFile_One (String::from(__LINE__), "\xE9\xA6\x96" "b" "\xC3\xA4" "." "\xC3\xB6" "y" "\xE9\xA0\x81", "\xE9\xA6\x96" "b" "\xC3\xA4" "." "\xC3\xB6" "y" "\xE9\xA0\x81"); }
-  if (!err) { err = Test_String_FilenameFile_One (String::from(__LINE__), "/" "\xE9\xA6\x96" "b" "\xC3\xA4" "." "\xC3\xB6" "y" "\xE9\xA0\x81", "\xE9\xA6\x96" "b" "\xC3\xA4" "." "\xC3\xB6" "y" "\xE9\xA0\x81"); }
-  if (!err) { err = Test_String_FilenameFile_One (String::from(__LINE__), "dir/" "\xE9\xA6\x96" "b" "\xC3\xA4" "." "\xC3\xB6" "y" "\xE9\xA0\x81", "\xE9\xA6\x96" "b" "\xC3\xA4" "." "\xC3\xB6" "y" "\xE9\xA0\x81"); }
-  if (!err) { err = Test_String_FilenameFile_One (String::from(__LINE__), "C:\\dir1\\dir2/dir3\\" "\xE9\xA6\x96" "b" "\xC3\xA4" "." "\xC3\xB6" "y" "\xE9\xA0\x81", "\xE9\xA6\x96" "b" "\xC3\xA4" "." "\xC3\xB6" "y" "\xE9\xA0\x81"); }
-  if (!err) { err = Test_String_FilenameFile_One (String::from(__LINE__), "C:\\dir1\\dir2/dir3/" "\xE9\xA6\x96" "b" "\xC3\xA4" "." "\xC3\xB6" "y" "\xE9\xA0\x81", "\xE9\xA6\x96" "b" "\xC3\xA4" "." "\xC3\xB6" "y" "\xE9\xA0\x81"); }
-  if (!err) { err = Test_String_FilenameFile_One (String::from(__LINE__), "http://www.bluehands.de/dir1/dir3/" "\xE9\xA6\x96" "b" "\xC3\xA4" "." "g" "i" "f", "\xE9\xA6\x96" "b" "\xC3\xA4" "." "g" "i" "f"); }
+  if (!err) { err = Test_String_FilenameFile_One(String::from(__LINE__), "abc.", "abc."); }
+  if (!err) { err = Test_String_FilenameFile_One(String::from(__LINE__), "abc.xyz", "abc.xyz"); }
+  if (!err) { err = Test_String_FilenameFile_One(String::from(__LINE__), "/abc.xyz", "abc.xyz"); }
+  if (!err) { err = Test_String_FilenameFile_One(String::from(__LINE__), "dir/abc.xyz", "abc.xyz"); }
+  if (!err) { err = Test_String_FilenameFile_One(String::from(__LINE__), "C:\\dir1\\dir2/dir3\\abc.xyz", "abc.xyz"); }
+  if (!err) { err = Test_String_FilenameFile_One(String::from(__LINE__), "C:\\dir1\\dir2/dir3/abc.xyz", "abc.xyz"); }
+  if (!err) { err = Test_String_FilenameFile_One(String::from(__LINE__), "http://www.bluehands.de/dir1/dir3/abc.gif", "abc.gif"); }
+  if (!err) { err = Test_String_FilenameFile_One(String::from(__LINE__), "\xE9\xA6\x96" "b" "\xC3\xA4" "." "\xC3\xB6" "y" "\xE9\xA0\x81", "\xE9\xA6\x96" "b" "\xC3\xA4" "." "\xC3\xB6" "y" "\xE9\xA0\x81"); }
+  if (!err) { err = Test_String_FilenameFile_One(String::from(__LINE__), "/" "\xE9\xA6\x96" "b" "\xC3\xA4" "." "\xC3\xB6" "y" "\xE9\xA0\x81", "\xE9\xA6\x96" "b" "\xC3\xA4" "." "\xC3\xB6" "y" "\xE9\xA0\x81"); }
+  if (!err) { err = Test_String_FilenameFile_One(String::from(__LINE__), "dir/" "\xE9\xA6\x96" "b" "\xC3\xA4" "." "\xC3\xB6" "y" "\xE9\xA0\x81", "\xE9\xA6\x96" "b" "\xC3\xA4" "." "\xC3\xB6" "y" "\xE9\xA0\x81"); }
+  if (!err) { err = Test_String_FilenameFile_One(String::from(__LINE__), "C:\\dir1\\dir2/dir3\\" "\xE9\xA6\x96" "b" "\xC3\xA4" "." "\xC3\xB6" "y" "\xE9\xA0\x81", "\xE9\xA6\x96" "b" "\xC3\xA4" "." "\xC3\xB6" "y" "\xE9\xA0\x81"); }
+  if (!err) { err = Test_String_FilenameFile_One(String::from(__LINE__), "C:\\dir1\\dir2/dir3/" "\xE9\xA6\x96" "b" "\xC3\xA4" "." "\xC3\xB6" "y" "\xE9\xA0\x81", "\xE9\xA6\x96" "b" "\xC3\xA4" "." "\xC3\xB6" "y" "\xE9\xA0\x81"); }
+  if (!err) { err = Test_String_FilenameFile_One(String::from(__LINE__), "http://www.bluehands.de/dir1/dir3/" "\xE9\xA6\x96" "b" "\xC3\xA4" "." "g" "i" "f", "\xE9\xA6\x96" "b" "\xC3\xA4" "." "g" "i" "f"); }
 
 //----
 
@@ -2648,6 +2648,171 @@ String Test_Apollo_joinCommandlineArguments()
   return s;
 }
 
+String Apollo_canonicalizeUrl(const String& sUrl)
+{
+  Apollo::URL url = sUrl;
+  String sPath = url.path();
+  String sFile = url.file();
+
+  if (sFile == "." || sFile == ".."){
+    sPath += sFile;
+    sFile = "";
+  }
+
+  int bTrailingSlash = sPath.endsWith("/") || sPath.endsWith("\\");
+  sPath.trim("/\\");
+  
+  Apollo::ValueList vlSegments;
+  String sSegment;
+  while (sPath.nextToken("/\\", sSegment)) {
+    vlSegments.add(sSegment);
+  }
+
+  Apollo::ValueList vlResult;
+  for (Apollo::ValueElem* e = 0; (e = vlSegments.nextElem(e)) != 0; ) {
+    if (e->getString() == ".") {
+      // Skip
+    } else if (e->getString() == "..") {
+      // Remove previous segment
+      int nMinSegements = 0;
+      if (url.protocol() == "file") { nMinSegements = 1; }
+      if (vlResult.length() > nMinSegements) {
+        vlResult.deleteElem(vlResult.elemAtIndex(vlResult.length() - 1));
+      }
+    } else {
+      vlResult.add(e->getString());
+    }
+  }
+
+  sPath = "";
+  if (url.protocol() == "file") {
+    for (Apollo::ValueElem* e = 0; (e = vlResult.nextElem(e)) != 0; ) {
+      if (sPath) { sPath += String::filenamePathSeparator(); }
+      int bDriveLetter = 0;
+      #if defined(WIN32)
+      if (sPath.empty()) {
+        if (e->getString().chars() == 1) {
+          bDriveLetter = 1;
+        }
+      }
+      #endif
+      if (bDriveLetter) {
+        sPath += String::toUpper(e->getString());
+        sPath += ":";
+      } else {
+        sPath += e->getString();
+      }
+    }
+    if (bTrailingSlash) { sPath += String::filenamePathSeparator(); }
+  } else {
+    for (Apollo::ValueElem* e = 0; (e = vlResult.nextElem(e)) != 0; ) {
+      sPath += "/";
+      sPath += e->getString();
+    }
+    if (bTrailingSlash) { sPath += "/"; }
+    if (sPath == "") { sPath = "/"; }
+  }
+
+  String sOut;
+  if (url.protocol() == "http" || url.protocol() == "https") {
+    sOut.appendf("%s://%s%s%s%s%s", _sz(url.protocol()), _sz(url.host()), _sz(url.port()), _sz(sPath), _sz(sFile), _sz(url.args()));
+  } else {
+    sOut.appendf("%s://%s%s", _sz(url.protocol()), _sz(sPath), _sz(sFile));
+  }
+
+  return sOut;
+}
+
+static String Test_Apollo_canonicalizeUrl1(const String& sInput, const String& sExpected)
+{
+  String s;
+  String sOutput = Apollo::canonicalizeUrl(sInput);
+  if (sOutput != sExpected) {
+    s.appendf("in=%s out=%s expected=%s", _sz(sInput), _sz(sOutput), _sz(sExpected));
+  }
+  return s;
+}
+
+static String Test_Apollo_canonicalizeUrl()
+{
+  String s;
+
+  // http URL prototype
+  if (!s) { s = Test_Apollo_canonicalizeUrl1("http://www.domain.com:80/path1/./path2/../file.php?a=1&b=2/3", "http://www.domain.com/path1/file.php?a=1&b=2/3"); }
+
+  // file URLs
+  if (!s) { s = Test_Apollo_canonicalizeUrl1("file://C:\\path1\\.\\path2\\..\\file.html", "file://C:\\path1\\file.html"); }
+  if (!s) { s = Test_Apollo_canonicalizeUrl1("file://C:\\..\\path1\\.\\path2\\file.html", "file://C:\\path1\\path2\\file.html"); }
+  if (!s) { s = Test_Apollo_canonicalizeUrl1("file://C:\\Heiner\\Apollo10\\src\\Win32App\\..\\..\\bin\\Win32\\Debug\\modules\\Dialog\\test/GenerateOpenedEvent.html", "file://C:\\Heiner\\Apollo10\\bin\\Win32\\Debug\\modules\\Dialog\\test\\GenerateOpenedEvent.html"); }
+  if (!s) { s = Test_Apollo_canonicalizeUrl1("file://C/Heiner/Apollo10/bin/Win32/Debug/modules/Dialog/test/GenerateOpenedEvent.html", "file://C:\\Heiner\\Apollo10\\bin\\Win32\\Debug\\modules\\Dialog\\test\\GenerateOpenedEvent.html"); }
+
+  if (!s) { s = Test_Apollo_canonicalizeUrl1("http://www.domain.com/./", "http://www.domain.com/"); }
+  if (!s) { s = Test_Apollo_canonicalizeUrl1("http://www.domain.com/../..", "http://www.domain.com/"); }
+  if (!s) { s = Test_Apollo_canonicalizeUrl1("http://www.domain.com/../../", "http://www.domain.com/"); }
+  if (!s) { s = Test_Apollo_canonicalizeUrl1("http://www.domain.com/../../fred", "http://www.domain.com/fred"); }
+  if (!s) { s = Test_Apollo_canonicalizeUrl1("http://www.domain.com/../../fred/", "http://www.domain.com/fred/"); }
+  if (!s) { s = Test_Apollo_canonicalizeUrl1("http://www.domain.com/etc/junk/../fred/", "http://www.domain.com/etc/fred/"); }
+  if (!s) { s = Test_Apollo_canonicalizeUrl1("http://www.domain.com/etc/junk/../fred/", "http://www.domain.com/etc/fred/"); }
+  if (!s) { s = Test_Apollo_canonicalizeUrl1("http://www.domain.com/etc//junk/../fred/", "http://www.domain.com/etc/fred/"); }
+  if (!s) { s = Test_Apollo_canonicalizeUrl1("http://www.domain.com/etc/junk/./fred/", "http://www.domain.com/etc/junk/fred/"); }
+  if (!s) { s = Test_Apollo_canonicalizeUrl1("http://www.domain.com/fred/..", "http://www.domain.com/"); }
+  if (!s) { s = Test_Apollo_canonicalizeUrl1("http://www.domain.com/fred/../", "http://www.domain.com/"); }
+  if (!s) { s = Test_Apollo_canonicalizeUrl1("http://www.domain.com/fred/././..", "http://www.domain.com/"); }
+  if (!s) { s = Test_Apollo_canonicalizeUrl1("http://www.domain.com/fred/././../", "http://www.domain.com/"); }
+  if (!s) { s = Test_Apollo_canonicalizeUrl1("http://www.domain.com/fred/.././junk/.././", "http://www.domain.com/"); }
+  if (!s) { s = Test_Apollo_canonicalizeUrl1("http://www.domain.com/fred/.././junk/../.", "http://www.domain.com/"); }
+
+  if (!s) { s = Test_Apollo_canonicalizeUrl1("http://www.domain.com/./?a=1&b=2/3", "http://www.domain.com/?a=1&b=2/3"); }
+  if (!s) { s = Test_Apollo_canonicalizeUrl1("http://www.domain.com/../..?a=1&b=2/3", "http://www.domain.com/?a=1&b=2/3"); }
+  if (!s) { s = Test_Apollo_canonicalizeUrl1("http://www.domain.com/../../?a=1&b=2/3", "http://www.domain.com/?a=1&b=2/3"); }
+  if (!s) { s = Test_Apollo_canonicalizeUrl1("http://www.domain.com/../../fred?a=1&b=2/3", "http://www.domain.com/fred?a=1&b=2/3"); }
+  if (!s) { s = Test_Apollo_canonicalizeUrl1("http://www.domain.com/../../fred/?a=1&b=2/3", "http://www.domain.com/fred/?a=1&b=2/3"); }
+  if (!s) { s = Test_Apollo_canonicalizeUrl1("http://www.domain.com/etc/junk/../fred/?a=1&b=2/3", "http://www.domain.com/etc/fred/?a=1&b=2/3"); }
+  if (!s) { s = Test_Apollo_canonicalizeUrl1("http://www.domain.com/etc/junk/../fred/?a=1&b=2/3", "http://www.domain.com/etc/fred/?a=1&b=2/3"); }
+  if (!s) { s = Test_Apollo_canonicalizeUrl1("http://www.domain.com/etc//junk/../fred/?a=1&b=2/3", "http://www.domain.com/etc/fred/?a=1&b=2/3"); }
+  if (!s) { s = Test_Apollo_canonicalizeUrl1("http://www.domain.com/etc/junk/./fred/?a=1&b=2/3", "http://www.domain.com/etc/junk/fred/?a=1&b=2/3"); }
+  if (!s) { s = Test_Apollo_canonicalizeUrl1("http://www.domain.com/fred/..?a=1&b=2/3", "http://www.domain.com/?a=1&b=2/3"); }
+  if (!s) { s = Test_Apollo_canonicalizeUrl1("http://www.domain.com/fred/../?a=1&b=2/3", "http://www.domain.com/?a=1&b=2/3"); }
+  if (!s) { s = Test_Apollo_canonicalizeUrl1("http://www.domain.com/fred/././..?a=1&b=2/3", "http://www.domain.com/?a=1&b=2/3"); }
+  if (!s) { s = Test_Apollo_canonicalizeUrl1("http://www.domain.com/fred/././../?a=1&b=2/3", "http://www.domain.com/?a=1&b=2/3"); }
+  if (!s) { s = Test_Apollo_canonicalizeUrl1("http://www.domain.com/fred/.././junk/.././?a=1&b=2/3", "http://www.domain.com/?a=1&b=2/3"); }
+  if (!s) { s = Test_Apollo_canonicalizeUrl1("http://www.domain.com/fred/.././junk/../.?a=1&b=2/3", "http://www.domain.com/?a=1&b=2/3"); }
+
+  if (!s) { s = Test_Apollo_canonicalizeUrl1("http://www.domain.com:1080/./?a=1&b=2/3", "http://www.domain.com:1080/?a=1&b=2/3"); }
+  if (!s) { s = Test_Apollo_canonicalizeUrl1("http://www.domain.com:1080/../..?a=1&b=2/3", "http://www.domain.com:1080/?a=1&b=2/3"); }
+  if (!s) { s = Test_Apollo_canonicalizeUrl1("http://www.domain.com:1080/../../?a=1&b=2/3", "http://www.domain.com:1080/?a=1&b=2/3"); }
+  if (!s) { s = Test_Apollo_canonicalizeUrl1("http://www.domain.com:1080/../../fred?a=1&b=2/3", "http://www.domain.com:1080/fred?a=1&b=2/3"); }
+  if (!s) { s = Test_Apollo_canonicalizeUrl1("http://www.domain.com:1080/../../fred/?a=1&b=2/3", "http://www.domain.com:1080/fred/?a=1&b=2/3"); }
+  if (!s) { s = Test_Apollo_canonicalizeUrl1("http://www.domain.com:1080/etc/junk/../fred/?a=1&b=2/3", "http://www.domain.com:1080/etc/fred/?a=1&b=2/3"); }
+  if (!s) { s = Test_Apollo_canonicalizeUrl1("http://www.domain.com:1080/etc/junk/../fred/?a=1&b=2/3", "http://www.domain.com:1080/etc/fred/?a=1&b=2/3"); }
+  if (!s) { s = Test_Apollo_canonicalizeUrl1("http://www.domain.com:1080/etc//junk/../fred/?a=1&b=2/3", "http://www.domain.com:1080/etc/fred/?a=1&b=2/3"); }
+  if (!s) { s = Test_Apollo_canonicalizeUrl1("http://www.domain.com:1080/etc/junk/./fred/?a=1&b=2/3", "http://www.domain.com:1080/etc/junk/fred/?a=1&b=2/3"); }
+  if (!s) { s = Test_Apollo_canonicalizeUrl1("http://www.domain.com:1080/fred/..?a=1&b=2/3", "http://www.domain.com:1080/?a=1&b=2/3"); }
+  if (!s) { s = Test_Apollo_canonicalizeUrl1("http://www.domain.com:1080/fred/../?a=1&b=2/3", "http://www.domain.com:1080/?a=1&b=2/3"); }
+  if (!s) { s = Test_Apollo_canonicalizeUrl1("http://www.domain.com:1080/fred/././..?a=1&b=2/3", "http://www.domain.com:1080/?a=1&b=2/3"); }
+  if (!s) { s = Test_Apollo_canonicalizeUrl1("http://www.domain.com:1080/fred/././../?a=1&b=2/3", "http://www.domain.com:1080/?a=1&b=2/3"); }
+  if (!s) { s = Test_Apollo_canonicalizeUrl1("http://www.domain.com:1080/fred/.././junk/.././?a=1&b=2/3", "http://www.domain.com:1080/?a=1&b=2/3"); }
+  if (!s) { s = Test_Apollo_canonicalizeUrl1("http://www.domain.com:1080/fred/.././junk/../.?a=1&b=2/3", "http://www.domain.com:1080/?a=1&b=2/3"); }
+
+  if (!s) { s = Test_Apollo_canonicalizeUrl1("http://www.domain.com:80/./?a=1&b=2/3", "http://www.domain.com/?a=1&b=2/3"); }
+  if (!s) { s = Test_Apollo_canonicalizeUrl1("http://www.domain.com:80/../..?a=1&b=2/3", "http://www.domain.com/?a=1&b=2/3"); }
+  if (!s) { s = Test_Apollo_canonicalizeUrl1("http://www.domain.com:80/../../?a=1&b=2/3", "http://www.domain.com/?a=1&b=2/3"); }
+  if (!s) { s = Test_Apollo_canonicalizeUrl1("http://www.domain.com:80/../../fred?a=1&b=2/3", "http://www.domain.com/fred?a=1&b=2/3"); }
+  if (!s) { s = Test_Apollo_canonicalizeUrl1("http://www.domain.com:80/../../fred/?a=1&b=2/3", "http://www.domain.com/fred/?a=1&b=2/3"); }
+  if (!s) { s = Test_Apollo_canonicalizeUrl1("http://www.domain.com:80/etc/junk/../fred/?a=1&b=2/3", "http://www.domain.com/etc/fred/?a=1&b=2/3"); }
+  if (!s) { s = Test_Apollo_canonicalizeUrl1("http://www.domain.com:80/etc/junk/../fred/?a=1&b=2/3", "http://www.domain.com/etc/fred/?a=1&b=2/3"); }
+  if (!s) { s = Test_Apollo_canonicalizeUrl1("http://www.domain.com:80/etc//junk/../fred/?a=1&b=2/3", "http://www.domain.com/etc/fred/?a=1&b=2/3"); }
+  if (!s) { s = Test_Apollo_canonicalizeUrl1("http://www.domain.com:80/etc/junk/./fred/?a=1&b=2/3", "http://www.domain.com/etc/junk/fred/?a=1&b=2/3"); }
+  if (!s) { s = Test_Apollo_canonicalizeUrl1("http://www.domain.com:80/fred/..?a=1&b=2/3", "http://www.domain.com/?a=1&b=2/3"); }
+  if (!s) { s = Test_Apollo_canonicalizeUrl1("http://www.domain.com:80/fred/../?a=1&b=2/3", "http://www.domain.com/?a=1&b=2/3"); }
+  if (!s) { s = Test_Apollo_canonicalizeUrl1("http://www.domain.com:80/fred/././..?a=1&b=2/3", "http://www.domain.com/?a=1&b=2/3"); }
+  if (!s) { s = Test_Apollo_canonicalizeUrl1("http://www.domain.com:80/fred/././../?a=1&b=2/3", "http://www.domain.com/?a=1&b=2/3"); }
+  if (!s) { s = Test_Apollo_canonicalizeUrl1("http://www.domain.com:80/fred/.././junk/.././?a=1&b=2/3", "http://www.domain.com/?a=1&b=2/3"); }
+  if (!s) { s = Test_Apollo_canonicalizeUrl1("http://www.domain.com:80/fred/.././junk/../.?a=1&b=2/3", "http://www.domain.com/?a=1&b=2/3"); }
+
+  return s;
+}
+
 #endif // AP_TEST_Lib
 
 //----------------------------------------------------------
@@ -2768,6 +2933,7 @@ void Test_Builtin_Register()
 #if defined(AP_TEST_Lib)
   AP_UNITTEST_REGISTER(Test_Apollo_splitCommandlineArguments);
   AP_UNITTEST_REGISTER(Test_Apollo_joinCommandlineArguments);
+  AP_UNITTEST_REGISTER(Test_Apollo_canonicalizeUrl);
 #endif // AP_TEST_Lib
 }
 
@@ -2887,5 +3053,6 @@ void Test_Builtin_Execute()
 #if defined(AP_TEST_Lib)
   AP_UNITTEST_EXECUTE(Test_Apollo_splitCommandlineArguments);
   AP_UNITTEST_EXECUTE(Test_Apollo_joinCommandlineArguments);
+  AP_UNITTEST_EXECUTE(Test_Apollo_canonicalizeUrl);
 #endif // AP_TEST_Lib
 }
