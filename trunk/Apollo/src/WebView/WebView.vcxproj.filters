@@ -1,0 +1,99 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{3310C060-F3C7-4623-B9E9-E8468B07DAF9}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{52D90B4D-6A02-429d-AD6E-0151273E5B70}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{7A559A34-CD76-49a8-A212-11216CC3CC9F}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
+    </Filter>
+    <Filter Include="HTML">
+      <UniqueIdentifier>{f74e6737-ef09-4060-92be-127483127bb0}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="dll.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="View.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WebViewModule.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WebViewModuleTester.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="dll.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Local.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="View.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WebViewModule.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WebViewModuleTester.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\bin\Win32\Debug\modules\WebView\apollo.js">
+      <Filter>HTML</Filter>
+    </None>
+    <None Include="..\..\bin\Win32\Debug\modules\WebView\test\CallCustomEcho.html">
+      <Filter>HTML</Filter>
+    </None>
+    <None Include="..\..\bin\Win32\Debug\modules\WebView\test\CallJSEcho.html">
+      <Filter>HTML</Filter>
+    </None>
+    <None Include="..\..\bin\Win32\Debug\modules\WebView\test\CallSystemEcho.html">
+      <Filter>HTML</Filter>
+    </None>
+    <None Include="..\..\bin\Win32\Debug\modules\WebView\test\dev-iframe.html">
+      <Filter>HTML</Filter>
+    </None>
+    <None Include="..\..\bin\Win32\Debug\modules\WebView\test\dev.html">
+      <Filter>HTML</Filter>
+    </None>
+    <None Include="..\..\bin\Win32\Debug\modules\WebView\test\FrameIO.html">
+      <Filter>HTML</Filter>
+    </None>
+    <None Include="..\..\bin\Win32\Debug\modules\WebView\test\FrameIO1.html">
+      <Filter>HTML</Filter>
+    </None>
+    <None Include="..\..\bin\Win32\Debug\modules\WebView\test\FrameIO2.html">
+      <Filter>HTML</Filter>
+    </None>
+    <None Include="..\..\bin\Win32\Debug\modules\WebView\test\GetDomElement.html">
+      <Filter>HTML</Filter>
+    </None>
+    <None Include="..\..\bin\Win32\Debug\modules\WebView\test\LoadHtml.js">
+      <Filter>HTML</Filter>
+    </None>
+    <None Include="..\..\bin\Win32\Debug\modules\WebView\test\StartAutomaticallySerialized1.html">
+      <Filter>HTML</Filter>
+    </None>
+    <None Include="..\..\bin\Win32\Debug\modules\WebView\test\StartAutomaticallySerialized2.html">
+      <Filter>HTML</Filter>
+    </None>
+    <None Include="..\..\bin\Win32\Debug\modules\WebView\test\StartManuallySerialized1.html">
+      <Filter>HTML</Filter>
+    </None>
+    <None Include="..\..\bin\Win32\Debug\modules\WebView\test\StartManuallySerialized2.html">
+      <Filter>HTML</Filter>
+    </None>
+    <None Include="..\..\bin\Win32\Debug\modules\WebView\config.txt" />
+  </ItemGroup>
+</Project>

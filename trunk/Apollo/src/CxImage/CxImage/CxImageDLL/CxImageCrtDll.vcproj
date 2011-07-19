@@ -72,13 +72,12 @@
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
-				Name="VCLinkerTool"
-				OutputFile="../../../../bin/Win32/Debug/cximagecrtdu.dll"
+				Name="VCLinkerTool" OutputFile="../../../../bin/Win32/Debug/cximage.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile=".\Debug/cximagecrtdu.pdb"
-				ImportLibrary="../../../../lib/Win32/Debug/cximagecrtdu.lib"
+				ProgramDatabaseFile=".\Debug/cximage.pdb"
+				ImportLibrary="../../../../lib/Win32/Debug/cximage.lib"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -169,11 +168,11 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="../../../../bin/Win32/Release/cximagecrtu.dll"
+				OutputFile="../../../../bin/Win32/Release/cximage.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				ProgramDatabaseFile=".\Release/cximagecrtu.pdb"
-				ImportLibrary="../../../../lib/Win32/Release/cximagecrtu.lib"
+				ProgramDatabaseFile=".\Release/cximage.pdb"
+				ImportLibrary="../../../../lib/Win32/Release/cximage.lib"
 				TargetMachine="1"
 			/>
 			<Tool

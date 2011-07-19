@@ -1,0 +1,125 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{76771031-6587-4AC7-B24B-AC8A4769496F}</ProjectGuid>
+    <RootNamespace>ApCore</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\build\msvc10\global.props" />
+    <Import Project="..\..\build\msvc10\dll.props" />
+    <Import Project="..\..\build\msvc10\release.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\build\msvc10\global.props" />
+    <Import Project="..\..\build\msvc10\dll.props" />
+    <Import Project="..\..\build\msvc10\debug.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.40219.1</_ProjectFileVersion>
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>APCORE_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>Apollo.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>APCORE_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>expat.lib;pcre.lib;sha1.lib;WinInet.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="ApCore.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ApCore.h" />
+    <ClInclude Include="..\..\include\ApCompiler.h" />
+    <ClInclude Include="..\..\include\ApContainer.h" />
+    <ClInclude Include="..\..\include\ApExports.h" />
+    <ClInclude Include="..\..\include\ApLog.h" />
+    <ClInclude Include="..\..\include\ApMessage.h" />
+    <ClInclude Include="..\..\include\ApModule.h" />
+    <ClInclude Include="..\..\include\Apollo.h" />
+    <ClInclude Include="..\..\include\ApOS.h" />
+    <ClInclude Include="..\..\include\ApTypes.h" />
+    <ClInclude Include="..\..\include\MessageDigest.h" />
+    <ClInclude Include="..\..\include\MsgConfig.h" />
+    <ClInclude Include="..\..\include\MsgConfigDialog.h" />
+    <ClInclude Include="..\..\include\MsgDB.h" />
+    <ClInclude Include="..\..\include\MsgFile.h" />
+    <ClInclude Include="..\..\include\MsgMainLoop.h" />
+    <ClInclude Include="..\..\include\MsgNet.h" />
+    <ClInclude Include="..\..\include\MsgOs.h" />
+    <ClInclude Include="..\..\include\MsgSample.h" />
+    <ClInclude Include="..\..\include\MsgSystem.h" />
+    <ClInclude Include="..\..\include\MsgTimer.h" />
+    <ClInclude Include="..\..\include\MsgUnitTest.h" />
+    <ClInclude Include="..\..\include\MsgVPI.h" />
+    <ClInclude Include="..\..\include\MsgXMPP.h" />
+    <ClInclude Include="..\..\include\Project.h" />
+    <ClInclude Include="..\..\include\RegEx.h" />
+    <ClInclude Include="..\..\include\SElem.h" />
+    <ClInclude Include="..\..\include\SListT.h" />
+    <ClInclude Include="..\..\include\SString.h" />
+    <ClInclude Include="..\..\include\SSystem.h" />
+    <ClInclude Include="..\..\include\STree.h" />
+    <ClInclude Include="..\..\include\URL.h" />
+    <ClInclude Include="..\..\include\XMLProcessor.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Apollo\Apollo.vcxproj">
+      <Project>{9b3fba6a-ed3f-479a-8919-a463882f19b1}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\vld\vld.vcxproj">
+      <Project>{0d30ffcb-45da-4d2b-8e3c-81bc145bf2de}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

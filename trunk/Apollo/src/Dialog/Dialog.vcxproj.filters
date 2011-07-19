@@ -1,0 +1,81 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{3911584C-D8BC-4c43-B032-6A5ABA6363E0}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{D4E50E4E-68BC-4253-B2CC-216C5CF881A9}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{3328E564-2C57-4e03-ABD3-9766EC03B42C}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
+    </Filter>
+    <Filter Include="HTML">
+      <UniqueIdentifier>{6367c072-0335-4b5d-a2a6-d1ce09a7cf34}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="HTML\WhiteWin">
+      <UniqueIdentifier>{9c21cbc7-7f59-49f5-8851-f5743fafe565}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="HTML\Mac">
+      <UniqueIdentifier>{898977dd-36bf-457a-a437-194ddef2e2b3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="HTML\Wood">
+      <UniqueIdentifier>{dcd6b0a2-cd93-4a6f-b0f8-7646fd3d0f00}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Dialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DialogModule.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dll.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Dialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DialogModule.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dll.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Local.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\bin\Win32\Debug\modules\Dialog\apollo.dialog.js">
+      <Filter>HTML</Filter>
+    </None>
+    <None Include="..\..\bin\Win32\Debug\modules\Dialog\test\CallContentScript.html">
+      <Filter>HTML</Filter>
+    </None>
+    <None Include="..\..\bin\Win32\Debug\modules\Dialog\test\CallContentSrpc.html">
+      <Filter>HTML</Filter>
+    </None>
+    <None Include="..\..\bin\Win32\Debug\modules\Dialog\test\CreateWaitCloseByContent.html">
+      <Filter>HTML</Filter>
+    </None>
+    <None Include="..\..\bin\Win32\Debug\modules\Dialog\test\GenerateOpenedEvent.html">
+      <Filter>HTML</Filter>
+    </None>
+    <None Include="..\..\bin\Win32\Debug\modules\Dialog\theme\WhiteWin\Dialog.html">
+      <Filter>HTML\WhiteWin</Filter>
+    </None>
+    <None Include="..\..\bin\Win32\Debug\modules\Dialog\theme\Mac\Dialog.html">
+      <Filter>HTML\Mac</Filter>
+    </None>
+    <None Include="..\..\bin\Win32\Debug\modules\Dialog\theme\Wood\Dialog.html">
+      <Filter>HTML\Wood</Filter>
+    </None>
+    <None Include="..\..\bin\Win32\Debug\modules\Dialog\config.txt" />
+  </ItemGroup>
+</Project>
