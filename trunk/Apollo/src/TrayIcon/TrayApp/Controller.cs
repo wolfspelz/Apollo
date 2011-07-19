@@ -453,7 +453,13 @@ namespace TrayApp
     internal void LaunchApp()
     {
       Log("Launching " + _sAppPath + " " + _sAppArgs);
-      var process = Process.Start(_sAppPath, _sAppArgs);
+      Process process = null;
+      try {
+        process = Process.Start(_sAppPath, _sAppArgs);
+      } catch (Exception ex) {
+        Log("Process.Start failed " + _sAppPath + ": " + ex.Message);
+      }
+
       if (process == null) {
         Log("Process.Start failed");
       } else {
