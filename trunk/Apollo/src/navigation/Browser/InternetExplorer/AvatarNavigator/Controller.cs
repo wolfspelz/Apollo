@@ -27,21 +27,30 @@ namespace OVW
 
     internal void Log(string s)
     {
-      string sLine = s.Replace("\r\n", "\n").Replace("\n", "\\n");
+      if (GetRegistryValue(Globals.Registry.Log, false)) {
+        string sLine = s.Replace("\r\n", "\n").Replace("\n", "\\n");
 
-      //SpicIE.Host.TraceSink.TraceInformation(sLine);
+        //SpicIE.Host.TraceSink.TraceInformation(sLine);
 
-      if (!_bInShutdown) {
-        try {
-          using (StreamWriter sw = File.AppendText("C:\\temp\\AvatarNavigator.log")) {
-            sw.WriteLine(sLine);
-            sw.Close();
-          }
-        } catch { }
+        if (!_bInShutdown) {
+          try {
+            using (StreamWriter sw = File.AppendText(GetRegistryValue(Globals.Registry.LogFile, "C:\\temp\\AvatarNavigator.log"))) {
+              sw.WriteLine(sLine);
+              sw.Close();
+            }
+          } catch { }
+        }
       }
     }
 
     #region Utility // --------------------------------------
+
+    bool TrueString(string sIn)
+    {
+      string s = sIn.ToLower();
+      if (s == "no" || s == "0" || s == "false") { return false; }
+      return s == "yes" || s == "true" || s == "1" || s == "on" || s == "ok" || s == "sure" || s == "yessir";
+    }
 
     internal int GetRandomNumber(int nMax)
     {
@@ -56,7 +65,7 @@ namespace OVW
     {
       string sResult = sDefault;
       try {
-        using (var key = Registry.CurrentUser.OpenSubKey(@"Software\OpenVirtualWorld\Avatar")) {
+        using (var key = Registry.CurrentUser.OpenSubKey(@"Software\" + Globals.Manufacturer + @"\" + Globals.ProductName + "")) {
           if (key != null) {
             sResult = (string) key.GetValue(sName, sDefault);
           }
@@ -74,6 +83,16 @@ namespace OVW
       return nResult;
     }
 
+    internal bool GetRegistryValue(string sName, bool bDefault)
+    {
+      bool bResult = false;
+      string sValue = GetRegistryValue(sName, "");
+      if (!String.IsNullOrEmpty(sValue)) {
+        bResult = TrueString(sValue);
+      }
+      return bResult;
+    }
+
     #endregion
 
     #region Main Flow // --------------------------------------
@@ -84,8 +103,10 @@ namespace OVW
         _sId = this.GetHashCode() + "-" + DateTime.Now.Ticks + "-" + GetRandomNumber(1000000000);
       }
 
-      _nMinReconnectInterval = GetRegistryValue("AvatarNavigator/MinReconnectInterval", 20);
-      _nMaxReconnectInterval = GetRegistryValue("AvatarNavigator/MaxReconnectInterval", 10000);
+      _nMinReconnectInterval = GetRegistryValue(Globals.Registry.MinReconnectInterval, 20);
+      _nMaxReconnectInterval = GetRegistryValue(Globals.Registry.MaxReconnectInterval, 10000);
+
+      _bAutoStart = !GetRegistryValue(Globals.Registry.Disabled, false);
 
       if (_bAutoStart) {
         _nReconnectInterval = _nMinReconnectInterval;

@@ -51,7 +51,6 @@ namespace OVW
 
       Log(string.Format("AvatarNavigator {0} - {1}", System.Reflection.Assembly.GetExecutingAssembly().FullName, DateTime.Now.TimeOfDay.ToString()));
 
-
       this.OnDocumentComplete += new SpicIE.Common.WebBrowserEvent_DocumentComplete(AvatarNavigator_OnDocumentComplete);
       this.OnBeforeNavigate += new SpicIE.Common.WebBrowserEvent_BeforeNavigate2(AvatarNavigator_OnBeforeNavigate);
       this.OnWindowStateChange += new SpicIE.Common.WebBrowserEvents_WindowStateChange(AvatarNavigator_OnWindowStateChange);

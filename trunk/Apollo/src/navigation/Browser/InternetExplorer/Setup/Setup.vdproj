@@ -430,7 +430,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:AvatarNavigator"
         "ProductCode" = "8:{A2041D9A-DD57-4BA5-BF83-B7B30D467E57}"
-        "PackageCode" = "8:{BCA06D7E-914D-465C-BB4B-49933701B524}"
+        "PackageCode" = "8:{E19C78F3-F807-4520-89A4-E56D6DFD196C}"
         "UpgradeCode" = "8:{523E4994-CD6F-4327-8FB2-A48C5E751F08}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
@@ -438,7 +438,7 @@
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
         "ProductVersion" = "8:1.0.0"
-        "Manufacturer" = "8:Open Virtual World"
+        "Manufacturer" = "8:OpenVirtualWorld"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"
         "Title" = "8:Avatar Navigator"
@@ -514,6 +514,68 @@
                             "Transitive" = "11:FALSE"
                                 "Keys"
                                 {
+                                    "{60EA8692-D2D5-43EB-80DC-7906BF13D6EF}:_64F03F1F442245A39D71CF794E57F5B1"
+                                    {
+                                    "Name" = "8:[ProductName]"
+                                    "Condition" = "8:"
+                                    "AlwaysCreate" = "11:FALSE"
+                                    "DeleteAtUninstall" = "11:FALSE"
+                                    "Transitive" = "11:FALSE"
+                                        "Keys"
+                                        {
+                                        }
+                                        "Values"
+                                        {
+                                            "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_13EEDDE67A3D45488B25762A107C740D"
+                                            {
+                                            "Name" = "8:MaxReconnectInterval"
+                                            "Condition" = "8:"
+                                            "Transitive" = "11:FALSE"
+                                            "ValueTypes" = "3:1"
+                                            "Value" = "8:10000"
+                                            }
+                                            "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_4BDD605C1253412BB36B243E1B08D176"
+                                            {
+                                            "Name" = "8:Port"
+                                            "Condition" = "8:"
+                                            "Transitive" = "11:FALSE"
+                                            "ValueTypes" = "3:1"
+                                            "Value" = "8:23763"
+                                            }
+                                            "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_6CCDEDF4DD0448FCADFF1F99520DE9CC"
+                                            {
+                                            "Name" = "8:LogFile"
+                                            "Condition" = "8:"
+                                            "Transitive" = "11:FALSE"
+                                            "ValueTypes" = "3:1"
+                                            "Value" = "8:C:\\temp\\AvatarNavigator.log"
+                                            }
+                                            "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_A3F7F8B7BEB94E958FF335C4F25044FF"
+                                            {
+                                            "Name" = "8:MinReconnectInterval"
+                                            "Condition" = "8:"
+                                            "Transitive" = "11:FALSE"
+                                            "ValueTypes" = "3:1"
+                                            "Value" = "8:20"
+                                            }
+                                            "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_BB206B4790B64DCC98BE7B6819B3D361"
+                                            {
+                                            "Name" = "8:Disabled"
+                                            "Condition" = "8:"
+                                            "Transitive" = "11:FALSE"
+                                            "ValueTypes" = "3:1"
+                                            "Value" = "8:no"
+                                            }
+                                            "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_E45388B0D53046E4B1EEA0A1C16EE9C2"
+                                            {
+                                            "Name" = "8:Log"
+                                            "Condition" = "8:"
+                                            "Transitive" = "11:FALSE"
+                                            "ValueTypes" = "3:1"
+                                            "Value" = "8:no"
+                                            }
+                                        }
+                                    }
                                 }
                                 "Values"
                                 {

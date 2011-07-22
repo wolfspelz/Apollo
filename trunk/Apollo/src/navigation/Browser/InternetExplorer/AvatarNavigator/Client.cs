@@ -48,7 +48,7 @@ namespace OVW
 
       Socket newSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
-      int nPort = Controller.GetRegistryValue("navigation/Server/Port", 23763);
+      int nPort = Controller.GetRegistryValue(Globals.Registry.Port, 23763);
 
       IPEndPoint iep = new IPEndPoint(IPAddress.Loopback, nPort);
       newSocket.BeginConnect(iep, new AsyncCallback(OnConnected), newSocket);
