@@ -2,7 +2,7 @@
 #Connection/Password=
 #Room/Nickname=
 Connection/AutoConnect=1
-Connection/Resource=ApolloTest
+Connection/Resource=Apollo
 Room/NicknameConflictRetry=20
 Room/DropDelayedChat=0
 Room/DropDelayedChatSec=60
