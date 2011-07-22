@@ -52,6 +52,8 @@ void SerializedLoadTaskList::TryLoad()
 {
   if (length() > 0) {
 
+    int bExecute = 0;
+
     if (bLocked_) {
       String sUrls;
       if (apLog_IsVerbose) {
@@ -60,7 +62,18 @@ void SerializedLoadTaskList::TryLoad()
         }
       }
       apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "Backlog: %d [current=%s] %s", length(), _sz(sCurrent_), _sz(sUrls)));
+
+      int nTimeout = Apollo::getModuleConfig(MODULE_NAME, "SerializedLoadTimeout", 20);
+      if (Apollo::getNow() - tvLocked_ > Apollo::TimeValue(nTimeout, 0)) {
+        apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "Unlocking: after %d sec", nTimeout));
+        LoadDone();
+        bExecute = 1;
+      }
     } else {
+      bExecute = 1;
+    }
+    
+    if (bExecute) {
       SerializedTask* pTask = First();
       if (pTask) {
         Remove(pTask);
@@ -69,6 +82,7 @@ void SerializedLoadTaskList::TryLoad()
         pTask->Execute();
         delete pTask;
         pTask = 0;
+        tvLocked_ = Apollo::getNow();
       }
     }
 
