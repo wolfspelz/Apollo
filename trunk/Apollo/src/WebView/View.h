@@ -118,6 +118,7 @@ public:
 
 protected:
   int bLocked_;
+  Apollo::TimeValue tvLocked_;
   String sCurrent_;
 };
 
