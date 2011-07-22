@@ -38,7 +38,7 @@ String SetupModule::GetInstallFirefoxExtensionCommandline()
   if (!sFirefoxCmd) { sFirefoxCmd = SRegistry::GetString(HKEY_CURRENT_USER, "Software\\Classes\\FirefoxHTML\\shell\\open\\command", "", ""); }
   if (!sFirefoxCmd) { sFirefoxCmd = SRegistry::GetString(HKEY_LOCAL_MACHINE, "SOFTWARE\\Classes\\FirefoxHTML\\shell\\open\\command", "", ""); }
 
-  String sUrl = Apollo::getModuleConfig("Navigation", "FirefoxExtensionInstallUrl", "modules/navigation/AvatarNavigator.xpi");
+  String sUrl = Apollo::getModuleConfig("Navigation", "FirefoxExtensionInstallUrl", "file://" + Apollo::getCwd() + "modules/navigation/AvatarNavigator.xpi");
   //if (!sUrl.startsWith("http:") && !sUrl.startsWith("https:")) {
   //  if (sUrl.subString(1, 1) == ":") {
   //    sUrl = "file://" + sUrl;
