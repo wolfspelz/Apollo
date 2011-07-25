@@ -21,3 +21,5 @@
 Language/en=[[MODULE_RESOURCE_PATH]]/en.txt
 Language/de=[[MODULE_RESOURCE_PATH]]/de.txt
 Language/ja=[[MODULE_RESOURCE_PATH]]/ja.txt
+
+SerializedLoadTimeout=10
