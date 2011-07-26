@@ -95,6 +95,27 @@ void SerializedLoadTaskList::LoadDone()
   sCurrent_ = "";
 }
 
+void SerializedLoadTaskList::ViewDeleted(View* pView)
+{
+  int bDone = 0;
+  while (!bDone) {
+    bDone = 1;
+    SerializedTask* pDeleteTask = 0;
+    for (SerializedTask* pTask = 0; (pTask = Next(pTask)) != 0; ) {
+      if (pTask->pView_ == pView) {
+        pDeleteTask = pTask;
+        bDone = 0;
+        break;
+      }
+    }
+    if (pDeleteTask) {
+      Remove(pDeleteTask);
+      delete pDeleteTask;
+      pDeleteTask = 0;
+    }
+  }
+}
+
 //------------------------------------------------------
 
 SerializedLoadTaskList View::serializedLoads_;
@@ -121,6 +142,7 @@ View::View(const ApHandle& hView)
 
 View::~View()
 {
+  serializedLoads_.ViewDeleted(this);
 }
 
 void View::Create(int nLeft, int nTop, int nWidth, int nHeight)
@@ -1138,4 +1160,3 @@ HRESULT View::webViewClosing(IWebView *webView)
 //
 //  return S_OK;
 //}
-

@@ -71,6 +71,7 @@ public:
   {}
   virtual void Execute() = 0;
   virtual String Description() = 0;
+
   View* pView_;
 };
 
@@ -115,6 +116,7 @@ public:
   void LoadHtml(View* pView, const String& sHtml, const String& sBase);
   void TryLoad();
   void LoadDone();
+  void ViewDeleted(View* pView);
 
 protected:
   int bLocked_;
