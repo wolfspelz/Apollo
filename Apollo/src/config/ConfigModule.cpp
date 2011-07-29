@@ -74,22 +74,40 @@ AP_MSG_HANDLER_METHOD(ConfigModule, Config_SetValue)
 
 AP_MSG_HANDLER_METHOD(ConfigModule, Config_GetValue)
 {
-  int ok = 0;
+  int bHandled = 0;
 
-  if (pMsg->sPath == "Dialog/Theme") {
+  if (pMsg->sPath == "System/Debug") {
     int AP_UNUSED_VARIABLE x = 1;
   }
 
-  ConfigPlane* pPlane = lPlanes_.FindByName(sCurrentPlane_);
-  if (pPlane != 0) {
-    StringTreeNode<String>* pNode = pPlane->stData_.Find(pMsg->sPath);
-    if (pNode != 0) {
-      pMsg->sValue = pNode->Value();
-      ok = 1;
+  if (!bHandled) {
+    ConfigPlane* pPlane = lPlanes_.FindByName(sCurrentPlane_);
+    if (pPlane != 0) {
+      StringTreeNode<String>* pNode = pPlane->stData_.Find(pMsg->sPath);
+      if (pNode != 0) {
+        pMsg->sValue = pNode->Value();
+        bHandled = 1;
+      }
     }
   }
 
-  pMsg->apStatus = ok ? ApMessage::Ok : ApMessage::Error;
+  // Pseudo config values:
+  if (!bHandled) {
+    if (pMsg->sPath == "System/Debug") {
+#if defined(_DEBUG)
+      pMsg->sValue = "1";
+#else
+      pMsg->sValue = "0";
+#endif
+      bHandled = 1;
+    }
+  }
+
+  if (bHandled) {
+    pMsg->apStatus = ApMessage::Ok;
+  } else {
+    pMsg->apStatus = ApMessage::Error;
+  }
 }
 
 AP_MSG_HANDLER_METHOD(ConfigModule, Config_DeleteValue)
