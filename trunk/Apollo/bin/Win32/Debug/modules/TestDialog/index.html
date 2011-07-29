@@ -23,6 +23,14 @@ input[type="text"] { border:1px solid #808080; }
       .send();
   }
 
+  function GetConfig()
+  {
+    Elem('iValue').value = api.Message('Config_GetValue')
+      .setString('sPath', Elem('iKey').value)
+      .send()
+      .getString('sValue');
+  }
+
   function DialogCreate()
   {
     api.Message('Dialog_Create')
@@ -86,7 +94,8 @@ input[type="text"] { border:1px solid #808080; }
     Config:
     <input id="iKey" type="text" value="Dialog/Theme" />
     <input id="iValue" type="text" value="Wood" />
-  <input type="button" value="Set" onclick="SetConfig();" />
+    <input type="button" value="Set" onclick="SetConfig();" />
+    <input type="button" value="Get" onclick="GetConfig();" />
   </p>
 
   <h1>Common</h1>

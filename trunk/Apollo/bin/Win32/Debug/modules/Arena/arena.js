@@ -61,6 +61,12 @@ Arena.prototype = {
         + '</div>'
       );
     }
+
+    var bDebug = api.Message('Config_GetValue').setString('sPath', 'System/Debug').send().getInt('sValue');
+    if (!bDebug) {
+      $('body').bind('contextmenu', function() { return false; });
+    }
+
   },
 
   // --------------------------------------
