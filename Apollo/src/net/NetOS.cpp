@@ -94,15 +94,16 @@ int NetOS::CheckIPConnection()
 int NetOS::GetLocalIPAddressList(List &lList)
 {
   int ok = 1;
+
 #if defined(WIN32)
-  String sAddress;
-	UINT aIPAddresses[50];
+  UINT aIPAddresses[50];
 	UINT aIPAddressesSize =50;
 	if (ok) { ok = NetOS::g_oMib.GetIPAddress(aIPAddresses, aIPAddressesSize); }
   if (ok) {
 		for (UINT i = 0; i< aIPAddressesSize; ++i) {
 			long ip = htonl(aIPAddresses[i]);
 			if ((ip != 0x7F000001) && (ip != 0)) {
+        int bUseAddress = 1;
 
          // exclude private ip spaces from rfc1918
          //|| ( ((ip & 0xff000000) >> 24) == (10) ) // 10.0.0.0 - 10.255.255.255 (10/8 prefix)
@@ -111,16 +112,33 @@ int NetOS::GetLocalIPAddressList(List &lList)
          //|| ( ((ip & 0xffff0000) >> 16) == (169 * 256 + 254) ) // 169.254.0.0 - 169.255.255.255 (169.254/16 prefix)
          //|| ( ((ip & 0xffffff00) >>  8) == (192 * 256 * 256 + 0 * 256 + 2) ) // 192.0.2.0 - 192.0.2.255 (192.0.2/24 prefix)
 
-        String sAddress = NetModule::ip4_LongtoStr(aIPAddresses[i]);
+        String sAddress = NetModule::ip4_LongToStr(aIPAddresses[i]);
         apLog_VeryVerbose((LOG_CHANNEL, LOG_CONTEXT, "IP address found: %s", _sz(sAddress)));
 
-        String sKey = "IgnoreLocalIp/" + sAddress;
-        if (Apollo::getModuleConfig(MODULE_NAME, sKey, 0)) {
-          apLog_VeryVerbose((LOG_CHANNEL, LOG_CONTEXT, "IP address ignored by config: %s", _sz(sAddress)));
-        } else {
+        //String sKey = "IgnoreLocalIp/" + sAddress;
+        //if (Apollo::getModuleConfig(MODULE_NAME, sKey, 0)) {
+        //  apLog_VeryVerbose((LOG_CHANNEL, LOG_CONTEXT, "IP address ignored by config: %s", _sz(sAddress)));
+        //} else {
+        //  lList.Add(sAddress);
+        //}
+
+        String sIgnoreLocalIp = Apollo::getModuleConfig(MODULE_NAME, "IgnoreLocalIp", "");
+        if (!sIgnoreLocalIp.empty()) {
+          sIgnoreLocalIp.trimWSP();
+          String sMask;
+          while (sIgnoreLocalIp.nextToken(" ,;", sMask)) {
+            if (NetModule::ipAddressInMask(sMask, sAddress)) {
+              apLog_VeryVerbose((LOG_CHANNEL, LOG_CONTEXT, "IP address ignored by config: %s in %s", _sz(sAddress), _sz(sMask)));
+              bUseAddress = 0;
+            }
+          }
+        }
+
+        if (bUseAddress) {
           lList.Add(sAddress);
         }
-			}
+
+      }
 		}
 	}	
 #elif defined(LINUX) || defined(MAC)
