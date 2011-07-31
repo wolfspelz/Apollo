@@ -624,6 +624,13 @@ int Client::onConnectionDisconnected()
     }
   }
 
+  int bWasConnected = 0;
+  if (nState_ == ClientState_Connected) {
+    bWasConnected = 1;
+  } else {
+    apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "was not connected, state=%d" ApHandleFormat "", nState_, ApHandlePrintf(hAp_)));
+  }
+
   pConnection_ = 0;
   nState_ = ClientState_NotConnected;
 
@@ -641,7 +648,7 @@ int Client::onConnectionDisconnected()
     bLoggedIn_ = 0;
   }
 
-  {
+  if (bWasConnected) {
     Msg_Xmpp_Disconnected msg;
     msg.hClient = hAp_;
     msg.Send();
