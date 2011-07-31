@@ -59,7 +59,7 @@ void DNSResolveTask::Execute()
       } else {
         if (aiList->ai_family == AF_INET) {
           struct sockaddr_in* pSai = (struct sockaddr_in*) aiList->ai_addr;
-          sAddress = NetModule::ip4_LongtoStr(pSai->sin_addr.s_addr);
+          sAddress = NetModule::ip4_LongToStr(pSai->sin_addr.s_addr);
           ok = 1;
         } else {
           sError.appendf("Address family not supported: %d", aiList->ai_family);

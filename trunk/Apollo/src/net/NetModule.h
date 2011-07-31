@@ -105,7 +105,9 @@ public:
   void checkOnlineChange(int bIPOnline);
 
 public:
-  static String ip4_LongtoStr(unsigned long ip);
+  static String ip4_LongToStr(unsigned long ip);
+  static unsigned long ip4_StrToLong(const String& sAddress);
+  static int ipAddressInMask(const String& sMask, const String& sAddress);
 
 public:
   SocketIO oSocketIO_;

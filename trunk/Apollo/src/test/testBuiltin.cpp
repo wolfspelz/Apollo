@@ -2813,6 +2813,183 @@ static String Test_Apollo_canonicalizeUrl()
   return s;
 }
 
+unsigned long ip4_StrToLong(const String& sAddress)
+{
+  String sWork = sAddress;
+  sWork.trimWSP();
+  String sPart1;
+  String sPart2;
+  String sPart3;
+  String sPart4;;
+  if (sWork.nextToken(".", sPart1)) {
+    if (sWork.nextToken(".", sPart2)) {
+      if (sWork.nextToken(".", sPart3)) {
+        if (sWork.nextToken(".", sPart4)) {
+        }
+      }
+    }
+  }
+
+  unsigned long nAddress = 0;
+  nAddress |= String::atoi(sPart1);
+  nAddress <<= 8;
+  nAddress |= String::atoi(sPart2);
+  nAddress <<= 8;
+  nAddress |= String::atoi(sPart3);
+  nAddress <<= 8;
+  nAddress |= String::atoi(sPart4);
+
+  return nAddress;
+}
+
+int AddressInMask(const String& sMask, const String& sAddress)
+{
+  String sPrefix;
+  String sLength;
+  String sWork = sMask;
+  sWork.trimWSP();
+  sWork.nextToken("/", sPrefix);
+  sWork.nextToken("/", sLength);
+  int nLength = String::atoi(sLength);
+  if (nLength == 0) { nLength = 32; }
+
+  unsigned long nMask = ip4_StrToLong(sPrefix);
+  unsigned long nAddress = ip4_StrToLong(sAddress);
+
+  unsigned long nValid = 0;
+  for (int i = 0; i < nLength; ++i) {
+    nValid >>= 1;
+    nValid |= (unsigned long) 0x80000000;
+  }
+
+  nMask &= nValid;
+  nAddress &= nValid;
+
+  return (int) nMask == nAddress;
+}
+
+String Test_Net_Netmask1(const String& sMask, const String& sAddress, int bExpected) 
+{
+  String s;
+
+  int bResult = AddressInMask(sMask, sAddress);
+  if (bResult != bExpected) {
+    s.appendf("mask=%s, address=%s, got=%d, expected=%d", _sz(sMask), _sz(sAddress), bResult, bExpected);
+  }
+
+  return s;
+}
+
+String Test_Net_Netmask()
+{
+  String s;
+
+  // 10.0.0.0 - 10.255.255.255 (10/8)
+  if (!s) { s = Test_Net_Netmask1("10/8", "10.0.0.0", 1); }
+  if (!s) { s = Test_Net_Netmask1("10/8", "10.255.255.255", 1); }
+  if (!s) { s = Test_Net_Netmask1("10/8", "10.0.0.1", 1); }
+  if (!s) { s = Test_Net_Netmask1("10/8", "11.0.0.0", 0); }
+  if (!s) { s = Test_Net_Netmask1("10/8", "11.0.0.0", 0); }
+  if (!s) { s = Test_Net_Netmask1("10/8", "1.0.0.0", 0); }
+  if (!s) { s = Test_Net_Netmask1("10/8", "26.0.0.0", 0); }
+
+  // 172.16.0.0 - 172.31.255.255  (172.16/12)
+  if (!s) { s = Test_Net_Netmask1("172.16/12", "1.0.0.1", 0); }
+  if (!s) { s = Test_Net_Netmask1("172.16/12", "1.16.0.1", 0); }
+  if (!s) { s = Test_Net_Netmask1("172.16/12", "171.16.0.1", 0); }
+  if (!s) { s = Test_Net_Netmask1("172.16/12", "172.16.0.0", 1); }
+  if (!s) { s = Test_Net_Netmask1("172.16/12", "172.16.0.1", 1); }
+  if (!s) { s = Test_Net_Netmask1("172.16/12", "172.16.0.255", 1); }
+  if (!s) { s = Test_Net_Netmask1("172.16/12", "172.16.255.255", 1); }
+  if (!s) { s = Test_Net_Netmask1("172.16/12", "172.17.0.0", 1); }
+  if (!s) { s = Test_Net_Netmask1("172.16/12", "172.17.0.1", 1); }
+  if (!s) { s = Test_Net_Netmask1("172.16/12", "172.17.255.1", 1); }
+  if (!s) { s = Test_Net_Netmask1("172.16/12", "172.18.10.20", 1); }
+  if (!s) { s = Test_Net_Netmask1("172.16/12", "172.30.10.20", 1); }
+  if (!s) { s = Test_Net_Netmask1("172.16/12", "172.31.255.255", 1); }
+  if (!s) { s = Test_Net_Netmask1("172.16/12", "172.32.10.20", 0); }
+  if (!s) { s = Test_Net_Netmask1("172.16/12", "172.63.10.20", 0); }
+  if (!s) { s = Test_Net_Netmask1("172.16/12", "173.1.1.2", 0); }
+  if (!s) { s = Test_Net_Netmask1("172.16/12", "224.1.2.3", 0); }
+  if (!s) { s = Test_Net_Netmask1("172.16/12", "255.1.2.3", 0); }
+  if (!s) { s = Test_Net_Netmask1("172.16/12", "255.255.255.255", 0); }
+
+  // 192.168.0.0 - 192.168.255.255 (192.168/16)
+  if (!s) { s = Test_Net_Netmask1("192.168/16", "0.0.0.0", 0); }
+  if (!s) { s = Test_Net_Netmask1("192.168/16", "0.0.0.1", 0); }
+  if (!s) { s = Test_Net_Netmask1("192.168/16", "1.0.0.1", 0); }
+  if (!s) { s = Test_Net_Netmask1("192.168/16", "24.168.0.1", 0); }
+  if (!s) { s = Test_Net_Netmask1("192.168/16", "10.0.0.1", 0); }
+  if (!s) { s = Test_Net_Netmask1("192.168/16", "10.168.0.1", 0); }
+  if (!s) { s = Test_Net_Netmask1("192.168/16", "128.168.0.1", 0); }
+  if (!s) { s = Test_Net_Netmask1("192.168/16", "191.168.0.1", 0); }
+  if (!s) { s = Test_Net_Netmask1("192.168/16", "192.168.0.1", 1); }
+  if (!s) { s = Test_Net_Netmask1("192.168/16", "192.168.255.255", 1); }
+  if (!s) { s = Test_Net_Netmask1("192.168/16", "192.169.0.1", 0); }
+  if (!s) { s = Test_Net_Netmask1("192.168/16", "193.168.0.1", 0); }
+  if (!s) { s = Test_Net_Netmask1("192.168/16", "224.168.0.1", 0); }
+  if (!s) { s = Test_Net_Netmask1("192.168/16", "255.255.255.255", 0); }
+
+  // 169.254.0.0 - 169.255.255.255 (169.254/16)
+  if (!s) { s = Test_Net_Netmask1("169.254/16", "0.0.0.0", 0); }
+  if (!s) { s = Test_Net_Netmask1("169.254/16", "0.0.0.1", 0); }
+  if (!s) { s = Test_Net_Netmask1("169.254/16", "1.0.0.1", 0); }
+  if (!s) { s = Test_Net_Netmask1("169.254/16", "24.168.0.1", 0); }
+  if (!s) { s = Test_Net_Netmask1("169.254/16", "10.0.0.1", 0); }
+  if (!s) { s = Test_Net_Netmask1("169.254/16", "10.168.0.1", 0); }
+  if (!s) { s = Test_Net_Netmask1("169.254/16", "128.168.0.1", 0); }
+  if (!s) { s = Test_Net_Netmask1("169.254/16", "191.168.0.1", 0); }
+  if (!s) { s = Test_Net_Netmask1("169.254/16", "192.168.0.1", 0); }
+  if (!s) { s = Test_Net_Netmask1("169.254/16", "192.168.255.255", 0); }
+  if (!s) { s = Test_Net_Netmask1("169.254/16", "169.254.0.1", 1); }
+  if (!s) { s = Test_Net_Netmask1("169.254/16", "169.254.255.255", 1); }
+  if (!s) { s = Test_Net_Netmask1("169.254/16", "192.169.0.1", 0); }
+  if (!s) { s = Test_Net_Netmask1("169.254/16", "193.168.0.1", 0); }
+  if (!s) { s = Test_Net_Netmask1("169.254/16", "224.168.0.1", 0); }
+  if (!s) { s = Test_Net_Netmask1("169.254/16", "255.255.255.255", 0); }
+
+  // 192.0.2.0 - 192.0.2.255 (192.0.2/24)
+  if (!s) { s = Test_Net_Netmask1("192.0.2/24", "0.0.0.0", 0); }
+  if (!s) { s = Test_Net_Netmask1("192.0.2/24", "0.0.0.1", 0); }
+  if (!s) { s = Test_Net_Netmask1("192.0.2/24", "0.0.1.0", 0); }
+  if (!s) { s = Test_Net_Netmask1("192.0.2/24", "0.0.2.0", 0); }
+  if (!s) { s = Test_Net_Netmask1("192.0.2/24", "0.1.0.0", 0); }
+  if (!s) { s = Test_Net_Netmask1("192.0.2/24", "192.0.0.0", 0); }
+  if (!s) { s = Test_Net_Netmask1("192.0.2/24", "192.0.1.0", 0); }
+  if (!s) { s = Test_Net_Netmask1("192.0.2/24", "192.0.1.1", 0); }
+  if (!s) { s = Test_Net_Netmask1("192.0.2/24", "192.0.2.0", 1); }
+  if (!s) { s = Test_Net_Netmask1("192.0.2/24", "192.0.2.1", 1); }
+  if (!s) { s = Test_Net_Netmask1("192.0.2/24", "192.0.2.254", 1); }
+  if (!s) { s = Test_Net_Netmask1("192.0.2/24", "192.0.2.255", 1); }
+  if (!s) { s = Test_Net_Netmask1("192.0.2/24", "192.0.3.255", 0); }
+  if (!s) { s = Test_Net_Netmask1("192.0.2/24", "192.1.2.255", 0); }
+  if (!s) { s = Test_Net_Netmask1("192.0.2/24", "193.0.2.255", 0); }
+
+  // 234.43.23.98 (234.43.23.98/32)
+  if (!s) { s = Test_Net_Netmask1("234.43.23.98/32", "0.0.0.0", 0); }
+  if (!s) { s = Test_Net_Netmask1("234.43.23.98/32", "0.0.0.1", 0); }
+  if (!s) { s = Test_Net_Netmask1("234.43.23.98/32", "234.43.23.98", 1); }
+  if (!s) { s = Test_Net_Netmask1("234.43.23.98/32", "234.43.23.97", 0); }
+  if (!s) { s = Test_Net_Netmask1("234.43.23.98/32", "234.43.23.99", 0); }
+  if (!s) { s = Test_Net_Netmask1("234.43.23.98/32", "234.43.22.97", 0); }
+  if (!s) { s = Test_Net_Netmask1("234.43.23.98/32", "234.43.24.97", 0); }
+  if (!s) { s = Test_Net_Netmask1("234.43.23.98/32", "234.44.23.97", 0); }
+  if (!s) { s = Test_Net_Netmask1("234.43.23.98/32", "232.43.23.97", 0); }
+  if (!s) { s = Test_Net_Netmask1("234.43.23.98/32", "255.255.255.255", 0); }
+  if (!s) { s = Test_Net_Netmask1("234.43.23.98", "0.0.0.0", 0); }
+  if (!s) { s = Test_Net_Netmask1("234.43.23.98", "0.0.0.1", 0); }
+  if (!s) { s = Test_Net_Netmask1("234.43.23.98", "234.43.23.98", 1); }
+  if (!s) { s = Test_Net_Netmask1("234.43.23.98", "234.43.23.97", 0); }
+  if (!s) { s = Test_Net_Netmask1("234.43.23.98", "234.43.23.99", 0); }
+  if (!s) { s = Test_Net_Netmask1("234.43.23.98", "234.43.22.97", 0); }
+  if (!s) { s = Test_Net_Netmask1("234.43.23.98", "234.43.24.97", 0); }
+  if (!s) { s = Test_Net_Netmask1("234.43.23.98", "234.44.23.97", 0); }
+  if (!s) { s = Test_Net_Netmask1("234.43.23.98", "232.43.23.97", 0); }
+  if (!s) { s = Test_Net_Netmask1("234.43.23.98", "255.255.255.255", 0); }
+
+  return s;
+}
+
 #endif // AP_TEST_Lib
 
 //----------------------------------------------------------
@@ -2934,6 +3111,7 @@ void Test_Builtin_Register()
   AP_UNITTEST_REGISTER(Test_Apollo_splitCommandlineArguments);
   AP_UNITTEST_REGISTER(Test_Apollo_joinCommandlineArguments);
   AP_UNITTEST_REGISTER(Test_Apollo_canonicalizeUrl);
+  AP_UNITTEST_REGISTER(Test_Net_Netmask);
 #endif // AP_TEST_Lib
 }
 
@@ -3054,5 +3232,6 @@ void Test_Builtin_Execute()
   AP_UNITTEST_EXECUTE(Test_Apollo_splitCommandlineArguments);
   AP_UNITTEST_EXECUTE(Test_Apollo_joinCommandlineArguments);
   AP_UNITTEST_EXECUTE(Test_Apollo_canonicalizeUrl);
+  AP_UNITTEST_EXECUTE(Test_Net_Netmask);
 #endif // AP_TEST_Lib
 }
