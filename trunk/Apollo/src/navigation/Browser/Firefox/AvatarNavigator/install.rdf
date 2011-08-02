@@ -6,9 +6,9 @@
     <em:name>Avatar Navigator</em:name>
     <em:version>1.0</em:version>
     <em:type>2</em:type>
-    <em:description>Supports avatars on web pages</em:description>
+    <em:description>Avatars on web pages</em:description>
     <em:creator>Heiner Wolf</em:creator>
-    <em:homepageURL>http://web-avatar.com/</em:homepageURL>
+    <em:homepageURL>http://avatar.io/firefox</em:homepageURL>
     <em:iconURL>chrome://avatarnav/content/images/logo32.png</em:iconURL>
 
     <em:targetApplication>
