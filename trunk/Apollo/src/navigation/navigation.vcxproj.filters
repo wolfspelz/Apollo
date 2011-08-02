@@ -19,6 +19,9 @@
     <Filter Include="Browser\Firefox">
       <UniqueIdentifier>{06a4e540-75f6-4921-90bb-f4389ed395a9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Browser\Chrome">
+      <UniqueIdentifier>{b2886267-5521-4e75-9fae-fec4a2d90dbb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Context.cpp">
@@ -47,6 +50,27 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\bin\win32\debug\modules\navigation\config.txt" />
+    <None Include="Browser\Chrome\AvatarNavigator\AvatarNavigator.js">
+      <Filter>Browser\Chrome</Filter>
+    </None>
+    <None Include="Browser\Chrome\AvatarNavigator\background.html">
+      <Filter>Browser\Chrome</Filter>
+    </None>
+    <None Include="Browser\Chrome\AvatarNavigator\manifest.json">
+      <Filter>Browser\Chrome</Filter>
+    </None>
+    <None Include="Browser\Chrome\AvatarNavigator\popup.html">
+      <Filter>Browser\Chrome</Filter>
+    </None>
+    <None Include="Browser\Chrome\AvatarNavigator\_locales\en\messages.json">
+      <Filter>Browser\Chrome</Filter>
+    </None>
+    <None Include="Browser\Chrome\AvatarNavigator\_locales\de\messages.json">
+      <Filter>Browser\Chrome</Filter>
+    </None>
+    <None Include="Browser\Chrome\AvatarNavigator\_locales\ja\messages.json">
+      <Filter>Browser\Chrome</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <CustomBuildStep Include="Browser\Firefox\AvatarNavigator\chrome\chromeFiles\locale\en-US\avatarnav\avatarnav.dtd">

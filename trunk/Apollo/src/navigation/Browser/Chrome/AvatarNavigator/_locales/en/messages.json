@@ -1,0 +1,7 @@
+{
+  "Name": { "message": "Avatar Navigator" },
+  "Description": { "message": "Avatars on web pages" },
+  "Show_chat_window": { "message": "Show chat window" },
+
+  "Last": { "message": "Last" }
+}
