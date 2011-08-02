@@ -12,6 +12,8 @@
 #include "HttpConnection.h"
 #include "TcpServer.h"
 #include "TcpConnection.h"
+#include "WebSocketServer.h"
+#include "WebSocketConnection.h"
 #include "MsgSrpcGate.h"
 
 int ServerModule::addHttpConnection(const ApHandle& hConnection, HttpConnection* pConnection)
@@ -40,6 +42,8 @@ HttpConnection* ServerModule::findHttpConnection(const ApHandle& hConnection)
   return pConnection;
 }
 
+//--------------------------
+
 int ServerModule::addTcpConnection(const ApHandle& hConnection, TcpConnection* pConnection)
 {
   int ok = 1;
@@ -66,9 +70,37 @@ TcpConnection* ServerModule::findTcpConnection(const ApHandle& hConnection)
   return pConnection;
 }
 
+//--------------------------
+
+int ServerModule::addWebSocketConnection(const ApHandle& hConnection, WebSocketConnection* pConnection)
+{
+  int ok = 1;
+
+  ok = websocketConnections_.Set(hConnection, pConnection);
+
+  return ok;
+}
+
+int ServerModule::removeWebSocketConnection(const ApHandle& hConnection)
+{
+  int ok = 1;
+
+  ok = websocketConnections_.Unset(hConnection);
+  // WebSocketConnection deletes itself externally
+
+  return ok;
+}
+
+WebSocketConnection* ServerModule::findWebSocketConnection(const ApHandle& hConnection)
+{
+  WebSocketConnection* pConnection = 0;
+  websocketConnections_.Get(hConnection, pConnection);
+  return pConnection;
+}
+
 //----------------------------------------------------------
 
-AP_MSG_HANDLER_METHOD(ServerModule, Server_StartHTTP)
+AP_MSG_HANDLER_METHOD(ServerModule, Server_StartHttp)
 {
   if (pHttpServer_ == 0) {
     pHttpServer_ = new HttpServer();
@@ -82,7 +114,7 @@ AP_MSG_HANDLER_METHOD(ServerModule, Server_StartHTTP)
   pMsg->apStatus = ApMessage::Ok;
 }
 
-AP_MSG_HANDLER_METHOD(ServerModule, Server_StopHTTP)
+AP_MSG_HANDLER_METHOD(ServerModule, Server_StopHttp)
 {
   if (pHttpServer_ != 0) {
     pHttpServer_->Stop();
@@ -227,13 +259,38 @@ AP_MSG_HANDLER_METHOD(ServerModule, TcpServer_SendSrpc)
   pMsg->apStatus = ApMessage::Ok;
 }
 
+AP_MSG_HANDLER_METHOD(ServerModule, Server_StartWebSocket)
+{
+  if (pWebSocketServer_ == 0) {
+    pWebSocketServer_ = new WebSocketServer();
+    if (!pWebSocketServer_) { throw ApException(LOG_CONTEXT, "new WebSocketServer failed"); }
+
+    sWebSocketAddress_ = Apollo::getModuleConfig(MODULE_NAME, "WebSocket/Address", "localhost");
+    nWebSocketPort_ = Apollo::getModuleConfig(MODULE_NAME, "WebSocket/Port", 23765);
+    if (!pWebSocketServer_->Start(sWebSocketAddress_, nWebSocketPort_)) { throw ApException(LOG_CONTEXT, "pServer_->Start(%s, %d) failed", _sz(sWebSocketAddress_), nWebSocketPort_); }
+  }
+
+  pMsg->apStatus = ApMessage::Ok;
+}
+
+AP_MSG_HANDLER_METHOD(ServerModule, Server_StopWebSocket)
+{
+  if (pWebSocketServer_ != 0) {
+    pWebSocketServer_->Stop();
+    delete pWebSocketServer_;
+    pWebSocketServer_ = 0;
+  }
+
+  pMsg->apStatus = ApMessage::Ok;
+}
+
 AP_MSG_HANDLER_METHOD(ServerModule, System_RunLevel)
 {
   if (0) {
   } else if (pMsg->sLevel == Msg_System_RunLevel_Normal) {
 
     if (Apollo::getModuleConfig(MODULE_NAME, "HTTP/Enabled", 0)) {
-      Msg_Server_StartHTTP msg;
+      Msg_Server_StartHttp msg;
       msg.Request();
     }
 
@@ -242,15 +299,25 @@ AP_MSG_HANDLER_METHOD(ServerModule, System_RunLevel)
       msg.Request();
     }
 
+    if (Apollo::getModuleConfig(MODULE_NAME, "WebSocket/Enabled", 0)) {
+      Msg_Server_StartWebSocket msg;
+      msg.Request();
+    }
+
   } else if (pMsg->sLevel == Msg_System_RunLevel_Shutdown) {
 
     if (Apollo::getModuleConfig(MODULE_NAME, "HTTP/Enabled", 0)) {
-      Msg_Server_StopHTTP msg;
+      Msg_Server_StopHttp msg;
       msg.Request();
     }
 
     if (Apollo::getModuleConfig(MODULE_NAME, "TCP/Enabled", 0)) {
       Msg_Server_StopTCP msg;
+      msg.Request();
+    }
+
+    if (Apollo::getModuleConfig(MODULE_NAME, "WebSocket/Enabled", 0)) {
+      Msg_Server_StopWebSocket msg;
       msg.Request();
     }
 
@@ -268,6 +335,7 @@ AP_MSG_HANDLER_METHOD(ServerModule, UnitTest_Begin)
   AP_UNUSED_ARG(pMsg);
   if (Apollo::getConfig("Test/Server", 0)) {
     AP_UNITTEST_REGISTER(HttpParser::test);
+    AP_UNITTEST_REGISTER(WebSocketConnection::test_KeyString2Buffer);
   }
 }
 
@@ -276,6 +344,7 @@ AP_MSG_HANDLER_METHOD(ServerModule, UnitTest_Execute)
   AP_UNUSED_ARG(pMsg);
   if (Apollo::getConfig("Test/Server", 0)) {
     AP_UNITTEST_EXECUTE(HttpParser::test);
+    AP_UNITTEST_EXECUTE(WebSocketConnection::test_KeyString2Buffer);
   }
 }
 
@@ -292,8 +361,8 @@ int ServerModule::init()
 {
   int ok = 1;
 
-  AP_MSG_REGISTRY_ADD(MODULE_NAME, ServerModule, Server_StartHTTP, this, ApCallbackPosNormal);
-  AP_MSG_REGISTRY_ADD(MODULE_NAME, ServerModule, Server_StopHTTP, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, ServerModule, Server_StartHttp, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, ServerModule, Server_StopHttp, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ServerModule, HttpServer_Request, this, ApCallbackPosLate); // as a default hander
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ServerModule, HttpServer_SendResponse, this, ApCallbackPosNormal);
 
@@ -301,6 +370,9 @@ int ServerModule::init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ServerModule, Server_StopTCP, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ServerModule, TcpServer_SrpcRequest, this, ApCallbackPosLate); // as default handler and SRPC gateway
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ServerModule, TcpServer_SendSrpc, this, ApCallbackPosNormal);
+
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, ServerModule, Server_StartWebSocket, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, ServerModule, Server_StopWebSocket, this, ApCallbackPosNormal);
 
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ServerModule, System_RunLevel, this, ApCallbackPosNormal);
 

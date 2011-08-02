@@ -628,7 +628,7 @@ int Client::onConnectionDisconnected()
   if (nState_ == ClientState_Connected) {
     bWasConnected = 1;
   } else {
-    apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "was not connected, state=%d" ApHandleFormat "", nState_, ApHandlePrintf(hAp_)));
+    apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "was not connected, state=%d " ApHandleFormat "", nState_, ApHandlePrintf(hAp_)));
   }
 
   pConnection_ = 0;

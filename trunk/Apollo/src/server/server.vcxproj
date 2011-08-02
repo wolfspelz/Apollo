@@ -81,6 +81,8 @@
     <ClCompile Include="ServerModule.cpp" />
     <ClCompile Include="TcpConnection.cpp" />
     <ClCompile Include="TcpServer.cpp" />
+    <ClCompile Include="WebSocketConnection.cpp" />
+    <ClCompile Include="WebSocketServer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="HttpConnection.h" />
@@ -91,6 +93,8 @@
     <ClInclude Include="ServerModule.h" />
     <ClInclude Include="TcpConnection.h" />
     <ClInclude Include="TcpServer.h" />
+    <ClInclude Include="WebSocketConnection.h" />
+    <ClInclude Include="WebSocketServer.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\bin\Win32\Debug\modules\server\config.txt" />
