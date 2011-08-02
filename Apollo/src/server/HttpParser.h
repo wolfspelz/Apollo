@@ -31,6 +31,7 @@ public:
   String& protocol() { return sProtocol_; }
   void getHeaders(List& l) { l = lHeaders_; }
   void getBody(Buffer& sb);
+  void getRemainingData(Buffer& sb);
   void skipRequest();
 
 #if defined(AP_TEST)

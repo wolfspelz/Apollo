@@ -14,6 +14,8 @@ class HttpConnection;
 class HttpServer;
 class TcpConnection;
 class TcpServer;
+class WebSocketConnection;
+class WebSocketServer;
 
 typedef ApHandlePointerTree<HttpConnection*> HttpConnectionList;
 typedef ApHandlePointerTreeNode<HttpConnection*> HttpConnectionNode;
@@ -23,12 +25,17 @@ typedef ApHandlePointerTree<TcpConnection*> TcpConnectionList;
 typedef ApHandlePointerTreeNode<TcpConnection*> TcpConnectionNode;
 typedef ApHandlePointerTreeIterator<TcpConnection*> TcpConnectionIterator;
 
+typedef ApHandlePointerTree<WebSocketConnection*> WebSocketConnectionList;
+typedef ApHandlePointerTreeNode<WebSocketConnection*> WebSocketConnectionNode;
+typedef ApHandlePointerTreeIterator<WebSocketConnection*> WebSocketConnectionIterator;
+
 class ServerModule
 {
 public:
   ServerModule()
     :pHttpServer_(0)
     ,pTcpServer_(0)
+    ,pWebSocketServer_(0)
   {}
 
   int init();
@@ -40,9 +47,12 @@ public:
   int addTcpConnection(const ApHandle& hConnection, TcpConnection* pConnection);
   int removeTcpConnection(const ApHandle& hConnection);
   TcpConnection* findTcpConnection(const ApHandle& hConnection);
+  int addWebSocketConnection(const ApHandle& hConnection, WebSocketConnection* pConnection);
+  int removeWebSocketConnection(const ApHandle& hConnection);
+  WebSocketConnection* findWebSocketConnection(const ApHandle& hConnection);
 
-  void On_Server_StartHTTP(Msg_Server_StartHTTP* pMsg);
-  void On_Server_StopHTTP(Msg_Server_StopHTTP* pMsg);
+  void On_Server_StartHttp(Msg_Server_StartHttp* pMsg);
+  void On_Server_StopHttp(Msg_Server_StopHttp* pMsg);
   void On_HttpServer_Request(Msg_HttpServer_Request* pMsg);
   void On_HttpServer_SendResponse(Msg_HttpServer_SendResponse* pMsg);
 
@@ -52,6 +62,9 @@ public:
   void On_TcpServer_SrpcRequest(Msg_TcpServer_SrpcRequest* pMsg);
   void On_TcpServer_SendSrpc(Msg_TcpServer_SendSrpc* pMsg);
   void On_TcpServer_Disconnected(Msg_TcpServer_Disconnected* pMsg);
+
+  void On_Server_StartWebSocket(Msg_Server_StartWebSocket* pMsg);
+  void On_Server_StopWebSocket(Msg_Server_StopWebSocket* pMsg);
 
   void On_System_RunLevel(Msg_System_RunLevel* pMsg);
 
@@ -71,6 +84,11 @@ public:
   TcpConnectionList tcpConnections_;
   String sTcpAddress_;
   int nTcpPort_;
+
+  WebSocketServer* pWebSocketServer_;
+  WebSocketConnectionList websocketConnections_;
+  String sWebSocketAddress_;
+  int nWebSocketPort_;
 
   AP_MSG_REGISTRY_DECLARE;
 };

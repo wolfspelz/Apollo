@@ -11,7 +11,7 @@
 
 int HttpConnection::OnConnected()
 {
-  apLog_VeryVerbose((LOG_CHANNEL, LOG_CONTEXT, "Display HttpConnection " ApHandleFormat " opened", ApHandlePrintf(hAp_)));
+  apLog_VeryVerbose((LOG_CHANNEL, LOG_CONTEXT, "" ApHandleFormat " opened", ApHandlePrintf(hAp_)));
   return 1;
 }
 

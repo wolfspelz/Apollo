@@ -8,17 +8,17 @@
 #define MsgServer_h_INCLUDED
 
 // -> server
-class Msg_Server_StartHTTP: public ApRequestMessage
+class Msg_Server_StartHttp: public ApRequestMessage
 {
 public:
-  Msg_Server_StartHTTP() : ApRequestMessage("Server_StartHTTP") {}
+  Msg_Server_StartHttp() : ApRequestMessage("Server_StartHttp") {}
 };
 
 // -> server
-class Msg_Server_StopHTTP: public ApRequestMessage
+class Msg_Server_StopHttp: public ApRequestMessage
 {
 public:
-  Msg_Server_StopHTTP() : ApRequestMessage("Server_StopHTTP") {}
+  Msg_Server_StopHttp() : ApRequestMessage("Server_StopHttp") {}
 };
 
 // ------------------------------------------------------
@@ -35,6 +35,22 @@ class Msg_Server_StopTCP: public ApRequestMessage
 {
 public:
   Msg_Server_StopTCP() : ApRequestMessage("Server_StopTCP") {}
+};
+
+// ------------------------------------------------------
+
+// -> server
+class Msg_Server_StartWebSocket: public ApRequestMessage
+{
+public:
+  Msg_Server_StartWebSocket() : ApRequestMessage("Server_StartWebSocket") {}
+};
+
+// -> server
+class Msg_Server_StopWebSocket: public ApRequestMessage
+{
+public:
+  Msg_Server_StopWebSocket() : ApRequestMessage("Server_StopWebSocket") {}
 };
 
 #endif // !defined(MsgServer_h_INCLUDED)
