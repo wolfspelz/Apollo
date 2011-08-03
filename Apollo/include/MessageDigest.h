@@ -18,21 +18,28 @@ public:
   MessageDigest(unsigned char* pData, size_t nLen)
     :sbMessage_(pData, nLen)
     ,bSHA1_(0)
+    ,bMD5_(0)
   {}
   virtual ~MessageDigest() {}
 
   String getSHA1Hex();
-  //String getSHA1base64();
   Buffer& getSHA1();
+
+  String getMD5Hex();
+  Buffer& getMD5();
 
 protected:
   void doSHA1();
+  void doMD5();
 
 protected:
   Buffer sbMessage_;
 
   int bSHA1_;
   Buffer sbSHA1_;
+
+  int bMD5_;
+  Buffer sbMD5_;
 };
 
 AP_NAMESPACE_END
