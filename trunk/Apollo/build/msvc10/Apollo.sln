@@ -122,6 +122,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Setup", "..\..\src\Setup\Se
 		{9B3FBA6A-ED3F-479A-8919-A463882F19B1} = {9B3FBA6A-ED3F-479A-8919-A463882F19B1}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "md5", "..\..\src\md5\md5.vcxproj", "{D9B2D659-1BA3-4AB5-8058-D7BED3A4F249}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -304,6 +306,10 @@ Global
 		{069A3623-907B-43EF-92DC-8BDEA35E9E3E}.Debug|Win32.Build.0 = Debug|Win32
 		{069A3623-907B-43EF-92DC-8BDEA35E9E3E}.Release|Win32.ActiveCfg = Release|Win32
 		{069A3623-907B-43EF-92DC-8BDEA35E9E3E}.Release|Win32.Build.0 = Release|Win32
+		{D9B2D659-1BA3-4AB5-8058-D7BED3A4F249}.Debug|Win32.ActiveCfg = Debug|Win32
+		{D9B2D659-1BA3-4AB5-8058-D7BED3A4F249}.Debug|Win32.Build.0 = Debug|Win32
+		{D9B2D659-1BA3-4AB5-8058-D7BED3A4F249}.Release|Win32.ActiveCfg = Release|Win32
+		{D9B2D659-1BA3-4AB5-8058-D7BED3A4F249}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -23,6 +23,7 @@
   #define AP_TEST_RegEx
   #define AP_TEST_Xml
   #define AP_TEST_Base64
+  #define AP_TEST_MD5
   #define AP_TEST_Crypto
   #define AP_TEST_Random
   #define AP_TEST_Url
@@ -2267,6 +2268,45 @@ int Test_base64_sha1()
 #endif // AP_TEST_Base64
 
 //----------------------------------------------------------
+// md5
+
+#if defined(AP_TEST_MD5)
+
+#include "MessageDigest.h"
+
+String Test_md5_base(const String& sMessage, const String& sExpected)
+{
+  String s;
+
+  Apollo::MessageDigest md((unsigned char*) (const char*) sMessage, sMessage.bytes());
+  String sHexResult = md.getMD5Hex();
+  if (sHexResult != sExpected) {
+    s.appendf("msg=%s: got=%s, expected=%s", _sz(sMessage), _sz(sHexResult), _sz(sExpected));
+  }
+
+  return s;
+}
+
+String Test_md5()
+{
+  String s;
+
+  if (!s) { s = Test_md5_base("a", "0cc175b9c0f1b6a831c399e269772661"); }
+  if (!s) { s = Test_md5_base("abc", "900150983cd24fb0d6963f7d28e17f72"); }
+  if (!s) { s = Test_md5_base("message digest", "f96b697d7cb7938d525a2f31aaf161d0"); }
+  if (!s) { s = Test_md5_base("abcdefghijklmnopqrstuvwxyz", "c3fcd3d76192e4007dfb496cca67e13b"); }
+  if (!s) { s = Test_md5_base("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789", "d174ab98d277d9f5a5611c2c9f419d9f"); }
+  if (!s) { s = Test_md5_base("12345678901234567890123456789012345678901234567890123456789012345678901234567890", "57edf4a22be3c955ac49da2e2107b67a"); }
+
+  // http://tools.ietf.org/html/draft-ietf-hybi-thewebsocketprotocol-00
+  if (!s) { s = Test_md5_base("\x2E\x50\x31\xB7\x06\xDA\xB8\x0B\x47\x30\x22\x2D\x5A\x3F\x47\x58", "30737433526c26712d325a555e776575"); }
+
+  return s;
+}
+
+#endif // AP_TEST_MD5
+
+//----------------------------------------------------------
 // Crypto functions
 
 #if defined(AP_TEST_Crypto)
@@ -3093,6 +3133,10 @@ void Test_Builtin_Register()
   AP_UNITTEST_REGISTER(Test_base64_sha1);
 #endif // AP_TEST_Base64
 
+#if defined(AP_TEST_MD5)
+  AP_UNITTEST_REGISTER(Test_md5);
+#endif // AP_TEST_Base64
+
 #if defined(AP_TEST_Crypto)
   AP_UNITTEST_REGISTER(Test_Crypto_Blowfish);
   AP_UNITTEST_REGISTER(Test_Crypto_NativeWithLoginCredentials);
@@ -3212,6 +3256,10 @@ void Test_Builtin_Execute()
 #if defined(AP_TEST_Base64)
   AP_UNITTEST_EXECUTE1(Test_base64);
   AP_UNITTEST_EXECUTE1(Test_base64_sha1);
+#endif
+
+#if defined(AP_TEST_MD5)
+  AP_UNITTEST_EXECUTE(Test_md5);
 #endif
 
 #if defined(AP_TEST_Crypto)
