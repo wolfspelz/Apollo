@@ -134,11 +134,6 @@ void HttpParser::getBody(Buffer& sb)
   }
 }
 
-void HttpParser::getRemainingData(Buffer& sb)
-{
-  sb = sbData_;
-}
-
 void HttpParser::skipRequest()
 {
   if (hasRequest()) {

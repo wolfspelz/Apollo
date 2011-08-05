@@ -287,5 +287,8 @@
     <ClInclude Include="..\..\include\XMLProcessor.h">
       <Filter>Header Files\Include</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\MsgWebSocketServer.h">
+      <Filter>Header Files\Include</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

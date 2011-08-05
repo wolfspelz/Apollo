@@ -11,7 +11,7 @@
 
 int TcpConnection::OnConnected()
 {
-  apLog_Info((LOG_CHANNEL, LOG_CONTEXT, "Navigation connection " ApHandleFormat " opened", ApHandlePrintf(hAp_)));
+  apLog_Info((LOG_CHANNEL, LOG_CONTEXT, "" ApHandleFormat " opened", ApHandlePrintf(hAp_)));
 
   Msg_TcpServer_Connected msg;
   msg.hConnection = apHandle();
@@ -66,7 +66,7 @@ int TcpConnection::OnDataIn(unsigned char* pData, size_t nLen)
 int TcpConnection::OnClosed()
 {
   AutoDelete(1);
-  apLog_Info((LOG_CHANNEL, LOG_CONTEXT, "Navigation connection " ApHandleFormat " closed", ApHandlePrintf(hAp_)));
+  apLog_Info((LOG_CHANNEL, LOG_CONTEXT, "" ApHandleFormat " closed", ApHandlePrintf(hAp_)));
 
   Msg_TcpServer_Disconnected msg;
   msg.hConnection = apHandle();

@@ -224,7 +224,6 @@ AP_MSG_HANDLER_METHOD(ServerModule, Server_StopTCP)
 AP_MSG_HANDLER_METHOD(ServerModule, TcpServer_SrpcRequest)
 {
   Msg_TcpServer_SendSrpc msgTSSS;
-  int ok = 0;
 
   String sType = pMsg->srpc.getString("ApType");
   ApSRPCMessage msg(sType);
@@ -236,7 +235,7 @@ AP_MSG_HANDLER_METHOD(ServerModule, TcpServer_SrpcRequest)
   }
 
   pMsg->srpc >> msg.srpc;
-  ok = msg.Call();
+  (void) msg.Call();
   msg.response >> pMsg->response;
 
   pMsg->apStatus = ApMessage::Ok;
@@ -280,6 +279,62 @@ AP_MSG_HANDLER_METHOD(ServerModule, Server_StopWebSocket)
     delete pWebSocketServer_;
     pWebSocketServer_ = 0;
   }
+
+  pMsg->apStatus = ApMessage::Ok;
+}
+
+AP_MSG_HANDLER_METHOD(ServerModule, WebSocketServer_ReceiveText)
+{
+  Msg_WebSocketServer_SrpcRequest msg;
+  msg.hConnection = pMsg->hConnection;
+  msg.srpc.fromString(pMsg->sData);
+
+  if (!msg.Request()) {
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_WebSocketServer_SrpcRequest() failed conn=" ApHandleFormat "", ApHandlePrintf(msg.hConnection)));
+  } else {
+
+    // If a response was provided, then send it
+    if (msg.response.length() > 0) {
+      Msg_WebSocketServer_SendText msgWSST;
+      msgWSST.sData = msg.response.toString();
+      msgWSST.hConnection = pMsg->hConnection;
+      if (!msgWSST.Request()) {
+        apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_WebSocketServer_SendText() failed conn=", ApHandlePrintf(msgWSST.hConnection)));
+      }
+    }
+  }
+
+  pMsg->apStatus = ApMessage::Ok;
+}
+
+AP_MSG_HANDLER_METHOD(ServerModule, WebSocketServer_SendText)
+{
+  if (apLog_IsVerbose) {
+    apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "conn=" ApHandleFormat " send: %s", ApHandlePrintf(pMsg->hConnection), _sz(pMsg->sData)));
+  }
+
+  WebSocketConnection* pConnection = findWebSocketConnection(pMsg->hConnection);
+  if (pConnection == 0) { throw ApException(LOG_CONTEXT, "findTcpConnection(" ApHandleFormat ") failed", ApHandlePrintf(pMsg->hConnection)); }
+  //if (!pConnection->DataOut((unsigned char*) pMsg->sData.c_str(), pMsg->sData.bytes()) ) { throw ApException(LOG_CONTEXT, "Connection " ApHandleFormat " DataOut() failed", ApHandlePrintf(pMsg->hConnection)); }
+  if (!pConnection->SendWebSocketMessage((unsigned char*) pMsg->sData.c_str(), pMsg->sData.bytes()) ) { throw ApException(LOG_CONTEXT, "Connection " ApHandleFormat " SendWebSocketMessage() failed", ApHandlePrintf(pMsg->hConnection)); }
+
+  pMsg->apStatus = ApMessage::Ok;
+}
+
+AP_MSG_HANDLER_METHOD(ServerModule, WebSocketServer_SrpcRequest)
+{
+  String sType = pMsg->srpc.getString("ApType");
+  ApSRPCMessage msg(sType);
+
+  // Given message type -> send SRPC with custom type
+  if (sType.empty()) {
+    // Empty message type -> send SRPC via SRPCGATE
+    msg.SetType(SRPCGATE_HANDLER_TYPE);
+  }
+
+  pMsg->srpc >> msg.srpc;
+  (void) msg.Call();
+  msg.response >> pMsg->response;
 
   pMsg->apStatus = ApMessage::Ok;
 }
@@ -336,6 +391,8 @@ AP_MSG_HANDLER_METHOD(ServerModule, UnitTest_Begin)
   if (Apollo::getConfig("Test/Server", 0)) {
     AP_UNITTEST_REGISTER(HttpParser::test);
     AP_UNITTEST_REGISTER(WebSocketConnection::test_KeyString2Buffer);
+    AP_UNITTEST_REGISTER(WebSocketConnection::test_Create_ChromePreStandard_Response);
+    AP_UNITTEST_REGISTER(WebSocketConnection::test_Create_Standard_Response);
   }
 }
 
@@ -345,6 +402,8 @@ AP_MSG_HANDLER_METHOD(ServerModule, UnitTest_Execute)
   if (Apollo::getConfig("Test/Server", 0)) {
     AP_UNITTEST_EXECUTE(HttpParser::test);
     AP_UNITTEST_EXECUTE(WebSocketConnection::test_KeyString2Buffer);
+    AP_UNITTEST_EXECUTE(WebSocketConnection::test_Create_ChromePreStandard_Response);
+    AP_UNITTEST_EXECUTE(WebSocketConnection::test_Create_Standard_Response);
   }
 }
 
@@ -373,6 +432,9 @@ int ServerModule::init()
 
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ServerModule, Server_StartWebSocket, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ServerModule, Server_StopWebSocket, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, ServerModule, WebSocketServer_ReceiveText, this, ApCallbackPosLate); // as default handler, convert to SRPC
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, ServerModule, WebSocketServer_SendText, this, ApCallbackPosLate);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, ServerModule, WebSocketServer_SrpcRequest, this, ApCallbackPosLate); // as default SRPC handler and SRPC gateway
 
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ServerModule, System_RunLevel, this, ApCallbackPosNormal);
 
