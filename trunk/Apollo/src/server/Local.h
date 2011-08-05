@@ -13,6 +13,7 @@
 #include "MsgServer.h"
 #include "MsgHttpServer.h"
 #include "MsgTcpServer.h"
+#include "MsgWebSocketServer.h"
 
 #define MODULE_NAME "Server"
 #define LOG_CHANNEL MODULE_NAME

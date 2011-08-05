@@ -224,8 +224,8 @@ function Start()
 //  chrome.tabs.onDetached.addListener(OnTabDetached);
 
   var myWebSocket = new WebSocket("ws://localhost:23766");
-  myWebSocket.onopen = function (evt) { alert("Connection open ..."); myWebSocket.send("Hello Web Sockets!"); };
-  myWebSocket.onmessage = function (evt) { alert("Received Message: " + evt.data); };
+  myWebSocket.onopen = function (evt) { myWebSocket.send("Method=System_GetHandle"); };
+  myWebSocket.onmessage = function (evt) { alert("" + evt.data); };
   myWebSocket.onclose = function (evt) { alert("Connection closed."); };
 }
 

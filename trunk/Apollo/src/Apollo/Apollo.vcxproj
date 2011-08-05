@@ -101,6 +101,7 @@
     <ClCompile Include="XMLProcessor.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\include\MsgWebSocketServer.h" />
     <ClInclude Include="ApLib.h" />
     <ClInclude Include="..\..\include\ApCompiler.h" />
     <ClInclude Include="..\..\include\ApContainer.h" />

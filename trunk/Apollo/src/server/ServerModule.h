@@ -65,6 +65,9 @@ public:
 
   void On_Server_StartWebSocket(Msg_Server_StartWebSocket* pMsg);
   void On_Server_StopWebSocket(Msg_Server_StopWebSocket* pMsg);
+  void On_WebSocketServer_ReceiveText(Msg_WebSocketServer_ReceiveText* pMsg);
+  void On_WebSocketServer_SendText(Msg_WebSocketServer_SendText* pMsg);
+  void On_WebSocketServer_SrpcRequest(Msg_WebSocketServer_SrpcRequest* pMsg);
 
   void On_System_RunLevel(Msg_System_RunLevel* pMsg);
 
