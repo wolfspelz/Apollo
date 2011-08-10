@@ -52,6 +52,8 @@ public:
 
   void On_TcpServer_SrpcRequest(Msg_TcpServer_SrpcRequest* pMsg);
   void On_TcpServer_Disconnected(Msg_TcpServer_Disconnected* pMsg);
+  void On_WebSocketServer_SrpcRequest(Msg_WebSocketServer_SrpcRequest* pMsg);
+  void On_WebSocketServer_Disconnected(Msg_WebSocketServer_Disconnected* pMsg);
 
   void On_Navigation_NavigatorHello(Msg_Navigation_NavigatorHello* pMsg);
   void On_Navigation_NavigatorBye(Msg_Navigation_NavigatorBye* pMsg);
@@ -78,6 +80,7 @@ protected:
   void associateContextWithConnection(const ApHandle& hContext, const ApHandle& hConnection);
   void addContextToConnection(const ApHandle& hContext, const ApHandle& hConnection);
   void removeContextFromConnection(const ApHandle& hContext, const ApHandle& hConnection);
+  void cleanupConnectionAssociatedContexts(const ApHandle& hConnection);
 
 public:
   ContextList contexts_;

@@ -120,30 +120,8 @@ int NavigationModule::destroyContext(const ApHandle& hContext)
   return ok;
 }
 
-//----------------------------------------------------------
-
-AP_MSG_HANDLER_METHOD(NavigationModule, TcpServer_SrpcRequest)
+void NavigationModule::cleanupConnectionAssociatedContexts(const ApHandle& hConnection)
 {
-  // Add/fake the hConnection for some messages
-  // Will be used by SrpcGate hander below
-
-  String sMethod = pMsg->srpc.getString(Srpc::Key::Method);
-  if (0
-    || sMethod == "Navigation_NavigatorHello"
-    || sMethod == "Navigation_NavigatorBye"
-    || sMethod == "Navigation_ContextOpen"
-    || sMethod == "Navigation_ContextNavigate"
-    ) {
-    pMsg->srpc.set("hConnection", pMsg->hConnection);
-  }
-
-  // No apStatus
-}
-
-AP_MSG_HANDLER_METHOD(NavigationModule, TcpServer_Disconnected)
-{
-  ApHandle hConnection = pMsg->hConnection;
-
   ConnectionContextListNode* pNode = connectionContexts_.Find(hConnection);
   if (pNode != 0) {
     // We know the connection, otherwise ignore it
@@ -178,6 +156,54 @@ AP_MSG_HANDLER_METHOD(NavigationModule, TcpServer_Disconnected)
     (void) connectionContexts_.Unset(hConnection);
 
   } // We know the connection
+}
+
+//----------------------------------------------------------
+
+AP_MSG_HANDLER_METHOD(NavigationModule, TcpServer_SrpcRequest)
+{
+  // Add/fake the hConnection for some messages
+  // Will be used by SrpcGate hander below
+
+  String sMethod = pMsg->srpc.getString(Srpc::Key::Method);
+  if (0
+    || sMethod == "Navigation_NavigatorHello"
+    || sMethod == "Navigation_NavigatorBye"
+    || sMethod == "Navigation_ContextOpen"
+    || sMethod == "Navigation_ContextNavigate"
+    ) {
+    pMsg->srpc.set("hConnection", pMsg->hConnection);
+  }
+
+  // No apStatus
+}
+
+AP_MSG_HANDLER_METHOD(NavigationModule, TcpServer_Disconnected)
+{
+  cleanupConnectionAssociatedContexts(pMsg->hConnection);
+}
+
+AP_MSG_HANDLER_METHOD(NavigationModule, WebSocketServer_SrpcRequest)
+{
+  // Add/fake the hConnection for some messages
+  // Will be used by SrpcGate hander below
+
+  String sMethod = pMsg->srpc.getString(Srpc::Key::Method);
+  if (0
+    || sMethod == "Navigation_NavigatorHello"
+    || sMethod == "Navigation_NavigatorBye"
+    || sMethod == "Navigation_ContextOpen"
+    || sMethod == "Navigation_ContextNavigate"
+    ) {
+    pMsg->srpc.set("hConnection", pMsg->hConnection);
+  }
+
+  // No apStatus
+}
+
+AP_MSG_HANDLER_METHOD(NavigationModule, WebSocketServer_Disconnected)
+{
+  cleanupConnectionAssociatedContexts(pMsg->hConnection);
 }
 
 //---------------------------
@@ -504,6 +530,8 @@ int NavigationModule::init()
 
   AP_MSG_REGISTRY_ADD(MODULE_NAME, NavigationModule, TcpServer_SrpcRequest, this, ApCallbackPosEarly);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, NavigationModule, TcpServer_Disconnected, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, NavigationModule, WebSocketServer_SrpcRequest, this, ApCallbackPosEarly);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, NavigationModule, WebSocketServer_Disconnected, this, ApCallbackPosNormal);
 
   AP_MSG_REGISTRY_ADD(MODULE_NAME, NavigationModule, Navigation_NavigatorHello, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, NavigationModule, Navigation_NavigatorBye, this, ApCallbackPosNormal);
