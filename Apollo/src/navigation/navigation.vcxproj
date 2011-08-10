@@ -131,8 +131,11 @@
     <None Include="..\..\bin\win32\debug\modules\navigation\config.txt" />
     <None Include="Browser\Chrome\AvatarNavigator\AvatarNavigator.js" />
     <None Include="Browser\Chrome\AvatarNavigator\background.html" />
+    <None Include="Browser\Chrome\AvatarNavigator\Log.js" />
     <None Include="Browser\Chrome\AvatarNavigator\manifest.json" />
     <None Include="Browser\Chrome\AvatarNavigator\popup.html" />
+    <None Include="Browser\Chrome\AvatarNavigator\SrpcMessage.js" />
+    <None Include="Browser\Chrome\AvatarNavigator\SrpcProtocol.js" />
     <None Include="Browser\Chrome\AvatarNavigator\_locales\de\messages.json" />
     <None Include="Browser\Chrome\AvatarNavigator\_locales\en\messages.json" />
     <None Include="Browser\Chrome\AvatarNavigator\_locales\ja\messages.json" />

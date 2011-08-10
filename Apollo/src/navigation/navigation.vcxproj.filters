@@ -71,6 +71,15 @@
     <None Include="Browser\Chrome\AvatarNavigator\_locales\ja\messages.json">
       <Filter>Browser\Chrome</Filter>
     </None>
+    <None Include="Browser\Chrome\AvatarNavigator\Log.js">
+      <Filter>Browser\Chrome</Filter>
+    </None>
+    <None Include="Browser\Chrome\AvatarNavigator\SrpcMessage.js">
+      <Filter>Browser\Chrome</Filter>
+    </None>
+    <None Include="Browser\Chrome\AvatarNavigator\SrpcProtocol.js">
+      <Filter>Browser\Chrome</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <CustomBuildStep Include="Browser\Firefox\AvatarNavigator\chrome\chromeFiles\locale\en-US\avatarnav\avatarnav.dtd">
