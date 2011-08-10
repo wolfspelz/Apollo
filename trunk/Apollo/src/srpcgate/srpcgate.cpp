@@ -281,7 +281,6 @@ void SrpcGate_System_GetTime(ApSRPCMessage* pMsg)
 {
   Msg_System_GetTime msg;
   SRPCGATE_HANDLER_NATIVE_REQUEST(pMsg, msg);
-  pMsg->response.createResponse(pMsg->srpc);
   pMsg->response.set("nSec", msg.nSec);
   pMsg->response.set("nMicroSec", msg.nMicroSec);
 }
