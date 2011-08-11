@@ -14,7 +14,7 @@
   "options_page": "options.html",
   "permissions": [ "tabs" ],
   "browser_action": {
-    "popup": "popup.html",
+    //"popup": "popup.html",
     "default_icon": "logo19.png"
   }
 }
