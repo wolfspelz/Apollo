@@ -77,6 +77,7 @@
     <ClCompile Include="Browser.cpp" />
     <ClCompile Include="browserinfo.cpp" />
     <ClCompile Include="BrowserInfoModule.cpp" />
+    <ClCompile Include="ChromeWin32Browser.cpp" />
     <ClCompile Include="Firefox3Win32Browser.cpp" />
     <ClCompile Include="Firefox4Win32Browser.cpp" />
     <ClCompile Include="Win32Browser.cpp" />
@@ -86,6 +87,7 @@
     <ClInclude Include="Browser.h" />
     <ClInclude Include="browserinfo.h" />
     <ClInclude Include="BrowserInfoModule.h" />
+    <ClInclude Include="ChromeWin32Browser.h" />
     <ClInclude Include="Firefox3Win32Browser.h" />
     <ClInclude Include="Firefox4Win32Browser.h" />
     <ClInclude Include="Local.h" />

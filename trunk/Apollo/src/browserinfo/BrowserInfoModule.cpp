@@ -12,6 +12,7 @@
 #include "Win32Window.h"
 #include "Firefox3Win32Browser.h"
 #include "Firefox4Win32Browser.h"
+#include "ChromeWin32Browser.h"
 #endif
 
 //----------------------------------------------------------
@@ -91,6 +92,8 @@ AP_MSG_HANDLER_METHOD(BrowserInfoModule, BrowserInfo_BeginTrackCoordinates)
     win = Firefox3Finder::GetToplevelWindow(pMsg->kvSignature);
   } else if (sType == Msg_BrowserInfo_BeginTrackCoordinates_Signature_Type_Firefox) {
     win = Firefox4Finder::GetToplevelWindow(pMsg->kvSignature);
+  } else if (sType == Msg_BrowserInfo_BeginTrackCoordinates_Signature_Type_Chrome) {
+    win = ChromeFinder::GetToplevelWindow(pMsg->kvSignature);
 #endif // defined(WIN32)
   }
 
@@ -110,6 +113,8 @@ AP_MSG_HANDLER_METHOD(BrowserInfoModule, BrowserInfo_BeginTrackCoordinates)
         pBrowser = new Firefox3Win32Browser(win);
       } else if (sType == Msg_BrowserInfo_BeginTrackCoordinates_Signature_Type_Firefox) {
         pBrowser = new Firefox4Win32Browser(win);
+      } else if (sType == Msg_BrowserInfo_BeginTrackCoordinates_Signature_Type_Chrome) {
+        pBrowser = new ChromeWin32Browser(win);
 #endif // defined(WIN32)
       }
 

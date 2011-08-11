@@ -222,14 +222,14 @@ Apollo::WindowHandle Firefox4Finder::GetToplevelWindow(Apollo::KeyValueList& kvS
 
   HWND hWnd = NULL;
 
-  Firefox4Finder foxPack;
-  foxPack.Run();
-  if (foxPack.list_.Count() == 1) {
+  Firefox4Finder windows;
+  windows.Run();
+  if (windows.list_.Count() == 1) {
     // Just 1 -> take it anyway
 
   } else {
 
-    HWNDList candidates_ = foxPack.list_;
+    HWNDList candidates_ = windows.list_;
 
     // Filter by title
     if (!sTitle.empty()) {
@@ -246,7 +246,7 @@ Apollo::WindowHandle Firefox4Finder::GetToplevelWindow(Apollo::KeyValueList& kvS
       } else {
         for (HWNDListNode* pNode = 0; (pNode = candidates_.Next(pNode)) != 0; ) {
           if (!WindowFinder::HasTitle(pNode->Key(), sTitle)) {
-            foxPack.list_.Unset(pNode->Key());
+            windows.list_.Unset(pNode->Key());
           }
         }
       }
@@ -256,20 +256,125 @@ Apollo::WindowHandle Firefox4Finder::GetToplevelWindow(Apollo::KeyValueList& kvS
     if (nLeft != IgnoreCoordinate || nTop != IgnoreCoordinate || nWidth != IgnoreCoordinate || nHeight != IgnoreCoordinate) {
       for (HWNDListNode* pNode = 0; (pNode = candidates_.Next(pNode)) != 0; ) {
         if (!WindowFinder::HasCoordinates(pNode->Key(), nLeft, nTop, nWidth, nHeight)) {
-          foxPack.list_.Unset(pNode->Key());
+          windows.list_.Unset(pNode->Key());
         }
       }
 
     }
   }
 
-  if (foxPack.list_.Count() > 1) {
-    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Ambiguity: %d candidates", foxPack.list_.Count()));
-  } if (foxPack.list_.Count() == 0) {
+  if (windows.list_.Count() > 1) {
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Ambiguity: %d candidates", windows.list_.Count()));
+  } if (windows.list_.Count() == 0) {
     apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "No window found"));
   } else {
     // Extract
-    hWnd = foxPack.list_.Next(0)->Key();
+    hWnd = windows.list_.Next(0)->Key();
+  }
+
+  return hWnd;
+}
+
+//------------------------------
+
+ChromeFinder::ChromeFinder()
+:WindowFinder(NULL)
+,sToplevelClass_("Chrome_WidgetWin_0")
+{
+}
+
+void ChromeFinder::OnWindow(HWND hWnd)
+{
+  if (HasClass(hWnd, sToplevelClass_)) {
+    if (::IsWindowVisible(hWnd)) {
+      RECT r;
+      ::GetWindowRect(hWnd, &r);
+      if (r.right - r.left > 0 && r.bottom - r.top > 0) {
+        list_.Set(hWnd, 1);
+      }
+    }
+  }
+}
+
+Apollo::WindowHandle ChromeFinder::GetToplevelWindow(Apollo::KeyValueList& kvSignature)
+{
+  String sTitle = kvSignature[Msg_BrowserInfo_BeginTrackCoordinates_Signature_Title].getString();
+  String sLeft = kvSignature[Msg_BrowserInfo_BeginTrackCoordinates_Signature_Left].getString();
+  String sTop = kvSignature[Msg_BrowserInfo_BeginTrackCoordinates_Signature_Top].getString();
+  String sWidth = kvSignature[Msg_BrowserInfo_BeginTrackCoordinates_Signature_Width].getString();
+  String sHeight = kvSignature[Msg_BrowserInfo_BeginTrackCoordinates_Signature_Height].getString();
+
+  int nLeft = IgnoreCoordinate; if (!sLeft.empty()) { nLeft = String::atoi(sLeft); }
+  int nTop = IgnoreCoordinate; if (!sTop.empty()) { nTop = String::atoi(sTop); }
+  int nWidth = IgnoreCoordinate; if (!sWidth.empty()) { nWidth = String::atoi(sWidth); }
+  int nHeight = IgnoreCoordinate; if (!sHeight.empty()) { nHeight = String::atoi(sHeight); }
+
+  HWND hWnd = NULL;
+
+  ChromeFinder windows;
+  windows.Run();
+
+  if (windows.list_.Count() == 1) {
+    // Just 1 -> take it anyway
+
+  } else {
+
+    HWNDList candidates_ = windows.list_;
+
+    if (windows.list_.Count() > 1) {
+      // Filter by width/height
+      if (nWidth != IgnoreCoordinate || nHeight != IgnoreCoordinate) {
+        for (HWNDListNode* pNode = 0; (pNode = candidates_.Next(pNode)) != 0; ) {
+          if (!WindowFinder::HasCoordinates(pNode->Key(), IgnoreCoordinate, IgnoreCoordinate, nWidth, nHeight)) {
+            windows.list_.Unset(pNode->Key());
+          }
+        }
+      }
+    }
+
+    if (windows.list_.Count() > 1) {
+      // Filter by left/top
+      if (nLeft != IgnoreCoordinate || nTop != IgnoreCoordinate) {
+        for (HWNDListNode* pNode = 0; (pNode = candidates_.Next(pNode)) != 0; ) {
+          if (!WindowFinder::HasCoordinates(pNode->Key(), nLeft, nTop, IgnoreCoordinate, IgnoreCoordinate)) {
+            windows.list_.Unset(pNode->Key());
+          }
+        }
+      }
+    }
+
+    if (windows.list_.Count() > 1) {
+      // Filter by title
+      if (!sTitle.empty()) {
+        // Count how many titles match
+        int nCnt = 0;
+        for (HWNDListNode* pNode = 0; (pNode = candidates_.Next(pNode)) != 0; ) {
+          if (WindowFinder::HasTitle(pNode->Key(), sTitle)) {
+            nCnt++;
+          }
+        }
+
+        if (nCnt == 0) {
+          // do not filter by title if no match
+        } else {
+          for (HWNDListNode* pNode = 0; (pNode = candidates_.Next(pNode)) != 0; ) {
+            if (!WindowFinder::HasTitle(pNode->Key(), sTitle)) {
+              windows.list_.Unset(pNode->Key());
+            }
+          }
+        }
+      } // sTitle
+    }
+
+  }
+
+  if (windows.list_.Count() > 1) {
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Ambiguity: %d candidates", windows.list_.Count()));
+  } if (windows.list_.Count() == 0) {
+    apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "No window found"));
+  } else {
+    // Extract
+    hWnd = windows.list_.Next(0)->Key();
   }
 
   return hWnd;

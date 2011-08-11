@@ -457,6 +457,7 @@ int ApCore::Call(ApMessage* pMsg)
         || pMsg->getName().startsWith("Core_")
         || pMsg->getName().startsWith("System_")
         || pMsg->getName().startsWith("MainLoop_")
+        || pMsg->getName().startsWith("Timer_Event")
         ) {
           // Do not trace
       } else {
@@ -638,7 +639,7 @@ AP_REFINSTANCE_MSG_HANDLER(ApCore, Core_ModulePackageName)
 
 ApCore::ApCore()
 :bExiting_(0)
-,bHeapCheck_(1)
+,bHeapCheck_(0)
 {
 }
 
