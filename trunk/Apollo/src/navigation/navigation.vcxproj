@@ -133,6 +133,7 @@
     <None Include="Browser\Chrome\AvatarNavigator\background.html" />
     <None Include="Browser\Chrome\AvatarNavigator\Log.js" />
     <None Include="Browser\Chrome\AvatarNavigator\manifest.json" />
+    <None Include="Browser\Chrome\AvatarNavigator\options.html" />
     <None Include="Browser\Chrome\AvatarNavigator\popup.html" />
     <None Include="Browser\Chrome\AvatarNavigator\SrpcMessage.js" />
     <None Include="Browser\Chrome\AvatarNavigator\SrpcProtocol.js" />

@@ -1,0 +1,63 @@
+<html>
+<head><title>My Test Extension Options</title></head>
+<script type="text/javascript">
+
+  function SaveOption(sName)
+  {
+    var sValue = document.getElementById('i' + sName).value;
+    if (sValue != null) {
+      localStorage[sName] = sValue;
+    }
+  }
+
+  function SaveOptions()
+  {
+    SaveOption('ServerHostname');
+    SaveOption('ServerPort');
+    SaveOption('MinReconnectDelay');
+    SaveOption('MaxReconnectDelay');
+    SaveOption('LogLevel');
+
+    chrome.extension.getBackgroundPage().GetOptions();
+    
+    // Update status to let user know options were saved.
+    var eStatus = document.getElementById("status");
+    eStatus.innerHTML = "Options Saved.";
+    setTimeout(function() {
+      eStatus.innerHTML = '';
+    }, 750);
+  }
+
+  function RestoreOption(sName)
+  {
+    var sValue = localStorage[sName];
+    if (sValue != null) {
+      document.getElementById('i' + sName).value = sValue;
+    }
+  }
+
+  function RestoreOptions()
+  {
+    RestoreOption('ServerHostname');
+    RestoreOption('ServerPort');
+    RestoreOption('MinReconnectDelay');
+    RestoreOption('MaxReconnectDelay');
+    RestoreOption('LogLevel');
+  }
+
+</script>
+
+<body onload="RestoreOptions()">
+
+<table border="0">
+<tr><td>ServerHostname:</td><td><input type="text" id="iServerHostname" value="" /></td></tr>
+<tr><td>ServerPort:</td><td><input type="text" id="iServerPort" value="" /></td></tr>
+<tr><td>MinReconnectDelay:</td><td><input type="text" id="iMinReconnectDelay" value="" /></td></tr>
+<tr><td>MaxReconnectDelay:</td><td><input type="text" id="iMaxReconnectDelay" value="" /></td></tr>
+<tr><td>LogLevel:</td><td><input type="text" id="iLogLevel" value="" /></td></tr>
+</table>
+
+<br>
+<button onclick="SaveOptions()">Save</button>
+</body>
+</html>
