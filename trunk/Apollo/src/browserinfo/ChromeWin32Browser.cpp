@@ -21,7 +21,12 @@ void ChromeWin32Browser::OnTimer()
     // No tabs as Win32 HWNDs
     // Then take the main HWND's client rect as content rect and manipulate the rectangle
     hContent = hWnd;
-
+    
+    ChildClassPathFinder ccpf(hWnd, "Chrome_WidgetWin_0/Chrome_RenderWidgetHostHWND");
+    ccpf.Run();
+    for (HWNDListNode* pNode = 0; (pNode = ccpf.list_.Next(pNode)) != 0; ) {
+      hContent = pNode->Key();
+    }
     RECT wr;
     ::GetWindowRect(hContent, &wr);
     RECT cr;
