@@ -1,5 +1,5 @@
 <html>
-<head><title>My Test Extension Options</title></head>
+<head><title>My Test Extension Options</title>
 <script type="text/javascript">
 
   function SaveOption(sName)
@@ -47,10 +47,17 @@
 
 </script>
 
+<style>
+  * { font-family:Arial,Verdana,Sans-Serif; font-size:12px; }
+  .Title { font-size:28px; font-weight:bold; }
+</style>
+
+</head>
 <body onload="RestoreOptions()">
 
 <table border="0">
-<tr><td>ServerHostname:</td><td><input type="text" id="iServerHostname" value="" /></td></tr>
+<tr><td><img src="logo48.png" /></td><td class="Title">AvatarNavigator Options</td></tr>
+<tr><td>ServerHostname:</td><td><input type="text" id="Text1" value="" /></td></tr>
 <tr><td>ServerPort:</td><td><input type="text" id="iServerPort" value="" /></td></tr>
 <tr><td>MinReconnectDelay:</td><td><input type="text" id="iMinReconnectDelay" value="" /></td></tr>
 <tr><td>MaxReconnectDelay:</td><td><input type="text" id="iMaxReconnectDelay" value="" /></td></tr>
