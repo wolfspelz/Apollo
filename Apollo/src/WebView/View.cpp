@@ -323,7 +323,8 @@ void View::Reload()
 void View::MoveWindowToCurrentRect()
 {
 #if defined(WIN32)
-  ::MoveWindow(hWnd_, nLeft_, nTop_ - (bVisible_ ? 0 : 10000), nWidth_, nHeight_, FALSE);
+  //apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "############### %d,%d %dx%d", nLeft_, nTop_, nWidth_, nHeight_));
+  ::MoveWindow(hWnd_, nLeft_ - (bVisible_ ? 0 : 0), nTop_ - (bVisible_ ? 0 : 10000), nWidth_, nHeight_, FALSE);
 #endif // WIN32
 }
 

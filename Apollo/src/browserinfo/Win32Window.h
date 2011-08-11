@@ -95,4 +95,16 @@ public:
   String sToplevelClass_;
 };
 
+class ChromeFinder: public WindowFinder
+{
+public:
+  ChromeFinder();
+
+  void OnWindow(HWND hWnd);
+
+  static Apollo::WindowHandle GetToplevelWindow(Apollo::KeyValueList& kvSignature);
+
+  String sToplevelClass_;
+};
+
 #endif // !defined(Win32Window_h_INCLUDED)

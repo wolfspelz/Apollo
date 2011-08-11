@@ -30,10 +30,12 @@ public:
   void SetVisibility(int bVisible) { bVisible_ = bVisible; }
   void SetPosition(int nLeft, int nBottom) { nLeft_ = nLeft; nBottom_ = nBottom; }
   void SetSize(int nWidth, int nHeight) { nWidth_ = nWidth; nHeight_ = nHeight; }
+  void SetWindow(const Apollo::WindowHandle& win) { win_ = win; }
 
   int IsVisible() { return bVisible_; }
   void GetPosition(int& nLeft, int& nBottom) { nLeft = nLeft_; nBottom = nBottom_; }
   void GetSize(int& nWidth, int& nHeight) { nWidth = nWidth_; nHeight = nHeight_; }
+  Apollo::WindowHandle GetWindow() { return win_; }
 
 protected:
   ApHandle hAp_;
@@ -43,6 +45,7 @@ protected:
   int nBottom_;
   int nWidth_;
   int nHeight_;
+  Apollo::WindowHandle win_;
 };
 
 typedef ApHandlePointerTree<Context*> ContextList;

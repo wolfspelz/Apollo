@@ -46,11 +46,16 @@ void Win32Browser::AdjustStackingOrder()
     for (ContextNode* pNode = 0; (pNode = contexts_.Next(pNode)) != 0; ) {
       Context* pContext = pNode->Value();
 
-      Msg_BrowserInfo_GetContextWin32Window msg;
-      msg.hContext = pContext->apHandle();
-      if (msg.Request()) {
-        contextWindows.Set(msg.hWnd, 1);
+      Apollo::WindowHandle win = pContext->GetWindow();
+      if (!win.isValid()) {
+        Msg_BrowserInfo_GetContextWin32Window msg;
+        msg.hContext = pContext->apHandle();
+        if (msg.Request()) {
+          pContext->SetWindow(msg.hWnd);
+          win = msg.hWnd;
+        }
       }
+      contextWindows.Set(win, 1);
     }
   }
 
