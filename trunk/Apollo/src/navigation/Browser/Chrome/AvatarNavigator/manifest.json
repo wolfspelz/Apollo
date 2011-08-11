@@ -13,7 +13,7 @@
   "background_page": "background.html",
   "permissions": [ "tabs" ],
   "browser_action": {
-    "default_icon": "logo19.png",
-    "popup": "popup.html"
+    //"popup": "popup.html",
+    "default_icon": "logo19.png"
   }
 }

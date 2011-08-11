@@ -14,21 +14,21 @@ var aWindows = null;
 var aTabs = null;
 
 var anLogLevel = anLogLevelDebug;
+var bTabCallbacksStarted = false;
 
 // --------------------------
 // Window
 
-function Window(windowId, window)
+function Window(windowId)
 {
   this.id = windowId;
   this.selectedTabId = null;
-  this.window = window;
 }
 
-function AddWindow(windowId, window)
+function AddWindow(windowId)
 {
   anLogVerbose('AddWindow' + windowId);
-  aWindows[windowId] = new Window(windowId, window);
+  aWindows[windowId] = new Window(windowId);
 }
 
 function DeleteWindow(windowId)
@@ -58,20 +58,20 @@ function SetWindowSelectedTab(windowId, tabId)
 // --------------------------
 // Tab
 
-function Tab(tabId, windowId, tab)
+function Tab(tabId, windowId)
 {
   this.id = tabId;
   this.windowId = windowId;
   this.sUrl = '';
   this.sContext = '';
   this.bVisible = false;
-  this.tab = tab;
+  this.bIsOpen = false;
 }
 
-function AddTab(tabId, windowId, tab)
+function AddTab(tabId, windowId)
 {
   anLogVerbose('AddTab ' + tabId);
-  aTabs[tabId] = new Tab(tabId, windowId, tab);
+  aTabs[tabId] = new Tab(tabId, windowId);
 }
 
 function DeleteTab(tabId)
@@ -101,17 +101,12 @@ function RequestTabContext(tabId)
           anLogInfo('TabContext tab=' + tabId + ' ctxt=' + hContext);
           myTab.sContext = hContext;
 
-          OpenContext(myTab.sContext);
-
-          IdentifyContext(myTab.sContext, myTab.windowId);
-
-          if (myTab.bVisible) {
-            ShowContext(myTab.sContext);
-          } else {
-            HideContext(myTab.sContext);
+          if (IsValidUrl(myTab.sUrl)) {
+            NavigateContext(myTab.sContext, myTab.sUrl);
+            myTab.bIsOpen = true;
+            IdentifyTab(tabId);
           }
 
-          NavigateContext(myTab.sContext, myTab.sUrl);
         }
       }
     }
@@ -127,6 +122,70 @@ function RequestTabContext(tabId)
   }
 }
 
+function IsValidUrl(sUrl)
+{
+  if (sUrl.indexOf('http://') == 0 || sUrl.indexOf('https://') == 0) {
+    return true;
+  }
+  return false;
+}
+
+function IdentifyTab(tabId)
+{
+  anLogVerbose('IdentifyTab' + tabId);
+
+  var myTab = GetTab(tabId);
+  if (myTab != null) {
+    chrome.windows.get(myTab.windowId, function (win)
+    {
+      if (srpcProtocol != null) {
+
+        var msg = new SrpcMessage();
+        msg.setString('Method', 'Navigation_ContextNativeWindow');
+        msg.setString('hContext', myTab.sContext);
+
+        var selectedTab = null;
+        var aTabs = win.tabs;
+        if (aTabs != null) {
+          for (var i = 0; i < aTabs.length; ++i) {
+            var tab = aTabs[i];
+            if (tab.selected) {
+              selectedTab = tab;
+            }
+          }
+        }
+        var sTitle = '';
+        if (selectedTab != null) {
+          sTitle = selectedTab.title;
+        }
+
+        var kvSignature = new SrpcMessage();
+        kvSignature.setString('sType', TYPE_CHROME);
+        kvSignature.setString('sVersion', navigator.userAgent);
+        if (sTitle != '') {
+          kvSignature.setString('sTitle', sTitle);
+        }
+        kvSignature.setString('nLeft', win.left);
+        kvSignature.setString('nTop', win.top);
+        kvSignature.setString('nWidth', win.width);
+        kvSignature.setString('nHeight', win.height);
+        msg.setString('kvSignature', kvSignature.toString());
+
+        srpcProtocol.sendRequest(msg);
+
+        if (myTab.bVisible) {
+          ShowContext(myTab.sContext);
+        } else {
+          HideContext(myTab.sContext);
+        }
+
+      } else {
+        anLogWarning('IdentifyTab ignored: not-connected ' + tabId);
+      }
+    });
+  }
+}
+
 // --------------------------
 // Core tab events
 
@@ -135,7 +194,7 @@ function OnOpenTab(tabId)
   anLogInfo('OnOpenTab ' + tabId);
   var myTab = GetTab(tabId);
   if (myTab != null) {
-    OpenContext(myTab.sContext);
+    //OpenContext(myTab.sContext);
   }
 }
 
@@ -180,7 +239,20 @@ function OnNavigateTab(tabId, sUrl)
     if (sOldUrl != sUrl) {
       myTab.sUrl = sUrl;
       if (myTab.sContext != '') {
-        NavigateContext(myTab.sContext, sUrl);
+
+        if (IsValidUrl(sUrl)) {
+          NavigateContext(myTab.sContext, sUrl);
+          if (!myTab.bIsOpen) {
+            myTab.bIsOpen = true;
+            IdentifyTab(tabId);
+          }
+        } else {
+          if (myTab.bIsOpen) {
+            myTab.bIsOpen = false;
+            CloseContext(myTab.sContext);
+          }
+        }
+
       }
     }
   }
@@ -193,7 +265,7 @@ function OnReparentTab(tabId, newWindowId)
   if (myTab != null) {
     if (myTab.windowId != newWindowId) {
       myTab.windowId = newWindowId;
-      IdentifyContext(myTab.sContext, newWindowId);
+      IdentifyTab(tabId);
     }
   }
 }
@@ -204,7 +276,10 @@ function OnCloseTab(tabId)
   var myTab = GetTab(tabId);
   if (myTab != null) {
     if (myTab.sContext != '') {
-      CloseContext(myTab.sContext);
+      if (myTab.bIsOpen) {
+        myTab.bIsOpen = false;
+        CloseContext(myTab.sContext);
+      }
     }
   }
 }
@@ -219,52 +294,6 @@ function OpenContext(sContext)
     srpcProtocol.sendRequest(new SrpcMessage().setString('Method', 'Navigation_ContextOpen').setString('hContext', sContext));
   } else {
     anLogWarning('OpenContext ignored(not-connected) ' + sContext);
-  }
-}
-
-function IdentifyContext(sContext, windowId)
-{
-  anLogVerbose('IdentifyContext' + sContext);
-  var myWindow = GetWindow(windowId);
-  if (myWindow != null) {
-    if (srpcProtocol != null) {
-
-      var msg = new SrpcMessage();
-      msg.setString('Method', 'Navigation_ContextNativeWindow');
-      msg.setString('hContext', sContext);
-
-      var selectedTab = null;
-      var aTabs = myWindow.window.tabs;
-      if (aTabs != null) {
-        for (var i = 0; i < aTabs.length; ++i) {
-          var tab = aTabs[i];
-          if (tab.selected) {
-            selectedTab = tab;
-          }
-        }
-      }
-      var sTitle = '';
-      if (selectedTab != null) {
-        sTitle = selectedTab.title;
-      }
-
-      var kvSignature = new SrpcMessage();
-      kvSignature.setString('sType', TYPE_CHROME);
-      kvSignature.setString('sVersion', navigator.userAgent);
-      if (sTitle != '') {
-        kvSignature.setString('sTitle', sTitle);
-      }
-      kvSignature.setString('nLeft', myWindow.window.left);
-      kvSignature.setString('nTop', myWindow.window.top);
-      kvSignature.setString('nWidth', myWindow.window.width);
-      kvSignature.setString('nHeight', myWindow.window.height);
-      msg.setString('kvSignature', kvSignature.toString());
-
-      srpcProtocol.sendRequest(msg);
-
-    } else {
-      anLogWarning('IdentifyContext ignored(not-connected) ' + sContext);
-    }
   }
 }
 
@@ -290,11 +319,6 @@ function HideContext(sContext)
 
 function NavigateContext(sContext, sUrl)
 {
-  if (sUrl.indexOf('http://') == 0 || sUrl.indexOf('https://') == 0) {
-  } else {
-    sUrl = '';
-  }
-
   anLogVerbose('NavigateContext ' + sContext + ' ' + sUrl)
   if (srpcProtocol != null) {
     srpcProtocol.sendRequest(new SrpcMessage().setString('Method', 'Navigation_ContextNavigate').setString('hContext', sContext).setString('sUrl', sUrl));
@@ -314,7 +338,7 @@ function CloseContext(sContext)
 }
 
 // --------------------------
-// chrome.tab and crome.window hooks
+// chrome.tab and chrome.window hooks
 
 function OnWindowGetSelectedTab(tab)
 {
@@ -430,6 +454,24 @@ function StartTabs()
   chrome.tabs.onSelectionChanged.addListener(OnTabSelectionChanged);
   chrome.tabs.onAttached.addListener(OnTabAttached);
   chrome.tabs.onDetached.addListener(OnTabDetached);
+
+  bTabCallbacksStarted = true;
+}
+
+function StopTabs()
+{
+  if (bTabCallbacksStarted) {
+    chrome.windows.onCreated.removeListener(OnWindowCreated);
+    chrome.windows.onRemoved.removeListener(OnWindowRemoved);
+    chrome.tabs.onCreated.removeListener(OnTabCreated);
+    chrome.tabs.onRemoved.removeListener(OnTabRemoved);
+    chrome.tabs.onUpdated.removeListener(OnTabUpdated);
+    chrome.tabs.onSelectionChanged.removeListener(OnTabSelectionChanged);
+    chrome.tabs.onAttached.removeListener(OnTabAttached);
+    chrome.tabs.onDetached.removeListener(OnTabDetached);
+
+    bTabCallbacksStarted = false;
+  }
 }
 
 function Start()
@@ -491,8 +533,12 @@ function OnWebSocketMesssge(evt)
 function OnWebSocketClosed(evt)
 {
   anLogInfo('OnWebSocketClosed');
+
   webSocket = null;
   srpcProtocol = null;
+
+  StopTabs();
+
   StartReconnectTimer();
 }
 
@@ -507,5 +553,24 @@ function Reconnect()
 }
 
 // --------------------------
+
+function ShowChatWindow()
+{
+  //alert('ShowChatWindow');
+//   if (srpcProtocol != null) {
+//     var msg = new SrpcMessage();
+//     msg.setString('ApType', 'Navigator_CallDisplay');
+//     msg.setString('Method', 'ShowChat');
+//     msg.setString('hContext', hContext);
+//     msg.setInt('bShow', 1);
+//     srpcProtocol.sendRequest(msg);
+//   }
+}
+
+function ReconnectNavigation()
+{
+  //alert('ReconnectNavigation');
+  //webSocket.close();
+}
 
 Start();
