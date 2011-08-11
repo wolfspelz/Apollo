@@ -5,3 +5,6 @@ HTTP/Address=127.0.0.1
 TCP/Enabled=1
 TCP/Port=23763
 TCP/Address=127.0.0.1
+WebSocket/Enabled=1
+WebSocket/Port=23765
+WebSocket/Address=127.0.0.1
