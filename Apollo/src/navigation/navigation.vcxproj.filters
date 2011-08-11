@@ -80,6 +80,9 @@
     <None Include="Browser\Chrome\AvatarNavigator\SrpcProtocol.js">
       <Filter>Browser\Chrome</Filter>
     </None>
+    <None Include="Browser\Chrome\AvatarNavigator\options.html">
+      <Filter>Browser\Chrome</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <CustomBuildStep Include="Browser\Firefox\AvatarNavigator\chrome\chromeFiles\locale\en-US\avatarnav\avatarnav.dtd">

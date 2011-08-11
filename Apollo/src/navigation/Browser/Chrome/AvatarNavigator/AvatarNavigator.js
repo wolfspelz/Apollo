@@ -5,16 +5,19 @@ var MAX_RECONNECT_DELAY = 10000;
 var TYPE_CHROME = 'Chrome';
 
 var sServerHostname = DEFAULT_HOSTNAME;
-var nServerPort = DEFAULT_PORT + 1;
+var nServerPort = DEFAULT_PORT;
 var nReconnectDelay = MIN_RECONNECT_DELAY;
+var nMinReconnectDelay = MIN_RECONNECT_DELAY;
+var nMaxReconnectDelay = MAX_RECONNECT_DELAY;
 var webSocket = null;
 var srpcProtocol = null;
 
 var aWindows = null;
 var aTabs = null;
 
-var anLogLevel = anLogLevelDebug;
+var anLogLevel = anLogLevelWarning;
 var bTabCallbacksStarted = false;
+var bWasConnected = false;
 
 // --------------------------
 // Window
@@ -27,14 +30,14 @@ function Window(windowId)
 
 function AddWindow(windowId)
 {
-  anLogVerbose('AddWindow' + windowId);
+  //anLogVerbose('AddWindow' + windowId);
   aWindows[windowId] = new Window(windowId);
 }
 
 function DeleteWindow(windowId)
 {
   if (aWindows[windowId] != null) {
-    anLogVerbose('DeleteWindow' + windowId);
+    //anLogVerbose('DeleteWindow' + windowId);
     delete aWindows[windowId];
   }
 }
@@ -70,7 +73,7 @@ function Tab(tabId, windowId)
 
 function AddTab(tabId, windowId)
 {
-  anLogVerbose('AddTab ' + tabId);
+  //anLogVerbose('AddTab ' + tabId);
   aTabs[tabId] = new Tab(tabId, windowId);
 }
 
@@ -78,7 +81,7 @@ function DeleteTab(tabId)
 {
   OnCloseTab(tabId);
   if (aTabs[tabId] != null) {
-    anLogVerbose('DeleteTab ' + tabId);
+    //anLogVerbose('DeleteTab ' + tabId);
     delete aTabs[tabId];
   }
 }
@@ -98,7 +101,7 @@ function RequestTabContext(tabId)
       if (response.getInt('Status') == 1) {
         var hContext = response.getString('hResult');
         if (hContext != '') {
-          anLogInfo('TabContext tab=' + tabId + ' ctxt=' + hContext);
+          anLogVerbose('TabContext tab=' + tabId + ' ctxt=' + hContext);
           myTab.sContext = hContext;
 
           if (IsValidUrl(myTab.sUrl)) {
@@ -132,7 +135,7 @@ function IsValidUrl(sUrl)
 
 function IdentifyTab(tabId)
 {
-  anLogVerbose('IdentifyTab' + tabId);
+  //anLogVerbose('IdentifyTab' + tabId);
 
   var myTab = GetTab(tabId);
   if (myTab != null) {
@@ -191,7 +194,7 @@ function IdentifyTab(tabId)
 
 function OnOpenTab(tabId)
 {
-  anLogInfo('OnOpenTab ' + tabId);
+  anLogVerbose('OnOpenTab ' + tabId);
   var myTab = GetTab(tabId);
   if (myTab != null) {
     //OpenContext(myTab.sContext);
@@ -201,7 +204,7 @@ function OnOpenTab(tabId)
 function OnShowTab(tabId)
 {
   var bVisible = true;
-  anLogInfo('OnShowTab ' + tabId);
+  anLogVerbose('OnShowTab ' + tabId);
   var myTab = GetTab(tabId);
   if (myTab != null) {
     var bOldVisible = myTab.bVisible;
@@ -217,7 +220,7 @@ function OnShowTab(tabId)
 function OnHideTab(tabId)
 {
   var bVisible = false;
-  anLogInfo('OnHideTab ' + tabId);
+  anLogVerbose('OnHideTab ' + tabId);
   var myTab = GetTab(tabId);
   if (myTab != null) {
     var bOldVisible = myTab.bVisible;
@@ -232,7 +235,7 @@ function OnHideTab(tabId)
 
 function OnNavigateTab(tabId, sUrl)
 {
-  anLogInfo('OnNavigateTab ' + tabId + ' ' + sUrl);
+  anLogVerbose('OnNavigateTab ' + tabId + ' ' + sUrl);
   var myTab = GetTab(tabId);
   if (myTab != null) {
     var sOldUrl = myTab.sUrl;
@@ -260,7 +263,7 @@ function OnNavigateTab(tabId, sUrl)
 
 function OnReparentTab(tabId, newWindowId)
 {
-  anLogInfo('OnReparentTab tab=' + tabId + ' to win=' + newWindowId);
+  anLogVerbose('OnReparentTab tab=' + tabId + ' to win=' + newWindowId);
   var myTab = GetTab(tabId);
   if (myTab != null) {
     if (myTab.windowId != newWindowId) {
@@ -272,7 +275,7 @@ function OnReparentTab(tabId, newWindowId)
 
 function OnCloseTab(tabId)
 {
-  anLogInfo('OnCloseTab ' + tabId);
+  anLogVerbose('OnCloseTab ' + tabId);
   var myTab = GetTab(tabId);
   if (myTab != null) {
     if (myTab.sContext != '') {
@@ -289,7 +292,7 @@ function OnCloseTab(tabId)
 
 function OpenContext(sContext)
 {
-  anLogVerbose('OpenContext ' + sContext);
+  //anLogVerbose('OpenContext ' + sContext);
   if (srpcProtocol != null) {
     srpcProtocol.sendRequest(new SrpcMessage().setString('Method', 'Navigation_ContextOpen').setString('hContext', sContext));
   } else {
@@ -299,7 +302,7 @@ function OpenContext(sContext)
 
 function ShowContext(sContext)
 {
-  anLogVerbose('ShowContext ' + sContext);
+  //anLogVerbose('ShowContext ' + sContext);
   if (srpcProtocol != null) {
     srpcProtocol.sendRequest(new SrpcMessage().setString('Method', 'Navigation_ContextShow').setString('hContext', sContext));
   } else {
@@ -309,7 +312,7 @@ function ShowContext(sContext)
 
 function HideContext(sContext)
 {
-  anLogVerbose('HideContext ' + sContext);
+  //anLogVerbose('HideContext ' + sContext);
   if (srpcProtocol != null) {
     srpcProtocol.sendRequest(new SrpcMessage().setString('Method', 'Navigation_ContextHide').setString('hContext', sContext));
   } else {
@@ -319,7 +322,7 @@ function HideContext(sContext)
 
 function NavigateContext(sContext, sUrl)
 {
-  anLogVerbose('NavigateContext ' + sContext + ' ' + sUrl)
+  //anLogVerbose('NavigateContext ' + sContext + ' ' + sUrl)
   if (srpcProtocol != null) {
     srpcProtocol.sendRequest(new SrpcMessage().setString('Method', 'Navigation_ContextNavigate').setString('hContext', sContext).setString('sUrl', sUrl));
   } else {
@@ -329,7 +332,7 @@ function NavigateContext(sContext, sUrl)
 
 function CloseContext(sContext)
 {
-  anLogVerbose('CloseContext ' + sContext)
+  //anLogVerbose('CloseContext ' + sContext)
   if (srpcProtocol != null) {
     srpcProtocol.sendRequest(new SrpcMessage().setString('Method', 'Navigation_ContextClose').setString('hContext', sContext));
   } else {
@@ -413,7 +416,7 @@ function OnTabSelectionChanged(tabId, selectInfo)
 
 function OnTabDetached(tabId, detachInfo)
 {
-  anLogVerbose('OnTabDetached');
+  //anLogVerbose('OnTabDetached');
   var myTab = GetTab(tabId);
   if (myTab != null) {
 //     if (myTab.bVisible) {
@@ -425,7 +428,7 @@ function OnTabDetached(tabId, detachInfo)
 
 function OnTabAttached(tabId, attachInfo)
 {
-  anLogVerbose('OnTabAttached');
+  //anLogVerbose('OnTabAttached');
   var myTab = GetTab(tabId);
   if (myTab != null) {
     OnReparentTab(tabId, attachInfo.newWindowId);
@@ -474,18 +477,51 @@ function StopTabs()
   }
 }
 
+function SetDefaultOption(sName, sDefaultValue)
+{
+  var sValue = localStorage[sName];
+  if (sValue == null || sValue == '') {
+    localStorage[sName] = sDefaultValue;
+  }
+}
+
+function SetDefaultOptions()
+{
+  SetDefaultOption('ServerHostname', DEFAULT_HOSTNAME);
+  SetDefaultOption('ServerPort', DEFAULT_PORT);
+  SetDefaultOption('MinReconnectDelay', MIN_RECONNECT_DELAY);
+  SetDefaultOption('MaxReconnectDelay', MAX_RECONNECT_DELAY);
+  SetDefaultOption('LogLevel', anLogLevelWarning);
+}
+
+function GetOption(sName)
+{
+  return localStorage[sName];
+}
+
+function GetOptions()
+{
+  sServerHostname = GetOption('ServerHostname');
+  nServerPort = GetOption('ServerPort');
+  nMinReconnectDelay = GetOption('MinReconnectDelay');
+  nMaxReconnectDelay = GetOption('MaxReconnectDelay');
+  anLogLevel = GetOption('LogLevel');
+}
+
 function Start()
 {
+  SetDefaultOptions();
+  GetOptions();
   StartReconnectTimer();
 }
 
 function StartReconnectTimer()
 {
   nReconnectDelay *= 2;
-  if (nReconnectDelay > MAX_RECONNECT_DELAY) {
-    nReconnectDelay = MAX_RECONNECT_DELAY;
+  if (nReconnectDelay > nMaxReconnectDelay) {
+    nReconnectDelay = nMaxReconnectDelay;
   }
-  anLogInfo('StartReconnectTimer: scheduling connect in  ' + nReconnectDelay + ' msec');
+  anLogVerbose('StartReconnectTimer: scheduling connect in  ' + nReconnectDelay + ' msec');
   window.setTimeout('Reconnect();', nReconnectDelay);
 }
 
@@ -495,12 +531,12 @@ function StartReconnectTimer()
 function OnReceiveMessage(msg)
 {
   var sMethod = msg.getString('Method');
-  anLogInfo('OnReceiveMessage Method=' + sMethod);
+  anLogVerbose('OnReceiveMessage Method=' + sMethod);
 }
 
 function OnSendData(sData)
 {
-  anLogInfo('OUT: ' + sData);
+  anLogVerbose('OUT: ' + sData);
   webSocket.send(sData);
 }
 
@@ -511,8 +547,9 @@ function OnHelloResponse(msg)
 
 function OnWebSocketOpened(evt)
 {
-  anLogInfo('OnWebSocketOpened');
-  nReconnectDelay = MIN_RECONNECT_DELAY;
+  anLogInfo('Connected');
+  nReconnectDelay = nMinReconnectDelay;
+  bWasConnected = true;
   
   srpcProtocol = new SrpcProtocol();
   srpcProtocol.onReceiveMessage = OnReceiveMessage;
@@ -526,14 +563,17 @@ function OnWebSocketOpened(evt)
 function OnWebSocketMesssge(evt)
 {
   var sData  = evt.data;
-  anLogInfo('IN: ' + sData);
+  anLogVerbose('IN: ' + sData);
   srpcProtocol.handleMessage(sData);
 }
 
 function OnWebSocketClosed(evt)
 {
-  anLogInfo('OnWebSocketClosed');
+  if (bWasConnected) {
+    anLogInfo('Connection closed');
+  }
 
+  bWasConnected = false;
   webSocket = null;
   srpcProtocol = null;
 
