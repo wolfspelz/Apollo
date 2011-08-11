@@ -1,11 +1,27 @@
 <html>
+<head>
+
 <script type="text/javascript">
 function ShowChatWindow()
 {
-  alert('ShowChatWindow');
+  chrome.extension.getBackgroundPage().ShowChatWindow();
+}
+
+function ReconnectNavigation()
+{
+  chrome.extension.getBackgroundPage().ReconnectNavigation();
 }
 </script>
+
+<style>
+.xx { margin:0; padding:0; }
+</style>
+
+</head>
 <body>
-<input type="button" value="Show chat window" onclick="ShowChatWindow()" />
+
+<input type="button" value="Show chat window" onclick="ShowChatWindow();" />
+<input type="button" value="Reconnect navigation" onclick="ReconnectNavigation();" />
+
 </body>
 </html>
