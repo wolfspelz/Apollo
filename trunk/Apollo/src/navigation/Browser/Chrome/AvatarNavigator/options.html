@@ -17,6 +17,7 @@
     SaveOption('MinReconnectDelay');
     SaveOption('MaxReconnectDelay');
     SaveOption('LogLevel');
+    SaveOption('PopupSupport');
 
     chrome.extension.getBackgroundPage().GetOptions();
     
@@ -43,6 +44,7 @@
     RestoreOption('MinReconnectDelay');
     RestoreOption('MaxReconnectDelay');
     RestoreOption('LogLevel');
+    RestoreOption('PopupSupport');
   }
 
 </script>
@@ -62,6 +64,7 @@
 <tr><td>MinReconnectDelay:</td><td><input type="text" id="iMinReconnectDelay" value="" /></td></tr>
 <tr><td>MaxReconnectDelay:</td><td><input type="text" id="iMaxReconnectDelay" value="" /></td></tr>
 <tr><td>LogLevel:</td><td><input type="text" id="iLogLevel" value="" /></td></tr>
+<tr><td>PopupSupport:</td><td><input type="text" id="iPopupSupport" value="" /></td></tr>
 </table>
 
 <br>
