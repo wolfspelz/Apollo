@@ -2,6 +2,9 @@ var DEFAULT_HOSTNAME = 'localhost';
 var DEFAULT_PORT = 23765;
 var MIN_RECONNECT_DELAY = 100;
 var MAX_RECONNECT_DELAY = 10000;
+var DEFAULT_LOGLEVEL = anLogLevelWarning;
+var DEFAULT_POPUPSUPPORT = false;
+
 var TYPE_CHROME = 'Chrome';
 
 var sServerHostname = DEFAULT_HOSTNAME;
@@ -15,9 +18,10 @@ var srpcProtocol = null;
 var aWindows = null;
 var aTabs = null;
 
-var anLogLevel = anLogLevelWarning;
+var anLogLevel = DEFAULT_LOGLEVEL;
 var bTabCallbacksStarted = false;
 var bWasConnected = false;
+var bPopupSupport = DEFAULT_POPUPSUPPORT;
 
 // --------------------------
 // Window
@@ -30,14 +34,14 @@ function Window(windowId)
 
 function AddWindow(windowId)
 {
-  //anLogVerbose('AddWindow' + windowId);
+  anLogTrace('AddWindow' + windowId);
   aWindows[windowId] = new Window(windowId);
 }
 
 function DeleteWindow(windowId)
 {
   if (aWindows[windowId] != null) {
-    //anLogVerbose('DeleteWindow' + windowId);
+    anLogTrace('DeleteWindow' + windowId);
     delete aWindows[windowId];
   }
 }
@@ -73,7 +77,7 @@ function Tab(tabId, windowId)
 
 function AddTab(tabId, windowId)
 {
-  //anLogVerbose('AddTab ' + tabId);
+  anLogTrace('AddTab ' + tabId);
   aTabs[tabId] = new Tab(tabId, windowId);
 }
 
@@ -81,7 +85,7 @@ function DeleteTab(tabId)
 {
   OnCloseTab(tabId);
   if (aTabs[tabId] != null) {
-    //anLogVerbose('DeleteTab ' + tabId);
+    anLogTrace('DeleteTab ' + tabId);
     delete aTabs[tabId];
   }
 }
@@ -135,7 +139,7 @@ function IsValidUrl(sUrl)
 
 function IdentifyTab(tabId)
 {
-  //anLogVerbose('IdentifyTab' + tabId);
+  anLogTrace('IdentifyTab' + tabId);
 
   var myTab = GetTab(tabId);
   if (myTab != null) {
@@ -203,8 +207,8 @@ function OnOpenTab(tabId)
 
 function OnShowTab(tabId)
 {
-  var bVisible = true;
   anLogVerbose('OnShowTab ' + tabId);
+  var bVisible = true;
   var myTab = GetTab(tabId);
   if (myTab != null) {
     var bOldVisible = myTab.bVisible;
@@ -219,8 +223,8 @@ function OnShowTab(tabId)
 
 function OnHideTab(tabId)
 {
-  var bVisible = false;
   anLogVerbose('OnHideTab ' + tabId);
+  var bVisible = false;
   var myTab = GetTab(tabId);
   if (myTab != null) {
     var bOldVisible = myTab.bVisible;
@@ -292,7 +296,7 @@ function OnCloseTab(tabId)
 
 function OpenContext(sContext)
 {
-  //anLogVerbose('OpenContext ' + sContext);
+  anLogTrace('OpenContext ' + sContext);
   if (srpcProtocol != null) {
     srpcProtocol.sendRequest(new SrpcMessage().setString('Method', 'Navigation_ContextOpen').setString('hContext', sContext));
   } else {
@@ -302,7 +306,7 @@ function OpenContext(sContext)
 
 function ShowContext(sContext)
 {
-  //anLogVerbose('ShowContext ' + sContext);
+  anLogTrace('ShowContext ' + sContext);
   if (srpcProtocol != null) {
     srpcProtocol.sendRequest(new SrpcMessage().setString('Method', 'Navigation_ContextShow').setString('hContext', sContext));
   } else {
@@ -312,7 +316,7 @@ function ShowContext(sContext)
 
 function HideContext(sContext)
 {
-  //anLogVerbose('HideContext ' + sContext);
+  anLogTrace('HideContext ' + sContext);
   if (srpcProtocol != null) {
     srpcProtocol.sendRequest(new SrpcMessage().setString('Method', 'Navigation_ContextHide').setString('hContext', sContext));
   } else {
@@ -322,7 +326,7 @@ function HideContext(sContext)
 
 function NavigateContext(sContext, sUrl)
 {
-  //anLogVerbose('NavigateContext ' + sContext + ' ' + sUrl)
+  anLogTrace('NavigateContext ' + sContext + ' ' + sUrl)
   if (srpcProtocol != null) {
     srpcProtocol.sendRequest(new SrpcMessage().setString('Method', 'Navigation_ContextNavigate').setString('hContext', sContext).setString('sUrl', sUrl));
   } else {
@@ -332,7 +336,7 @@ function NavigateContext(sContext, sUrl)
 
 function CloseContext(sContext)
 {
-  //anLogVerbose('CloseContext ' + sContext)
+  anLogTrace('CloseContext ' + sContext)
   if (srpcProtocol != null) {
     srpcProtocol.sendRequest(new SrpcMessage().setString('Method', 'Navigation_ContextClose').setString('hContext', sContext));
   } else {
@@ -345,11 +349,13 @@ function CloseContext(sContext)
 
 function OnWindowGetSelectedTab(tab)
 {
+  anLogTrace('OnWindowGetSelectedTab ' + tab.id);
   SetWindowSelectedTab(tab.windowId, tab.id);
 }
 
 function OnWindowGetAllResult(windows)
 {
+  anLogTrace('OnWindowGetAllResult');
   var nWindows = windows.length;
   for (var i = 0; i < nWindows; i++) {
     var win = windows[i];
@@ -371,22 +377,21 @@ function OnWindowGetAllResult(windows)
 
 function OnWindowCreated(win)
 {
-  var windowId = win.id;
-  //anLogVerbose('OnWindowCreated ' + 'left=' + win.left + ' top=' + win.top + ' width=' + win.width + ' height=' + win.height + ' ');
-  if (win.type == 'normal') {
-    AddWindow(windowId, win);
+  anLogTrace('OnWindowCreated ' + win.id + ' left=' + win.left + ' top=' + win.top + ' width=' + win.width + ' height=' + win.height + ' ');
+  if (win.type == 'normal' || (win.type == 'popup' && bPopupSupport)) {
+    AddWindow(win.id, win);
   }
 }
 
 function OnWindowRemoved(windowId)
 {
-  //anLogVerbose('OnWindowRemoved ' + windowId);
+  anLogTrace('OnWindowRemoved ' + windowId);
   DeleteWindow(windowId);
 }
 
 function OnTabCreated(tab)
 {
-  //anLogVerbose('OnTabCreated');
+  anLogTrace('OnTabCreated');
   var tabId = tab.id;
   if (!HasTab(tabId)) {
     AddTab(tabId, tab.windowId, tab);
@@ -396,13 +401,13 @@ function OnTabCreated(tab)
 
 function OnTabRemoved(tabId, removeInfo)
 {
-  //anLogVerbose('OnTabRemoved ' + tabId);
+  anLogTrace('OnTabRemoved ' + tabId);
   DeleteTab(tabId);
 }
 
 function OnTabUpdated(tabId, changeInfo, tab)
 {
-  //anLogVerbose('OnTabUpdated');
+  anLogTrace('OnTabUpdated');
   if (HasTab(tabId) && tab.url != null) {
     OnNavigateTab(tabId, tab.url);
   }
@@ -410,13 +415,13 @@ function OnTabUpdated(tabId, changeInfo, tab)
 
 function OnTabSelectionChanged(tabId, selectInfo)
 {
-  //anLogVerbose('OnTabSelectionChanged');
+  anLogTrace('OnTabSelectionChanged');
   SetWindowSelectedTab(selectInfo.windowId, tabId);
 }
 
 function OnTabDetached(tabId, detachInfo)
 {
-  //anLogVerbose('OnTabDetached');
+  anLogTrace('OnTabDetached');
   var myTab = GetTab(tabId);
   if (myTab != null) {
 //     if (myTab.bVisible) {
@@ -428,7 +433,7 @@ function OnTabDetached(tabId, detachInfo)
 
 function OnTabAttached(tabId, attachInfo)
 {
-  //anLogVerbose('OnTabAttached');
+  anLogTrace('OnTabAttached');
   var myTab = GetTab(tabId);
   if (myTab != null) {
     OnReparentTab(tabId, attachInfo.newWindowId);
@@ -444,6 +449,7 @@ function OnTabAttached(tabId, attachInfo)
 
 function StartTabs()
 {
+  anLogTrace('StartTabs');
   aWindows = new Object();
   aTabs = new Object();
 
@@ -463,6 +469,7 @@ function StartTabs()
 
 function StopTabs()
 {
+  anLogTrace('StopTabs');
   if (bTabCallbacksStarted) {
     chrome.windows.onCreated.removeListener(OnWindowCreated);
     chrome.windows.onRemoved.removeListener(OnWindowRemoved);
@@ -487,11 +494,13 @@ function SetDefaultOption(sName, sDefaultValue)
 
 function SetDefaultOptions()
 {
+  anLogTrace('SetDefaultOptions');
   SetDefaultOption('ServerHostname', DEFAULT_HOSTNAME);
   SetDefaultOption('ServerPort', DEFAULT_PORT);
   SetDefaultOption('MinReconnectDelay', MIN_RECONNECT_DELAY);
   SetDefaultOption('MaxReconnectDelay', MAX_RECONNECT_DELAY);
   SetDefaultOption('LogLevel', anLogLevelWarning);
+  SetDefaultOption('PopupSupport', DEFAULT_POPUPSUPPORT);
 }
 
 function GetOption(sName)
@@ -501,15 +510,20 @@ function GetOption(sName)
 
 function GetOptions()
 {
+  anLogTrace('GetOptions');
   sServerHostname = GetOption('ServerHostname');
   nServerPort = GetOption('ServerPort');
   nMinReconnectDelay = GetOption('MinReconnectDelay');
   nMaxReconnectDelay = GetOption('MaxReconnectDelay');
   anLogLevel = GetOption('LogLevel');
+  var sPopupSupport = GetOption('PopupSupport');
+  if (sPopupSupport == 'true') { bPopupSupport = true; }
+  if (sPopupSupport == 'false') { bPopupSupport = false; }
 }
 
 function Start()
 {
+  anLogTrace('Start');
   SetDefaultOptions();
   GetOptions();
   StartReconnectTimer();
@@ -542,6 +556,7 @@ function OnSendData(sData)
 
 function OnHelloResponse(msg)
 {
+  anLogTrace('OnHelloResponse');
   StartTabs();
 }
 
@@ -571,6 +586,8 @@ function OnWebSocketClosed(evt)
 {
   if (bWasConnected) {
     anLogInfo('Connection closed');
+  } else {
+    anLogTrace('OnWebSocketClosed');
   }
 
   bWasConnected = false;
