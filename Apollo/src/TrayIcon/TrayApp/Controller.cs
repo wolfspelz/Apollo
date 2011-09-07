@@ -87,7 +87,7 @@ namespace TrayApp
           }
         }
       } catch (Exception ex) {
-        Log(ex.Message);
+        Log("SetRegistryValue: " + ex.Message + " [" + sPath + "] " + sName);
       }
     }
 
@@ -100,7 +100,7 @@ namespace TrayApp
           }
         }
       } catch (Exception ex) {
-        Log(ex.Message);
+        Log("DeleteRegistryValue: " + ex.Message + " [" + sPath + "] " + sName);
       }
     }
 
@@ -114,7 +114,7 @@ namespace TrayApp
           }
         }
       } catch (Exception ex) {
-        Log(ex.Message);
+        Log("GetRegistryValue: " + ex.Message + " [" + sPath + "] " + sName);
       }
       return sResult;
     }
@@ -432,7 +432,9 @@ namespace TrayApp
           SetRegistryValue(Registry.CurrentUser, @"Software\Microsoft\Windows\CurrentVersion\Run", Global.ProductName, sCommandline);
         }
       } else {
-        DeleteRegistryValue(Registry.CurrentUser, @"Software\Microsoft\Windows\CurrentVersion\Run", Global.ProductName);
+        //if (!String.IsNullOrEmpty(GetRegistryValue(Registry.CurrentUser, @"Software\Microsoft\Windows\CurrentVersion\Run", Global.ProductName, ""))) {
+          DeleteRegistryValue(Registry.CurrentUser, @"Software\Microsoft\Windows\CurrentVersion\Run", Global.ProductName);
+        //}
       }
     }
 
