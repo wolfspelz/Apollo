@@ -42,7 +42,13 @@ protected:
   void SetupDone();
 
   static String GetInstallFirefoxExtensionCommandline();
+  static String GetInstallChromeExtensionCommandline();
   static void InstallFirefoxExtensionByFirefox();
+  static void InstallFirefoxExtension();
+  static void UninstallFirefoxExtension();
+  static void InstallChromeExtensionByChrome();
+  static void InstallChromeExtension();
+  static void UninstallChromeExtension();
   static void InstallInternetExplorerExtension();
 
 protected:

@@ -1,1 +1,14 @@
+# For InstallFirefoxExtensionByFirefox
 FirefoxExtensionInstallUrl=file://[[MODULE_RESOURCE_PATH]]/AvatarNavigator.xpi
+
+# For InstallFirefoxExtension
+FirefoxExtensionPath=[[MODULE_RESOURCE_PATH]]/AvatarNavigator.xpi
+FirefoxExtensionId=AvatarNavigator@OpenVirtualWorld.org
+
+# For InstallChromeExtensionByChrome
+ChromeExtensionInstallUrl=file://[[MODULE_RESOURCE_PATH]]/AvatarNavigator.crx
+
+# For InstallChromeExtension
+ChromeExtensionPath=[[MODULE_RESOURCE_PATH]]/AvatarNavigator.crx
+ChromeExtensionId=cdegcijmfiaehalcfbpdnfbchlafenke
+ChromeExtensionVersion=1.0
