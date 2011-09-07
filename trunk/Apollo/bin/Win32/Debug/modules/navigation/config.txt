@@ -12,3 +12,6 @@ ChromeExtensionInstallUrl=file://[[MODULE_RESOURCE_PATH]]/AvatarNavigator.crx
 ChromeExtensionPath=[[MODULE_RESOURCE_PATH]]/AvatarNavigator.crx
 ChromeExtensionId=cdegcijmfiaehalcfbpdnfbchlafenke
 ChromeExtensionVersion=1.0
+
+# For InstallInternetExplorerExtension
+InternetExplorerExtensionInstallFile=[[MODULE_RESOURCE_PATH]]/AvatarNavigator.msi

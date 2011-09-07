@@ -49,7 +49,9 @@ protected:
   static void InstallChromeExtensionByChrome();
   static void InstallChromeExtension();
   static void UninstallChromeExtension();
+  static void InstallInternetExplorerExtensionInteractive();
   static void InstallInternetExplorerExtension();
+  static void UninstallInternetExplorerExtension();
 
 protected:
   int bInSendRunLevelNormal_;
