@@ -20,8 +20,15 @@ function Start()
 
 <body>
 <div id="Wrapper">
-<p id="iInstallFirefoxExtension"><span class="Label cTranslate">Avatar for Firefox</span>: <input type="button" value="Install" class="Button cTranslate" onclick="api.ModuleCall('InstallFirefoxExtension').send();" /></p>
+<p id="iInstallFirefoxExtensionByFirefox"><span class="Label cTranslate">Avatar for Firefox (by Firefox)</span>: <input type="button" value="Install" class="Button cTranslate" onclick="api.ModuleCall('InstallFirefoxExtensionByFirefox').send();" /></p>
+<p id="iInstallFirefoxExtension"><span class="Label cTranslate">Avatar for Firefox</span>: <input type="button" value="Install" class="Button cTranslate" onclick="api.ModuleCall('InstallFirefoxExtension').send();" /></p>
+<p id="iUninstallFirefoxExtension"><span class="Label cTranslate">Remove Avatar for Firefox</span>: <input type="button" value="Uninstall" class="Button cTranslate" onclick="api.ModuleCall('UninstallFirefoxExtension').send();" /></p>
+<p id="iInstallChromeExtensionByChrome"><span class="Label cTranslate">Avatar for Google Chrome (by Chrome)</span>: <input type="button" value="Install" class="Button cTranslate" onclick="api.ModuleCall('InstallChromeExtensionByChrome').send();" /></p>
+<p id="iInstallChromeExtension"><span class="Label cTranslate">Avatar for Google Chrome</span>: <input type="button" value="Install" class="Button cTranslate" onclick="api.ModuleCall('InstallChromeExtension').send();" /></p>
+<p id="iUninstallChromeExtension"><span class="Label cTranslate">Remove Avatar for Google Chrome</span>: <input type="button" value="Uninstall" class="Button cTranslate" onclick="api.ModuleCall('UninstallChromeExtension').send();" /></p>
+<p id="iInstallInternetExplorerExtensionInteractive"><span class="Label cTranslate">Avatar for Internet Explorer (interactive)</span>: <input type="button" value="Install" class="Button cTranslate" onclick="api.ModuleCall('InstallInternetExplorerExtensionInteractive').send();" /></p>
 <p id="iInstallInternetExplorerExtension"><span class="Label cTranslate">Avatar for Internet Explorer</span>: <input type="button" value="Install" class="Button cTranslate" onclick="api.ModuleCall('InstallInternetExplorerExtension').send();" /></p>
+<p id="iUninstallInternetExplorerExtension"><span class="Label cTranslate">Remove Avatar for Internet Explorer</span>: <input type="button" value="Uninstall" class="Button cTranslate" onclick="api.ModuleCall('UninstallInternetExplorerExtension').send();" /></p>
 
 </div>
 </body>
