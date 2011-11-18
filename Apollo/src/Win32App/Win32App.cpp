@@ -5,10 +5,11 @@
 #include "Main/Main.h"
 #include "MsgOs.h"
 #include <stdlib.h>
+#include <shellapi.h>
 
 //----------------------------------------------------------
 
-int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
+int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow)
 {
   AP_MEMORY_CHECK(DLL_PROCESS_ATTACH);
 
@@ -24,8 +25,12 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 #else
   apLog_SetMask(apLog_MaskMaxUser);
 #endif
-  
-  if (!Apollo::Init(__argc, __argv)) {
+
+  String sCmdline = GetCommandLine();
+  Apollo::ValueList vlArgs;
+  Apollo::splitCommandlineArguments(sCmdline, vlArgs);
+
+  if (!Apollo::Init(vlArgs)) {
     apLog_Alert(("Main", "WinMain", "Apollo::Init() failed"));
   }
 

@@ -715,11 +715,7 @@ AP_MSG_HANDLER_METHOD(UnitTest, MainLoop_EventLoopBegin)
   if (!bStart) {
     Msg_System_GetCmdLineArgs msg;
     if (msg.Request()) {
-      List lArgv;
-      for (int n = 0; n < msg.nArgc; n++) {
-        lArgv.AddLast(msg.pszArgv[n]);
-      }
-      if (lArgv.FindByName("-test") != 0) {
+      if (msg.vlArgs.findString("-test") != 0) {
         bStart = 1;
       }
     }

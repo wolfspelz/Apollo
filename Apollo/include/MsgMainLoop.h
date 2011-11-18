@@ -18,7 +18,7 @@ public:
   Msg_MainLoop_Win32Loop() : ApRequestMessage("MainLoop_Win32Loop"), hInstance(NULL), hPrevInstance(NULL), lpCmdLine(0), nCmdShow(0), wParam(0) {}
   ApIN HINSTANCE hInstance;
   ApIN HINSTANCE hPrevInstance;
-  ApIN LPSTR lpCmdLine;
+  ApIN LPWSTR lpCmdLine;
   ApIN int nCmdShow;
   ApOUT int wParam;
 };

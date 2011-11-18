@@ -67,7 +67,7 @@ typedef void *ApWindowHandle;
 
 AP_NAMESPACE_BEGIN
 
-APOLLO_API int Init(int nArgc, char** pszArgv);
+APOLLO_API int Init(Apollo::ValueList& vlArgs);
 APOLLO_API int Exit();
 
 enum CallFlag {

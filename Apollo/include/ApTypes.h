@@ -180,6 +180,7 @@ public:
   ApHandle atIndex(int nIndex, const ApHandle& hDefault);
 
   inline int length() { return List::length(); }
+  inline void empty() { List::Empty(); }
 
   void operator=(ValueList& l);
   void removeAll() { List::Empty(); }

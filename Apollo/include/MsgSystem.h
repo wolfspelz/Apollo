@@ -128,10 +128,9 @@ public:
 class APOLLO_API Msg_System_GetCmdLineArgs : public ApRequestMessage
 {
 public:
-  Msg_System_GetCmdLineArgs() : ApRequestMessage("System_GetCmdLineArgs"), nArgc(0), pszArgv(NULL) {}
+  Msg_System_GetCmdLineArgs() : ApRequestMessage("System_GetCmdLineArgs") {}
 public:
-  ApOUT int nArgc;
-  ApOUT char** pszArgv;
+  ApOUT Apollo::ValueList vlArgs;
 };
 
 // -------------------------------------------------------------------

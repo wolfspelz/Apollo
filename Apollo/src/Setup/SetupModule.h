@@ -52,7 +52,9 @@ protected:
   static void InstallInternetExplorerExtensionInteractive();
   static void InstallInternetExplorerExtension();
   static void UninstallInternetExplorerExtension();
-
+  static void InstallBrowserExtensions();
+  static void UninstallBrowserExtensions();
+  
 protected:
   int bInSendRunLevelNormal_;
   int bInterseptedRunLevelNormal_;

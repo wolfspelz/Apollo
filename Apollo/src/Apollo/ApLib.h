@@ -28,7 +28,7 @@ public:
   ApLib();
   virtual ~ApLib();
 
-  int Init(int nArgc, char** pszArgv);
+  int Init(Apollo::ValueList& vlArgs);
   int Exit();
 
   int callMsg(ApMessage* pMsg, int nFlags);
@@ -125,10 +125,10 @@ public:
   String UserProfilePathToken();
 
 //protected: Should be protected, but, hey the Apollo namespace is our friend
-  int nArgc_;
-  char** pszArgv_;
-  List lArgv_;
   ApHandle nNextHandle_;
+  //int nArgc_;
+  //char** pszArgv_;
+  Apollo::ValueList vlArgs_;
   UINT nThreadId_;
   Apollo::TimeValue tvNow_;
   int n3Timer_;

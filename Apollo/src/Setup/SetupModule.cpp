@@ -213,6 +213,14 @@ void SetupModule::UninstallInternetExplorerExtension()
   }
 }
 
+void SetupModule::InstallBrowserExtensions()
+{
+}
+
+void SetupModule::UninstallBrowserExtensions()
+{
+}
+
 #include "ShellAPI.h"
 
 void SetupModule::InstallInternetExplorerExtensionInteractive()
@@ -340,6 +348,12 @@ AP_MSG_HANDLER_METHOD(SetupModule, WebView_ModuleCall)
 
     } else if (sMethod == "UninstallInternetExplorerExtension") {
       UninstallInternetExplorerExtension();
+
+    } else if (sMethod == "InstallBrowserExtensions") {
+      InstallBrowserExtensions();
+
+    } else if (sMethod == "UninstallBrowserExtensions") {
+      UninstallBrowserExtensions();
 
     } else {
       throw ApException(LOG_CONTEXT, "Unknown Method=%s", _sz(sMethod));
