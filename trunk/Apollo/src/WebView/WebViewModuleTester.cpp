@@ -601,37 +601,37 @@ String WebViewModuleTester::Dev()
 
 void WebViewModuleTester::Begin()
 {
-  AP_UNITTEST_REGISTER(WebViewModuleTester::LoadHtml);
+  //AP_UNITTEST_REGISTER(WebViewModuleTester::LoadHtml);
   AP_UNITTEST_REGISTER(WebViewModuleTester::CallJSEcho);
   AP_UNITTEST_REGISTER(WebViewModuleTester::CallJSEcho_Result);
-  AP_UNITTEST_REGISTER(WebViewModuleTester::CallSystemEcho);
-  AP_UNITTEST_REGISTER(WebViewModuleTester::CallSystemEcho_Result);
-  AP_UNITTEST_REGISTER(WebViewModuleTester::CallCustomEcho);
-  AP_UNITTEST_REGISTER(WebViewModuleTester::CallCustomEcho_Result);
-  AP_UNITTEST_REGISTER(WebViewModuleTester::FrameIO);
-  AP_UNITTEST_REGISTER(WebViewModuleTester::FrameIO_Result0);
-  AP_UNITTEST_REGISTER(WebViewModuleTester::FrameIO_Result1);
-  AP_UNITTEST_REGISTER(WebViewModuleTester::FrameIO_Result2);
-  AP_UNITTEST_REGISTER(WebViewModuleTester::StartManuallySerialized);
-  AP_UNITTEST_REGISTER(WebViewModuleTester::StartManuallySerialized_Result1);
-  AP_UNITTEST_REGISTER(WebViewModuleTester::StartManuallySerialized_Result2);
-  AP_UNITTEST_REGISTER(WebViewModuleTester::StartAutomaticallySerialized);
-  AP_UNITTEST_REGISTER(WebViewModuleTester::StartAutomaticallySerialized_Result1);
-  AP_UNITTEST_REGISTER(WebViewModuleTester::StartAutomaticallySerialized_Result2);
-  AP_UNITTEST_REGISTER(WebViewModuleTester::GetDomElement);
-  AP_UNITTEST_REGISTER(WebViewModuleTester::GetDomElement_Result);
+  //AP_UNITTEST_REGISTER(WebViewModuleTester::CallSystemEcho);
+  //AP_UNITTEST_REGISTER(WebViewModuleTester::CallSystemEcho_Result);
+  //AP_UNITTEST_REGISTER(WebViewModuleTester::CallCustomEcho);
+  //AP_UNITTEST_REGISTER(WebViewModuleTester::CallCustomEcho_Result);
+  //AP_UNITTEST_REGISTER(WebViewModuleTester::FrameIO);
+  //AP_UNITTEST_REGISTER(WebViewModuleTester::FrameIO_Result0);
+  //AP_UNITTEST_REGISTER(WebViewModuleTester::FrameIO_Result1);
+  //AP_UNITTEST_REGISTER(WebViewModuleTester::FrameIO_Result2);
+  //AP_UNITTEST_REGISTER(WebViewModuleTester::StartManuallySerialized);
+  //AP_UNITTEST_REGISTER(WebViewModuleTester::StartManuallySerialized_Result1);
+  //AP_UNITTEST_REGISTER(WebViewModuleTester::StartManuallySerialized_Result2);
+  //AP_UNITTEST_REGISTER(WebViewModuleTester::StartAutomaticallySerialized);
+  //AP_UNITTEST_REGISTER(WebViewModuleTester::StartAutomaticallySerialized_Result1);
+  //AP_UNITTEST_REGISTER(WebViewModuleTester::StartAutomaticallySerialized_Result2);
+  //AP_UNITTEST_REGISTER(WebViewModuleTester::GetDomElement);
+  //AP_UNITTEST_REGISTER(WebViewModuleTester::GetDomElement_Result);
 }
 
 void WebViewModuleTester::Execute()
 {
-  AP_UNITTEST_EXECUTE(WebViewModuleTester::LoadHtml);
+  //AP_UNITTEST_EXECUTE(WebViewModuleTester::LoadHtml);
   AP_UNITTEST_EXECUTE(WebViewModuleTester::CallJSEcho);
-  AP_UNITTEST_EXECUTE(WebViewModuleTester::CallSystemEcho);
-  AP_UNITTEST_EXECUTE(WebViewModuleTester::CallCustomEcho);
-  AP_UNITTEST_EXECUTE(WebViewModuleTester::FrameIO);
-  AP_UNITTEST_EXECUTE(WebViewModuleTester::StartManuallySerialized);
-  AP_UNITTEST_EXECUTE(WebViewModuleTester::StartAutomaticallySerialized);
-  AP_UNITTEST_EXECUTE(WebViewModuleTester::GetDomElement);
+  //AP_UNITTEST_EXECUTE(WebViewModuleTester::CallSystemEcho);
+  //AP_UNITTEST_EXECUTE(WebViewModuleTester::CallCustomEcho);
+  //AP_UNITTEST_EXECUTE(WebViewModuleTester::FrameIO);
+  //AP_UNITTEST_EXECUTE(WebViewModuleTester::StartManuallySerialized);
+  //AP_UNITTEST_EXECUTE(WebViewModuleTester::StartAutomaticallySerialized);
+  //AP_UNITTEST_EXECUTE(WebViewModuleTester::GetDomElement);
   
   //(void) WebViewModuleTester::Dev();
 }

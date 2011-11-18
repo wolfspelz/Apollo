@@ -32,13 +32,13 @@ ApLib gApLib;
 
 // -------------------------------------------------------------------
 
-int Apollo::Init(int nArgc, char** pszArgv)
+int Apollo::Init(Apollo::ValueList& vlArgs)
 {
   int ok = 0;
 
   ::srand((unsigned) time(0));
 
-  ok = gApLib.Init(nArgc, pszArgv);
+  ok = gApLib.Init(vlArgs);
 
   return ok;
 }
@@ -920,24 +920,16 @@ String Apollo::canonicalizeUrl(const String& sUrl)
 
 String Apollo::getAppBasePath()
 {
-#if defined(WIN32)
-  String sCmdLine0;
-  String sAppBasePath;
+  String sExecutablePath = gApLib.vlArgs_.atIndex(0, "");
 
-  if (gApLib.nArgc_ > 0) {
-    sCmdLine0 = gApLib.pszArgv_[0];
-    sAppBasePath = String::filenameBasePath(sCmdLine0);
-    if (!String::filenameIsAbsolutePath(sAppBasePath)) {
-      String sCwd = Apollo::getCwd();
-      if (!sCwd.empty()) { sAppBasePath.append(sCwd); }
+  if (!String::filenameIsAbsolutePath(sExecutablePath)) {
+    String sCwd = Apollo::getCwd();
+    if (!sCwd.empty()) {
+      sExecutablePath = sCwd + String::filenamePathSeparator() + sExecutablePath;
     }
-  } else {
-    AP_DEBUG_BREAK();
   }
 
-#else
-  #error Not implemented for this OS
-#endif
+  String sAppBasePath = String::filenameBasePath(sExecutablePath);
 
   return sAppBasePath;
 }

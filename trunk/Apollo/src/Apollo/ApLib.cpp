@@ -24,9 +24,9 @@
 // -------------------------------------------------------------------
 
 ApLib::ApLib()
-:nArgc_(0)
-,pszArgv_(0)
-,nNextHandle_(0, 1)
+:nNextHandle_(0, 1)
+//,nArgc_(0)
+//,pszArgv_(0)
 ,nThreadId_(Apollo::GetCurrentThreadId())
 ,tvNow_(Apollo::TimeValue::getTime())
 ,n3Timer_(0)
@@ -262,8 +262,13 @@ String ApLib::shortHash(const String& sData, unsigned int nLength)
 
 String ApLib::getCwd()
 {
+#if defined(WIN32)
+  Flexbuf<wchar_t> buf(4*MAX_PATH);
+  String sCwd = ::_wgetcwd(buf, buf.length());
+#else
   Flexbuf<char> buf(4*1024);
   String sCwd = ::getcwd(buf, buf.length());
+#endif
   if (!sCwd.endsWith(String::filenamePathSeparator())) { sCwd += String::filenamePathSeparator(); }
   return sCwd;
 }
@@ -557,8 +562,9 @@ AP_MSG_HANDLER_METHOD(ApLib, System_SecTimer)
 
 AP_MSG_HANDLER_METHOD(ApLib, System_GetCmdLineArgs)
 {
-  pMsg->nArgc = nArgc_;
-  pMsg->pszArgv = pszArgv_;
+  for (Apollo::ValueElem* e = 0; (e = vlArgs_.nextElem(e)) != 0; ) {
+    pMsg->vlArgs.add(e->getString());
+  }
 
   pMsg->apStatus = ApMessage::Ok;
   pMsg->Stop();
@@ -867,7 +873,7 @@ AP_MSG_HANDLER_METHOD(ApLib, OS_GetProcessInfo)
 
 // -------------------------------------------------------------------
 
-int ApLib::Init(int nArgc, char** pszArgv)
+int ApLib::Init(Apollo::ValueList& vlArgs)
 {
   int ok = 1;
 
@@ -879,11 +885,12 @@ int ApLib::Init(int nArgc, char** pszArgv)
   #endif
   sRandomSeed_.appendf("%d%d%d", (unsigned) time(0), rand(), nPid);
 
-  nArgc_ = nArgc;
-  pszArgv_ = pszArgv;
+  //nArgc_ = nArgc;
+  //pszArgv_ = pszArgv;
 
-  for (int n = 0; n < nArgc; n++) {
-    lArgv_.AddLast(pszArgv[n]);
+  vlArgs_.empty();
+  for (Apollo::ValueElem* e = 0; (e = vlArgs.nextElem(e)) != 0; ) {
+    vlArgs_.add(e->getString());
   }
 
 #if defined(WIN32)
