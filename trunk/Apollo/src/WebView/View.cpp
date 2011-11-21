@@ -933,10 +933,7 @@ String View::GetUrlFrom(IWebFrame *frame)
   if (FAILED( frame->dataSource(dataSource) )) goto exit;
   if (FAILED( dataSource->request(request) )) goto exit;
 
-  BSTR bstrUrl = 0;
-  if (FAILED( request->URL(&bstrUrl) )) goto exit;
-
-  sUrl = StringFromBSTR(bstrUrl);
+  sUrl = GetUrlFrom(request);
 
 exit:
   return sUrl;
@@ -948,8 +945,8 @@ String View::GetUrlFrom(IWebURLRequest *request)
 
   BSTR bstrUrl = 0;
   if (FAILED( request->URL(&bstrUrl) )) goto exit;
-
   sUrl = StringFromBSTR(bstrUrl);
+  if (bstrUrl != 0) { ::SysFreeString(bstrUrl); }
 
 exit:
   return sUrl;
@@ -1003,6 +1000,31 @@ HRESULT View::didFinishLoadForFrame(IWebView* webView, IWebFrame* frame)
     msg.Post();
   }
 
+  return S_OK;
+}
+
+HRESULT View::didFailLoadingWithError(IWebView *webView, unsigned long identifier, IWebError *error, IWebDataSource *dataSource)
+{
+  if (pWebView_ == webView) {
+
+    BSTR bstrUrl = 0;
+    error->failingURL(&bstrUrl);
+    String sUrl = StringFromBSTR(bstrUrl);
+    if (bstrUrl != 0) { ::SysFreeString(bstrUrl); }
+
+    BSTR bstrDescription = 0;
+    error->localizedDescription(&bstrDescription);
+    String sDescription = StringFromBSTR(bstrDescription);
+    if (bstrDescription != 0) { ::SysFreeString(bstrDescription); }
+
+    apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "" ApHandleFormat " %s: %s", ApHandlePrintf(hAp_), _sz(sDescription), _sz(sUrl)));
+
+    ApAsyncMessage<Msg_WebView_Event_DocumentError> msg;
+    msg->hView = apHandle();
+    msg->sUrl = sUrl;
+    msg->sDescription = sDescription;
+    msg.Post();
+  }
   return S_OK;
 }
 
