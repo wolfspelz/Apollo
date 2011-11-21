@@ -313,7 +313,7 @@ public:
   virtual HRESULT STDMETHODCALLTYPE didReceiveResponse(IWebView *webView, unsigned long identifier, IWebURLResponse *response, IWebDataSource *dataSource) { return S_OK; }
   virtual HRESULT STDMETHODCALLTYPE didReceiveContentLength(IWebView *webView, unsigned long identifier, UINT length, IWebDataSource *dataSource) { return S_OK; }
   virtual HRESULT STDMETHODCALLTYPE didFinishLoadingFromDataSource(IWebView *webView, unsigned long identifier, IWebDataSource *dataSource) { return S_OK; }
-  virtual HRESULT STDMETHODCALLTYPE didFailLoadingWithError(IWebView *webView, unsigned long identifier, IWebError *error, IWebDataSource *dataSource) { return S_OK; }
+  virtual HRESULT STDMETHODCALLTYPE didFailLoadingWithError(IWebView *webView, unsigned long identifier, IWebError *error, IWebDataSource *dataSource);// { return S_OK; }
   virtual HRESULT STDMETHODCALLTYPE plugInFailedWithError(IWebView *webView, IWebError *error, IWebDataSource *dataSource) { return S_OK; }
 
   // IWebPolicyDelegate

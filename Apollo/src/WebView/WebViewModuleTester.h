@@ -19,6 +19,7 @@ public:
   static void End();
 
   static String LoadHtml();
+  static String LoadFromNonAsciiPath();
   static String CallJSEcho();
   static String CallSystemEcho();
   static String CallCustomEcho();
