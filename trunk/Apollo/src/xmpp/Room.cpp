@@ -71,13 +71,24 @@ int Room::sendState()
   if (!msgPGRI.sUrl.empty() && !msgPGRI.sDigest.empty()) {
     Apollo::XMLNode* pIdentity = presence.addChild("x");
     if (pIdentity) {
-      pIdentity->addAttribute("xmlns", FB_NS_PRESENCE_X_USER_IDENTITY);
-      if (msgPGRI.sId) { pIdentity->addAttribute("id", msgPGRI.sId); }
-      if (Apollo::getModuleConfig(MODULE_NAME, "Room/SendJidInIdentityExtension", 0)) {
-        pIdentity->addAttribute("jid", pClient_->getJabberId()); // deprecated
+
+      if (Apollo::getModuleConfig(MODULE_NAME, "Room/SendFbUserIdentity", 0)) {
+        pIdentity->addAttribute("xmlns", NS_PRESENCE_X_USER_IDENTITY_LEGACY);
+        if (msgPGRI.sId) { pIdentity->addAttribute("id", msgPGRI.sId); }
+        if (Apollo::getModuleConfig(MODULE_NAME, "Room/SendJidInIdentityExtension", 0)) {
+          pIdentity->addAttribute("jid", pClient_->getJabberId()); // deprecated
+        }
+        pIdentity->addAttribute("src", msgPGRI.sUrl);
+        pIdentity->addAttribute("digest", msgPGRI.sDigest);
       }
-      pIdentity->addAttribute("src", msgPGRI.sUrl);
-      pIdentity->addAttribute("digest", msgPGRI.sDigest);
+
+      if (Apollo::getModuleConfig(MODULE_NAME, "Room/SendVpIdentity", 1)) {
+        pIdentity->addAttribute("xmlns", NS_PRESENCE_X_IDENTITY);
+        if (msgPGRI.sId) { pIdentity->addAttribute("id", msgPGRI.sId); }
+        pIdentity->addAttribute("src", msgPGRI.sUrl);
+        pIdentity->addAttribute("digest", msgPGRI.sDigest);
+      }
+
     }
   }
 
@@ -90,22 +101,46 @@ int Room::sendState()
   msgPRGC.Filter();
 
   if (msgPRGP.kvParams.length() > 0 || msgPRGC.kvParams.length() > 0) {
-    Apollo::XMLNode* pState = presence.addChild("x");
-    if (pState) {
-      pState->addAttribute("xmlns", FB_NS_PRESENCE_X_AVATAR_STATE);
-      if (msgPRGP.kvParams.length() > 0) {
-        Apollo::XMLNode* pPosition = pState->addChild("position");
-        if (pPosition) {
-          for (Apollo::KeyValueElem* e = 0; (e = msgPRGP.kvParams.nextElem(e)) != 0; ) {
-            pPosition->addAttribute(e->getKey(), e->getString());
+    if (Apollo::getModuleConfig(MODULE_NAME, "Room/SendFbAvatarState", 0)) {
+      Apollo::XMLNode* pState = presence.addChild("x");
+      if (pState) {
+        pState->addAttribute("xmlns", NS_PRESENCE_X_AVATAR_STATE_LEGACY);
+        if (msgPRGP.kvParams.length() > 0) {
+          Apollo::XMLNode* pPosition = pState->addChild("position");
+          if (pPosition) {
+            for (Apollo::KeyValueElem* e = 0; (e = msgPRGP.kvParams.nextElem(e)) != 0; ) {
+              pPosition->addAttribute(e->getKey(), e->getString());
+            }
+          }
+        }
+        if (msgPRGC.kvParams.length() > 0) {
+          Apollo::XMLNode* pCondition = pState->addChild("condition");
+          if (pCondition) {
+            for (Apollo::KeyValueElem* e = 0; (e = msgPRGC.kvParams.nextElem(e)) != 0; ) {
+              pCondition->addAttribute(e->getKey(), e->getString());
+            }
           }
         }
       }
-      if (msgPRGC.kvParams.length() > 0) {
-        Apollo::XMLNode* pCondition = pState->addChild("condition");
-        if (pCondition) {
-          for (Apollo::KeyValueElem* e = 0; (e = msgPRGC.kvParams.nextElem(e)) != 0; ) {
-            pCondition->addAttribute(e->getKey(), e->getString());
+    }
+    if (Apollo::getModuleConfig(MODULE_NAME, "Room/SendVpState", 1)) {
+      Apollo::XMLNode* pState = presence.addChild("x");
+      if (pState) {
+        pState->addAttribute("xmlns", NS_PRESENCE_X_STATE);
+        if (msgPRGP.kvParams.length() > 0) {
+          Apollo::XMLNode* pPosition = pState->addChild("position");
+          if (pPosition) {
+            for (Apollo::KeyValueElem* e = 0; (e = msgPRGP.kvParams.nextElem(e)) != 0; ) {
+              pPosition->addAttribute(e->getKey(), e->getString());
+            }
+          }
+        }
+        if (msgPRGC.kvParams.length() > 0) {
+          Apollo::XMLNode* pCondition = pState->addChild("condition");
+          if (pCondition) {
+            for (Apollo::KeyValueElem* e = 0; (e = msgPRGC.kvParams.nextElem(e)) != 0; ) {
+              pCondition->addAttribute(e->getKey(), e->getString());
+            }
           }
         }
       }

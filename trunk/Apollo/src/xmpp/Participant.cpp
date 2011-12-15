@@ -130,7 +130,8 @@ x  <x xmlns='firebat:user:jid'>12344151@xmpp1.zweitgeist.com</x>
       String sXmlNs = pX->getAttribute( "xmlns").getValue();
 
       if (0) {
-      } else if (sXmlNs == FB_NS_PRESENCE_X_USER_IDENTITY) {
+      } else if (sXmlNs == NS_PRESENCE_X_USER_IDENTITY_LEGACY) {
+      } else if (sXmlNs == NS_PRESENCE_X_IDENTITY) {
         // 
         // <x xmlns='firebat:user:identity' 
         //   id='id:weblin:12344151' 
@@ -158,7 +159,7 @@ x  <x xmlns='firebat:user:jid'>12344151@xmpp1.zweitgeist.com</x>
           }
         }
         
-      } else if (sXmlNs == FB_NS_PRESENCE_X_USER_JID) {
+      } else if (sXmlNs == NS_PRESENCE_X_USER_JID_LEGACY) {
         // <x xmlns='firebat:user:jid'>12344151@xmpp1.zweitgeist.com</x>
         String sJid = pX->getCData();
         sJid.trimWSP();
@@ -208,7 +209,7 @@ x  <x xmlns='firebat:user:jid'>12344151@xmpp1.zweitgeist.com</x>
           }
         }
 
-      } else if (sXmlNs == FB_NS_PRESENCE_X_AVATAR_STATE) {
+      } else if (sXmlNs == NS_PRESENCE_X_AVATAR_STATE_LEGACY) {
         // <x xmlns='firebat:avatar:state'><position x='189' y='0' z='0'/><condition status='sleep'/></x>
 
         Apollo::XMLNode* pPosition = pX->getChild("position");
@@ -233,7 +234,7 @@ x  <x xmlns='firebat:user:jid'>12344151@xmpp1.zweitgeist.com</x>
           }
         }
 
-      } else if (sXmlNs == FB_NS_PRESENCE_X_FEATURES) {
+      } else if (sXmlNs == NS_PRESENCE_X_FEATURES_LEGACY) {
         // <x xmlns='firebat:features'>pc,pp,cw,ms,lo,wo.wp,cl.wp,sg.wp,fb.2.7.13</x>
 
         if (pMsgFirebatFeatures == 0) { pMsgFirebatFeatures = new Msg_Xmpp_Participant_FirebatFeatures(); }
