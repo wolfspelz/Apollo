@@ -279,7 +279,7 @@ int GmModule::doRegister()
 
       SrpcMessage srpc;
       srpc.set(Srpc::Key::Method, GmService_Method_Register);
-      srpc.set("Token", Apollo::getModuleConfig(MODULE_NAME, "Srpc/ApiToken", "8uzxXXZTAmHcni6tK3t"));
+      srpc.set("Token", Apollo::getModuleConfig(MODULE_NAME, "Srpc/Token", "8uzxXXZTAmHcni6tK3t-Apollo-3"));
       srpc.set("User", Apollo::getRandomString(20));
       srpc.set("Password", Apollo::getRandomString(20));
       
@@ -310,26 +310,46 @@ void GmModule::onLoginResult(SrpcMessage& srpc)
   apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "Success"));
   bLoggedIn_ = 1;
 
+  Apollo::KeyValueList kvCommands;
+  Apollo::SrpcMessage srpcCommands;
+  srpcCommands.fromString(srpc.getString("Commands"));
+
   int nCnt = 0;
   int bDone = 0;
   while (!bDone) {
-    String sKey; sKey.appendf("%d:Command", nCnt);
-    String sValue = srpc.getString(sKey);
-    if (sValue.empty()) {
+    Apollo::SrpcMessage srpcCommand;
+    srpcCommand.fromString(srpcCommands.getString(String::from(nCnt)));
+    if (srpcCommand.length() == 0) {
       bDone = 1;
     } else {
-      Apollo::KeyValueList kvCommand;
-      srpc.getKeyValueList(sKey, kvCommand);
-
       ApSRPCMessage msg(SRPCGATE_HANDLER_TYPE);
-      for (Apollo::KeyValueElem* e = 0; (e = kvCommand.nextElem(e)) != 0; ) {
-        msg.srpc.set(e->getKey(), e->getString());
-      }
+      srpcCommand >> msg.srpc;
       apLog_Info((LOG_CHANNEL, LOG_CONTEXT, "Execute %s", _sz(msg.srpc.toString())));
       msg.Call();
       nCnt++;
     }
   }
+
+  //int nCnt = 0;
+  //int bDone = 0;
+  //while (!bDone) {
+  //  String sKey; sKey.appendf("%d:Command", nCnt);
+  //  String sValue = srpc.getString(sKey);
+  //  if (sValue.empty()) {
+  //    bDone = 1;
+  //  } else {
+  //    Apollo::KeyValueList kvCommand;
+  //    srpc.getKeyValueList(sKey, kvCommand);
+
+  //    ApSRPCMessage msg(SRPCGATE_HANDLER_TYPE);
+  //    for (Apollo::KeyValueElem* e = 0; (e = kvCommand.nextElem(e)) != 0; ) {
+  //      msg.srpc.set(e->getKey(), e->getString());
+  //    }
+  //    apLog_Info((LOG_CHANNEL, LOG_CONTEXT, "Execute %s", _sz(msg.srpc.toString())));
+  //    msg.Call();
+  //    nCnt++;
+  //  }
+  //}
 }
 
 void GmModule::onLoginError(const String sError)
@@ -390,7 +410,7 @@ int GmModule::doLogin()
 
         SrpcMessage srpc;
         srpc.set(Srpc::Key::Method, GmService_Method_Login);
-        srpc.set("Token", Apollo::getModuleConfig(MODULE_NAME, "Srpc/ApiToken", "8uzxXXZTAmHcni6tK3t"));
+        srpc.set("Token", Apollo::getModuleConfig(MODULE_NAME, "Srpc/Token", "8uzxXXZTAmHcni6tK3t-Apollo-3"));
         srpc.set("User", Apollo::getModuleConfig(MODULE_NAME, "User", ""));
         srpc.set("Password", getPassword());
         srpc.set("Client", kvClientInfo.toString());
@@ -569,7 +589,7 @@ AP_MSG_HANDLER_METHOD(GmModule, IdentityMgmt_SetProperty)
 
   SrpcMessage srpc;
   srpc.set(Srpc::Key::Method, GmService_Method_SetProperty);
-  srpc.set("Token", Apollo::getModuleConfig(MODULE_NAME, "Srpc/ApiToken", "8uzxXXZTAmHcni6tK3t"));
+  srpc.set("Token", Apollo::getModuleConfig(MODULE_NAME, "Srpc/Token", "8uzxXXZTAmHcni6tK3t-Apollo-3"));
   srpc.set("User", Apollo::getModuleConfig(MODULE_NAME, "User", ""));
   srpc.set("Password", getPassword());
   srpc.set("Key", pMsg->sKey);

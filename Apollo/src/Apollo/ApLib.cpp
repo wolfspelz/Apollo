@@ -281,13 +281,11 @@ String ApLib::getCwd()
 
 String ApLib::getMachineId()
 {
-  String sMachineId;
-
   String sData;
 
 #if defined(WIN32)
   String sVolumeSerialNumber;
-  {
+  if (Apollo::getConfig("System/MachineIdUseVolumeSerialNumber", 1)) {
     DWORD dwVolumeSerialNumber = 0;
     String sRootPathName = "C:\\";
     if (::GetVolumeInformation(
@@ -305,7 +303,7 @@ String ApLib::getMachineId()
   }
 
   String sComputerName;
-  {
+  if (Apollo::getConfig("System/MachineIdUseComputerName", 1)) {
     WCHAR pNameBuffer[10240+1];
     DWORD nNameBufferSize = 10240;
     if (::GetComputerName(pNameBuffer, &nNameBufferSize)) {
@@ -315,7 +313,7 @@ String ApLib::getMachineId()
   }
 
   String sMacAddress;
-  {
+  if (Apollo::getConfig("System/MachineIdUseMacAddress", 1)) {
     List lAddress;
 
     DWORD dwBufLen = 0;
@@ -326,7 +324,13 @@ String ApLib::getMachineId()
           PIP_ADAPTER_INFO ppAdapterInfo = pAdapterInfo;
           do {
             String sIpAddress = (char*) & (ppAdapterInfo->IpAddressList.IpAddress);
-            if (sIpAddress != "0.0.0.0") {
+            if (  sIpAddress != "0.0.0.0" 
+              &&  sIpAddress != "127.0.0.1"
+              //&& !sIpAddress.startsWith("10.")
+              //&& !sIpAddress.startsWith("169.254.")
+              //&& !sIpAddress.startsWith("192.168.")
+              //&& !sIpAddress.startsWith("192.0.2.")
+              ) {
               String sMac;
               sMac.appendf("%02X%02X%02X%02X%02X%02X"
                 , ppAdapterInfo->Address[0]
@@ -358,19 +362,26 @@ String ApLib::getMachineId()
     }
   }
 
+  if (sVolumeSerialNumber.isset()) {
+    sData += sVolumeSerialNumber;
+  }
+
+  if (sComputerName.isset()) {
+    sData += sComputerName;
+  }
+
   if (sMacAddress.isset()) {
     sData += sMacAddress;
-  } else if (sVolumeSerialNumber.isset()) {
-    sData += sComputerName;
-    sData += sVolumeSerialNumber;
   }
 
 #endif
 
+  String sMachineId;
+
   if (sData != "") {
-    //Apollo::MessageDigest digest((unsigned char *) sData.c_str(), sData.bytes());
-    //sMachineId = digest.getSHA1Hex();
-    sMachineId = sData;
+    //sMachineId = sData;
+    Apollo::MessageDigest digest((unsigned char *) sData.c_str(), sData.bytes());
+    sMachineId = digest.getSHA1Hex();
   }
 
   return sMachineId;

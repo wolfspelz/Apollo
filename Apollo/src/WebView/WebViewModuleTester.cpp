@@ -639,7 +639,7 @@ void WebViewModuleTester::Begin()
 {
   AP_UNITTEST_REGISTER(WebViewModuleTester::LoadHtml);
   AP_UNITTEST_REGISTER(WebViewModuleTester::LoadFromNonAsciiPath);
-  AP_UNITTEST_REGISTER(WebViewModuleTester::LoadFromNonAsciiPath_Result);
+  //AP_UNITTEST_REGISTER(WebViewModuleTester::LoadFromNonAsciiPath_Result);
   AP_UNITTEST_REGISTER(WebViewModuleTester::CallJSEcho);
   AP_UNITTEST_REGISTER(WebViewModuleTester::CallJSEcho_Result);
   AP_UNITTEST_REGISTER(WebViewModuleTester::CallSystemEcho);

@@ -2,7 +2,7 @@ Active=1
 #StartOnRunLevelNormal=1
 
 Srpc/Url=http://web.avatar.io/srpc
-Srpc/ApiToken=8uzxXXZTAmHcni6tK3t
+#Srpc/Token=8uzxXXZTAmHcni6tK3t-Apollo-3
 #Srpc/MaxDataSize=30000
 
 #Register/MaxRetries=3
