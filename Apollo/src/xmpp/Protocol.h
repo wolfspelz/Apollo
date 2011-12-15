@@ -19,10 +19,13 @@
 
 #define JABBER_ERRORCODE_Conflict 409
 
-#define FB_NS_PRESENCE_X_USER_IDENTITY "firebat:user:identity"
-#define FB_NS_PRESENCE_X_USER_JID "firebat:user:jid"
-#define FB_NS_PRESENCE_X_AVATAR_STATE "firebat:avatar:state"
-#define FB_NS_PRESENCE_X_FEATURES "firebat:features"
+#define NS_PRESENCE_X_USER_IDENTITY_LEGACY "firebat:user:identity"
+#define NS_PRESENCE_X_USER_JID_LEGACY "firebat:user:jid"
+#define NS_PRESENCE_X_AVATAR_STATE_LEGACY "firebat:avatar:state"
+#define NS_PRESENCE_X_FEATURES_LEGACY "firebat:features"
+
+#define NS_PRESENCE_X_IDENTITY "vp:identity"
+#define NS_PRESENCE_X_STATE "vp:state"
 
 /*
 #define JABBER_NS_ROSTER "jabber:iq:roster"
