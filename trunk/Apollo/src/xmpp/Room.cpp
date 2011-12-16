@@ -69,10 +69,10 @@ int Room::sendState()
   msgPGRI.Filter();
 
   if (!msgPGRI.sUrl.empty() && !msgPGRI.sDigest.empty()) {
-    Apollo::XMLNode* pIdentity = presence.addChild("x");
-    if (pIdentity) {
 
-      if (Apollo::getModuleConfig(MODULE_NAME, "Room/SendFbUserIdentity", 0)) {
+    if (Apollo::getModuleConfig(MODULE_NAME, "Room/SendFbUserIdentity", 0)) {
+      Apollo::XMLNode* pIdentity = presence.addChild("x");
+      if (pIdentity) {
         pIdentity->addAttribute("xmlns", NS_PRESENCE_X_USER_IDENTITY_LEGACY);
         if (msgPGRI.sId) { pIdentity->addAttribute("id", msgPGRI.sId); }
         if (Apollo::getModuleConfig(MODULE_NAME, "Room/SendJidInIdentityExtension", 0)) {
@@ -81,15 +81,18 @@ int Room::sendState()
         pIdentity->addAttribute("src", msgPGRI.sUrl);
         pIdentity->addAttribute("digest", msgPGRI.sDigest);
       }
+    }
 
-      if (Apollo::getModuleConfig(MODULE_NAME, "Room/SendVpIdentity", 1)) {
+    if (Apollo::getModuleConfig(MODULE_NAME, "Room/SendVpIdentity", 1)) {
+      Apollo::XMLNode* pIdentity = presence.addChild("x");
+      if (pIdentity) {
         pIdentity->addAttribute("xmlns", NS_PRESENCE_X_IDENTITY);
         if (msgPGRI.sId) { pIdentity->addAttribute("id", msgPGRI.sId); }
         pIdentity->addAttribute("src", msgPGRI.sUrl);
         pIdentity->addAttribute("digest", msgPGRI.sDigest);
       }
-
     }
+
   }
 
   Msg_Protocol_Room_GetPosition msgPRGP;
@@ -101,6 +104,7 @@ int Room::sendState()
   msgPRGC.Filter();
 
   if (msgPRGP.kvParams.length() > 0 || msgPRGC.kvParams.length() > 0) {
+
     if (Apollo::getModuleConfig(MODULE_NAME, "Room/SendFbAvatarState", 0)) {
       Apollo::XMLNode* pState = presence.addChild("x");
       if (pState) {
@@ -123,6 +127,7 @@ int Room::sendState()
         }
       }
     }
+
     if (Apollo::getModuleConfig(MODULE_NAME, "Room/SendVpState", 1)) {
       Apollo::XMLNode* pState = presence.addChild("x");
       if (pState) {
@@ -145,6 +150,7 @@ int Room::sendState()
         }
       }
     }
+
   }
 
   ok = pClient_->sendStanza(presence);
