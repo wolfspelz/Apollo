@@ -111,6 +111,9 @@ x  <x xmlns='firebat:user:jid'>12344151@xmpp1.zweitgeist.com</x>
   AutoPtr<Msg_Protocol_Participant_Position> pMsgAvatarPosition;
   AutoPtr<Msg_Xmpp_Participant_FirebatFeatures> pMsgFirebatFeatures;
 
+  int bGotIdentity = 0;
+  int bGotState = 0;
+
   for (Apollo::XMLNode* pNode = 0; (pNode = stanza.nextChild(pNode)); ) {
     if (0) {
     } else if (pNode->getName() == "status") {
@@ -130,8 +133,7 @@ x  <x xmlns='firebat:user:jid'>12344151@xmpp1.zweitgeist.com</x>
       String sXmlNs = pX->getAttribute( "xmlns").getValue();
 
       if (0) {
-      } else if (sXmlNs == NS_PRESENCE_X_USER_IDENTITY_LEGACY) {
-      } else if (sXmlNs == NS_PRESENCE_X_IDENTITY) {
+      } else if (sXmlNs == NS_PRESENCE_X_IDENTITY || sXmlNs == NS_PRESENCE_X_USER_IDENTITY_LEGACY) {
         // 
         // <x xmlns='firebat:user:identity' 
         //   id='id:weblin:12344151' 
@@ -139,22 +141,25 @@ x  <x xmlns='firebat:user:jid'>12344151@xmpp1.zweitgeist.com</x>
         //   digest='c4423ad4bf2e7e23d179c2c0bd83e88bf9a35610' 
         //   src='http://storage.zweitgeist.com/index.php/12344151'
         // />
-        if (pMsgIdentity == 0) { pMsgIdentity = new Msg_Protocol_Participant_VpIdentity(); }
-        if (pMsgIdentity != 0) {
-          pMsgIdentity->sId = pX->getAttribute("id").getValue();
-          pMsgIdentity->sDigest = pX->getAttribute("digest").getValue();
-          pMsgIdentity->sSrc = pX->getAttribute("src").getValue();
+        if (!bGotIdentity) {
+          bGotIdentity = 1;
+          if (pMsgIdentity == 0) { pMsgIdentity = new Msg_Protocol_Participant_VpIdentity(); }
+          if (pMsgIdentity != 0) {
+            pMsgIdentity->sId = pX->getAttribute("id").getValue();
+            pMsgIdentity->sDigest = pX->getAttribute("digest").getValue();
+            pMsgIdentity->sSrc = pX->getAttribute("src").getValue();
 
-          String sJid = pX->getAttribute("jid").getValue();
-          if (!sJid.empty()) {
-            if (pMsgJabberId == 0) {
-              pMsgJabberId = new Msg_Xmpp_Participant_JabberId();
-              if (pMsgJabberId != 0) {
-                pMsgJabberId->sJabberId = sJid;
+            String sJid = pX->getAttribute("jid").getValue();
+            if (!sJid.empty()) {
+              if (pMsgJabberId == 0) {
+                pMsgJabberId = new Msg_Xmpp_Participant_JabberId();
+                if (pMsgJabberId != 0) {
+                  pMsgJabberId->sJabberId = sJid;
+                }
+              } else {
+                String sPreviousJid = pMsgJabberId->sJabberId;
+                pMsgJabberId->sJabberId = selectBetterJid(sJid, sPreviousJid);
               }
-            } else {
-              String sPreviousJid = pMsgJabberId->sJabberId;
-              pMsgJabberId->sJabberId = selectBetterJid(sJid, sPreviousJid);
             }
           }
         }
@@ -209,27 +214,30 @@ x  <x xmlns='firebat:user:jid'>12344151@xmpp1.zweitgeist.com</x>
           }
         }
 
-      } else if (sXmlNs == NS_PRESENCE_X_AVATAR_STATE_LEGACY) {
+      } else if (sXmlNs == NS_PRESENCE_X_STATE || sXmlNs == NS_PRESENCE_X_AVATAR_STATE_LEGACY) {
         // <x xmlns='firebat:avatar:state'><position x='189' y='0' z='0'/><condition status='sleep'/></x>
 
-        Apollo::XMLNode* pPosition = pX->getChild("position");
-        if (pPosition != 0) {
-          if (pMsgAvatarPosition == 0) { pMsgAvatarPosition = new Msg_Protocol_Participant_Position(); }
-          if (pMsgAvatarPosition != 0) {
-            Apollo::XMLAttrList& attributes = pPosition->getAttributes();
-            for (Apollo::XMLAttr* pAttr = 0; (pAttr = attributes.nextAttribute(pAttr)) != 0; ) {
-              pMsgAvatarPosition->kvParams.add(pAttr->getKey(), pAttr->getValue());
+        if (!bGotState) {
+          bGotState = 1;
+          Apollo::XMLNode* pPosition = pX->getChild("position");
+          if (pPosition != 0) {
+            if (pMsgAvatarPosition == 0) { pMsgAvatarPosition = new Msg_Protocol_Participant_Position(); }
+            if (pMsgAvatarPosition != 0) {
+              Apollo::XMLAttrList& attributes = pPosition->getAttributes();
+              for (Apollo::XMLAttr* pAttr = 0; (pAttr = attributes.nextAttribute(pAttr)) != 0; ) {
+                pMsgAvatarPosition->kvParams.add(pAttr->getKey(), pAttr->getValue());
+              }
             }
           }
-        }
 
-        Apollo::XMLNode* pCondition = pX->getChild("condition");
-        if (pCondition != 0) {
-          if (pMsgAvatarCondition != 0) {
-            pMsgAvatarCondition->kvParams.removeAll();
-            Apollo::XMLAttrList& attributes = pCondition->getAttributes();
-            for (Apollo::XMLAttr* pAttr = 0; (pAttr = attributes.nextAttribute(pAttr)) != 0; ) {
-              pMsgAvatarCondition->kvParams.add(pAttr->getKey(), pAttr->getValue());
+          Apollo::XMLNode* pCondition = pX->getChild("condition");
+          if (pCondition != 0) {
+            if (pMsgAvatarCondition != 0) {
+              pMsgAvatarCondition->kvParams.removeAll();
+              Apollo::XMLAttrList& attributes = pCondition->getAttributes();
+              for (Apollo::XMLAttr* pAttr = 0; (pAttr = attributes.nextAttribute(pAttr)) != 0; ) {
+                pMsgAvatarCondition->kvParams.add(pAttr->getKey(), pAttr->getValue());
+              }
             }
           }
         }
