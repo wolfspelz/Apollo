@@ -33,8 +33,8 @@
   #include <unistd.h>
   #include <errno.h>
   #include <strings.h>
+  #include "limits.h" // INT_MAX
 #endif
-//#include "limits.h" // INT_MAX
 
 #if defined(WIN32)
   #ifdef APOLLO_EXPORTS
