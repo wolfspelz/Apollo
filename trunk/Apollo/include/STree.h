@@ -100,7 +100,7 @@ public:
   // Sets EXT_ID, if not already there
   //TreeNode<EXT_ID, INT_ID> &operator[](const EXT_ID &ext_id);
 
-  size_t Count(void) { return current_size_; }
+  size_t Count(void);// { return current_size_; }
   const Tree<EXT_ID, INT_ID, COMPARE_KEYS>& operator=(const Tree<EXT_ID, INT_ID, COMPARE_KEYS> &rbt);
   virtual int lessthan (const EXT_ID &k1, const EXT_ID &k2) const;
 
@@ -213,7 +213,7 @@ public:
 template <class EXT_ID, class INT_ID, class COMPARE_KEYS>
 PointerTree<EXT_ID, INT_ID, COMPARE_KEYS>::~PointerTree()
 {
-  while (Count() > 0) {
+  while (this->Count() > 0) {
     PointerTreeIterator<EXT_ID, INT_ID, COMPARE_KEYS> iter(*this);
     PointerTreeNode<EXT_ID, INT_ID>* pNode = iter.Next();
     if (pNode != 0) {
@@ -299,8 +299,13 @@ Tree<EXT_ID, INT_ID, COMPARE_KEYS>::~Tree ()
 }
 
 template <class EXT_ID, class INT_ID, class COMPARE_KEYS>
-const Tree<EXT_ID, INT_ID, COMPARE_KEYS>& Tree<EXT_ID, INT_ID, COMPARE_KEYS>::operator=(const Tree<EXT_ID, INT_ID, 
-                                                           COMPARE_KEYS> &rbt)
+size_t Tree<EXT_ID, INT_ID, COMPARE_KEYS>::Count(void)
+{
+  return current_size_;
+}
+
+template <class EXT_ID, class INT_ID, class COMPARE_KEYS>
+const Tree<EXT_ID, INT_ID, COMPARE_KEYS>& Tree<EXT_ID, INT_ID, COMPARE_KEYS>::operator=(const Tree<EXT_ID, INT_ID, COMPARE_KEYS> &rbt)
 {
   const TreeNode<EXT_ID, INT_ID>* pNodeOther = NULL;
   while((pNodeOther = rbt.Next(pNodeOther))) {
