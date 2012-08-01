@@ -37,6 +37,7 @@ class Msg_Config_Clear: public ApRequestMessage
 {
 public:
   Msg_Config_Clear() : ApRequestMessage("Config_Clear") {}
+  static int _() { Msg_Config_Clear msg; return msg.Request(); }
 };
 
 // Load file into the current config plane
@@ -65,6 +66,7 @@ class Msg_Config_SetPlane: public ApRequestMessage
 {
 public:
   Msg_Config_SetPlane() : ApRequestMessage("Config_SetPlane") {}
+  static int _(const String& sPlane) { Msg_Config_SetPlane msg; msg.sPlane = sPlane; return msg.Request(); }
   ApIN String sPlane;
 };
 
@@ -73,6 +75,13 @@ class Msg_Config_GetPlane: public ApRequestMessage
 public:
   Msg_Config_GetPlane() : ApRequestMessage("Config_GetPlane") {}
   ApOUT String sPlane;
+
+  static String _()
+  {
+    Msg_Config_GetPlane msg;
+    msg.Request();
+    return msg.sPlane;
+  }
 };
 
 class Msg_Config_DeletePlane: public ApRequestMessage
