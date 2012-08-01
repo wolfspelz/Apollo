@@ -492,6 +492,17 @@ void VpiModule::On_Vpi_GetLocationXml(Msg_Vpi_GetLocationXml* pMsg)
   if (ok && location_xml != 0) {
     apLog_VeryVerbose((LOG_CHANNEL, LOG_CONTEXT, "vpi_get_location_xml success,  url:%s", _sz(pMsg->sDocumentUrl)));
     pMsg->sLocationXml = location_xml;
+  } else {
+    int nError = vpi_get_last_error(pVpi_);
+    switch (nError) {
+      case VPI_ERROR_NEED_DATA: pMsg->sComment = "VPI_ERROR_NEED_DATA: "; break;
+      case VPI_ERROR_REQUESTED_DATA: pMsg->sComment = "VPI_ERROR_REQUESTED_DATA: "; break;
+    }
+
+    Flexbuf<char> buf(4096);
+    unsigned int nLength = buf.length();
+    vpi_get_last_error_string(pVpi_, (char*) buf, &nLength);
+    pMsg->sComment += (char*) buf; 
   }
 
   if (location_xml != 0) {

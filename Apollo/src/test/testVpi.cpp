@@ -11,11 +11,48 @@
 #if defined(AP_TEST_Vpi)
 #include "MsgVpi.h"
 #include "MsgNet.h"
+#include "MsgConfig.h"
+
+static int Test_Vpi_UnitTest_nCntAsyncJobs = 0;
+static String Test_Vpi_UnitTest_sOriginalPlane;
+
+static void Test_Vpi_UnitTest_TokenBegin()
+{
+  Test_Vpi_UnitTest_sOriginalPlane = Msg_Config_GetPlane::_();
+  Msg_Config_SetPlane::_("test");
+  Msg_Config_Clear::_();
+  Apollo::setModuleConfig("Vpi", "LocalVpiFileName", "_vpi.xml");
+  Apollo::setModuleConfig("Vpi", "GlobalRoot", "http://lms.virtual-presence.org/v7/root.xml");
+  Apollo::setModuleConfig("Vpi", "DefaultTimeToLive", 3600);
+  Apollo::setModuleConfig("Vpi", "MinTimeToLive", 20);
+  Apollo::setModuleConfig("Vpi", "MaxVpiFileSize", 30000);
+  Apollo::setModuleConfig("Vpi", "ErrorTimeToLive", 60);
+  { Msg_Vpi_Clear msg; msg.Request(); }
+}
 
 static void Test_Vpi_UnitTest_TokenEnd()
 {
+  Msg_Config_SetPlane::_(Test_Vpi_UnitTest_sOriginalPlane);
+  { Msg_Vpi_Clear msg; msg.Request(); }
+
   apLog_Info((LOG_CHANNEL, LOG_CONTEXT, "Finished Test/Vpi"));
   { ApAsyncMessage<Msg_UnitTest_Token> msg; msg.Post(); }
+}
+
+static void Test_Vpi_UnitTest_TokenInc()
+{
+  if (Test_Vpi_UnitTest_nCntAsyncJobs == 0) {
+    Test_Vpi_UnitTest_TokenBegin();
+  }
+  Test_Vpi_UnitTest_nCntAsyncJobs++;
+}
+
+static void Test_Vpi_UnitTest_TokenDec()
+{
+  Test_Vpi_UnitTest_nCntAsyncJobs--;
+  if (Test_Vpi_UnitTest_nCntAsyncJobs == 0) {
+    Test_Vpi_UnitTest_TokenEnd();
+  }
 }
 
 //----------------------------------------------------------
@@ -102,6 +139,17 @@ static String Test_Vpi_Synchronous()
 {
   String s;
 
+  String sOriginalPlane = Msg_Config_GetPlane::_();
+  Msg_Config_SetPlane::_("test");
+  Msg_Config_Clear::_();
+
+  Apollo::setModuleConfig("Vpi", "LocalVpiFileName", "_vpi.xml");
+  Apollo::setModuleConfig("Vpi", "GlobalRoot", "http://lms.virtual-presence.org/v7/root.xml");
+  Apollo::setModuleConfig("Vpi", "DefaultTimeToLive", 3600);
+  Apollo::setModuleConfig("Vpi", "MinTimeToLive", 20);
+  Apollo::setModuleConfig("Vpi", "MaxVpiFileSize", 30000);
+  Apollo::setModuleConfig("Vpi", "ErrorTimeToLive", 60);
+
   { Msg_Vpi_Clear msg; msg.Request(); }
 
   {
@@ -166,7 +214,7 @@ static String Test_Vpi_Synchronous()
     Msg_Vpi_GetLocationXml msg;
     msg.sDocumentUrl = "http://www.virtual-presence.org/notes/VPTN-2.txt";
     if (!msg.Request()) {
-      s = "Msg_Vpi_GetLocationXml failed";
+      s = "Msg_Vpi_GetLocationXml failed: " + msg.sComment;
     } else {
       if (msg.apStatus != ApMessage::Ok) {
         s = "Msg_Vpi_GetLocationXml success, but result !Ok";
@@ -189,12 +237,25 @@ static String Test_Vpi_Synchronous()
     }
   }
 
+  Msg_Config_SetPlane::_(sOriginalPlane);
+
   return s;
 }
 
 static String Test_Vpi_SynchronousIncomplete()
 {
   String s;
+
+  String sOriginalPlane = Msg_Config_GetPlane::_();
+  Msg_Config_SetPlane::_("test");
+  Msg_Config_Clear::_();
+
+  Apollo::setModuleConfig("Vpi", "LocalVpiFileName", "_vpi.xml");
+  Apollo::setModuleConfig("Vpi", "GlobalRoot", "http://lms.virtual-presence.org/v7/root.xml");
+  Apollo::setModuleConfig("Vpi", "DefaultTimeToLive", 3600);
+  Apollo::setModuleConfig("Vpi", "MinTimeToLive", 20);
+  Apollo::setModuleConfig("Vpi", "MaxVpiFileSize", 30000);
+  Apollo::setModuleConfig("Vpi", "ErrorTimeToLive", 60);
 
   { Msg_Vpi_Clear msg; msg.Request(); }
 
@@ -242,6 +303,8 @@ static String Test_Vpi_SynchronousIncomplete()
       s = Test_CompareLists("Test_Vpi_SynchronousIncomplete", msg.vlFiles, vlExpected);
     }
   }
+
+  Msg_Config_SetPlane::_(sOriginalPlane);
 
   return s;
 }
@@ -331,6 +394,12 @@ static int Test_Vpi_DetailedMap_Vpi_LocationXmlResponse(Msg_Vpi_LocationXmlRespo
     AP_UNITTEST_FAILED(Test_Vpi_DetailedMap_End, s);
   }
 
+  { Msg_Vpi_LocationXmlResponse msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_Vpi_DetailedMap_Vpi_LocationXmlResponse, 0); }
+  { Msg_Vpi_RequestFile msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_Vpi_DetailedMap_Vpi_RequestFile, 0); }
+  { Msg_Vpi_ReceiveFile msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_Vpi_DetailedMap_Vpi_ReceiveFile, 0); }
+
+  Test_Vpi_UnitTest_TokenDec();
+
   return 1;
 }
 
@@ -342,7 +411,7 @@ static String Test_Vpi_DetailedMap_Start()
   { Msg_Vpi_RequestFile msg; msg.Hook(MODULE_NAME, (ApCallback) Test_Vpi_DetailedMap_Vpi_RequestFile, 0, ApCallbackPosNormal); }  
   { Msg_Vpi_ReceiveFile msg; msg.Hook(MODULE_NAME, (ApCallback) Test_Vpi_DetailedMap_Vpi_ReceiveFile, 0, ApCallbackPosEarly); }  
 
-  { Msg_Vpi_Clear msg; msg.Request(); }
+  Test_Vpi_UnitTest_TokenInc();
 
   if (s.empty()) {
     Msg_Vpi_LocationXmlRequest msg;
@@ -350,6 +419,7 @@ static String Test_Vpi_DetailedMap_Start()
     msg.hRequest = g_hTest_Vpi_DetailedMap = Apollo::newHandle();
     if (!msg.Request()) {
       s.appendf("Failed to map '%s'", _sz(g_sTest_Vpi_DetailedMap_Vpi_DocumentURL));
+      Test_Vpi_UnitTest_TokenDec();
     }
   }
 
@@ -455,9 +525,8 @@ static int Test_Vpi_Map_Vpi_LocationXmlResponse(Msg_Vpi_LocationXmlResponse* pMs
   }
 
   if (bDone) {
-    { Msg_Vpi_Clear msg; msg.Request(); }
     { Msg_Vpi_LocationXmlResponse msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_Vpi_Map_Vpi_LocationXmlResponse, 0); }
-    Test_Vpi_UnitTest_TokenEnd();
+    Test_Vpi_UnitTest_TokenDec();
   }
 
   return 1;
@@ -478,8 +547,11 @@ static String Test_Vpi_Map_Start()
   lTest_Vpi_Map_DataList.AddLast(new Test_Vpi_Map_Data(Apollo::newHandle(), "http://lms.virtual-presence.org/test/test-broken-xml-vpi/index.html", "xmpp:80190f173d84129117b2cb406c7e6d7667e9f77e@muc4.virtual-presence.org"));
   lTest_Vpi_Map_DataList.AddLast(new Test_Vpi_Map_Data(Apollo::newHandle(), "http://lms.virtual-presence.org/test/test-html-instead-vpi/index.html", "xmpp:80190f173d84129117b2cb406c7e6d7667e9f77e@muc4.virtual-presence.org"));
 
+  Test_Vpi_UnitTest_TokenInc();
+
   if (s.empty()) {
     for (Test_Vpi_Map_Data* d = 0; (d = (Test_Vpi_Map_Data*) lTest_Vpi_Map_DataList.Next(d)) != 0; ) {
+
       Msg_Vpi_LocationXmlRequest msg;
       msg.sDocumentUrl = d->sDocumentUrl_;
       msg.hRequest = d->apHandle();
