@@ -80,7 +80,7 @@ AP_MSG_HANDLER_METHOD(DialogModule, Dialog_GetView)
 {
   Dialog* pDialog = FindDialog(pMsg->hDialog);
   if (pDialog) {
-    pDialog->GetView();
+    pMsg->hView = pDialog->GetView();
     pMsg->apStatus = ApMessage::Ok;
   }
 }
