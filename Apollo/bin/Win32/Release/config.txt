@@ -22,6 +22,7 @@
 #Test/Arena=1
 #Test/Dialog=1
 #Test/TrayIcon=1
+#Test/Setup=1
 
 # ---------------------------------------------
 
