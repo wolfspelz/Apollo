@@ -53,7 +53,10 @@ AP_MSG_HANDLER_METHOD(ConfigModule, Config_SetValue)
   if (pPlane != 0) {
     ok = setValue(pPlane, pMsg->sPath, pMsg->sValue);
 
-    if (bUseDb_) {
+    int bSkipDB = 0;
+    if (pPlane->getName().startsWith("_")) { bSkipDB = 1; }
+
+    if (bUseDb_ && !bSkipDB) {
       if (ok) {
         if (pPlane->sDbName_) {
           Msg_DB_Set msg;

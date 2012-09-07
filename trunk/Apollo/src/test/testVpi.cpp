@@ -19,7 +19,7 @@ static String Test_Vpi_UnitTest_sOriginalPlane;
 static void Test_Vpi_UnitTest_TokenBegin()
 {
   Test_Vpi_UnitTest_sOriginalPlane = Msg_Config_GetPlane::_();
-  Msg_Config_SetPlane::_("test");
+  Msg_Config_SetPlane::_("_test");
   Msg_Config_Clear::_();
   Apollo::setModuleConfig("Vpi", "LocalVpiFileName", "_vpi.xml");
   Apollo::setModuleConfig("Vpi", "GlobalRoot", "http://lms.virtual-presence.org/v7/root.xml");
@@ -140,7 +140,7 @@ static String Test_Vpi_Synchronous()
   String s;
 
   String sOriginalPlane = Msg_Config_GetPlane::_();
-  Msg_Config_SetPlane::_("test");
+  Msg_Config_SetPlane::_("_test");
   Msg_Config_Clear::_();
 
   Apollo::setModuleConfig("Vpi", "LocalVpiFileName", "_vpi.xml");
@@ -247,7 +247,7 @@ static String Test_Vpi_SynchronousIncomplete()
   String s;
 
   String sOriginalPlane = Msg_Config_GetPlane::_();
-  Msg_Config_SetPlane::_("test");
+  Msg_Config_SetPlane::_("_test");
   Msg_Config_Clear::_();
 
   Apollo::setModuleConfig("Vpi", "LocalVpiFileName", "_vpi.xml");
