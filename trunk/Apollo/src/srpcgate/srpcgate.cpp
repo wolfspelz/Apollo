@@ -137,9 +137,9 @@ AP_MSGCLASS_HANDLER_METHOD(SrpcGateModule, SrpcGate_Handler, ApSRPCMessage)
 
   String sMethod = pMsg->srpc.getString(Srpc::Key::Method);
   HandlerNode* pNode = handlers_.Find(sMethod);
-  if (pNode != 0) {
-    ok = pNode->Value().handle(pMsg);
-  }
+  if (pNode == 0) { throw ApException(LOG_CONTEXT, "Method=%s not registered", _sz(sMethod)); }
+
+  ok = pNode->Value().handle(pMsg);
 
   pMsg->apStatus = ok ? ApMessage::Ok : ApMessage::Error;
 }
@@ -184,8 +184,13 @@ AP_MSG_HANDLER_METHOD(SrpcGateModule, HttpServer_Request)
       request >> msg.srpc;
       (void) msg.Call();
 
+      String sResponse;
       // Create response
-      String sResponse = msg.response.toString();
+      if (msg.apStatus == ApMessage::Error) {
+        sResponse = msg.sComment;
+      } else {
+        sResponse = msg.response.toString();
+      }
 
       Msg_HttpServer_SendResponse msgSHR;
       msgSHR.sbBody.SetData(sResponse);
