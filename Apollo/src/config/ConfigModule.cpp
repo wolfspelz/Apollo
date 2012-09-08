@@ -39,6 +39,8 @@ AP_MSG_HANDLER_METHOD(ConfigModule, Config_SetValue)
 {
   int ok = 0;
 
+  if (pMsg->sPath.empty()) { throw ApException(LOG_CONTEXT, "Empty path"); }
+
   if (pMsg->sPath == "Dialog/Theme") {
     int AP_UNUSED_VARIABLE x = 1;
   }
