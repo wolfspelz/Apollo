@@ -18,10 +18,10 @@
     <ClCompile Include="dll.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Sample.cpp">
+    <ClCompile Include="Inventory.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SampleModule.cpp">
+    <ClCompile Include="InventoryModule.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -32,14 +32,14 @@
     <ClInclude Include="Local.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Sample.h">
+    <ClInclude Include="Inventory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SampleModule.h">
+    <ClInclude Include="InventoryModule.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\bin\Win32\Debug\modules\sample\config.txt" />
+    <None Include="..\..\bin\Win32\Debug\modules\Inventory\config.txt" />
   </ItemGroup>
 </Project>

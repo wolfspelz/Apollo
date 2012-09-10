@@ -95,11 +95,18 @@ Arena.prototype = {
     + '      <img class="cCommunity" style="display:none; z-index:43;" />'
     + (bSelf ? ''
       + '    <div class="cChatIn" style="display:none; z-index:100;">'
-      + '      <table border="0" cellpadding="0" cellspacing="0"><tr>'
+      + '      <table border="0" cellpadding="0" cellspacing="0">'
+      + '      <tr>'
       + '        <td><input type="text" class="cText" /></td>'
       + '        <td><input type="submit" class="cSend cTranslate" value="Send" /></td>'
       + '        <td><img src="img/CloseChatInButton.png" class="cCloseButton" /></td>'
-      + '      </tr></table>'
+      + '      </tr>'
+      + '      <tr>'
+      + '        <td><input type="button" class="cThings cTranslate" value="Things" /></td>'
+      + '        <td> </td>'
+      + '        <td> </td>'
+      + '      </tr>'
+      + '      </table>'
       + '    </div>'
       :'')
     + '    </div>'
@@ -333,6 +340,11 @@ Arena.prototype = {
     api.ModuleCall('SendPublicChat').setString('sText', sText).send();
   },
 
+  OnShowInventory: function ()
+  {
+    api.ModuleCall('OnShowInventory').send();
+  },
+
   // --------------------------------------
   // protected
     
@@ -397,6 +409,12 @@ Arena.prototype = {
       function(ev) {
         arena.SendPublicChat($('.cChatIn .cText').val());
         $('.cChatIn .cText').val('').focus();
+      }
+    );
+
+    $('.cChatIn .cThings').click(
+      function(ev) {
+        arena.OnShowInventory();
       }
     );
 

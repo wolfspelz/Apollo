@@ -304,11 +304,11 @@ void Display::OnModuleCall(Apollo::SrpcMessage& request, Apollo::SrpcMessage& re
     String sMethod = request.getString(Srpc::Key::Method);
 
     if (0){
-    } else if (sMethod == "OnShowDebug") {
-      OnShowDebug(request.getInt("bShow"));
+    } else if (sMethod == "OnShowDebugTools") {
+      OnShowDebugTools(request.getInt("bShow"));
 
-    } else if (sMethod == "OnShowChat") {
-      OnShowChat(request.getInt("bShow"));
+    } else if (sMethod == "OnShowChatWindow") {
+      OnShowChatWindow(request.getInt("bShow"));
 
     } else if (sMethod == "SendPublicChat") {
       String sText = request.getString("sText");
@@ -321,13 +321,22 @@ void Display::OnModuleCall(Apollo::SrpcMessage& request, Apollo::SrpcMessage& re
         }
       }
 
+    } else if (sMethod == "OnShowInventory") {
+      OnShowInventory(1);
+
     } else {
       throw ApException(LOG_CONTEXT, "Unknown Method=%s", _sz(sMethod));
     }
   }
 }
 
-void Display::OnShowChat(int bShow)
+void Display::OnShowInventory(int bShow)
+{
+  // Use default inventory
+  if (!Msg_Inventory_Show::_(ApNoHandle, 1)) { throw ApException(LOG_CONTEXT, "Msg_Inventory_Show failed"); }
+}
+
+void Display::OnShowChatWindow(int bShow)
 {
   if (ApIsHandle(hLocation_)) {
     Msg_ChatWindow_OpenForLocation msg;
@@ -339,7 +348,7 @@ void Display::OnShowChat(int bShow)
   }
 }
 
-void Display::OnShowDebug(int bShow)
+void Display::OnShowDebugTools(int bShow)
 {
   bDebug_ = bShow;
 
@@ -360,11 +369,11 @@ void Display::OnNavigatorCallDisplay(Apollo::SrpcMessage& request, Apollo::SrpcM
   if (0){
   } else if (sMethod == "ShowChat") {
     int bShow = request.getInt("bShow");
-    OnShowChat(bShow);
+    OnShowChatWindow(bShow);
 
   } else if (sMethod == "ShowDebug") {
     int bShow = request.getInt("bShow");
-    OnShowDebug(bShow);
+    OnShowDebugTools(bShow);
 
   } else {
     throw ApException(LOG_CONTEXT, "Unknown Method=%s", _sz(sMethod));
@@ -461,7 +470,7 @@ void Display::StartDisplay()
   ViewSrpcMessage vsm(this, "Start");
   vsm.Request();
 
-  OnShowDebug(bDebug_);
+  OnShowDebugTools(bDebug_);
 
   { Msg_VpView_SubscribeContextDetail msg; msg.hContext = hContext_; msg.sKey = Msg_VpView_ContextDetail_DocumentUrl; msg.Request(); }
   { Msg_VpView_SubscribeContextDetail msg; msg.hContext = hContext_; msg.sKey = Msg_VpView_ContextDetail_LocationUrl; msg.Request(); }

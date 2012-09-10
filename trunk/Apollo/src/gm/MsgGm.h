@@ -9,29 +9,69 @@
 
 #include "ApMessage.h"
 
+// -> Gm
 class Msg_Gm_Start: public ApRequestMessage
 {
 public:
   Msg_Gm_Start() : ApRequestMessage("Gm_Start") {}
 };
 
+// -> Gm
 class Msg_Gm_Stop: public ApRequestMessage
 {
 public:
   Msg_Gm_Stop() : ApRequestMessage("Gm_Stop") {}
 };
 
+// -> Gm
 class Msg_Gm_StartXmpp: public ApRequestMessage
 {
 public:
   Msg_Gm_StartXmpp() : ApRequestMessage("Gm_StartXmpp") {}
 };
 
+// -> Gm
 class Msg_Gm_Activate: public ApRequestMessage
 {
 public:
   Msg_Gm_Activate() : ApRequestMessage("Gm_Activate"), bActive(0) {}
   ApIN int bActive;
+};
+
+// -> Gm
+class Msg_Gm_SendRequest: public ApRequestMessage
+{
+public:
+  Msg_Gm_SendRequest() : ApRequestMessage("Gm_SendRequest") {}
+  ApIN ApHandle hChannel;
+  ApIN Apollo::SrpcMessage srpc;
+};
+
+// Gm ->
+class Msg_Gm_ReceiveResponse: public ApRequestMessage
+{
+public:
+  Msg_Gm_ReceiveResponse() : ApRequestMessage("Gm_ReceiveResponse") {}
+  ApIN ApHandle hChannel;
+  ApIN Apollo::SrpcMessage srpc;
+};
+
+// Gm ->
+class Msg_Gm_ReceiveRequest: public ApRequestMessage
+{
+public:
+  Msg_Gm_ReceiveRequest() : ApRequestMessage("Gm_ReceiveRequest") {}
+  ApIN ApHandle hChannel;
+  ApIN Apollo::SrpcMessage srpc;
+};
+
+// -> Gm
+class Msg_Gm_SendResponse: public ApRequestMessage
+{
+public:
+  Msg_Gm_SendResponse() : ApRequestMessage("Gm_SendResponse") {}
+  ApIN ApHandle hChannel;
+  ApIN Apollo::SrpcMessage srpc;
 };
 
 #endif // !defined(MsgGm_h_INCLUDED)

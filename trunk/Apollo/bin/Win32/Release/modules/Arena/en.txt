@@ -1,3 +1,4 @@
 #ässert utf-8
 Hello World=Hello World
 Send=Send
+Things=My things

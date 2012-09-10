@@ -9,144 +9,147 @@ function ApMessage(sMethod)
   }
 }
 
-ApMessage.prototype = 
+ApMessage.prototype =
 {
   // ---------------------
   // Setter
 
-  fromString: function(sMsg)
-  {
-	  var aLines = sMsg.split("\n");
-	  if (aLines.length > 0) {
+  fromString: function (sMsg) {
+    var aLines = sMsg.split("\n");
+    if (aLines.length > 0) {
       for (var i = 0; i < aLines.length; i++) {
         var nIndex = aLines[i].indexOf('=');
-			  if (nIndex > 0) {
-				  var sKey = aLines[i].substr(0, nIndex);
-				  var sValue = aLines[i].substr(nIndex + 1);
-				  if (sKey != '') {
-					  this.aParams_[sKey] = sValue;
-				  }
-			  }
-		  }
-	  }
-	  return this;
+        if (nIndex > 0) {
+          var sKey = aLines[i].substr(0, nIndex);
+          var sValue = aLines[i].substr(nIndex + 1);
+          if (sKey != '') {
+            this.aParams_[sKey] = sValue;
+          }
+        }
+      }
+    }
+    return this;
   },
 
-  encodeCString: function(sValue)
-  {
-	  var sResult = '';
-	  if (sValue) {
-	    for (var i = 0; i < sValue.length; i++) {
-		    switch (sValue.charAt(i)) {
-			    case '\\': sResult += '\\\\'; break;
-			    case '\r': sResult += '\\r'; break;
-			    case '\n': sResult += '\\n'; break;
-			    default: sResult += sValue.charAt(i);
-		    }
-	    }
-	  }
-	  return sResult;
+  encodeCString: function (sValue) {
+    var sResult = '';
+    if (sValue) {
+      for (var i = 0; i < sValue.length; i++) {
+        switch (sValue.charAt(i)) {
+          case '\\': sResult += '\\\\'; break;
+          case '\r': sResult += '\\r'; break;
+          case '\n': sResult += '\\n'; break;
+          default: sResult += sValue.charAt(i);
+        }
+      }
+    }
+    return sResult;
   },
 
-  setString: function(sKey, sValue)
-  {
-	  sValue = this.encodeCString(sValue);
-	  this.aParams_[sKey] = sValue;
-	  return this;
+  setString: function (sKey, sValue) {
+    sValue = this.encodeCString(sValue);
+    this.aParams_[sKey] = sValue;
+    return this;
   },
 
-  setInt: function(sKey, nValue)
-  {
-	  this.aParams_[sKey] = String(nValue);
-	  return this;
+  setInt: function (sKey, nValue) {
+    this.aParams_[sKey] = String(nValue);
+    return this;
   },
 
-  setKeyValueList: function(sKey, kvList)
-  {
+  setKeyValueList: function (sKey, kvList) {
     var s = '';
-    for (var i in kvList) { 
+    for (var i in kvList) {
       s += i + '=' + this.encodeCString(kvList[i]) + '\n';
     }
-	  this.setString(sKey, s);
-	  return this;
+    this.setString(sKey, s);
+    return this;
   },
 
   // ---------------------
   // Getter
 
-  toString: function()
-  {
+  toString: function () {
     var sMsg = '';
     for (var i in this.aParams_) {
       sMsg += i + '=' + this.aParams_[i] + '\n';
     }
-	  return sMsg;
+    return sMsg;
   },
 
-  decodeCString: function(sValue)
-  {
-	  var sResult = '';
-	  var bEscape = false;
-	  for (var i = 0; i < sValue.length; i++) {
-		  var sChar = sValue.charAt(i);
-		  if (!bEscape) {
-			  if (sChar == '\\') {
-				  bEscape = true;
-			  } else {
-				  sResult += sChar;
-			  }
-		  } else {
-			  switch (sChar) {
-				  case '\\': sChar = '\\'; break;
-				  case 'r': sChar = '\r'; break;
-				  case 'n': sChar = '\n'; break;
-				  default:;
-			  }
-			  sResult += sChar;
-			  bEscape = false;
-		  }
-	  }
-	  return sResult;
+  decodeCString: function (sValue) {
+    var sResult = '';
+    var bEscape = false;
+    for (var i = 0; i < sValue.length; i++) {
+      var sChar = sValue.charAt(i);
+      if (!bEscape) {
+        if (sChar == '\\') {
+          bEscape = true;
+        } else {
+          sResult += sChar;
+        }
+      } else {
+        switch (sChar) {
+          case '\\': sChar = '\\'; break;
+          case 'r': sChar = '\r'; break;
+          case 'n': sChar = '\n'; break;
+          default: ;
+        }
+        sResult += sChar;
+        bEscape = false;
+      }
+    }
+    return sResult;
   },
 
-  getString: function(sKey)
-  {
-	  var sValue = '';
-	  if (this.aParams_[sKey]) {
-		  sValue = this.aParams_[sKey];
-		  sValue = this.decodeCString(sValue);
-	  }
-	  return sValue;
+  getString: function (sKey) {
+    var sValue = '';
+    if (this.aParams_[sKey]) {
+      sValue = this.aParams_[sKey];
+      sValue = this.decodeCString(sValue);
+    }
+    return sValue;
   },
 
-  getInt: function(sKey)
-  {
-	  return parseInt(this.getString(sKey));
+  getInt: function (sKey) {
+    return parseInt(this.getString(sKey));
   },
 
-  getKeyValueList: function(sKey)
-  {
+  getBool: function (sKey) {
+    var b = false;
+    var sValue = this.getString(sKey);
+    if (0
+    || sValue == '1'
+    || sValue == 'true'
+    || sValue == 'yes'
+    || sValue == 'on'
+    ) {
+      b = true;
+    }
+    return b;
+  },
+
+  getKeyValueList: function (sKey) {
     var kvList = new Object();
     var srpc = new ApMessage();
     srpc.fromString(this.getString(sKey));
     for (var i in srpc.aParams_) {
       kvList[i] = srpc.aParams_[i];
     }
-	  return kvList;
+    return kvList;
   },
 
   // ---------------------
   // IO
 
-  send: function()
-  {
-    if (typeof(apollo) != 'undefined') {
+  send: function () {
+    if (typeof (apollo) != 'undefined') {
       var sMsg = this.toString();
-      if (typeof(this.onLog) == 'function') { this.onLog('&gt; ' + sMsg); }
+      if (typeof (this.onLog) == 'function') { this.onLog('&gt; ' + sMsg); }
 
       var sRespose = apollo.sendMessage(sMsg);
-      if (typeof(this.onLog) == 'function') { this.onLog('&nbsp;&nbsp;&lt; ' + sRespose); }
-      
+      if (typeof (this.onLog) == 'function') { this.onLog('&nbsp;&nbsp;&lt; ' + sRespose); }
+
       return new ApMessage().fromString(sRespose);
     }
   },
@@ -154,30 +157,29 @@ ApMessage.prototype =
   // ---------------------
   // Test
 
-  unitTest: function()
-  {
-	  var s = '';
+  unitTest: function () {
+    var s = '';
 
-	  if (!s) {
-		  var msg = new ApMessage();
-		  msg.fromString('Method=Test\na=b\nc=d\n');
-		  if (!s) { if (msg.aParams_['Method'] != 'Test') { s = 'Missing Method'; } }
-		  if (!s) { if (msg.aParams_['a'] != 'b') { s = 'Missing a=b'; } }
-		  if (!s) { if (msg.aParams_['c'] != 'd') { s = 'Missing c=d'; } }
-	  }
+    if (!s) {
+      var msg = new ApMessage();
+      msg.fromString('Method=Test\na=b\nc=d\n');
+      if (!s) { if (msg.aParams_['Method'] != 'Test') { s = 'Missing Method'; } }
+      if (!s) { if (msg.aParams_['a'] != 'b') { s = 'Missing a=b'; } }
+      if (!s) { if (msg.aParams_['c'] != 'd') { s = 'Missing c=d'; } }
+    }
 
-	  if (!s) {
-		  var msg = new ApMessage();
-		  msg.fromString('Method=Test\na=w=x\\ny=z\\n\nc=d\n');
-		  if (!s) { if (msg.aParams_['Method'] != 'Test') { s = 'Missing Method'; } }
-		  if (!s) { if (msg.aParams_['a'] != 'w=x\\ny=z\\n') { s = 'Missing a=w=x\\ny=z\\n'; } }
-		  if (!s) { if (msg.aParams_['c'] != 'd') { s = 'Missing c=d'; } }
-	  }
+    if (!s) {
+      var msg = new ApMessage();
+      msg.fromString('Method=Test\na=w=x\\ny=z\\n\nc=d\n');
+      if (!s) { if (msg.aParams_['Method'] != 'Test') { s = 'Missing Method'; } }
+      if (!s) { if (msg.aParams_['a'] != 'w=x\\ny=z\\n') { s = 'Missing a=w=x\\ny=z\\n'; } }
+      if (!s) { if (msg.aParams_['c'] != 'd') { s = 'Missing c=d'; } }
+    }
 
-	  return s;
+    return s;
   },
-  
-  _:0
+
+  _: 0
 }
 
 // ------------------------------------------

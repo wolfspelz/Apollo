@@ -83,6 +83,9 @@ AP_MSG_HANDLER_METHOD(SampleModule, Sample_Get)
   // Example of using the Apollo wrapper method for the same as above
   sSomeConfigValue = Apollo::getConfig("path", "default");
 
+  // Example of using the Apollo wrapper method for the same as above
+  String sModuleConfigValue = Apollo::getModuleConfig(MODULE_NAME, "SampleKey", "default");
+
   // Logging example
   apLog_Info((LOG_CHANNEL, LOG_CONTEXT, "Format string %d", nTheAnswer_));
 

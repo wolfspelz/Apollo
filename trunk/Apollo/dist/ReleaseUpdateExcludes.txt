@@ -74,6 +74,9 @@ identity.dll
 identity.ilk
 identity.pdb
 Identity.sqlite3
+Inventory.dll
+Inventory.ilk
+Inventory.pdb
 JavaScriptCore_debug.dll
 JavaScriptCore_debug.pdb
 log.dll
