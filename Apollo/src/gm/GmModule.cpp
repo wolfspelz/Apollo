@@ -502,6 +502,38 @@ AP_MSG_HANDLER_METHOD(GmModule, Gm_StartXmpp)
   pMsg->apStatus = ok ? ApMessage::Ok : ApMessage::Error;
 }
 
+AP_MSG_HANDLER_METHOD(GmModule, Gm_Activate)
+{
+  bActive_ = pMsg->bActive;
+  pMsg->apStatus = ApMessage::Ok;
+}
+
+AP_MSG_HANDLER_METHOD(GmModule, Gm_SendRequest)
+{
+  int ok = 0;
+  pMsg->apStatus = ok ? ApMessage::Ok : ApMessage::Error;
+}
+
+AP_MSG_HANDLER_METHOD(GmModule, Gm_ReceiveResponse)
+{
+  int ok = 0;
+  apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "Response not handled, hChannel=" ApHandleFormat "", ApHandlePrintf(pMsg->hChannel)));
+  pMsg->apStatus = ok ? ApMessage::Ok : ApMessage::Error;
+}
+
+AP_MSG_HANDLER_METHOD(GmModule, Gm_ReceiveRequest)
+{
+  int ok = 0;
+  apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "Request not handled, hChannel=" ApHandleFormat "", ApHandlePrintf(pMsg->hChannel)));
+  pMsg->apStatus = ok ? ApMessage::Ok : ApMessage::Error;
+}
+
+AP_MSG_HANDLER_METHOD(GmModule, Gm_SendResponse)
+{
+  int ok = 0;
+  pMsg->apStatus = ok ? ApMessage::Ok : ApMessage::Error;
+}
+
 AP_MSG_HANDLER_METHOD(GmModule, Config_GetValue)
 {
   if (bActive_) {
@@ -569,12 +601,6 @@ AP_MSG_HANDLER_METHOD(GmModule, Timer_Event)
       apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "doLogin() failed"));
     }
   }
-}
-
-AP_MSG_HANDLER_METHOD(GmModule, Gm_Activate)
-{
-  bActive_ = pMsg->bActive;
-  pMsg->apStatus = ApMessage::Ok;
 }
 
 AP_MSG_HANDLER_METHOD(GmModule, IdentityMgmt_SetProperty)
@@ -687,11 +713,15 @@ int GmModule::init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, GmModule, Gm_Start, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, GmModule, Gm_Stop, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, GmModule, Gm_StartXmpp, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, GmModule, Gm_Activate, this, ApCallbackPosEarly);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, GmModule, Gm_SendRequest, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, GmModule, Gm_ReceiveResponse, this, ApCallbackPosLate);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, GmModule, Gm_ReceiveRequest, this, ApCallbackPosLate);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, GmModule, Gm_SendResponse, this, ApCallbackPosNormal);
 
   AP_MSG_REGISTRY_ADD(MODULE_NAME, GmModule, Config_GetValue, this, ApCallbackPosEarly);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, GmModule, System_RunLevel, this, ApCallbackPosEarly);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, GmModule, Timer_Event, this, ApCallbackPosNormal);
-  AP_MSG_REGISTRY_ADD(MODULE_NAME, GmModule, Gm_Activate, this, ApCallbackPosEarly);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, GmModule, IdentityMgmt_SetProperty, this, ApCallbackPosEarly);
 
   #if defined(AP_TEST)
@@ -710,5 +740,6 @@ int GmModule::init()
 
 void GmModule::exit()
 {
+  srpcGateRegistry_.finish();
   AP_MSG_REGISTRY_FINISH;
 }

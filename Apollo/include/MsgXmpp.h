@@ -196,7 +196,7 @@ public:
   ApIN ApHandle hRoom;
 };
 
-// Hook this be notified of the confirmation by the server.
+// Hook this to be notified of the confirmation by the server.
 // xmpp -> 
 class Msg_Xmpp_EnterRoomComplete: public ApNotificationMessage
 {
@@ -217,7 +217,7 @@ public:
   ApIN ApHandle hRoom;
 };
 
-// Hook this be notified of the confirmation by the server.
+// Hook this to be notified of the confirmation by the server.
 // xmpp -> 
 class Msg_Xmpp_LeavingRoom: public ApNotificationMessage
 {
@@ -227,7 +227,7 @@ public:
   ApIN ApHandle hRoom;
 };
 
-// Hook this be notified when leaving a room starts.
+// Hook this to be notified when leaving a room starts.
 // xmpp -> 
 class Msg_Xmpp_LeaveRoomComplete: public ApNotificationMessage
 {
@@ -286,7 +286,7 @@ public:
   ApIN ApHandle hParticipant;
 };
 
-// Hook this be notified when a room participant enters.
+// Hook this to be notified when a room participant enters.
 // xmpp -> 
 class Msg_Xmpp_ParticipantEntered: public Msg_Xmpp_Participant_Notification
 {
@@ -295,7 +295,7 @@ public:
   ApIN String sNickname;
 };
 
-// Hook this be notified when a room participant leaves. This includes a simulated leave for all participants when I leave.
+// Hook this to be notified when a room participant leaves. This includes a simulated leave for all participants when I leave.
 // xmpp -> 
 class Msg_Xmpp_ParticipantLeft: public Msg_Xmpp_Participant_Notification
 {
@@ -304,7 +304,7 @@ public:
   ApIN String sNickname;
 };
 
-// Hook this be notified when the room knows who I am.
+// Hook this to be notified when the room knows who I am.
 // xmpp -> 
 class Msg_Xmpp_ParticipantSelf: public Msg_Xmpp_Participant_Notification
 {
@@ -315,7 +315,7 @@ public:
 // --------------------------------
 // Participant data
 
-// Hook this be notified when before the evaluation of the participant presence data starts.
+// Hook this to be notified when before the evaluation of the participant presence data starts.
 // xmpp -> 
 class Msg_Xmpp_Participant_Begin: public Msg_Xmpp_Participant_Notification
 {
@@ -323,7 +323,7 @@ public:
   Msg_Xmpp_Participant_Begin() : Msg_Xmpp_Participant_Notification("Xmpp_Participant_Begin") {}
 };
 
-// Hook this be notified when before the evaluation of the participant presence data starts.
+// Hook this to be notified when before the evaluation of the participant presence data starts.
 // xmpp -> 
 class Msg_Xmpp_Participant_End: public Msg_Xmpp_Participant_Notification
 {
@@ -331,7 +331,7 @@ public:
   Msg_Xmpp_Participant_End() : Msg_Xmpp_Participant_Notification("Xmpp_Participant_End") {}
 };
 
-// Hook this be notified of a participant status.
+// Hook this to be notified of a participant status.
 // This message is is enclosed by Xmpp_Participant_Status/Xmpp_Participant_End
 // xmpp -> 
 #define Msg_Xmpp_Participant_Status_Chat "chat"
@@ -346,7 +346,7 @@ public:
   String sStatus;
 };
 
-// Hook this be notified of a participant status message.
+// Hook this to be notified of a participant status message.
 // This message is is enclosed by Xmpp_Participant_Begin/Xmpp_Participant_End
 // xmpp -> 
 class Msg_Xmpp_Participant_StatusMessage: public Msg_Xmpp_Participant_Notification
@@ -356,7 +356,7 @@ public:
   String sMessage;
 };
 
-// Hook this be notified of a participant jabber id, if available.
+// Hook this to be notified of a participant jabber id, if available.
 // This message is is enclosed by Xmpp_Participant_Begin/Xmpp_Participant_End
 // xmpp -> 
 class Msg_Xmpp_Participant_JabberId: public Msg_Xmpp_Participant_Notification
@@ -366,7 +366,7 @@ public:
   String sJabberId;
 };
 
-// Hook this be notified of a participant's muc user info.
+// Hook this to be notified of a participant's muc user info.
 // This message is is enclosed by Xmpp_Participant_Begin/Xmpp_Participant_End
 // xmpp -> 
 class Msg_Xmpp_Participant_MucUser: public Msg_Xmpp_Participant_Notification

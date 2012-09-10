@@ -35,11 +35,15 @@ public:
   void On_Gm_Start(Msg_Gm_Start* pMsg);
   void On_Gm_Stop(Msg_Gm_Stop* pMsg);
   void On_Gm_StartXmpp(Msg_Gm_StartXmpp* pMsg);
+  void On_Gm_Activate(Msg_Gm_Activate* pMsg);
+  void On_Gm_SendRequest(Msg_Gm_SendRequest* pMsg);
+  void On_Gm_ReceiveResponse(Msg_Gm_ReceiveResponse* pMsg);
+  void On_Gm_ReceiveRequest(Msg_Gm_ReceiveRequest* pMsg);
+  void On_Gm_SendResponse(Msg_Gm_SendResponse* pMsg);
 
   void On_Config_GetValue(Msg_Config_GetValue* pMsg);
   void On_System_RunLevel(Msg_System_RunLevel* pMsg);
   void On_Timer_Event(Msg_Timer_Event* pMsg);
-  void On_Gm_Activate(Msg_Gm_Activate* pMsg);
   void On_IdentityMgmt_SetProperty(Msg_IdentityMgmt_SetProperty* pMsg);
 
   void onRegisterResult(SrpcMessage& srpc);

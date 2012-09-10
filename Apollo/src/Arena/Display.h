@@ -52,8 +52,9 @@ public:
   void OnLocationDetailsChanged(Apollo::ValueList& vlKeys);
   void OnAvatarAnimationBegin(const ApHandle& hParticipant, const String& sUrl);
   void OnModuleCall(Apollo::SrpcMessage& request, Apollo::SrpcMessage& response);
-  void OnShowChat(int bShow);
-  void OnShowDebug(int bShow);
+  void OnShowChatWindow(int bShow);
+  void OnShowDebugTools(int bShow);
+  void OnShowInventory(int bShow);
   void OnNavigatorCallDisplay(Apollo::SrpcMessage& request, Apollo::SrpcMessage& response);
 
   inline int GetWidth() { return nWidth_; }

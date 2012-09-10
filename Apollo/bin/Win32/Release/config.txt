@@ -23,6 +23,7 @@
 #Test/Dialog=1
 #Test/TrayIcon=1
 #Test/Setup=1
+#Test/Inventory=1
 
 # ---------------------------------------------
 

@@ -8,13 +8,10 @@
 #define Local_H_INCLUDED
 
 #include "ApLog.h"
-#include "MsgConfig.h"
-#include "MsgWebView.h"
-#include "MsgBrowserInfo.h"
-#include "MsgChatWindow.h"
 #include "MsgInventory.h"
+#include "InventoryModule.h"
 
-#define MODULE_NAME "Arena"
+#define MODULE_NAME "Inventory"
 #define LOG_CHANNEL MODULE_NAME
 #define LOG_CONTEXT apLog_Context
 

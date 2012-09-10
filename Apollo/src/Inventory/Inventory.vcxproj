@@ -11,8 +11,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{90F145AF-E81D-4B1A-8229-9A9A24618A22}</ProjectGuid>
-    <RootNamespace>sample</RootNamespace>
+    <ProjectGuid>{349D6246-8911-4850-B08C-8C1841439969}</ProjectGuid>
+    <RootNamespace>Inventory</RootNamespace>
     <Keyword>Win32Proj</Keyword>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -55,7 +55,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>SAMPLE_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>INVENTORY_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
     </ClCompile>
     <Link>
@@ -65,7 +65,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>SAMPLE_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>INVENTORY_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
@@ -75,14 +75,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="dll.cpp" />
-    <ClCompile Include="Sample.cpp" />
-    <ClCompile Include="SampleModule.cpp" />
+    <ClCompile Include="Inventory.cpp" />
+    <ClCompile Include="InventoryModule.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="dll.h" />
     <ClInclude Include="Local.h" />
-    <ClInclude Include="Sample.h" />
-    <ClInclude Include="SampleModule.h" />
+    <ClInclude Include="Inventory.h" />
+    <ClInclude Include="InventoryModule.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Apollo\Apollo.vcxproj">
@@ -95,7 +95,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\bin\Win32\Debug\modules\sample\config.txt" />
+    <None Include="..\..\bin\Win32\Debug\modules\Inventory\config.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
