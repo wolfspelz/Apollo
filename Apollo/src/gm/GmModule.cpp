@@ -510,22 +510,25 @@ AP_MSG_HANDLER_METHOD(GmModule, Gm_Activate)
 
 AP_MSG_HANDLER_METHOD(GmModule, Gm_SendRequest)
 {
-  int ok = 0;
-  pMsg->apStatus = ok ? ApMessage::Ok : ApMessage::Error;
+  Msg_Xmpp_SendSrpcRequest msg;
+  msg.sDestination = Apollo::getModuleConfig(MODULE_NAME, "Srpc/Jid", "");
+  msg.sReference = pMsg->hRequest.toString();
+  pMsg->srpc >> msg.srpc;
+  if (!msg.Request()) { throw ApException(LOG_CONTEXT, "sDestination=%s sReference=", _sz(msg.sDestination), _sz(msg.sReference)); }
+  pMsg->apStatus = ApMessage::Ok;
 }
 
 AP_MSG_HANDLER_METHOD(GmModule, Gm_ReceiveResponse)
 {
-  int ok = 0;
-  apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "Response not handled, hChannel=" ApHandleFormat "", ApHandlePrintf(pMsg->hChannel)));
-  pMsg->apStatus = ok ? ApMessage::Ok : ApMessage::Error;
+  apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "Response not handled, hRequest=" ApHandleFormat "", ApHandlePrintf(pMsg->hRequest)));
+  pMsg->apStatus = ApMessage::Ok;
 }
 
 AP_MSG_HANDLER_METHOD(GmModule, Gm_ReceiveRequest)
 {
   int ok = 0;
-  apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "Request not handled, hChannel=" ApHandleFormat "", ApHandlePrintf(pMsg->hChannel)));
-  pMsg->apStatus = ok ? ApMessage::Ok : ApMessage::Error;
+  apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "Request not handled, hRequest=" ApHandleFormat "", ApHandlePrintf(pMsg->hRequest)));
+  pMsg->apStatus = ApMessage::Ok;
 }
 
 AP_MSG_HANDLER_METHOD(GmModule, Gm_SendResponse)
