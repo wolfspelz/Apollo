@@ -62,7 +62,7 @@ int Room::sendState()
   sTo += "/";
   sTo += sNickname_;
 
-  PresenceStanza presence(JABBER_PRESENCE_AVAILABLE, sTo);
+  PresenceStanza presence(XMPP_PRESENCE_AVAILABLE, sTo);
 
   Msg_Protocol_Room_GetIdentity msgPGRI;
   msgPGRI.hRoom = apHandle();
@@ -200,7 +200,7 @@ int Room::leave()
   sTo += "/";
   sTo += sNickname_;
 
-  PresenceStanza presence(JABBER_PRESENCE_UNAVAILABLE, sTo);
+  PresenceStanza presence(XMPP_PRESENCE_UNAVAILABLE, sTo);
   ok = pClient_->sendStanza(presence);
   if (!ok) {
     apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "pClient_->sendStanza() failed " ApHandleFormat "", ApHandlePrintf(hAp_)));
@@ -562,11 +562,11 @@ int Room::timeFromDelayNode(Apollo::XMLNode& delay, Apollo::TimeValue& tvStamp)
   int ok = 0;
 
   if (0) {
-  } else if (delay.getAttribute("xmlns").getValue() == JABBER_NS_DELAY2) {
+  } else if (delay.getAttribute("xmlns").getValue() == XMPP_NS_DELAY2) {
     String sStamp = delay.getAttribute("stamp").getValue();
     ok = parseXEP0082DateTime(sStamp, tvStamp);
 
-  } else if (delay.getAttribute("xmlns").getValue() == JABBER_NS_DELAY) {
+  } else if (delay.getAttribute("xmlns").getValue() == XMPP_NS_DELAY) {
     String sStamp = delay.getAttribute("stamp").getValue();
     ok = parseXEP0091DateTime(sStamp, tvStamp);
 
@@ -629,7 +629,7 @@ int Room::receiveGroupchat(Stanza& stanza)
   {
     Apollo::XMLNode* pDelayX = 0;
     for (Apollo::XMLNode* pNode = 0; (pNode = stanza.nextChild(pNode, "x")) != 0; ) {
-      if (pNode->getAttribute("xmlns").getValue() == JABBER_NS_DELAY) {
+      if (pNode->getAttribute("xmlns").getValue() == XMPP_NS_DELAY) {
         pDelayX = pNode;
         break;
       }

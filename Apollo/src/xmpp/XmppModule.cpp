@@ -254,6 +254,17 @@ AP_MSG_HANDLER_METHOD(XmppModule, Xmpp_StanzaOut)
   pMsg->apStatus = ok ? ApMessage::Ok : ApMessage::Error;
 }
 
+AP_MSG_HANDLER_METHOD(XmppModule, Xmpp_SendSrpcRequest)
+{
+  int ok = 0;
+
+  FORWARD_TO_CLIENT_PRE(LOG_CONTEXT);
+  ok = pClient->sendSrpcRequest(pMsg->sDestination, pMsg->sReference, pMsg->srpc);
+  FORWARD_TO_CLIENT_POST(LOG_CONTEXT);
+  
+  pMsg->apStatus = ok ? ApMessage::Ok : ApMessage::Error;
+}
+
 AP_MSG_HANDLER_METHOD(XmppModule, Xmpp_EnterRoom)
 {
   int ok = 0;
@@ -736,6 +747,7 @@ int XmppModule::Init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, XmppModule, Xmpp_DataOut, this, ApCallbackPosLate);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, XmppModule, Xmpp_StanzaIn, this, ApCallbackPosLate);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, XmppModule, Xmpp_StanzaOut, this, ApCallbackPosLate);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, XmppModule, Xmpp_SendSrpcRequest, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, XmppModule, Xmpp_EnterRoom, this, ApCallbackPosLate);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, XmppModule, Xmpp_LeaveRoom, this, ApCallbackPosLate);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, XmppModule, Xmpp_GetRoomHandle, this, ApCallbackPosNormal);

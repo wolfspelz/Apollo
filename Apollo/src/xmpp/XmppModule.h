@@ -48,6 +48,8 @@ public:
   void On_Xmpp_StanzaIn(Msg_Xmpp_StanzaIn* pMsg);
   void On_Xmpp_StanzaOut(Msg_Xmpp_StanzaOut* pMsg);
 
+  void On_Xmpp_SendSrpcRequest(Msg_Xmpp_SendSrpcRequest* pMsg);
+
   void On_Xmpp_EnterRoom(Msg_Xmpp_EnterRoom* pMsg);
   void On_Xmpp_LeaveRoom(Msg_Xmpp_LeaveRoom* pMsg);
   void On_Xmpp_GetRoomHandle(Msg_Xmpp_GetRoomHandle* pMsg);

@@ -54,7 +54,7 @@ int LoginTask::handleStanza(Stanza& stanza, StanzaHandlerResult& result)
   case AuthMechanisms:
     if (stanza.getName() == "iq") {
       // <iq id='1' type='result'><query xmlns='jabber:iq:auth'><username>lluna_484de02a54c5</username><digest/><password/><resource/></query></iq>      
-      if (nId_ == String::atoi(stanza.getAttribute("id").getValue())) {
+      if (sId_ == stanza.getAttribute("id").getValue()) {
         result.stanzaHandled(1);
         result.stanzaConsumed(1);
         String sType = stanza.getAttribute("type").getValue();
@@ -93,7 +93,7 @@ int LoginTask::handleStanza(Stanza& stanza, StanzaHandlerResult& result)
   case DigestAuth:
     if (stanza.getName() == "iq") {
       // <iq id='2' type='result'/>
-      if (nId_ == String::atoi(stanza.getAttribute("id").getValue())) {
+      if (sId_ == stanza.getAttribute("id").getValue()) {
         result.stanzaHandled(1);
         result.stanzaConsumed(1);
         result.taskFinished(1);
@@ -120,7 +120,7 @@ int LoginTask::handleStanza(Stanza& stanza, StanzaHandlerResult& result)
   case PasswordAuth:
     if (stanza.getName() == "iq") {
       // <iq id='2' type='result'/>
-      if (nId_ == String::atoi(stanza.getAttribute("id").getValue())) {
+      if (sId_ == stanza.getAttribute("id").getValue()) {
         result.stanzaHandled(1);
         result.stanzaConsumed(1);
         result.taskFinished(1);
@@ -167,9 +167,9 @@ int LoginTask::sendAuthMechQuery()
   // </iq>
   int ok = 1;
 
-  nId_ = pClient_->getNextStanzaId();
-  GetStanza request(nId_, pClient_->getJabberId().host());
-  Apollo::XMLNode& query = request.addQuery(JABBER_NS_AUTH);
+  sId_ = pClient_->getNextStanzaId();
+  GetStanza request(sId_, pClient_->getJabberId().host());
+  Apollo::XMLNode& query = request.addQuery(XMPP_NS_AUTH);
 
   Apollo::XMLNode& username = query.addChildRef("username");
   username.setCData(pClient_->getJabberId().user());
@@ -199,9 +199,9 @@ int LoginTask::sendDigestAuth()
   Apollo::MessageDigest sha1((unsigned char*) sToken.c_str(), sToken.bytes());
   sToken = sha1.getSHA1Hex();
 
-  nId_ = pClient_->getNextStanzaId();
-  SetStanza request(nId_, pClient_->getJabberId().host());
-  Apollo::XMLNode& query = request.addQuery(JABBER_NS_AUTH);
+  sId_ = pClient_->getNextStanzaId();
+  SetStanza request(sId_, pClient_->getJabberId().host());
+  Apollo::XMLNode& query = request.addQuery(XMPP_NS_AUTH);
 
   Apollo::XMLNode& username = query.addChildRef("username");
   username.setCData(pClient_->getJabberId().user());
@@ -231,9 +231,9 @@ int LoginTask::sendPasswordAuth()
   // </iq>
   int ok = 1;
 
-  nId_ = pClient_->getNextStanzaId();
-  SetStanza request(nId_, pClient_->getJabberId().host());
-  Apollo::XMLNode& query = request.addQuery(JABBER_NS_AUTH);
+  sId_ = pClient_->getNextStanzaId();
+  SetStanza request(sId_, pClient_->getJabberId().host());
+  Apollo::XMLNode& query = request.addQuery(XMPP_NS_AUTH);
 
   Apollo::XMLNode& username = query.addChildRef("username");
   username.setCData(pClient_->getJabberId().user());
@@ -266,11 +266,11 @@ int PresenceTask::handleStanza(Stanza& stanza, StanzaHandlerResult& result)
 
     String sType = stanza.getAttribute("type").getValue();
     if (sType.empty()) {
-      sType = JABBER_PRESENCE_AVAILABLE;
+      sType = XMPP_PRESENCE_AVAILABLE;
     }
 
     if (0) {
-    } else if (sType == JABBER_PRESENCE_AVAILABLE) {
+    } else if (sType == XMPP_PRESENCE_AVAILABLE) {
 
       if (0) {
       } else if (pRoom != 0){
@@ -284,7 +284,7 @@ int PresenceTask::handleStanza(Stanza& stanza, StanzaHandlerResult& result)
         bUsed = 1;
       }
 
-    } else if (sType == JABBER_PRESENCE_UNAVAILABLE) {
+    } else if (sType == XMPP_PRESENCE_UNAVAILABLE) {
 
       if (0) {
       } else if (pRoom != 0){
@@ -298,7 +298,7 @@ int PresenceTask::handleStanza(Stanza& stanza, StanzaHandlerResult& result)
         bUsed = 1;
       }
 
-    } else if (sType == JABBER_PRESENCE_ERROR) {
+    } else if (sType == XMPP_PRESENCE_ERROR) {
 
       if (0) {
       } else if (pRoom != 0){
@@ -343,7 +343,7 @@ int VersionTask::handleStanza(Stanza& stanza, StanzaHandlerResult& result)
   if (stanza.getName() == "iq") {
     Apollo::XMLNode& query = stanza.getChildRef("query");
     if (query) {
-      if (query.getAttribute("xmlns").getValue() == JABBER_NS_VERSION) {
+      if (query.getAttribute("xmlns").getValue() == XMPP_NS_VERSION) {
         result.stanzaHandled(1);
         result.stanzaConsumed(1);
         ok = sendResponse(stanza);
@@ -375,7 +375,7 @@ int VersionTask::sendResponse(Stanza& stanza)
     apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "missing from"));
   } else {
     ResultStanza result(sId, sFrom);
-    Apollo::XMLNode& AP_UNUSED_VARIABLE query = result.addQuery(JABBER_NS_VERSION);
+    Apollo::XMLNode& AP_UNUSED_VARIABLE query = result.addQuery(XMPP_NS_VERSION);
 
     String sName = Apollo::getModuleConfig(MODULE_NAME, "ClientInfo/Name", "Apollo");
     String sVersion = Apollo::getModuleConfig(MODULE_NAME, "ClientInfo/Version", "0.1");

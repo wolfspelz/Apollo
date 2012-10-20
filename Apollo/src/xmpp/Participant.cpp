@@ -181,7 +181,7 @@ x  <x xmlns='firebat:user:jid'>12344151@xmpp1.zweitgeist.com</x>
           }
         }
 
-      } else if (sXmlNs == JABBER_NS_MUC_USER) {
+      } else if (sXmlNs == XMPP_NS_MUC_USER) {
         // <x xmlns='http://jabber.org/protocol/muc#user'><item affiliation='none' role='participant'/></x>
         // <x xmlns='http://jabber.org/protocol/muc#user'><item affiliation='none' role='participant'/><status code='110'/></x>
         // <x xmlns='http://jabber.org/protocol/muc#user'><item affiliation='owner' role='moderator'/></x>

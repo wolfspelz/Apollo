@@ -13,6 +13,7 @@
 #include "MsgGalileo.h"
 #include "MsgTimer.h"
 #include "MsgLog.h"
+#include "MsgConfig.h"
 #include "MsgWebView.h"
 
 #if defined(AP_TEST_Arena)
@@ -382,6 +383,8 @@ static void Test_VpView_GetLocationDetail(Msg_VpView_GetLocationDetail* pMsg)
 }
 
 // ------------------------------------------------------
+
+//static String Test_InNavigateChatOut_sOriginalPlane;
 
 class Test_InNavigateChatOut_Wait: public Test_InNavigateChatOut_Action
 {
@@ -880,6 +883,9 @@ public:
 
 void Test_InNavigateChatOut::Begin()
 {
+  //Test_InNavigateChatOut_sOriginalPlane = Msg_Config_GetPlane::_();
+  //Msg_Config_SetPlane::_("_test");
+
   hContext_ = Apollo::newHandle();
   hLocation1_ = Apollo::newHandle();
   hLocation2_ = Apollo::newHandle();
@@ -1010,6 +1016,8 @@ void Test_InNavigateChatOut::End()
   { Msg_VpView_GetLocationDetail msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_VpView_GetLocationDetail, this); }
 
   ActionList::End();
+
+  //Msg_Config_SetPlane::_(Test_InNavigateChatOut_sOriginalPlane);
 
   Test_Arena_UnitTest_TokenEnd();
 }

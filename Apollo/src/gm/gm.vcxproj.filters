@@ -41,9 +41,6 @@
     <ClInclude Include="Local.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="MsgGm.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="SrpcClient.h">
       <Filter>Header Files</Filter>
     </ClInclude>

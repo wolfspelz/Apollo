@@ -50,6 +50,8 @@ public:
   void onRegisterError(const String sError);
   void onLoginResult(SrpcMessage& srpc);
   void onLoginError(const String sError);
+  void onTranceiverResult(SrpcMessage& srpc, const String& sReference);
+  void onTranceiverError(const String sError);
 
 #if defined(AP_TEST)
   void On_UnitTest_Begin(Msg_UnitTest_Begin* pMsg);
@@ -126,8 +128,23 @@ public:
   virtual void OnError(const String sError);
 };
 
+class TranceiverClient: public SrpcClient
+{
+public:
+  TranceiverClient(GmModule* pModule, const String& sReference)
+    :SrpcClient("TranceiverClient", pModule)
+    ,sReference_(sReference)
+  {}
+
+  String sReference_;
+
+  virtual void OnResult(SrpcMessage& srpc);
+  virtual void OnError(const String sError);
+};
+
 #define GmService_Method_Register "Gm.Register"
 #define GmService_Method_Login "Gm.Login"
 #define GmService_Method_SetProperty "Gm.SetProperty"
+#define GmService_Method_Tranceiver "Gm.Tranceiver"
 
 #endif // GmModule_H_INCLUDED

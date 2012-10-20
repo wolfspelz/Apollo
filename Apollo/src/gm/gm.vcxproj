@@ -84,7 +84,6 @@
     <ClInclude Include="GmModule.h" />
     <ClInclude Include="GmModuleTester.h" />
     <ClInclude Include="Local.h" />
-    <ClInclude Include="MsgGm.h" />
     <ClInclude Include="SrpcClient.h" />
   </ItemGroup>
   <ItemGroup>

@@ -172,6 +172,20 @@ public:
 };
 
 // --------------------------------
+
+// Send a request via XMPP to a destination address
+// -> xmpp
+class Msg_Xmpp_SendSrpcRequest: public ApRequestMessage
+{
+public:
+  Msg_Xmpp_SendSrpcRequest() : ApRequestMessage("Xmpp_SendSrpcRequest") {}
+  ApIN ApHandle hClient;
+  ApIN String sDestination;
+  ApIN String sReference;
+  ApIN Apollo::SrpcMessage srpc;
+};
+
+// --------------------------------
 // Now some real work: enter and leave chat room
 
 // Hook this early to change the data before it is processed.

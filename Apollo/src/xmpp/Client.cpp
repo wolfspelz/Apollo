@@ -331,9 +331,9 @@ int Client::sendHeartbeat()
 
 // -------------------------------------------------------------------
 
-int Client::getNextStanzaId()
+String Client::getNextStanzaId()
 {
-  return nStanzaId_++;
+  return String::from(nStanzaId_++);
 }
 
 int Client::sendStanza(Apollo::XMLNode& stanza)
@@ -484,6 +484,25 @@ int Client::stanzaOut(const String& sData)
 }
 
 // -------------------------------------------------------------------
+// SRPC in XMPP
+
+int Client::sendSrpcRequest(const String& sTo, const String& sId, Apollo::SrpcMessage& srpc)
+{
+  int ok = 0;
+
+  SetStanza request(sId, sTo);
+  Apollo::XMLNode& query = request.addQuery(XMPP_NS_SRPC);
+  query.appendCData(srpc.toString());
+
+  ok = sendStanza(request);
+  if (!ok) {
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "failed " ApHandleFormat "", ApHandlePrintf(hAp_)));
+  }
+
+  return ok;
+}
+
+// -------------------------------------------------------------------
 // Protocoll events
 
 int Client::onProtocolStart()
@@ -536,7 +555,7 @@ int Client::onProtocolLogin()
   }
 
   String sTo = getJabberId();
-  PresenceStanza presence(JABBER_PRESENCE_AVAILABLE, sTo);
+  PresenceStanza presence(XMPP_PRESENCE_AVAILABLE, sTo);
   ok = sendStanza(presence);
   if (!ok) {
     apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "failed " ApHandleFormat " <%s to=%s ...", ApHandlePrintf(hAp_), _sz(presence.getName()), _sz(sTo)));
