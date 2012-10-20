@@ -27,13 +27,13 @@ public:
 class GetStanza : public IQStanza
 {
 public:
-  GetStanza(int nId, const char* szTo);
+  GetStanza(const char* szId, const char* szTo);
 };
 
 class SetStanza : public IQStanza
 {
 public:
-  SetStanza(int nId, const char* szTo);
+  SetStanza(const char* szId, const char* szTo);
 };
 
 class ResultStanza : public IQStanza

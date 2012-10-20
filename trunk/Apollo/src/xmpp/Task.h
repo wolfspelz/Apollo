@@ -58,7 +58,6 @@ public:
   LoginTask(Client* pClient)
     :Task(pClient)
     ,nPhase_(StreamOpen)
-    ,nId_(0)
   {}
 
   int handleStanza(Stanza& stanza, StanzaHandlerResult& result);
@@ -78,7 +77,7 @@ public:
 
   LoginPhase nPhase_;
   String sStreamId_;
-  int nId_;
+  String sId_;
 };
 
 // -------------------------------------------------------------------

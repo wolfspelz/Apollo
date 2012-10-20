@@ -82,6 +82,24 @@ void SetPropertyClient::OnError(const String sError)
 
 //----------------------------------------------------------
 
+void TranceiverClient::OnResult(SrpcMessage& srpc)
+{
+  if (pModule_) {
+    pModule_->onTranceiverResult(srpc, sReference_);
+  }
+}
+
+void TranceiverClient::OnError(const String sError)
+{
+  apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "%s", _sz(sError)));
+
+  if (pModule_) {
+    pModule_->onTranceiverError(sError);
+  }
+}
+
+//----------------------------------------------------------
+
 //String GmModule::encrypt(const String& sIn)
 //{
 //  String sOut;
@@ -437,6 +455,23 @@ int GmModule::doLogout()
   return ok;
 }
 
+void GmModule::onTranceiverResult(SrpcMessage& srpc, const String& sReference)
+{
+  apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "%s %s", _sz(sReference), _sz(srpc.toString())));
+
+  String sResponse = srpc.getString("Response");
+
+  Msg_Gm_ReceiveRequest msg;
+  msg.hRequest.fromString(sReference);
+  msg.srpc.fromString(sResponse);
+  msg.Send();
+}
+
+void GmModule::onTranceiverError(const String sError)
+{
+  apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "%s", _sz(sError)));
+}
+
 /*
 int GmModule::hasXmppLoginData()
 {
@@ -510,12 +545,38 @@ AP_MSG_HANDLER_METHOD(GmModule, Gm_Activate)
 
 AP_MSG_HANDLER_METHOD(GmModule, Gm_SendRequest)
 {
-  Msg_Xmpp_SendSrpcRequest msg;
-  msg.sDestination = Apollo::getModuleConfig(MODULE_NAME, "Srpc/Jid", "");
-  msg.sReference = pMsg->hRequest.toString();
-  pMsg->srpc >> msg.srpc;
-  if (!msg.Request()) { throw ApException(LOG_CONTEXT, "sDestination=%s sReference=", _sz(msg.sDestination), _sz(msg.sReference)); }
-  pMsg->apStatus = ApMessage::Ok;
+  //Msg_Xmpp_SendSrpcRequest msg;
+  //msg.sDestination = Apollo::getModuleConfig(MODULE_NAME, "Srpc/Jid", "");
+  //msg.sReference = pMsg->hRequest.toString();
+  //pMsg->srpc >> msg.srpc;
+  //if (!msg.Request()) { throw ApException(LOG_CONTEXT, "sDestination=%s sReference=", _sz(msg.sDestination), _sz(msg.sReference)); }
+  //pMsg->apStatus = ApMessage::Ok;
+
+  String sUrl = Apollo::getModuleConfig(MODULE_NAME, "Srpc/Url", "");
+  String sReference = pMsg->hRequest.toString();
+
+  if (sUrl.empty()) {
+    apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "%s/Srpc/Url empty", _sz(MODULE_NAME)));
+  } else {
+
+    Apollo::SrpcMessage srpc;
+    srpc.set(Srpc::Key::Method, GmService_Method_Tranceiver);
+    srpc.set("Token", Apollo::getModuleConfig(MODULE_NAME, "Srpc/Token", "8uzxXXZTAmHcni6tK3t-Apollo-3"));
+    srpc.set("User", Apollo::getModuleConfig(MODULE_NAME, "User", ""));
+    srpc.set("Session", Apollo::getModuleConfig(MODULE_NAME, "Srpc/Session", "SessionToken"));
+    srpc.set("Request", pMsg->srpc.toString());
+
+    TranceiverClient* pClient = new TranceiverClient(this, sReference);
+    if (pClient != 0) {
+      if (apLog_IsVerbose) {
+        apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "%s", _sz(pMsg->srpc.toString())));
+      }
+      int ok = pClient->Post(sUrl, srpc);
+      if (!ok) {
+        apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "TranceiverClient.Post(%s) failed", _sz(sUrl)));
+      }
+    }
+  }
 }
 
 AP_MSG_HANDLER_METHOD(GmModule, Gm_ReceiveResponse)

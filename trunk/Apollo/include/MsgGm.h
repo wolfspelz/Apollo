@@ -43,25 +43,25 @@ class Msg_Gm_SendRequest: public ApRequestMessage
 {
 public:
   Msg_Gm_SendRequest() : ApRequestMessage("Gm_SendRequest") {}
-  ApIN ApHandle hChannel;
+  ApIN ApHandle hRequest;
   ApIN Apollo::SrpcMessage srpc;
 };
 
 // Gm ->
-class Msg_Gm_ReceiveResponse: public ApRequestMessage
+class Msg_Gm_ReceiveResponse: public ApNotificationMessage
 {
 public:
-  Msg_Gm_ReceiveResponse() : ApRequestMessage("Gm_ReceiveResponse") {}
-  ApIN ApHandle hChannel;
+  Msg_Gm_ReceiveResponse() : ApNotificationMessage("Gm_ReceiveResponse") {}
+  ApIN ApHandle hRequest;
   ApIN Apollo::SrpcMessage srpc;
 };
 
 // Gm ->
-class Msg_Gm_ReceiveRequest: public ApRequestMessage
+class Msg_Gm_ReceiveRequest: public ApNotificationMessage
 {
 public:
-  Msg_Gm_ReceiveRequest() : ApRequestMessage("Gm_ReceiveRequest") {}
-  ApIN ApHandle hChannel;
+  Msg_Gm_ReceiveRequest() : ApNotificationMessage("Gm_ReceiveRequest") {}
+  ApIN ApHandle hRequest;
   ApIN Apollo::SrpcMessage srpc;
 };
 
@@ -70,7 +70,7 @@ class Msg_Gm_SendResponse: public ApRequestMessage
 {
 public:
   Msg_Gm_SendResponse() : ApRequestMessage("Gm_SendResponse") {}
-  ApIN ApHandle hChannel;
+  ApIN ApHandle hRequest;
   ApIN Apollo::SrpcMessage srpc;
 };
 

@@ -62,18 +62,16 @@ Apollo::XMLNode& IQStanza::addQuery(const char* szNameSpace)
   return query;
 }
 
-GetStanza::GetStanza(int nId, const char* szTo)
+GetStanza::GetStanza(const char* szId, const char* szTo)
 {
-  String sId; sId.appendf("%d", nId);
-  addAttribute("id", sId);
+  addAttribute("id", szId);
   addAttribute("to", szTo);
   addAttribute("type", "get");
 }
 
-SetStanza::SetStanza(int nId, const char* szTo)
+SetStanza::SetStanza(const char* szId, const char* szTo)
 {
-  String sId; sId.appendf("%d", nId);
-  addAttribute("id", sId);
+  addAttribute("id", szId);
   addAttribute("to", szTo);
   addAttribute("type", "set");
 }
@@ -91,7 +89,7 @@ PresenceStanza::PresenceStanza(const char* szType, const char* szTo)
 :Stanza("presence")
 {
   String sType = szType;
-  if (sType != JABBER_PRESENCE_AVAILABLE) {
+  if (sType != XMPP_PRESENCE_AVAILABLE) {
     addAttribute("type", szType);
   }
 

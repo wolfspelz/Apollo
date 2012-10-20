@@ -7,17 +7,21 @@
 #if !defined(Protocol_h_INCLUDED)
 #define Protocol_h_INCLUDED
 
-#define JABBER_PRESENCE_AVAILABLE "available"
-#define JABBER_PRESENCE_UNAVAILABLE "unavailable"
-#define JABBER_PRESENCE_ERROR "error"
+// Standards
+#define XMPP_PRESENCE_AVAILABLE "available"
+#define XMPP_PRESENCE_UNAVAILABLE "unavailable"
+#define XMPP_PRESENCE_ERROR "error"
 
-#define JABBER_NS_AUTH "jabber:iq:auth"
-#define JABBER_NS_MUC_USER "http://jabber.org/protocol/muc#user"
-#define JABBER_NS_VERSION "jabber:iq:version"
-#define JABBER_NS_DELAY "jabber:x:delay"
-#define JABBER_NS_DELAY2 "urn:xmpp:delay"
+#define XMPP_NS_AUTH "jabber:iq:auth"
+#define XMPP_NS_MUC_USER "http://jabber.org/protocol/muc#user"
+#define XMPP_NS_VERSION "jabber:iq:version"
+#define XMPP_NS_DELAY "jabber:x:delay"
+#define XMPP_NS_DELAY2 "urn:xmpp:delay"
 
 #define JABBER_ERRORCODE_Conflict 409
+
+// Proprietary
+#define XMPP_NS_SRPC "urn:xmpp:srpc"
 
 #define NS_PRESENCE_X_USER_IDENTITY_LEGACY "firebat:user:identity"
 #define NS_PRESENCE_X_USER_JID_LEGACY "firebat:user:jid"

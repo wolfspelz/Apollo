@@ -57,6 +57,8 @@ public:
   int sendStanza(Apollo::XMLNode& stanza);
   // Called by Msg_Xmpp_StanzaOut handler, sends to connection
   int stanzaOut(const String& sData);
+  // Called by Msg_Xmpp_SendSrpcRequest, sends an iq-get
+  int sendSrpcRequest(const String& sTo, const String& sId, Apollo::SrpcMessage& srpc);
 
   int isDefault();
   void setDefault(int bDefault);
@@ -110,7 +112,7 @@ public:
   int getPort();
 
   inline ApHandle apHandle() { return hAp_; }
-  int getNextStanzaId();
+  String getNextStanzaId();
 
   typedef enum _ClientState { ClientState_Unknown
     ,ClientState_NotConnected
