@@ -61,7 +61,7 @@ class Msg_Gm_ReceiveRequest: public ApNotificationMessage
 {
 public:
   Msg_Gm_ReceiveRequest() : ApNotificationMessage("Gm_ReceiveRequest") {}
-  ApIN ApHandle hRequest;
+  ApIN String sReference;
   ApIN Apollo::SrpcMessage srpc;
 };
 
@@ -70,7 +70,7 @@ class Msg_Gm_SendResponse: public ApRequestMessage
 {
 public:
   Msg_Gm_SendResponse() : ApRequestMessage("Gm_SendResponse") {}
-  ApIN ApHandle hRequest;
+  ApIN String sReference;
   ApIN Apollo::SrpcMessage srpc;
 };
 

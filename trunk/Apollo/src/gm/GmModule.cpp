@@ -461,7 +461,7 @@ void GmModule::onTranceiverResult(SrpcMessage& srpc, const String& sReference)
 
   String sResponse = srpc.getString("Response");
 
-  Msg_Gm_ReceiveRequest msg;
+  Msg_Gm_ReceiveResponse msg;
   msg.hRequest.fromString(sReference);
   msg.srpc.fromString(sResponse);
   msg.Send();
@@ -545,6 +545,8 @@ AP_MSG_HANDLER_METHOD(GmModule, Gm_Activate)
 
 AP_MSG_HANDLER_METHOD(GmModule, Gm_SendRequest)
 {
+  int ok = 0;
+
   //Msg_Xmpp_SendSrpcRequest msg;
   //msg.sDestination = Apollo::getModuleConfig(MODULE_NAME, "Srpc/Jid", "");
   //msg.sReference = pMsg->hRequest.toString();
@@ -563,7 +565,7 @@ AP_MSG_HANDLER_METHOD(GmModule, Gm_SendRequest)
     srpc.set(Srpc::Key::Method, GmService_Method_Tranceiver);
     srpc.set("Token", Apollo::getModuleConfig(MODULE_NAME, "Srpc/Token", "8uzxXXZTAmHcni6tK3t-Apollo-3"));
     srpc.set("User", Apollo::getModuleConfig(MODULE_NAME, "User", ""));
-    srpc.set("Session", Apollo::getModuleConfig(MODULE_NAME, "Srpc/Session", "SessionToken"));
+    srpc.set("Session", Apollo::getModuleConfig(MODULE_NAME, "Session", "SessionToken"));
     srpc.set("Request", pMsg->srpc.toString());
 
     TranceiverClient* pClient = new TranceiverClient(this, sReference);
@@ -571,25 +573,24 @@ AP_MSG_HANDLER_METHOD(GmModule, Gm_SendRequest)
       if (apLog_IsVerbose) {
         apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "%s", _sz(pMsg->srpc.toString())));
       }
-      int ok = pClient->Post(sUrl, srpc);
+      ok = pClient->Post(sUrl, srpc);
       if (!ok) {
         apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "TranceiverClient.Post(%s) failed", _sz(sUrl)));
       }
     }
   }
+
+  pMsg->apStatus = ok ? ApMessage::Ok : ApMessage::Error;
 }
 
 AP_MSG_HANDLER_METHOD(GmModule, Gm_ReceiveResponse)
 {
   apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "Response not handled, hRequest=" ApHandleFormat "", ApHandlePrintf(pMsg->hRequest)));
-  pMsg->apStatus = ApMessage::Ok;
 }
 
 AP_MSG_HANDLER_METHOD(GmModule, Gm_ReceiveRequest)
 {
-  int ok = 0;
-  apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "Request not handled, hRequest=" ApHandleFormat "", ApHandlePrintf(pMsg->hRequest)));
-  pMsg->apStatus = ApMessage::Ok;
+  apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "Request not handled, sReference=%s", _sz(pMsg->sReference)));
 }
 
 AP_MSG_HANDLER_METHOD(GmModule, Gm_SendResponse)

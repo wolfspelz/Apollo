@@ -37,6 +37,7 @@ class InventoryModule
 {
 public:
   InventoryModule()
+    :pInventory_(0)
     {}
 
   int Init();
@@ -45,8 +46,9 @@ public:
   void On_Inventory_Create(Msg_Inventory_Create* pMsg);
   void On_Inventory_Destroy(Msg_Inventory_Destroy* pMsg);
   void On_Inventory_Show(Msg_Inventory_Show* pMsg);
-  void On_System_RunLevel(Msg_System_RunLevel* pMsg);
+  //void On_System_RunLevel(Msg_System_RunLevel* pMsg);
   void On_Config_GetValue(Msg_Config_GetValue* pMsg);
+  void On_Gm_ReceiveResponse(Msg_Gm_ReceiveResponse* pMsg);
 
 #if defined(AP_TEST)
   void On_UnitTest_Begin(Msg_UnitTest_Begin* pMsg);
@@ -56,15 +58,7 @@ public:
 #endif
 
 protected:
-  Inventory* NewInventory(const ApHandle& hInventory);
-  void DeleteInventory(const ApHandle& hInventory);
-  Inventory* FindInventory(const ApHandle& hInventory); // return 0 if !found
-  Inventory* GetInventory(const ApHandle& hInventory) throw (ApException); // ApException if !found
-  ApHandle FirstInventoryHandle();
-
-protected:
-  ApHandle hDefaultInventory_;
-  InventoryList inventories_;
+  Inventory* pInventory_;
 
   AP_MSG_REGISTRY_DECLARE;
 };
