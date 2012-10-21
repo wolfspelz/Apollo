@@ -7,116 +7,65 @@
 #include "Apollo.h"
 #include "Local.h"
 
-// Ignore this:
-// Replace regex: \(Msg_[a-zA-Z]+_[^ *]+\* pMsg\)
-
-Inventory* InventoryModule::NewInventory(const ApHandle& hInventory)
-{
-  Inventory* pInventory = new Inventory(hInventory);
-  if (pInventory) {
-    try {
-      pInventory->Create();
-      inventories_.Set(hInventory, pInventory);
-    } catch (ApException& ex) {
-      delete pInventory;
-      pInventory = 0;
-      throw ex;
-    }
-  }
-
-  return pInventory;
-}
-
-void InventoryModule::DeleteInventory(const ApHandle& hInventory)
-{
-  Inventory* pInventory = FindInventory(hInventory);
-  if (pInventory) {
-    ApHandle h = hInventory;
-    if (!ApIsHandle(h)) {
-      h = pInventory->apHandle();
-    }
-    pInventory->Destroy();
-    inventories_.Unset(h);
-    delete pInventory;
-    pInventory = 0;
-  }
-}
-
-Inventory* InventoryModule::FindInventory(const ApHandle& hInventory)
-{
-  Inventory* pInventory = 0;
-
-  if (ApIsHandle(hInventory)) {
-    inventories_.Get(hInventory, pInventory);
-  } else {
-    if (inventories_.Count() == 0) { throw ApException(LOG_CONTEXT, "no default Inventory"); }
-    inventories_.Get(FirstInventoryHandle(), pInventory);
-  }
-
-  return pInventory;
-}
-
-Inventory* InventoryModule::GetInventory(const ApHandle& hInventory)
-{
-  Inventory* pInventory = FindInventory(hInventory);
-  if (pInventory == 0) { throw ApException(LOG_CONTEXT, "no Inventory=" ApHandleFormat "", ApHandlePrintf(hInventory)); }
-  return pInventory;
-}
-
-ApHandle InventoryModule::FirstInventoryHandle()
-{
-  InventoryListNode* pNode = inventories_.Next(0);
-  if (pNode != 0) { return pNode->Key(); }
-  return ApNoHandle;
-}
-
 //----------------------------------------------------------
 
 AP_MSG_HANDLER_METHOD(InventoryModule, Inventory_Create)
 {
-  if (!ApIsHandle(pMsg->hInventory)) { throw ApException(LOG_CONTEXT, "empty hInventory"); }
-  if (inventories_.Find(pMsg->hInventory) != 0) { throw ApException(LOG_CONTEXT, "Inventory=" ApHandleFormat " already exists", ApHandlePrintf(pMsg->hInventory)); }
-  Inventory* pInventory = NewInventory(pMsg->hInventory);
+  if (pInventory_ != 0) { throw ApException(LOG_CONTEXT, "Inventory already exists"); }
+
+  pInventory_ = new Inventory();
+  if (pInventory_ != 0) {
+    pInventory_->Create();
+  }
+
   pMsg->apStatus = ApMessage::Ok;
 }
 
 AP_MSG_HANDLER_METHOD(InventoryModule, Inventory_Destroy)
 {
-  DeleteInventory(pMsg->hInventory);
+  if (pInventory_ == 0) { throw ApException(LOG_CONTEXT, "no Inventory"); }
+
+  pInventory_->Destroy();
+  delete pInventory_;
+  pInventory_ = 0;
+
   pMsg->apStatus = ApMessage::Ok;
 }
 
 AP_MSG_HANDLER_METHOD(InventoryModule, Inventory_Show)
 {
-  GetInventory(pMsg->hInventory)->Show(pMsg->bShow);
+  if (pInventory_ == 0) { throw ApException(LOG_CONTEXT, "no Inventory"); }
+  
+  pInventory_->Show(pMsg->bShow);
+
   pMsg->apStatus = ApMessage::Ok;
 }
 
-AP_MSG_HANDLER_METHOD(InventoryModule, System_RunLevel)
-{
-  if (0) {
-  } else if (pMsg->sLevel == Msg_System_RunLevel_Normal) {
-
-    Msg_Inventory_Create msg;
-    msg.hInventory = Apollo::newHandle();
-    if (!msg.Request()) {
-      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Failed to create default inventory"));
-    } else {
-      hDefaultInventory_ = msg.hInventory;
-    }
-
-  } else if (pMsg->sLevel == Msg_System_RunLevel_Shutdown) {
-
-    Msg_Inventory_Destroy msg;
-    msg.hInventory = hDefaultInventory_;
-    if (!msg.Request()) {
-      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Failed to delete default inventory"));
-    } else {
-      hDefaultInventory_ = ApNoHandle;
-    }
-
-  }
-}
+//AP_MSG_HANDLER_METHOD(InventoryModule, System_RunLevel)
+//{
+//  if (0) {
+//  } else if (pMsg->sLevel == Msg_System_RunLevel_Normal) {
+//
+//    Msg_Inventory_Create msg;
+//    msg.hInventory = Apollo::newHandle();
+//    if (!msg.Request()) {
+//      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Failed to create default inventory"));
+//    } else {
+//      hDefaultInventory_ = msg.hInventory;
+//    }
+//
+//  } else if (pMsg->sLevel == Msg_System_RunLevel_Shutdown) {
+//
+//    Msg_Inventory_Destroy msg;
+//    msg.hInventory = hDefaultInventory_;
+//    if (!msg.Request()) {
+//      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Failed to delete default inventory"));
+//    } else {
+//      hDefaultInventory_ = ApNoHandle;
+//    }
+//
+//  }
+//}
 
 AP_MSG_HANDLER_METHOD(InventoryModule, Config_GetValue)
 {
@@ -124,6 +73,12 @@ AP_MSG_HANDLER_METHOD(InventoryModule, Config_GetValue)
     pMsg->sValue = "1";
     pMsg->apStatus = ApMessage::Ok;
   }
+}
+
+AP_MSG_HANDLER_METHOD(InventoryModule, Gm_ReceiveResponse)
+{
+  pMsg->hRequest;
+  pMsg->srpc;
 }
 
 //----------------------------------------------------------
@@ -165,8 +120,9 @@ int InventoryModule::Init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, InventoryModule, Inventory_Create, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, InventoryModule, Inventory_Destroy, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, InventoryModule, Inventory_Show, this, ApCallbackPosNormal);
-  AP_MSG_REGISTRY_ADD(MODULE_NAME, InventoryModule, System_RunLevel, this, ApCallbackPosNormal);
+  //AP_MSG_REGISTRY_ADD(MODULE_NAME, InventoryModule, System_RunLevel, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, InventoryModule, Config_GetValue, this, ApCallbackPosEarly);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, InventoryModule, Gm_ReceiveResponse, this, ApCallbackPosEarly);
 
   AP_UNITTEST_HOOK(InventoryModule, this);
 
