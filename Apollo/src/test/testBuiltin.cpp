@@ -1315,6 +1315,33 @@ String Test_SrpcMessage()
   return s;
 }
 
+String Test_SrpcMessage_cloneTo()
+{
+  String s;
+
+  // cloneTo
+  if (!s) {
+    // Arrange
+    Apollo::SrpcMessage m;
+    Apollo::KeyValueList kv; 
+    kv.add("aInt", 111); 
+    kv.add("bString", "222"); 
+    kv.add("cComplexString", "33 \n3");
+    m.set("kvList", kv);
+
+    // Act
+    Apollo::SrpcMessage clone;
+    m.cloneTo(clone);
+
+    // Assert
+    if (!s) { if (clone.getInt("aInt") != m.getInt("aInt")) { s = "aInt mismatch"; } }
+    if (!s) { if (clone.getString("bString") != m.getString("bString")) { s = "bString mismatch"; } }
+    if (!s) { if (clone.getString("cComplexString") != m.getString("cComplexString")) { s = "cComplexString mismatch"; } }
+  }
+
+  return s;
+}
+
 #endif // AP_TEST_SrpcMessage
 
 //----------------------------------------------------------
@@ -3073,6 +3100,7 @@ void Test_Builtin_Register()
 
 #if defined(AP_TEST_SrpcMessage)
   AP_UNITTEST_REGISTER(Test_SrpcMessage);
+  AP_UNITTEST_REGISTER(Test_SrpcMessage_cloneTo);
 #endif
 
 #if defined(AP_TEST_SrpcStreamParser)
@@ -3198,6 +3226,7 @@ void Test_Builtin_Execute()
 
 #if defined(AP_TEST_SrpcMessage)
   AP_UNITTEST_EXECUTE(Test_SrpcMessage);
+  AP_UNITTEST_EXECUTE(Test_SrpcMessage_cloneTo);
 #endif
 
 #if defined(AP_TEST_SrpcStreamParser)

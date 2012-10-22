@@ -7,12 +7,13 @@
 #if !defined(Inventory_H_INCLUDED)
 #define Inventory_H_INCLUDED
 
+#include "Request.h"
+
 class Inventory
 {
 public:
-  Inventory::Inventory(const ApHandle& hInventory)
-    :hAp_(hInventory)
-    ,bVisible_(0)
+  Inventory::Inventory()
+    :bVisible_(0)
     ,nLeft_(100)
     ,nTop_(100)
     ,nWidth_(600)
@@ -20,19 +21,22 @@ public:
   {}
   virtual ~Inventory();
 
-  inline ApHandle apHandle() { return hAp_; }
-
   void Create();
   void Destroy();
   void Show(int bShow);
 
+  int ConsumeResponse(const ApHandle& hRequest, Apollo::SrpcMessage& response);
+  void Purge();
+  void BuildPanes(Apollo::KeyValueList& kvValues);
+
 protected:
-  ApHandle hAp_;
   int bVisible_;
   int nLeft_;
   int nTop_;
   int nWidth_;
   int nHeight_;
+
+  ApHandleTree<Request*> requests_; 
 };
 
 #endif // Inventory_H_INCLUDED

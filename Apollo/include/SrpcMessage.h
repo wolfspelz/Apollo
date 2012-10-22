@@ -56,9 +56,10 @@ public:
   void createError(SrpcMessage& request, const String& sMessage);
   String toString();
   void fromString(const String& s);
+  void cloneTo(SrpcMessage& target);
 
 protected:
-  void moveTo(SrpcMessage& lTarget);
+  void moveTo(SrpcMessage& target);
 };
 
 AP_NAMESPACE_END

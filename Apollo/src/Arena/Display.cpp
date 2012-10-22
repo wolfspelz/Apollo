@@ -333,7 +333,7 @@ void Display::OnModuleCall(Apollo::SrpcMessage& request, Apollo::SrpcMessage& re
 void Display::OnShowInventory(int bShow)
 {
   // Use default inventory
-  if (!Msg_Inventory_Show::_(ApNoHandle, 1)) { throw ApException(LOG_CONTEXT, "Msg_Inventory_Show failed"); }
+  if (!Msg_Inventory_Show::_(1)) { throw ApException(LOG_CONTEXT, "Msg_Inventory_Show failed"); }
 }
 
 void Display::OnShowChatWindow(int bShow)

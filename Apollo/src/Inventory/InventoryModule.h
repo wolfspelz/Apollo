@@ -15,10 +15,6 @@
 #include "MsgSystem.h"
 #include "Inventory.h"
 
-typedef ApHandlePointerTree<Inventory*> InventoryList;
-typedef ApHandlePointerTreeNode<Inventory*> InventoryListNode;
-typedef ApHandlePointerTreeIterator<Inventory*> InventoryListIterator;
-
 #if defined(AP_TEST)
 
 class InventoryModuleTester
@@ -28,8 +24,7 @@ public:
   static void Execute();
   static void End();
 
-  static String CreateDeleteInventory();
-  static String CreateDeleteDefaultInventory();
+  //static String CreateDeleteInventory();
 };
 #endif
 
