@@ -34,9 +34,23 @@ AP_MSG_HANDLER_METHOD(InventoryModule, Inventory_Destroy)
 
 AP_MSG_HANDLER_METHOD(InventoryModule, Inventory_Show)
 {
+  if (Apollo::getModuleConfig(MODULE_NAME, "CreateOnShow", 0)) {
+    if (pMsg->bShow && pInventory_ == 0) {
+      Msg_Inventory_Create msg;
+      msg.Request();
+    }
+  }
+
   if (pInventory_ == 0) { throw ApException(LOG_CONTEXT, "no Inventory"); }
   
   pInventory_->Show(pMsg->bShow);
+
+  if (Apollo::getModuleConfig(MODULE_NAME, "DestroyOnHide", 0)) {
+    if (!pMsg->bShow && pInventory_ != 0) {
+      Msg_Inventory_Destroy msg;
+      msg.Request();
+    }
+  }
 
   pMsg->apStatus = ApMessage::Ok;
 }
@@ -77,8 +91,11 @@ AP_MSG_HANDLER_METHOD(InventoryModule, Config_GetValue)
 
 AP_MSG_HANDLER_METHOD(InventoryModule, Gm_ReceiveResponse)
 {
-  pMsg->hRequest;
-  pMsg->srpc;
+  if (pInventory_ != 0) {
+    if (pInventory_->ConsumeResponse(pMsg->hRequest, pMsg->srpc)) {
+      pMsg->Stop();
+    }
+  }
 }
 
 //----------------------------------------------------------
@@ -141,14 +158,12 @@ void InventoryModule::Exit()
 
 void InventoryModuleTester::Begin()
 {
-  AP_UNITTEST_REGISTER(InventoryModuleTester::CreateDeleteInventory);
-  AP_UNITTEST_REGISTER(InventoryModuleTester::CreateDeleteDefaultInventory);
+  //AP_UNITTEST_REGISTER(InventoryModuleTester::CreateDeleteInventory);
 }
 
 void InventoryModuleTester::Execute()
 {
-  AP_UNITTEST_EXECUTE(InventoryModuleTester::CreateDeleteInventory);
-  AP_UNITTEST_EXECUTE(InventoryModuleTester::CreateDeleteDefaultInventory);
+  //AP_UNITTEST_EXECUTE(InventoryModuleTester::CreateDeleteInventory);
 }
 
 void InventoryModuleTester::End()
@@ -157,39 +172,14 @@ void InventoryModuleTester::End()
 
 //----------------------------
 
-String InventoryModuleTester::CreateDeleteInventory()
-{
-  String s;
-
-  InventoryModule m;
-  ApHandle hInventory = Apollo::newHandle();
-
-  m.NewInventory(hInventory);
-  if (!s) { if (m.inventories_.Count() != 1) { s = String::from(__LINE__); }}
-  if (!s) { if (m.FindInventory(hInventory) == 0) { s = String::from(__LINE__); }}
-  if (!s) { if (m.FirstInventoryHandle() != hInventory) { s = String::from(__LINE__); }}
-  m.DeleteInventory(hInventory);
-  if (!s) { if (m.inventories_.Count() != 0) { s = String::from(__LINE__); }}
-
-  return s;
-}
-
-String InventoryModuleTester::CreateDeleteDefaultInventory()
-{
-  String s;
-
-  InventoryModule m;
-  ApHandle hInventory = Apollo::newHandle();
-
-  m.NewInventory(hInventory);
-  if (!s) { if (m.inventories_.Count() != 1) { s = String::from(__LINE__); }}
-  if (!s) { if (m.FindInventory(ApNoHandle) == 0) { s = String::from(__LINE__); }}
-  if (!s) { if (m.FirstInventoryHandle() != hInventory) { s = String::from(__LINE__); }}
-  m.DeleteInventory(ApNoHandle);
-  if (!s) { if (m.inventories_.Count() != 0) { s = String::from(__LINE__); }}
-
-  return s;
-}
+//String InventoryModuleTester::CreateDeleteInventory()
+//{
+//  String s;
+//
+//  InventoryModule m;
+//
+//  return s;
+//}
 
 //----------------------------
 

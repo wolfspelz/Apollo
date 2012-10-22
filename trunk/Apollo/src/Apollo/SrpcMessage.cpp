@@ -165,6 +165,13 @@ void SrpcMessage::getKeyValueList(const String& sKey, KeyValueList& kvList)
   kvList.fromList(l);
 }
 
+void SrpcMessage::cloneTo(SrpcMessage& target)
+{
+  for (Elem* e = 0; (e = Next(e)) != 0; ) {
+    target.set(e->getName(), e->getString());
+  }
+}
+
 void SrpcMessage::moveTo(SrpcMessage& target)
 {
   Elem* e = 0;

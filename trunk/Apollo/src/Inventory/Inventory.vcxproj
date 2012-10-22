@@ -77,12 +77,14 @@
     <ClCompile Include="dll.cpp" />
     <ClCompile Include="Inventory.cpp" />
     <ClCompile Include="InventoryModule.cpp" />
+    <ClCompile Include="Request.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="dll.h" />
     <ClInclude Include="Local.h" />
     <ClInclude Include="Inventory.h" />
     <ClInclude Include="InventoryModule.h" />
+    <ClInclude Include="Request.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Apollo\Apollo.vcxproj">
