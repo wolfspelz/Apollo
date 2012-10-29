@@ -26,7 +26,7 @@ Core/Modules/02900/Chat/Path=Chat
 Core/Modules/03000/Dialog/Path=Dialog
 Core/Modules/03100/TestDialog/Path=TestDialog
 Core/Modules/03200/Setup/Path=Setup
-Core/Modules/03300/Setup/Path=Inventory
+Core/Modules/03300/Inventory/Path=Inventory
 
 Core/ModulesDirectory=modules
 

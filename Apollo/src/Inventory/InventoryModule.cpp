@@ -55,6 +55,23 @@ AP_MSG_HANDLER_METHOD(InventoryModule, Inventory_Show)
   pMsg->apStatus = ApMessage::Ok;
 }
 
+AP_MSG_HANDLER_METHOD(InventoryModule, Dialog_OnOpened)
+{
+  if (pInventory_ != 0) {
+    pInventory_->OnOpened(pMsg->hDialog);
+  }
+}
+
+AP_MSG_HANDLER_METHOD(InventoryModule, Dialog_OnClosed)
+{
+  if (pInventory_ != 0) {
+    pInventory_->OnClosed(pMsg->hDialog);
+
+    Msg_Inventory_Destroy msg;
+    msg.Request();
+  }
+}
+
 //AP_MSG_HANDLER_METHOD(InventoryModule, System_RunLevel)
 //{
 //  if (0) {
@@ -137,6 +154,8 @@ int InventoryModule::Init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, InventoryModule, Inventory_Create, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, InventoryModule, Inventory_Destroy, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, InventoryModule, Inventory_Show, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, InventoryModule, Dialog_OnOpened, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, InventoryModule, Dialog_OnClosed, this, ApCallbackPosNormal);
   //AP_MSG_REGISTRY_ADD(MODULE_NAME, InventoryModule, System_RunLevel, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, InventoryModule, Config_GetValue, this, ApCallbackPosEarly);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, InventoryModule, Gm_ReceiveResponse, this, ApCallbackPosEarly);
