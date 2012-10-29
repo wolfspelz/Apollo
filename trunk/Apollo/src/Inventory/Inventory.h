@@ -18,6 +18,7 @@ public:
     ,nTop_(100)
     ,nWidth_(600)
     ,nHeight_(400)
+    ,nGrid_(0)
   {}
   virtual ~Inventory();
 
@@ -25,6 +26,10 @@ public:
   void Destroy();
   void Show(int bShow);
 
+  void OnOpened(const ApHandle& hDialog);
+  void OnClosed(const ApHandle& hDialog);
+
+  void SetVisibility(int bShow);
   int ConsumeResponse(const ApHandle& hRequest, Apollo::SrpcMessage& response);
   void Purge();
   void BuildPanes(Apollo::KeyValueList& kvValues);
@@ -36,7 +41,10 @@ protected:
   int nWidth_;
   int nHeight_;
 
-  ApHandleTree<Request*> requests_; 
+  ApHandleTree<Request*> requests_;
+  ApHandle hCandidate_;
+  ApHandle hDialog_;
+  long nGrid_;
 };
 
 #endif // Inventory_H_INCLUDED

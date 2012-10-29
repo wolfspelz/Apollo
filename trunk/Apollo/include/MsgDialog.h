@@ -40,6 +40,16 @@ public:
   Msg_Dialog_GetView() : ApRequestMessage("Dialog_GetView") {}
   ApIN ApHandle hDialog;
   ApOUT ApHandle hView;
+
+  static ApHandle _(const ApHandle& hDialog)
+  {
+    Msg_Dialog_GetView msg;
+    msg.hDialog = hDialog;
+    if (msg.Request()) {
+      return msg.hView;
+    }
+    return ApNoHandle;
+  }
 };
 
 // -> Dialog 

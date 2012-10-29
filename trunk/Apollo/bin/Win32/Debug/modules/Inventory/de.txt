@@ -1,0 +1,2 @@
+#ässert utf-8
+Inventory=Gegenstände

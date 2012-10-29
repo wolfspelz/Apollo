@@ -104,6 +104,7 @@ public:
   static int isPunct(const char* szText);
   static String from(int n);
   static int atoi(const String& s) { return ::atoi(s); }
+  static long atol(const String& s) { return ::atol(s); }
   static double atof(const String& s) { return ::atof(s); }
 
   // escape

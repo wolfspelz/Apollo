@@ -41,6 +41,8 @@ public:
   void On_Inventory_Create(Msg_Inventory_Create* pMsg);
   void On_Inventory_Destroy(Msg_Inventory_Destroy* pMsg);
   void On_Inventory_Show(Msg_Inventory_Show* pMsg);
+  void On_Dialog_OnOpened(Msg_Dialog_OnOpened* pMsg);
+  void On_Dialog_OnClosed(Msg_Dialog_OnClosed* pMsg);
   //void On_System_RunLevel(Msg_System_RunLevel* pMsg);
   void On_Config_GetValue(Msg_Config_GetValue* pMsg);
   void On_Gm_ReceiveResponse(Msg_Gm_ReceiveResponse* pMsg);
