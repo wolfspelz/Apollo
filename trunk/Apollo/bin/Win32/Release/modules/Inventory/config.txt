@@ -1,5 +1,8 @@
-#SampleKey=value
+CreateOnShow=1
+DestroyOnHide=1
 
 Language/en=[[MODULE_RESOURCE_PATH]]/en.txt
 Language/de=[[MODULE_RESOURCE_PATH]]/de.txt
 Language/ja=[[MODULE_RESOURCE_PATH]]/ja.txt
+
+#Name=123@item.osiris
