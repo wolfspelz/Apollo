@@ -45,6 +45,7 @@ function LimitChat(sText, nMaxLength)
 function Arena(sDomId)
 {
   this.sDomId = sDomId;
+  this.bHasInventory = false;
 }
 
 Arena.prototype = {
@@ -67,6 +68,7 @@ Arena.prototype = {
       $('body').bind('contextmenu', function() { return false; });
     }
 
+    this.bHasInventory = api.Message('Config_GetValue').setString('sPath', 'Inventory/Available').send().getBool('sValue')
   },
 
   // --------------------------------------
@@ -101,11 +103,13 @@ Arena.prototype = {
       + '        <td><input type="submit" class="cSend cTranslate" value="Send" /></td>'
       + '        <td><img src="img/CloseChatInButton.png" class="cCloseButton" /></td>'
       + '      </tr>'
-      + '      <tr>'
-      + '        <td><input type="button" class="cThings cTranslate" value="Things" /></td>'
-      + '        <td> </td>'
-      + '        <td> </td>'
-      + '      </tr>'
+      + (this.bHasInventory ? ''
+        + '      <tr>'
+        + '        <td><input type="button" class="cThings cTranslate" value="Things" /></td>'
+        + '        <td> </td>'
+        + '        <td> </td>'
+        + '      </tr>'
+        :'')
       + '      </table>'
       + '    </div>'
       :'')
@@ -414,6 +418,7 @@ Arena.prototype = {
 
     $('.cChatIn .cThings').click(
       function(ev) {
+        $('.cChatIn').fadeOut('fast');
         arena.OnShowInventory();
       }
     );
