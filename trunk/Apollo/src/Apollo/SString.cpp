@@ -904,6 +904,21 @@ int String::isPunct(const char* szText)
   return is;
 }
 
+int String::isTrue(const char* szText)
+{
+  int is = 0;
+
+  if (!is) {
+    int n = String::atoi(szText);
+    is = (n == 1);
+  }
+  if (!is) { is = (String("true") == String::toLower(szText)); }
+  if (!is) { is = (String("yes") == String::toLower(szText)); }
+  if (!is) { is = (String("on") == String::toLower(szText)); }
+
+  return is;
+}
+
 String String::from(int n)
 {
   String s;

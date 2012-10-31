@@ -20,6 +20,7 @@ function ReceiveMessageFromModule(sMsg)
     var sMethod = msg.getString('Method');
     switch (sMethod) {
       case 'Start': return Start(); break;
+      case 'Ready': return Ready(); break;
       default: throw 'Unknown method: ' + sMethod;
     }
 
@@ -32,11 +33,15 @@ function ReceiveMessageFromModule(sMsg)
     return sResponse;
   }
 }
-function Start()
-{    api = new ApolloApi('Inventory');
-  
-  api.Log.Debug('Start')
-}
+
+function Start() {
+  api = new ApolloApi('Inventory');
+}
+
+function Ready() {
+  api.ModuleCall('PlayModel').send();
+}
+
 // -----------------------------------------------
 
 </script>

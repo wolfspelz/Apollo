@@ -57,18 +57,26 @@ AP_MSG_HANDLER_METHOD(InventoryModule, Inventory_Show)
 
 AP_MSG_HANDLER_METHOD(InventoryModule, Dialog_OnOpened)
 {
-  if (pInventory_ != 0) {
+  if (pInventory_ != 0 && pInventory_->HasCandidate(pMsg->hDialog)) {
     pInventory_->OnOpened(pMsg->hDialog);
   }
 }
 
 AP_MSG_HANDLER_METHOD(InventoryModule, Dialog_OnClosed)
 {
-  if (pInventory_ != 0) {
+  if (pInventory_ != 0 && pInventory_->HasDialog(pMsg->hDialog)) {
     pInventory_->OnClosed(pMsg->hDialog);
 
     Msg_Inventory_Destroy msg;
     msg.Request();
+  }
+}
+
+AP_MSG_HANDLER_METHOD(InventoryModule, WebView_ModuleCall)
+{
+  if (pInventory_ != 0 && pInventory_->HasDialog(pMsg->hView)) {
+    pInventory_->OnModuleCall(pMsg->srpc, pMsg->response);
+    pMsg->apStatus = ApMessage::Ok;
   }
 }
 
@@ -156,6 +164,7 @@ int InventoryModule::Init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, InventoryModule, Inventory_Show, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, InventoryModule, Dialog_OnOpened, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, InventoryModule, Dialog_OnClosed, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, InventoryModule, WebView_ModuleCall, this, ApCallbackPosNormal);
   //AP_MSG_REGISTRY_ADD(MODULE_NAME, InventoryModule, System_RunLevel, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, InventoryModule, Config_GetValue, this, ApCallbackPosEarly);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, InventoryModule, Gm_ReceiveResponse, this, ApCallbackPosEarly);

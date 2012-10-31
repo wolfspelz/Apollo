@@ -48,6 +48,7 @@ public:
   ApHandle getHandle(const String& sKey);
   void getValueList(const String& sKey, ValueList& vlList);
   void getKeyValueList(const String& sKey, KeyValueList& kvList);
+  void getKeyValueListAsSrpcMessage(const String& sKey, SrpcMessage& srpc);
 
   // Move items from this instance to the target list
   void operator>>(SrpcMessage& target) { moveTo(target); }
