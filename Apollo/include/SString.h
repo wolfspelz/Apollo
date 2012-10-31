@@ -102,6 +102,7 @@ public:
   static String toUpper(const char* szText);
   static int isDigit(const char* szText);
   static int isPunct(const char* szText);
+  static int isTrue(const char* szText);
   static String from(int n);
   static int atoi(const String& s) { return ::atoi(s); }
   static long atol(const String& s) { return ::atol(s); }

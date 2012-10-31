@@ -77,10 +77,12 @@
     <ClCompile Include="dll.cpp" />
     <ClCompile Include="Inventory.cpp" />
     <ClCompile Include="InventoryModule.cpp" />
+    <ClCompile Include="Item.cpp" />
     <ClCompile Include="Request.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="dll.h" />
+    <ClInclude Include="Item.h" />
     <ClInclude Include="Local.h" />
     <ClInclude Include="Inventory.h" />
     <ClInclude Include="InventoryModule.h" />

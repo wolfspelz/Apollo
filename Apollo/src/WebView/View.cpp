@@ -235,7 +235,7 @@ void View::Load(const String& sUrl)
   if (sUrl.contains("arena")) {
     int x = 1;
   }
-  apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "" ApHandleFormat " url=%s", ApHandlePrintf(hAp_), _sz(sUrl)));
+  apLog_Info((LOG_CHANNEL, LOG_CONTEXT, "" ApHandleFormat " url=%s", ApHandlePrintf(hAp_), _sz(sUrl)));
   serializedLoads_.Load(this, sUrl);
 }
 
@@ -986,7 +986,7 @@ HRESULT View::didFinishLoadForFrame(IWebView* webView, IWebFrame* frame)
   String sUrl = GetUrlFrom(frame);
 
   if (pTopLoadingFrame_ == frame) {
-    apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "" ApHandleFormat " DocumentComplete %s", ApHandlePrintf(hAp_), _sz(sUrl)));
+    apLog_Info((LOG_CHANNEL, LOG_CONTEXT, "" ApHandleFormat " DocumentComplete %s", ApHandlePrintf(hAp_), _sz(sUrl)));
 
     ApAsyncMessage<Msg_WebView_Event_DocumentComplete> msg;
     msg->hView = apHandle();
@@ -1007,24 +1007,50 @@ HRESULT View::didFailLoadingWithError(IWebView *webView, unsigned long identifie
 {
   if (pWebView_ == webView) {
 
+    int code = 0;
+    error->code(&code);
+
     BSTR bstrUrl = 0;
     error->failingURL(&bstrUrl);
     String sUrl = StringFromBSTR(bstrUrl);
     if (bstrUrl != 0) { ::SysFreeString(bstrUrl); }
 
-    BSTR bstrDescription = 0;
-    error->localizedDescription(&bstrDescription);
-    String sDescription = StringFromBSTR(bstrDescription);
-    if (bstrDescription != 0) { ::SysFreeString(bstrDescription); }
+    bool bIsError = true;
+    if (code == -999) {
+      //WebFrame.cpp:
+      //ResourceError WebFrame::cancelledError(const ResourceRequest& request)
+      //{
+      //    // FIXME: Need ChickenCat to include CFNetwork/CFURLError.h to get these values
+      //    // Alternatively, we could create our own error domain/codes.
+      //    return ResourceError(String(WebURLErrorDomain), -999, request.url().string(), String());
+      //}
+      bIsError = false;
+      apLog_Info((LOG_CHANNEL, LOG_CONTEXT, "" ApHandleFormat " %s: %s", ApHandlePrintf(hAp_), _sz("Load cancelled"), _sz(sUrl)));
+    }
 
-    apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "" ApHandleFormat " %s: %s", ApHandlePrintf(hAp_), _sz(sDescription), _sz(sUrl)));
+    if (bIsError) {
+      BSTR bstrDescription = 0;
+      error->localizedDescription(&bstrDescription);
+      String sDescription = StringFromBSTR(bstrDescription);
+      if (bstrDescription != 0) { ::SysFreeString(bstrDescription); }
 
-    ApAsyncMessage<Msg_WebView_Event_DocumentError> msg;
-    msg->hView = apHandle();
-    msg->sUrl = sUrl;
-    msg->sDescription = sDescription;
-    msg.Post();
+      if (false) { // throws E_NOTIMPL
+        BSTR bstrLocalizedFailureReason = 0;
+        error->localizedFailureReason(&bstrLocalizedFailureReason);
+        String sLocalizedFailureReason = StringFromBSTR(bstrLocalizedFailureReason);
+        if (bstrLocalizedFailureReason != 0) { ::SysFreeString(bstrLocalizedFailureReason); }
+      }
+
+      apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "" ApHandleFormat " %s: %s", ApHandlePrintf(hAp_), _sz(sDescription), _sz(sUrl)));
+
+      ApAsyncMessage<Msg_WebView_Event_DocumentError> msg;
+      msg->hView = apHandle();
+      msg->sUrl = sUrl;
+      msg->sDescription = sDescription;
+      msg.Post();
+    }
   }
+
   return S_OK;
 }
 

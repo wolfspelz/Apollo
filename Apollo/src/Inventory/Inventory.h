@@ -8,6 +8,11 @@
 #define Inventory_H_INCLUDED
 
 #include "Request.h"
+#include "Item.h"
+
+typedef PointerTree<String, Item*, LessThan<String> > ItemList;
+typedef PointerTreeNode<String, Item*> ItemListNode;
+typedef PointerTreeIterator<String, Item*, LessThan<String> > ItemListIterator;
 
 class Inventory
 {
@@ -18,7 +23,9 @@ public:
     ,nTop_(100)
     ,nWidth_(600)
     ,nHeight_(400)
+    ,nState_(NoState)
     ,nGrid_(0)
+    ,nGridOrder_(0)
   {}
   virtual ~Inventory();
 
@@ -28,11 +35,30 @@ public:
 
   void OnOpened(const ApHandle& hDialog);
   void OnClosed(const ApHandle& hDialog);
+  void OnModuleCall(Apollo::SrpcMessage& request, Apollo::SrpcMessage& response);
 
+  int HasCandidate(const ApHandle& hCandidate) { return hCandidate_ == hCandidate; }
+  int HasDialog(const ApHandle& hDialog) { return hDialog_ == hDialog; }
+
+protected:
   void SetVisibility(int bShow);
+  void BuildGrids();
+  void PurgeModel();
+  void PlayModel();
+
+  void AddRequest(const ApHandle& hRequest, Request* pRequest);
+  void DeleteRequest(const ApHandle& hRequest);
+  friend class InventoryModule;
   int ConsumeResponse(const ApHandle& hRequest, Apollo::SrpcMessage& response);
-  void Purge();
-  void BuildPanes(Apollo::KeyValueList& kvValues);
+
+  friend class GetGridsRequest;
+  void GetGridsResponse(Apollo::SrpcMessage& kvIdValues);
+
+  friend class GetGridItemsRequest;
+  void GetGridItemsResponse(long nGrid, Apollo::SrpcMessage& kvProperties);
+
+  friend class GetItemsPropertiesRequest;
+  void GetItemsPropertiesResponse(long nGrid, Apollo::SrpcMessage& kvIdKeyValues);
 
 protected:
   int bVisible_;
@@ -42,9 +68,22 @@ protected:
   int nHeight_;
 
   ApHandleTree<Request*> requests_;
+
+  enum { NoState = 0
+    ,StateGetGrids = 1
+    ,StateGetGridDetails = 2
+    ,StateGetItemDetails = 3
+    ,StateReady = 4
+  };
+
+  int nState_;
+  long nGrid_;
+  String sGridName_;
+  int nGridOrder_;
+  ItemList items_;
+
   ApHandle hCandidate_;
   ApHandle hDialog_;
-  long nGrid_;
 };
 
 #endif // Inventory_H_INCLUDED
