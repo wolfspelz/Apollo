@@ -35,21 +35,21 @@ public:
 class GetGridItemsRequest : public Request
 {
 public:
-  GetGridItemsRequest(Inventory* pInventory, long nGrid) : Request(pInventory), nGrid_(nGrid) {}
+  GetGridItemsRequest(Inventory* pInventory, const String& sId) : Request(pInventory), sId_(sId) {}
 
   void HandleResponse(Apollo::SrpcMessage& response);
 
-  long nGrid_;
+  String sId_;
 };
 
 class GetItemsPropertiesRequest : public Request
 {
 public:
-  GetItemsPropertiesRequest(Inventory* pInventory, long nGrid) : Request(pInventory), nGrid_(nGrid) {}
+  GetItemsPropertiesRequest(Inventory* pInventory, const String& sId) : Request(pInventory), sId_(sId) {}
 
   void HandleResponse(Apollo::SrpcMessage& response);
 
-  long nGrid_;
+  String sId_;
 };
 
 #endif // Request_H_INCLUDED

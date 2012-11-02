@@ -89,6 +89,29 @@ public:
   ApIN String sFunction;
   ApIN Apollo::SrpcMessage srpc;
   ApOUT Apollo::SrpcMessage response;
+
+  static int _(const ApHandle& hDialog, const String& sFunction)
+  {
+    Msg_Dialog_ContentCall msg;
+    msg.hDialog = hDialog;
+    return msg.Request();
+  }
+  static int _(const ApHandle& hDialog, const String& sFunction, Apollo::SrpcMessage& srpc)
+  {
+    Msg_Dialog_ContentCall msg;
+    msg.hDialog = hDialog;
+    srpc >> msg.srpc;
+    return msg.Request();
+  }
+  static int _(const ApHandle& hDialog, const String& sFunction, Apollo::SrpcMessage& srpc, Apollo::SrpcMessage& response)
+  {
+    Msg_Dialog_ContentCall msg;
+    msg.hDialog = hDialog;
+    srpc >> msg.srpc;
+    int ok = msg.Request();
+    msg.response >> response;
+    return ok;
+  }
 };
 
 // ------------------------------------
