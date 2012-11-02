@@ -68,12 +68,7 @@ void Inventory::OnOpened(const ApHandle& hDialog)
 
     SetVisibility(bVisible_);
 
-    {
-      Msg_Dialog_ContentCall msg;
-      msg.hDialog = hDialog_;
-      msg.sFunction = "Start";
-      msg.Request();
-    }
+    Msg_Dialog_ContentCall::_(hDialog_, "Start");
 
     if (nState_ == NoState) {
       BuildGrids();
@@ -146,28 +141,6 @@ int Inventory::ConsumeResponse(const ApHandle& hRequest, Apollo::SrpcMessage& re
   return bConsumed;
 }
 
-void Inventory::PurgeModel()
-{
-  nState_ = NoState;
-  nGrid_ = 0;
-  sGridName_ = "";
-  nGridOrder_ = -1;
-
-  while (items_.Count() > 0) {
-    ItemListNode* pNode = items_.Next(0);
-    if (pNode != 0) {
-      items_.Unset(pNode->Key());
-      Item* pItem = pNode->Value();
-      delete pItem;
-    }
-  }
-}
-
-void Inventory::PlayModel()
-{
-
-}
-
 void Inventory::BuildGrids()
 {
   ApHandle h = Apollo::newHandle();
@@ -195,20 +168,21 @@ void Inventory::BuildGrids()
 
 void Inventory::GetGridsResponse(Apollo::SrpcMessage& kvIdValues)
 {
-  nGrid_ = 0;
+  sGridId_ = "";
 
   for (Elem* e = 0; (e = kvIdValues.Next(e)); ) {
-    long nId = String::atol(e->getName());
+    String sId = e->getName();
+    long nId = String::atol(sId);
     int bIsGrid = String::isTrue(e->getString());
     if (bIsGrid) {
-      nGrid_ = nId;
+      sGridId_ = sId;
     }
   }
 
-  if (nGrid_ != 0) {
+  if (!sGridId_.empty()) {
     ApHandle h = Apollo::newHandle();
 
-    GetGridItemsRequest* pRequest = new GetGridItemsRequest(this, nGrid_);
+    GetGridItemsRequest* pRequest = new GetGridItemsRequest(this, sGridId_);
     if (pRequest != 0) {
       AddRequest(h, pRequest);
     }
@@ -216,7 +190,8 @@ void Inventory::GetGridsResponse(Apollo::SrpcMessage& kvIdValues)
     Msg_Gm_SendRequest msg;
     msg.hRequest = h;
     msg.srpc.set(Srpc::Key::Method, "Item.GetProperties");
-    msg.srpc.set("nItem", nGrid_);
+    msg.srpc.set("sInventory", Apollo::getModuleConfig(MODULE_NAME, "Name", ""));
+    msg.srpc.set("nItem", sGridId_);
     msg.srpc.set("vlKeys", "Name Nickname GridOrder Slots Contains");
 
     if (!msg.Request()) {
@@ -242,17 +217,19 @@ void Inventory::GetGridItemsResponse(long nGrid, Apollo::SrpcMessage& kvProperti
 
   // -------------------------------
 
-  sGridName_ = sNickname;
-  if (sGridName_.empty()) { sGridName_ = sName; }
+  sName_ = sNickname;
+  if (sName_.empty()) { sName_ = sName; }
 
-  nGridOrder_ = nGridOrder;
+  nOrder_ = nGridOrder;
+
+  nSlots_ = nSlots;
 
   // -------------------------------
 
   if (!sContains.empty()) {
     ApHandle h = Apollo::newHandle();
 
-    GetItemsPropertiesRequest* pRequest = new GetItemsPropertiesRequest(this, nGrid_);
+    GetItemsPropertiesRequest* pRequest = new GetItemsPropertiesRequest(this, sGridId_);
     if (pRequest != 0) {
       AddRequest(h, pRequest);
     }
@@ -273,7 +250,6 @@ void Inventory::GetGridItemsResponse(long nGrid, Apollo::SrpcMessage& kvProperti
   }
 
 }
-
 
 void Inventory::GetItemsPropertiesResponse(long nGrid, Apollo::SrpcMessage& kvIdKeyValues)
 {
@@ -303,11 +279,50 @@ void Inventory::GetItemsPropertiesResponse(long nGrid, Apollo::SrpcMessage& kvId
 
   nState_ = StateReady;
 
-  {
-    Msg_Dialog_ContentCall msg;
-    msg.hDialog = hDialog_;
-    msg.sFunction = "Ready";
-    msg.Request();
+  Msg_Dialog_ContentCall::_(hDialog_, "Ready");
+}
+
+void Inventory::PurgeModel()
+{
+  nState_ = NoState;
+  sGridId_ = "";
+  sName_ = "";
+  nOrder_ = -1;
+
+  while (items_.Count() > 0) {
+    ItemListNode* pNode = items_.Next(0);
+    if (pNode != 0) {
+      items_.Unset(pNode->Key());
+      Item* pItem = pNode->Value();
+      delete pItem;
+    }
+  }
+}
+
+void Inventory::PlayModel()
+{
+  if (nState_ == StateReady) {
+    {
+      Apollo::SrpcMessage srpc;
+      srpc.set("sId", sGridId_);
+      srpc.set("sLabel", sName_);
+      srpc.set("nOrder", nOrder_);
+      srpc.set("nSlots", nSlots_);
+      srpc.set("nOrder", nOrder_);
+      Msg_Dialog_ContentCall::_(hDialog_, "AddGrid", srpc);
+    }
+  
+    ItemListNode* node = 0;
+    for (ItemListIterator iter(items_); (node = iter.Next()); ) {
+      Item* pItem = node->Value();
+      if (pItem != 0) {
+
+        //weiter
+
+        Apollo::SrpcMessage srpc;
+        Msg_Dialog_ContentCall::_(hDialog_, "AddItem", srpc);
+      }
+    }
   }
 }
 

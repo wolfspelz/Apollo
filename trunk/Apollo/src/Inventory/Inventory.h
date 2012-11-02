@@ -24,8 +24,7 @@ public:
     ,nWidth_(600)
     ,nHeight_(400)
     ,nState_(NoState)
-    ,nGrid_(0)
-    ,nGridOrder_(0)
+    ,nOrder_(0)
   {}
   virtual ~Inventory();
 
@@ -77,9 +76,11 @@ protected:
   };
 
   int nState_;
-  long nGrid_;
-  String sGridName_;
-  int nGridOrder_;
+
+  String sGridId_;
+  String sName_;
+  int nOrder_;
+  int nSlots_;
   ItemList items_;
 
   ApHandle hCandidate_;
