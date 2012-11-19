@@ -1154,7 +1154,7 @@ AP_MSG_HANDLER_METHOD(IdentityModule, Identity_SetStorageName)
   pMsg->apStatus = ok ? ApMessage::Ok : ApMessage::Error;
 }
 
-AP_MSG_HANDLER_METHOD(IdentityModule, HttpServer_Request)
+AP_MSG_HANDLER_METHOD(IdentityModule, HttpServer_ReceiveRequest)
 {
   #define IdentityModule_HttpServer_Request_sUriPrefix "/" MODULE_NAME
 
@@ -1354,7 +1354,7 @@ int IdentityModule::init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, IdentityModule, Identity_ExpireAllStorage, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, IdentityModule, Identity_SetStorageName, this, ApCallbackPosNormal);
 
-  AP_MSG_REGISTRY_ADD(MODULE_NAME, IdentityModule, HttpServer_Request, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, IdentityModule, HttpServer_ReceiveRequest, this, ApCallbackPosNormal);
 
 #if defined(AP_TEST)
   AP_MSG_REGISTRY_ADD(MODULE_NAME, IdentityModule, UnitTest_Begin, this, ApCallbackPosNormal);

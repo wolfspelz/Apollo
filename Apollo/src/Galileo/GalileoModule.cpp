@@ -428,7 +428,7 @@ String GalileoModule::GetSequenceDataCacheUrl(ApHandle& hItem, const String& sGr
   }
 }
 
-AP_MSG_HANDLER_METHOD(GalileoModule, HttpServer_Request)
+AP_MSG_HANDLER_METHOD(GalileoModule, HttpServer_ReceiveRequest)
 {
   #define GalileoModule_HttpServer_Request_sUriPrefix "/" MODULE_NAME
 
@@ -669,7 +669,7 @@ int GalileoModule::Init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, GalileoModule, System_AfterLoadModules, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, GalileoModule, System_BeforeUnloadModules, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, GalileoModule, System_RunLevel, this, ApCallbackPosNormal);
-  AP_MSG_REGISTRY_ADD(MODULE_NAME, GalileoModule, HttpServer_Request, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, GalileoModule, HttpServer_ReceiveRequest, this, ApCallbackPosNormal);
 
   AP_UNITTEST_HOOK(GalileoModule, this);
 

@@ -13,6 +13,9 @@
       <UniqueIdentifier>{7A2249ED-1B67-42dc-B5EA-6DEC9A6C351E}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
     </Filter>
+    <Filter Include="HTML">
+      <UniqueIdentifier>{ac71e4d4-7fa9-41cf-b13b-ada1980fc3b0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dll.cpp">
@@ -53,5 +56,11 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\bin\Win32\Debug\modules\Inventory\config.txt" />
+    <None Include="..\..\bin\Win32\Debug\modules\Inventory\Inventory.css">
+      <Filter>HTML</Filter>
+    </None>
+    <None Include="..\..\bin\Win32\Debug\modules\Inventory\Inventory.html">
+      <Filter>HTML</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -166,7 +166,7 @@ public:
 
   void On_VpView_ReplayLocationPublicChat(Msg_VpView_ReplayLocationPublicChat* pMsg);
 
-  void On_HttpServer_Request(Msg_HttpServer_Request* pMsg);
+  void On_HttpServer_ReceiveRequest(Msg_HttpServer_ReceiveRequest* pMsg);
 
   //void On_Xmpp_DataIn(Msg_Xmpp_DataIn* pMsg);
   //void On_Timer_Event(Msg_Timer_Event* pMsg);

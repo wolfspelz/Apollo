@@ -90,16 +90,19 @@ public:
   ApIN Apollo::SrpcMessage srpc;
   ApOUT Apollo::SrpcMessage response;
 
-  static int _(const ApHandle& hDialog, const String& sFunction)
+  static int _(const ApHandle& hDialog, const String& sFunction, const String& sMethod)
   {
     Msg_Dialog_ContentCall msg;
     msg.hDialog = hDialog;
+    msg.sFunction = sFunction;
+    msg.srpc.set(Srpc::Key::Method, sMethod);
     return msg.Request();
   }
   static int _(const ApHandle& hDialog, const String& sFunction, Apollo::SrpcMessage& srpc)
   {
     Msg_Dialog_ContentCall msg;
     msg.hDialog = hDialog;
+    msg.sFunction = sFunction;
     srpc >> msg.srpc;
     return msg.Request();
   }
@@ -107,6 +110,7 @@ public:
   {
     Msg_Dialog_ContentCall msg;
     msg.hDialog = hDialog;
+    msg.sFunction = sFunction;
     srpc >> msg.srpc;
     int ok = msg.Request();
     msg.response >> response;

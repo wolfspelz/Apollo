@@ -40,6 +40,8 @@ public:
   int HasDialog(const ApHandle& hDialog) { return hDialog_ == hDialog; }
 
 protected:
+  String GetScriptFunctionName();
+  
   void SetVisibility(int bShow);
   void BuildGrids();
   void PurgeModel();
@@ -54,10 +56,10 @@ protected:
   void GetGridsResponse(Apollo::SrpcMessage& kvIdValues);
 
   friend class GetGridItemsRequest;
-  void GetGridItemsResponse(long nGrid, Apollo::SrpcMessage& kvProperties);
+  void GetGridItemsResponse(const String& sGrid, Apollo::SrpcMessage& kvProperties);
 
   friend class GetItemsPropertiesRequest;
-  void GetItemsPropertiesResponse(long nGrid, Apollo::SrpcMessage& kvIdKeyValues);
+  void GetItemsPropertiesResponse(const String& sGrid, Apollo::SrpcMessage& kvIdKeyValues);
 
 protected:
   int bVisible_;

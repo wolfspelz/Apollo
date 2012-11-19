@@ -125,7 +125,7 @@ AP_MSG_HANDLER_METHOD(ServerModule, Server_StopHttp)
   pMsg->apStatus = ApMessage::Ok;
 }
 
-AP_MSG_HANDLER_METHOD(ServerModule, HttpServer_Request)
+AP_MSG_HANDLER_METHOD(ServerModule, HttpServer_ReceiveRequest)
 {
   Msg_HttpServer_SendResponse msg;
   msg.hConnection = pMsg->hConnection;
@@ -422,7 +422,7 @@ int ServerModule::init()
 
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ServerModule, Server_StartHttp, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ServerModule, Server_StopHttp, this, ApCallbackPosNormal);
-  AP_MSG_REGISTRY_ADD(MODULE_NAME, ServerModule, HttpServer_Request, this, ApCallbackPosLate); // as a default hander
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, ServerModule, HttpServer_ReceiveRequest, this, ApCallbackPosLate); // as a default hander
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ServerModule, HttpServer_SendResponse, this, ApCallbackPosNormal);
 
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ServerModule, Server_StartTCP, this, ApCallbackPosNormal);

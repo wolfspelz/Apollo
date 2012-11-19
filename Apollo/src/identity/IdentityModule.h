@@ -105,7 +105,7 @@ public:
   void On_Identity_ExpireAllStorage(Msg_Identity_ExpireAllStorage* pMsg);
   void On_Identity_SetStorageName(Msg_Identity_SetStorageName* pMsg);
 
-  void On_HttpServer_Request(Msg_HttpServer_Request* pMsg);
+  void On_HttpServer_ReceiveRequest(Msg_HttpServer_ReceiveRequest* pMsg);
 
 #if defined(AP_TEST)
   void On_UnitTest_Begin(Msg_UnitTest_Begin* pMsg);

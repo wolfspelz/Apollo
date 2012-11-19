@@ -28,7 +28,7 @@ void Dialog::Create(int nLeft, int nTop, int nWidth, int nHeight, int bVisible, 
     //if (!Msg_WebView_Position::_(hView, nLeft, nTop, nWidth, nHeight)) { throw ApException(LOG_CONTEXT, "Msg_WebView_Position failed"); }
     if (!Msg_WebView_Visibility::_(hView, bVisible)) { throw ApException(LOG_CONTEXT, "Msg_WebView_Visibility failed"); }
     if (!Msg_WebView_SetScriptAccessPolicy::Allow(hView)) { throw ApException(LOG_CONTEXT, "Msg_WebView_SetScriptAccessPolicy failed"); }
-    if (!Msg_WebView_Load::_(hView, "file://" + Apollo::getModuleResourcePath(MODULE_NAME) + "theme/" + Apollo::getModuleConfig(MODULE_NAME, "Theme", "WhiteWin") + "/Dialog.html")) { throw ApException(LOG_CONTEXT, "Msg_WebView_Load failed"); }
+    if (!Msg_WebView_Load::_(hView, "file://" + Apollo::getModuleResourcePath(MODULE_NAME) + "theme" + String::filenamePathSeparator() + Apollo::getModuleConfig(MODULE_NAME, "Theme", "WhiteWin") + "/Dialog.html")) { throw ApException(LOG_CONTEXT, "Msg_WebView_Load failed"); }
 
     //if (!Msg_WebView_SetNavigationPolicy::Deny(hView)) { throw ApException(LOG_CONTEXT, "Msg_WebView_SetNavigationPolicy failed"); }
 
@@ -142,6 +142,20 @@ void Dialog::OnDocumentLoaded()
 
   if (sCaption_) { SetCaption(sCaption_); }
   if (sIconUrl_) { SetIcon(sIconUrl_); }
+}
+
+void Dialog::OnDocumentLoadError(const String& sUrl, const String& sError)
+{
+  //String sHtml = "<body style='background-color:#FFFFFF;'>Error<body>";
+  //if (!Msg_WebView_LoadHtml::_(hView_, sHtml, Apollo::getModuleResourcePath(MODULE_NAME))) {
+  //  apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Loading error message failed"));
+  //}
+
+  apLog_Alert((LOG_CHANNEL, LOG_CONTEXT, "%s %s", _sz(sError), _sz(sUrl)));
+
+  ApAsyncMessage<Msg_Dialog_Destroy> msg;
+  msg->hDialog = hView_;
+  msg.Post();
 }
 
 void Dialog::OnContentLoaded(const String& sUrl)

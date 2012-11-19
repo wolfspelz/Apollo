@@ -22,14 +22,14 @@ void GetGridItemsRequest::HandleResponse(Apollo::SrpcMessage& response)
   if (pInventory_ != 0) {
     Apollo::SrpcMessage kvProperties;
     response.getKeyValueListAsSrpcMessage("kvProperties", kvProperties);
-    pInventory_->GetGridItemsResponse(nGrid_, kvProperties);
+    pInventory_->GetGridItemsResponse(sGrid_, kvProperties);
   }
 }
 
 void GetItemsPropertiesRequest::HandleResponse(Apollo::SrpcMessage& response)
 {
   if (pInventory_ != 0) {
-    pInventory_->GetItemsPropertiesResponse(nGrid_, response);
+    pInventory_->GetItemsPropertiesResponse(sGrid_, response);
   }
 }
 

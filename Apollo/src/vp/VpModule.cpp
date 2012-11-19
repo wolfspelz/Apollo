@@ -1253,7 +1253,7 @@ String VpModule::getItemDataExternUrl(const String& sIdentityUrl, const String& 
   return url();
 }
 
-AP_MSG_HANDLER_METHOD(VpModule, HttpServer_Request)
+AP_MSG_HANDLER_METHOD(VpModule, HttpServer_ReceiveRequest)
 {
   if (Apollo::getModuleConfig(MODULE_NAME, "HTTP/Enabled", 1) && pMsg->sUri.startsWith(VpModule_HttpServer_Request_sUriPrefix)) {
 
@@ -1786,7 +1786,7 @@ int VpModule::init()
 
   AP_MSG_REGISTRY_ADD(MODULE_NAME, VpModule, VpView_ReplayLocationPublicChat, this, ApCallbackPosNormal);
 
-  AP_MSG_REGISTRY_ADD(MODULE_NAME, VpModule, HttpServer_Request, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, VpModule, HttpServer_ReceiveRequest, this, ApCallbackPosNormal);
 
   // For Debugging
   //AP_MSG_REGISTRY_ADD(MODULE_NAME, VpModule, Xmpp_DataIn, this, ApCallbackPosEarly);

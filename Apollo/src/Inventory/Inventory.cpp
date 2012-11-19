@@ -68,7 +68,7 @@ void Inventory::OnOpened(const ApHandle& hDialog)
 
     SetVisibility(bVisible_);
 
-    Msg_Dialog_ContentCall::_(hDialog_, "Start");
+    Msg_Dialog_ContentCall::_(hDialog_, GetScriptFunctionName(), "Start");
 
     if (nState_ == NoState) {
       BuildGrids();
@@ -203,7 +203,7 @@ void Inventory::GetGridsResponse(Apollo::SrpcMessage& kvIdValues)
   }
 }
 
-void Inventory::GetGridItemsResponse(long nGrid, Apollo::SrpcMessage& kvProperties)
+void Inventory::GetGridItemsResponse(const String& sGrid, Apollo::SrpcMessage& kvProperties)
 {
   String sName = kvProperties.getString("Name");
 
@@ -239,7 +239,7 @@ void Inventory::GetGridItemsResponse(long nGrid, Apollo::SrpcMessage& kvProperti
     msg.srpc.set(Srpc::Key::Method, "Item.GetMultiItemProperties");
     msg.srpc.set("sInventory", Apollo::getModuleConfig(MODULE_NAME, "Name", ""));
     msg.srpc.set("vlItems", sContains);
-    msg.srpc.set("vlKeys", "Name Nickname Icon32Url Stacksize Slot");
+    msg.srpc.set("vlKeys", "Id Name Nickname Icon32Url Stacksize Slot");
 
     if (!msg.Request()) {
       DeleteRequest(h);
@@ -251,7 +251,7 @@ void Inventory::GetGridItemsResponse(long nGrid, Apollo::SrpcMessage& kvProperti
 
 }
 
-void Inventory::GetItemsPropertiesResponse(long nGrid, Apollo::SrpcMessage& kvIdKeyValues)
+void Inventory::GetItemsPropertiesResponse(const String& sGrid, Apollo::SrpcMessage& kvIdKeyValues)
 {
   for (Elem* e = 0; (e = kvIdKeyValues.Next(e)); ) {
     String sId = e->getName();
@@ -259,19 +259,12 @@ void Inventory::GetItemsPropertiesResponse(long nGrid, Apollo::SrpcMessage& kvId
     if (nId > 0) {
       Apollo::KeyValueList kvProperties;
       kvIdKeyValues.getKeyValueList(sId, kvProperties);
-      String sName = kvProperties["Name"].getString();
-      String sNickname = kvProperties["Nickname"].getString();
-      String sIcon32Url = kvProperties["Icon32Url"].getString();
-      int nStacksize = kvProperties["Stacksize"].getInt();
-      int nSlot = kvProperties["Slot"].getInt();
 
       Item* pItem = new Item();
       if (pItem != 0) {
-        if (sName) { pItem->add("Name", sName); }
-        if (sName) { pItem->add("Nickname", sNickname); }
-        if (sName) { pItem->add("Icon32Url", sIcon32Url); }
-        if (nStacksize > 1) { pItem->add("Stacksize", nStacksize); }
-        if (nSlot != 0) { pItem->add("Slot", nSlot); }
+        for (Apollo::KeyValueElem* e = 0; (e = kvProperties.nextElem(e)); ) {
+          pItem->add(e->getKey(), e->getString());
+        }
         items_.Set(sId, pItem);
       }
     }
@@ -279,7 +272,7 @@ void Inventory::GetItemsPropertiesResponse(long nGrid, Apollo::SrpcMessage& kvId
 
   nState_ = StateReady;
 
-  Msg_Dialog_ContentCall::_(hDialog_, "Ready");
+  PlayModel();
 }
 
 void Inventory::PurgeModel()
@@ -292,37 +285,49 @@ void Inventory::PurgeModel()
   while (items_.Count() > 0) {
     ItemListNode* pNode = items_.Next(0);
     if (pNode != 0) {
-      items_.Unset(pNode->Key());
       Item* pItem = pNode->Value();
+      items_.Unset(pNode->Key());
       delete pItem;
     }
   }
 }
 
+String Inventory::GetScriptFunctionName()
+{
+  return Apollo::getModuleConfig(MODULE_NAME, "CallScriptSrpcFunctionName", "ReceiveMessageFromModule");
+}
+
 void Inventory::PlayModel()
 {
   if (nState_ == StateReady) {
-    {
-      Apollo::SrpcMessage srpc;
-      srpc.set("sId", sGridId_);
-      srpc.set("sLabel", sName_);
-      srpc.set("nOrder", nOrder_);
-      srpc.set("nSlots", nSlots_);
-      srpc.set("nOrder", nOrder_);
-      Msg_Dialog_ContentCall::_(hDialog_, "AddGrid", srpc);
-    }
-  
-    ItemListNode* node = 0;
-    for (ItemListIterator iter(items_); (node = iter.Next()); ) {
-      Item* pItem = node->Value();
-      if (pItem != 0) {
+    Msg_Dialog_ContentCall::_(hDialog_, GetScriptFunctionName(), "PurgeGrids");
 
-        //weiter
-
+    { // for all grids
+      {
         Apollo::SrpcMessage srpc;
-        Msg_Dialog_ContentCall::_(hDialog_, "AddItem", srpc);
+        srpc.set(Srpc::Key::Method, "AddGrid");
+        srpc.set("Grid", sGridId_);
+        srpc.set("Name", sName_);
+        srpc.set("Order", nOrder_);
+        srpc.set("Slots", nSlots_);
+        Msg_Dialog_ContentCall::_(hDialog_, GetScriptFunctionName(), srpc);
+      }
+  
+      ItemListNode* node = 0;
+      for (ItemListIterator iter(items_); (node = iter.Next()); ) {
+        Item* pItem = node->Value();
+        if (pItem != 0) {
+          Apollo::SrpcMessage srpc;
+          srpc.set(Srpc::Key::Method, "AddItem");
+          srpc.set("Grid", sGridId_);
+          for (Apollo::KeyValueElem* e = 0; (e = pItem->nextElem(e)); ) {
+            srpc.set(e->getKey(), e->getString());
+          }
+          Msg_Dialog_ContentCall::_(hDialog_, GetScriptFunctionName(), srpc);
+        }
       }
     }
+
   }
 }
 

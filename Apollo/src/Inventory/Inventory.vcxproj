@@ -100,6 +100,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\bin\Win32\Debug\modules\Inventory\config.txt" />
+    <None Include="..\..\bin\Win32\Debug\modules\Inventory\Inventory.css" />
+    <None Include="..\..\bin\Win32\Debug\modules\Inventory\Inventory.html" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -53,7 +53,7 @@ public:
 
   void On_Server_StartHttp(Msg_Server_StartHttp* pMsg);
   void On_Server_StopHttp(Msg_Server_StopHttp* pMsg);
-  void On_HttpServer_Request(Msg_HttpServer_Request* pMsg);
+  void On_HttpServer_ReceiveRequest(Msg_HttpServer_ReceiveRequest* pMsg);
   void On_HttpServer_SendResponse(Msg_HttpServer_SendResponse* pMsg);
 
   void On_Server_StartTCP(Msg_Server_StartTCP* pMsg);
