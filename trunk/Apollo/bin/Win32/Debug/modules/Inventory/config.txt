@@ -1,3 +1,5 @@
+CallScriptSrpcFunctionName=ReceiveMessageFromModule
+
 CreateOnShow=1
 DestroyOnHide=1
 

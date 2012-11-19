@@ -129,6 +129,14 @@ AP_MSG_HANDLER_METHOD(DialogModule, WebView_Event_DocumentLoaded)
   }
 }
 
+AP_MSG_HANDLER_METHOD(DialogModule, WebView_Event_DocumentError)
+{
+  Dialog* pDialog = FindDialogByView(pMsg->hView);
+  if (pDialog) {
+    pDialog->OnDocumentLoadError(pMsg->sUrl, pMsg->sComment);
+  }
+}
+
 AP_MSG_HANDLER_METHOD(DialogModule, WebView_Event_ReceivedFocus)
 {
   Dialog* pDialog = FindDialogByView(pMsg->hView);
@@ -254,6 +262,7 @@ int DialogModule::Init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, DialogModule, Dialog_ContentCall, this, ApCallbackPosNormal);
 
   AP_MSG_REGISTRY_ADD(MODULE_NAME, DialogModule, WebView_Event_DocumentLoaded, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, DialogModule, WebView_Event_DocumentError, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, DialogModule, WebView_Event_ReceivedFocus, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, DialogModule, WebView_Event_LostFocus, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, DialogModule, WebView_Event_Closing, this, ApCallbackPosNormal);

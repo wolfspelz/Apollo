@@ -7,20 +7,22 @@
 
 <script type="text/javascript">
 
-var api = null;
+var api = new ApolloApi('Chat');
 
-function ReceiveMessageFromModule(sMsg)
-{
-  //api.Log.Debug('ReceiveMessageFromModule ' + sMsg)
+function ReceiveMessageFromModule(sMsg) {
+  //api.Log.Debug('ReceiveMessageFromModule ' + sMsg);
+
   var msg = new ApMessage().fromString(sMsg);
   var resp = null;
 
   try {
-  
+
     var sMethod = msg.getString('Method');
     switch (sMethod) {
       case 'Start': return Start(); break;
-      case 'Ready': return Ready(); break;
+      case 'PurgeGrids': return PurgeGrids(); break;
+      case 'AddGrid': return AddGrid(msg.getString('Grid'), msg.getString('Name'), msg.getInt('Order'), msg.getInt('Slots')); break;
+      case 'AddItem': return AddItem(msg.getString('Grid'), msg); break;
       default: throw 'Unknown method: ' + sMethod;
     }
 
@@ -36,10 +38,36 @@ function ReceiveMessageFromModule(sMsg)
 
 function Start() {
   api = new ApolloApi('Inventory');
+  api.ModuleCall('PlayModel').send();
 }
 
-function Ready() {
-  api.ModuleCall('PlayModel').send();
+function PurgeGrids() {
+  $('#Wrapper').empty();
+}
+
+function AddGrid(sGridId, sName, nOrder, nSlots) {
+  $('#Wrapper').append(''
+        + '<div id="Grid_' + sGridId + '" class="Grid">'
+        + '  <div class="Name">' + sName + '</div>'
+        + '  <div class="Items"></div>'
+        + '</div>'
+      );
+}
+
+function AddItem(sGridId, props) {
+  var sGridId = props.getString('Grid');
+  var sItemId = props.getString('Item');
+  var sName = props.getString('Name');
+  var sNickname = props.getString('Nickname');
+  var sIcon = props.getString('Icon32Url');
+  var nSlot = props.getInt('Slot');
+  var nStacksize  = props.getInt('Stacksize');
+  $('#Grid_' + sGridId).append(''
+        + '<div id="Item_' + sItemId + '" class="Item">'
+        + '  <img src="' + sIcon + '" class="Icon" />'
+        + '  <div class="Name">' + sName + '</div>'
+        + '</div>'
+      );
 }
 
 // -----------------------------------------------

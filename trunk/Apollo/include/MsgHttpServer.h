@@ -8,10 +8,10 @@
 #define MsgHttpServer_h_INCLUDED
 
 // server ->
-class Msg_HttpServer_Request: public ApRequestMessage
+class Msg_HttpServer_ReceiveRequest: public ApRequestMessage
 {
 public:
-  Msg_HttpServer_Request() : ApRequestMessage("HttpServer_Request") {}
+  Msg_HttpServer_ReceiveRequest() : ApRequestMessage("HttpServer_ReceiveRequest") {}
   ApIN ApHandle hConnection;
   ApIN String sMethod;
   ApIN String sUri;

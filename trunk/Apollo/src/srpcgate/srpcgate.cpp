@@ -83,7 +83,7 @@ public:
   void On_SrpcGate_Unregister(Msg_SrpcGate_Unregister* pMsg);
   void On_SrpcGate_Handler(ApSRPCMessage* pMsg);
 
-  void On_HttpServer_Request(Msg_HttpServer_Request* pMsg);
+  void On_HttpServer_ReceiveRequest(Msg_HttpServer_ReceiveRequest* pMsg);
 
   Apollo::SrpcGateHandlerRegistry srpcGateRegistry_;
 
@@ -144,7 +144,7 @@ AP_MSGCLASS_HANDLER_METHOD(SrpcGateModule, SrpcGate_Handler, ApSRPCMessage)
   pMsg->apStatus = ok ? ApMessage::Ok : ApMessage::Error;
 }
 
-AP_MSG_HANDLER_METHOD(SrpcGateModule, HttpServer_Request)
+AP_MSG_HANDLER_METHOD(SrpcGateModule, HttpServer_ReceiveRequest)
 {
   #define SrpcGateModule_HttpServer_Request_sUriPrefix "/" MODULE_NAME
 
@@ -331,7 +331,7 @@ int SrpcGateModule::Init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SrpcGateModule, SrpcGate_Register, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SrpcGateModule, SrpcGate_Unregister, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, SrpcGateModule, SrpcGate_Handler, this, ApCallbackPosNormal);
-  AP_MSG_REGISTRY_ADD(MODULE_NAME, SrpcGateModule, HttpServer_Request, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, SrpcGateModule, HttpServer_ReceiveRequest, this, ApCallbackPosNormal);
 
   srpcGateRegistry_.add("MainLoop_EndLoop", SrpcGate_MainLoop_EndLoop);
   srpcGateRegistry_.add("Xmpp_Connect", SrpcGate_Xmpp_Connect);

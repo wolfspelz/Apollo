@@ -9,7 +9,7 @@
 
 <script type="text/javascript">
 
-var api = null;
+var api = new ApolloApi('Chat');
 
 function ReceiveMessageFromModule(sMsg)
 {
@@ -42,8 +42,7 @@ function ReceiveMessageFromModule(sMsg)
   }
 }
 function Start()
-{    api = new ApolloApi('Chat');
-  var gLayout = $('#Wrapper').layout({    south__size: 42,//    east__size: Math.floor( $('body').clientWidth / 3),    east__size: 150,    south__spacing_open: 4,    east__spacing_open: 4,    enableCursorHotkey: false  });//  $.each('south,east'.split(','), function (i, pane) {//    var opts = myLayout.options[pane].resizeWhileDragging = true;
+{    var gLayout = $('#Wrapper').layout({    south__size: 42,//    east__size: Math.floor( $('body').clientWidth / 3),    east__size: 150,    south__spacing_open: 4,    east__spacing_open: 4,    enableCursorHotkey: false  });//  $.each('south,east'.split(','), function (i, pane) {//    var opts = myLayout.options[pane].resizeWhileDragging = true;
 //  });  $('#ChatIn').bind("keydown", 
     function(ev) {
       var keycode = (ev.keyCode ? ev.keyCode : (ev.which ? ev.which : ev.charCode));

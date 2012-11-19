@@ -52,7 +52,7 @@ public:
   void SetAnimationData(const String& sUrl, Buffer& sbData, const String& sMimeType);
   void GetAnimationData(Buffer& sbData, String& sMimeType);
 
-  // public for HttpServer_Request
+  // public for HttpServer_ReceiveRequest
   int HasDataInCache();
   int GetDataFromCache();
   void FlushData();
@@ -210,7 +210,7 @@ public:
   int HasTimer(const ApHandle& hTimer) { return ApIsHandle(hTimer) && hTimer_ == hTimer; }
   void OnTimer();
 
-  // For HttpServer_Request
+  // For HttpServer_ReceiveRequest
   ListT<Group, Elem>& Groups() { return lGroups_; }
   inline ApHandle apHandle() { return hAp_; }
   String Src() { return sSrc_; }
