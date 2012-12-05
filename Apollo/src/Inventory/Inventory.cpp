@@ -63,7 +63,8 @@ void Inventory::Show(int bShow)
 
 void Inventory::OnOpened(const ApHandle& hDialog)
 {
-  if (hCandidate_ == hDialog) {
+  if (hCandidate_ == hDialog || hDialog_ == hDialog) {
+    hCandidate_ = ApNoHandle;
     hDialog_ = hDialog;
 
     SetVisibility(bVisible_);
@@ -82,6 +83,10 @@ void Inventory::OnClosed(const ApHandle& hDialog)
   if (hDialog_ == hDialog) {
     hDialog_ = ApNoHandle;
     nState_ = NoState;
+  }
+
+  if (hCandidate_ == hDialog) {
+    hCandidate_ = ApNoHandle;
   }
 }
 

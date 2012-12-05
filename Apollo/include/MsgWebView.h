@@ -349,10 +349,10 @@ public:
 };
 
 // WebView ->
-class Msg_WebView_Event_DocumentError: public ApNotificationMessage
+class Msg_WebView_Event_LoadError: public ApNotificationMessage
 {
 public:
-  Msg_WebView_Event_DocumentError() : ApNotificationMessage("WebView_Event_DocumentError") {}
+  Msg_WebView_Event_LoadError() : ApNotificationMessage("WebView_Event_LoadError") {}
   ApIN ApHandle hView;
   ApIN String sUrl;
   ApIN String sDescription;

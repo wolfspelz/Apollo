@@ -1043,7 +1043,7 @@ HRESULT View::didFailLoadingWithError(IWebView *webView, unsigned long identifie
 
       apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "" ApHandleFormat " %s: %s", ApHandlePrintf(hAp_), _sz(sDescription), _sz(sUrl)));
 
-      ApAsyncMessage<Msg_WebView_Event_DocumentError> msg;
+      ApAsyncMessage<Msg_WebView_Event_LoadError> msg;
       msg->hView = apHandle();
       msg->sUrl = sUrl;
       msg->sDescription = sDescription;

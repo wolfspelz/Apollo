@@ -204,7 +204,7 @@ AP_MSG_HANDLER_METHOD(WebViewModule, WebView_Event_DocumentLoaded)
   View::TryLoad();
 }
 
-AP_MSG_HANDLER_METHOD(WebViewModule, WebView_Event_DocumentError)
+AP_MSG_HANDLER_METHOD(WebViewModule, WebView_Event_LoadError)
 {
   View::LoadDone();
   View::TryLoad();
@@ -404,7 +404,7 @@ int WebViewModule::Init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, WebViewModule, WebView_GetWin32Window, this, ApCallbackPosNormal);
   #endif // defined(WIN32)
   AP_MSG_REGISTRY_ADD(MODULE_NAME, WebViewModule, WebView_Event_DocumentLoaded, this, ApCallbackPosNormal);
-  AP_MSG_REGISTRY_ADD(MODULE_NAME, WebViewModule, WebView_Event_DocumentError, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, WebViewModule, WebView_Event_LoadError, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, WebViewModule, System_3SecTimer, this, ApCallbackPosNormal);
 
   AP_UNITTEST_HOOK(WebViewModule, this);

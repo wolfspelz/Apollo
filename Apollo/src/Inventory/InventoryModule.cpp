@@ -57,7 +57,7 @@ AP_MSG_HANDLER_METHOD(InventoryModule, Inventory_Show)
 
 AP_MSG_HANDLER_METHOD(InventoryModule, Dialog_OnOpened)
 {
-  if (pInventory_ != 0 && pInventory_->HasCandidate(pMsg->hDialog)) {
+  if (pInventory_ != 0 && pInventory_->HasDialog(pMsg->hDialog)) {
     pInventory_->OnOpened(pMsg->hDialog);
   }
 }
@@ -67,8 +67,10 @@ AP_MSG_HANDLER_METHOD(InventoryModule, Dialog_OnClosed)
   if (pInventory_ != 0 && pInventory_->HasDialog(pMsg->hDialog)) {
     pInventory_->OnClosed(pMsg->hDialog);
 
-    Msg_Inventory_Destroy msg;
-    msg.Request();
+    if (Apollo::getModuleConfig(MODULE_NAME, "DestroyOnHide", 0)) {
+      Msg_Inventory_Destroy msg;
+      msg.Request();
+    }
   }
 }
 

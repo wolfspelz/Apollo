@@ -36,8 +36,7 @@ public:
   void OnClosed(const ApHandle& hDialog);
   void OnModuleCall(Apollo::SrpcMessage& request, Apollo::SrpcMessage& response);
 
-  int HasCandidate(const ApHandle& hCandidate) { return hCandidate_ == hCandidate; }
-  int HasDialog(const ApHandle& hDialog) { return hDialog_ == hDialog; }
+  int HasDialog(const ApHandle& hDialog) { return hDialog_ == hDialog || hCandidate_ == hDialog; }
 
 protected:
   String GetScriptFunctionName();
