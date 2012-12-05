@@ -7,11 +7,46 @@
   font-size:11px;
 }
 
-#Wrapper
-{
+#Wrapper {
   position:absolute;
   left:4px;
   top:4px;
   right:4px;
   bottom:4px;
+  background-color:#ffffff;
+  padding:4px;
+}
+
+.Grid .Name 
+{
+  display:none;
+}
+
+.Item {
+  float: left;
+  border: solid 1px #D0D0D0;
+  margin: 1px;
+  padding: 2px;
+  overflow: hidden;
+  height: 100px;
+  width: 100px;
+}
+
+.Item img.Icon {
+  margin-right: 4px;
+}
+
+.Grid .Item .Name 
+{
+  display:inline;
+}
+
+.Item .Nickname 
+{
+  font-weight:bold;
+}
+
+.Item .Stacksize {
+  float: right;
+  margin-left: 2px;
 }

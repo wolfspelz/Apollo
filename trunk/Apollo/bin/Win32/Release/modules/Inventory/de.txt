@@ -1,2 +1,2 @@
 #ässert utf-8
-Inventory=Gegenstände
+Inventory=Deine Gegenstände

@@ -7,19 +7,24 @@
 
 <script type="text/javascript">
 
-var api = null;
+var api = new ApolloApi('Chat');
 
-function ReceiveMessageFromModule(sMsg)
-{
-  //api.Log.Debug('ReceiveMessageFromModule ' + sMsg)
+function ReceiveMessageFromModule(sMsg) {
+  //api.Log.Debug('ReceiveMessageFromModule ' + sMsg);
+
   var msg = new ApMessage().fromString(sMsg);
   var resp = null;
 
   try {
-  
+
     var sMethod = msg.getString('Method');
     switch (sMethod) {
       case 'Start': return Start(); break;
+      case 'PurgeGrids': return PurgeGrids(); break;
+      case 'AddGrid': return AddGrid(msg.getString('Grid'), msg.getString('Name'), msg.getInt('Order'), msg.getInt('Slots')); break;
+      case 'RemoveGrid': return RemoveGrid(msg.getString('Grid')); break;
+      case 'AddItem': return AddItem(msg.getString('Grid'), msg.getString('Item'), msg); break;
+      case 'RemoveItem': return RemoveItem(msg.getString('Grid'), msg.getString('Item')); break;
       default: throw 'Unknown method: ' + sMethod;
     }
 
@@ -32,11 +37,50 @@ function ReceiveMessageFromModule(sMsg)
     return sResponse;
   }
 }
-function Start()
-{    api = new ApolloApi('Inventory');
-  
-  api.Log.Debug('Start')
-}
+
+function Start() {
+  api = new ApolloApi('Inventory');
+  api.ModuleCall('PlayModel').send();
+}
+
+function PurgeGrids() {
+  $('#Wrapper').empty();
+}
+
+function AddGrid(sGridId, sName, nOrder, nSlots) {
+  $('#Wrapper').append(''
+        + '<div id="Grid_' + sGridId + '" class="Grid">'
+        + '  <div class="Name">' + sName + '</div>'
+        + '  <div class="Items"></div>'
+        + '</div>'
+      );
+}
+
+function RemoveGrid(sGridId) {
+  $('#Grid_' + sGridId).remove();
+}
+
+function AddItem(sGridId, sItemId, props) {
+  var sName = props.getString('Name');
+  var sNickname = props.getString('Nickname');
+  var sIcon = props.getString('Icon32Url');
+  var nSlot = props.getInt('Slot');
+  var nStacksize = props.getInt('Stacksize');
+
+  $('#Grid_' + sGridId).append(''
+        + '<div id="Item_' + sItemId + '" class="Item">'
+        + '  <img src="' + sIcon + '" class="Icon" />'
+        + '  <div class="Stacksize">' + nStacksize + '</div>'
+        + (sNickname != '' ? '  <div class="Nickname">' + sNickname + '</div>' : '')
+        + '  <div class="Name">' + sName + '</div>'
+        + '</div>'
+      );
+}
+
+function RemoveItem(sGridId, sItemId) {
+  $('#Item_' + sItemId).remove();
+}
+
 // -----------------------------------------------
 
 </script>
