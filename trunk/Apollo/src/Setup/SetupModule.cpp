@@ -27,35 +27,6 @@ void SetupModule::SendRunLevelNormal()
   bInSendRunLevelNormal_ = 0;
 }
 
-static String _CanonicalizePath(const String& sPath)
-{
-  String sPrefixedPath;
-  String sCanonicalizedPath;
-  String sPrefix = "file://";
-
-  // Remove ../ ./ if necessary
-  // canonicalizeUrl only works with URLs, but we need a path here
-  // Add prefix, canonicalize, remove prefix
-
-  int bWasPrefixed = 0;
-  if (sPath.startsWith(sPrefix)) {
-    sPrefixedPath = sPath;
-    bWasPrefixed = 1;
-  } else {
-    sPrefixedPath = sPrefix + sPath;
-  }
-
-  sCanonicalizedPath = Apollo::canonicalizeUrl(sPrefixedPath);
-
-  if (!bWasPrefixed) {
-    if (sCanonicalizedPath.startsWith(sPrefix)) {
-      sCanonicalizedPath = sCanonicalizedPath.subString(sPrefix.chars());
-    }
-  }
-
-  return sCanonicalizedPath;
-}
-
 String SetupModule::GetInstallFirefoxExtensionCommandline()
 {
   String sCmdline;
@@ -125,7 +96,7 @@ void SetupModule::InstallFirefoxExtension()
   String sId = Apollo::getModuleConfig("Navigation", "FirefoxExtensionId", "AvatarNavigator@OpenVirtualWorld.org");
   String sPath = Apollo::getModuleConfig("Navigation", "FirefoxExtensionPath", Apollo::getCwd() + "modules/navigation/AvatarNavigator.xpi");
   
-  sPath = _CanonicalizePath( sPath);
+  sPath = Apollo::canonicalizePath(sPath);
 
   SRegistry::SetString(HKEY_CURRENT_USER, "Software\\Mozilla\\Firefox\\Extensions", sId, sPath);
 }
@@ -164,7 +135,7 @@ void SetupModule::InstallChromeExtension()
   String sPath = Apollo::getModuleConfig("Navigation", "ChromeExtensionPath", Apollo::getCwd() + "modules/navigation/AvatarNavigator.crx");
   String sVersion = Apollo::getModuleConfig("Navigation", "ChromeExtensionVersion", "1.0");
   
-  sPath = _CanonicalizePath( sPath);
+  sPath = Apollo::canonicalizePath(sPath);
 
   SRegistry::SetString(HKEY_LOCAL_MACHINE, "Software\\Google\\Chrome\\Extensions\\" + sId, "path", sPath);
   SRegistry::SetString(HKEY_LOCAL_MACHINE, "Software\\Google\\Chrome\\Extensions\\" + sId, "version", sVersion);
@@ -182,7 +153,7 @@ void SetupModule::InstallInternetExplorerExtension()
   String sPath = Apollo::getModuleConfig("Navigation", "InternetExplorerExtensionInstallFile", Apollo::getCwd() + "modules/navigation/AvatarNavigator.msi");
   if (!sPath) { throw ApException(LOG_CONTEXT, "No installer path"); }
 
-  sPath = _CanonicalizePath( sPath);
+  sPath = Apollo::canonicalizePath(sPath);
 
   {
     Msg_OS_StartProcess msg;
@@ -200,7 +171,7 @@ void SetupModule::UninstallInternetExplorerExtension()
   String sPath = Apollo::getModuleConfig("Navigation", "InternetExplorerExtensionInstallFile", Apollo::getCwd() + "modules/navigation/AvatarNavigator.msi");
   if (!sPath) { throw ApException(LOG_CONTEXT, "No installer path"); }
 
-  sPath = _CanonicalizePath( sPath);
+  sPath = Apollo::canonicalizePath(sPath);
 
   {
     Msg_OS_StartProcess msg;

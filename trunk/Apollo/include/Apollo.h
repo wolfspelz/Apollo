@@ -153,6 +153,7 @@ APOLLO_API void splitCommandlineArguments(const String& sCmdline, Apollo::ValueL
 APOLLO_API String joinCommandlineArguments(Apollo::ValueList& vlArgs);
 
 APOLLO_API String canonicalizeUrl(const String& sUrl);
+APOLLO_API String canonicalizePath(const String& sPath);
 
 
 

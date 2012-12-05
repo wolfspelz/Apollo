@@ -34,7 +34,7 @@ public:
   void On_Dialog_ContentCall(Msg_Dialog_ContentCall* pMsg);
 
   void On_WebView_Event_DocumentLoaded(Msg_WebView_Event_DocumentLoaded* pMsg);
-  void On_WebView_Event_DocumentError(Msg_WebView_Event_DocumentError* pMsg);
+  void On_WebView_Event_LoadError(Msg_WebView_Event_LoadError* pMsg);
   void On_WebView_Event_ReceivedFocus(Msg_WebView_Event_ReceivedFocus* pMsg);
   void On_WebView_Event_LostFocus(Msg_WebView_Event_LostFocus* pMsg);
   void On_WebView_Event_Closing(Msg_WebView_Event_Closing* pMsg);

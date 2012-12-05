@@ -870,6 +870,35 @@ String Apollo::canonicalizeUrl(const String& sUrl)
   return sOut;
 }
 
+String Apollo::canonicalizePath(const String& sPath)
+{
+  String sPrefixedPath;
+  String sCanonicalizedPath;
+  String sPrefix = "file://";
+
+  // Remove ../ ./ if necessary
+  // canonicalizeUrl only works with URLs, but we need a path here
+  // Add prefix, canonicalize, remove prefix
+
+  int bWasPrefixed = 0;
+  if (sPath.startsWith(sPrefix)) {
+    sPrefixedPath = sPath;
+    bWasPrefixed = 1;
+  } else {
+    sPrefixedPath = sPrefix + sPath;
+  }
+
+  sCanonicalizedPath = Apollo::canonicalizeUrl(sPrefixedPath);
+
+  if (!bWasPrefixed) {
+    if (sCanonicalizedPath.startsWith(sPrefix)) {
+      sCanonicalizedPath = sCanonicalizedPath.subString(sPrefix.chars());
+    }
+  }
+
+  return sCanonicalizedPath;
+}
+
 // --------------------------------
 
 // --------------------------------

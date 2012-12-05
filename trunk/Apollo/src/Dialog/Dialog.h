@@ -32,8 +32,8 @@ public:
   void ContentCall(const String& sFunction, Apollo::SrpcMessage& srpc, Apollo::SrpcMessage& response);
 
   void OnDocumentLoaded();
-  void OnDocumentLoadError(const String& sUrl, const String& sError);
   void OnContentLoaded(const String& sUrl);
+  void OnLoadError(const String& sUrl, const String& sError);
   void OnReceivedFocus();
   void OnLostFocus();
   void OnUnload();
@@ -47,6 +47,7 @@ protected:
   int nTop_;
   int nWidth_;
   int nHeight_;
+  String sUrl_;
   String sCaption_;
   String sIconUrl_;
   String sContentUrl_;
