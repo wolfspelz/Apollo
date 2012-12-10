@@ -20,11 +20,11 @@ function ReceiveMessageFromModule(sMsg) {
     var sMethod = msg.getString('Method');
     switch (sMethod) {
       case 'Start': return Start(); break;
-      case 'PurgeGrids': return PurgeGrids(); break;
-      case 'AddGrid': return AddGrid(msg.getString('Grid'), msg.getString('Name'), msg.getInt('Order'), msg.getInt('Slots')); break;
-      case 'RemoveGrid': return RemoveGrid(msg.getString('Grid')); break;
-      case 'AddItem': return AddItem(msg.getString('Grid'), msg.getString('Item'), msg); break;
-      case 'RemoveItem': return RemoveItem(msg.getString('Grid'), msg.getString('Item')); break;
+      case 'PurgePanels': return PurgePanels(); break;
+      case 'AddPanel': return AddPanel(msg.getString('Panel'), msg.getString('Name'), msg.getInt('Order'), msg.getInt('Slots')); break;
+      case 'RemovePanel': return RemovePanel(msg.getString('Panel')); break;
+      case 'AddItem': return AddItem(msg.getString('Panel'), msg.getString('Item'), msg); break;
+      case 'RemoveItem': return RemoveItem(msg.getString('Panel'), msg.getString('Item')); break;
       default: throw 'Unknown method: ' + sMethod;
     }
 
@@ -43,31 +43,31 @@ function Start() {
   api.ModuleCall('PlayModel').send();
 }
 
-function PurgeGrids() {
+function PurgePanels() {
   $('#Wrapper').empty();
 }
 
-function AddGrid(sGridId, sName, nOrder, nSlots) {
+function AddPanel(sPanelId, sName, nOrder, nSlots) {
   $('#Wrapper').append(''
-        + '<div id="Grid_' + sGridId + '" class="Grid">'
+        + '<div id="Panel_' + sPanelId + '" class="Panel">'
         + '  <div class="Name">' + sName + '</div>'
         + '  <div class="Items"></div>'
         + '</div>'
       );
 }
 
-function RemoveGrid(sGridId) {
-  $('#Grid_' + sGridId).remove();
+function RemovePanel(sPanelId) {
+  $('#Panel_' + sPanelId).remove();
 }
 
-function AddItem(sGridId, sItemId, props) {
+function AddItem(sPanelId, sItemId, props) {
   var sName = props.getString('Name');
   var sNickname = props.getString('Nickname');
   var sIcon = props.getString('Icon32Url');
   var nSlot = props.getInt('Slot');
   var nStacksize = props.getInt('Stacksize');
 
-  $('#Grid_' + sGridId).append(''
+  $('#Panel_' + sPanelId).append(''
         + '<div id="Item_' + sItemId + '" class="Item">'
         + '  <img src="' + sIcon + '" class="Icon" />'
         + '  <div class="Stacksize">' + nStacksize + '</div>'
@@ -77,7 +77,7 @@ function AddItem(sGridId, sItemId, props) {
       );
 }
 
-function RemoveItem(sGridId, sItemId) {
+function RemoveItem(sPanelId, sItemId) {
   $('#Item_' + sItemId).remove();
 }
 

@@ -17,7 +17,7 @@
   padding:4px;
 }
 
-.Grid .Name 
+.Panel .Name 
 {
   display:none;
 }
@@ -36,7 +36,7 @@
   margin-right: 4px;
 }
 
-.Grid .Item .Name 
+.Panel .Item .Name 
 {
   display:inline;
 }
