@@ -72,7 +72,7 @@ void Inventory::OnOpened(const ApHandle& hDialog)
     Msg_Dialog_ContentCall::_(hDialog_, GetScriptFunctionName(), "Start");
 
     if (nState_ == NoState) {
-      BuildGrids();
+      BuildPanels();
     }
 
   }
@@ -146,13 +146,13 @@ int Inventory::ConsumeResponse(const ApHandle& hRequest, Apollo::SrpcMessage& re
   return bConsumed;
 }
 
-void Inventory::BuildGrids()
+void Inventory::BuildPanels()
 {
   ApHandle h = Apollo::newHandle();
 
   PurgeModel();
 
-  GetGridsRequest* pRequest = new GetGridsRequest(this);
+  GetPanelsRequest* pRequest = new GetPanelsRequest(this);
   if (pRequest != 0) {
     AddRequest(h, pRequest);
   }
@@ -161,33 +161,33 @@ void Inventory::BuildGrids()
   msg.hRequest = h;
   msg.srpc.set(Srpc::Key::Method, "Item.GetItemIdsAndValuesByProperty");
   msg.srpc.set("sInventory", Apollo::getModuleConfig(MODULE_NAME, "Name", ""));
-  msg.srpc.set("sKey", "IsGrid");
+  msg.srpc.set("sKey", "IsPanel");
   
   if (!msg.Request()) {
     DeleteRequest(h);
     throw ApException(LOG_CONTEXT, "Msg_Gm_SendRequest failed");
   }
 
-  nState_ = StateGetGrids;
+  nState_ = StateGetPanels;
 }
 
-void Inventory::GetGridsResponse(Apollo::SrpcMessage& kvIdValues)
+void Inventory::GetPanelsResponse(Apollo::SrpcMessage& kvIdValues)
 {
-  sGridId_ = "";
+  sPanelId_ = "";
 
   for (Elem* e = 0; (e = kvIdValues.Next(e)); ) {
     String sId = e->getName();
     long nId = String::atol(sId);
-    int bIsGrid = String::isTrue(e->getString());
-    if (bIsGrid) {
-      sGridId_ = sId;
+    int bIsPanel = String::isTrue(e->getString());
+    if (bIsPanel) {
+      sPanelId_ = sId;
     }
   }
 
-  if (!sGridId_.empty()) {
+  if (!sPanelId_.empty()) {
     ApHandle h = Apollo::newHandle();
 
-    GetGridItemsRequest* pRequest = new GetGridItemsRequest(this, sGridId_);
+    GetPanelItemsRequest* pRequest = new GetPanelItemsRequest(this, sPanelId_);
     if (pRequest != 0) {
       AddRequest(h, pRequest);
     }
@@ -196,25 +196,25 @@ void Inventory::GetGridsResponse(Apollo::SrpcMessage& kvIdValues)
     msg.hRequest = h;
     msg.srpc.set(Srpc::Key::Method, "Item.GetProperties");
     msg.srpc.set("sInventory", Apollo::getModuleConfig(MODULE_NAME, "Name", ""));
-    msg.srpc.set("nItem", sGridId_);
-    msg.srpc.set("vlKeys", "Name Nickname GridOrder Slots Contains");
+    msg.srpc.set("nItem", sPanelId_);
+    msg.srpc.set("vlKeys", "Name Nickname PanelOrder Slots Contains");
 
     if (!msg.Request()) {
       DeleteRequest(h);
       throw ApException(LOG_CONTEXT, "Msg_Gm_SendRequest failed");
     }
 
-    nState_ = StateGetGridDetails;
+    nState_ = StateGetPanelDetails;
   }
 }
 
-void Inventory::GetGridItemsResponse(const String& sGrid, Apollo::SrpcMessage& kvProperties)
+void Inventory::GetPanelItemsResponse(const String& sPanel, Apollo::SrpcMessage& kvProperties)
 {
   String sName = kvProperties.getString("Name");
 
   String sNickname = kvProperties.getString("Nickname");
   
-  int nGridOrder = kvProperties.getInt("GridOrder");
+  int nPanelOrder = kvProperties.getInt("PanelOrder");
   
   int nSlots = kvProperties.getInt("Slots");
   
@@ -225,7 +225,7 @@ void Inventory::GetGridItemsResponse(const String& sGrid, Apollo::SrpcMessage& k
   sName_ = sNickname;
   if (sName_.empty()) { sName_ = sName; }
 
-  nOrder_ = nGridOrder;
+  nOrder_ = nPanelOrder;
 
   nSlots_ = nSlots;
 
@@ -234,7 +234,7 @@ void Inventory::GetGridItemsResponse(const String& sGrid, Apollo::SrpcMessage& k
   if (!sContains.empty()) {
     ApHandle h = Apollo::newHandle();
 
-    GetItemsPropertiesRequest* pRequest = new GetItemsPropertiesRequest(this, sGridId_);
+    GetItemsPropertiesRequest* pRequest = new GetItemsPropertiesRequest(this, sPanelId_);
     if (pRequest != 0) {
       AddRequest(h, pRequest);
     }
@@ -256,7 +256,7 @@ void Inventory::GetGridItemsResponse(const String& sGrid, Apollo::SrpcMessage& k
 
 }
 
-void Inventory::GetItemsPropertiesResponse(const String& sGrid, Apollo::SrpcMessage& kvIdKeyValues)
+void Inventory::GetItemsPropertiesResponse(const String& sPanel, Apollo::SrpcMessage& kvIdKeyValues)
 {
   for (Elem* e = 0; (e = kvIdKeyValues.Next(e)); ) {
     String sId = e->getName();
@@ -283,7 +283,7 @@ void Inventory::GetItemsPropertiesResponse(const String& sGrid, Apollo::SrpcMess
 void Inventory::PurgeModel()
 {
   nState_ = NoState;
-  sGridId_ = "";
+  sPanelId_ = "";
   sName_ = "";
   nOrder_ = -1;
 
@@ -305,13 +305,13 @@ String Inventory::GetScriptFunctionName()
 void Inventory::PlayModel()
 {
   if (nState_ == StateReady) {
-    Msg_Dialog_ContentCall::_(hDialog_, GetScriptFunctionName(), "PurgeGrids");
+    Msg_Dialog_ContentCall::_(hDialog_, GetScriptFunctionName(), "PurgePanels");
 
     { // for all grids
       {
         Apollo::SrpcMessage srpc;
-        srpc.set(Srpc::Key::Method, "AddGrid");
-        srpc.set("Grid", sGridId_);
+        srpc.set(Srpc::Key::Method, "AddPanel");
+        srpc.set("Panel", sPanelId_);
         srpc.set("Name", sName_);
         srpc.set("Order", nOrder_);
         srpc.set("Slots", nSlots_);
@@ -324,7 +324,7 @@ void Inventory::PlayModel()
         if (pItem != 0) {
           Apollo::SrpcMessage srpc;
           srpc.set(Srpc::Key::Method, "AddItem");
-          srpc.set("Grid", sGridId_);
+          srpc.set("Panel", sPanelId_);
           for (Apollo::KeyValueElem* e = 0; (e = pItem->nextElem(e)); ) {
             srpc.set(e->getKey(), e->getString());
           }

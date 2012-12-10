@@ -24,32 +24,32 @@ protected:
   Apollo::TimeValue tvCreated_;
 };
 
-class GetGridsRequest : public Request
+class GetPanelsRequest : public Request
 {
 public:
-  GetGridsRequest(Inventory* pInventory) : Request(pInventory) {}
+  GetPanelsRequest(Inventory* pInventory) : Request(pInventory) {}
 
   void HandleResponse(Apollo::SrpcMessage& response);
 };
 
-class GetGridItemsRequest : public Request
+class GetPanelItemsRequest : public Request
 {
 public:
-  GetGridItemsRequest(Inventory* pInventory, const String& sGrid) : Request(pInventory), sGrid_(sGrid) {}
+  GetPanelItemsRequest(Inventory* pInventory, const String& sPanel) : Request(pInventory), sPanel_(sPanel) {}
 
   void HandleResponse(Apollo::SrpcMessage& response);
 
-  String sGrid_;
+  String sPanel_;
 };
 
 class GetItemsPropertiesRequest : public Request
 {
 public:
-  GetItemsPropertiesRequest(Inventory* pInventory, const String& sGrid) : Request(pInventory), sGrid_(sGrid) {}
+  GetItemsPropertiesRequest(Inventory* pInventory, const String& sPanel) : Request(pInventory), sPanel_(sPanel) {}
 
   void HandleResponse(Apollo::SrpcMessage& response);
 
-  String sGrid_;
+  String sPanel_;
 };
 
 #endif // Request_H_INCLUDED

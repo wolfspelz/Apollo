@@ -42,7 +42,7 @@ protected:
   String GetScriptFunctionName();
   
   void SetVisibility(int bShow);
-  void BuildGrids();
+  void BuildPanels();
   void PurgeModel();
   void PlayModel();
 
@@ -51,14 +51,14 @@ protected:
   friend class InventoryModule;
   int ConsumeResponse(const ApHandle& hRequest, Apollo::SrpcMessage& response);
 
-  friend class GetGridsRequest;
-  void GetGridsResponse(Apollo::SrpcMessage& kvIdValues);
+  friend class GetPanelsRequest;
+  void GetPanelsResponse(Apollo::SrpcMessage& kvIdValues);
 
-  friend class GetGridItemsRequest;
-  void GetGridItemsResponse(const String& sGrid, Apollo::SrpcMessage& kvProperties);
+  friend class GetPanelItemsRequest;
+  void GetPanelItemsResponse(const String& sPanel, Apollo::SrpcMessage& kvProperties);
 
   friend class GetItemsPropertiesRequest;
-  void GetItemsPropertiesResponse(const String& sGrid, Apollo::SrpcMessage& kvIdKeyValues);
+  void GetItemsPropertiesResponse(const String& sPanel, Apollo::SrpcMessage& kvIdKeyValues);
 
 protected:
   int bVisible_;
@@ -70,15 +70,15 @@ protected:
   ApHandleTree<Request*> requests_;
 
   enum { NoState = 0
-    ,StateGetGrids = 1
-    ,StateGetGridDetails = 2
+    ,StateGetPanels = 1
+    ,StateGetPanelDetails = 2
     ,StateGetItemDetails = 3
     ,StateReady = 4
   };
 
   int nState_;
 
-  String sGridId_;
+  String sPanelId_;
   String sName_;
   int nOrder_;
   int nSlots_;
