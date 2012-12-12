@@ -52,6 +52,18 @@ public:
   }
 };
 
+// -> Dialog
+class Msg_Dialog_GetContentRect: public ApRequestMessage
+{
+public:
+  Msg_Dialog_GetContentRect() : ApRequestMessage("Dialog_GetContentRect"), nLeft(0), nTop(0), nWidth(0), nHeight(0) {}
+  ApIN ApHandle hDialog;
+  ApOUT int nLeft;
+  ApOUT int nTop;
+  ApOUT int nWidth;
+  ApOUT int nHeight;
+};
+
 // -> Dialog 
 class Msg_Dialog_SetCaption: public ApRequestMessage
 {

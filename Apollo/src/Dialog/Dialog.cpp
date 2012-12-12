@@ -74,6 +74,25 @@ void Dialog::SetIcon(const String& sIconUrl)
   }
 }
 
+void Dialog::GetContentRect(int& nLeft, int& nTop ,int& nWidth, int& nHeight)
+{
+  nLeft = 12;
+  nTop = 32;
+
+  if (bDocumentLoaded_){
+    Msg_WebView_CallScriptFunction msg;
+    msg.hView = hView_;
+    msg.sFunction = "ApGetContentRect";
+    if (!msg.Request()) { apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "%s(%s) failed: %s", _sz(msg.Type()), _sz(msg.sFunction), _sz(msg.sComment))); }
+    Apollo::SrpcMessage srpc;
+    srpc.fromString(msg.sResult);
+    nLeft = srpc.getInt("nLeft");
+    nTop = srpc.getInt("nTop");
+    nWidth = srpc.getInt("nWidth");
+    nHeight = srpc.getInt("nHeight");
+  }
+}
+
 String Dialog::CallScriptFunction(const String& sFunction, List& lArgs)
 {
   // document.getElementById('iApContent').contentWindow.eval("SetText('zz')")

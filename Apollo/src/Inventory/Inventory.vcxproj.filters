@@ -62,5 +62,8 @@
     <None Include="..\..\bin\Win32\Debug\modules\Inventory\Inventory.html">
       <Filter>HTML</Filter>
     </None>
+    <None Include="..\..\bin\Win32\Debug\modules\Inventory\DragItem.html">
+      <Filter>HTML</Filter>
+    </None>
   </ItemGroup>
 </Project>

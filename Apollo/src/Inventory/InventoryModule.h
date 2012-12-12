@@ -44,6 +44,7 @@ public:
   void On_Dialog_OnOpened(Msg_Dialog_OnOpened* pMsg);
   void On_Dialog_OnClosed(Msg_Dialog_OnClosed* pMsg);
   //void On_System_RunLevel(Msg_System_RunLevel* pMsg);
+  void On_WebView_Event_DocumentComplete(Msg_WebView_Event_DocumentComplete* pMsg);
   void On_WebView_ModuleCall(Msg_WebView_ModuleCall* pMsg);
   void On_Config_GetValue(Msg_Config_GetValue* pMsg);
   void On_Gm_ReceiveResponse(Msg_Gm_ReceiveResponse* pMsg);

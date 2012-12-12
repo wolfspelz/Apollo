@@ -74,6 +74,13 @@ AP_MSG_HANDLER_METHOD(InventoryModule, Dialog_OnClosed)
   }
 }
 
+AP_MSG_HANDLER_METHOD(InventoryModule, WebView_Event_DocumentComplete)
+{
+  if (pInventory_ != 0 && pInventory_->HasDragItem(pMsg->hView)) {
+    pInventory_->OnDragItemReady(pMsg->hView);
+  }
+}
+
 AP_MSG_HANDLER_METHOD(InventoryModule, WebView_ModuleCall)
 {
   if (pInventory_ != 0 && pInventory_->HasDialog(pMsg->hView)) {
@@ -166,6 +173,7 @@ int InventoryModule::Init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, InventoryModule, Inventory_Show, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, InventoryModule, Dialog_OnOpened, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, InventoryModule, Dialog_OnClosed, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, InventoryModule, WebView_Event_DocumentComplete, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, InventoryModule, WebView_ModuleCall, this, ApCallbackPosNormal);
   //AP_MSG_REGISTRY_ADD(MODULE_NAME, InventoryModule, System_RunLevel, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, InventoryModule, Config_GetValue, this, ApCallbackPosEarly);

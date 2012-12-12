@@ -23,8 +23,8 @@ function ReceiveMessageFromModule(sMsg) {
       case 'PurgePanels': return PurgePanels(); break;
       case 'AddPanel': return AddPanel(msg.getString('Panel'), msg.getString('Name'), msg.getInt('Order'), msg.getInt('Slots')); break;
       case 'RemovePanel': return RemovePanel(msg.getString('Panel')); break;
-      case 'AddItem': return AddItem(msg.getString('Panel'), msg.getString('Item'), msg); break;
-      case 'RemoveItem': return RemoveItem(msg.getString('Panel'), msg.getString('Item')); break;
+      case 'AddItem': return AddItem(msg.getString('Panel'), msg.getString('Id'), msg); break;
+      case 'RemoveItem': return RemoveItem(msg.getString('Panel'), msg.getString('Id')); break;
       default: throw 'Unknown method: ' + sMethod;
     }
 
@@ -40,7 +40,7 @@ function ReceiveMessageFromModule(sMsg) {
 
 function Start() {
   api = new ApolloApi('Inventory');
-  api.ModuleCall('PlayModel').send();
+  api.ModuleCall('OnPlayModel').send();
 }
 
 function PurgePanels() {
@@ -73,12 +73,38 @@ function AddItem(sPanelId, sItemId, props) {
         + '  <div class="Stacksize">' + nStacksize + '</div>'
         + (sNickname != '' ? '  <div class="Nickname">' + sNickname + '</div>' : '')
         + '  <div class="Name">' + sName + '</div>'
+        + '  <div class="sItemId">' + sItemId + '</div>'
+        + '  <div class="Drag"><input type="button" value="Drag" onclick="OnDragItem(\'' + sItemId + '\');"/></div>'
         + '</div>'
       );
 }
 
 function RemoveItem(sPanelId, sItemId) {
   $('#Item_' + sItemId).remove();
+}
+
+// -----------------------------------------------
+
+function OnDragItem(sItemId) {
+  var eItem = $('#Item_' + sItemId);
+  var off = eItem.offset();
+
+  var nLeft = off.left + 3;
+  var nTop = off.top + 3;
+  var nWidth = eItem.width();
+  var nHeight = eItem.height();
+  var nOffsetX = 0;
+  var nOffsetY = 0;
+
+  api.ModuleCall('OnDragItem')
+     .setString('sItemId', sItemId)
+     .setInt('nLeft', nLeft)
+     .setInt('nTop', nTop)
+     .setInt('nWidth', nWidth)
+     .setInt('nHeight', nHeight)
+     .setInt('nOffsetX', nOffsetX)
+     .setInt('nOffsetY', nOffsetY)
+     .send();
 }
 
 // -----------------------------------------------
