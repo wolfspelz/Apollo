@@ -340,8 +340,10 @@ ApolloApi.prototype =
   
   OnMouseDown: function(ev)
   {
+    //api.Log.Debug('OnMouseDown ' + ev.target.className + ' ' + ev.x + ' ' + ev.y);
+
     api.bIsMove = false; 
-    api.bIsSize = false; 
+    api.bIsSize = false;
 
     var aClasses = ev.target.className.split(' ');
     if (aClasses != null) {

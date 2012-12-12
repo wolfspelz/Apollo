@@ -74,9 +74,15 @@ function AddItem(sPanelId, sItemId, props) {
         + (sNickname != '' ? '  <div class="Nickname">' + sNickname + '</div>' : '')
         + '  <div class="Name">' + sName + '</div>'
         + '  <div class="sItemId">' + sItemId + '</div>'
-        + '  <div class="Drag"><input type="button" value="Drag" onclick="OnDragItem(\'' + sItemId + '\');"/></div>'
         + '</div>'
       );
+
+  $('#Item_' + sItemId).mousedown(
+    function (ev) {
+      //api.Log.Debug('pageX=' + ev.pageX + ' pageY=' + ev.pageY);
+      OnDragItem(sItemId, ev.pageX, ev.pageY);
+    }
+  );
 }
 
 function RemoveItem(sPanelId, sItemId) {
@@ -85,7 +91,7 @@ function RemoveItem(sPanelId, sItemId) {
 
 // -----------------------------------------------
 
-function OnDragItem(sItemId) {
+function OnDragItem(sItemId, nX, nY) {
   var eItem = $('#Item_' + sItemId);
   var off = eItem.offset();
 
@@ -93,8 +99,8 @@ function OnDragItem(sItemId) {
   var nTop = off.top + 3;
   var nWidth = eItem.width();
   var nHeight = eItem.height();
-  var nOffsetX = 0;
-  var nOffsetY = 0;
+  var nOffsetX = nX - nLeft;
+  var nOffsetY = nY - nTop;
 
   api.ModuleCall('OnDragItem')
      .setString('sItemId', sItemId)

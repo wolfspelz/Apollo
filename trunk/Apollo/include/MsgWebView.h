@@ -278,6 +278,13 @@ public:
     lArgs.AddLast(sArg1);
     return _(hView, sFrame, sFunction, lArgs);
   }
+  static String _(const ApHandle& hView, const String& sFrame, const String& sFunction, const String& sArg1, const String& sArg2)
+  {
+    List lArgs;
+    lArgs.AddLast(sArg1);
+    lArgs.AddLast(sArg2);
+    return _(hView, sFrame, sFunction, lArgs);
+  }
 };
 
 // -> WebView

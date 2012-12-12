@@ -25,6 +25,8 @@ public:
     ,nHeight_(400)
     ,nState_(NoState)
     ,nOrder_(0)
+    ,nDragOffsetX_(0)
+    ,nDragOffsetY_(0)
   {}
   virtual ~Inventory();
 
@@ -91,7 +93,10 @@ protected:
 
   ApHandle hCandidate_;
   ApHandle hDialog_;
+
   ApHandle hDragItem_;
+  int nDragOffsetX_;
+  int nDragOffsetY_;
 };
 
 #endif // Inventory_H_INCLUDED
