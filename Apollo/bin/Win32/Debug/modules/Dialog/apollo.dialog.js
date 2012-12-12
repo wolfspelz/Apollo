@@ -16,17 +16,20 @@ ApSetIcon = function(sUrl)
   $('#iApIcon').attr('src', sUrl);
 }
 
-ApGetContentRect = function () {
-  var e = document.getElementById('iApContent');
+ApGetContentRect = function ()
+{
   var nLeft = 0;
   var nTop = 0;
   var nWidth = 0;
   var nHeight = 0;
+
+  var e = document.getElementById('iApContent');
+  nWidth = e.offsetWidth;
+  nHeight = e.offsetHeight;
+
   while (e != null) {
     nLeft += e.offsetLeft;
     nTop += e.offsetTop;
-    nWidth += e.offsetWidth;
-    nHeight += e.offsetHeight;
     e = e.offsetParent;
   }
 

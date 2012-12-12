@@ -352,6 +352,9 @@ void Inventory::BeginDragItem(const String& sItemId, int nLeft, int nTop, int nW
     EndDragItem();
   }
 
+  nDragOffsetX_ = nOffsetX;
+  nDragOffsetY_ = nOffsetY;
+
   ApHandle h = Apollo::newHandle();
   ApHandle hDialogView = Msg_Dialog_GetView::_(hDialog_);
 
@@ -377,8 +380,8 @@ void Inventory::BeginDragItem(const String& sItemId, int nLeft, int nTop, int nW
     }
   }
 
-  int nAbsLeft = nInventoryLeft + nContentLeft + nLeft - nOffsetX;
-  int nAbsTop = nInventoryTop + nContentTop + nTop - nOffsetY;
+  int nAbsLeft = nInventoryLeft + nContentLeft + nLeft;
+  int nAbsTop = nInventoryTop + nContentTop + nTop;
 
   if (!Msg_WebView_Create::_(h, nAbsLeft, nAbsTop, nWidth, nHeight)) { throw ApException(LOG_CONTEXT, "Msg_WebView_Create failed"); }
   if (!Msg_WebView_SetScriptAccessPolicy::Allow(h)) { throw ApException(LOG_CONTEXT, "Msg_WebView_SetScriptAccessPolicy failed"); }
@@ -400,7 +403,7 @@ void Inventory::OnDragItemReady(const ApHandle& hView)
 {
   if (hDragItem_ == hView) {
     //if (!Msg_WebView_ViewCall::_(hView, "Start")) { throw ApException(LOG_CONTEXT, "Msg_WebView_ViewCall 'Start' failed"); }
-    String sResult = Msg_WebView_CallScriptFunction::_(hView, "", "Start");
+    String sResult = Msg_WebView_CallScriptFunction::_(hView, "", "Start", String::from(nDragOffsetX_), String::from(nDragOffsetY_));
   }
 }
 
