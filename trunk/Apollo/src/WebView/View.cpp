@@ -671,14 +671,16 @@ void View::CallJsSrpc(const String& sFunction, Apollo::SrpcMessage& srpc, Apollo
   Msg_WebView_CallScriptFunction msg;
   msg.hView = apHandle();
   msg.sFunction = sFunction;
-  msg.lArgs.AddLast(srpc.toString());
+  if (srpc.length() > 0) {
+    msg.lArgs.AddLast(srpc.toString());
+  }
   if (!msg.Request()) { throw ApException(LOG_CONTEXT, "" ApHandleFormat " Msg_WebView_CallScriptFunction: %s", ApHandlePrintf(hAp_), _sz(msg.sComment)); }
 
   response.fromString(msg.sResult);
   if (response.length() > 0) {
     int nStatus = response.getInt(Srpc::Key::Status);
     if (nStatus != 1) {
-      throw ApException(LOG_CONTEXT, "" ApHandleFormat " Status=%d Message=%s", ApHandlePrintf(hAp_), nStatus, _sz(response.getString(Srpc::Key::Message)));
+      throw ApException(LOG_CONTEXT, "" ApHandleFormat " Status=%d Message=%s raw=%s", ApHandlePrintf(hAp_), nStatus, _sz(response.getString(Srpc::Key::Message)), _sz(msg.sResult));
     }
   }
 }
@@ -728,22 +730,27 @@ JSValueRef View::JS_Apollo_getSharedValue(JSContextRef ctx, JSObjectRef thisObje
   if (!JSValueIsObjectOfClass(ctx, thisObject, JS_Apollo_class())) return JSValueMakeUndefined(ctx);
 
   View* pView = static_cast<View*>(JSObjectGetPrivate(thisObject));
-  if (pView == 0 || !pView->HasScriptAccess()) return JSValueMakeUndefined(ctx);
+  if (pView == 0) { return JSValueMakeUndefined(ctx); }
 
-  String sName;
-  String sValue;
-  sName.set((PWSTR) JSStringGetCharactersPtr(propertyName), JSStringGetLength(propertyName));
-  if (0) {
-  } else if (sName == "viewHandle") {
-    sValue = pView->apHandle().toString();
-  } else {
+  if (!pView->HasScriptAccess()) {
+    apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "SharedValue access denied for Javascript view=" ApHandleFormat " url=%s", ApHandlePrintf(pView->apHandle()), _sz(pView->sUrl_)));
     return JSValueMakeUndefined(ctx);
+  } else {
+    String sName;
+    String sValue;
+    sName.set((PWSTR) JSStringGetCharactersPtr(propertyName), JSStringGetLength(propertyName));
+    if (0) {
+    } else if (sName == "viewHandle") {
+      sValue = pView->apHandle().toString();
+    } else {
+      return JSValueMakeUndefined(ctx);
+    }
+
+    AutoJSStringRef text = JSStringCreateWithUTF8CString(sValue);
+    JSValueRef value = JSValueMakeString(ctx, text);
+
+    return value;
   }
-
-  AutoJSStringRef text = JSStringCreateWithUTF8CString(sValue);
-  JSValueRef value = JSValueMakeString(ctx, text);
-
-  return value;
 }
 
 JSValueRef View::JS_Apollo_echoString(JSContextRef ctx, JSObjectRef callableFunction, JSObjectRef thisObject, size_t argumentCount, const JSValueRef* arguments, JSValueRef* exception)

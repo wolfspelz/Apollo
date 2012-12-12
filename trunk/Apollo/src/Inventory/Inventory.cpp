@@ -95,8 +95,18 @@ void Inventory::OnModuleCall(Apollo::SrpcMessage& request, Apollo::SrpcMessage& 
   String sMethod = request.getString(Srpc::Key::Method);
 
   if (0){
-  } else if (sMethod == "PlayModel") {
+  } else if (sMethod == "OnPlayModel") {
     PlayModel();
+
+  } else if (sMethod == "OnDragItem") {
+    BeginDragItem(request.getString("sItemId")
+      , request.getInt("nLeft")
+      , request.getInt("nTop")
+      , request.getInt("nWidth")
+      , request.getInt("nHeight")
+      , request.getInt("nOffsetX")
+      , request.getInt("nOffsetY")
+      );
 
   } else {
     throw ApException(LOG_CONTEXT, "Unknown Method=%s", _sz(sMethod));
@@ -335,4 +345,63 @@ void Inventory::PlayModel()
 
   }
 }
+
+void Inventory::BeginDragItem(const String& sItemId, int nLeft, int nTop, int nWidth, int nHeight, int nOffsetX, int nOffsetY)
+{
+  if (ApIsHandle(hDragItem_)) {
+    EndDragItem();
+  }
+
+  ApHandle h = Apollo::newHandle();
+  ApHandle hDialogView = Msg_Dialog_GetView::_(hDialog_);
+
+  int nInventoryLeft = 0;
+  int nInventoryTop = 0;
+  {
+    Msg_WebView_GetPosition msg;
+    msg.hView = hDialogView;
+    if (msg.Request()) {
+      nInventoryLeft = msg.nLeft;
+      nInventoryTop = msg.nTop;
+    }
+  }
+
+  int nContentLeft = 0;
+  int nContentTop = 0;
+  {
+    Msg_Dialog_GetContentRect msg;
+    msg.hDialog = hDialog_;
+    if (msg.Request()) {
+      nContentLeft = msg.nLeft;
+      nContentTop = msg.nTop;
+    }
+  }
+
+  int nAbsLeft = nInventoryLeft + nContentLeft + nLeft - nOffsetX;
+  int nAbsTop = nInventoryTop + nContentTop + nTop - nOffsetY;
+
+  if (!Msg_WebView_Create::_(h, nAbsLeft, nAbsTop, nWidth, nHeight)) { throw ApException(LOG_CONTEXT, "Msg_WebView_Create failed"); }
+  if (!Msg_WebView_SetScriptAccessPolicy::Allow(h)) { throw ApException(LOG_CONTEXT, "Msg_WebView_SetScriptAccessPolicy failed"); }
+  if (!Msg_WebView_Load::_(h, "file://" + Apollo::getModuleResourcePath(MODULE_NAME) + "DragItem.html")) { throw ApException(LOG_CONTEXT, "Msg_WebView_Load failed"); }
+  if (!Msg_WebView_Visibility::_(h, 1)) { throw ApException(LOG_CONTEXT, "Msg_WebView_Visibility failed"); }
+
+  hDragItem_ = h;
+}
+
+void Inventory::EndDragItem()
+{
+  if (ApIsHandle(hDragItem_)) {
+    Msg_WebView_Destroy::_(hDragItem_);
+    hDragItem_ = ApNoHandle;
+  }
+}
+
+void Inventory::OnDragItemReady(const ApHandle& hView)
+{
+  if (hDragItem_ == hView) {
+    //if (!Msg_WebView_ViewCall::_(hView, "Start")) { throw ApException(LOG_CONTEXT, "Msg_WebView_ViewCall 'Start' failed"); }
+    String sResult = Msg_WebView_CallScriptFunction::_(hView, "", "Start");
+  }
+}
+
 

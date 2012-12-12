@@ -85,6 +85,15 @@ AP_MSG_HANDLER_METHOD(DialogModule, Dialog_GetView)
   }
 }
 
+AP_MSG_HANDLER_METHOD(DialogModule, Dialog_GetContentRect)
+{
+  Dialog* pDialog = FindDialog(pMsg->hDialog);
+  if (pDialog) {
+    pDialog->GetContentRect(pMsg->nLeft, pMsg->nTop, pMsg->nWidth, pMsg->nHeight);
+    pMsg->apStatus = ApMessage::Ok;
+  }
+}
+
 AP_MSG_HANDLER_METHOD(DialogModule, Dialog_SetCaption)
 {
   Dialog* pDialog = FindDialog(pMsg->hDialog);
@@ -198,7 +207,18 @@ void SrpcGate_Dialog_GetView(ApSRPCMessage* pMsg)
   Msg_Dialog_GetView msg;
   msg.hDialog = pMsg->srpc.getHandle("hDialog");
   SRPCGATE_HANDLER_NATIVE_REQUEST(pMsg, msg);
-  pMsg->srpc.getString("hView") = msg.hView.toString();
+  pMsg->srpc.set("hView", msg.hView.toString());
+}
+
+void SrpcGate_Dialog_GetContentRect(ApSRPCMessage* pMsg)
+{
+  Msg_Dialog_GetContentRect msg;
+  msg.hDialog = pMsg->srpc.getHandle("hDialog");
+  SRPCGATE_HANDLER_NATIVE_REQUEST(pMsg, msg);
+  pMsg->srpc.set("nLeft", msg.nLeft);
+  pMsg->srpc.set("nTop", msg.nTop);
+  pMsg->srpc.set("nWidth", msg.nWidth);
+  pMsg->srpc.set("nHeight", msg.nHeight);
 }
 
 void SrpcGate_Dialog_SetCaption(ApSRPCMessage* pMsg)
@@ -256,6 +276,7 @@ int DialogModule::Init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, DialogModule, Dialog_Create, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, DialogModule, Dialog_Destroy, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, DialogModule, Dialog_GetView, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, DialogModule, Dialog_GetContentRect, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, DialogModule, Dialog_SetCaption, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, DialogModule, Dialog_SetIcon, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, DialogModule, Dialog_CallScriptFunction, this, ApCallbackPosNormal);
@@ -271,6 +292,7 @@ int DialogModule::Init()
   srpcGateRegistry_.add("Dialog_Create", SrpcGate_Dialog_Create);
   srpcGateRegistry_.add("Dialog_Destroy", SrpcGate_Dialog_Destroy);
   srpcGateRegistry_.add("Dialog_GetView", SrpcGate_Dialog_GetView);
+  srpcGateRegistry_.add("Dialog_GetContentRect", SrpcGate_Dialog_GetContentRect);
   srpcGateRegistry_.add("Dialog_SetCaption", SrpcGate_Dialog_SetCaption);
   srpcGateRegistry_.add("Dialog_SetIcon", SrpcGate_Dialog_SetIcon);
 

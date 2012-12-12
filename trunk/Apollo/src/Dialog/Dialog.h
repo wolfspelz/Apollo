@@ -28,6 +28,7 @@ public:
   void Destroy();
   void SetCaption(const String& sCaption);
   void SetIcon(const String& sIconUrl);
+  void GetContentRect(int& nLeft, int& nTop,int& nWidth, int& nHeight);
   String CallScriptFunction(const String& sFunction, List& lArgs);
   void ContentCall(const String& sFunction, Apollo::SrpcMessage& srpc, Apollo::SrpcMessage& response);
 

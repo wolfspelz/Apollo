@@ -267,6 +267,11 @@ public:
     (void) msg.Request();
     return msg.sResult;
   }
+  static String _(const ApHandle& hView, const String& sFrame, const String& sFunction)
+  {
+    List lArgs;
+    return _(hView, sFrame, sFunction, lArgs);
+  }
   static String _(const ApHandle& hView, const String& sFrame, const String& sFunction, const String& sArg1)
   {
     List lArgs;
@@ -306,6 +311,14 @@ public:
   ApIN String sFunction;
   ApIN Apollo::SrpcMessage srpc;
   ApOUT Apollo::SrpcMessage response;
+
+  static int _(const ApHandle& hView, const String& sFunction)
+  {
+    Msg_WebView_ViewCall msg;
+    msg.hView = hView;
+    msg.sFunction = sFunction;
+    return msg.Request();
+  }
 };
 
 // Script of Module -> Module DLL

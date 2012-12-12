@@ -28,6 +28,7 @@ public:
   void On_Dialog_Create(Msg_Dialog_Create* pMsg);
   void On_Dialog_Destroy(Msg_Dialog_Destroy* pMsg);
   void On_Dialog_GetView(Msg_Dialog_GetView* pMsg);
+  void On_Dialog_GetContentRect(Msg_Dialog_GetContentRect* pMsg);
   void On_Dialog_SetCaption(Msg_Dialog_SetCaption* pMsg);
   void On_Dialog_SetIcon(Msg_Dialog_SetIcon* pMsg);
   void On_Dialog_CallScriptFunction(Msg_Dialog_CallScriptFunction* pMsg);

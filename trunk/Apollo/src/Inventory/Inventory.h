@@ -34,9 +34,11 @@ public:
 
   void OnOpened(const ApHandle& hDialog);
   void OnClosed(const ApHandle& hDialog);
+  void OnDragItemReady(const ApHandle& hView);
   void OnModuleCall(Apollo::SrpcMessage& request, Apollo::SrpcMessage& response);
 
   int HasDialog(const ApHandle& hDialog) { return hDialog_ == hDialog || hCandidate_ == hDialog; }
+  int HasDragItem(const ApHandle& hView) { return hDragItem_ == hView; }
 
 protected:
   String GetScriptFunctionName();
@@ -59,6 +61,9 @@ protected:
 
   friend class GetItemsPropertiesRequest;
   void GetItemsPropertiesResponse(const String& sPanel, Apollo::SrpcMessage& kvIdKeyValues);
+
+  void BeginDragItem(const String& sItemId, int nLeft, int nTop, int nWidth, int nHeight, int nOffsetX, int nOffsetY);
+  void EndDragItem();
 
 protected:
   int bVisible_;
@@ -86,6 +91,7 @@ protected:
 
   ApHandle hCandidate_;
   ApHandle hDialog_;
+  ApHandle hDragItem_;
 };
 
 #endif // Inventory_H_INCLUDED
