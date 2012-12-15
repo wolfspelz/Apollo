@@ -2,8 +2,72 @@
 <html>
 <head>
 <script type="text/javascript" src="../WebView/jquery-1.5.1.min.js"></script>
+<script type="text/javascript" src="../WebView/jquery-ui-1.8.13.custom.min.js"></script> 
 <script type="text/javascript" src="../WebView/apollo.js"></script>
-<link type='text/css' rel='stylesheet' href='Inventory.css' media='all' />
+
+<style type="text/css">
+* { margin:0; padding:0; }
+
+*
+{
+  font-family:Verdana, Arial, Sans-Serif;
+  font-size:11px;
+}
+
+#Wrapper {
+  position:absolute;
+  left:4px;
+  top:4px;
+  right:4px;
+  bottom:4px;
+  background-color:#ffffff;
+  padding:4px;
+}
+
+.Items
+{
+  position:absolute;
+  left:0px;
+  top:0px;
+  right:0px;
+  bottom:0px;
+}
+
+.Panel .Name 
+{
+  display:none;
+}
+
+.Item {
+  float: left;
+  border: solid 1px #D0D0D0;
+  background-color:#ffffff;
+  margin: 1px;
+  padding: 2px;
+  overflow: hidden;
+  height: 100px;
+  width: 100px;
+}
+
+.Item img.Icon {
+  margin-right: 4px;
+}
+
+.Panel .Item .Name 
+{
+  display:inline;
+}
+
+.Item .Nickname 
+{
+  font-weight:bold;
+}
+
+.Item .Stacksize {
+  float: right;
+  margin-left: 2px;
+}
+</style>
 
 <script type="text/javascript">
 
@@ -77,12 +141,19 @@ function AddItem(sPanelId, sItemId, props) {
         + '</div>'
       );
 
-  $('#Item_' + sItemId).mousedown(
-    function (ev) {
-      //api.Log.Debug('pageX=' + ev.pageX + ' pageY=' + ev.pageY);
-      OnDragItem(sItemId, ev.pageX, ev.pageY);
-    }
-  );
+//  $('#Item_' + sItemId).mousedown(
+//    function (ev) {
+//      //api.Log.Debug('pageX=' + ev.pageX + ' pageY=' + ev.pageY);
+//      OnDragItem(sItemId, ev.pageX, ev.pageY);
+//    });
+
+  $('#Item_' + sItemId).draggable({
+    distance: 10,
+    stack: 'div',
+    delay: 200,
+    grid: [ 108, 108 ],
+    containment: '#Panel_' + sPanelId + ' .Items'
+  });
 }
 
 function RemoveItem(sPanelId, sItemId) {

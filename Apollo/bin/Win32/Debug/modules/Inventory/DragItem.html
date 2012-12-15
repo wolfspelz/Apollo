@@ -9,30 +9,32 @@
 
 body
 {
-  background-color:#ff0000;
   overflow:hidden;
 }
 
 #Wrapper
 {
-  background-color:#0000ff;
   position:absolute;
   left:0;
   top:0;
   right:0;
   bottom:0;
 }
+
 </style>
 
 <script type="text/javascript">
 
 var api = new ApolloApi('DragItem');
 
-function Start(nX, nY) {
+function Start(sImageUrl, nX, nY) {
   //api.Log.Debug('Start');
+
+  $('.cImage').attr('src', sImageUrl);
+
   api.Init();
   api.InitMoveSize();
-  //api.Log.Debug('Start ' + $('#Wrapper').get(0).nodeName);
+
   var ev = jQuery.Event('mousedown');
   ev.target = $('#Wrapper').get(0);
   ev.x = nX;
@@ -45,8 +47,7 @@ function Start(nX, nY) {
 </head>
 
 <body>
-<div id="Wrapper" class="cApMove">
-DragItem
+<div id="Wrapper" class="cApMove"><img class="cImage" src="ItemIcon32.gif" alt="Item"/>
 </div>
 </body>
 

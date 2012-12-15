@@ -169,7 +169,7 @@ void Inventory::BuildPanels()
 
   Msg_Gm_SendRequest msg;
   msg.hRequest = h;
-  msg.srpc.set(Srpc::Key::Method, "Item.GetItemIdsAndValuesByProperty");
+  msg.srpc.set(Srpc::Key::Method, Gm_ItemProtocol_GetItemIdsAndValuesByProperty);
   msg.srpc.set("sInventory", Apollo::getModuleConfig(MODULE_NAME, "Name", ""));
   msg.srpc.set("sKey", "IsPanel");
   
@@ -204,10 +204,10 @@ void Inventory::GetPanelsResponse(Apollo::SrpcMessage& kvIdValues)
 
     Msg_Gm_SendRequest msg;
     msg.hRequest = h;
-    msg.srpc.set(Srpc::Key::Method, "Item.GetProperties");
+    msg.srpc.set(Srpc::Key::Method, Gm_ItemProtocol_GetProperties);
     msg.srpc.set("sInventory", Apollo::getModuleConfig(MODULE_NAME, "Name", ""));
     msg.srpc.set("nItem", sPanelId_);
-    msg.srpc.set("vlKeys", "Name Nickname PanelOrder Slots Contains");
+    msg.srpc.set("vlKeys", Item_PropertyId_Name " " Item_PropertyId_Nickname " " Item_PropertyId_PanelOrder " " Item_PropertyId_Slots " " Item_PropertyId_Contains);
 
     if (!msg.Request()) {
       DeleteRequest(h);
@@ -220,15 +220,15 @@ void Inventory::GetPanelsResponse(Apollo::SrpcMessage& kvIdValues)
 
 void Inventory::GetPanelItemsResponse(const String& sPanel, Apollo::SrpcMessage& kvProperties)
 {
-  String sName = kvProperties.getString("Name");
+  String sName = kvProperties.getString(Item_PropertyId_Name);
 
-  String sNickname = kvProperties.getString("Nickname");
+  String sNickname = kvProperties.getString(Item_PropertyId_Nickname);
   
-  int nPanelOrder = kvProperties.getInt("PanelOrder");
+  int nPanelOrder = kvProperties.getInt(Item_PropertyId_PanelOrder);
   
-  int nSlots = kvProperties.getInt("Slots");
+  int nSlots = kvProperties.getInt(Item_PropertyId_Slots);
   
-  String sContains = kvProperties.getString("Contains");
+  String sContains = kvProperties.getString(Item_PropertyId_Contains);
 
   // -------------------------------
 
@@ -251,10 +251,10 @@ void Inventory::GetPanelItemsResponse(const String& sPanel, Apollo::SrpcMessage&
 
     Msg_Gm_SendRequest msg;
     msg.hRequest = h;
-    msg.srpc.set(Srpc::Key::Method, "Item.GetMultiItemProperties");
+    msg.srpc.set(Srpc::Key::Method, Gm_ItemProtocol_GetMultiItemProperties);
     msg.srpc.set("sInventory", Apollo::getModuleConfig(MODULE_NAME, "Name", ""));
     msg.srpc.set("vlItems", sContains);
-    msg.srpc.set("vlKeys", "Id Name Nickname Icon32Url Stacksize Slot");
+    msg.srpc.set("vlKeys", Item_PropertyId_Id " " Item_PropertyId_Name " " Item_PropertyId_Nickname " " Item_PropertyId_Icon32Url " " Item_PropertyId_Image100Url " " Item_PropertyId_Stacksize " " Item_PropertyId_Slot);
 
     if (!msg.Request()) {
       DeleteRequest(h);
@@ -348,10 +348,11 @@ void Inventory::PlayModel()
 
 void Inventory::BeginDragItem(const String& sItemId, int nLeft, int nTop, int nWidth, int nHeight, int nOffsetX, int nOffsetY)
 {
-  if (ApIsHandle(hDragItem_)) {
+  if (ApIsHandle(hDragItemView_)) {
     EndDragItem();
   }
 
+  sDragItemId_ = sItemId;
   nDragOffsetX_ = nOffsetX;
   nDragOffsetY_ = nOffsetY;
 
@@ -388,22 +389,37 @@ void Inventory::BeginDragItem(const String& sItemId, int nLeft, int nTop, int nW
   if (!Msg_WebView_Load::_(h, "file://" + Apollo::getModuleResourcePath(MODULE_NAME) + "DragItem.html")) { throw ApException(LOG_CONTEXT, "Msg_WebView_Load failed"); }
   if (!Msg_WebView_Visibility::_(h, 1)) { throw ApException(LOG_CONTEXT, "Msg_WebView_Visibility failed"); }
 
-  hDragItem_ = h;
+  hDragItemView_ = h;
 }
 
 void Inventory::EndDragItem()
 {
-  if (ApIsHandle(hDragItem_)) {
-    Msg_WebView_Destroy::_(hDragItem_);
-    hDragItem_ = ApNoHandle;
+  if (ApIsHandle(hDragItemView_)) {
+    Msg_WebView_Destroy::_(hDragItemView_);
+    hDragItemView_ = ApNoHandle;
   }
 }
 
 void Inventory::OnDragItemReady(const ApHandle& hView)
 {
-  if (hDragItem_ == hView) {
+  if (hDragItemView_ == hView) {
     //if (!Msg_WebView_ViewCall::_(hView, "Start")) { throw ApException(LOG_CONTEXT, "Msg_WebView_ViewCall 'Start' failed"); }
-    String sResult = Msg_WebView_CallScriptFunction::_(hView, "", "Start", String::from(nDragOffsetX_), String::from(nDragOffsetY_));
+    String sUrl;
+    ItemListNode* pNode = items_.Find(sDragItemId_);
+    if (pNode != 0) {
+      Item* pItem = pNode->Value();
+      if (pItem != 0) {
+        sUrl = (*pItem)[Item_PropertyId_Image100Url].getString();
+        if (!sUrl) {
+          sUrl = (*pItem)[Item_PropertyId_Icon32Url].getString();
+        }
+      }
+    }
+    List lArgs;
+    lArgs.AddLast(sUrl);
+    lArgs.AddLast(String::from(nDragOffsetX_));
+    lArgs.AddLast(String::from(nDragOffsetY_));
+    String sResult = Msg_WebView_CallScriptFunction::_(hView, "", "Start", lArgs);
   }
 }
 
