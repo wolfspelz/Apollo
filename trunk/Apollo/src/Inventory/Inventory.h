@@ -40,7 +40,7 @@ public:
   void OnModuleCall(Apollo::SrpcMessage& request, Apollo::SrpcMessage& response);
 
   int HasDialog(const ApHandle& hDialog) { return hDialog_ == hDialog || hCandidate_ == hDialog; }
-  int HasDragItem(const ApHandle& hView) { return hDragItem_ == hView; }
+  int HasDragItem(const ApHandle& hView) { return hDragItemView_ == hView; }
 
 protected:
   String GetScriptFunctionName();
@@ -94,7 +94,8 @@ protected:
   ApHandle hCandidate_;
   ApHandle hDialog_;
 
-  ApHandle hDragItem_;
+  ApHandle hDragItemView_;
+  String sDragItemId_;
   int nDragOffsetX_;
   int nDragOffsetY_;
 };
