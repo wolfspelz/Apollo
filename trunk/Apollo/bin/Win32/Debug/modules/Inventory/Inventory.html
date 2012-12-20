@@ -161,6 +161,8 @@ function AddItem(sPanelId, sItemId, props) {
     stack: 'div',
     xdelay: 200,
     xgrid: [108, 108],
+    xcursor: 'move',
+    xcursorAt: { top: 50, left: 50 },
     containment: '#Panel_' + sPanelId + ' .Items',
     start: function (ev) {
       nLastX = ev.pageX;
