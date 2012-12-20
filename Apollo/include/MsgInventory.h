@@ -38,4 +38,54 @@ public:
   }
 };
 
+// Item drag begins
+// Inventory -> 
+class Msg_Inventory_DragItemBegin: public ApNotificationMessage
+{
+public:
+  Msg_Inventory_DragItemBegin() : ApNotificationMessage("Inventory_DragItemBegin") {}
+  ApIN ApHandle hDrag;
+  ApIN String sItem; // Item Id
+};
+
+// Item drag move mouse event with screen coordinates
+// Inventory -> 
+class Msg_Inventory_DragItemMove: public ApNotificationMessage
+{
+public:
+  Msg_Inventory_DragItemMove() : ApNotificationMessage("Inventory_DragItemMove"), nX(0), nY(0) {}
+  ApIN ApHandle hDrag;
+  ApIN int nX;
+  ApIN int nY;
+};
+
+// Item dropped at screen coordinates
+// Inventory -> 
+class Msg_Inventory_DragItemDrop: public ApNotificationMessage
+{
+public:
+  Msg_Inventory_DragItemDrop() : ApNotificationMessage("Inventory_DragItemDrop") {}
+  ApIN ApHandle hDrag;
+  ApIN int nX;
+  ApIN int nY;
+};
+
+// Item drag cancelled = not dropped
+// Inventory -> 
+class Msg_Inventory_DragItemCancel: public ApNotificationMessage
+{
+public:
+  Msg_Inventory_DragItemCancel() : ApNotificationMessage("Inventory_DragItemCancel") {}
+  ApIN ApHandle hDrag;
+};
+
+// Item drag ends here
+// Inventory -> 
+class Msg_Inventory_DragItemEnd: public ApNotificationMessage
+{
+public:
+  Msg_Inventory_DragItemEnd() : ApNotificationMessage("Inventory_DragItemEnd") {}
+  ApIN ApHandle hDrag;
+};
+
 #endif // !defined(MsgInventory_h_INCLUDED)
