@@ -137,22 +137,46 @@ function AddItem(sPanelId, sItemId, props) {
         + '  <div class="Stacksize">' + nStacksize + '</div>'
         + (sNickname != '' ? '  <div class="Nickname">' + sNickname + '</div>' : '')
         + '  <div class="Name">' + sName + '</div>'
-        + '  <div class="sItemId">' + sItemId + '</div>'
+        + '  <div class="ItemId">' + sItemId + '</div>'
+        + '  <input type="button" class="Drag" value="Drag"/>'
         + '</div>'
       );
 
-//  $('#Item_' + sItemId).mousedown(
-//    function (ev) {
-//      //api.Log.Debug('pageX=' + ev.pageX + ' pageY=' + ev.pageY);
-//      OnDragItem(sItemId, ev.pageX, ev.pageY);
-//    });
+    $('#Item_' + sItemId + ' .Drag').mousedown(
+      function (ev) {
+        OnDragItem(sItemId, ev.pageX, ev.pageY);
+      });
+
+  //  $('#Item_' + sItemId).mousedown(
+  //    function (ev) {
+  //      //api.Log.Debug('pageX=' + ev.pageX + ' pageY=' + ev.pageY);
+  //      OnDragItem(sItemId, ev.pageX, ev.pageY);
+  //    });
+
+  var nLastX = 0;
+  var nLastY = 0;
 
   $('#Item_' + sItemId).draggable({
-    distance: 10,
+    distance: 8,
     stack: 'div',
-    delay: 200,
-    grid: [ 108, 108 ],
-    containment: '#Panel_' + sPanelId + ' .Items'
+    xdelay: 200,
+    xgrid: [108, 108],
+    containment: '#Panel_' + sPanelId + ' .Items',
+    start: function (ev) {
+      nLastX = ev.pageX;
+      nLastY = ev.pageY;
+      //api.Message('WebView_MouseCapture').setString('hView', api.GetViewHandle()).send();
+    },
+    drag: function (ev) {
+      var nDX = ev.pageX - nLastX;
+      var nDY = ev.pageY - nLastY;
+      //api.Log.Debug('dx=' + nDX + ' dY=' + nDY);
+      nLastX = ev.pageX;
+      nLastY = ev.pageY;
+    },
+    stop: function (ev) {
+
+    }
   });
 }
 
