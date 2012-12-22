@@ -13,6 +13,64 @@ Inventory::~Inventory()
 }
 
 //---------------------------------------------------
+// ItemId to Handle mapper
+
+ApHandle Inventory::GetOrCreateItemHandle(const String& sItem)
+{
+  ApHandle hItem = GetItemHandle(sItem);
+  if (ApIsHandle(hItem)) {
+    return hItem;
+  } else {
+    return CreateItemHandle(sItem);
+  }
+}
+
+ApHandle Inventory::CreateItemHandle(const String& sItem)
+{
+  if (id2Handle_.Find(sItem) != 0) { throw ApException(LOG_CONTEXT, "Item %s already mapped", _sz(sItem)); }
+  ApHandle hItem = Apollo::newHandle();
+  handle2Id_.Set(hItem, sItem);
+  id2Handle_.Set(sItem, hItem);
+  return hItem;
+}
+
+ApHandle Inventory::GetItemHandle(const String& sItem)
+{
+  ItemId2HandleListNode* node = id2Handle_.Find(sItem);
+  if (node != 0) {
+    return node->Value();
+  }
+  return ApNoHandle;
+}
+
+String Inventory::GetItemId(const ApHandle& hItem)
+{
+  ItemHandle2IdListNode* node = handle2Id_.Find(hItem);
+  if (node != 0) {
+    return node->Value();
+  }
+  return "";
+}
+
+void Inventory::DeleteItemId(const String& sItem)
+{
+  ApHandle hItem = GetItemHandle(sItem);
+  if (ApIsHandle(hItem)) {
+    handle2Id_.Unset(hItem);
+    id2Handle_.Unset(sItem);
+  }
+}
+
+void Inventory::DeleteItemHandle(const ApHandle& hItem)
+{
+  String sItem = GetItemId(hItem);
+  if (!sItem.empty()) {
+    handle2Id_.Unset(hItem);
+    id2Handle_.Unset(sItem);
+  }
+}
+
+//---------------------------------------------------
 // Interface
 
 void Inventory::Create()
@@ -423,4 +481,106 @@ void Inventory::OnDragItemReady(const ApHandle& hView)
   }
 }
 
+//---------------------------------------------------
+// Tests
+
+String Inventory::Test_CreateItemHandle()
+{
+  String s;
+  Inventory i;
+  ApHandle h = i.CreateItemHandle("1"); 
+  if (i.GetItemHandle("1") != h) { s = String::from(__LINE__); }
+  return s;
+}
+
+String Inventory::Test_MultipleCreateItemHandle()
+{
+  String s;
+  Inventory i;
+  ApHandle h1 = i.CreateItemHandle("1");
+  ApHandle h3 = i.CreateItemHandle("3");
+  ApHandle h2 = i.CreateItemHandle("2");
+  if (!s) { if (i.GetItemHandle("1") != h1) { s = String::from(__LINE__); }}
+  if (!s) { if (i.GetItemHandle("2") != h2) { s = String::from(__LINE__); }}
+  if (!s) { if (i.GetItemHandle("3") != h3) { s = String::from(__LINE__); }}
+  if (!s) { if (i.GetItemId(h1) != "1") { s = String::from(__LINE__); }}
+  if (!s) { if (i.GetItemId(h2) != "2") { s = String::from(__LINE__); }}
+  if (!s) { if (i.GetItemId(h3) != "3") { s = String::from(__LINE__); }}
+  return s;
+}
+
+String Inventory::Test_DeleteItemId()
+{
+  String s;
+  Inventory i;
+  ApHandle h1 = i.CreateItemHandle("1");
+  ApHandle h3 = i.CreateItemHandle("3");
+  ApHandle h2 = i.CreateItemHandle("2");
+  i.DeleteItemId("2");
+  if (!s) { if (i.GetItemHandle("1") != h1) { s = String::from(__LINE__); }}
+  if (!s) { if (i.GetItemHandle("2") != ApNoHandle) { s = String::from(__LINE__); }}
+  if (!s) { if (i.GetItemHandle("3") != h3) { s = String::from(__LINE__); }}
+  if (!s) { if (i.GetItemId(h1) != "1") { s = String::from(__LINE__); }}
+  if (!s) { if (i.GetItemId(h2) != "") { s = String::from(__LINE__); }}
+  if (!s) { if (i.GetItemId(h3) != "3") { s = String::from(__LINE__); }}
+  return s;
+}
+
+String Inventory::Test_DeleteItemHandle()
+{
+  String s;
+  Inventory i;
+  ApHandle h1 = i.CreateItemHandle("1");
+  ApHandle h3 = i.CreateItemHandle("3");
+  ApHandle h2 = i.CreateItemHandle("2");
+  i.DeleteItemHandle(h2);
+  if (!s) { if (i.GetItemHandle("1") != h1) { s = String::from(__LINE__); }}
+  if (!s) { if (i.GetItemHandle("2") != ApNoHandle) { s = String::from(__LINE__); }}
+  if (!s) { if (i.GetItemHandle("3") != h3) { s = String::from(__LINE__); }}
+  if (!s) { if (i.GetItemId(h1) != "1") { s = String::from(__LINE__); }}
+  if (!s) { if (i.GetItemId(h2) != "") { s = String::from(__LINE__); }}
+  if (!s) { if (i.GetItemId(h3) != "3") { s = String::from(__LINE__); }}
+  return s;
+}
+
+String Inventory::Test_GetOrCreateItemHandle()
+{
+  String s;
+  Inventory i;
+  ApHandle h3 = i.CreateItemHandle("3");
+  ApHandle h2 = i.CreateItemHandle("2");
+  ApHandle h1 = i.CreateItemHandle("1");
+  ApHandle h2b = i.GetOrCreateItemHandle("2");
+  if (!s) { if (i.GetItemHandle("2") != h2) { s = String::from(__LINE__); }}
+  if (!s) { if (i.GetItemHandle("2") != h2b) { s = String::from(__LINE__); }}
+  if (!s) { if (h2 != h2b) { s = String::from(__LINE__); }}
+  return s;
+}
+
+String Inventory::Test_CreateItemHandleDuplicateEntryException()
+{
+  String s;
+  try {
+    Inventory i;
+    ApHandle h = i.CreateItemHandle("1"); 
+    i.CreateItemHandle("1"); 
+    s = String::from(__LINE__);
+  } catch (ApException& ex) {
+  }
+  return s;
+}
+
+String Inventory::TestItemId2HandleMapper()
+{
+  String s;
+
+  if (!s) { s = Test_CreateItemHandle(); }
+  if (!s) { s = Test_MultipleCreateItemHandle(); }
+  if (!s) { s = Test_DeleteItemHandle(); }
+  if (!s) { s = Test_DeleteItemId(); }
+  if (!s) { s = Test_GetOrCreateItemHandle(); }
+  if (!s) { s = Test_CreateItemHandleDuplicateEntryException(); }
+
+  return s;
+}
 
