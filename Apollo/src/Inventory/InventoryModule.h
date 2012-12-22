@@ -24,7 +24,7 @@ public:
   static void Execute();
   static void End();
 
-  //static String CreateDeleteInventory();
+  static String ItemId2HandleMapper();
 };
 #endif
 

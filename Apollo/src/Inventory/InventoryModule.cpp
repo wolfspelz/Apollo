@@ -196,12 +196,12 @@ void InventoryModule::Exit()
 
 void InventoryModuleTester::Begin()
 {
-  //AP_UNITTEST_REGISTER(InventoryModuleTester::CreateDeleteInventory);
+  AP_UNITTEST_REGISTER(InventoryModuleTester::ItemId2HandleMapper);
 }
 
 void InventoryModuleTester::Execute()
 {
-  //AP_UNITTEST_EXECUTE(InventoryModuleTester::CreateDeleteInventory);
+  AP_UNITTEST_EXECUTE(InventoryModuleTester::ItemId2HandleMapper);
 }
 
 void InventoryModuleTester::End()
@@ -210,14 +210,16 @@ void InventoryModuleTester::End()
 
 //----------------------------
 
-//String InventoryModuleTester::CreateDeleteInventory()
-//{
-//  String s;
-//
-//  InventoryModule m;
-//
-//  return s;
-//}
+String InventoryModuleTester::ItemId2HandleMapper()
+{
+  String s;
+
+  if (!s) {
+    s = Inventory::TestItemId2HandleMapper();
+  }
+
+  return s;
+}
 
 //----------------------------
 

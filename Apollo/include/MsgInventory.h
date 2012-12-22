@@ -40,20 +40,20 @@ public:
 
 // Item drag begins
 // Inventory -> 
-class Msg_Inventory_DragItemBegin: public ApNotificationMessage
+class Msg_Inventory_OnDragItemBegin: public ApNotificationMessage
 {
 public:
-  Msg_Inventory_DragItemBegin() : ApNotificationMessage("Inventory_DragItemBegin") {}
+  Msg_Inventory_OnDragItemBegin() : ApNotificationMessage("Inventory_OnDragItemBegin") {}
   ApIN ApHandle hDrag;
   ApIN String sItem; // Item Id
 };
 
 // Item drag move mouse event with screen coordinates
 // Inventory -> 
-class Msg_Inventory_DragItemMove: public ApNotificationMessage
+class Msg_Inventory_OnDragItemMove: public ApNotificationMessage
 {
 public:
-  Msg_Inventory_DragItemMove() : ApNotificationMessage("Inventory_DragItemMove"), nX(0), nY(0) {}
+  Msg_Inventory_OnDragItemMove() : ApNotificationMessage("Inventory_OnDragItemMove"), nX(0), nY(0) {}
   ApIN ApHandle hDrag;
   ApIN int nX;
   ApIN int nY;
@@ -61,10 +61,10 @@ public:
 
 // Item dropped at screen coordinates
 // Inventory -> 
-class Msg_Inventory_DragItemDrop: public ApNotificationMessage
+class Msg_Inventory_OnDragItemDrop: public ApNotificationMessage
 {
 public:
-  Msg_Inventory_DragItemDrop() : ApNotificationMessage("Inventory_DragItemDrop") {}
+  Msg_Inventory_OnDragItemDrop() : ApNotificationMessage("Inventory_OnDragItemDrop") {}
   ApIN ApHandle hDrag;
   ApIN int nX;
   ApIN int nY;
@@ -72,19 +72,19 @@ public:
 
 // Item drag cancelled = not dropped
 // Inventory -> 
-class Msg_Inventory_DragItemCancel: public ApNotificationMessage
+class Msg_Inventory_OnDragItemCancel: public ApNotificationMessage
 {
 public:
-  Msg_Inventory_DragItemCancel() : ApNotificationMessage("Inventory_DragItemCancel") {}
+  Msg_Inventory_OnDragItemCancel() : ApNotificationMessage("Inventory_OnDragItemCancel") {}
   ApIN ApHandle hDrag;
 };
 
 // Item drag ends here
 // Inventory -> 
-class Msg_Inventory_DragItemEnd: public ApNotificationMessage
+class Msg_Inventory_OnDragItemEnd: public ApNotificationMessage
 {
 public:
-  Msg_Inventory_DragItemEnd() : ApNotificationMessage("Inventory_DragItemEnd") {}
+  Msg_Inventory_OnDragItemEnd() : ApNotificationMessage("Inventory_OnDragItemEnd") {}
   ApIN ApHandle hDrag;
 };
 
