@@ -72,12 +72,15 @@ protected:
   int ConsumeResponse(const ApHandle& hRequest, Apollo::SrpcMessage& response);
 
   friend class GetPanelsRequest;
+  void SendGetPanelsRequest();
   void GetPanelsResponse(Apollo::SrpcMessage& kvIdValues);
 
   friend class GetPanelItemsRequest;
+  void SendGetPanelItemsRequest(const String& sPanel);
   void GetPanelItemsResponse(const String& sPanel, Apollo::SrpcMessage& kvProperties);
 
   friend class GetItemsPropertiesRequest;
+  void SendGetItemsPropertiesResquest(const String& sContains);
   void GetItemsPropertiesResponse(const String& sPanel, Apollo::SrpcMessage& kvIdKeyValues);
 
   void BeginDragItem(const String& sItemId, int nLeft, int nTop, int nWidth, int nHeight, int nOffsetX, int nOffsetY);
