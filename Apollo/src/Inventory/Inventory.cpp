@@ -263,6 +263,8 @@ void Inventory::GetPanelsResponse(Apollo::SrpcMessage& kvIdValues)
   }
 }
 
+//-------------------------
+
 void Inventory::SendGetPanelItemsRequest(const String& sPanel)
 {
   ApHandle h = Apollo::newHandle();
@@ -299,8 +301,6 @@ void Inventory::GetPanelItemsResponse(const String& sPanel, Apollo::SrpcMessage&
   
   String sContains = kvProperties.getString(Item_PropertyId_Contains);
 
-  // -------------------------------
-
   sName_ = sNickname;
   if (sName_.empty()) { sName_ = sName; }
 
@@ -308,13 +308,13 @@ void Inventory::GetPanelItemsResponse(const String& sPanel, Apollo::SrpcMessage&
 
   nSlots_ = nSlots;
 
-  // -------------------------------
-
   if (!sContains.empty()) {
     SendGetItemsPropertiesResquest(sContains);
   }
 
 }
+
+//-------------------------
 
 void Inventory::SendGetItemsPropertiesResquest(const String& sContains)
 {
@@ -363,6 +363,8 @@ void Inventory::GetItemsPropertiesResponse(const String& sPanel, Apollo::SrpcMes
 
   PlayModel();
 }
+
+//-------------------------
 
 void Inventory::PurgeModel()
 {
@@ -419,6 +421,8 @@ void Inventory::PlayModel()
 
   }
 }
+
+//-------------------------
 
 void Inventory::BeginDragItem(const String& sItemId, int nLeft, int nTop, int nWidth, int nHeight, int nOffsetX, int nOffsetY)
 {
