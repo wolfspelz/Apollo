@@ -214,11 +214,17 @@ int Inventory::ConsumeResponse(const ApHandle& hRequest, Apollo::SrpcMessage& re
   return bConsumed;
 }
 
+//-------------------------
+
 void Inventory::BuildPanels()
 {
-  ApHandle h = Apollo::newHandle();
-
   PurgeModel();
+  SendGetPanelsRequest();
+}
+
+void Inventory::SendGetPanelsRequest()
+{
+  ApHandle h = Apollo::newHandle();
 
   GetPanelsRequest* pRequest = new GetPanelsRequest(this);
   if (pRequest != 0) {
@@ -253,27 +259,32 @@ void Inventory::GetPanelsResponse(Apollo::SrpcMessage& kvIdValues)
   }
 
   if (!sPanelId_.empty()) {
-    ApHandle h = Apollo::newHandle();
-
-    GetPanelItemsRequest* pRequest = new GetPanelItemsRequest(this, sPanelId_);
-    if (pRequest != 0) {
-      AddRequest(h, pRequest);
-    }
-
-    Msg_Gm_SendRequest msg;
-    msg.hRequest = h;
-    msg.srpc.set(Srpc::Key::Method, Gm_ItemProtocol_GetProperties);
-    msg.srpc.set("sInventory", Apollo::getModuleConfig(MODULE_NAME, "Name", ""));
-    msg.srpc.set("nItem", sPanelId_);
-    msg.srpc.set("vlKeys", Item_PropertyId_Name " " Item_PropertyId_Nickname " " Item_PropertyId_PanelOrder " " Item_PropertyId_Slots " " Item_PropertyId_Contains);
-
-    if (!msg.Request()) {
-      DeleteRequest(h);
-      throw ApException(LOG_CONTEXT, "Msg_Gm_SendRequest failed");
-    }
-
-    nState_ = StateGetPanelDetails;
+    SendGetPanelItemsRequest(sPanelId_);
   }
+}
+
+void Inventory::SendGetPanelItemsRequest(const String& sPanel)
+{
+  ApHandle h = Apollo::newHandle();
+
+  GetPanelItemsRequest* pRequest = new GetPanelItemsRequest(this, sPanel);
+  if (pRequest != 0) {
+    AddRequest(h, pRequest);
+  }
+
+  Msg_Gm_SendRequest msg;
+  msg.hRequest = h;
+  msg.srpc.set(Srpc::Key::Method, Gm_ItemProtocol_GetProperties);
+  msg.srpc.set("sInventory", Apollo::getModuleConfig(MODULE_NAME, "Name", ""));
+  msg.srpc.set("nItem", sPanelId_);
+  msg.srpc.set("vlKeys", Item_PropertyId_Name " " Item_PropertyId_Nickname " " Item_PropertyId_PanelOrder " " Item_PropertyId_Slots " " Item_PropertyId_Contains);
+
+  if (!msg.Request()) {
+    DeleteRequest(h);
+    throw ApException(LOG_CONTEXT, "Msg_Gm_SendRequest failed");
+  }
+
+  nState_ = StateGetPanelDetails;
 }
 
 void Inventory::GetPanelItemsResponse(const String& sPanel, Apollo::SrpcMessage& kvProperties)
@@ -300,28 +311,33 @@ void Inventory::GetPanelItemsResponse(const String& sPanel, Apollo::SrpcMessage&
   // -------------------------------
 
   if (!sContains.empty()) {
-    ApHandle h = Apollo::newHandle();
-
-    GetItemsPropertiesRequest* pRequest = new GetItemsPropertiesRequest(this, sPanelId_);
-    if (pRequest != 0) {
-      AddRequest(h, pRequest);
-    }
-
-    Msg_Gm_SendRequest msg;
-    msg.hRequest = h;
-    msg.srpc.set(Srpc::Key::Method, Gm_ItemProtocol_GetMultiItemProperties);
-    msg.srpc.set("sInventory", Apollo::getModuleConfig(MODULE_NAME, "Name", ""));
-    msg.srpc.set("vlItems", sContains);
-    msg.srpc.set("vlKeys", Item_PropertyId_Id " " Item_PropertyId_Name " " Item_PropertyId_Nickname " " Item_PropertyId_Icon32Url " " Item_PropertyId_Image100Url " " Item_PropertyId_Stacksize " " Item_PropertyId_Slot);
-
-    if (!msg.Request()) {
-      DeleteRequest(h);
-      throw ApException(LOG_CONTEXT, "Msg_Gm_SendRequest failed");
-    }
-
-    nState_ = StateGetItemDetails;
+    SendGetItemsPropertiesResquest(sContains);
   }
 
+}
+
+void Inventory::SendGetItemsPropertiesResquest(const String& sContains)
+{
+  ApHandle h = Apollo::newHandle();
+
+  GetItemsPropertiesRequest* pRequest = new GetItemsPropertiesRequest(this, sPanelId_);
+  if (pRequest != 0) {
+    AddRequest(h, pRequest);
+  }
+
+  Msg_Gm_SendRequest msg;
+  msg.hRequest = h;
+  msg.srpc.set(Srpc::Key::Method, Gm_ItemProtocol_GetMultiItemProperties);
+  msg.srpc.set("sInventory", Apollo::getModuleConfig(MODULE_NAME, "Name", ""));
+  msg.srpc.set("vlItems", sContains);
+  msg.srpc.set("vlKeys", Item_PropertyId_Id " " Item_PropertyId_Name " " Item_PropertyId_Nickname " " Item_PropertyId_Icon32Url " " Item_PropertyId_Image100Url " " Item_PropertyId_Stacksize " " Item_PropertyId_Slot);
+
+  if (!msg.Request()) {
+    DeleteRequest(h);
+    throw ApException(LOG_CONTEXT, "Msg_Gm_SendRequest failed");
+  }
+
+  nState_ = StateGetItemDetails;
 }
 
 void Inventory::GetItemsPropertiesResponse(const String& sPanel, Apollo::SrpcMessage& kvIdKeyValues)
