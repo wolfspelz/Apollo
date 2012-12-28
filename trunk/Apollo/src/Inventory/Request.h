@@ -35,21 +35,21 @@ public:
 class GetPanelItemsRequest : public Request
 {
 public:
-  GetPanelItemsRequest(Inventory* pInventory, const String& sPanel) : Request(pInventory), sPanel_(sPanel) {}
+  GetPanelItemsRequest(Inventory* pInventory, const ApHandle& hPanel) : Request(pInventory), hPanel_(hPanel) {}
 
   void HandleResponse(Apollo::SrpcMessage& response);
 
-  String sPanel_;
+  ApHandle hPanel_;
 };
 
 class GetItemsPropertiesRequest : public Request
 {
 public:
-  GetItemsPropertiesRequest(Inventory* pInventory, const String& sPanel) : Request(pInventory), sPanel_(sPanel) {}
+  GetItemsPropertiesRequest(Inventory* pInventory, const ApHandle& hPanel) : Request(pInventory), hPanel_(hPanel) {}
 
   void HandleResponse(Apollo::SrpcMessage& response);
 
-  String sPanel_;
+  ApHandle hPanel_;
 };
 
 #endif // Request_H_INCLUDED

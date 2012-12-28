@@ -64,9 +64,6 @@
     <None Include="..\..\bin\Win32\Debug\modules\Arena\arena.js">
       <Filter>HTML</Filter>
     </None>
-    <None Include="..\..\bin\Win32\Debug\modules\Arena\utils.js">
-      <Filter>HTML</Filter>
-    </None>
     <None Include="..\..\bin\Win32\Debug\modules\Arena\config.txt" />
   </ItemGroup>
 </Project>

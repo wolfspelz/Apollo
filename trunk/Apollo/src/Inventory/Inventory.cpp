@@ -70,15 +70,23 @@ void Inventory::DeleteItemHandle(const ApHandle& hItem)
   }
 }
 
+void Inventory::DeleteAllItemHandles()
+{
+  ItemHandle2IdListNode* node = 0;
+  while ((node = handle2Id_.Next(0)) != 0) {
+    DeleteItemHandle(node->Key());
+  }
+}
+
 //---------------------------------------------------
 // Interface
 
 void Inventory::Create()
 {
-  ApHandle h = Apollo::newHandle();
+  ApHandle hDialog = Apollo::newHandle();
 
   Msg_Dialog_Create msg;
-  msg.hDialog = h; 
+  msg.hDialog = hDialog; 
   msg.nLeft = Apollo::getModuleConfig(MODULE_NAME, "Left", 200);
   msg.nTop = Apollo::getModuleConfig(MODULE_NAME, "Top", 200);
   msg.nWidth = Apollo::getModuleConfig(MODULE_NAME, "Width", 500);
@@ -89,7 +97,7 @@ void Inventory::Create()
   msg.sContentUrl = "file://" + Apollo::getModuleResourcePath(MODULE_NAME) + "Inventory.html";
   if (!msg.Request()) { throw ApException(LOG_CONTEXT, "%s failed: %s", _sz(msg.Type()), _sz(msg.sComment)); }
 
-  hCandidate_ = h;
+  hCandidate_ = hDialog;
 }
 
 void Inventory::Destroy()
@@ -157,7 +165,7 @@ void Inventory::OnModuleCall(Apollo::SrpcMessage& request, Apollo::SrpcMessage& 
     PlayModel();
 
   } else if (sMethod == "OnDragItem") {
-    BeginDragItem(request.getString("sItemId")
+    BeginDragItem(request.getHandle("hItem")
       , request.getInt("nLeft")
       , request.getInt("nTop")
       , request.getInt("nWidth")
@@ -224,21 +232,21 @@ void Inventory::BuildPanels()
 
 void Inventory::SendGetPanelsRequest()
 {
-  ApHandle h = Apollo::newHandle();
+  ApHandle hRequest = Apollo::newHandle();
 
   GetPanelsRequest* pRequest = new GetPanelsRequest(this);
   if (pRequest != 0) {
-    AddRequest(h, pRequest);
+    AddRequest(hRequest, pRequest);
   }
 
   Msg_Gm_SendRequest msg;
-  msg.hRequest = h;
+  msg.hRequest = hRequest;
   msg.srpc.set(Srpc::Key::Method, Gm_ItemProtocol_GetItemIdsAndValuesByProperty);
   msg.srpc.set("sInventory", Apollo::getModuleConfig(MODULE_NAME, "Name", ""));
   msg.srpc.set("sKey", "IsPanel");
   
   if (!msg.Request()) {
-    DeleteRequest(h);
+    DeleteRequest(hRequest);
     throw ApException(LOG_CONTEXT, "Msg_Gm_SendRequest failed");
   }
 
@@ -247,49 +255,50 @@ void Inventory::SendGetPanelsRequest()
 
 void Inventory::GetPanelsResponse(Apollo::SrpcMessage& kvIdValues)
 {
-  sPanelId_ = "";
+  ApHandle hPanel;
 
   for (Elem* e = 0; (e = kvIdValues.Next(e)); ) {
     String sId = e->getName();
     long nId = String::atol(sId);
     int bIsPanel = String::isTrue(e->getString());
     if (bIsPanel) {
-      sPanelId_ = sId;
+      hPanel = GetOrCreateItemHandle(sId);
     }
   }
 
-  if (!sPanelId_.empty()) {
-    SendGetPanelItemsRequest(sPanelId_);
+  if (ApIsHandle(hPanel)) {
+    SendGetPanelItemsRequest(hPanel);
+    hPanel_ = hPanel;
   }
 }
 
 //-------------------------
 
-void Inventory::SendGetPanelItemsRequest(const String& sPanel)
+void Inventory::SendGetPanelItemsRequest(const ApHandle& hPanel)
 {
-  ApHandle h = Apollo::newHandle();
+  ApHandle hRequest = Apollo::newHandle();
 
-  GetPanelItemsRequest* pRequest = new GetPanelItemsRequest(this, sPanel);
+  GetPanelItemsRequest* pRequest = new GetPanelItemsRequest(this, hPanel);
   if (pRequest != 0) {
-    AddRequest(h, pRequest);
+    AddRequest(hRequest, pRequest);
   }
 
   Msg_Gm_SendRequest msg;
-  msg.hRequest = h;
+  msg.hRequest = hRequest;
   msg.srpc.set(Srpc::Key::Method, Gm_ItemProtocol_GetProperties);
   msg.srpc.set("sInventory", Apollo::getModuleConfig(MODULE_NAME, "Name", ""));
-  msg.srpc.set("nItem", sPanelId_);
+  msg.srpc.set("nItem", GetItemId(hPanel));
   msg.srpc.set("vlKeys", Item_PropertyId_Name " " Item_PropertyId_Nickname " " Item_PropertyId_PanelOrder " " Item_PropertyId_Slots " " Item_PropertyId_Contains);
 
   if (!msg.Request()) {
-    DeleteRequest(h);
+    DeleteRequest(hRequest);
     throw ApException(LOG_CONTEXT, "Msg_Gm_SendRequest failed");
   }
 
   nState_ = StateGetPanelDetails;
 }
 
-void Inventory::GetPanelItemsResponse(const String& sPanel, Apollo::SrpcMessage& kvProperties)
+void Inventory::GetPanelItemsResponse(const ApHandle& hPanel, Apollo::SrpcMessage& kvProperties)
 {
   String sName = kvProperties.getString(Item_PropertyId_Name);
 
@@ -309,38 +318,38 @@ void Inventory::GetPanelItemsResponse(const String& sPanel, Apollo::SrpcMessage&
   nSlots_ = nSlots;
 
   if (!sContains.empty()) {
-    SendGetItemsPropertiesResquest(sContains);
+    SendGetItemsPropertiesResquest(hPanel, sContains);
   }
 
 }
 
 //-------------------------
 
-void Inventory::SendGetItemsPropertiesResquest(const String& sContains)
+void Inventory::SendGetItemsPropertiesResquest(const ApHandle& hPanel, const String& sContains)
 {
-  ApHandle h = Apollo::newHandle();
+  ApHandle hRequest = Apollo::newHandle();
 
-  GetItemsPropertiesRequest* pRequest = new GetItemsPropertiesRequest(this, sPanelId_);
+  GetItemsPropertiesRequest* pRequest = new GetItemsPropertiesRequest(this, hPanel);
   if (pRequest != 0) {
-    AddRequest(h, pRequest);
+    AddRequest(hRequest, pRequest);
   }
 
   Msg_Gm_SendRequest msg;
-  msg.hRequest = h;
+  msg.hRequest = hRequest;
   msg.srpc.set(Srpc::Key::Method, Gm_ItemProtocol_GetMultiItemProperties);
   msg.srpc.set("sInventory", Apollo::getModuleConfig(MODULE_NAME, "Name", ""));
   msg.srpc.set("vlItems", sContains);
   msg.srpc.set("vlKeys", Item_PropertyId_Id " " Item_PropertyId_Name " " Item_PropertyId_Nickname " " Item_PropertyId_Icon32Url " " Item_PropertyId_Image100Url " " Item_PropertyId_Stacksize " " Item_PropertyId_Slot);
 
   if (!msg.Request()) {
-    DeleteRequest(h);
+    DeleteRequest(hRequest);
     throw ApException(LOG_CONTEXT, "Msg_Gm_SendRequest failed");
   }
 
   nState_ = StateGetItemDetails;
 }
 
-void Inventory::GetItemsPropertiesResponse(const String& sPanel, Apollo::SrpcMessage& kvIdKeyValues)
+void Inventory::GetItemsPropertiesResponse(const ApHandle& hPanel, Apollo::SrpcMessage& kvIdKeyValues)
 {
   for (Elem* e = 0; (e = kvIdKeyValues.Next(e)); ) {
     String sId = e->getName();
@@ -349,12 +358,17 @@ void Inventory::GetItemsPropertiesResponse(const String& sPanel, Apollo::SrpcMes
       Apollo::KeyValueList kvProperties;
       kvIdKeyValues.getKeyValueList(sId, kvProperties);
 
-      Item* pItem = new Item();
+      String sName = kvProperties[Item_PropertyId_Nickname].getString();
+      if (sName.empty()) {
+        sName = kvProperties[Item_PropertyId_Name].getString();
+      }
+      String sIcon = kvProperties[Item_PropertyId_Icon32Url].getString();
+      int nSlot = kvProperties[Item_PropertyId_Slot].getInt();
+      int nStacksize = kvProperties[Item_PropertyId_Stacksize].getInt();
+
+      Item* pItem = new Item(sName, sIcon, nSlot, nStacksize);
       if (pItem != 0) {
-        for (Apollo::KeyValueElem* e = 0; (e = kvProperties.nextElem(e)); ) {
-          pItem->add(e->getKey(), e->getString());
-        }
-        items_.Set(sId, pItem);
+        items_.Set(GetOrCreateItemHandle(sId), pItem);
       }
     }
   }
@@ -369,7 +383,7 @@ void Inventory::GetItemsPropertiesResponse(const String& sPanel, Apollo::SrpcMes
 void Inventory::PurgeModel()
 {
   nState_ = NoState;
-  sPanelId_ = "";
+  hPanel_ = ApNoHandle;
   sName_ = "";
   nOrder_ = -1;
 
@@ -381,6 +395,8 @@ void Inventory::PurgeModel()
       delete pItem;
     }
   }
+
+  DeleteAllItemHandles();
 }
 
 String Inventory::GetScriptFunctionName()
@@ -393,27 +409,32 @@ void Inventory::PlayModel()
   if (nState_ == StateReady) {
     Msg_Dialog_ContentCall::_(hDialog_, GetScriptFunctionName(), "PurgePanels");
 
-    { // for all grids
+    { // Should be for all panels
+      ApHandle hPanel = hPanel_;
+
       {
         Apollo::SrpcMessage srpc;
         srpc.set(Srpc::Key::Method, "AddPanel");
-        srpc.set("Panel", sPanelId_);
-        srpc.set("Name", sName_);
-        srpc.set("Order", nOrder_);
-        srpc.set("Slots", nSlots_);
+        srpc.set("hPanel", hPanel);
+        srpc.set("sName", sName_);
+        srpc.set("nOrder", nOrder_);
+        srpc.set("nSlots", nSlots_);
         Msg_Dialog_ContentCall::_(hDialog_, GetScriptFunctionName(), srpc);
       }
   
       ItemListNode* node = 0;
       for (ItemListIterator iter(items_); (node = iter.Next()); ) {
+        ApHandle hItem = node->Key();
         Item* pItem = node->Value();
         if (pItem != 0) {
           Apollo::SrpcMessage srpc;
           srpc.set(Srpc::Key::Method, "AddItem");
-          srpc.set("Panel", sPanelId_);
-          for (Apollo::KeyValueElem* e = 0; (e = pItem->nextElem(e)); ) {
-            srpc.set(e->getKey(), e->getString());
-          }
+          srpc.set("hPanel", hPanel);
+          srpc.set("hItem", hItem);
+          srpc.set("sName", pItem->sName_);
+          srpc.set("sIcon", pItem->sIcon_);
+          srpc.set("nSlot", pItem->nSlot_);
+          srpc.set("nStacksize", pItem->nStacksize_);
           Msg_Dialog_ContentCall::_(hDialog_, GetScriptFunctionName(), srpc);
         }
       }
@@ -424,17 +445,17 @@ void Inventory::PlayModel()
 
 //-------------------------
 
-void Inventory::BeginDragItem(const String& sItemId, int nLeft, int nTop, int nWidth, int nHeight, int nOffsetX, int nOffsetY)
+void Inventory::BeginDragItem(const ApHandle& hItem, int nLeft, int nTop, int nWidth, int nHeight, int nOffsetX, int nOffsetY)
 {
   if (ApIsHandle(hDragItemView_)) {
     EndDragItem();
   }
 
-  sDragItemId_ = sItemId;
+  hDragItem_ = hItem;
   nDragOffsetX_ = nOffsetX;
   nDragOffsetY_ = nOffsetY;
 
-  ApHandle h = Apollo::newHandle();
+  ApHandle hDragItemView = Apollo::newHandle();
   ApHandle hDialogView = Msg_Dialog_GetView::_(hDialog_);
 
   int nInventoryLeft = 0;
@@ -462,12 +483,12 @@ void Inventory::BeginDragItem(const String& sItemId, int nLeft, int nTop, int nW
   int nAbsLeft = nInventoryLeft + nContentLeft + nLeft;
   int nAbsTop = nInventoryTop + nContentTop + nTop;
 
-  if (!Msg_WebView_Create::_(h, nAbsLeft, nAbsTop, nWidth, nHeight)) { throw ApException(LOG_CONTEXT, "Msg_WebView_Create failed"); }
-  if (!Msg_WebView_SetScriptAccessPolicy::Allow(h)) { throw ApException(LOG_CONTEXT, "Msg_WebView_SetScriptAccessPolicy failed"); }
-  if (!Msg_WebView_Load::_(h, "file://" + Apollo::getModuleResourcePath(MODULE_NAME) + "DragItem.html")) { throw ApException(LOG_CONTEXT, "Msg_WebView_Load failed"); }
-  if (!Msg_WebView_Visibility::_(h, 1)) { throw ApException(LOG_CONTEXT, "Msg_WebView_Visibility failed"); }
+  if (!Msg_WebView_Create::_(hDragItemView, nAbsLeft, nAbsTop, nWidth, nHeight)) { throw ApException(LOG_CONTEXT, "Msg_WebView_Create failed"); }
+  if (!Msg_WebView_SetScriptAccessPolicy::Allow(hDragItemView)) { throw ApException(LOG_CONTEXT, "Msg_WebView_SetScriptAccessPolicy failed"); }
+  if (!Msg_WebView_Load::_(hDragItemView, "file://" + Apollo::getModuleResourcePath(MODULE_NAME) + "DragItem.html")) { throw ApException(LOG_CONTEXT, "Msg_WebView_Load failed"); }
+  if (!Msg_WebView_Visibility::_(hDragItemView, 1)) { throw ApException(LOG_CONTEXT, "Msg_WebView_Visibility failed"); }
 
-  hDragItemView_ = h;
+  hDragItemView_ = hDragItemView;
 }
 
 void Inventory::EndDragItem()
@@ -483,14 +504,11 @@ void Inventory::OnDragItemReady(const ApHandle& hView)
   if (hDragItemView_ == hView) {
     //if (!Msg_WebView_ViewCall::_(hView, "Start")) { throw ApException(LOG_CONTEXT, "Msg_WebView_ViewCall 'Start' failed"); }
     String sUrl;
-    ItemListNode* pNode = items_.Find(sDragItemId_);
+    ItemListNode* pNode = items_.Find(hDragItem_);
     if (pNode != 0) {
       Item* pItem = pNode->Value();
       if (pItem != 0) {
-        sUrl = (*pItem)[Item_PropertyId_Image100Url].getString();
-        if (!sUrl) {
-          sUrl = (*pItem)[Item_PropertyId_Icon32Url].getString();
-        }
+        sUrl = pItem->sIcon_;
       }
     }
     List lArgs;
@@ -590,6 +608,19 @@ String Inventory::Test_CreateItemHandleDuplicateEntryException()
   return s;
 }
 
+String Inventory::Test_DeleteAllItemHandles()
+{
+  String s;
+  Inventory i;
+  ApHandle h1 = i.CreateItemHandle("1");
+  ApHandle h3 = i.CreateItemHandle("3");
+  ApHandle h2 = i.CreateItemHandle("2");
+  i.DeleteAllItemHandles();
+  if (!s) { if (i.id2Handle_.Count()) { s = String::from(__LINE__); }}
+  if (!s) { if (i.handle2Id_.Count()) { s = String::from(__LINE__); }}
+  return s;
+}
+
 String Inventory::TestItemId2HandleMapper()
 {
   String s;
@@ -600,6 +631,7 @@ String Inventory::TestItemId2HandleMapper()
   if (!s) { s = Test_DeleteItemId(); }
   if (!s) { s = Test_GetOrCreateItemHandle(); }
   if (!s) { s = Test_CreateItemHandleDuplicateEntryException(); }
+  if (!s) { s = Test_DeleteAllItemHandles(); }
 
   return s;
 }

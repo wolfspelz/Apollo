@@ -94,7 +94,6 @@
     <None Include="..\..\bin\Win32\Debug\modules\Arena\arena.css" />
     <None Include="..\..\bin\Win32\Debug\modules\Arena\arena.html" />
     <None Include="..\..\bin\Win32\Debug\modules\Arena\arena.js" />
-    <None Include="..\..\bin\Win32\Debug\modules\Arena\utils.js" />
     <None Include="..\..\bin\Win32\Debug\modules\Arena\config.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

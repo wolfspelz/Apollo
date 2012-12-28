@@ -3,6 +3,7 @@
 <head>
 <script type="text/javascript" src="../WebView/jquery-1.5.1.min.js"></script>
 <script type="text/javascript" src="../WebView/jquery-ui-1.8.13.custom.min.js"></script> 
+<script type="text/javascript" src="../WebView/utils.js"></script>
 <script type="text/javascript" src="../WebView/apollo.js"></script>
 
 <style type="text/css">
@@ -71,7 +72,7 @@
 
 <script type="text/javascript">
 
-var api = new ApolloApi('Chat');
+var api = new ApolloApi('Inventory');
 
 function ReceiveMessageFromModule(sMsg) {
   //api.Log.Debug('ReceiveMessageFromModule ' + sMsg);
@@ -85,10 +86,10 @@ function ReceiveMessageFromModule(sMsg) {
     switch (sMethod) {
       case 'Start': return Start(); break;
       case 'PurgePanels': return PurgePanels(); break;
-      case 'AddPanel': return AddPanel(msg.getString('Panel'), msg.getString('Name'), msg.getInt('Order'), msg.getInt('Slots')); break;
-      case 'RemovePanel': return RemovePanel(msg.getString('Panel')); break;
-      case 'AddItem': return AddItem(msg.getString('Panel'), msg.getString('Id'), msg); break;
-      case 'RemoveItem': return RemoveItem(msg.getString('Panel'), msg.getString('Id')); break;
+      case 'AddPanel': return AddPanel(msg.getString('hPanel'), msg.getString('sName'), msg.getInt('nOrder'), msg.getInt('nSlots')); break;
+      case 'RemovePanel': return RemovePanel(msg.getString('hPanel')); break;
+      case 'AddItem': return AddItem(msg.getString('hPanel'), msg.getString('hItem'), msg.getString('sName'), msg.getString('sIcon'), msg.getInt('nSlot'), msg.getInt('nStacksize')); break;
+      case 'RemoveItem': return RemoveItem(msg.getString('hPanel'), msg.getString('hItem')); break;
       default: throw 'Unknown method: ' + sMethod;
     }
 
@@ -111,59 +112,52 @@ function PurgePanels() {
   $('#Wrapper').empty();
 }
 
-function AddPanel(sPanelId, sName, nOrder, nSlots) {
+function AddPanel(hPanel, sName, nOrder, nSlots) {
   $('#Wrapper').append(''
-        + '<div id="Panel_' + sPanelId + '" class="Panel">'
+        + '<div id="Panel_' + hPanel.toDomCompatible() + '" class="Panel">'
         + '  <div class="Name">' + sName + '</div>'
         + '  <div class="Items"></div>'
         + '</div>'
       );
 }
 
-function RemovePanel(sPanelId) {
-  $('#Panel_' + sPanelId).remove();
+function RemovePanel(hPanel) {
+  $('#Panel_' + hPanel.toDomCompatible()).remove();
 }
 
-function AddItem(sPanelId, sItemId, props) {
-  var sName = props.getString('Name');
-  var sNickname = props.getString('Nickname');
-  var sIcon = props.getString('Icon32Url');
-  var nSlot = props.getInt('Slot');
-  var nStacksize = props.getInt('Stacksize');
+function AddItem(hPanel, hItem, sName, sIcon, nSlot, nStacksize) {
+  $('#Panel_' + hPanel.toDomCompatible()).append(''
+      + '<div id="Item_' + hItem.toDomCompatible() + '" class="Item">'
+      + '  <img src="' + sIcon + '" class="Icon" />'
+      + '  <div class="Stacksize">' + nStacksize + '</div>'
+      + '  <div class="Name">' + sName + '</div>'
+      + '  <div class="ItemId">' + hItem + '</div>'
+      + '  <input type="button" class="Drag" value="Drag"/>'
+      + '</div>'
+    );
 
-  $('#Panel_' + sPanelId).append(''
-        + '<div id="Item_' + sItemId + '" class="Item">'
-        + '  <img src="' + sIcon + '" class="Icon" />'
-        + '  <div class="Stacksize">' + nStacksize + '</div>'
-        + (sNickname != '' ? '  <div class="Nickname">' + sNickname + '</div>' : '')
-        + '  <div class="Name">' + sName + '</div>'
-        + '  <div class="ItemId">' + sItemId + '</div>'
-        + '  <input type="button" class="Drag" value="Drag"/>'
-        + '</div>'
-      );
+  $('#Item_' + hItem.toDomCompatible() + ' .Drag').mousedown(
+    function (ev) {
+      OnDragItem(hItem, ev.pageX, ev.pageY);
+    });
 
-    $('#Item_' + sItemId + ' .Drag').mousedown(
-      function (ev) {
-        OnDragItem(sItemId, ev.pageX, ev.pageY);
-      });
-
-  //  $('#Item_' + sItemId).mousedown(
+    //  $('#Item_' + hItem.toDomCompatible()).mousedown(
   //    function (ev) {
   //      //api.Log.Debug('pageX=' + ev.pageX + ' pageY=' + ev.pageY);
-  //      OnDragItem(sItemId, ev.pageX, ev.pageY);
+  //      OnDragItem(hItem, ev.pageX, ev.pageY);
   //    });
 
   var nLastX = 0;
   var nLastY = 0;
 
-  $('#Item_' + sItemId).draggable({
+  $('#Item_' + hItem.toDomCompatible()).draggable({
     distance: 8,
     stack: 'div',
     xdelay: 200,
     xgrid: [108, 108],
     xcursor: 'move',
     xcursorAt: { top: 50, left: 50 },
-    containment: '#Panel_' + sPanelId + ' .Items',
+    containment: '#Panel_' + hPanel.toDomCompatible() + ' .Items',
     start: function (ev) {
       nLastX = ev.pageX;
       nLastY = ev.pageY;
@@ -182,14 +176,14 @@ function AddItem(sPanelId, sItemId, props) {
   });
 }
 
-function RemoveItem(sPanelId, sItemId) {
-  $('#Item_' + sItemId).remove();
+function RemoveItem(hPanel, hItem) {
+  $('#Item_' + hItem.toDomCompatible()).remove();
 }
 
 // -----------------------------------------------
 
-function OnDragItem(sItemId, nX, nY) {
-  var eItem = $('#Item_' + sItemId);
+function OnDragItem(hItem, nX, nY) {
+  var eItem = $('#Item_' + hItem.toDomCompatible());
   var off = eItem.offset();
 
   var nLeft = off.left + 3;
@@ -200,7 +194,7 @@ function OnDragItem(sItemId, nX, nY) {
   var nOffsetY = nY - nTop;
 
   api.ModuleCall('OnDragItem')
-     .setString('sItemId', sItemId)
+     .setString('hItem', hItem)
      .setInt('nLeft', nLeft)
      .setInt('nTop', nTop)
      .setInt('nWidth', nWidth)

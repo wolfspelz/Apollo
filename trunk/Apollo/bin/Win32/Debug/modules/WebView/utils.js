@@ -25,7 +25,9 @@ String.prototype.toDomCompatible = function()
 	var sValue = this;
   for (var i = 0; i < sValue.length; i++) {
     var c = sValue.charAt(i);
-    if (c >= 'A' && c <= 'Z' || c >= 'a' && c <= 'z' || c >= '0' && c <= '9') {
+    if (c == '[' || c == ']') {
+		  s += '_';
+    } else if (c >= 'A' && c <= 'Z' || c >= 'a' && c <= 'z' || c >= '0' && c <= '9') {
 		  s += c;
     } else if (c == '_') {
 		  s += '__';
@@ -43,7 +45,8 @@ var String_Tester = {
   },
   toDomCompatible: function() { var s = null;
     if (s==null) s = String_Tester.toDomCompatible1('a1_2@b-c.d', 'a1__2_64b_45c_46d');
-    if (s==null) s = String_Tester.toDomCompatible1('[5]', '_915_93');
+    //if (s==null) s = String_Tester.toDomCompatible1('[5]', '_915_93');
+    if (s==null) s = String_Tester.toDomCompatible1('[5]', '_5_');
     return s;
   }
 }
