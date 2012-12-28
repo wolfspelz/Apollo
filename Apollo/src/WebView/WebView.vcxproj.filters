@@ -98,5 +98,8 @@
     <None Include="..\..\bin\Win32\Debug\modules\WebView\test\aホü\NonAsciiPath.html">
       <Filter>HTML</Filter>
     </None>
+    <None Include="..\..\bin\Win32\Debug\modules\WebView\utils.js">
+      <Filter>HTML</Filter>
+    </None>
   </ItemGroup>
 </Project>

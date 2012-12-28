@@ -22,14 +22,14 @@ void GetPanelItemsRequest::HandleResponse(Apollo::SrpcMessage& response)
   if (pInventory_ != 0) {
     Apollo::SrpcMessage kvProperties;
     response.getKeyValueListAsSrpcMessage("kvProperties", kvProperties);
-    pInventory_->GetPanelItemsResponse(sPanel_, kvProperties);
+    pInventory_->GetPanelItemsResponse(hPanel_, kvProperties);
   }
 }
 
 void GetItemsPropertiesRequest::HandleResponse(Apollo::SrpcMessage& response)
 {
   if (pInventory_ != 0) {
-    pInventory_->GetItemsPropertiesResponse(sPanel_, response);
+    pInventory_->GetItemsPropertiesResponse(hPanel_, response);
   }
 }
 

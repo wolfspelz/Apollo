@@ -107,6 +107,7 @@
     <None Include="..\..\bin\Win32\Debug\modules\WebView\test\StartManuallySerialized1.html" />
     <None Include="..\..\bin\Win32\Debug\modules\WebView\test\StartManuallySerialized2.html" />
     <None Include="..\..\bin\Win32\Debug\modules\WebView\config.txt" />
+    <None Include="..\..\bin\Win32\Debug\modules\WebView\utils.js" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

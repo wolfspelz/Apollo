@@ -18,9 +18,9 @@ typedef StringTree<ApHandle> ItemId2HandleList;
 typedef StringTreeNode<ApHandle> ItemId2HandleListNode;
 typedef StringTreeIterator<ApHandle> ItemId2HandleListIterator;
 
-typedef PointerTree<String, Item*, LessThan<String> > ItemList;
-typedef PointerTreeNode<String, Item*> ItemListNode;
-typedef PointerTreeIterator<String, Item*, LessThan<String> > ItemListIterator;
+typedef ApHandlePointerTree<Item*> ItemList;
+typedef ApHandlePointerTreeNode<Item*> ItemListNode;
+typedef ApHandlePointerTreeIterator<Item*> ItemListIterator;
 
 class Inventory
 {
@@ -57,6 +57,7 @@ public:
   static String Test_DeleteItemHandle();
   static String Test_GetOrCreateItemHandle();
   static String Test_CreateItemHandleDuplicateEntryException();
+  static String Test_DeleteAllItemHandles();
 
 protected:
   String GetScriptFunctionName();
@@ -76,14 +77,14 @@ protected:
   void GetPanelsResponse(Apollo::SrpcMessage& kvIdValues);
 
   friend class GetPanelItemsRequest;
-  void SendGetPanelItemsRequest(const String& sPanel);
-  void GetPanelItemsResponse(const String& sPanel, Apollo::SrpcMessage& kvProperties);
+  void SendGetPanelItemsRequest(const ApHandle& hPanel);
+  void GetPanelItemsResponse(const ApHandle& hPanel, Apollo::SrpcMessage& kvProperties);
 
   friend class GetItemsPropertiesRequest;
-  void SendGetItemsPropertiesResquest(const String& sContains);
-  void GetItemsPropertiesResponse(const String& sPanel, Apollo::SrpcMessage& kvIdKeyValues);
+  void SendGetItemsPropertiesResquest(const ApHandle& hPanel, const String& sContains);
+  void GetItemsPropertiesResponse(const ApHandle& hPanel, Apollo::SrpcMessage& kvIdKeyValues);
 
-  void BeginDragItem(const String& sItemId, int nLeft, int nTop, int nWidth, int nHeight, int nOffsetX, int nOffsetY);
+  void BeginDragItem(const ApHandle& hItem, int nLeft, int nTop, int nWidth, int nHeight, int nOffsetX, int nOffsetY);
   void EndDragItem();
 
 protected:
@@ -94,6 +95,7 @@ protected:
   String GetItemId(const ApHandle& hItem);
   void DeleteItemId(const String& sItem);
   void DeleteItemHandle(const ApHandle& hItem);
+  void DeleteAllItemHandles();
   ItemHandle2IdList handle2Id_;
   ItemId2HandleList id2Handle_;
 
@@ -115,7 +117,7 @@ protected:
 
   int nState_;
 
-  String sPanelId_;
+  ApHandle hPanel_;
   String sName_;
   int nOrder_;
   int nSlots_;
@@ -125,7 +127,7 @@ protected:
   ApHandle hDialog_;
 
   ApHandle hDragItemView_;
-  String sDragItemId_;
+  ApHandle hDragItem_;
   int nDragOffsetX_;
   int nDragOffsetY_;
 };
