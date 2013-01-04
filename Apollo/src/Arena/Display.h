@@ -51,6 +51,7 @@ public:
   void OnContextDetailsChanged(Apollo::ValueList& vlKeys);
   void OnLocationDetailsChanged(Apollo::ValueList& vlKeys);
   void OnAvatarAnimationBegin(const ApHandle& hParticipant, const String& sUrl);
+  void OnDragItemMove(const ApHandle& hView, int nLeft, int nTop, int nWidth, int nHeight);
   void OnModuleCall(Apollo::SrpcMessage& request, Apollo::SrpcMessage& response);
   void OnShowChatWindow(int bShow);
   void OnShowDebugTools(int bShow);

@@ -17,12 +17,13 @@
 
 #Wrapper {
   position:absolute;
-  left:4px;
-  top:4px;
-  right:4px;
-  bottom:4px;
+  left:0px;
+  top:0px;
+  right:0px;
+  bottom:0px;
+  border: solid 1px #D0D0D0;
   background-color:#ffffff;
-  padding:4px;
+  padding:0px;
 }
 
 .Items
@@ -41,13 +42,13 @@
 
 .Item {
   float: left;
-  border: solid 1px #D0D0D0;
-  background-color:#ffffff;
+  xborder: solid 1px #D0D0D0;
+  xbackground-color:#ffffff;
   margin: 1px;
-  padding: 2px;
+  xpadding: 2px;
   overflow: hidden;
-  height: 100px;
-  width: 100px;
+  xheight: 100px;
+  xwidth: 100px;
 }
 
 .Item img.Icon {
@@ -129,49 +130,66 @@ function AddItem(hPanel, hItem, sName, sIcon, nSlot, nStacksize) {
   $('#Panel_' + hPanel.toDomCompatible()).append(''
       + '<div id="Item_' + hItem.toDomCompatible() + '" class="Item">'
       + '  <img src="' + sIcon + '" class="Icon" />'
-      + '  <div class="Stacksize">' + nStacksize + '</div>'
-      + '  <div class="Name">' + sName + '</div>'
-      + '  <div class="ItemId">' + hItem + '</div>'
-      + '  <input type="button" class="Drag" value="Drag"/>'
+//      + '  <div class="Stacksize">' + nStacksize + '</div>'
+//      + '  <div class="Name">' + sName + '</div>'
+//      + '  <div class="ItemId">' + hItem + '</div>'
+//      + '  <input type="button" class="Drag" value="Drag"/>'
       + '</div>'
     );
 
-  $('#Item_' + hItem.toDomCompatible() + ' .Drag').mousedown(
-    function (ev) {
-      OnDragItem(hItem, ev.pageX, ev.pageY);
-    });
+//  $('#Item_' + hItem.toDomCompatible() + ' .Drag').mousedown(
+//  //$('#Item_' + hItem.toDomCompatible() + ' .Icon').mousedown(
+//    function (ev) {
+//      api.Log.Debug('OnDragItem');
+//      OnDragItem(hItem, ev.pageX, ev.pageY);
+//    });
 
-    //  $('#Item_' + hItem.toDomCompatible()).mousedown(
+  //  $('#Item_' + hItem.toDomCompatible()).mousedown(
   //    function (ev) {
   //      //api.Log.Debug('pageX=' + ev.pageX + ' pageY=' + ev.pageY);
   //      OnDragItem(hItem, ev.pageX, ev.pageY);
   //    });
 
-  var nLastX = 0;
-  var nLastY = 0;
+  var nPinX = 16;
+  var nPinY = 16;
 
   $('#Item_' + hItem.toDomCompatible()).draggable({
-    distance: 8,
+    //    iframeFix: true,
+    distance: 4,
     stack: 'div',
-    xdelay: 200,
-    xgrid: [108, 108],
-    xcursor: 'move',
-    xcursorAt: { top: 50, left: 50 },
+    opacity: 0.7,
+    scroll: false,
+    //    revert: true,
+    //    helper: 'clone',
+    //    delay: 200,
+    //    grid: [108, 108],
+    cursor: 'move',
+    xcursorAt: { top: 16, left: 16 },
     containment: '#Panel_' + hPanel.toDomCompatible() + ' .Items',
     start: function (ev) {
-      nLastX = ev.pageX;
-      nLastY = ev.pageY;
-      //api.Message('WebView_MouseCapture').setString('hView', api.GetViewHandle()).send();
+      var off = $(this).offset();
+      nPinX = ev.pageX - off.left;
+      nPinY = ev.pageY - off.top;
     },
     drag: function (ev) {
-      var nDX = ev.pageX - nLastX;
-      var nDY = ev.pageY - nLastY;
-      //api.Log.Debug('dx=' + nDX + ' dY=' + nDY);
-      nLastX = ev.pageX;
-      nLastY = ev.pageY;
+      var nBorder = 4;
+      var eParent = this.offsetParent;
+      var nLeft = eParent.offsetLeft - nBorder;
+      var nTop = eParent.offsetTop - nBorder;
+      var nRight = nLeft + eParent.offsetWidth + nBorder;
+      var nBottom = nTop + eParent.offsetHeight + nBorder;
+      var nMouseX = ev.pageX;
+      var nMouseY = ev.pageY;
+      var bInside = true;
+      if (nMouseX < nLeft || nMouseX > nRight) { bInside = false; }
+      if (nMouseY < nTop || nMouseY > nBottom) { bInside = false; }
+      if (!bInside) {
+        OnDragItem(hItem, nMouseX, nMouseY, nPinX, nPinY);
+        $('#Item_' + hItem.toDomCompatible()).hide();
+        return false;
+      }
     },
     stop: function (ev) {
-
     }
   });
 }
@@ -182,16 +200,18 @@ function RemoveItem(hPanel, hItem) {
 
 // -----------------------------------------------
 
-function OnDragItem(hItem, nX, nY) {
+function OnDragItem(hItem, nMouseX, nMouseY, nPinX, nPinY) {
   var eItem = $('#Item_' + hItem.toDomCompatible());
   var off = eItem.offset();
-
-  var nLeft = off.left + 3;
-  var nTop = off.top + 3;
+  var nLeft = off.left;
+  var nTop = off.top;
   var nWidth = eItem.width();
   var nHeight = eItem.height();
-  var nOffsetX = nX - nLeft;
-  var nOffsetY = nY - nTop;
+  var nOffsetX = nMouseX - nLeft;
+  var nOffsetY = nMouseY - nTop;
+  api.Log.Debug('offset: ' + off.left + ' ' + off.top);
+  api.Log.Debug('size: ' + nWidth + ' ' + nHeight);
+  api.Log.Debug('mouse: ' + nOffsetX + ' ' + nOffsetY);
 
   api.ModuleCall('OnDragItem')
      .setString('hItem', hItem)
@@ -199,8 +219,10 @@ function OnDragItem(hItem, nX, nY) {
      .setInt('nTop', nTop)
      .setInt('nWidth', nWidth)
      .setInt('nHeight', nHeight)
-     .setInt('nOffsetX', nOffsetX)
-     .setInt('nOffsetY', nOffsetY)
+     .setInt('nMouseX', nMouseX)
+     .setInt('nMouseY', nMouseY)
+     .setInt('nPinX', nPinX)
+     .setInt('nPinY', nPinY)
      .send();
 }
 

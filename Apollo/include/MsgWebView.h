@@ -326,6 +326,24 @@ public:
     msg.sFunction = sFunction;
     return msg.Request();
   }
+  static int _(const ApHandle& hView, const String& sFunction, Apollo::SrpcMessage& srpc)
+  {
+    Msg_WebView_ViewCall msg;
+    msg.hView = hView;
+    msg.sFunction = sFunction;
+    srpc >> msg.srpc;
+    return msg.Request();
+  }
+  static int _(const ApHandle& hView, const String& sFunction, Apollo::SrpcMessage& srpc, Apollo::SrpcMessage& response)
+  {
+    Msg_WebView_ViewCall msg;
+    msg.hView = hView;
+    msg.sFunction = sFunction;
+    srpc >> msg.srpc;
+    int ok = msg.Request();
+    msg.response >> response;
+    return ok;
+  }
 };
 
 // Script of Module -> Module DLL
@@ -437,6 +455,19 @@ class Msg_WebView_Event_LostFocus: public ApNotificationMessage
 public:
   Msg_WebView_Event_LostFocus() : ApNotificationMessage("WebView_Event_LostFocus") {}
   ApIN ApHandle hView;
+};
+
+// Window moved to screen coordinates and/or sized
+// WebView ->
+class Msg_WebView_Event_Position: public ApNotificationMessage
+{
+public:
+  Msg_WebView_Event_Position() : ApNotificationMessage("WebView_Event_Position"), nLeft(0), nTop(0), nWidth(0), nHeight(0) {}
+  ApIN ApHandle hView;
+  ApIN int nLeft;
+  ApIN int nTop;
+  ApIN int nWidth;
+  ApIN int nHeight;
 };
 
 #endif // !defined(MsgWebView_h_INCLUDED)

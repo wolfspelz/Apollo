@@ -55,17 +55,25 @@ AP_MSG_HANDLER_METHOD(InventoryModule, Inventory_Show)
   pMsg->apStatus = ApMessage::Ok;
 }
 
-AP_MSG_HANDLER_METHOD(InventoryModule, Dialog_OnOpened)
+// Dialog -> WebView
+AP_MSG_HANDLER_METHOD(InventoryModule, WebView_Event_DocumentLoaded)
 {
-  if (pInventory_ != 0 && pInventory_->HasDialog(pMsg->hDialog)) {
-    pInventory_->OnOpened(pMsg->hDialog);
+  if (pInventory_ != 0 && pInventory_->HasDialog(pMsg->hView)) {
+    pInventory_->OnOpened(pMsg->hView);
   }
 }
+//AP_MSG_HANDLER_METHOD(InventoryModule, Dialog_OnOpened)
+//{
+//  if (pInventory_ != 0 && pInventory_->HasDialog(pMsg->hDialog)) {
+//    pInventory_->OnOpened(pMsg->hDialog);
+//  }
+//}
 
-AP_MSG_HANDLER_METHOD(InventoryModule, Dialog_OnClosed)
+// Dialog -> WebView
+AP_MSG_HANDLER_METHOD(InventoryModule, WebView_Event_Closing)
 {
-  if (pInventory_ != 0 && pInventory_->HasDialog(pMsg->hDialog)) {
-    pInventory_->OnClosed(pMsg->hDialog);
+  if (pInventory_ != 0 && pInventory_->HasDialog(pMsg->hView)) {
+    pInventory_->OnClosed(pMsg->hView);
 
     if (Apollo::getModuleConfig(MODULE_NAME, "DestroyOnHide", 0)) {
       Msg_Inventory_Destroy msg;
@@ -73,6 +81,17 @@ AP_MSG_HANDLER_METHOD(InventoryModule, Dialog_OnClosed)
     }
   }
 }
+//AP_MSG_HANDLER_METHOD(InventoryModule, Dialog_OnClosed)
+//{
+//  if (pInventory_ != 0 && pInventory_->HasDialog(pMsg->hDialog)) {
+//    pInventory_->OnClosed(pMsg->hDialog);
+//
+//    if (Apollo::getModuleConfig(MODULE_NAME, "DestroyOnHide", 0)) {
+//      Msg_Inventory_Destroy msg;
+//      msg.Request();
+//    }
+//  }
+//}
 
 AP_MSG_HANDLER_METHOD(InventoryModule, WebView_Event_DocumentComplete)
 {
@@ -86,6 +105,13 @@ AP_MSG_HANDLER_METHOD(InventoryModule, WebView_ModuleCall)
   if (pInventory_ != 0 && pInventory_->HasDialog(pMsg->hView)) {
     pInventory_->OnModuleCall(pMsg->srpc, pMsg->response);
     pMsg->apStatus = ApMessage::Ok;
+  }
+}
+
+AP_MSG_HANDLER_METHOD(InventoryModule, WebView_Event_Position)
+{
+  if (pInventory_ != 0 && pInventory_->HasDragItem(pMsg->hView)) {
+    pInventory_->OnDragItemMove(pMsg->hView, pMsg->nLeft, pMsg->nTop, pMsg->nWidth, pMsg->nHeight);
   }
 }
 
@@ -171,10 +197,14 @@ int InventoryModule::Init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, InventoryModule, Inventory_Create, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, InventoryModule, Inventory_Destroy, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, InventoryModule, Inventory_Show, this, ApCallbackPosNormal);
-  AP_MSG_REGISTRY_ADD(MODULE_NAME, InventoryModule, Dialog_OnOpened, this, ApCallbackPosNormal);
-  AP_MSG_REGISTRY_ADD(MODULE_NAME, InventoryModule, Dialog_OnClosed, this, ApCallbackPosNormal);
+  // Dialog -> WebView
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, InventoryModule, WebView_Event_DocumentLoaded, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, InventoryModule, WebView_Event_Closing, this, ApCallbackPosNormal);
+  //AP_MSG_REGISTRY_ADD(MODULE_NAME, InventoryModule, Dialog_OnOpened, this, ApCallbackPosNormal);
+  //AP_MSG_REGISTRY_ADD(MODULE_NAME, InventoryModule, Dialog_OnClosed, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, InventoryModule, WebView_Event_DocumentComplete, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, InventoryModule, WebView_ModuleCall, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, InventoryModule, WebView_Event_Position, this, ApCallbackPosEarly);
   //AP_MSG_REGISTRY_ADD(MODULE_NAME, InventoryModule, System_RunLevel, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, InventoryModule, Config_GetValue, this, ApCallbackPosEarly);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, InventoryModule, Gm_ReceiveResponse, this, ApCallbackPosEarly);

@@ -44,8 +44,7 @@ class Msg_Inventory_OnDragItemBegin: public ApNotificationMessage
 {
 public:
   Msg_Inventory_OnDragItemBegin() : ApNotificationMessage("Inventory_OnDragItemBegin") {}
-  ApIN ApHandle hDrag;
-  ApIN String sItem; // Item Id
+  ApIN ApHandle hItem;
 };
 
 // Item drag move mouse event with screen coordinates
@@ -53,10 +52,12 @@ public:
 class Msg_Inventory_OnDragItemMove: public ApNotificationMessage
 {
 public:
-  Msg_Inventory_OnDragItemMove() : ApNotificationMessage("Inventory_OnDragItemMove"), nX(0), nY(0) {}
-  ApIN ApHandle hDrag;
-  ApIN int nX;
-  ApIN int nY;
+  Msg_Inventory_OnDragItemMove() : ApNotificationMessage("Inventory_OnDragItemMove"), nLeft(0), nTop(0), nWidth(0), nHeight(0) {}
+  ApIN ApHandle hItem;
+  ApIN int nLeft;
+  ApIN int nTop;
+  ApIN int nWidth;
+  ApIN int nHeight;
 };
 
 // Item dropped at screen coordinates
@@ -65,9 +66,9 @@ class Msg_Inventory_OnDragItemDrop: public ApNotificationMessage
 {
 public:
   Msg_Inventory_OnDragItemDrop() : ApNotificationMessage("Inventory_OnDragItemDrop") {}
-  ApIN ApHandle hDrag;
-  ApIN int nX;
-  ApIN int nY;
+  ApIN ApHandle hItem;
+  ApIN int nLeft;
+  ApIN int nTop;
 };
 
 // Item drag cancelled = not dropped
@@ -76,7 +77,7 @@ class Msg_Inventory_OnDragItemCancel: public ApNotificationMessage
 {
 public:
   Msg_Inventory_OnDragItemCancel() : ApNotificationMessage("Inventory_OnDragItemCancel") {}
-  ApIN ApHandle hDrag;
+  ApIN ApHandle hItem;
 };
 
 // Item drag ends here
@@ -85,7 +86,7 @@ class Msg_Inventory_OnDragItemEnd: public ApNotificationMessage
 {
 public:
   Msg_Inventory_OnDragItemEnd() : ApNotificationMessage("Inventory_OnDragItemEnd") {}
-  ApIN ApHandle hDrag;
+  ApIN ApHandle hItem;
 };
 
 #endif // !defined(MsgInventory_h_INCLUDED)

@@ -326,6 +326,16 @@ void View::MoveWindowToCurrentRect()
   //apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "############### %d,%d %dx%d", nLeft_, nTop_, nWidth_, nHeight_));
   ::MoveWindow(hWnd_, nLeft_ - (bVisible_ ? 0 : 0), nTop_ - (bVisible_ ? 0 : 10000), nWidth_, nHeight_, FALSE);
 #endif // WIN32
+
+  {
+    Msg_WebView_Event_Position msg;
+    msg.hView = apHandle();
+    msg.nLeft = nLeft_;
+    msg.nTop = nTop_;
+    msg.nWidth = nWidth_;
+    msg.nHeight = nHeight_;
+    msg.Send();
+  }
 }
 
 void View::SetPosition(int nLeft, int nTop, int nWidth, int nHeight)
