@@ -389,7 +389,9 @@ ApolloApi.prototype =
 
   OnMouseMove: function(ev)
   {
-    if (api.bMouseCaptured) {
+    if (!api.bMouseCaptured) {
+      api.Log.Debug('OnMouseMove');
+    } else {
       var dx = ev.x - api.nStartX;
       var dy = ev.y - api.nStartY;
       if (!api.bMouseActive) {

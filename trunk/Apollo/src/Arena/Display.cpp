@@ -291,6 +291,17 @@ void Display::OnAvatarAnimationBegin(const ApHandle& hParticipant, const String&
   }
 }
 
+void Display::OnDragItemMove(const ApHandle& hView, int nLeft, int nTop, int nWidth, int nHeight)
+{
+  int nX = nLeft - nLeft_;
+  int nY = nBottom_ - nTop - nHeight;
+  if (nX > 0 && nX <= nWidth_ && nY > 0 && nY < nHeight_) {
+    apLog_Debug((LOG_CHANNEL, LOG_CONTEXT, "IN  %d %d", nX, nY));
+  } else {
+    apLog_Debug((LOG_CHANNEL, LOG_CONTEXT, "OUT %d %d", nX, nY));
+  }
+}
+
 void Display::OnModuleCall(Apollo::SrpcMessage& request, Apollo::SrpcMessage& response)
 {
   ApHandle hParticipant = Apollo::string2Handle(request.getString("hParticipant"));

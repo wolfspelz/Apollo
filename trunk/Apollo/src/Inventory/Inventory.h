@@ -33,8 +33,10 @@ public:
     ,nHeight_(400)
     ,nState_(NoState)
     ,nOrder_(0)
-    ,nDragOffsetX_(0)
-    ,nDragOffsetY_(0)
+    ,nDragMouseX_(0)
+    ,nDragMouseY_(0)
+    ,nDragPinX_(0)
+    ,nDragPinY_(0)
   {}
   virtual ~Inventory();
 
@@ -45,6 +47,7 @@ public:
   void OnOpened(const ApHandle& hDialog);
   void OnClosed(const ApHandle& hDialog);
   void OnDragItemReady(const ApHandle& hView);
+  void OnDragItemMove(const ApHandle& hView, int nLeft, int nTop, int nWidth, int nHeight);
   void OnModuleCall(Apollo::SrpcMessage& request, Apollo::SrpcMessage& response);
 
   int HasDialog(const ApHandle& hDialog) { return hDialog_ == hDialog || hCandidate_ == hDialog; }
@@ -84,7 +87,7 @@ protected:
   void SendGetItemsPropertiesResquest(const ApHandle& hPanel, const String& sContains);
   void GetItemsPropertiesResponse(const ApHandle& hPanel, Apollo::SrpcMessage& kvIdKeyValues);
 
-  void BeginDragItem(const ApHandle& hItem, int nLeft, int nTop, int nWidth, int nHeight, int nOffsetX, int nOffsetY);
+  void BeginDragItem(const ApHandle& hItem, int nLeft, int nTop, int nWidth, int nHeight, int nMouseX, int nMouseY, int nPinX, int nPinY);
   void EndDragItem();
 
 protected:
@@ -128,8 +131,10 @@ protected:
 
   ApHandle hDragItemView_;
   ApHandle hDragItem_;
-  int nDragOffsetX_;
-  int nDragOffsetY_;
+  int nDragMouseX_;
+  int nDragMouseY_;
+  int nDragPinX_;
+  int nDragPinY_;
 };
 
 #endif // Inventory_H_INCLUDED
