@@ -82,6 +82,20 @@ public:
     msg.bVisible = bVisible;
     return msg.Request();
   }
+  static int Show(const ApHandle& hView)
+  {
+    Msg_WebView_Visibility msg;
+    msg.hView = hView;
+    msg.bVisible = 1;
+    return msg.Request();
+  }
+  static int Hide(const ApHandle& hView)
+  {
+    Msg_WebView_Visibility msg;
+    msg.hView = hView;
+    msg.bVisible = 0;
+    return msg.Request();
+  }
   ApIN ApHandle hView;
   ApIN int bVisible;
 };

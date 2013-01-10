@@ -101,6 +101,8 @@ void Inventory::Create()
   //msg.sContentUrl = "file://" + Apollo::getModuleResourcePath(MODULE_NAME) + "Inventory.html";
   //if (!msg.Request()) { throw ApException(LOG_CONTEXT, "%s failed: %s", _sz(msg.Type()), _sz(msg.sComment)); }
 
+  drag_.Init();
+
   hCandidate_ = hDialog;
 }
 
@@ -466,17 +468,14 @@ void Inventory::PlayModel()
 
 void Inventory::BeginDragItem(const ApHandle& hItem, int nLeft, int nTop, int nWidth, int nHeight, int nMouseX, int nMouseY, int nPinX, int nPinY)
 {
-  if (ApIsHandle(hDragItemView_)) {
+  if (ApIsHandle(drag_.hView_)) {
     EndDragItem();
   }
 
-  hDragItem_ = hItem;
-  nDragMouseX_ = nMouseX;
-  nDragMouseY_ = nMouseY;
-  nDragPinX_ = nPinX;
-  nDragPinY_ = nPinY;
+  drag_.hItem_ = hItem;
+  drag_.nPinX_ = nPinX;
+  drag_.nPinY_ = nPinY;
 
-  ApHandle hDragItemView = Apollo::newHandle();
   // Dialog -> WebView
   ApHandle hDialogView = hDialog_;
   //ApHandle hDialogView = Msg_Dialog_GetView::_(hDialog_);
@@ -504,45 +503,38 @@ void Inventory::BeginDragItem(const ApHandle& hItem, int nLeft, int nTop, int nW
   //  }
   //}
 
-  int nAbsLeft = nInventoryLeft + nContentLeft + nLeft;
-  int nAbsTop = nInventoryTop + nContentTop + nTop;
-
-  if (!Msg_WebView_Create::_(hDragItemView, nAbsLeft, nAbsTop, nWidth, nHeight)) { throw ApException(LOG_CONTEXT, "Msg_WebView_Create failed"); }
-  if (!Msg_WebView_SetScriptAccessPolicy::Allow(hDragItemView)) { throw ApException(LOG_CONTEXT, "Msg_WebView_SetScriptAccessPolicy failed"); }
-  if (!Msg_WebView_Load::_(hDragItemView, "file://" + Apollo::getModuleResourcePath(MODULE_NAME) + "DragItem.html")) { throw ApException(LOG_CONTEXT, "Msg_WebView_Load failed"); }
-  if (!Msg_WebView_Visibility::_(hDragItemView, 1)) { throw ApException(LOG_CONTEXT, "Msg_WebView_Visibility failed"); }
-
-  hDragItemView_ = hDragItemView;
+  int nAbsLeft = nInventoryLeft + nContentLeft + nMouseX - nPinX;
+  int nAbsTop = nInventoryTop + nContentTop + nMouseY - nPinY;
 
   {
     Msg_Inventory_OnDragItemBegin msg;
-    msg.hItem = hDragItem_;
+    msg.hItem = drag_.hItem_;
     msg.Send();
   }
 }
 
 void Inventory::EndDragItem()
 {
-  if (ApIsHandle(hDragItemView_)) {
+  if (ApIsHandle(drag_.hView_)) {
     {
       Msg_Inventory_OnDragItemEnd msg;
-      msg.hItem = hDragItem_;
+      msg.hItem = drag_.hItem_;
       msg.Send();
     }
 
-    Msg_WebView_Destroy::_(hDragItemView_);
+    Msg_WebView_Destroy::_(drag_.hView_);
 
-    hDragItemView_ = ApNoHandle;
-    hDragItem_ = ApNoHandle;
+    drag_.hView_ = ApNoHandle;
+    drag_.hItem_ = ApNoHandle;
   }
 }
 
 void Inventory::OnDragItemReady(const ApHandle& hView)
 {
-  if (hDragItemView_ == hView) {
+  if (drag_.hView_ == hView) {
     //if (!Msg_WebView_ViewCall::_(hView, "Start")) { throw ApException(LOG_CONTEXT, "Msg_WebView_ViewCall 'Start' failed"); }
     String sUrl;
-    ItemListNode* pNode = items_.Find(hDragItem_);
+    ItemListNode* pNode = items_.Find(drag_.hItem_);
     if (pNode != 0) {
       Item* pItem = pNode->Value();
       if (pItem != 0) {
@@ -551,17 +543,17 @@ void Inventory::OnDragItemReady(const ApHandle& hView)
     }
     List lArgs;
     lArgs.AddLast(sUrl);
-    lArgs.AddLast(String::from(nDragPinX_));
-    lArgs.AddLast(String::from(nDragPinY_));
+    lArgs.AddLast(String::from(drag_.nPinX_));
+    lArgs.AddLast(String::from(drag_.nPinY_));
     String sResult = Msg_WebView_CallScriptFunction::_(hView, "", "Start", lArgs);
   }
 }
 
 void Inventory::OnDragItemMove(const ApHandle& hView, int nLeft, int nTop, int nWidth, int nHeight)
 {
-  if (hDragItemView_ == hView) {
+  if (drag_.hView_ == hView) {
     Msg_Inventory_OnDragItemMove msg;
-    msg.hItem = hDragItem_;
+    msg.hItem = drag_.hItem_;
     msg.nLeft = nLeft;
     msg.nTop = nTop;
     msg.nWidth = nWidth;

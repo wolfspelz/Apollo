@@ -9,6 +9,7 @@
 
 #include "Request.h"
 #include "Item.h"
+#include "DragItem.h"
 
 typedef ApHandleTree<String> ItemHandle2IdList;
 typedef ApHandleTreeNode<String> ItemHandle2IdListNode;
@@ -25,7 +26,7 @@ typedef ApHandlePointerTreeIterator<Item*> ItemListIterator;
 class Inventory
 {
 public:
-  Inventory::Inventory()
+  Inventory()
     :bVisible_(0)
     ,nLeft_(100)
     ,nTop_(100)
@@ -33,10 +34,6 @@ public:
     ,nHeight_(400)
     ,nState_(NoState)
     ,nOrder_(0)
-    ,nDragMouseX_(0)
-    ,nDragMouseY_(0)
-    ,nDragPinX_(0)
-    ,nDragPinY_(0)
   {}
   virtual ~Inventory();
 
@@ -51,7 +48,7 @@ public:
   void OnModuleCall(Apollo::SrpcMessage& request, Apollo::SrpcMessage& response);
 
   int HasDialog(const ApHandle& hDialog) { return hDialog_ == hDialog || hCandidate_ == hDialog; }
-  int HasDragItem(const ApHandle& hView) { return hDragItemView_ == hView; }
+  int HasDragItem(const ApHandle& hView) { return drag_.hView_ == hView; }
 
   static String TestItemId2HandleMapper();
   static String Test_CreateItemHandle();
@@ -129,12 +126,7 @@ protected:
   ApHandle hCandidate_;
   ApHandle hDialog_;
 
-  ApHandle hDragItemView_;
-  ApHandle hDragItem_;
-  int nDragMouseX_;
-  int nDragMouseY_;
-  int nDragPinX_;
-  int nDragPinY_;
+  DragItem drag_;
 };
 
 #endif // Inventory_H_INCLUDED

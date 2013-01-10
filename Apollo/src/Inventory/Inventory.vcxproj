@@ -75,6 +75,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="dll.cpp" />
+    <ClCompile Include="DragItem.cpp" />
     <ClCompile Include="Inventory.cpp" />
     <ClCompile Include="InventoryModule.cpp" />
     <ClCompile Include="Item.cpp" />
@@ -82,6 +83,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="dll.h" />
+    <ClInclude Include="DragItem.h" />
     <ClInclude Include="Item.h" />
     <ClInclude Include="Local.h" />
     <ClInclude Include="Inventory.h" />
