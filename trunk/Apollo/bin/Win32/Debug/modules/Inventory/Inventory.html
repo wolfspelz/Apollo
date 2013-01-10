@@ -154,15 +154,15 @@ function AddItem(hPanel, hItem, sName, sIcon, nSlot, nStacksize) {
   var nPinY = 16;
 
   $('#Item_' + hItem.toDomCompatible()).draggable({
-    //    iframeFix: true,
+    iframeFix: true,
     distance: 4,
     stack: 'div',
     opacity: 0.7,
     scroll: false,
-    //    revert: true,
-    //    helper: 'clone',
-    //    delay: 200,
-    //    grid: [108, 108],
+    //revert: true,
+    //helper: 'clone',
+    //delay: 200,
+    //grid: [108, 108],
     cursor: 'move',
     xcursorAt: { top: 16, left: 16 },
     containment: '#Panel_' + hPanel.toDomCompatible() + ' .Items',
