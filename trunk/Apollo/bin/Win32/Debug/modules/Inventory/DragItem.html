@@ -27,23 +27,31 @@ body
 
 var api = new ApolloApi('DragItem');
 
-function Start(sImageUrl, nX, nY) {
+function Start() {
   //api.Log.Debug('Start');
-
-  $('.cImage').attr('src', sImageUrl);
-
   api.Init();
   api.InitMoveSize();
-
-  var ev = jQuery.Event('mousedown');
-  ev.target = $('#Wrapper').get(0);
-  ev.x = nX;
-  ev.y = nY;
-  api.OnMouseDown(ev);
 }
 
 function SetImage(sImageUrl) {
   $('.cImage').attr('src', sImageUrl);
+}
+
+function BeginDrag(nPinX, nPinY) {
+  $('#Wrapper').mouseup(function (ev) {
+    api.Log.Debug('OnEndDrag');
+    OnEndDrag();
+  });
+
+  var ev = jQuery.Event('mousedown');
+  ev.target = $('#Wrapper').get(0);
+  ev.x = nPinX;
+  ev.y = nPinY;
+  api.OnMouseDown(ev);
+}
+
+function OnEndDrag() {
+  api.ModuleCall('OnEndDrag').send();
 }
 
 </script>

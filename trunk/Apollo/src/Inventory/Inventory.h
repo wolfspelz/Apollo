@@ -45,10 +45,11 @@ public:
   void OnClosed(const ApHandle& hDialog);
   void OnDragItemReady(const ApHandle& hView);
   void OnDragItemMove(const ApHandle& hView, int nLeft, int nTop, int nWidth, int nHeight);
+  void OnDragItemLostFocus(const ApHandle& hView);
   void OnModuleCall(Apollo::SrpcMessage& request, Apollo::SrpcMessage& response);
 
   int HasDialog(const ApHandle& hDialog) { return hDialog_ == hDialog || hCandidate_ == hDialog; }
-  int HasDragItem(const ApHandle& hView) { return drag_.hView_ == hView; }
+  int HasDragItem(const ApHandle& hView) { return drag_.GetView() == hView; }
 
   static String TestItemId2HandleMapper();
   static String Test_CreateItemHandle();

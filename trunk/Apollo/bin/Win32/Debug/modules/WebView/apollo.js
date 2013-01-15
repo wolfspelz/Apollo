@@ -243,7 +243,7 @@ ApolloApi.prototype =
   Message: function(sMethod)
   {
     var msg = new ApMessage(sMethod);
-      //if (msg.getString('Method') != 'Log_Line') { api.Log.Debug(sType + ' ' + apollo.viewHandle); }
+    //if (msg.getString('Method') != 'Log_Line') { api.Log.Debug('apollo.js: ' + sType + ' ' + apollo.viewHandle); }
     msg.setString('hView', apollo.viewHandle);
     return msg;
   },
@@ -340,7 +340,7 @@ ApolloApi.prototype =
   
   OnMouseDown: function(ev)
   {
-    //api.Log.Debug('OnMouseDown ' + ev.target.className + ' ' + ev.x + ' ' + ev.y);
+    //api.Log.Debug('apollo.js: ' + 'OnMouseDown ' + ev.target.className + ' ' + ev.x + ' ' + ev.y);
 
     api.bIsMove = false; 
     api.bIsSize = false;
@@ -390,7 +390,7 @@ ApolloApi.prototype =
   OnMouseMove: function(ev)
   {
     if (!api.bMouseCaptured) {
-      api.Log.Debug('OnMouseMove');
+      //api.Log.Debug('apollo.js: ' + 'OnMouseMove');
     } else {
       var dx = ev.x - api.nStartX;
       var dy = ev.y - api.nStartY;
@@ -431,6 +431,7 @@ ApolloApi.prototype =
 
   OnMouseUp: function()
   {
+    api.Log.Debug('apollo.js: ' + 'OnMouseUp');
     if (document.getElementById('cApCover')) {
       document.body.removeChild(document.getElementById('cApCover'));
     }

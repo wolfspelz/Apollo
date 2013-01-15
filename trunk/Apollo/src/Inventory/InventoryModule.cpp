@@ -102,7 +102,7 @@ AP_MSG_HANDLER_METHOD(InventoryModule, WebView_Event_DocumentComplete)
 
 AP_MSG_HANDLER_METHOD(InventoryModule, WebView_ModuleCall)
 {
-  if (pInventory_ != 0 && pInventory_->HasDialog(pMsg->hView)) {
+  if (pInventory_ != 0 && (pInventory_->HasDialog(pMsg->hView) || pInventory_->HasDragItem(pMsg->hView))) {
     pInventory_->OnModuleCall(pMsg->srpc, pMsg->response);
     pMsg->apStatus = ApMessage::Ok;
   }

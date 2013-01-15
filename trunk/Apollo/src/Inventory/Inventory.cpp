@@ -117,6 +117,8 @@ void Inventory::Destroy()
     if (!msg.Request()) { throw ApException(LOG_CONTEXT, "%s failed: %s", _sz(msg.Type()), _sz(msg.sComment)); }
     hDialog_ = ApNoHandle;
   }
+
+  drag_.Exit();
 }
 
 void Inventory::SetVisibility(int bShow)
@@ -188,6 +190,9 @@ void Inventory::OnModuleCall(Apollo::SrpcMessage& request, Apollo::SrpcMessage& 
       ,request.getInt("nPinX")
       ,request.getInt("nPinY")
       );
+
+  } else if (sMethod == "OnEndDrag") {
+    EndDragItem();
 
   } else {
     throw ApException(LOG_CONTEXT, "Unknown Method=%s", _sz(sMethod));
@@ -468,13 +473,14 @@ void Inventory::PlayModel()
 
 void Inventory::BeginDragItem(const ApHandle& hItem, int nLeft, int nTop, int nWidth, int nHeight, int nMouseX, int nMouseY, int nPinX, int nPinY)
 {
-  if (ApIsHandle(drag_.hView_)) {
-    EndDragItem();
-  }
+  drag_.SetItem(hItem);
 
-  drag_.hItem_ = hItem;
-  drag_.nPinX_ = nPinX;
-  drag_.nPinY_ = nPinY;
+  String sImage;
+  ItemListNode* pNode = items_.Find(hItem);
+  if (pNode != 0) {
+    sImage = pNode->Value()->sIcon_;
+  }
+  drag_.SetImage(sImage);
 
   // Dialog -> WebView
   ApHandle hDialogView = hDialog_;
@@ -506,59 +512,55 @@ void Inventory::BeginDragItem(const ApHandle& hItem, int nLeft, int nTop, int nW
   int nAbsLeft = nInventoryLeft + nContentLeft + nMouseX - nPinX;
   int nAbsTop = nInventoryTop + nContentTop + nMouseY - nPinY;
 
+  drag_.SetPosition(nAbsLeft, nAbsTop, nWidth, nHeight, nPinX, nPinY);
+
   {
     Msg_Inventory_OnDragItemBegin msg;
-    msg.hItem = drag_.hItem_;
+    msg.hItem = hItem;
     msg.Send();
   }
+
+  drag_.Show();
 }
 
 void Inventory::EndDragItem()
 {
-  if (ApIsHandle(drag_.hView_)) {
+  if (ApIsHandle(drag_.GetView())) {
     {
       Msg_Inventory_OnDragItemEnd msg;
-      msg.hItem = drag_.hItem_;
+      msg.hItem = drag_.GetItem();
       msg.Send();
     }
 
-    Msg_WebView_Destroy::_(drag_.hView_);
-
-    drag_.hView_ = ApNoHandle;
-    drag_.hItem_ = ApNoHandle;
+    drag_.Destroy();
+    drag_.Create();
   }
 }
 
 void Inventory::OnDragItemReady(const ApHandle& hView)
 {
-  if (drag_.hView_ == hView) {
-    //if (!Msg_WebView_ViewCall::_(hView, "Start")) { throw ApException(LOG_CONTEXT, "Msg_WebView_ViewCall 'Start' failed"); }
-    String sUrl;
-    ItemListNode* pNode = items_.Find(drag_.hItem_);
-    if (pNode != 0) {
-      Item* pItem = pNode->Value();
-      if (pItem != 0) {
-        sUrl = pItem->sIcon_;
-      }
-    }
-    List lArgs;
-    lArgs.AddLast(sUrl);
-    lArgs.AddLast(String::from(drag_.nPinX_));
-    lArgs.AddLast(String::from(drag_.nPinY_));
-    String sResult = Msg_WebView_CallScriptFunction::_(hView, "", "Start", lArgs);
+  if (drag_.GetView() == hView) {
+    String sResult = Msg_WebView_CallScriptFunction::_(hView, "", "Start");
   }
 }
 
 void Inventory::OnDragItemMove(const ApHandle& hView, int nLeft, int nTop, int nWidth, int nHeight)
 {
-  if (drag_.hView_ == hView) {
+  if (drag_.GetView() == hView) {
     Msg_Inventory_OnDragItemMove msg;
-    msg.hItem = drag_.hItem_;
+    msg.hItem = drag_.GetItem();
     msg.nLeft = nLeft;
     msg.nTop = nTop;
     msg.nWidth = nWidth;
     msg.nHeight = nHeight;
     msg.Send();
+  }
+}
+
+void Inventory::OnDragItemLostFocus(const ApHandle& hView)
+{
+  if (drag_.GetView() == hView) {
+    EndDragItem();
   }
 }
 
