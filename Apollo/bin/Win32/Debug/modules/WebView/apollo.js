@@ -340,7 +340,7 @@ ApolloApi.prototype =
   
   OnMouseDown: function(ev)
   {
-    //api.Log.Debug('apollo.js: ' + 'OnMouseDown ' + ev.target.className + ' ' + ev.x + ' ' + ev.y);
+    api.Log.Debug('apollo.js: ' + 'OnMouseDown ' + ev.target.className + ' ' + ev.x + ' ' + ev.y);
 
     api.bIsMove = false; 
     api.bIsSize = false;
