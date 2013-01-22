@@ -38,16 +38,20 @@ function SetImage(sImageUrl) {
 }
 
 function BeginDrag(nPinX, nPinY) {
+  api.Log.Debug('BeginDrag');
+
   $('#Wrapper').mouseup(function (ev) {
     api.Log.Debug('OnEndDrag');
     OnEndDrag();
   });
 
   var ev = jQuery.Event('mousedown');
-  ev.target = $('#Wrapper').get(0);
+  //ev.target = $('#Wrapper').get(0);
   ev.x = nPinX;
   ev.y = nPinY;
-  api.OnMouseDown(ev);
+
+  jQuery('#Wrapper').trigger(ev);
+  //api.OnMouseDown(ev);
 }
 
 function OnEndDrag() {
