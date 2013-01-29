@@ -154,6 +154,7 @@ public:
   void SetNavigationPolicy(const String& sPolicy);
   void MoveBy(int nX, int nY);
   void SizeBy(int nX, int nY, int nDirection);
+  void MakeFrontWindow();
   void MouseCapture();
   void MouseRelease();
   void GetPosition(int& nLeft, int& nTop, int& nWidth, int& nHeight);

@@ -167,8 +167,13 @@ function AddItem(hPanel, hItem, sName, sIcon, nSlot, nStacksize) {
     containment: '#Panel_' + hPanel.toDomCompatible() + ' .Items',
     start: function (ev) {
       var off = $(this).offset();
-      nPinX = ev.pageX - off.left;
-      nPinY = ev.pageY - off.top;
+      var nMouseX = ev.pageX;
+      var nMouseY = ev.pageY;
+      var nPinX = ev.pageX - off.left;
+      var nPinY = ev.pageY - off.top;
+      api.Log.Debug('draggable.start ' + nPinX + ' ' + nPinY);
+      OnDragItem(hItem, nMouseX, nMouseY, nPinX, nPinY);
+      return false;
     },
     drag: function (ev) {
       var nBorder = 4;
@@ -182,7 +187,7 @@ function AddItem(hPanel, hItem, sName, sIcon, nSlot, nStacksize) {
       var bInside = true;
       if (nMouseX < nLeft || nMouseX > nRight) { bInside = false; }
       if (nMouseY < nTop || nMouseY > nBottom) { bInside = false; }
-      //api.Log.Debug('drag ' + nMouseX + ' ' + nMouseY);
+      api.Log.Debug('draggable.drag ' + nMouseX + ' ' + nMouseY);
       if (!bInside) {
         OnDragItem(hItem, nMouseX, nMouseY, nPinX, nPinY);
         $('#Item_' + hItem.toDomCompatible()).hide();
@@ -190,6 +195,7 @@ function AddItem(hPanel, hItem, sName, sIcon, nSlot, nStacksize) {
       }
     },
     stop: function (ev) {
+      api.Log.Debug('draggable.stop ');
     }
   });
 }

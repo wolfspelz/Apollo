@@ -59,6 +59,7 @@ void DragItem::SetPosition(int nLeft, int nTop, int nWidth, int nHeight, int nPi
 
   if (ApIsHandle(hView_)) {
     if (!Msg_WebView_Position::_(hView_, nLeft, nTop, nWidth, nHeight)) { throw ApException(LOG_CONTEXT, "Msg_WebView_Position failed"); }
+    if (!Msg_WebView_MakeFrontWindow::_(hView_)) { throw ApException(LOG_CONTEXT, "Msg_WebView_MakeFrontWindow failed"); }
   }
 }
 
