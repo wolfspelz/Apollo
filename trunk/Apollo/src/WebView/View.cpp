@@ -441,6 +441,13 @@ void View::SizeBy(int nX, int nY, int nDirection)
   MoveWindowToCurrentRect();
 }
 
+void View::MakeFrontWindow()
+{
+#if defined(WIN32)
+  ::SetWindowPos(hWnd_, 0, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW | SWP_NOACTIVATE);
+#endif // WIN32
+}
+
 void View::MouseCapture()
 {
 #if defined(WIN32)

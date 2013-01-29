@@ -168,6 +168,13 @@ AP_MSG_HANDLER_METHOD(WebViewModule, WebView_MouseCapture)
   pMsg->apStatus = ApMessage::Ok;
 }
 
+AP_MSG_HANDLER_METHOD(WebViewModule, WebView_MakeFrontWindow)
+{
+  View* pView = FindView(pMsg->hView);
+  pView->MakeFrontWindow();
+  pMsg->apStatus = ApMessage::Ok;
+}
+
 AP_MSG_HANDLER_METHOD(WebViewModule, WebView_MouseRelease)
 {
   View* pView = FindView(pMsg->hView);
@@ -313,6 +320,13 @@ void SrpcGate_WebView_MouseCapture(ApSRPCMessage* pMsg)
   SRPCGATE_HANDLER_NATIVE_REQUEST(pMsg, msg);
 }
 
+void SrpcGate_WebView_MakeFrontWindow(ApSRPCMessage* pMsg)
+{
+  Msg_WebView_MakeFrontWindow msg;
+  msg.hView = pMsg->srpc.getHandle("hView");
+  SRPCGATE_HANDLER_NATIVE_REQUEST(pMsg, msg);
+}
+
 void SrpcGate_WebView_MouseRelease(ApSRPCMessage* pMsg)
 {
   Msg_WebView_MouseRelease msg;
@@ -396,6 +410,7 @@ int WebViewModule::Init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, WebViewModule, WebView_SetNavigationPolicy, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, WebViewModule, WebView_MoveBy, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, WebViewModule, WebView_SizeBy, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, WebViewModule, WebView_MakeFrontWindow, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, WebViewModule, WebView_MouseCapture, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, WebViewModule, WebView_MouseRelease, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, WebViewModule, WebView_GetPosition, this, ApCallbackPosNormal);
@@ -419,6 +434,7 @@ int WebViewModule::Init()
   srpcGateRegistry_.add("WebView_Reload", SrpcGate_WebView_Reload);
   srpcGateRegistry_.add("WebView_MoveBy", SrpcGate_WebView_MoveBy);
   srpcGateRegistry_.add("WebView_SizeBy", SrpcGate_WebView_SizeBy);
+  srpcGateRegistry_.add("WebView_MakeFrontWindow", SrpcGate_WebView_MakeFrontWindow);
   srpcGateRegistry_.add("WebView_MouseCapture", SrpcGate_WebView_MouseCapture);
   srpcGateRegistry_.add("WebView_MouseRelease", SrpcGate_WebView_MouseRelease);
   srpcGateRegistry_.add("WebView_GetPosition", SrpcGate_WebView_GetPosition);

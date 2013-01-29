@@ -41,6 +41,7 @@ public:
   void On_WebView_SetNavigationPolicy(Msg_WebView_SetNavigationPolicy* pMsg);
   void On_WebView_MoveBy(Msg_WebView_MoveBy* pMsg);
   void On_WebView_SizeBy(Msg_WebView_SizeBy* pMsg);
+  void On_WebView_MakeFrontWindow(Msg_WebView_MakeFrontWindow* pMsg);
   void On_WebView_MouseCapture(Msg_WebView_MouseCapture* pMsg);
   void On_WebView_MouseRelease(Msg_WebView_MouseRelease* pMsg);
   void On_WebView_GetPosition(Msg_WebView_GetPosition* pMsg);

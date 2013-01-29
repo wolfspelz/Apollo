@@ -223,6 +223,20 @@ public:
 };
 
 // -> WebView
+class Msg_WebView_MakeFrontWindow: public ApRequestMessage
+{
+public:
+  Msg_WebView_MakeFrontWindow() : ApRequestMessage("WebView_MakeFrontWindow") {}
+  ApIN ApHandle hView;
+  static int _(const ApHandle& hView)
+  {
+    Msg_WebView_MakeFrontWindow msg;
+    msg.hView = hView;
+    return msg.Request();
+  }
+};
+
+// -> WebView
 class Msg_WebView_MouseCapture: public ApRequestMessage
 {
 public:
