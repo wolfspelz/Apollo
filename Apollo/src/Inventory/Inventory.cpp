@@ -86,20 +86,20 @@ void Inventory::Create()
   ApHandle hDialog = Apollo::newHandle();
 
   // Dialog -> WebView
-  if (!Msg_WebView_Create::_(hDialog, Apollo::getModuleConfig(MODULE_NAME, "Left", 200), Apollo::getModuleConfig(MODULE_NAME, "Top", 200), Apollo::getModuleConfig(MODULE_NAME, "Width", 500), Apollo::getModuleConfig(MODULE_NAME, "Height", 300))) { throw ApException(LOG_CONTEXT, "Msg_WebView_Create"); }
-  if (!Msg_WebView_SetScriptAccessPolicy::Allow(hDialog)) { throw ApException(LOG_CONTEXT, "Msg_WebView_SetScriptAccessPolicy"); }
-  if (!Msg_WebView_Load::_(hDialog, "file://" + Apollo::getModuleResourcePath(MODULE_NAME) + "Inventory.html")) { throw ApException(LOG_CONTEXT, "Msg_WebView_Load"); }
-  //Msg_Dialog_Create msg;
-  //msg.hDialog = hDialog; 
-  //msg.nLeft = Apollo::getModuleConfig(MODULE_NAME, "Left", 200);
-  //msg.nTop = Apollo::getModuleConfig(MODULE_NAME, "Top", 200);
-  //msg.nWidth = Apollo::getModuleConfig(MODULE_NAME, "Width", 500);
-  //msg.nHeight = Apollo::getModuleConfig(MODULE_NAME, "Height", 300);
-  //msg.bVisible = 0;
-  //msg.sCaption = Apollo::translate(MODULE_NAME, "", "Inventory");
-  //msg.sIconUrl = "file://" + Apollo::getModuleResourcePath(MODULE_NAME) + "icon.png";
-  //msg.sContentUrl = "file://" + Apollo::getModuleResourcePath(MODULE_NAME) + "Inventory.html";
-  //if (!msg.Request()) { throw ApException(LOG_CONTEXT, "%s failed: %s", _sz(msg.Type()), _sz(msg.sComment)); }
+  //if (!Msg_WebView_Create::_(hDialog, Apollo::getModuleConfig(MODULE_NAME, "Left", 200), Apollo::getModuleConfig(MODULE_NAME, "Top", 200), Apollo::getModuleConfig(MODULE_NAME, "Width", 500), Apollo::getModuleConfig(MODULE_NAME, "Height", 300))) { throw ApException(LOG_CONTEXT, "Msg_WebView_Create"); }
+  //if (!Msg_WebView_SetScriptAccessPolicy::Allow(hDialog)) { throw ApException(LOG_CONTEXT, "Msg_WebView_SetScriptAccessPolicy"); }
+  //if (!Msg_WebView_Load::_(hDialog, "file://" + Apollo::getModuleResourcePath(MODULE_NAME) + "Inventory.html")) { throw ApException(LOG_CONTEXT, "Msg_WebView_Load"); }
+  Msg_Dialog_Create msg;
+  msg.hDialog = hDialog; 
+  msg.nLeft = Apollo::getModuleConfig(MODULE_NAME, "Left", 200);
+  msg.nTop = Apollo::getModuleConfig(MODULE_NAME, "Top", 200);
+  msg.nWidth = Apollo::getModuleConfig(MODULE_NAME, "Width", 500);
+  msg.nHeight = Apollo::getModuleConfig(MODULE_NAME, "Height", 300);
+  msg.bVisible = 0;
+  msg.sCaption = Apollo::translate(MODULE_NAME, "", "Inventory");
+  msg.sIconUrl = "file://" + Apollo::getModuleResourcePath(MODULE_NAME) + "icon.png";
+  msg.sContentUrl = "file://" + Apollo::getModuleResourcePath(MODULE_NAME) + "Inventory.html";
+  if (!msg.Request()) { throw ApException(LOG_CONTEXT, "%s failed: %s", _sz(msg.Type()), _sz(msg.sComment)); }
 
   drag_.Init();
 
@@ -110,10 +110,10 @@ void Inventory::Destroy()
 {
   if (ApIsHandle(hDialog_)) {
     // Dialog -> WebView
-    Msg_WebView_Destroy msg;
-    msg.hView = hDialog_;
-    //Msg_Dialog_Destroy msg;
-    //msg.hDialog = hDialog_;
+    //Msg_WebView_Destroy msg;
+    //msg.hView = hDialog_;
+    Msg_Dialog_Destroy msg;
+    msg.hDialog = hDialog_;
     if (!msg.Request()) { throw ApException(LOG_CONTEXT, "%s failed: %s", _sz(msg.Type()), _sz(msg.sComment)); }
     hDialog_ = ApNoHandle;
   }
@@ -125,8 +125,8 @@ void Inventory::SetVisibility(int bShow)
 {
   if (ApIsHandle(hDialog_)) {
     // Dialog -> WebView
-    ApHandle hView = hDialog_;
-    //ApHandle hView = Msg_Dialog_GetView::_(hDialog_);
+    //ApHandle hView = hDialog_;
+    ApHandle hView = Msg_Dialog_GetView::_(hDialog_);
     if (ApIsHandle(hView)) {
       Msg_WebView_Visibility::_(hView, bShow);
     }
@@ -149,8 +149,8 @@ void Inventory::OnOpened(const ApHandle& hDialog)
     SetVisibility(bVisible_);
 
     // Dialog -> WebView
-    Msg_WebView_CallScriptFunction::_(hDialog_, "", "Start");
-    //Msg_Dialog_ContentCall::_(hDialog_, GetScriptFunctionName(), "Start");
+    //Msg_WebView_CallScriptFunction::_(hDialog_, "", "Start");
+    Msg_Dialog_ContentCall::_(hDialog_, GetScriptFunctionName(), "Start");
 
     if (nState_ == NoState) {
       BuildPanels();
@@ -428,8 +428,8 @@ void Inventory::PlayModel()
 {
   if (nState_ == StateReady) {
     // Dialog -> WebView
-    Msg_WebView_CallScriptFunction::_(hDialog_, "", "PurgePanels");
-    //Msg_Dialog_ContentCall::_(hDialog_, GetScriptFunctionName(), "PurgePanels");
+    //Msg_WebView_CallScriptFunction::_(hDialog_, "", "PurgePanels");
+    Msg_Dialog_ContentCall::_(hDialog_, GetScriptFunctionName(), "PurgePanels");
 
     { // Should be for all panels
       ApHandle hPanel = hPanel_;
@@ -442,8 +442,8 @@ void Inventory::PlayModel()
         srpc.set("nOrder", nOrder_);
         srpc.set("nSlots", nSlots_);
         // Dialog -> WebView
-        Msg_WebView_ViewCall::_(hDialog_, GetScriptFunctionName(), srpc);
-        //Msg_Dialog_ContentCall::_(hDialog_, GetScriptFunctionName(), srpc);
+        //Msg_WebView_ViewCall::_(hDialog_, GetScriptFunctionName(), srpc);
+        Msg_Dialog_ContentCall::_(hDialog_, GetScriptFunctionName(), srpc);
       }
   
       ItemListNode* node = 0;
@@ -460,8 +460,8 @@ void Inventory::PlayModel()
           srpc.set("nSlot", pItem->nSlot_);
           srpc.set("nStacksize", pItem->nStacksize_);
           // Dialog -> WebView
-          Msg_WebView_ViewCall::_(hDialog_, GetScriptFunctionName(), srpc);
-          //Msg_Dialog_ContentCall::_(hDialog_, GetScriptFunctionName(), srpc);
+          //Msg_WebView_ViewCall::_(hDialog_, GetScriptFunctionName(), srpc);
+          Msg_Dialog_ContentCall::_(hDialog_, GetScriptFunctionName(), srpc);
         }
       }
     }
@@ -483,8 +483,8 @@ void Inventory::BeginDragItem(const ApHandle& hItem, int nLeft, int nTop, int nW
   drag_.SetImage(sImage);
 
   // Dialog -> WebView
-  ApHandle hDialogView = hDialog_;
-  //ApHandle hDialogView = Msg_Dialog_GetView::_(hDialog_);
+  //ApHandle hDialogView = hDialog_;
+  ApHandle hDialogView = Msg_Dialog_GetView::_(hDialog_);
 
   int nInventoryLeft = 0;
   int nInventoryTop = 0;
@@ -500,14 +500,14 @@ void Inventory::BeginDragItem(const ApHandle& hItem, int nLeft, int nTop, int nW
   int nContentLeft = 0;
   int nContentTop = 0;
   // Dialog -> WebView
-  //{
-  //  Msg_Dialog_GetContentRect msg;
-  //  msg.hDialog = hDialog_;
-  //  if (msg.Request()) {
-  //    nContentLeft = msg.nLeft;
-  //    nContentTop = msg.nTop;
-  //  }
-  //}
+  {
+    Msg_Dialog_GetContentRect msg;
+    msg.hDialog = hDialog_;
+    if (msg.Request()) {
+      nContentLeft = msg.nLeft;
+      nContentTop = msg.nTop;
+    }
+  }
 
   int nAbsLeft = nInventoryLeft + nContentLeft + nMouseX - nPinX;
   int nAbsTop = nInventoryTop + nContentTop + nMouseY - nPinY;

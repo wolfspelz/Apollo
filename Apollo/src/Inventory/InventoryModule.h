@@ -42,12 +42,12 @@ public:
   void On_Inventory_Destroy(Msg_Inventory_Destroy* pMsg);
   void On_Inventory_Show(Msg_Inventory_Show* pMsg);
   // Dialog -> WebView
-  void On_WebView_Event_DocumentLoaded(Msg_WebView_Event_DocumentLoaded* pMsg);
-  //void On_Dialog_OnOpened(Msg_Dialog_OnOpened* pMsg);
+  //void On_WebView_Event_DocumentLoaded(Msg_WebView_Event_DocumentLoaded* pMsg);
+  void On_Dialog_OnOpened(Msg_Dialog_OnOpened* pMsg);
 
   // Dialog -> WebView
-  void On_WebView_Event_Closing(Msg_WebView_Event_Closing* pMsg);
-  //void On_Dialog_OnClosed(Msg_Dialog_OnClosed* pMsg);
+  //void On_WebView_Event_Closing(Msg_WebView_Event_Closing* pMsg);
+  void On_Dialog_OnClosed(Msg_Dialog_OnClosed* pMsg);
 
   //void On_System_RunLevel(Msg_System_RunLevel* pMsg);
   void On_WebView_Event_DocumentComplete(Msg_WebView_Event_DocumentComplete* pMsg);

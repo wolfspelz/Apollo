@@ -105,7 +105,6 @@ function ReceiveMessageFromModule(sMsg) {
 }
 
 function Start() {
-  api = new ApolloApi('Inventory');
   api.ModuleCall('OnPlayModel').send();
 }
 
@@ -183,6 +182,7 @@ function AddItem(hPanel, hItem, sName, sIcon, nSlot, nStacksize) {
       var bInside = true;
       if (nMouseX < nLeft || nMouseX > nRight) { bInside = false; }
       if (nMouseY < nTop || nMouseY > nBottom) { bInside = false; }
+      //api.Log.Debug('drag ' + nMouseX + ' ' + nMouseY);
       if (!bInside) {
         OnDragItem(hItem, nMouseX, nMouseY, nPinX, nPinY);
         $('#Item_' + hItem.toDomCompatible()).hide();
