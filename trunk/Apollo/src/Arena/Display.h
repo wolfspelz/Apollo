@@ -103,6 +103,7 @@ protected:
   int bHasPosition_;
   int bHasSize_;
   int bDebug_;
+  bool bLastInDropArea_;
 
   ApHandle hView_;
   int bViewLoaded_;

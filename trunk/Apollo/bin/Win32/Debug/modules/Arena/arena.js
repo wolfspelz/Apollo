@@ -306,6 +306,18 @@ Arena.prototype = {
     $('#iLocationState').removeClass().addClass("sState");
   },
 
+  HiliteItemDropArea: function (bShow)
+  {
+    //api.Log.Debug('HiliteItemDropArea ' + bShow);
+    if (bShow) {
+      $('#iItemDropArea').css('visibility', 'visible');
+      //$('#iItemDropArea').css('display', '');
+    } else {
+      $('#iItemDropArea').css('visibility', 'hidden');
+      //$('#iItemDropArea').css('display', 'none');
+    }
+  },
+
   // --------------------------------------
   // Messages to module
   

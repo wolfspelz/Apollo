@@ -25,6 +25,7 @@ Display::Display(ArenaModule* pModule, const ApHandle& hContext)
 ,bHasSize_(0)
 ,bDebug_(0)
 ,bViewLoaded_(0)
+,bLastInDropArea_(false)
 {
 }
 
@@ -295,10 +296,15 @@ void Display::OnDragItemMove(const ApHandle& hView, int nLeft, int nTop, int nWi
 {
   int nX = nLeft - nLeft_;
   int nY = nBottom_ - nTop - nHeight;
-  if (nX > 0 && nX <= nWidth_ && nY > 0 && nY < nHeight_) {
-    apLog_Debug((LOG_CHANNEL, LOG_CONTEXT, "IN  %d %d", nX, nY));
-  } else {
-    apLog_Debug((LOG_CHANNEL, LOG_CONTEXT, "OUT %d %d", nX, nY));
+  int nDropAreaHeight = 100;
+
+  bool bInWindow = nX > 0 && nX <= nWidth_ - nWidth && nY > 0 && nY < nHeight_ - nHeight;
+  bool bInDropArea = nX > 0 - nWidth/2 && nX <= nWidth_ - nWidth/2 && nY > 0 - nHeight/2 && nY < nDropAreaHeight - nHeight/2;
+  //apLog_Debug((LOG_CHANNEL, LOG_CONTEXT, "%s %d %d", bInDropArea ? "IN " : "OUT", nX, nY));
+
+  if (bLastInDropArea_ != bInDropArea) {
+    bLastInDropArea_ = bInDropArea;
+    ViewSrpcMessage vsm(this, "HiliteItemDropArea"); vsm.srpc.set("bShow", bInDropArea); vsm.Request();
   }
 }
 
