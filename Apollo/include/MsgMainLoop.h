@@ -57,6 +57,17 @@ public:
   ApOUT HWND hWnd;
 };
 
+class Msg_Win32_WndProcMessage: public ApRequestMessage
+{
+public:
+  Msg_Win32_WndProcMessage() : ApRequestMessage("Msg_Win32_WndProcMessage"), hWnd(NULL), message(0), wParam(0), lParam(0), lResult(0) {}
+  ApIN HWND hWnd;
+  ApIN UINT message;
+  ApIN WPARAM wParam;
+  ApIN LPARAM lParam;
+  ApOUT LRESULT lResult;
+};
+
 #elif defined(LINUX) || defined(MAC) || defined(_CONSOLE)
 
 class Msg_MainLoop_Loop: public ApRequestMessage
@@ -82,6 +93,13 @@ public:
 };
 
 // mainloop ->
+class Msg_MainLoop_EventLoopBeforeBegin: public ApNotificationMessage
+{
+public:
+  Msg_MainLoop_EventLoopBeforeBegin() : ApNotificationMessage("MainLoop_EventLoopBeforeBegin") {}
+};
+
+// mainloop ->
 class Msg_MainLoop_EventLoopBegin: public ApNotificationMessage
 {
 public:
@@ -97,18 +115,18 @@ public:
   ApINOUT int nWaitCount;
 };
 
-// -> mainloop
-class Msg_MainLoop_ModuleFinished: public ApNotificationMessage
-{
-public:
-  Msg_MainLoop_ModuleFinished() : ApNotificationMessage("MainLoop_ModuleFinished") {}
-};
-
 // mainloop ->
 class Msg_MainLoop_EventLoopEnd: public ApNotificationMessage
 {
 public:
   Msg_MainLoop_EventLoopEnd() : ApNotificationMessage("MainLoop_EventLoopEnd") {}
+};
+
+// -> mainloop
+class Msg_MainLoop_ModuleFinished: public ApNotificationMessage
+{
+public:
+  Msg_MainLoop_ModuleFinished() : ApNotificationMessage("MainLoop_ModuleFinished") {}
 };
 
 // mainloop ->
