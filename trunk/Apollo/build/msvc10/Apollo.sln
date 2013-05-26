@@ -126,6 +126,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "md5", "..\..\src\md5\md5.vc
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Inventory", "..\..\src\Inventory\Inventory.vcxproj", "{349D6246-8911-4850-B08C-8C1841439969}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wintimer", "..\..\src\wintimer\wintimer.vcxproj", "{52F0E390-3012-4CA6-A60A-B3C9A5889033}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -316,6 +318,10 @@ Global
 		{349D6246-8911-4850-B08C-8C1841439969}.Debug|Win32.Build.0 = Debug|Win32
 		{349D6246-8911-4850-B08C-8C1841439969}.Release|Win32.ActiveCfg = Release|Win32
 		{349D6246-8911-4850-B08C-8C1841439969}.Release|Win32.Build.0 = Release|Win32
+		{52F0E390-3012-4CA6-A60A-B3C9A5889033}.Debug|Win32.ActiveCfg = Debug|Win32
+		{52F0E390-3012-4CA6-A60A-B3C9A5889033}.Debug|Win32.Build.0 = Debug|Win32
+		{52F0E390-3012-4CA6-A60A-B3C9A5889033}.Release|Win32.ActiveCfg = Release|Win32
+		{52F0E390-3012-4CA6-A60A-B3C9A5889033}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
