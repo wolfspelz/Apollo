@@ -9,6 +9,7 @@
 
 #include "ApLog.h"
 #include "MsgInventory.h"
+#include "MsgTranslation.h"
 #include "MsgGm.h"
 #include "MsgWebView.h"
 #include "MsgDialog.h"

@@ -13,6 +13,19 @@ class Msg_Translation_Get: public ApRequestMessage
 {
 public:
   Msg_Translation_Get() : ApRequestMessage("Translation_Get") {}
+  static String _(const char* szModule, const char* szContext, const char* szText)
+  {
+    Msg_Translation_Get msg;
+    msg.sModule = szModule;
+    msg.sContext = szContext;
+    msg.sText = szText;
+    (void) msg.Request();
+    if (msg.sTranslated.empty()) {
+      return szText;
+    }
+    return msg.sTranslated;
+  }
+public:
   ApIN String sModule;
   ApIN String sContext;
   ApIN String sText;

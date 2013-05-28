@@ -13,6 +13,7 @@
 #include "MsgDialog.h"
 #include "MsgWebView.h"
 #include "MsgProcess.h"
+#include "MsgTranslation.h"
 #include "SetupModule.h"
 
 #define MODULE_NAME "Setup"

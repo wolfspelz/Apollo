@@ -66,7 +66,11 @@ int ApLib::callMsg(ApMessage* pMsg, int nFlags)
 
 int ApLib::isMainThread()
 {
+#if defined(WIN32)
   return (Apollo::GetCurrentThreadId() == nThreadId_);
+#else
+  #error not implemented for this os
+#endif
 }
 
 // --------------------------------
