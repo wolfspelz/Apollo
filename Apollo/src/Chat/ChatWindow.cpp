@@ -33,7 +33,7 @@ void ChatWindow::Open()
     msg.nWidth = Apollo::getModuleConfig(MODULE_NAME, "Width", 500);
     msg.nHeight = Apollo::getModuleConfig(MODULE_NAME, "Height", 300);
     msg.bVisible = 1;
-    msg.sCaption = Apollo::translate(MODULE_NAME, "", "Chat");
+    msg.sCaption = Msg_Translation_Get::_(MODULE_NAME, "", "Chat");
     msg.sIconUrl = "file://" + Apollo::getModuleResourcePath(MODULE_NAME) + "icon.png";
     msg.sContentUrl = "file://" + Apollo::getModuleResourcePath(MODULE_NAME) + "Chat.html";
     if (!msg.Request()) { throw ApException(LOG_CONTEXT, "%s failed: %s", _sz(msg.Type()), _sz(msg.sComment)); }
@@ -68,7 +68,7 @@ void ChatWindow::AttachToLocation(const ApHandle& hLocation)
           if (msgVVGCD.sValue) {
             Msg_Dialog_SetCaption msgDSC;
             msgDSC.hDialog = hAp_;
-            msgDSC.sCaption = Apollo::translate(MODULE_NAME, "", "Chat") + " " + msgVVGCD.sValue;
+            msgDSC.sCaption = Msg_Translation_Get::_(MODULE_NAME, "", "Chat") + " " + msgVVGCD.sValue;
             msgDSC.Request();
             break;
           }

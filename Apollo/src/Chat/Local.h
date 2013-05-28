@@ -8,6 +8,7 @@
 #define Local_H_INCLUDED
 
 #include "ApLog.h"
+#include "MsgTranslation.h"
 #include "MsgChatWindow.h"
 #include "MsgVp.h"
 #include "MsgWebView.h"

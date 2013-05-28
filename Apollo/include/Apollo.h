@@ -127,8 +127,8 @@ APOLLO_API String getModuleConfig(const char* szModuleName, const char* szPath, 
 APOLLO_API void deleteModuleConfig(const char* szModuleName, const char* szPath);
 APOLLO_API int getModuleConfigKeys(const char* szModuleName, const char* szPath, ValueList& vlKeys);
 
-APOLLO_API String translate(const char* szModule, const char* szContext, const char* szText);
-APOLLO_API String translate(const char* szModule, const char* szContext, const char* szText, List& lVars);
+//APOLLO_API String translate(const char* szModule, const char* szContext, const char* szText);
+//APOLLO_API String translate(const char* szModule, const char* szContext, const char* szText, List& lVars);
 
 //APOLLO_API ApHandle startInterval(int nSec, int nMicroSec);
 //APOLLO_API ApHandle startTimeout(int nSec, int nMicroSec);

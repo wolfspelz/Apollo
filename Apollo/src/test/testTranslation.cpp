@@ -15,7 +15,7 @@ String Test_Translation_Basic_1(const char* szLine, const char* szModule, const 
   String s;
 
   String sExpected = szExpected;
-  String sTranslated = Apollo::translate(szModule, szContext, szText);
+  String sTranslated = Msg_Translation_Get::_(szModule, szContext, szText);
   if (sTranslated != sExpected) {
     s.appendf("%s: Got:%s expected:%s", _sz(szLine), _sz(sTranslated), _sz(sExpected));
   }

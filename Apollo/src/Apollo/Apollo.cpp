@@ -522,32 +522,32 @@ int Apollo::getModuleConfigKeys(const char* szModuleName, const char* szPath, Va
 
 // --------------------------------
 
-String Apollo::translate(const char* szModule, const char* szContext, const char* szText)
-{
-  Msg_Translation_Get msg;
-  msg.sModule = szModule;
-  msg.sContext = szContext;
-  msg.sText = szText;
-  (void) msg.Request();
-  String sTranslated;
-  if (msg.sTranslated.empty()) {
-    sTranslated = szText;
-  } else {
-    sTranslated = msg.sTranslated;
-  }
-  return sTranslated;
-}
+//String Apollo::translate(const char* szModule, const char* szContext, const char* szText)
+//{
+//  Msg_Translation_Get msg;
+//  msg.sModule = szModule;
+//  msg.sContext = szContext;
+//  msg.sText = szText;
+//  (void) msg.Request();
+//  String sTranslated;
+//  if (msg.sTranslated.empty()) {
+//    sTranslated = szText;
+//  } else {
+//    sTranslated = msg.sTranslated;
+//  }
+//  return sTranslated;
+//}
 
-String Apollo::translate(const char* szModule, const char* szContext, const char* szText, List& lVars)
-{
-  AP_UNUSED_ARG(szModule);
-  AP_UNUSED_ARG(szContext);
-  AP_UNUSED_ARG(szText);
-  AP_UNUSED_ARG(lVars);
-  
-  String sTranslated;
-  return sTranslated;
-}
+//String Apollo::translate(const char* szModule, const char* szContext, const char* szText, List& lVars)
+//{
+//  AP_UNUSED_ARG(szModule);
+//  AP_UNUSED_ARG(szContext);
+//  AP_UNUSED_ARG(szText);
+//  AP_UNUSED_ARG(lVars);
+//  
+//  String sTranslated;
+//  return sTranslated;
+//}
 
 // --------------------------------
 
