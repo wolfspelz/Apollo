@@ -83,7 +83,7 @@ void SetupModule::InstallFirefoxExtensionByFirefox()
   if (!sExe) { throw ApException(LOG_CONTEXT, "No exe path"); }
 
   {
-    Msg_OS_StartProcess msg;
+    Msg_Process_Start msg;
     msg.sExePath = sExe;
     msg.vlArgs = vlParts;
     msg.sCwdPath = String::filenameBasePath(sExe);
@@ -121,7 +121,7 @@ void SetupModule::InstallChromeExtensionByChrome()
   if (!sExe) { throw ApException(LOG_CONTEXT, "No exe path"); }
 
   {
-    Msg_OS_StartProcess msg;
+    Msg_Process_Start msg;
     msg.sExePath = sExe;
     msg.vlArgs = vlParts;
     msg.sCwdPath = String::filenameBasePath(sExe);
@@ -156,7 +156,7 @@ void SetupModule::InstallInternetExplorerExtension()
   sPath = Apollo::canonicalizePath(sPath);
 
   {
-    Msg_OS_StartProcess msg;
+    Msg_Process_Start msg;
     msg.sExePath = "msiexec";
     msg.vlArgs.add("/package");
     msg.vlArgs.add(sPath);
@@ -174,7 +174,7 @@ void SetupModule::UninstallInternetExplorerExtension()
   sPath = Apollo::canonicalizePath(sPath);
 
   {
-    Msg_OS_StartProcess msg;
+    Msg_Process_Start msg;
     msg.sExePath = "msiexec";
     msg.vlArgs.add("/uninstall");
     msg.vlArgs.add(sPath);
