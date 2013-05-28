@@ -65,16 +65,14 @@ public:
 
 
   // Message handlers
-  void On_System_RunLevel(Msg_System_RunLevel* pMsg);
   void On_System_GetRunLevel(Msg_System_GetRunLevel* pMsg);
   void On_System_GetTime(Msg_System_GetTime* pMsg);
   void On_System_GetHandle(Msg_System_GetHandle* pMsg);
-  void On_System_Echo(Msg_System_Echo* pMsg);
-  void On_System_SecTimer(Msg_System_SecTimer* pMsg);
   void On_System_GetCmdLineArgs(Msg_System_GetCmdLineArgs* pMsg);
-  void On_MainLoop_EventLoopBegin(Msg_MainLoop_EventLoopBegin* pMsg);
-  void On_MainLoop_EventLoopEnd(Msg_MainLoop_EventLoopEnd* pMsg);
-  void On_Config_Loaded(Msg_Config_Loaded* pMsg);
+  void On_System_GetCurrentWorkingDirectory(Msg_System_GetCurrentWorkingDirectory* pMsg);
+  void On_System_GetMachineId(Msg_System_GetMachineId* pMsg);
+  void On_System_GetUserLoginName(Msg_System_GetUserLoginName* pMsg);
+  void On_System_GetUserProfilePath(Msg_System_GetUserProfilePath* pMsg);
 
   void On_File_Load(Msg_File_Load* pMsg);
   void On_File_Save(Msg_File_Save* pMsg);
@@ -87,6 +85,13 @@ public:
   void On_Process_Kill(Msg_Process_Kill* pMsg);
   void On_Process_GetId(Msg_Process_GetId* pMsg);
   void On_Process_GetInfo(Msg_Process_GetInfo* pMsg);
+
+  void On_System_SecTimer(Msg_System_SecTimer* pMsg);
+  void On_System_RunLevel(Msg_System_RunLevel* pMsg);
+  void On_System_Echo(Msg_System_Echo* pMsg);
+  void On_MainLoop_EventLoopBegin(Msg_MainLoop_EventLoopBegin* pMsg);
+  void On_MainLoop_EventLoopEnd(Msg_MainLoop_EventLoopEnd* pMsg);
+  void On_Config_Loaded(Msg_Config_Loaded* pMsg);
 
 
 

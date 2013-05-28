@@ -190,7 +190,7 @@ String GmModule::getMachineId()
   String sMachine = sMachine_;
 
   if (sMachine.empty()) {
-    sMachine = Apollo::getMachineId();
+    sMachine = Msg_System_GetMachineId::_();
     sMachine_ = sMachine;
   }
 
@@ -302,7 +302,7 @@ int GmModule::doRegister()
       srpc.set("Password", Apollo::getRandomString(20));
       
       if (Apollo::getModuleConfig(MODULE_NAME, "Register/UseLoginAsNickname", 1)) {
-        String sNickname = Apollo::getUserLoginName();
+        String sNickname = Msg_System_GetUserLoginName::_();
         if (!sNickname.empty()) {
           srpc.set("Nickname", sNickname);
         }

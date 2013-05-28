@@ -133,6 +133,42 @@ public:
   ApOUT Apollo::ValueList vlArgs;
 };
 
+class APOLLO_API Msg_System_GetCurrentWorkingDirectory : public ApRequestMessage
+{
+public:
+  Msg_System_GetCurrentWorkingDirectory() : ApRequestMessage("System_GetCurrentWorkingDirectory") {}
+  static String _() { Msg_System_GetCurrentWorkingDirectory msg; msg.Request(); return msg.sCwd; }
+public:
+  ApOUT String sCwd;
+};
+
+class APOLLO_API Msg_System_GetMachineId : public ApRequestMessage
+{
+public:
+  Msg_System_GetMachineId() : ApRequestMessage("System_GetMachineId") {}
+  static String _() { Msg_System_GetMachineId msg; msg.Request(); return msg.sId; }
+public:
+  ApOUT String sId;
+};
+
+class APOLLO_API Msg_System_GetUserLoginName : public ApRequestMessage
+{
+public:
+  Msg_System_GetUserLoginName() : ApRequestMessage("System_GetUserLoginName") {}
+  static String _() { Msg_System_GetUserLoginName msg; msg.Request(); return msg.sName; }
+public:
+  ApOUT String sName;
+};
+
+class APOLLO_API Msg_System_GetUserProfilePath : public ApRequestMessage
+{
+public:
+  Msg_System_GetUserProfilePath() : ApRequestMessage("System_GetUserProfilePath") {}
+  static String _() { Msg_System_GetUserProfilePath msg; msg.Request(); return msg.sPath; }
+public:
+  ApOUT String sPath;
+};
+
 // -------------------------------------------------------------------
 
 // -> system

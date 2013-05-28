@@ -192,7 +192,7 @@ AP_MSG_HANDLER_METHOD(TestDialogModule, WebView_ModuleCall)
     }
 
   } else if (sMethod == "Cwd") {
-    apLog_Debug((LOG_CHANNEL, LOG_CONTEXT, "cwd=%s", _sz(Apollo::getCwd())));
+    apLog_Debug((LOG_CHANNEL, LOG_CONTEXT, "cwd=%s", _sz(Msg_System_GetCurrentWorkingDirectory::_())));
 
   }
 

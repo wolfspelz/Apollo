@@ -603,7 +603,7 @@ int Apollo::cancelTimeout(const ApHandle& hTimer)
 int Apollo::cancelInterval(const ApHandle& hTimer) { return cancelTimeout(hTimer); }
 
 // --------------------------------
-
+//TODO
 int Apollo::loadFile(const String& sFile, Buffer& sbData)
 {
   Msg_File_Load msg;
@@ -696,26 +696,6 @@ int Apollo::renameFile(const String& sFile, const String& sNewName)
 }
 
 // --------------------------------
-
-String Apollo::getCwd()
-{
-  return gApLib.getCwd();
-}
-
-String Apollo::getMachineId()
-{
-  return gApLib.getMachineId();
-}
-
-String Apollo::getUserLoginName()
-{
-  return gApLib.getUserLoginName();
-}
-
-String Apollo::getUserProfilePath()
-{
-  return gApLib.getUserProfilePath();
-}
 
 void Apollo::splitCommandlineArguments(const String& sCmdline, Apollo::ValueList& vlArgs)
 {
@@ -952,7 +932,7 @@ String Apollo::getAppBasePath()
   String sExecutablePath = gApLib.vlArgs_.atIndex(0, "");
 
   if (!String::filenameIsAbsolutePath(sExecutablePath)) {
-    String sCwd = Apollo::getCwd();
+    String sCwd = gApLib.getCwd();
     if (!sCwd.empty()) {
       sExecutablePath = sCwd + String::filenamePathSeparator() + sExecutablePath;
     }

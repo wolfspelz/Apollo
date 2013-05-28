@@ -38,7 +38,7 @@ String SetupModule::GetInstallFirefoxExtensionCommandline()
   if (!sFirefoxCmd) { sFirefoxCmd = SRegistry::GetString(HKEY_CURRENT_USER, "Software\\Classes\\FirefoxHTML\\shell\\open\\command", "", ""); }
   if (!sFirefoxCmd) { sFirefoxCmd = SRegistry::GetString(HKEY_LOCAL_MACHINE, "SOFTWARE\\Classes\\FirefoxHTML\\shell\\open\\command", "", ""); }
 
-  String sUrl = Apollo::getModuleConfig("Navigation", "FirefoxExtensionInstallUrl", "file://" + Apollo::getCwd() + "modules/navigation/AvatarNavigator.xpi");
+  String sUrl = Apollo::getModuleConfig("Navigation", "FirefoxExtensionInstallUrl", "file://" + Msg_System_GetCurrentWorkingDirectory::_() + "modules/navigation/AvatarNavigator.xpi");
   //if (!sUrl.startsWith("http:") && !sUrl.startsWith("https:")) {
   //  if (sUrl.subString(1, 1) == ":") {
   //    sUrl = "file://" + sUrl;
@@ -60,7 +60,7 @@ String SetupModule::GetInstallChromeExtensionCommandline()
   if (!sChromeCmd) { sChromeCmd = SRegistry::GetString(HKEY_CLASSES_ROOT, "ChromeHTML\\shell\\open\\command", "", ""); }
   if (!sChromeCmd) { sChromeCmd = SRegistry::GetString(HKEY_LOCAL_MACHINE, "SOFTWARE\\Classes\\ChromeHTML\\shell\\open\\command", "", ""); }
 
-  String sUrl = Apollo::getModuleConfig("Navigation", "ChromeExtensionInstallUrl", "file://" + Apollo::getCwd() + "modules/navigation/AvatarNavigator.crx");
+  String sUrl = Apollo::getModuleConfig("Navigation", "ChromeExtensionInstallUrl", "file://" + Msg_System_GetCurrentWorkingDirectory::_() + "modules/navigation/AvatarNavigator.crx");
 
   sCmdline = sChromeCmd;
   sCmdline.replace("%1", sUrl);
@@ -94,7 +94,7 @@ void SetupModule::InstallFirefoxExtensionByFirefox()
 void SetupModule::InstallFirefoxExtension()
 {
   String sId = Apollo::getModuleConfig("Navigation", "FirefoxExtensionId", "AvatarNavigator@OpenVirtualWorld.org");
-  String sPath = Apollo::getModuleConfig("Navigation", "FirefoxExtensionPath", Apollo::getCwd() + "modules/navigation/AvatarNavigator.xpi");
+  String sPath = Apollo::getModuleConfig("Navigation", "FirefoxExtensionPath", Msg_System_GetCurrentWorkingDirectory::_() + "modules/navigation/AvatarNavigator.xpi");
   
   sPath = Apollo::canonicalizePath(sPath);
 
@@ -132,7 +132,7 @@ void SetupModule::InstallChromeExtensionByChrome()
 void SetupModule::InstallChromeExtension()
 {
   String sId = Apollo::getModuleConfig("Navigation", "ChromeExtensionId", "cdegcijmfiaehalcfbpdnfbchlafenke");
-  String sPath = Apollo::getModuleConfig("Navigation", "ChromeExtensionPath", Apollo::getCwd() + "modules/navigation/AvatarNavigator.crx");
+  String sPath = Apollo::getModuleConfig("Navigation", "ChromeExtensionPath", Msg_System_GetCurrentWorkingDirectory::_() + "modules/navigation/AvatarNavigator.crx");
   String sVersion = Apollo::getModuleConfig("Navigation", "ChromeExtensionVersion", "1.0");
   
   sPath = Apollo::canonicalizePath(sPath);
@@ -150,7 +150,7 @@ void SetupModule::UninstallChromeExtension()
 
 void SetupModule::InstallInternetExplorerExtension()
 {
-  String sPath = Apollo::getModuleConfig("Navigation", "InternetExplorerExtensionInstallFile", Apollo::getCwd() + "modules/navigation/AvatarNavigator.msi");
+  String sPath = Apollo::getModuleConfig("Navigation", "InternetExplorerExtensionInstallFile", Msg_System_GetCurrentWorkingDirectory::_() + "modules/navigation/AvatarNavigator.msi");
   if (!sPath) { throw ApException(LOG_CONTEXT, "No installer path"); }
 
   sPath = Apollo::canonicalizePath(sPath);
@@ -168,7 +168,7 @@ void SetupModule::InstallInternetExplorerExtension()
 
 void SetupModule::UninstallInternetExplorerExtension()
 {
-  String sPath = Apollo::getModuleConfig("Navigation", "InternetExplorerExtensionInstallFile", Apollo::getCwd() + "modules/navigation/AvatarNavigator.msi");
+  String sPath = Apollo::getModuleConfig("Navigation", "InternetExplorerExtensionInstallFile", Msg_System_GetCurrentWorkingDirectory::_() + "modules/navigation/AvatarNavigator.msi");
   if (!sPath) { throw ApException(LOG_CONTEXT, "No installer path"); }
 
   sPath = Apollo::canonicalizePath(sPath);
@@ -196,7 +196,7 @@ void SetupModule::UninstallBrowserExtensions()
 
 void SetupModule::InstallInternetExplorerExtensionInteractive()
 {
-   String sFile = Apollo::getModuleConfig("Navigation", "InternetExplorerExtensionInstallFile", Apollo::getCwd() + "modules/navigation/AvatarNavigator.msi");
+   String sFile = Apollo::getModuleConfig("Navigation", "InternetExplorerExtensionInstallFile", Msg_System_GetCurrentWorkingDirectory::_() + "modules/navigation/AvatarNavigator.msi");
    if (!sFile) { throw ApException(LOG_CONTEXT, "No installer path"); }
    HINSTANCE hInst = ::ShellExecute(NULL, String("open"), sFile, NULL, NULL, SW_SHOW);
    if (hInst <= 0) {
