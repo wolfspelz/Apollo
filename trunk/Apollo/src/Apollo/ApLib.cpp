@@ -473,9 +473,9 @@ String ApLib::getUserProfilePath()
   int bCanReadWrite = 0;
   String sAssertWriteabilityPath = s + "base.txt";
   String sAssertWriteabilityData = s;
-  if (Apollo::saveFile(sAssertWriteabilityPath, sAssertWriteabilityData)) {
+  if (Msg_File_Save::_(sAssertWriteabilityPath, sAssertWriteabilityData)) {
     String sData;
-    if (Apollo::loadFile(sAssertWriteabilityPath, sData)) {
+    if (Msg_File_Load::_(sAssertWriteabilityPath, sData)) {
       if (sAssertWriteabilityData == sData) {
         bCanReadWrite = 1;
       }

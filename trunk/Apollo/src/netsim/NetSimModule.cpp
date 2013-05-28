@@ -31,7 +31,7 @@ void NetSimModule::writeHttpLog(const String& s)
   String sLogFile = Apollo::getModuleConfig(MODULE_NAME, "HTTP/LogFile", "");
   if (sLogFile) {
     String sData = s + "\n";
-    Apollo::appendFile(sLogFile, sData);
+    Msg_File_Append::_(sLogFile, sData);
   }
 }
 

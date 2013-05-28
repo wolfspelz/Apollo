@@ -10,6 +10,7 @@
 #if defined(AP_TEST_Core)
 #include "MsgSample.h"
 #include "MsgSystem.h"
+#include "MsgFile.h"
 
 int Test_Core_ModuleLoad()
 {
@@ -495,46 +496,46 @@ String Test_Core_File()
   String sPath = Apollo::getModuleResourcePath(MODULE_NAME) + "testfile";
   String sPath2 = Apollo::getModuleResourcePath(MODULE_NAME) + "testfile2";
 
-  Apollo::saveFile(sPath2,sbInData0);
+  Msg_File_Save::_(sPath2,sbInData0);
   for (int i = 0; i < (17042) && s.empty(); i += sizeof(pInData2)){ //200,023 KB
     sbInData3.Append((unsigned char*)pInData2, sizeof(pInData2) * sizeof(*pInData2));
-    if (!Apollo::appendFile(sPath2,sbInData2)){
+    if (!Msg_File_Append::_(sPath2,sbInData2)){
       s = "append failed";
     }
   }
 
   if (s.empty()){ 
-    if (!Apollo::saveFile(sPath, sbInData1)){
+    if (!Msg_File_Save::_(sPath, sbInData1)){
       s = "1 write failed";
     }
   }
   if (s.empty()){ 
-    if (!Apollo::loadFile(sPath, sbOutData1)){
+    if (!Msg_File_Load::_(sPath, sbOutData1)){
       s = "1 read failed";
     }
   }
   if (s.empty()){ 
-    if (!Apollo::saveFile(sPath, sbInData2)){
+    if (!Msg_File_Save::_(sPath, sbInData2)){
       s = "2 write failed";
     }
   }
   if (s.empty()){ 
-    if (!Apollo::loadFile(sPath, sbOutData2)){
+    if (!Msg_File_Load::_(sPath, sbOutData2)){
       s = "2 read failed";
     }
   }
   if (s.empty()){ 
-    if (!Apollo::saveFile(sPath, sbInData3)){
+    if (!Msg_File_Save::_(sPath, sbInData3)){
       s = "3 write failed";
     }
   }
   if (s.empty()){ 
-    if (!Apollo::loadFile(sPath, sbOutData3)){
+    if (!Msg_File_Load::_(sPath, sbOutData3)){
       s = "3 read failed";
     }
   }
   if (s.empty()){ 
-    if (!Apollo::loadFile(sPath2, sbOutData4)){
+    if (!Msg_File_Load::_(sPath2, sbOutData4)){
       s = "append read failed";
     }
   }

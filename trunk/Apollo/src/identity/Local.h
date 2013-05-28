@@ -8,6 +8,9 @@
 #define Local_H_INCLUDED
 
 #include "ApLog.h"
+#include "MsgFile.h"
+#include "MsgDB.h"
+#include "MsgNet.h"
 
 #define MODULE_NAME "Identity"
 #define LOG_CHANNEL MODULE_NAME

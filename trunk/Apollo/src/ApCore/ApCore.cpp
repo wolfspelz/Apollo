@@ -9,6 +9,7 @@
 #include "ApCore.h"
 #include "ApLog.h"
 #include "MsgSystem.h"
+#include "MsgFile.h"
 #include "MsgCore.h"
 #include "MsgConfig.h"
 
@@ -45,7 +46,7 @@ int ApCore::loadModuleConfig(const String& sModuleName, const String& sModuleFil
   int ok = 0;
 
   String sData;
-  ok = Apollo::loadFile(sConfigFile, sData);
+  ok = Msg_File_Load::_(sConfigFile, sData);
   if (ok) {
     apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "%s", _sz(sConfigFile)));
 
@@ -130,7 +131,7 @@ int ApCore::loadModule(const char* szModuleName, const char* szDllPath)
             // This is a OS specific library because of included ext.
             // -> load only if present
             sSupportDll += sSupportDllBaseName;
-            if (!Apollo::fileExists(sSupportDll)) { sSupportDll.clear(); }
+            if (!Msg_File_Exists::_(sSupportDll)) { sSupportDll.clear(); }
           }
           if (!sSupportDll.empty()) {
             HMODULE hDll = (HMODULE) Apollo::libraryLoad(sSupportDll);

@@ -192,7 +192,7 @@ int HttpManager::Init(const char* szClientName)
   sHttpLog_ = Apollo::getModuleConfig(MODULE_NAME, "/HTTP/LogFile", "");
   if (!sHttpLog_.empty()) {
     String s = "[Begin] " + Apollo::TimeValue::getTime().toString() + "\n";
-    Apollo::appendFile(NetModuleInstance::Get()->oHttp_.sHttpLog_, s);
+    Msg_File_Append::_(NetModuleInstance::Get()->oHttp_.sHttpLog_, s);
   }
 
   return ok;
@@ -202,7 +202,7 @@ void HttpManager::Exit()
 {
   if (!sHttpLog_.empty()) {
     String s = "[End] " + Apollo::TimeValue::getTime().toString() + "\n";
-    Apollo::appendFile(NetModuleInstance::Get()->oHttp_.sHttpLog_, s);
+    Msg_File_Append::_(NetModuleInstance::Get()->oHttp_.sHttpLog_, s);
   }
   (void) NetOS::HTTP_Manager_Shutdown(*this);
 }

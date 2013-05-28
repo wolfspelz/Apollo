@@ -275,7 +275,7 @@ void GmModule::onRegisterError(const String sError)
     } else {
       int nDelay = Apollo::getModuleConfig(MODULE_NAME, "Register/RetryDelay", 10) + Apollo::getRandom(Apollo::getModuleConfig(MODULE_NAME, "Register/RetryRandomDelay", 10));
       apLog_Info((LOG_CHANNEL, LOG_CONTEXT, "Scheduling timer in %d sec", nDelay));
-      hRegisterTimer_ = Apollo::startTimeout(nDelay, 0);
+      hRegisterTimer_ = Msg_Timer_Start::Timeout(nDelay, 0);
     }
   }
 }
@@ -382,7 +382,7 @@ void GmModule::onLoginError(const String sError)
     } else {
       int nDelay = Apollo::getModuleConfig(MODULE_NAME, "Login/RetryDelay", 30) + Apollo::getRandom(Apollo::getModuleConfig(MODULE_NAME, "Login/RetryRandomDelay", 30));
       apLog_Info((LOG_CHANNEL, LOG_CONTEXT, "Scheduling timer in %d sec", nDelay));
-      hLoginTimer_ = Apollo::startTimeout(nDelay, 0);
+      hLoginTimer_ = Msg_Timer_Start::Timeout(nDelay, 0);
     }
   }
 }

@@ -130,20 +130,20 @@ APOLLO_API int getModuleConfigKeys(const char* szModuleName, const char* szPath,
 APOLLO_API String translate(const char* szModule, const char* szContext, const char* szText);
 APOLLO_API String translate(const char* szModule, const char* szContext, const char* szText, List& lVars);
 
-APOLLO_API ApHandle startInterval(int nSec, int nMicroSec);
-APOLLO_API ApHandle startTimeout(int nSec, int nMicroSec);
-APOLLO_API int cancelInterval(const ApHandle& hTimer);
-APOLLO_API int cancelTimeout(const ApHandle& hTimer);
+//APOLLO_API ApHandle startInterval(int nSec, int nMicroSec);
+//APOLLO_API ApHandle startTimeout(int nSec, int nMicroSec);
+//APOLLO_API int cancelInterval(const ApHandle& hTimer);
+//APOLLO_API int cancelTimeout(const ApHandle& hTimer);
 
-APOLLO_API int loadFile(const String& sFile, Buffer& sbData);
-APOLLO_API int loadFile(const String& sFile, String& sbData);
-APOLLO_API int saveFile(const String& sFile, const Buffer& sbData);
-APOLLO_API int saveFile(const String& sFile, const String& sData);
-APOLLO_API int appendFile(const String& sFile, const Buffer& sbData);
-APOLLO_API int appendFile(const String& sFile, const String& sData);
-APOLLO_API int deleteFile(const String& sFile);
-APOLLO_API int fileExists(const String& sFile);
-APOLLO_API int renameFile(const String& sFile, const String& sNewName);
+//APOLLO_API int loadFile(const String& sFile, Buffer& sbData);
+//APOLLO_API int loadFile(const String& sFile, String& sbData);
+//APOLLO_API int saveFile(const String& sFile, const Buffer& sbData);
+//APOLLO_API int saveFile(const String& sFile, const String& sData);
+//APOLLO_API int appendFile(const String& sFile, const Buffer& sbData);
+//APOLLO_API int appendFile(const String& sFile, const String& sData);
+//APOLLO_API int deleteFile(const String& sFile);
+//APOLLO_API int fileExists(const String& sFile);
+//APOLLO_API int renameFile(const String& sFile, const String& sNewName);
 
 APOLLO_API void splitCommandlineArguments(const String& sCmdline, Apollo::ValueList& vlArgs);
 APOLLO_API String joinCommandlineArguments(Apollo::ValueList& vlArgs);

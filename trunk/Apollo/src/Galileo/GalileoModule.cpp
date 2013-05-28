@@ -6,8 +6,6 @@
 
 #include "Apollo.h"
 #include "Local.h"
-#include "MsgConfig.h"
-#include "MsgDB.h"
 #include "URL.h"
 #include "GalileoModule.h"
 #include "GalileoModuleTester.h"
@@ -625,7 +623,7 @@ int GalileoModule::Init()
 
   //CxImageGIF img;
   //Buffer sbSource;
-  //Apollo::loadFile("test/tassadar/" + "walk-l.gif", sbSource);
+  //Msg_File_Load::_("test/tassadar/" + "walk-l.gif", sbSource);
   //CxMemFile mfSource(sbSource.Data(), sbSource.Length());
   //img.Decode(&mfSource);
 

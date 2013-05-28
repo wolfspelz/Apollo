@@ -8,6 +8,9 @@
 #define Local_H_INCLUDED
 
 #include "ApLog.h"
+#include "MsgConfig.h"
+#include "MsgDB.h"
+#include "MsgFile.h"
 
 #define MODULE_NAME "Galileo"
 #define LOG_CHANNEL MODULE_NAME

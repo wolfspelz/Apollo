@@ -9,6 +9,7 @@
 #include "babelfish.h"
 #include "MsgTranslation.h"
 #include "MsgCore.h"
+#include "MsgFile.h"
 #include "STree.h"
 #include "SrpcGateHelper.h"
 
@@ -257,7 +258,7 @@ AP_MSG_HANDLER_METHOD(BabelfishModule, Translation_LoadModuleLanguageFile)
 
   if (!sPath.empty()) {
     String sData;
-    if (!Apollo::loadFile(sPath, sData)) {
+    if (!Msg_File_Load::_(sPath, sData)) {
       ok = 0;
       apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "file.Load(%s) failed", _sz(sPath)));
     } else {

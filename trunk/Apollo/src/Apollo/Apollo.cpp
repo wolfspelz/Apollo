@@ -551,149 +551,149 @@ String Apollo::translate(const char* szModule, const char* szContext, const char
 
 // --------------------------------
 
-ApHandle Apollo::startInterval(int nSec, int nMicroSec)
-{
-  ApHandle hTimer = Apollo::newHandle();
-
-  Msg_Timer_Start msg;
-  msg.hTimer = hTimer;
-  msg.nSec = nSec;
-  msg.nMicroSec = nMicroSec;
-  msg.nCount = 0; // 0 means infinite
-  if (!msg.Request()) {
-    hTimer = ApNoHandle;
-    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_Timer_Start failed"));
-  }
-
-  return hTimer;
-}
-
-ApHandle Apollo::startTimeout(int nSec, int nMicroSec)
-{
-  ApHandle hTimer = Apollo::newHandle();
-
-  Msg_Timer_Start msg;
-  msg.hTimer = hTimer;
-  msg.nSec = nSec;
-  msg.nMicroSec = nMicroSec;
-  msg.nCount = 1;
-  if (!msg.Request()) {
-    hTimer = ApNoHandle;
-    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_Timer_Start failed"));
-  }
-
-  return hTimer;
-}
-
-int Apollo::cancelTimeout(const ApHandle& hTimer)
-{
-  int ok = 0;
-
-  Msg_Timer_Cancel msg;
-  msg.hTimer = hTimer;
-  msg.Request();
-  ok = msg.Request();
-  if (!ok) {
-    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_Timer_Cancel failed"));
-  }
-
-  return ok;
-}
-
-int Apollo::cancelInterval(const ApHandle& hTimer) { return cancelTimeout(hTimer); }
+//ApHandle Apollo::startInterval(int nSec, int nMicroSec)
+//{
+//  ApHandle hTimer = Apollo::newHandle();
+//
+//  Msg_Timer_Start msg;
+//  msg.hTimer = hTimer;
+//  msg.nSec = nSec;
+//  msg.nMicroSec = nMicroSec;
+//  msg.nCount = 0; // 0 means infinite
+//  if (!msg.Request()) {
+//    hTimer = ApNoHandle;
+//    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_Timer_Start failed"));
+//  }
+//
+//  return hTimer;
+//}
+//
+//ApHandle Apollo::startTimeout(int nSec, int nMicroSec)
+//{
+//  ApHandle hTimer = Apollo::newHandle();
+//
+//  Msg_Timer_Start msg;
+//  msg.hTimer = hTimer;
+//  msg.nSec = nSec;
+//  msg.nMicroSec = nMicroSec;
+//  msg.nCount = 1;
+//  if (!msg.Request()) {
+//    hTimer = ApNoHandle;
+//    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_Timer_Start failed"));
+//  }
+//
+//  return hTimer;
+//}
+//
+//int Apollo::cancelTimeout(const ApHandle& hTimer)
+//{
+//  int ok = 0;
+//
+//  Msg_Timer_Cancel msg;
+//  msg.hTimer = hTimer;
+//  msg.Request();
+//  ok = msg.Request();
+//  if (!ok) {
+//    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_Timer_Cancel failed"));
+//  }
+//
+//  return ok;
+//}
+//
+//int Apollo::cancelInterval(const ApHandle& hTimer) { return cancelTimeout(hTimer); }
 
 // --------------------------------
 //TODO
-int Apollo::loadFile(const String& sFile, Buffer& sbData)
-{
-  Msg_File_Load msg;
-  msg.sPathName = sFile;
-  int ok = msg.Request();
-  if (ok) {
-    sbData.SetData(msg.sbData.Data(), msg.sbData.Length());
-  }
+//int Msg_File_Load::_(const String& sFile, Buffer& sbData)
+//{
+//  Msg_File_Load msg;
+//  msg.sPathName = sFile;
+//  int ok = msg.Request();
+//  if (ok) {
+//    sbData.SetData(msg.sbData.Data(), msg.sbData.Length());
+//  }
+//
+//  return ok;
+//}
+//
+//int Msg_File_Load::_(const String& sFile, String& sData)
+//{
+//  Msg_File_Load msg;
+//  msg.sPathName = sFile;
+//  int ok = msg.Request();
+//  if (ok) {
+//    msg.sbData.GetString(sData);
+//  }
+//
+//  return ok;
+//}
 
-  return ok;
-}
+//int Apollo::saveFile(const String& sFile, const Buffer& sbData)
+//{
+//  Msg_File_Save msg;
+//  msg.sPathName = sFile;
+//  msg.nFlags = Msg_File_Flag_CreatePath;
+//  msg.sbData.SetData(sbData.Data(), sbData.Length());
+//  
+//  return msg.Request();
+//}
+//
+//int Apollo::saveFile(const String& sFile, const String& sData)
+//{
+//  Msg_File_Save msg;
+//  msg.sPathName = sFile;
+//  msg.nFlags = Msg_File_Flag_CreatePath;
+//  msg.sbData.SetData(sData);
+//  
+//  return msg.Request();
+//}
 
-int Apollo::loadFile(const String& sFile, String& sData)
-{
-  Msg_File_Load msg;
-  msg.sPathName = sFile;
-  int ok = msg.Request();
-  if (ok) {
-    msg.sbData.GetString(sData);
-  }
+//int Msg_File_Append::_(const String& sFile, const Buffer& sbData)
+//{
+//  Msg_File_Append msg;
+//  msg.sPathName = sFile;
+//  msg.nFlags = Msg_File_Flag_CreatePath;
+//  msg.sbData.SetData(sbData.Data(), sbData.Length());
+//  
+//  return msg.Request();
+//}
+//
+//int Msg_File_Append::_(const String& sFile, const String& sData)
+//{
+//  Msg_File_Append msg;
+//  msg.sPathName = sFile;
+//  msg.nFlags = Msg_File_Flag_CreatePath;
+//  msg.sbData.SetData(sData);
+//  
+//  return msg.Request();
+//}
 
-  return ok;
-}
-
-int Apollo::saveFile(const String& sFile, const Buffer& sbData)
-{
-  Msg_File_Save msg;
-  msg.sPathName = sFile;
-  msg.nFlags = Msg_File_Flag_CreatePath;
-  msg.sbData.SetData(sbData.Data(), sbData.Length());
-  
-  return msg.Request();
-}
-
-int Apollo::saveFile(const String& sFile, const String& sData)
-{
-  Msg_File_Save msg;
-  msg.sPathName = sFile;
-  msg.nFlags = Msg_File_Flag_CreatePath;
-  msg.sbData.SetData(sData);
-  
-  return msg.Request();
-}
-
-int Apollo::appendFile(const String& sFile, const Buffer& sbData)
-{
-  Msg_File_Append msg;
-  msg.sPathName = sFile;
-  msg.nFlags = Msg_File_Flag_CreatePath;
-  msg.sbData.SetData(sbData.Data(), sbData.Length());
-  
-  return msg.Request();
-}
-
-int Apollo::appendFile(const String& sFile, const String& sData)
-{
-  Msg_File_Append msg;
-  msg.sPathName = sFile;
-  msg.nFlags = Msg_File_Flag_CreatePath;
-  msg.sbData.SetData(sData);
-  
-  return msg.Request();
-}
-
-int Apollo::deleteFile(const String& sFile)
-{
-  Msg_File_Delete msg;
-  msg.sPathName = sFile;
-
-  return msg.Request();
-}
-
-int Apollo::fileExists(const String& sFile)
-{
-  Msg_File_Exists msg;
-  msg.sPathName = sFile;
-  if (msg.Request()) {
-    return msg.bExists;
-  }
-  return 0;
-}
-
-int Apollo::renameFile(const String& sFile, const String& sNewName)
-{
-  Msg_File_Rename msg;
-  msg.sPathName = sFile;
-  msg.sNewPathName = sNewName;
-
-  return msg.Request();
-}
+//int Apollo::deleteFile(const String& sFile)
+//{
+//  Msg_File_Delete msg;
+//  msg.sPathName = sFile;
+//
+//  return msg.Request();
+//}
+//
+//int Apollo::fileExists(const String& sFile)
+//{
+//  Msg_File_Exists msg;
+//  msg.sPathName = sFile;
+//  if (msg.Request()) {
+//    return msg.bExists;
+//  }
+//  return 0;
+//}
+//
+//int Apollo::renameFile(const String& sFile, const String& sNewName)
+//{
+//  Msg_File_Rename msg;
+//  msg.sPathName = sFile;
+//  msg.sNewPathName = sNewName;
+//
+//  return msg.Request();
+//}
 
 // --------------------------------
 

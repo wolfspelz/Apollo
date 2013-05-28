@@ -140,7 +140,7 @@ String GalileoModuleTester::Test_LoadGIF()
 
   GalileoModule m;
   Animation a(&m, Apollo::getAppResourcePath() + "test/tassadar/" + "walk-l.gif", 0, 0);
-  Apollo::loadFile(Apollo::getAppResourcePath() + "test/tassadar/" + "walk-l.gif", a.sbData_);
+  Msg_File_Load::_(Apollo::getAppResourcePath() + "test/tassadar/" + "walk-l.gif", a.sbData_);
   a.Load();
   if (!s) { if (a.length() != 13) { s = "expected 13 frames"; } }
   if (!s) { if (a.nDurationMSec_ != 1300) { s = "expected 1300 ms duration"; } }
@@ -232,7 +232,7 @@ static void GalileoModuleTester_Test_Item_AnimationData_RelativeUrl(Item& i, con
   String sAnimationPath = Apollo::getAppResourcePath() + "test/tassadar/" + sName;
   String sAnimationUrl = sBaseUrl + sName;
   Buffer sbAnimationData;
-  Apollo::loadFile(sAnimationPath, sbAnimationData);
+  Msg_File_Load::_(sAnimationPath, sbAnimationData);
   i.SetAnimationData(sAnimationUrl, sbAnimationData, "image/gif");
 }
 
@@ -240,7 +240,7 @@ static void GalileoModuleTester_Test_Item_AnimationData_AbsoluteUrl(Item& i, con
 {
   String sAnimationPath = Apollo::getAppResourcePath() + "test/tassadar/" + sName;
   Buffer sbAnimationData;
-  Apollo::loadFile(sAnimationPath, sbAnimationData);
+  Msg_File_Load::_(sAnimationPath, sbAnimationData);
   i.SetAnimationData(sUrl, sbAnimationData, "image/gif");
 }
 
