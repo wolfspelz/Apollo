@@ -337,9 +337,9 @@ static String Test_Timer_QueueAddOne(ListT<Test_Timer_Elem, Elem>& l, int nSec, 
 {
   String err;
 
-  ApHandle hAp = Apollo::startTimeout(nSec, nUSec);
+  ApHandle hAp = Msg_Timer_Start::Timeout(nSec, nUSec);
   if (!ApIsHandle(hAp)) { 
-    err.appendf("Apollo::startTimeout(%d, %d) failed", nSec, nUSec);
+    err.appendf("Msg_Timer_Start::Timeout(%d, %d) failed", nSec, nUSec);
   } else {
     Test_Timer_Elem* e = new Test_Timer_Elem();
     e->setInt(nPos);
@@ -396,8 +396,8 @@ static void Test_Timer_Basic_On_Timer_Event(Msg_Timer_Event* pMsg)
 {
   if (pMsg->hTimer == hTest_Timer_Basic_On_Timer_Event) {
     String err;
-    if (!Apollo::cancelInterval(hTest_Timer_Basic_On_Timer_Event)) {
-      err = "Apollo::cancelTimeout() failed";
+    if (!Msg_Timer_Cancel::Interval(hTest_Timer_Basic_On_Timer_Event)) {
+      err = "Msg_Timer_Cancel::Timeout() failed";
     }
     AP_UNITTEST_RESULT(WinTimerModule::Test_Timer_Basic_Complete, err.empty(), err);
     { Msg_Timer_Event msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_Timer_Basic_On_Timer_Event, 0); }  
@@ -413,9 +413,9 @@ String WinTimerModule::Test_Timer_Basic()
   { Msg_Timer_Event msg; msg.Hook(MODULE_NAME, (ApCallback) Test_Timer_Basic_On_Timer_Event, 0, ApCallbackPosNormal); }
 
   if (err.empty()) {
-    hTest_Timer_Basic_On_Timer_Event = Apollo::startInterval(0, 10000);
+    hTest_Timer_Basic_On_Timer_Event = Msg_Timer_Start::Interval(0, 10000);
     if (!ApIsHandle(hTest_Timer_Basic_On_Timer_Event)) {
-      err = "Apollo::startTimeout() failed";
+      err = "Msg_Timer_Start::Intertval() failed";
     }
   }
   
@@ -435,8 +435,8 @@ static void Test_Timer_Interval_On_Timer_Event(Msg_Timer_Event* pMsg)
     apLog_Info((LOG_CHANNEL, LOG_CONTEXT, "%d %s", nTest_Timer_Interval_On_Timer_Event, _sz(tv.toString())));
     if (nTest_Timer_Interval_On_Timer_Event == 10) {
       String err;
-      if (!Apollo::cancelInterval(hTest_Timer_Interval_On_Timer_Event)) {
-        err = "Apollo::cancelInterval() failed";
+      if (!Msg_Timer_Cancel::Interval(hTest_Timer_Interval_On_Timer_Event)) {
+        err = "Msg_Timer_Cancel::Interval() failed";
       }
       AP_UNITTEST_RESULT(WinTimerModule::Test_Timer_Interval_Complete, err.empty(), err);
       { Msg_Timer_Event msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_Timer_Interval_On_Timer_Event, 0); }  
@@ -454,9 +454,9 @@ String WinTimerModule::Test_Timer_Interval()
   { Msg_Timer_Event msg; msg.Hook(MODULE_NAME, (ApCallback) Test_Timer_Interval_On_Timer_Event, 0, ApCallbackPosNormal); }
 
   if (err.empty()) {
-    hTest_Timer_Interval_On_Timer_Event = Apollo::startInterval(0, 10000);
+    hTest_Timer_Interval_On_Timer_Event = Msg_Timer_Start::Interval(0, 10000);
     if (!ApIsHandle(hTest_Timer_Interval_On_Timer_Event)) {
-      err = "Apollo::startInterval() failed";
+      err = "Msg_Timer_Start::Interval() failed";
     }
   }
   

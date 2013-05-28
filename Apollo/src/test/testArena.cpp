@@ -11,6 +11,7 @@
 #include "MsgUnitTest.h"
 #include "MsgVpView.h"
 #include "MsgGalileo.h"
+#include "MsgFile.h"
 #include "MsgTimer.h"
 #include "MsgLog.h"
 #include "MsgConfig.h"
@@ -126,7 +127,7 @@ void ActionList::Proceed()
         nSec = nMSec % 1000;
         nMSec = nDelayMSec - nSec * 1000;
       }
-      hTimer_ = Apollo::startTimeout(nSec, nMSec * 1000);
+      hTimer_ = Msg_Timer_Start::Timeout(nSec, nMSec * 1000);
     }
   }
 }
@@ -332,7 +333,7 @@ static void Test_Galileo_LoadAnimationDataFromStorage(Msg_Galileo_LoadAnimationD
   Test_InNavigateChatOut* t = (Test_InNavigateChatOut*) pMsg->Ref();
 
   String sFile = String::filenameFile(pMsg->sUrl);
-  Apollo::loadFile(Apollo::getAppResourcePath() + "test/tassadar/" + sFile, pMsg->sbData);
+  Msg_File_Load::_(Apollo::getAppResourcePath() + "test/tassadar/" + sFile, pMsg->sbData);
   pMsg->sMimeType = "image/gif";
 
   pMsg->apStatus = ApMessage::Ok;
@@ -899,7 +900,7 @@ void Test_InNavigateChatOut::Begin()
     Test_Participant* p = new Test_Participant();
     if (p) {
       p->sNickname = "Tassadar";
-      Apollo::loadFile(Apollo::getAppResourcePath() + "test/tassadar/" + "config.xml", p->sbAvatar);
+      Msg_File_Load::_(Apollo::getAppResourcePath() + "test/tassadar/" + "config.xml", p->sbAvatar);
       p->sAvatarMimetype = "avatar/gif";
       p->sAvatarSource = "IdentityItemUrl=http://ydentiti.org/test/Tassadar/config.xml";
       p->sAvatarUrl = "http://ydentiti.org/test/Tassadar/walk-l.gif";
@@ -920,7 +921,7 @@ void Test_InNavigateChatOut::Begin()
     Test_Participant* p = new Test_Participant();
     if (p) {
       p->sNickname = "Planta";
-      Apollo::loadFile(Apollo::getAppResourcePath() + "test/planta/" + "avatar.xml", p->sbAvatar);
+      Msg_File_Load::_(Apollo::getAppResourcePath() + "test/planta/" + "avatar.xml", p->sbAvatar);
       p->sAvatarMimetype = "avatar/gif";
       p->sAvatarSource = "IdentityItemUrl=http://ydentiti.org/test/Planta/avatar.xml";
       p->sAvatarUrl = "http://ydentiti.org/test/Planta/wave.gif";

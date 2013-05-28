@@ -5,6 +5,7 @@
 // ============================================================================
 
 #include "Apollo.h"
+#include "MsgFile.h"
 #include "logModule.h"
 #include "logFile.h"
 
@@ -50,17 +51,17 @@ void FileLogger::appendLog(const String& sLevel, const String& sChannel, const S
     //}
 
     if (!sFile.empty()) {
-      if (Apollo::fileExists(sFile)) {
+      if (Msg_File_Exists::_(sFile)) {
         String sFileOld = sFile + ".old";
-        Apollo::renameFile(sFile, sFileOld);
+        Msg_File_Rename::_(sFile, sFileOld);
       }
     }
 
     sFile_ = sFile;
-    Apollo::appendFile(sFile_, "-----------------------------------------------------------------------------\n");
+    Msg_File_Append::_(sFile_, "-----------------------------------------------------------------------------\n");
   }
 
   if (!sFile_.empty()) {
-    Apollo::appendFile(sFile_, sLine);
+    Msg_File_Append::_(sFile_, sLine);
   }
 }

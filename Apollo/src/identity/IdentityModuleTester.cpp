@@ -6,10 +6,8 @@
 
 #include "Apollo.h"
 #include "Local.h"
-#include "MsgDB.h"
 #include "IdentityModule.h"
 #include "IdentityModuleTester.h"
-#include "MsgNet.h"
 
 #if defined(AP_TEST)
 
@@ -403,8 +401,8 @@ String IdentityModuleTester::test_GetItem()
   }
 
   Buffer sbImage;
-  if (!Apollo::loadFile(Apollo::getAppResourcePath() + "test/test1.png", sbImage)) {
-    s = "Apollo::loadFile(test/test1.png) failed";
+  if (!Msg_File_Load::_(Apollo::getAppResourcePath() + "test/test1.png", sbImage)) {
+    s = "Msg_File_Load::_(test/test1.png) failed";
   }
 
   if (!s) {
@@ -743,8 +741,8 @@ String IdentityModuleTester::test_Change()
   }
 
   Buffer sbImage;
-  if (!Apollo::loadFile(Apollo::getAppResourcePath() + "test/test1.png", sbImage)) {
-    s = "Apollo::loadFile(test/test1.png) failed";
+  if (!Msg_File_Load::_(Apollo::getAppResourcePath() + "test/test1.png", sbImage)) {
+    s = "Msg_File_Load::_(test/test1.png) failed";
   }
 
   if (!s) {

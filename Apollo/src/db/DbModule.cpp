@@ -187,7 +187,7 @@ AP_MSG_HANDLER_METHOD(DbModule, DB_DeleteFile)
     sFilePath = SQLiteFile::pathFromName(pMsg->sName);
   }
 
-  ok = Apollo::deleteFile(sFilePath);
+  ok = Msg_File_Delete::_(sFilePath);
 
   pMsg->apStatus = ok ? ApMessage::Ok : ApMessage::Error;
 }
@@ -354,9 +354,9 @@ static String Test_Db_Bulk()
 
   // Bulk data
   Buffer sbFile;
-  Apollo::loadFile(Apollo::getAppResourcePath() + "ApCore.dll", sbFile);
+  Msg_File_Load::_(Apollo::getAppResourcePath() + "ApCore.dll", sbFile);
   Buffer sbFile2;
-  Apollo::loadFile(Apollo::getAppResourcePath() + "test/test1.png", sbFile2);
+  Msg_File_Load::_(Apollo::getAppResourcePath() + "test/test1.png", sbFile2);
 
   if (!s) {
     Msg_DB_SetBinary msg;
@@ -463,9 +463,9 @@ static String Test_Db_UpdateBulk()
 
   // Bulk data
   Buffer sbFile;
-  Apollo::loadFile(Apollo::getAppResourcePath() + "ApCore.dll", sbFile);
+  Msg_File_Load::_(Apollo::getAppResourcePath() + "ApCore.dll", sbFile);
   Buffer sbFile2;
-  Apollo::loadFile(Apollo::getAppResourcePath() + "test/test1.png", sbFile2);
+  Msg_File_Load::_(Apollo::getAppResourcePath() + "test/test1.png", sbFile2);
 
   if (!s) {
     Msg_DB_SetBinary msg;

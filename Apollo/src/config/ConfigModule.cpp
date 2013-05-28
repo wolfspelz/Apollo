@@ -186,7 +186,7 @@ AP_MSG_HANDLER_METHOD(ConfigModule, Config_Load)
         sFile += ".txt";
 
         String sData;
-        if (!Apollo::loadFile(sFile, sData)) {
+        if (!Msg_File_Load::_(sFile, sData)) {
           apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "fConfig.Load(%s)", _sz(sFile)));
         } else {
           ok = 1;
@@ -207,7 +207,7 @@ AP_MSG_HANDLER_METHOD(ConfigModule, Config_Load)
         sFile += ".local.txt";
 
         String sData;
-        if (!Apollo::loadFile(sFile, sData)) {
+        if (!Msg_File_Load::_(sFile, sData)) {
           apLog_Info((LOG_CHANNEL, LOG_CONTEXT, "fConfig.Load failed(%s)", _sz(sFile)));
         } else {
           ok = 1;

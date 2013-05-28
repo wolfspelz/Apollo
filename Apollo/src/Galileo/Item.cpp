@@ -675,7 +675,7 @@ int Item::StartTimer()
 
   tvLastTimer_ = Apollo::TimeValue::getTime();
 
-  hTimer_ = Apollo::startInterval(0, nDelayMSec * 1000);
+  hTimer_ = Msg_Timer_Start::Interval(0, nDelayMSec * 1000);
   if (ApIsHandle(hTimer_)) {
     ok = 1;
   }
@@ -686,7 +686,7 @@ int Item::StartTimer()
 void Item::StopTimer()
 {
   if (ApIsHandle(hTimer_)) {
-    Apollo::cancelInterval(hTimer_);
+    Msg_Timer_Cancel::Interval(hTimer_);
     hTimer_ = ApNoHandle;
   }
 }
