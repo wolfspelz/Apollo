@@ -60,7 +60,6 @@ public:
   MainLoopModule()
     :hAppInstance_(NULL)
     ,hWnd_(NULL)
-    ,bFirstMessage_(true)
     ,nWM_APMSG_(WM_APP + 1)
     ,nQuitTimer_(-1)
     ,nWaitFinishingModules_(0)
@@ -90,7 +89,6 @@ protected:
 
   HINSTANCE hAppInstance_;
   HWND hWnd_;
-  bool bFirstMessage_;
   UINT nWM_APMSG_;
   UINT nQuitTimer_;
   int nWaitFinishingModules_;
