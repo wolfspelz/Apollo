@@ -14,7 +14,7 @@
 #include "MsgConfig.h"
 #include "MsgUnitTest.h"
 #include "MsgFile.h"
-#include "MsgOS.h"
+#include "MsgProcess.h"
 
 // -------------------------------------------------------------------
 
@@ -83,10 +83,10 @@ public:
   void On_File_Exists(Msg_File_Exists* pMsg);
   void On_File_Rename(Msg_File_Rename* pMsg);
 
-  void On_OS_StartProcess(Msg_OS_StartProcess* pMsg);
-  void On_OS_KillProcess(Msg_OS_KillProcess* pMsg);
-  void On_OS_GetProcessId(Msg_OS_GetProcessId* pMsg);
-  void On_OS_GetProcessInfo(Msg_OS_GetProcessInfo* pMsg);
+  void On_Process_Start(Msg_Process_Start* pMsg);
+  void On_Process_Kill(Msg_Process_Kill* pMsg);
+  void On_Process_GetId(Msg_Process_GetId* pMsg);
+  void On_Process_GetInfo(Msg_Process_GetInfo* pMsg);
 
 
 

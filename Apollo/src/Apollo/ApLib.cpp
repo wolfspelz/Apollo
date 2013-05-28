@@ -702,7 +702,7 @@ static String _FormatLastError()
 #include "ShellAPI.h"
 #endif
 
-AP_MSG_HANDLER_METHOD(ApLib, OS_StartProcess)
+AP_MSG_HANDLER_METHOD(ApLib, Process_Start)
 {
   int ok = 0;
 
@@ -710,7 +710,7 @@ AP_MSG_HANDLER_METHOD(ApLib, OS_StartProcess)
   //::ShellExecute(NULL, _T("open"), pMsg->sExePath, pMsg->sArgs,  String::filenameBasePath(pMsg->sExePath), SW_SHOW);
   //int bDone = 0;
   //while (!bDone) {
-  //  Msg_OS_GetProcessId msg;
+  //  Msg_Process_GetId msg;
   //  msg.sName = String::filenameFile(pMsg->sExePath);
   //  if (msg.Request()) {
   //    pMsg->nPid = msg.nPid;
@@ -757,7 +757,7 @@ AP_MSG_HANDLER_METHOD(ApLib, OS_StartProcess)
 #endif
 }
 
-AP_MSG_HANDLER_METHOD(ApLib, OS_KillProcess)
+AP_MSG_HANDLER_METHOD(ApLib, Process_Kill)
 {
   int ok = 0;
 
@@ -782,7 +782,7 @@ AP_MSG_HANDLER_METHOD(ApLib, OS_KillProcess)
 #include "Psapi.h"
 #endif
 
-AP_MSG_HANDLER_METHOD(ApLib, OS_GetProcessId)
+AP_MSG_HANDLER_METHOD(ApLib, Process_GetId)
 {
   int ok = 0;
 
@@ -833,7 +833,7 @@ AP_MSG_HANDLER_METHOD(ApLib, OS_GetProcessId)
 #endif
 }
 
-AP_MSG_HANDLER_METHOD(ApLib, OS_GetProcessInfo)
+AP_MSG_HANDLER_METHOD(ApLib, Process_GetInfo)
 {
   int ok = 0;
 
@@ -845,7 +845,7 @@ AP_MSG_HANDLER_METHOD(ApLib, OS_GetProcessInfo)
     DWORD dwLength = ::GetProcessImageFileName(hProcess, wzBaseName.get(), nSize);
     if (dwLength > 0) {
       String sProgramPath = wzBaseName;
-      pMsg->kvInfo.add(Msg_OS_GetProcessInfo_ProgramPath, sProgramPath);
+      pMsg->kvInfo.add(Msg_Process_GetInfo_ProgramPath, sProgramPath);
       ok = 1;
     } else {
       pMsg->sComment = _FormatLastError();
@@ -954,10 +954,10 @@ int ApLib::Init(Apollo::ValueList& vlArgs)
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ApLib, File_Delete, this, ApCallbackPosLate);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ApLib, File_Exists, this, ApCallbackPosLate);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ApLib, File_Rename, this, ApCallbackPosLate);
-  AP_MSG_REGISTRY_ADD(MODULE_NAME, ApLib, OS_StartProcess, this, ApCallbackPosLate);
-  AP_MSG_REGISTRY_ADD(MODULE_NAME, ApLib, OS_KillProcess, this, ApCallbackPosLate);
-  AP_MSG_REGISTRY_ADD(MODULE_NAME, ApLib, OS_GetProcessId, this, ApCallbackPosLate);
-  AP_MSG_REGISTRY_ADD(MODULE_NAME, ApLib, OS_GetProcessInfo, this, ApCallbackPosLate);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, ApLib, Process_Start, this, ApCallbackPosLate);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, ApLib, Process_Kill, this, ApCallbackPosLate);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, ApLib, Process_GetId, this, ApCallbackPosLate);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, ApLib, Process_GetInfo, this, ApCallbackPosLate);
 
   return ok;
 }
