@@ -114,11 +114,11 @@ function PurgePanels() {
 
 function AddPanel(hPanel, sName, nOrder, nSlots) {
   $('#Wrapper').append(''
-    + '<div id="Panel_' + hPanel.toDomCompatible() + '" class="Panel">'
-    + '  <div class="Name">' + sName + '</div>'
-    + '  <div class="Items"></div>'
-    + '</div>'
-  );
+        + '<div id="Panel_' + hPanel.toDomCompatible() + '" class="Panel">'
+        + '  <div class="Name">' + sName + '</div>'
+        + '  <div class="Items"></div>'
+        + '</div>'
+      );
 }
 
 function RemovePanel(hPanel) {
@@ -127,24 +127,77 @@ function RemovePanel(hPanel) {
 
 function AddItem(hPanel, hItem, sName, sIcon, nSlot, nStacksize) {
   $('#Panel_' + hPanel.toDomCompatible()).append(''
-    + '<div id="Item_' + hItem.toDomCompatible() + '" class="Item">'
-    + '<img src="' + sIcon + '" class="Icon" />'
-    + '<input type="button" value="xx" />'
-    + '</div>'
-  );
+      + '<div id="Item_' + hItem.toDomCompatible() + '" class="Item">'
+      + '  <img src="' + sIcon + '" class="Icon" />'
+//      + '  <div class="Stacksize">' + nStacksize + '</div>'
+//      + '  <div class="Name">' + sName + '</div>'
+//      + '  <div class="ItemId">' + hItem + '</div>'
+//      + '  <input type="button" class="Drag" value="Drag"/>'
+      + '</div>'
+    );
 
-  $('#Item_' + hItem.toDomCompatible()).click(function () {
-      api.Log.Debug('click');
+//  $('#Item_' + hItem.toDomCompatible() + ' .Drag').mousedown(
+//  //$('#Item_' + hItem.toDomCompatible() + ' .Icon').mousedown(
+//    function (ev) {
+//      api.Log.Debug('OnDragItem');
+//      OnDragItem(hItem, ev.pageX, ev.pageY);
+//    });
+
+  //  $('#Item_' + hItem.toDomCompatible()).mousedown(
+  //    function (ev) {
+  //      //api.Log.Debug('pageX=' + ev.pageX + ' pageY=' + ev.pageY);
+  //      OnDragItem(hItem, ev.pageX, ev.pageY);
+  //    });
+
+  var nPinX = 16;
+  var nPinY = 16;
+
+  $('#Item_' + hItem.toDomCompatible()).draggable({
+    iframeFix: true,
+    distance: 4,
+    stack: 'div',
+    opacity: 0.7,
+    scroll: false,
+    //revert: true,
+    //helper: 'clone',
+    //delay: 200,
+    //grid: [108, 108],
+    cursor: 'move',
+    xcursorAt: { top: 16, left: 16 },
+    containment: '#Panel_' + hPanel.toDomCompatible() + ' .Items',
+    start: function (ev) {
+      var off = $(this).offset();
+      var nMouseX = ev.pageX;
+      var nMouseY = ev.pageY;
+      var nPinX = ev.pageX - off.left;
+      var nPinY = ev.pageY - off.top;
+      api.Log.Debug('draggable.start ' + nPinX + ' ' + nPinY);
+      OnDragItem(hItem, nMouseX, nMouseY, nPinX, nPinY);
+      return false;
+    },
+    drag: function (ev) {
+      var nBorder = 4;
+      var eParent = this.offsetParent;
+      var nLeft = eParent.offsetLeft - nBorder;
+      var nTop = eParent.offsetTop - nBorder;
+      var nRight = nLeft + eParent.offsetWidth + nBorder;
+      var nBottom = nTop + eParent.offsetHeight + nBorder;
+      var nMouseX = ev.pageX;
+      var nMouseY = ev.pageY;
+      var bInside = true;
+      if (nMouseX < nLeft || nMouseX > nRight) { bInside = false; }
+      if (nMouseY < nTop || nMouseY > nBottom) { bInside = false; }
+      api.Log.Debug('draggable.drag ' + nMouseX + ' ' + nMouseY);
+      if (!bInside) {
+        OnDragItem(hItem, nMouseX, nMouseY, nPinX, nPinY);
+        $('#Item_' + hItem.toDomCompatible()).hide();
+        return false;
+      }
+    },
+    stop: function (ev) {
+      api.Log.Debug('draggable.stop ');
+    }
   });
-
-//  function (ev) {
-//    var off = $(this).offset();
-//    var nMouseX = ev.pageX;
-//    var nMouseY = ev.pageY;
-//    var nPinX = ev.pageX - off.left;
-//    var nPinY = ev.pageY - off.top;
-//    OnDragItem(hItem, nMouseX, nMouseY, nPinX, nPinY);
-//  } 
 }
 
 function RemoveItem(hPanel, hItem) {
@@ -186,7 +239,6 @@ function OnDragItem(hItem, nMouseX, nMouseY, nPinX, nPinY) {
 </head>
 
 <body>
-<input type="button" value="xx" />
 <div id="Wrapper">
 Inventory
 </div>
