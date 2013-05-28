@@ -145,10 +145,6 @@ APOLLO_API int deleteFile(const String& sFile);
 APOLLO_API int fileExists(const String& sFile);
 APOLLO_API int renameFile(const String& sFile, const String& sNewName);
 
-APOLLO_API String getCwd();
-APOLLO_API String getMachineId();
-APOLLO_API String getUserLoginName();
-APOLLO_API String getUserProfilePath();
 APOLLO_API void splitCommandlineArguments(const String& sCmdline, Apollo::ValueList& vlArgs);
 APOLLO_API String joinCommandlineArguments(Apollo::ValueList& vlArgs);
 

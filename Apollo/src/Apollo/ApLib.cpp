@@ -581,6 +581,31 @@ AP_MSG_HANDLER_METHOD(ApLib, System_GetCmdLineArgs)
   pMsg->Stop();
 }
 
+AP_MSG_HANDLER_METHOD(ApLib, System_GetCurrentWorkingDirectory)
+{  
+  pMsg->sCwd = getCwd();
+  pMsg->apStatus = ApMessage::Ok;
+}
+
+AP_MSG_HANDLER_METHOD(ApLib, System_GetMachineId)
+{
+  pMsg->sId = getMachineId();
+  pMsg->apStatus = ApMessage::Ok;
+}
+
+AP_MSG_HANDLER_METHOD(ApLib, System_GetUserLoginName)
+{
+  pMsg->sName = getUserLoginName();
+  pMsg->apStatus = ApMessage::Ok;
+}
+
+AP_MSG_HANDLER_METHOD(ApLib, System_GetUserProfilePath)
+{
+  pMsg->sPath = getUserProfilePath();
+  pMsg->apStatus = ApMessage::Ok;
+}
+
+
 AP_MSG_HANDLER_METHOD(ApLib, MainLoop_EventLoopBegin)
 {
   AP_UNUSED_ARG(pMsg);
@@ -606,7 +631,7 @@ AP_MSG_HANDLER_METHOD(ApLib, Config_Loaded)
   sModuleResourcePathToken_ = Apollo::getConfig("Core/ModuleConfig/ModuleResourcePathToken", sModuleResourcePathToken_);
   sUserProfilePathToken_ = Apollo::getConfig("Core/ModuleConfig/UserProfilePathToken", sUserProfilePathToken_);
 
-  lPathVars_["[[USER_PROFILE]]"] = Apollo::getUserProfilePath();
+  lPathVars_["[[USER_PROFILE]]"] = getUserProfilePath();
 }
 
 // --------------------------------
@@ -947,6 +972,10 @@ int ApLib::Init(Apollo::ValueList& vlArgs)
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ApLib, MainLoop_EventLoopEnd, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ApLib, System_SecTimer, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ApLib, System_GetCmdLineArgs, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, ApLib, System_GetCurrentWorkingDirectory, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, ApLib, System_GetMachineId, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, ApLib, System_GetUserLoginName, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, ApLib, System_GetUserProfilePath, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ApLib, Config_Loaded, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ApLib, File_Load, this, ApCallbackPosLate);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ApLib, File_Save, this, ApCallbackPosLate);

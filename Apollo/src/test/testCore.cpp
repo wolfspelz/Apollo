@@ -9,6 +9,7 @@
 
 #if defined(AP_TEST_Core)
 #include "MsgSample.h"
+#include "MsgSystem.h"
 
 int Test_Core_ModuleLoad()
 {
@@ -551,10 +552,10 @@ String Test_Core_MachineId()
 {
   String s;
 
-  String sMachineId = Apollo::getMachineId();
+  String sMachineId = Msg_System_GetMachineId::_();
   if (sMachineId.empty()) { s = "getMachineId() empty"; }
 
-  String sMachineId2 = Apollo::getMachineId();
+  String sMachineId2 = Msg_System_GetMachineId::_();
   if (sMachineId != sMachineId2) { s = "not equal"; }
 
   return s;
