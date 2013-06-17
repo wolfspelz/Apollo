@@ -15,17 +15,11 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="AutoWindowsMessage.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="WinMainLoop.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="AutoWindowsMessage.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="WinMainLoop.h">
       <Filter>Header Files</Filter>
     </ClInclude>

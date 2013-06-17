@@ -76,11 +76,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="AutoWindowsMessage.cpp" />
     <ClCompile Include="WinMainLoop.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="AutoWindowsMessage.h" />
     <ClInclude Include="WinMainLoop.h" />
     <ClInclude Include="res\resource.h" />
   </ItemGroup>
