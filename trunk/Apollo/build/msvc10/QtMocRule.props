@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemDefinitionGroup>
+	<QtMOC>
+	  <OutputFileName>%(RootDir)%(Directory)moc_%(FileName).cc</OutputFileName>
+      <CommandLineTemplate>$(QTDIR)\bin\moc.exe [AllOptions] [Inputs]</CommandLineTemplate>
+      <ExecutionDescription>Compiling %(Filename)%(Extension) using QT MOC</ExecutionDescription>
+    </QtMOC>
+  </ItemDefinitionGroup>
+</Project>
