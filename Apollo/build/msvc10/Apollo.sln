@@ -128,6 +128,13 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Inventory", "..\..\src\Inve
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wintimer", "..\..\src\wintimer\wintimer.vcxproj", "{52F0E390-3012-4CA6-A60A-B3C9A5889033}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QWebView", "..\..\src\QWebView\QWebView.vcxproj", "{CF72AB4B-0219-49B3-B26A-1E697CCA13AF}"
+	ProjectSection(ProjectDependencies) = postProject
+		{9B3FBA6A-ED3F-479A-8919-A463882F19B1} = {9B3FBA6A-ED3F-479A-8919-A463882F19B1}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QMainLoop", "..\..\src\QMainLoop\QMainLoop.vcxproj", "{5821119E-4A21-4D97-A138-5C6336AEB9B7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -322,6 +329,14 @@ Global
 		{52F0E390-3012-4CA6-A60A-B3C9A5889033}.Debug|Win32.Build.0 = Debug|Win32
 		{52F0E390-3012-4CA6-A60A-B3C9A5889033}.Release|Win32.ActiveCfg = Release|Win32
 		{52F0E390-3012-4CA6-A60A-B3C9A5889033}.Release|Win32.Build.0 = Release|Win32
+		{CF72AB4B-0219-49B3-B26A-1E697CCA13AF}.Debug|Win32.ActiveCfg = Debug|Win32
+		{CF72AB4B-0219-49B3-B26A-1E697CCA13AF}.Debug|Win32.Build.0 = Debug|Win32
+		{CF72AB4B-0219-49B3-B26A-1E697CCA13AF}.Release|Win32.ActiveCfg = Release|Win32
+		{CF72AB4B-0219-49B3-B26A-1E697CCA13AF}.Release|Win32.Build.0 = Release|Win32
+		{5821119E-4A21-4D97-A138-5C6336AEB9B7}.Debug|Win32.ActiveCfg = Debug|Win32
+		{5821119E-4A21-4D97-A138-5C6336AEB9B7}.Debug|Win32.Build.0 = Debug|Win32
+		{5821119E-4A21-4D97-A138-5C6336AEB9B7}.Release|Win32.ActiveCfg = Release|Win32
+		{5821119E-4A21-4D97-A138-5C6336AEB9B7}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
