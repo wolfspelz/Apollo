@@ -4,8 +4,8 @@
 //
 // ============================================================================
 
-#if !defined(WebView_H_INCLUDED)
-#define WebView_H_INCLUDED
+#if !defined(View_H_INCLUDED)
+#define View_H_INCLUDED
 
 #include <WebKit/WebKit.h>
 #include <WebKit/WebKitCOMAPI.h>
@@ -344,4 +344,4 @@ public:
 
 };
 
-#endif // WebView_H_INCLUDED
+#endif // View_H_INCLUDED
