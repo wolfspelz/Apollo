@@ -380,7 +380,7 @@ void NetModule::On_Net_HTTP_CancelAll(Msg_Net_HTTP_CancelAll* pMsg)
   pMsg->apStatus = ok ? ApMessage::Ok : ApMessage::Error;
 }
 
-void NetModule::On_MainLoop_EventLoopBeforeEnd(Msg_MainLoop_EventLoopBeforeEnd* pMsg)
+void NetModule::On_MainLoop_EventLoopDelayEnd(Msg_MainLoop_EventLoopDelayEnd* pMsg)
 {
   apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, ""));
 

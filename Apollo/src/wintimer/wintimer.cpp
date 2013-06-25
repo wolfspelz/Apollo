@@ -83,7 +83,7 @@ public:
   void On_Timer_Start(Msg_Timer_Start* pMsg);
   void On_Timer_Cancel(Msg_Timer_Cancel* pMsg);
   void On_Win32_WndProcMessage(Msg_Win32_WndProcMessage* pMsg);
-  void On_MainLoop_EventLoopBeforeBegin(Msg_MainLoop_EventLoopBeforeBegin* pMsg);
+  void On_MainLoop_EventLoopBegin(Msg_MainLoop_EventLoopBegin* pMsg);
   void On_MainLoop_EventLoopEnd(Msg_MainLoop_EventLoopEnd* pMsg);
 
 #if defined(AP_TEST)
@@ -313,7 +313,7 @@ void WinTimerModule::On_Win32_WndProcMessage(Msg_Win32_WndProcMessage* pMsg)
   } //  if WM_TIMER
 }
 
-void WinTimerModule::On_MainLoop_EventLoopBeforeBegin(Msg_MainLoop_EventLoopBeforeBegin* pMsg)
+void WinTimerModule::On_MainLoop_EventLoopBegin(Msg_MainLoop_EventLoopBegin* pMsg)
 {
   ::SetTimer(GetHWnd(), SEC_TIMER, 1000, NULL);
 }
@@ -546,7 +546,7 @@ AP_REFINSTANCE_MSG_HANDLER(WinTimerModule, Timer_ClearAll)
 AP_REFINSTANCE_MSG_HANDLER(WinTimerModule, Timer_Start)
 AP_REFINSTANCE_MSG_HANDLER(WinTimerModule, Timer_Cancel)
 AP_REFINSTANCE_MSG_HANDLER(WinTimerModule, Win32_WndProcMessage)
-AP_REFINSTANCE_MSG_HANDLER(WinTimerModule, MainLoop_EventLoopBeforeBegin)
+AP_REFINSTANCE_MSG_HANDLER(WinTimerModule, MainLoop_EventLoopBegin)
 AP_REFINSTANCE_MSG_HANDLER(WinTimerModule, MainLoop_EventLoopEnd)
 #if defined(AP_TEST)
 AP_REFINSTANCE_MSG_HANDLER(WinTimerModule, UnitTest_Begin)
@@ -565,7 +565,7 @@ WINTIMER_API int Load(AP_MODULE_CALL* pModuleData)
   { Msg_Timer_Start msg; msg.Hook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(WinTimerModule, Timer_Start), WinTimerModuleInstance::Get(), ApCallbackPosNormal); }
   { Msg_Timer_Cancel msg; msg.Hook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(WinTimerModule, Timer_Cancel), WinTimerModuleInstance::Get(), ApCallbackPosNormal); }
   { Msg_Win32_WndProcMessage msg; msg.Hook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(WinTimerModule, Win32_WndProcMessage), WinTimerModuleInstance::Get(), ApCallbackPosNormal); }
-  { Msg_MainLoop_EventLoopBeforeBegin msg; msg.Hook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(WinTimerModule, MainLoop_EventLoopBeforeBegin), WinTimerModuleInstance::Get(), ApCallbackPosNormal); }
+  { Msg_MainLoop_EventLoopBegin msg; msg.Hook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(WinTimerModule, MainLoop_EventLoopBegin), WinTimerModuleInstance::Get(), ApCallbackPosNormal); }
   { Msg_MainLoop_EventLoopEnd msg; msg.Hook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(WinTimerModule, MainLoop_EventLoopEnd), WinTimerModuleInstance::Get(), ApCallbackPosNormal); }
 #if defined(AP_TEST)
   { Msg_UnitTest_Begin msg; msg.Hook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(WinTimerModule, UnitTest_Begin), WinTimerModuleInstance::Get(), ApCallbackPosNormal); }
@@ -584,7 +584,7 @@ WINTIMER_API int UnLoad(AP_MODULE_CALL* pModuleData)
   { Msg_Timer_Start msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(WinTimerModule, Timer_Start), WinTimerModuleInstance::Get()); }
   { Msg_Timer_Cancel msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(WinTimerModule, Timer_Cancel), WinTimerModuleInstance::Get()); }
   { Msg_Win32_WndProcMessage msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(WinTimerModule, Win32_WndProcMessage), WinTimerModuleInstance::Get()); }
-  { Msg_MainLoop_EventLoopBeforeBegin msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(WinTimerModule, MainLoop_EventLoopBeforeBegin), WinTimerModuleInstance::Get()); }
+  { Msg_MainLoop_EventLoopBegin msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(WinTimerModule, MainLoop_EventLoopBegin), WinTimerModuleInstance::Get()); }
   { Msg_MainLoop_EventLoopEnd msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(WinTimerModule, MainLoop_EventLoopEnd), WinTimerModuleInstance::Get()); }
 #if defined(AP_TEST)
   { Msg_UnitTest_Begin msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(WinTimerModule, UnitTest_Begin), WinTimerModuleInstance::Get()); }

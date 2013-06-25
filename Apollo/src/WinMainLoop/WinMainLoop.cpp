@@ -60,7 +60,6 @@ public:
   MainLoopModule()
     :hAppInstance_(NULL)
     ,hWnd_(NULL)
-    ,bFirstMessage_(true)
     ,nWM_APMSG_(WM_APP + 1)
     ,nQuitTimer_(-1)
     ,nWaitFinishingModules_(0)
@@ -90,7 +89,6 @@ protected:
 
   HINSTANCE hAppInstance_;
   HWND hWnd_;
-  bool bFirstMessage_;
   UINT nWM_APMSG_;
   UINT nQuitTimer_;
   int nWaitFinishingModules_;
@@ -213,7 +211,7 @@ LRESULT MainLoopModule::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 
       int nDelay = Apollo::getModuleConfig(MODULE_NAME, "ShutdownDelay", 2);
       {
-        Msg_MainLoop_EventLoopBeforeEnd msg;
+        Msg_MainLoop_EventLoopDelayEnd msg;
         msg.nDelaySec = nDelay;
         msg.nWaitCount = 0;
         msg.Filter();
@@ -233,7 +231,6 @@ LRESULT MainLoopModule::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
   case WM_DESTROY:
     {
       PostQuitMessage(0);
-      { Msg_MainLoop_EventLoopEnd msg; msg.Send(); }
     }
     break;
 
@@ -332,10 +329,10 @@ void MainLoopModule::On_MainLoop_Win32Loop(Msg_MainLoop_Win32Loop* pMsg)
       ::UpdateWindow(hWnd_);
     }
 
-    { Msg_MainLoop_EventLoopBeforeBegin msg; msg.Send(); }
-
     HACCEL hAccelTable = ::LoadAccelerators(g_hDllInstance, (LPCTSTR) IDC_WIN32APP);
     MSG windowsMessage;
+
+    { Msg_MainLoop_EventLoopBegin msg; msg.Send(); }
 
     int bReLoop = 0;
 loop:
@@ -343,11 +340,6 @@ loop:
     try {
 
       while (::GetMessage(&windowsMessage, NULL, 0, 0)) {
-
-        if (bFirstMessage_) {
-          bFirstMessage_ = false;
-          { Msg_MainLoop_EventLoopBegin msg; msg.Send(); }
-        }
 
         if (!::TranslateAccelerator(windowsMessage.hwnd, hAccelTable, &windowsMessage)) {
           ::TranslateMessage(&windowsMessage);
@@ -372,6 +364,8 @@ loop:
 
     }
     if (bReLoop) { goto loop; }
+
+    { Msg_MainLoop_EventLoopEnd msg; msg.Send(); }
 
     pMsg->wParam = windowsMessage.wParam;
   }
