@@ -85,6 +85,13 @@ public:
 
 #endif
 
+// mainloop ->
+class Msg_MainLoop_EventLoopBegin: public ApNotificationMessage
+{
+public:
+  Msg_MainLoop_EventLoopBegin() : ApNotificationMessage("MainLoop_EventLoopBegin") {}
+};
+
 // main -> mainloop
 class Msg_MainLoop_EndLoop: public ApRequestMessage
 {
@@ -93,24 +100,10 @@ public:
 };
 
 // mainloop ->
-class Msg_MainLoop_EventLoopBeforeBegin: public ApNotificationMessage
+class Msg_MainLoop_EventLoopDelayEnd: public ApFilterMessage
 {
 public:
-  Msg_MainLoop_EventLoopBeforeBegin() : ApNotificationMessage("MainLoop_EventLoopBeforeBegin") {}
-};
-
-// mainloop ->
-class Msg_MainLoop_EventLoopBegin: public ApNotificationMessage
-{
-public:
-  Msg_MainLoop_EventLoopBegin() : ApNotificationMessage("MainLoop_EventLoopBegin") {}
-};
-
-// mainloop ->
-class Msg_MainLoop_EventLoopBeforeEnd: public ApFilterMessage
-{
-public:
-  Msg_MainLoop_EventLoopBeforeEnd() : ApFilterMessage("MainLoop_EventLoopBeforeEnd"), nDelaySec(0), nWaitCount(0) {}
+  Msg_MainLoop_EventLoopDelayEnd() : ApFilterMessage("MainLoop_EventLoopDelayEnd"), nDelaySec(0), nWaitCount(0) {}
   ApINOUT int nDelaySec;
   ApINOUT int nWaitCount;
 };

@@ -60,7 +60,7 @@ AP_REFINSTANCE_MSG_HANDLER(NetModule, Net_HTTP_Request)
 AP_REFINSTANCE_MSG_HANDLER(NetModule, Net_HTTP_Cancel)
 AP_REFINSTANCE_MSG_HANDLER(NetModule, Net_HTTP_CancelAll)
 
-AP_REFINSTANCE_MSG_HANDLER(NetModule, MainLoop_EventLoopBeforeEnd)
+AP_REFINSTANCE_MSG_HANDLER(NetModule, MainLoop_EventLoopDelayEnd)
 AP_REFINSTANCE_MSG_HANDLER(NetModule, System_SecTimer)
 AP_REFINSTANCE_MSG_HANDLER(NetModule, System_3SecTimer)
 AP_REFINSTANCE_MSG_HANDLER(NetModule, System_BeforeUnloadModules)
@@ -82,7 +82,7 @@ NET_API int Load(AP_MODULE_CALL* pModuleData)
   }
 
   if (ok) {
-    { Msg_MainLoop_EventLoopBeforeEnd msg; msg.Hook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(NetModule, MainLoop_EventLoopBeforeEnd), NetModuleInstance::Get(), ApCallbackPosNormal); }
+    { Msg_MainLoop_EventLoopDelayEnd msg; msg.Hook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(NetModule, MainLoop_EventLoopDelayEnd), NetModuleInstance::Get(), ApCallbackPosNormal); }
     { Msg_System_SecTimer msg; msg.Hook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(NetModule, System_SecTimer), NetModuleInstance::Get(), ApCallbackPosNormal); }
     { Msg_System_3SecTimer msg; msg.Hook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(NetModule, System_3SecTimer), NetModuleInstance::Get(), ApCallbackPosNormal); }
     { Msg_System_BeforeUnloadModules msg; msg.Hook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(NetModule, System_BeforeUnloadModules), NetModuleInstance::Get(), ApCallbackPosNormal); }
@@ -133,7 +133,7 @@ NET_API int UnLoad(AP_MODULE_CALL* pModuleData)
   { Msg_Net_HTTP_Cancel msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(NetModule, Net_HTTP_Cancel), NetModuleInstance::Get()); }
   { Msg_Net_HTTP_CancelAll msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(NetModule, Net_HTTP_CancelAll), NetModuleInstance::Get()); }
 
-  { Msg_MainLoop_EventLoopBeforeEnd msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(NetModule, MainLoop_EventLoopBeforeEnd), NetModuleInstance::Get()); }
+  { Msg_MainLoop_EventLoopDelayEnd msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(NetModule, MainLoop_EventLoopDelayEnd), NetModuleInstance::Get()); }
   { Msg_System_SecTimer msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(NetModule, System_SecTimer), NetModuleInstance::Get()); }
   { Msg_System_3SecTimer msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(NetModule, System_3SecTimer), NetModuleInstance::Get()); }
   { Msg_System_BeforeUnloadModules msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(NetModule, System_BeforeUnloadModules), NetModuleInstance::Get()); }

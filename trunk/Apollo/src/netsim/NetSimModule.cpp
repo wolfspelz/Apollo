@@ -309,7 +309,7 @@ AP_MSG_HANDLER_METHOD(NetSimModule, MainLoop_EventLoopBegin)
   msg.Request();
 }
 
-AP_MSG_HANDLER_METHOD(NetSimModule, MainLoop_EventLoopBeforeEnd)
+AP_MSG_HANDLER_METHOD(NetSimModule, MainLoop_EventLoopDelayEnd)
 {
   Msg_NetSim_Disengage msg;
   msg.Request();
@@ -327,7 +327,7 @@ int NetSimModule::init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, NetSimModule, NetSim_Disengage, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, NetSimModule, NetSim_ContinueHttp, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, NetSimModule, MainLoop_EventLoopBegin, this, ApCallbackPosEarly);
-  AP_MSG_REGISTRY_ADD(MODULE_NAME, NetSimModule, MainLoop_EventLoopBeforeEnd, this, ApCallbackPosLate);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, NetSimModule, MainLoop_EventLoopDelayEnd, this, ApCallbackPosLate);
 
   return ok;
 }

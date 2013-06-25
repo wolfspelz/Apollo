@@ -138,7 +138,7 @@ public:
   void On_UnitTest_Token(Msg_UnitTest_Token* pMsg);
   void On_System_RunLevel(Msg_System_RunLevel* pMsg);
   void On_MainLoop_EventLoopBegin(Msg_MainLoop_EventLoopBegin* pMsg);
-  void On_MainLoop_EventLoopBeforeEnd(Msg_MainLoop_EventLoopBeforeEnd* pMsg);
+  void On_MainLoop_EventLoopDelayEnd(Msg_MainLoop_EventLoopDelayEnd* pMsg);
   void On_MainLoop_EventLoopEnd(Msg_MainLoop_EventLoopEnd* pMsg);
   void On_UnitTest_Register(Msg_UnitTest_Register* pMsg);
   void On_UnitTest_Complete(Msg_UnitTest_Complete* pMsg);
@@ -732,7 +732,7 @@ AP_MSG_HANDLER_METHOD(UnitTest, MainLoop_EventLoopBegin)
   }
 }
 
-AP_MSG_HANDLER_METHOD(UnitTest, MainLoop_EventLoopBeforeEnd)
+AP_MSG_HANDLER_METHOD(UnitTest, MainLoop_EventLoopDelayEnd)
 {
   AP_UNUSED_ARG(pMsg);
   if (bStarted_) {
@@ -782,7 +782,7 @@ int UnitTest::Init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, UnitTest, UnitTest_Token, this, ApCallbackPosLate);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, UnitTest, System_RunLevel, this, ApCallbackPosEarly);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, UnitTest, MainLoop_EventLoopBegin, this, ApCallbackPosEarly);
-  AP_MSG_REGISTRY_ADD(MODULE_NAME, UnitTest, MainLoop_EventLoopBeforeEnd, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, UnitTest, MainLoop_EventLoopDelayEnd, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, UnitTest, MainLoop_EventLoopEnd, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, UnitTest, UnitTest_Register, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, UnitTest, UnitTest_Complete, this, ApCallbackPosNormal);

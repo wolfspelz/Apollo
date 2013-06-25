@@ -17,7 +17,7 @@
 // ----------------------------------
 
 class Msg_Core_BeforeModuleUnloaded;
-class Msg_MainLoop_EventLoopBeforeEnd;
+class Msg_MainLoop_EventLoopDelayEnd;
 class Msg_Log_Line;
 
 // ----------------------------------
@@ -33,7 +33,7 @@ public:
   void Exit();
 
   void On_Core_BeforeModuleUnloaded(Msg_Core_BeforeModuleUnloaded* pMsg);
-  void On_MainLoop_EventLoopBeforeEnd(Msg_MainLoop_EventLoopBeforeEnd* pMsg);
+  void On_MainLoop_EventLoopDelayEnd(Msg_MainLoop_EventLoopDelayEnd* pMsg);
   void On_Log_Line(Msg_Log_Line* pMsg);
 
 protected:

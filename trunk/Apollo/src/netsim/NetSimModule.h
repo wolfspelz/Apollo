@@ -30,7 +30,7 @@ public:
   void On_NetSim_Disengage(Msg_NetSim_Disengage* pMsg);
   void On_NetSim_ContinueHttp(Msg_NetSim_ContinueHttp* pMsg);
   void On_MainLoop_EventLoopBegin(Msg_MainLoop_EventLoopBegin* pMsg);
-  void On_MainLoop_EventLoopBeforeEnd(Msg_MainLoop_EventLoopBeforeEnd* pMsg);
+  void On_MainLoop_EventLoopDelayEnd(Msg_MainLoop_EventLoopDelayEnd* pMsg);
   
   void On_Net_IsOnline(Msg_Net_IsOnline* pMsg);
   void On_Net_DNS_Resolve(Msg_Net_DNS_Resolve* pMsg);

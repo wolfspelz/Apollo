@@ -1,6 +1,6 @@
 
-  Core/Modules/00100/WinMainLoop/Path=WinMainLoop
-Core/Modules/00100/QMainLoop/Path=QMainLoop
+Core/Modules/00100/WinMainLoop/Path=WinMainLoop
+  Core/Modules/00100/QMainLoop/Path=QMainLoop
 Core/Modules/00110/wintimer/Path=wintimer
 Core/Modules/00200/SrpcGate/Path=srpcgate
 Core/Modules/00300/log/Path=log

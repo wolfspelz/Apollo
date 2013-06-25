@@ -90,7 +90,7 @@ public:
   void On_Net_HTTP_Cancel(Msg_Net_HTTP_Cancel* pMsg);
   void On_Net_HTTP_CancelAll(Msg_Net_HTTP_CancelAll* pMsg);
   
-  void On_MainLoop_EventLoopBeforeEnd(Msg_MainLoop_EventLoopBeforeEnd* pMsg);
+  void On_MainLoop_EventLoopDelayEnd(Msg_MainLoop_EventLoopDelayEnd* pMsg);
   void On_System_SecTimer(Msg_System_SecTimer* pMsg);
   void On_System_3SecTimer(Msg_System_3SecTimer* pMsg);
   void On_System_BeforeUnloadModules(Msg_System_BeforeUnloadModules* pMsg);
