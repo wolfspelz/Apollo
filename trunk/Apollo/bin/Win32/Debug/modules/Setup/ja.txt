@@ -1,2 +1,5 @@
 #ässert utf-8
 Setup=チャット
+Avatar for Firefox=Avatar for Firefox
+Avatar for Internet Explorer=Avatar for Internet Explorer
+Install=Install

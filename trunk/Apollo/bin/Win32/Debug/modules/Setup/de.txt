@@ -1,2 +1,5 @@
 #ässert utf-8
 Setup=Einrichten
+Avatar for Firefox=Avatar für Firefox
+Avatar for Internet Explorer=Avatar für Internet Explorer
+Install=Installieren
