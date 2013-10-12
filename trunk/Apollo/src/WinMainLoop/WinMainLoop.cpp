@@ -410,8 +410,6 @@ void MainLoopModule::On_MainLoop_ModuleFinished(Msg_MainLoop_ModuleFinished* pMs
     ::KillTimer(hWnd_, QUIT_TIMER);
     nQuitTimer_ = ::SetTimer(hWnd_, QUIT_TIMER, 0, NULL);
   }
-
-  pMsg->apStatus = ApMessage::Ok;
 }
 
 //----------------------------------------------------------

@@ -49,6 +49,7 @@ class MainLoopModule
 public:
   MainLoopModule()
     :_pApp(0)
+    ,_pMainWindow(0)
     //:hAppInstance_(NULL)
     //,hWnd_(NULL)
     //,bFirstMessage_(true)
@@ -65,6 +66,10 @@ public:
 
   virtual ~MainLoopModule()
   {
+    if (_pMainWindow == 0) {
+      delete _pMainWindow;
+      _pMainWindow = 0;
+    }
     if (_pApp == 0) {
       delete _pApp;
       _pApp = 0;
@@ -82,25 +87,9 @@ public:
 //  LRESULT WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 protected:
-
-  //enum TimerID {
-  //  NO_TIMER = 0xAFFE,
-  //  SEC_TIMER,
-  //  TIMERQUEUE_TIMER,
-  //  QUIT_TIMER
-  //};
-
-  //HINSTANCE hAppInstance_;
-  //HWND hWnd_;
-  //bool bFirstMessage_;
-  //UINT nWM_APMSG_;
-  //UINT nQuitTimer_;
-  //int nWaitFinishingModules_;
-  //int nFinishedModules_;
-  //WPARAM wParam_WM_CLOSE_;
-  //LPARAM lParam_WM_CLOSE_;
-
   QApplication* _pApp;
+  MainWindow* _pMainWindow;
+
 };
 
 //----------------------------------------------------------
@@ -135,9 +124,32 @@ void MainLoopModule::Exit()
 
 //----------------------------------------------------------
 
+void MainLoopModule::HandleAsyncMessage(void* p)
+{
+  ApMessage* pMsg = (ApMessage*) p;
+
+  //if (0
+  //  || pMsg->getName() == "Timer_Event"
+  //  || pMsg->getName() == "Animation_SequenceBegin"
+  //  || pMsg->getName() == "Animation_SequenceEnd"
+  //  || pMsg->getName() == "Animation_Frame"
+  //  || pMsg->getName() == "UnitTest_Token"
+  //  || pMsg->getName() == "Net_TCP_Listening"
+  //  ) {
+  //} else {
+  //  int x = 1;
+  //}
+
+  Apollo::callMsg(pMsg);
+  delete pMsg;
+}
+
 void MainLoopModule::On_System_ThreadMessage(Msg_System_ThreadMessage* pMsg)
 {
   int ok = 0;
+
+  emit AsyncMessage(pMsg);
+
 /* TODO
   MainLoopModule* self = (MainLoopModule*) pMsg->Ref();
   if (self != 0) {
@@ -152,270 +164,13 @@ void MainLoopModule::On_System_ThreadMessage(Msg_System_ThreadMessage* pMsg)
 
 //----------------------------------------------------------
 
-/*
-LRESULT MainLoopModule::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
-{
-  int wmId, wmEvent;
-  PAINTSTRUCT ps;
-  HDC hdc = NULL;
-
-  if (0) {
-  } else if (message == nWM_APMSG_) {
-    ApMessage* pMsg = (ApMessage*) wParam;
-
-    //if (0
-    //  || pMsg->getName() == "Timer_Event"
-    //  || pMsg->getName() == "Animation_SequenceBegin"
-    //  || pMsg->getName() == "Animation_SequenceEnd"
-    //  || pMsg->getName() == "Animation_Frame"
-    //  || pMsg->getName() == "UnitTest_Token"
-    //  || pMsg->getName() == "Net_TCP_Listening"
-    //  ) {
-    //} else {
-    //  int x = 1;
-    //}
-
-    Apollo::callMsg(pMsg);
-    delete pMsg;
-  }
-
-  switch (message) {
-  case WM_COMMAND:
-    wmId    = LOWORD(wParam);
-    wmEvent = HIWORD(wParam);
-    // Parse the menu selections:
-    switch (wmId)
-    {
-    case IDM_ABOUT:
-      //DialogBox(hInstance, (LPCTSTR)IDD_ABOUTBOX, hWnd, (DLGPROC)About);
-      break;
-    case IDM_EXIT:
-      DestroyWindow(hWnd);
-      break;
-
-    case ID_TOOLS_OPTIONS:
-      //{ Msg_ConfigDialog_Open msg; msg.Request(); }
-      break;
-
-    case ID_TOOLS_TEST:
-      {
-        ApSRPCMessage msg("TestDialog_Srpc");
-        msg.srpc.set(Srpc::Key::Method, "Open");
-        (void) msg.Call();
-      }
-      break;
-
-    case ID_TOOLS_DISPLAY:
-      { Msg_Setup_Open msg; msg.Request(); }
-      break;
-
-    default:
-      return DefWindowProc(hWnd, message, wParam, lParam);
-    }
-    break;
-
-  case WM_PAINT:
-    hdc = BeginPaint(hWnd, &ps);
-    RECT rt;
-    GetClientRect(hWnd, &rt);
-    //DrawText(hdc, "Apollo", _tcslen("Apollo"), &rt, DT_CENTER);
-    EndPaint(hWnd, &ps);
-    break;
-
-  case WM_TIMER:
-    {
-      switch (wParam) {
-
-      case QUIT_TIMER:
-        ::KillTimer(hWnd, QUIT_TIMER);
-        DefWindowProc(hWnd, WM_CLOSE, wParam_WM_CLOSE_, lParam_WM_CLOSE_);
-        break;
-
-      }
-    }
-    break;
-
-  case WM_CLOSE:
-    {
-      wParam_WM_CLOSE_ = wParam;
-      lParam_WM_CLOSE_ = lParam;
-
-      int nDelay = Apollo::getModuleConfig(MODULE_NAME, "ShutdownDelay", 2);
-      {
-        Msg_MainLoop_EventLoopBeforeEnd msg;
-        msg.nDelaySec = nDelay;
-        msg.nWaitCount = 0;
-        msg.Filter();
-
-        nWaitFinishingModules_ = msg.nWaitCount;
-        if (nWaitFinishingModules_ == 0) {
-          nDelay = 0;
-        } else {
-          nDelay = msg.nDelaySec;
-        }
-      }
-
-      nQuitTimer_ = ::SetTimer(hWnd, QUIT_TIMER, 1000 * nDelay, NULL);
-    }
-    break;
-
-  case WM_DESTROY:
-    {
-      PostQuitMessage(0);
-      { Msg_MainLoop_EventLoopEnd msg; msg.Send(); }
-    }
-    break;
-
-  default:
-    return DefWindowProc(hWnd, message, wParam, lParam);
-  }
-
-  return 0;
-}
-
-static LRESULT CALLBACK MainLoopModule_WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
-{
-  LRESULT lResult = 0;
-  MainLoopModule* pMainLoopModule = 0;
-
-	if (message == WM_CREATE) {
-    LPCREATESTRUCT lpcs = (LPCREATESTRUCT) lParam;
-    SetWindowLong(hWnd, GWL_USERDATA, (LONG) lpcs->lpCreateParams);
-    pMainLoopModule = (MainLoopModule*) lpcs->lpCreateParams;
-  } else {
-    pMainLoopModule = (MainLoopModule*) GetWindowLong(hWnd, GWL_USERDATA);
-  }
-
-  if (pMainLoopModule != 0) {
-    //nResult = pMainLoopModule->WndProc(hWnd, message, wParam, lParam);
-    Msg_Win32_WndProcMessage msg;
-    msg.hWnd = hWnd;
-    msg.message = message;
-    msg.wParam = wParam;
-    msg.lParam = lParam;
-    msg.Request();
-    lResult = msg.lResult;
-  } else {
-		lResult = DefWindowProc(hWnd, message, wParam, lParam);
-  }
-
-  return lResult;
-}
-*/
-
-/* TODO
-void MainLoopModule::On_MainLoop_Win32Loop(Msg_MainLoop_Win32Loop* pMsg)
-{
-  int ok = 1;
-  String sClass = Apollo::getModuleConfig(MODULE_NAME, "WindowClass", "ApolloQMainLoopClass");
-  String sTitle = Apollo::getModuleConfig(MODULE_NAME, "WindowTitle", "ApolloQMainLoopTitle");
-
-  if (Apollo::getModuleConfig(MODULE_NAME, "Singleton", 1)) {
-    HWND hWnd = FindWindow(sClass, sTitle);
-    if (hWnd != NULL) {
-      apLog_Info((LOG_CHANNEL, LOG_CONTEXT, "Terminating because of Singleton requirement, found window class=%s title=%s", _sz(sClass), _sz(sTitle)));
-      ok = 0;
-    }
-  }
-
-  if (ok) {
-    hAppInstance_ = pMsg->hInstance;
-
-    WNDCLASSEX wcex;
-    wcex.cbSize = sizeof(WNDCLASSEX);
-    wcex.style = CS_HREDRAW | CS_VREDRAW;
-    wcex.lpfnWndProc = (WNDPROC)MainLoopModule_WndProc;
-    wcex.cbClsExtra = 0;
-    wcex.cbWndExtra = sizeof(void*); // for MainLoopModule* this
-    wcex.hInstance = g_hDllInstance;
-    wcex.hIcon = ::LoadIcon(g_hDllInstance, (LPCTSTR) IDI_MAIN);
-    wcex.hCursor = ::LoadCursor(NULL, IDC_ARROW);
-    wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW+1);
-    wcex.lpszMenuName = (LPTSTR)IDC_WIN32APP;
-    wcex.lpszClassName = sClass;
-    wcex.hIconSm = ::LoadIcon(g_hDllInstance, (LPCTSTR) IDI_MAIN);
-    ATOM a = ::RegisterClassEx(&wcex);
-    if (a == 0) {
-      ok = 0;
-    }
-  }
-
-  if (ok) {
-    hWnd_ = ::CreateWindow(
-                sClass,
-                sTitle,
-                WS_OVERLAPPEDWINDOW,
-                0, 0, 150, 80,
-                NULL,
-                NULL,
-                g_hDllInstance,
-                this
-              );
-    if (hWnd_ == NULL) {
-      ok = 0;
-    }
-  }
-
-  if (ok) {
-    if (Apollo::getModuleConfig(MODULE_NAME, "ShowWindow", 1)) {
-      ::ShowWindow(hWnd_, pMsg->nCmdShow);
-      ::UpdateWindow(hWnd_);
-    }
-
-    { Msg_MainLoop_EventLoopBeforeBegin msg; msg.Send(); }
-
-    HACCEL hAccelTable = ::LoadAccelerators(g_hDllInstance, (LPCTSTR) IDC_WIN32APP);
-    MSG windowsMessage;
-
-    int bReLoop = 0;
-loop:
-    bReLoop = 0;
-    try {
-
-      while (::GetMessage(&windowsMessage, NULL, 0, 0)) {
-
-        if (bFirstMessage_) {
-          bFirstMessage_ = false;
-          { Msg_MainLoop_EventLoopBegin msg; msg.Send(); }
-        }
-
-        if (!::TranslateAccelerator(windowsMessage.hwnd, hAccelTable, &windowsMessage)) {
-          ::TranslateMessage(&windowsMessage);
-          ::DispatchMessage(&windowsMessage);
-        }
-
-        //Msg_MainLoop_EventLoopIdle msg;
-        //msg.Send();
-      }
-      // Terminate normally and exit
-
-    } catch (...) {
-
-      // Exception: restart loop
-      bReLoop = 1;
-      ApAsyncMessage<Msg_Log_Line> msgLL;
-      msgLL->nMask = apLog_MaskError;
-      msgLL->sChannel = MODULE_NAME;
-      msgLL->sContext = LOG_CONTEXT;
-      msgLL->sMessage = "Unknown exception";
-      msgLL.Post();
-
-    }
-    if (bReLoop) { goto loop; }
-
-    pMsg->wParam = windowsMessage.wParam;
-  }
-
-  pMsg->apStatus = ok ? ApMessage::Ok : ApMessage::Error;
-}
-*/
-
 void MainLoopModule::On_MainLoop_Win32Loop(Msg_MainLoop_Win32Loop* pMsg)
 {
   int ok = 1;
   if (_pApp != 0) {
-    MainWindow mainWindow;
+    MainWindow mainWindow; _pMainWindow...
     mainWindow.Setup(_pApp);    
+    
     mainWindow.show();    
 
     _pApp->exec();
@@ -459,6 +214,7 @@ void MainLoopModule::On_Win32_WndProcMessage(Msg_Win32_WndProcMessage* pMsg)
 
 void MainLoopModule::On_MainLoop_ModuleFinished(Msg_MainLoop_ModuleFinished* pMsg)
 {
+  if (
 /* TODO
   nFinishedModules_++;
 
@@ -467,7 +223,6 @@ void MainLoopModule::On_MainLoop_ModuleFinished(Msg_MainLoop_ModuleFinished* pMs
     nQuitTimer_ = ::SetTimer(hWnd_, QUIT_TIMER, 0, NULL);
   }
 */
-  pMsg->apStatus = ApMessage::Ok;
 }
 
 //----------------------------------------------------------
