@@ -22,6 +22,7 @@
 #include <QtGui/QMenuBar>
 #include <QtGui/QMenu>
 #include <QtGui/QMainWindow>
+#include <QTCore/QTimer>
 
 #define MODULE_NAME "QMainLoop"
 #define LOG_CHANNEL MODULE_NAME
