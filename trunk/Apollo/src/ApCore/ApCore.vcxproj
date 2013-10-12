@@ -76,6 +76,32 @@
     <ClCompile Include="ApCore.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\include\MsgAnimation.h" />
+    <ClInclude Include="..\..\include\MsgBrowserInfo.h" />
+    <ClInclude Include="..\..\include\MsgChatWindow.h" />
+    <ClInclude Include="..\..\include\MsgCore.h" />
+    <ClInclude Include="..\..\include\MsgDialog.h" />
+    <ClInclude Include="..\..\include\MsgGalileo.h" />
+    <ClInclude Include="..\..\include\MsgGm.h" />
+    <ClInclude Include="..\..\include\MsgHttpServer.h" />
+    <ClInclude Include="..\..\include\MsgIdentity.h" />
+    <ClInclude Include="..\..\include\MsgIdentityMgmt.h" />
+    <ClInclude Include="..\..\include\MsgInventory.h" />
+    <ClInclude Include="..\..\include\MsgLog.h" />
+    <ClInclude Include="..\..\include\MsgNavigation.h" />
+    <ClInclude Include="..\..\include\MsgNetSim.h" />
+    <ClInclude Include="..\..\include\MsgProcess.h" />
+    <ClInclude Include="..\..\include\MsgProtocol.h" />
+    <ClInclude Include="..\..\include\MsgServer.h" />
+    <ClInclude Include="..\..\include\MsgSetup.h" />
+    <ClInclude Include="..\..\include\MsgSrpcGate.h" />
+    <ClInclude Include="..\..\include\MsgTcpServer.h" />
+    <ClInclude Include="..\..\include\MsgThreadPool.h" />
+    <ClInclude Include="..\..\include\MsgTranslation.h" />
+    <ClInclude Include="..\..\include\MsgVp.h" />
+    <ClInclude Include="..\..\include\MsgVpView.h" />
+    <ClInclude Include="..\..\include\MsgWebSocketServer.h" />
+    <ClInclude Include="..\..\include\MsgWebView.h" />
     <ClInclude Include="ApCore.h" />
     <ClInclude Include="..\..\include\ApCompiler.h" />
     <ClInclude Include="..\..\include\ApContainer.h" />
