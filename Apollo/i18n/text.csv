@@ -3,6 +3,7 @@
 "#";;;;;;;;;;;;;;;;;;;;
 ;"Arena";;"Hello World";;"For testing only";;"Hello World";;"Hallo Welt";;;;;;"ハローワールド";;;;;
 ;"Arena";;"Send";;"Chat input at avatar";10;"Send";;"Senden";;;;;;"送信";;;;;
+;"Arena";;"Things";;"Virtual items window";10;"My things";;"Meine Sachen";;;;;;"送信";;;;;
 ;"Chat";;"Chat";;"Chat dialog caption, also used as prefix as in: ""Chat http://www.google.com/""";15;"Chat";;"Chat";;;;;;"チャット";;;;;
 ;"Chat";;"Send";;"Send button";15;"Send";;"Senden";;;;;;"送信";;;;;
 ;"Chat";;"Clear";;"Clear button inside chat out area";15;"Clear";;"Löschen";;;;;;"削除";;;;;
