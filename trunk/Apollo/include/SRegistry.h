@@ -23,6 +23,7 @@ public:
 
   static int SetInt(HKEY hMainKey, const String& sPath, const String& sName, int nValue);
   static int GetInt(HKEY hMainKey, const String& sPath, const String& sName, int nDefault);
+  static bool HasKey(HKEY hMainKey, const String& sPath);
 
   static int Delete(HKEY hMainKey, const String& sPath, const String& sName = "");
   static int Create(HKEY hMainKey, const String& sPath);

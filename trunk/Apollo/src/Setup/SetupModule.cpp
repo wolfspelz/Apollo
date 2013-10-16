@@ -137,8 +137,13 @@ void SetupModule::InstallChromeExtension()
   
   sPath = Apollo::canonicalizePath(sPath);
 
-  SRegistry::SetString(HKEY_LOCAL_MACHINE, "Software\\Google\\Chrome\\Extensions\\" + sId, "path", sPath);
-  SRegistry::SetString(HKEY_LOCAL_MACHINE, "Software\\Google\\Chrome\\Extensions\\" + sId, "version", sVersion);
+  if (SRegistry::HasKey(HKEY_LOCAL_MACHINE, "Software\\Wow6432Node")) {
+    SRegistry::SetString(HKEY_LOCAL_MACHINE, "Software\\Wow6432Node\\Google\\Chrome\\Extensions\\" + sId, "path", sPath);
+    SRegistry::SetString(HKEY_LOCAL_MACHINE, "Software\\Wow6432Node\\Google\\Chrome\\Extensions\\" + sId, "version", sVersion);
+  } else {
+    SRegistry::SetString(HKEY_LOCAL_MACHINE, "Software\\Google\\Chrome\\Extensions\\" + sId, "path", sPath);
+    SRegistry::SetString(HKEY_LOCAL_MACHINE, "Software\\Google\\Chrome\\Extensions\\" + sId, "version", sVersion);
+  }
 }
 
 void SetupModule::UninstallChromeExtension()
