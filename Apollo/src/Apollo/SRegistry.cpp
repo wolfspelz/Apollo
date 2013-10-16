@@ -107,6 +107,19 @@ String SRegistry::GetString(HKEY hMainKey, const String& sPath, const String& sN
   return sValue;
 }
 
+bool SRegistry::HasKey(HKEY hMainKey, const String& sPath)
+{
+  bool bHasKey = false;
+
+  HKEY hKey = NULL;
+  if (::RegOpenKeyEx(hMainKey, sPath, 0, KEY_READ, &hKey) == ERROR_SUCCESS) {
+    bHasKey = true;
+    ::RegCloseKey(hKey);
+  }
+
+  return bHasKey;
+}
+
 int SRegistry::GetInt(HKEY hMainKey, const String& sPath, const String& sName, int nDefault)
 {
   int nValue = nDefault;
@@ -195,10 +208,14 @@ int SRegistry::Test()
   SRegistry::SetString(HKEY_CURRENT_USER, "Software\\Test\\Section\\SubSection\\xx\\yy", "Name2", "Value2");
   SRegistry::SetString(HKEY_CURRENT_USER, "Software\\Test\\Section\\SubSection\\xx\\zz", "Name4", "Value4");
   SRegistry::SetString(HKEY_CURRENT_USER, "Software\\Test\\Section\\SubSection\\xx", "Name3", "Value3");
+
+  bool bHasKey = SRegistry::HasKey(HKEY_CURRENT_USER, "Software\\Test\\Section\\SubSection\\xx");
+  bool bNotHasKey = SRegistry::HasKey(HKEY_CURRENT_USER, "Software\\Test\\Section\\SubSection\\notexist");
+
   SRegistry::Delete(HKEY_CURRENT_USER, "Software\\Test\\Section\\SubSection\\xx");
   SRegistry::Delete(HKEY_CURRENT_USER, "Software\\Test");
 
-  return sValue == "42" && sDefaultValue == "43" && sDeletedValue == "41" && nValue == 42;
+  return sValue == "42" && sDefaultValue == "43" && sDeletedValue == "41" && nValue == 42 && bHasKey == true && bNotHasKey == false;
 }
 
 #endif // defined(WIN32) 
