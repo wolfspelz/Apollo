@@ -16,6 +16,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
     </Filter>
+    <Filter Include="Header Files\Include\Msg">
+      <UniqueIdentifier>{fa66e42f-bbd5-4639-8bfd-26605d8551e4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ApConfig.cpp">
@@ -137,105 +140,6 @@
     <ClInclude Include="..\..\include\MessageDigest.h">
       <Filter>Header Files\Include</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\MsgAnimation.h">
-      <Filter>Header Files\Include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\MsgBrowserInfo.h">
-      <Filter>Header Files\Include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\MsgChatWindow.h">
-      <Filter>Header Files\Include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\MsgConfig.h">
-      <Filter>Header Files\Include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\MsgConfigDialog.h">
-      <Filter>Header Files\Include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\MsgCore.h">
-      <Filter>Header Files\Include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\MsgDB.h">
-      <Filter>Header Files\Include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\MsgFile.h">
-      <Filter>Header Files\Include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\MsgGalileo.h">
-      <Filter>Header Files\Include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\MsgHttpServer.h">
-      <Filter>Header Files\Include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\MsgIdentity.h">
-      <Filter>Header Files\Include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\MsgIdentityMgmt.h">
-      <Filter>Header Files\Include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\MsgLog.h">
-      <Filter>Header Files\Include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\MsgMainLoop.h">
-      <Filter>Header Files\Include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\MsgNavigation.h">
-      <Filter>Header Files\Include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\MsgNet.h">
-      <Filter>Header Files\Include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\MsgNetSim.h">
-      <Filter>Header Files\Include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\MsgOs.h">
-      <Filter>Header Files\Include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\MsgProtocol.h">
-      <Filter>Header Files\Include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\MsgSample.h">
-      <Filter>Header Files\Include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\MsgServer.h">
-      <Filter>Header Files\Include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\MsgSrpcGate.h">
-      <Filter>Header Files\Include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\MsgSystem.h">
-      <Filter>Header Files\Include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\MsgTcpServer.h">
-      <Filter>Header Files\Include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\MsgThreadPool.h">
-      <Filter>Header Files\Include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\MsgTimer.h">
-      <Filter>Header Files\Include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\MsgTranslation.h">
-      <Filter>Header Files\Include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\MsgUnitTest.h">
-      <Filter>Header Files\Include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\MsgVp.h">
-      <Filter>Header Files\Include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\MsgVpi.h">
-      <Filter>Header Files\Include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\MsgVpView.h">
-      <Filter>Header Files\Include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\MsgWebView.h">
-      <Filter>Header Files\Include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\MsgXmpp.h">
-      <Filter>Header Files\Include</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\include\Project.h">
       <Filter>Header Files\Include</Filter>
     </ClInclude>
@@ -287,11 +191,110 @@
     <ClInclude Include="..\..\include\XMLProcessor.h">
       <Filter>Header Files\Include</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\MsgWebSocketServer.h">
-      <Filter>Header Files\Include</Filter>
+    <ClInclude Include="..\..\include\MsgAnimation.h">
+      <Filter>Header Files\Include\Msg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\MsgXmpp.h">
+      <Filter>Header Files\Include\Msg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\MsgBrowserInfo.h">
+      <Filter>Header Files\Include\Msg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\MsgChatWindow.h">
+      <Filter>Header Files\Include\Msg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\MsgConfig.h">
+      <Filter>Header Files\Include\Msg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\MsgConfigDialog.h">
+      <Filter>Header Files\Include\Msg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\MsgCore.h">
+      <Filter>Header Files\Include\Msg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\MsgDB.h">
+      <Filter>Header Files\Include\Msg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\MsgFile.h">
+      <Filter>Header Files\Include\Msg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\MsgGalileo.h">
+      <Filter>Header Files\Include\Msg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\MsgHttpServer.h">
+      <Filter>Header Files\Include\Msg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\MsgIdentity.h">
+      <Filter>Header Files\Include\Msg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\MsgIdentityMgmt.h">
+      <Filter>Header Files\Include\Msg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\MsgLog.h">
+      <Filter>Header Files\Include\Msg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\MsgMainLoop.h">
+      <Filter>Header Files\Include\Msg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\MsgNavigation.h">
+      <Filter>Header Files\Include\Msg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\MsgNet.h">
+      <Filter>Header Files\Include\Msg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\MsgNetSim.h">
+      <Filter>Header Files\Include\Msg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\MsgOs.h">
+      <Filter>Header Files\Include\Msg</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\MsgProcess.h">
-      <Filter>Header Files\Include</Filter>
+      <Filter>Header Files\Include\Msg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\MsgProtocol.h">
+      <Filter>Header Files\Include\Msg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\MsgSample.h">
+      <Filter>Header Files\Include\Msg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\MsgServer.h">
+      <Filter>Header Files\Include\Msg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\MsgSrpcGate.h">
+      <Filter>Header Files\Include\Msg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\MsgSystem.h">
+      <Filter>Header Files\Include\Msg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\MsgTcpServer.h">
+      <Filter>Header Files\Include\Msg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\MsgThreadPool.h">
+      <Filter>Header Files\Include\Msg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\MsgTimer.h">
+      <Filter>Header Files\Include\Msg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\MsgTranslation.h">
+      <Filter>Header Files\Include\Msg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\MsgUnitTest.h">
+      <Filter>Header Files\Include\Msg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\MsgVp.h">
+      <Filter>Header Files\Include\Msg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\MsgVpi.h">
+      <Filter>Header Files\Include\Msg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\MsgVpView.h">
+      <Filter>Header Files\Include\Msg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\MsgWebSocketServer.h">
+      <Filter>Header Files\Include\Msg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\MsgWebView.h">
+      <Filter>Header Files\Include\Msg</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
