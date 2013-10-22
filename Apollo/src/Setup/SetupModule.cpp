@@ -58,7 +58,14 @@ String SetupModule::GetInstallChromeExtensionCommandline()
   // "C:\Program Files\Mozilla Firefox\firefox.exe" -requestPending -osint -url "%1"
   String sChromeCmd;
   if (!sChromeCmd) { sChromeCmd = SRegistry::GetString(HKEY_CLASSES_ROOT, "ChromeHTML\\shell\\open\\command", "", ""); }
+  if (!sChromeCmd) { sChromeCmd = SRegistry::GetString(HKEY_CLASSES_ROOT, "ChromeHTML.65NBJCX4VLGP55V6AMILGWHKH4\\shell\\open\\command", "", ""); }
   if (!sChromeCmd) { sChromeCmd = SRegistry::GetString(HKEY_LOCAL_MACHINE, "SOFTWARE\\Classes\\ChromeHTML\\shell\\open\\command", "", ""); }
+  if (!sChromeCmd) { sChromeCmd = SRegistry::GetString(HKEY_LOCAL_MACHINE, "SOFTWARE\\Classes\\ChromeHTML.65NBJCX4VLGP55V6AMILGWHKH4\\shell\\open\\command", "", ""); }
+  if (!sChromeCmd) { sChromeCmd = SRegistry::GetString(HKEY_LOCAL_MACHINE, "SOFTWARE\\Classes\\ChromeHTML.65NBJCX4VLGP55V6AMILGWHKH4\\shell\\open\\command", "", ""); }
+  if (!sChromeCmd) { 
+    String sChromeFileType = SRegistry::GetString(HKEY_CLASSES_ROOT, ".htm", "", "");
+    sChromeCmd = SRegistry::GetString(HKEY_CLASSES_ROOT, sChromeFileType + "\\shell\\open\\command", "", "");
+  }
 
   String sUrl = Apollo::getModuleConfig("Navigation", "ChromeExtensionInstallUrl", "file://" + Msg_System_GetCurrentWorkingDirectory::_() + "modules/navigation/AvatarNavigator.crx");
 
@@ -418,11 +425,15 @@ String SetupModuleTester::GetInstallFirefoxExtensionCommandline()
     String sSub1 = "firefox.exe";
     String sSub2 = "avatarnavigator.xpi";
     String sResult = String::toLower(SetupModule::GetInstallFirefoxExtensionCommandline());
-    if (!sResult.contains(sSub1)) {
-      s.appendf("got=%s expected substring=%s", _sz(sResult), _sz(sSub1));
+    if (!s) {
+      if (!sResult.contains(sSub1)) {
+        s.appendf("got=%s expected substring=%s", _sz(sResult), _sz(sSub1));
+      }
     }
-    if (!sResult.contains(sSub2)) {
-      s.appendf("got=%s expected substring=%s", _sz(sResult), _sz(sSub2));
+    if (!s) {
+      if (!sResult.contains(sSub2)) {
+        s.appendf("got=%s expected substring=%s", _sz(sResult), _sz(sSub2));
+      }
     }
   }
 
@@ -437,11 +448,15 @@ String SetupModuleTester::GetInstallChromeExtensionCommandline()
     String sSub1 = "chrome.exe";
     String sSub2 = "avatarnavigator.crx";
     String sResult = String::toLower(SetupModule::GetInstallChromeExtensionCommandline());
-    if (!sResult.contains(sSub1)) {
-      s.appendf("got=%s expected substring=%s", _sz(sResult), _sz(sSub1));
+    if (!s) {
+      if (!sResult.contains(sSub1)) {
+        s.appendf("got=%s expected substring=%s", _sz(sResult), _sz(sSub1));
+      }
     }
-    if (!sResult.contains(sSub2)) {
-      s.appendf("got=%s expected substring=%s", _sz(sResult), _sz(sSub2));
+    if (!s) {
+      if (!sResult.contains(sSub2)) {
+        s.appendf("got=%s expected substring=%s", _sz(sResult), _sz(sSub2));
+      }
     }
   }
 
