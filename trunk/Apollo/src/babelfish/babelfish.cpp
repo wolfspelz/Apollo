@@ -9,7 +9,7 @@
 #include "babelfish.h"
 #include "MsgTranslation.h"
 #include "MsgCore.h"
-#include "MsgFile.h"
+#include "MsgOS.h"
 #include "STree.h"
 #include "SrpcGateHelper.h"
 

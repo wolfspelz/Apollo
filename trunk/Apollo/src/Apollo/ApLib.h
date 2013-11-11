@@ -13,8 +13,7 @@
 #include "MsgMainLoop.h"
 #include "MsgConfig.h"
 #include "MsgUnitTest.h"
-#include "MsgFile.h"
-#include "MsgProcess.h"
+#include "MsgOs.h"
 
 // -------------------------------------------------------------------
 

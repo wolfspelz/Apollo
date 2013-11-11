@@ -10,7 +10,7 @@
 #include "ApLog.h"
 #include "MsgConfig.h"
 #include "MsgDB.h"
-#include "MsgFile.h"
+#include "MsgOS.h"
 
 #define MODULE_NAME "Galileo"
 #define LOG_CHANNEL MODULE_NAME

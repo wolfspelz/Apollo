@@ -4,10 +4,67 @@
 //
 // ============================================================================
 
-#if !defined(MsgFile_H_INCLUDED)
-#define MsgFile_H_INCLUDED
+#if !defined(MsgOs_H_INCLUDED)
+#define MsgOs_H_INCLUDED
 
 #include "ApMessage.h"
+
+// timer -> os
+class APOLLO_API Msg_OSTimer_Start: public ApRequestMessage
+{
+public:
+  Msg_OSTimer_Start() : ApRequestMessage("OSTimer_Start"), nSec(0), nMicroSec(0) {}
+public:
+  ApIN ApHandle hTimer;
+  ApIN int nSec;
+  ApIN int nMicroSec;
+};
+
+// timer -> os
+class APOLLO_API Msg_OSTimer_Cancel: public ApRequestMessage
+{
+public:
+  Msg_OSTimer_Cancel() : ApRequestMessage("OSTimer_Cancel") {}
+  ApIN ApHandle hTimer;
+};
+
+// ----------------------------------------------------------
+
+class Msg_Process_Start: public ApRequestMessage
+{
+public:
+  Msg_Process_Start() : ApRequestMessage("Process_Start"), nPid(0) {}
+  ApIN String sExePath;
+  ApIN String sCwdPath;
+  ApIN Apollo::ValueList vlArgs;
+  ApOUT int nPid;
+};
+
+class Msg_Process_Kill: public ApRequestMessage
+{
+public:
+  Msg_Process_Kill() : ApRequestMessage("Process_Kill"), nPid(0) {}
+  ApIN int nPid;
+};
+
+class Msg_Process_GetId: public ApRequestMessage
+{
+public:
+  Msg_Process_GetId() : ApRequestMessage("Process_GetId"), nPid(0) {}
+  ApIN String sName;
+  ApOUT int nPid;
+};
+
+class Msg_Process_GetInfo: public ApRequestMessage
+{
+public:
+  Msg_Process_GetInfo() : ApRequestMessage("Process_GetInfo"), nPid(0) {}
+  ApIN int nPid;
+  #define Msg_Process_GetInfo_ProgramPath "Name"
+  ApOUT Apollo::KeyValueList kvInfo;
+};
+
+// ----------------------------------------------------------
 
 #define Msg_File_Flag_CreatePath 1
 
@@ -141,7 +198,6 @@ public:
   ApOUT int bExists;
 };
 
-#endif // MsgFile_H_INCLUDED
+// ----------------------------------------------------------
 
-
-
+#endif // MsgOs_H_INCLUDED

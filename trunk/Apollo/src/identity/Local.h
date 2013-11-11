@@ -8,7 +8,7 @@
 #define Local_H_INCLUDED
 
 #include "ApLog.h"
-#include "MsgFile.h"
+#include "MsgOS.h"
 #include "MsgDB.h"
 #include "MsgNet.h"
 

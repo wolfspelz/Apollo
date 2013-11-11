@@ -215,9 +215,6 @@
     <ClInclude Include="..\..\include\MsgDB.h">
       <Filter>Header Files\Include\Msg</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\MsgFile.h">
-      <Filter>Header Files\Include\Msg</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\include\MsgGalileo.h">
       <Filter>Header Files\Include\Msg</Filter>
     </ClInclude>
@@ -243,12 +240,6 @@
       <Filter>Header Files\Include\Msg</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\MsgNetSim.h">
-      <Filter>Header Files\Include\Msg</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\MsgOs.h">
-      <Filter>Header Files\Include\Msg</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\MsgProcess.h">
       <Filter>Header Files\Include\Msg</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\MsgProtocol.h">
@@ -294,6 +285,9 @@
       <Filter>Header Files\Include\Msg</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\MsgWebView.h">
+      <Filter>Header Files\Include\Msg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\MsgOS.h">
       <Filter>Header Files\Include\Msg</Filter>
     </ClInclude>
   </ItemGroup>

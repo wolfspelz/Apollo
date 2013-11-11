@@ -6,7 +6,6 @@
 
 #include "Local.h"
 #include "MsgConfig.h"
-#include "MsgFile.h"
 #include "ApLog.h"
 #include "ApOS.h"
 

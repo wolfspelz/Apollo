@@ -10,7 +10,7 @@
 #if defined(AP_TEST_Core)
 #include "MsgSample.h"
 #include "MsgSystem.h"
-#include "MsgFile.h"
+#include "MsgOS.h"
 
 int Test_Core_ModuleLoad()
 {

@@ -11,7 +11,7 @@
 #include "MsgUnitTest.h"
 #include "MsgVpView.h"
 #include "MsgGalileo.h"
-#include "MsgFile.h"
+#include "MsgOS.h"
 #include "MsgTimer.h"
 #include "MsgLog.h"
 #include "MsgConfig.h"

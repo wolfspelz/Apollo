@@ -11,7 +11,7 @@
 #include "MsgMainLoop.h"
 #include "MsgGalileo.h"
 #include "MsgDB.h"
-#include "MsgFile.h"
+#include "MsgOS.h"
 
 #if defined(AP_TEST_Galileo)
 
