@@ -79,9 +79,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="MainLoopModule.cpp" />
     <ClCompile Include="MainWindow.cpp" />
+    <ClCompile Include="moc_MainLoopModule.cc" />
     <ClCompile Include="moc_MainWindow.cc" />
-    <ClCompile Include="QMainLoop.cpp" />
+    <ClCompile Include="dll.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Local.h" />
@@ -90,7 +92,8 @@
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Compiling %(Filename)%(Extension) using MOC</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(RootDir)%(Directory)moc_%(Filename).cpp</Outputs>
     </QtMOC>
-    <ClInclude Include="QMainLoop.h" />
+    <QtMOC Include="MainLoopModule.h" />
+    <ClInclude Include="dll.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\bin\Win32\Debug\modules\QMainLoop\config.txt" />
