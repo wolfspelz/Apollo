@@ -7,7 +7,6 @@
 #if !defined(Local_H_INCLUDED)
 #define Local_H_INCLUDED
 
-#include "QMainLoop.h"
 #include "ApLog.h"
 #include "ApOS.h"
 #include "MsgLog.h"

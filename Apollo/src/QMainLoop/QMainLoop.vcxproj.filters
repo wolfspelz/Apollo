@@ -15,21 +15,27 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="QMainLoop.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="MainWindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="moc_MainWindow.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="MainLoopModule.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dll.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="moc_MainLoopModule.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="QMainLoop.h">
+    <ClInclude Include="Local.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Local.h">
+    <ClInclude Include="dll.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -38,6 +44,9 @@
   </ItemGroup>
   <ItemGroup>
     <QtMOC Include="MainWindow.h">
+      <Filter>Header Files</Filter>
+    </QtMOC>
+    <QtMOC Include="MainLoopModule.h">
       <Filter>Header Files</Filter>
     </QtMOC>
   </ItemGroup>

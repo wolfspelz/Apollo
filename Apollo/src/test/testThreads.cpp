@@ -132,6 +132,45 @@ void Test_Threads_ThreadPool_End()
   g_Test_Threads_ThreadPool_Pool.Stop();
 }
 
+// ----------------------------------------------------------------------------
+
+//static Apollo::Thread g_Test_Threads_ThreadMessage_Thread;
+//
+//class Msg_ThreadMessage_Test_Threads_JobFinished : public ApNotificationMessage
+//{
+//public:
+//  Msg_ThreadMessage_Test_Threads_JobFinished() : ApNotificationMessage("Msg_ThreadMessage_Test_Threads_JobFinished"), sName_("") {}
+//public:
+//  String sName_;
+//};
+//
+//class Test_Threads_ThreadMessage_Job : public Apollo::Task
+//{
+//public:
+//  Test_Threads_ThreadMessage_Job(const char* szName) : Apollo::Task((char*) szName) {}
+//  virtual ~Test_Threads_ThreadMessage_Job() {}
+//public:
+//  virtual void Execute()
+//  {
+//    ApAsyncMessage<Msg_ThreadMessage_Test_Threads_JobFinished> msg;
+//    msg->sName_ = getName();
+//    msg.Post();
+//  }
+//};
+//
+//void Test_Threads_ThreadMessage_Begin()
+//{
+//  g_Test_Threads_ThreadMessage_Thread.Run();
+//
+//  Apollo::Task* pTask = new Test_Threads_ThreadMessage_Job("Test_Threads_ThreadMessage");
+//  g_Test_Threads_ThreadMessage_Thread.AddTask(pTask);
+//}
+//
+//void Test_Threads_ThreadMessage_End()
+//{
+//  g_Test_Threads_ThreadMessage_Thread.Stop();
+//}
+
 #endif // AP_TEST_Threads
 
 // ----------------------------------------------------------------------------
@@ -140,6 +179,7 @@ void Test_Threads_Register()
 {
 #if defined(AP_TEST_Threads)
   AP_UNITTEST_REGISTER(Test_Threads_ThreadPool);
+  //AP_UNITTEST_REGISTER(Test_Threads_ThreadMessage);
 #endif
 }
 
@@ -147,6 +187,7 @@ void Test_Threads_Begin()
 {
 #if defined(AP_TEST_Threads)
   Test_Threads_ThreadPool_Begin();
+  //Test_Threads_ThreadMessage_Begin();
 #endif
 }
 
@@ -154,6 +195,7 @@ void Test_Threads_End()
 {
 #if defined(AP_TEST_Threads)
   Test_Threads_ThreadPool_End();
+  //Test_Threads_ThreadMessage_End();
 #endif
 }
 
