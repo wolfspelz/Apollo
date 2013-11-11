@@ -8,6 +8,7 @@
 #define Local_H_INCLUDED
 
 #include "ApLog.h"
+#include "MsgOS.h"
 
 #define MODULE_NAME "Net"
 #define LOG_CHANNEL MODULE_NAME

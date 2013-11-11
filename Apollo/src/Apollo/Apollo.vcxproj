@@ -100,7 +100,7 @@
     <ClCompile Include="XMLProcessor.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\include\MsgProcess.h" />
+    <ClInclude Include="..\..\include\MsgOS.h" />
     <ClInclude Include="..\..\include\MsgWebSocketServer.h" />
     <ClInclude Include="ApLib.h" />
     <ClInclude Include="..\..\include\ApCompiler.h" />
@@ -123,7 +123,6 @@
     <ClInclude Include="..\..\include\MsgConfigDialog.h" />
     <ClInclude Include="..\..\include\MsgCore.h" />
     <ClInclude Include="..\..\include\MsgDB.h" />
-    <ClInclude Include="..\..\include\MsgFile.h" />
     <ClInclude Include="..\..\include\MsgGalileo.h" />
     <ClInclude Include="..\..\include\MsgHttpServer.h" />
     <ClInclude Include="..\..\include\MsgIdentity.h" />
@@ -133,7 +132,6 @@
     <ClInclude Include="..\..\include\MsgNavigation.h" />
     <ClInclude Include="..\..\include\MsgNet.h" />
     <ClInclude Include="..\..\include\MsgNetSim.h" />
-    <ClInclude Include="..\..\include\MsgOs.h" />
     <ClInclude Include="..\..\include\MsgProtocol.h" />
     <ClInclude Include="..\..\include\MsgSample.h" />
     <ClInclude Include="..\..\include\MsgServer.h" />

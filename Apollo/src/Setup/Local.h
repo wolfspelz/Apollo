@@ -12,7 +12,7 @@
 #include "MsgSystem.h"
 #include "MsgDialog.h"
 #include "MsgWebView.h"
-#include "MsgProcess.h"
+#include "MsgOS.h"
 #include "MsgTranslation.h"
 #include "SetupModule.h"
 
