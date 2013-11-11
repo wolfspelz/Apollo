@@ -38,7 +38,7 @@ String SetupModule::GetInstallFirefoxExtensionCommandline()
   if (!sFirefoxCmd) { sFirefoxCmd = SRegistry::GetString(HKEY_CURRENT_USER, "Software\\Classes\\FirefoxHTML\\shell\\open\\command", "", ""); }
   if (!sFirefoxCmd) { sFirefoxCmd = SRegistry::GetString(HKEY_LOCAL_MACHINE, "SOFTWARE\\Classes\\FirefoxHTML\\shell\\open\\command", "", ""); }
 
-  String sUrl = Apollo::getModuleConfig("Navigation", "FirefoxExtensionInstallUrl", "file://" + Msg_System_GetCurrentWorkingDirectory::_() + "modules/navigation/AvatarNavigator.xpi");
+  String sUrl = Apollo::getModuleConfig("Navigation", "FirefoxExtensionLocalUrl", "file://" + Msg_System_GetCurrentWorkingDirectory::_() + "modules/navigation/AvatarNavigator.xpi");
   //if (!sUrl.startsWith("http:") && !sUrl.startsWith("https:")) {
   //  if (sUrl.subString(1, 1) == ":") {
   //    sUrl = "file://" + sUrl;
@@ -67,7 +67,8 @@ String SetupModule::GetInstallChromeExtensionCommandline()
     sChromeCmd = SRegistry::GetString(HKEY_CLASSES_ROOT, sChromeFileType + "\\shell\\open\\command", "", "");
   }
 
-  String sUrl = Apollo::getModuleConfig("Navigation", "ChromeExtensionInstallUrl", "file://" + Msg_System_GetCurrentWorkingDirectory::_() + "modules/navigation/AvatarNavigator.crx");
+  //String sUrl = Apollo::getModuleConfig("Navigation", "ChromeExtensionLocalUrl", "file://" + Msg_System_GetCurrentWorkingDirectory::_() + "modules/navigation/AvatarNavigator.crx");
+  String sUrl = Apollo::getModuleConfig("Navigation", "ChromeExtensionOnlineURL", "https://chrome.google.com/webstore/detail/cdegcijmfiaehalcfbpdnfbchlafenke");
 
   sCmdline = sChromeCmd;
   sCmdline.replace("%1", sUrl);
@@ -117,6 +118,7 @@ void SetupModule::UninstallFirefoxExtension()
 
 void SetupModule::InstallChromeExtensionByChrome()
 {
+
   String sCmdline = GetInstallChromeExtensionCommandline();
   if (!sCmdline) { throw ApException(LOG_CONTEXT, "No command line"); }
 
@@ -446,7 +448,8 @@ String SetupModuleTester::GetInstallChromeExtensionCommandline()
 
   if (!s) {
     String sSub1 = "chrome.exe";
-    String sSub2 = "avatarnavigator.crx";
+    //String sSub2 = "avatarnavigator.crx";
+    String sSub2 = "cdegcijmfiaehalcfbpdnfbchlafenke";
     String sResult = String::toLower(SetupModule::GetInstallChromeExtensionCommandline());
     if (!s) {
       if (!sResult.contains(sSub1)) {
