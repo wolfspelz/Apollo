@@ -5,7 +5,7 @@
 // ============================================================================
 
 #include "Apollo.h"
-#include "wintimer.h"
+#include "timer.h"
 #include "ApLog.h"
 #include "MsgUnitTest.h"
 #include "MsgOS.h"
@@ -24,7 +24,7 @@ BOOL APIENTRY DllMain(HANDLE hModule, DWORD dwReason, LPVOID lpReserved)
 }
 #endif // defined(WIN32)
 
-#define MODULE_NAME "wintimer"
+#define MODULE_NAME "timer"
 #define LOG_CHANNEL MODULE_NAME
 #define LOG_CONTEXT apLog_Context
 
@@ -43,7 +43,7 @@ static AP_MODULE_INFO g_info = {
   PROJECT_HomepageUrl
 };
 
-WINTIMER_API AP_MODULE_INFO* Info(AP_MODULE_CALL* pModuleData)
+TIMER_API AP_MODULE_INFO* Info(AP_MODULE_CALL* pModuleData)
 {
   AP_UNUSED_ARG(pModuleData);
   return &g_info;
@@ -71,10 +71,10 @@ public:
 
 //----------------------------------------------------------
 
-class WinTimerModule
+class TimerModule
 {
 public:
-  WinTimerModule()
+  TimerModule()
     :bFirstTimer_(true)
   {}
 
@@ -110,11 +110,11 @@ private:
   List lTimer_;
 };
 
-typedef ApModuleSingleton<WinTimerModule> WinTimerModuleInstance;
+typedef ApModuleSingleton<TimerModule> TimerModuleInstance;
 
 //----------------------------------------------------------
 
-int WinTimerModule::InsertTimer(TimerListElem* eTimer)
+int TimerModule::InsertTimer(TimerListElem* eTimer)
 {
   int ok = 0;
   int bReSchedule = 0;
@@ -153,7 +153,7 @@ int WinTimerModule::InsertTimer(TimerListElem* eTimer)
   return ok;
 }
 
-void WinTimerModule::ScheduleNextTimer()
+void TimerModule::ScheduleNextTimer()
 {
   if (ApIsHandle(hTimerQueueTimer_)) {
     Msg_OSTimer_Cancel msg;
@@ -187,7 +187,7 @@ void WinTimerModule::ScheduleNextTimer()
   }
 }
 
-void WinTimerModule::ProcessNextTimer()
+void TimerModule::ProcessNextTimer()
 {
   Apollo::TimeValue tvNow = Apollo::TimeValue::getTime();
 
@@ -200,7 +200,7 @@ void WinTimerModule::ProcessNextTimer()
       if (tvNow >= tvExpires) {
         bDone = 0;
         lTimer_.Remove(eNext);
-        
+
         {
           ApAsyncMessage<Msg_Timer_Event> msg;
           msg->hTimer = eNext->hTimer_;
@@ -229,7 +229,7 @@ void WinTimerModule::ProcessNextTimer()
 
 //----------------------------------------------------------
 
-void WinTimerModule::On_Timer_ClearAll(Msg_Timer_ClearAll* pMsg)
+void TimerModule::On_Timer_ClearAll(Msg_Timer_ClearAll* pMsg)
 {
   int ok = 1;
 
@@ -249,7 +249,7 @@ void WinTimerModule::On_Timer_ClearAll(Msg_Timer_ClearAll* pMsg)
   pMsg->apStatus = ok ? ApMessage::Ok : ApMessage::Error;
 }
 
-void WinTimerModule::On_Timer_Start(Msg_Timer_Start* pMsg)
+void TimerModule::On_Timer_Start(Msg_Timer_Start* pMsg)
 {
   int ok = 0;
 
@@ -275,7 +275,7 @@ void WinTimerModule::On_Timer_Start(Msg_Timer_Start* pMsg)
   pMsg->apStatus = ok ? ApMessage::Ok : ApMessage::Error;
 }
 
-void WinTimerModule::On_Timer_Cancel(Msg_Timer_Cancel* pMsg)
+void TimerModule::On_Timer_Cancel(Msg_Timer_Cancel* pMsg)
 {
   for (TimerListElem* eTimer = 0; (eTimer = (TimerListElem*) lTimer_.Next(eTimer)) != 0; ) {
     if (eTimer->hTimer_ == pMsg->hTimer) {
@@ -289,7 +289,7 @@ void WinTimerModule::On_Timer_Cancel(Msg_Timer_Cancel* pMsg)
   pMsg->apStatus = ApMessage::Ok;
 }
 
-void WinTimerModule::On_OSTimer_Event(Msg_OSTimer_Event* pMsg)
+void TimerModule::On_OSTimer_Event(Msg_OSTimer_Event* pMsg)
 {
   if (pMsg->hTimer == hSecTimer_) {
     Msg_System_SecTimer msg;
@@ -301,7 +301,7 @@ void WinTimerModule::On_OSTimer_Event(Msg_OSTimer_Event* pMsg)
   }
 }
 
-void WinTimerModule::On_MainLoop_EventLoopBegin(Msg_MainLoop_EventLoopBegin* pMsg)
+void TimerModule::On_MainLoop_EventLoopBegin(Msg_MainLoop_EventLoopBegin* pMsg)
 {
   hSecTimer_ = Apollo::newHandle();
   Msg_OSTimer_Start msg;
@@ -310,7 +310,7 @@ void WinTimerModule::On_MainLoop_EventLoopBegin(Msg_MainLoop_EventLoopBegin* pMs
   msg.Request();
 }
 
-void WinTimerModule::On_MainLoop_EventLoopEnd(Msg_MainLoop_EventLoopEnd* pMsg)
+void TimerModule::On_MainLoop_EventLoopEnd(Msg_MainLoop_EventLoopEnd* pMsg)
 {
   if (ApIsHandle(hSecTimer_)) {
     Msg_OSTimer_Cancel msg;
@@ -334,19 +334,19 @@ static String Test_Timer_QueueAddOne(ListT<Test_Timer_Elem, Elem>& l, int nSec, 
   String err;
 
   ApHandle hAp = Msg_Timer_Start::Timeout(nSec, nUSec);
-  if (!ApIsHandle(hAp)) { 
+  if (!ApIsHandle(hAp)) {
     err.appendf("Msg_Timer_Start::Timeout(%d, %d) failed", nSec, nUSec);
   } else {
     Test_Timer_Elem* e = new Test_Timer_Elem();
     e->setInt(nPos);
     e->hExpected_ = hAp;
-    l.AddLast(e); 
+    l.AddLast(e);
   }
 
   return err;
 }
 
-String WinTimerModule::Test_Timer_Queue()
+String TimerModule::Test_Timer_Queue()
 {
   String err;
 
@@ -395,14 +395,14 @@ static void Test_Timer_Basic_On_Timer_Event(Msg_Timer_Event* pMsg)
     if (!Msg_Timer_Cancel::Interval(hTest_Timer_Basic_On_Timer_Event)) {
       err = "Msg_Timer_Cancel::Timeout() failed";
     }
-    AP_UNITTEST_RESULT(WinTimerModule::Test_Timer_Basic_Complete, err.empty(), err);
-    { Msg_Timer_Event msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_Timer_Basic_On_Timer_Event, 0); }  
+    AP_UNITTEST_RESULT(TimerModule::Test_Timer_Basic_Complete, err.empty(), err);
+    { Msg_Timer_Event msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_Timer_Basic_On_Timer_Event, 0); }
 
-    AP_UNITTEST_EXECUTE(WinTimerModule::Test_Timer_Interval);
+    AP_UNITTEST_EXECUTE(TimerModule::Test_Timer_Interval);
   }
 }
 
-String WinTimerModule::Test_Timer_Basic()
+String TimerModule::Test_Timer_Basic()
 {
   String err;
 
@@ -414,7 +414,7 @@ String WinTimerModule::Test_Timer_Basic()
       err = "Msg_Timer_Start::Intertval() failed";
     }
   }
-  
+
   return err;
 }
 
@@ -434,16 +434,16 @@ static void Test_Timer_Interval_On_Timer_Event(Msg_Timer_Event* pMsg)
       if (!Msg_Timer_Cancel::Interval(hTest_Timer_Interval_On_Timer_Event)) {
         err = "Msg_Timer_Cancel::Interval() failed";
       }
-      AP_UNITTEST_RESULT(WinTimerModule::Test_Timer_Interval_Complete, err.empty(), err);
-      { Msg_Timer_Event msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_Timer_Interval_On_Timer_Event, 0); }  
-      
-      AP_UNITTEST_EXECUTE(WinTimerModule::Test_System_SecTimer);
-      //WinTimerModule::UnitTest_TokenEnd();
+      AP_UNITTEST_RESULT(TimerModule::Test_Timer_Interval_Complete, err.empty(), err);
+      { Msg_Timer_Event msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_Timer_Interval_On_Timer_Event, 0); }
+
+      AP_UNITTEST_EXECUTE(TimerModule::Test_System_SecTimer);
+      //TimerModule::UnitTest_TokenEnd();
     }
   }
 }
 
-String WinTimerModule::Test_Timer_Interval()
+String TimerModule::Test_Timer_Interval()
 {
   String err;
 
@@ -455,7 +455,7 @@ String WinTimerModule::Test_Timer_Interval()
       err = "Msg_Timer_Start::Interval() failed";
     }
   }
-  
+
   return err;
 }
 
@@ -469,14 +469,14 @@ static void Test_System_SecTimer_On_System_SecTimer(Msg_System_SecTimer* pMsg)
 
   nTest_System_SecTimer_On_System_SecTimer++;
   if (nTest_System_SecTimer_On_System_SecTimer == 2) {
-    AP_UNITTEST_RESULT(WinTimerModule::Test_System_SecTimer_Complete, err.empty(), err);
-    { Msg_System_SecTimer msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_System_SecTimer_On_System_SecTimer, 0); }  
-      
-    WinTimerModule::UnitTest_TokenEnd();
+    AP_UNITTEST_RESULT(TimerModule::Test_System_SecTimer_Complete, err.empty(), err);
+    { Msg_System_SecTimer msg; msg.Unhook(MODULE_NAME, (ApCallback) Test_System_SecTimer_On_System_SecTimer, 0); }
+
+    TimerModule::UnitTest_TokenEnd();
   }
 }
 
-String WinTimerModule::Test_System_SecTimer()
+String TimerModule::Test_System_SecTimer()
 {
   String err;
 
@@ -487,50 +487,50 @@ String WinTimerModule::Test_System_SecTimer()
 
 //---------------
 
-void WinTimerModule::UnitTest_TokenEnd()
+void TimerModule::UnitTest_TokenEnd()
 {
   apLog_Info((LOG_CHANNEL, LOG_CONTEXT, "Finished Test/Timer"));
   { ApAsyncMessage<Msg_UnitTest_Token> msg; msg.Post(); }
 }
 
-void WinTimerModule::UnitTest_Token(Msg_UnitTest_Token* pMsg)
+void TimerModule::UnitTest_Token(Msg_UnitTest_Token* pMsg)
 {
   AP_UNUSED_ARG(pMsg);
-  { Msg_UnitTest_Token msg; msg.Unhook(MODULE_NAME, (ApCallback) WinTimerModule::UnitTest_Token, 0); }
+  { Msg_UnitTest_Token msg; msg.Unhook(MODULE_NAME, (ApCallback) TimerModule::UnitTest_Token, 0); }
   apLog_Info((LOG_CHANNEL, LOG_CONTEXT, "Starting Test/Timer"));
   int bTokenEndNow = 0;
 
-  AP_UNITTEST_EXECUTE(WinTimerModule::Test_Timer_Basic);
+  AP_UNITTEST_EXECUTE(TimerModule::Test_Timer_Basic);
 
   if (bTokenEndNow) { UnitTest_TokenEnd(); }
 }
 
 //---------------
 
-void WinTimerModule::On_UnitTest_Begin(Msg_UnitTest_Begin* pMsg)
+void TimerModule::On_UnitTest_Begin(Msg_UnitTest_Begin* pMsg)
 {
   AP_UNUSED_ARG(pMsg);
   if (Apollo::getConfig("Test/Timer", 0)) {
     AP_UNITTEST_REGISTER(Test_Timer_Queue);
-    AP_UNITTEST_REGISTER(WinTimerModule::Test_Timer_Basic);
-    AP_UNITTEST_REGISTER(WinTimerModule::Test_Timer_Basic_Complete);
-    AP_UNITTEST_REGISTER(WinTimerModule::Test_Timer_Interval);
-    AP_UNITTEST_REGISTER(WinTimerModule::Test_Timer_Interval_Complete);
-    AP_UNITTEST_REGISTER(WinTimerModule::Test_System_SecTimer);
-    AP_UNITTEST_REGISTER(WinTimerModule::Test_System_SecTimer_Complete);
+    AP_UNITTEST_REGISTER(TimerModule::Test_Timer_Basic);
+    AP_UNITTEST_REGISTER(TimerModule::Test_Timer_Basic_Complete);
+    AP_UNITTEST_REGISTER(TimerModule::Test_Timer_Interval);
+    AP_UNITTEST_REGISTER(TimerModule::Test_Timer_Interval_Complete);
+    AP_UNITTEST_REGISTER(TimerModule::Test_System_SecTimer);
+    AP_UNITTEST_REGISTER(TimerModule::Test_System_SecTimer_Complete);
   }
 }
 
-void WinTimerModule::On_UnitTest_Execute(Msg_UnitTest_Execute* pMsg)
+void TimerModule::On_UnitTest_Execute(Msg_UnitTest_Execute* pMsg)
 {
   AP_UNUSED_ARG(pMsg);
   if (Apollo::getConfig("Test/Timer", 0)) {
     AP_UNITTEST_EXECUTE(Test_Timer_Queue);
-    { Msg_UnitTest_Token msg; msg.Hook(MODULE_NAME, (ApCallback) WinTimerModule::UnitTest_Token, 0, ApCallbackPosNormal); }  
+    { Msg_UnitTest_Token msg; msg.Hook(MODULE_NAME, (ApCallback) TimerModule::UnitTest_Token, 0, ApCallbackPosNormal); }
   }
 }
 
-void WinTimerModule::On_UnitTest_End(Msg_UnitTest_End* pMsg)
+void TimerModule::On_UnitTest_End(Msg_UnitTest_End* pMsg)
 {
   AP_UNUSED_ARG(pMsg);
 }
@@ -538,57 +538,57 @@ void WinTimerModule::On_UnitTest_End(Msg_UnitTest_End* pMsg)
 
 //----------------------------------------------------------
 
-AP_REFINSTANCE_MSG_HANDLER(WinTimerModule, Timer_ClearAll)
-AP_REFINSTANCE_MSG_HANDLER(WinTimerModule, Timer_Start)
-AP_REFINSTANCE_MSG_HANDLER(WinTimerModule, Timer_Cancel)
-AP_REFINSTANCE_MSG_HANDLER(WinTimerModule, OSTimer_Event)
-AP_REFINSTANCE_MSG_HANDLER(WinTimerModule, MainLoop_EventLoopBegin)
-AP_REFINSTANCE_MSG_HANDLER(WinTimerModule, MainLoop_EventLoopEnd)
+AP_REFINSTANCE_MSG_HANDLER(TimerModule, Timer_ClearAll)
+AP_REFINSTANCE_MSG_HANDLER(TimerModule, Timer_Start)
+AP_REFINSTANCE_MSG_HANDLER(TimerModule, Timer_Cancel)
+AP_REFINSTANCE_MSG_HANDLER(TimerModule, OSTimer_Event)
+AP_REFINSTANCE_MSG_HANDLER(TimerModule, MainLoop_EventLoopBegin)
+AP_REFINSTANCE_MSG_HANDLER(TimerModule, MainLoop_EventLoopEnd)
 #if defined(AP_TEST)
-AP_REFINSTANCE_MSG_HANDLER(WinTimerModule, UnitTest_Begin)
-AP_REFINSTANCE_MSG_HANDLER(WinTimerModule, UnitTest_Execute)
-AP_REFINSTANCE_MSG_HANDLER(WinTimerModule, UnitTest_End)
+AP_REFINSTANCE_MSG_HANDLER(TimerModule, UnitTest_Begin)
+AP_REFINSTANCE_MSG_HANDLER(TimerModule, UnitTest_Execute)
+AP_REFINSTANCE_MSG_HANDLER(TimerModule, UnitTest_End)
 #endif
 
 //----------------------------------------------------------
 
-WINTIMER_API int Load(AP_MODULE_CALL* pModuleData)
+TIMER_API int Load(AP_MODULE_CALL* pModuleData)
 {
   AP_UNUSED_ARG(pModuleData);
-  WinTimerModuleInstance::Delete();
+  TimerModuleInstance::Delete();
 
-  { Msg_Timer_ClearAll msg; msg.Hook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(WinTimerModule, Timer_ClearAll), WinTimerModuleInstance::Get(), ApCallbackPosNormal); }
-  { Msg_Timer_Start msg; msg.Hook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(WinTimerModule, Timer_Start), WinTimerModuleInstance::Get(), ApCallbackPosNormal); }
-  { Msg_Timer_Cancel msg; msg.Hook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(WinTimerModule, Timer_Cancel), WinTimerModuleInstance::Get(), ApCallbackPosNormal); }
-  { Msg_OSTimer_Event msg; msg.Hook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(WinTimerModule, OSTimer_Event), WinTimerModuleInstance::Get(), ApCallbackPosNormal); }
-  { Msg_MainLoop_EventLoopBegin msg; msg.Hook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(WinTimerModule, MainLoop_EventLoopBegin), WinTimerModuleInstance::Get(), ApCallbackPosNormal); }
-  { Msg_MainLoop_EventLoopEnd msg; msg.Hook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(WinTimerModule, MainLoop_EventLoopEnd), WinTimerModuleInstance::Get(), ApCallbackPosNormal); }
+  { Msg_Timer_ClearAll msg; msg.Hook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(TimerModule, Timer_ClearAll), TimerModuleInstance::Get(), ApCallbackPosNormal); }
+  { Msg_Timer_Start msg; msg.Hook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(TimerModule, Timer_Start), TimerModuleInstance::Get(), ApCallbackPosNormal); }
+  { Msg_Timer_Cancel msg; msg.Hook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(TimerModule, Timer_Cancel), TimerModuleInstance::Get(), ApCallbackPosNormal); }
+  { Msg_OSTimer_Event msg; msg.Hook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(TimerModule, OSTimer_Event), TimerModuleInstance::Get(), ApCallbackPosNormal); }
+  { Msg_MainLoop_EventLoopBegin msg; msg.Hook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(TimerModule, MainLoop_EventLoopBegin), TimerModuleInstance::Get(), ApCallbackPosNormal); }
+  { Msg_MainLoop_EventLoopEnd msg; msg.Hook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(TimerModule, MainLoop_EventLoopEnd), TimerModuleInstance::Get(), ApCallbackPosNormal); }
 #if defined(AP_TEST)
-  { Msg_UnitTest_Begin msg; msg.Hook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(WinTimerModule, UnitTest_Begin), WinTimerModuleInstance::Get(), ApCallbackPosNormal); }
-  { Msg_UnitTest_Execute msg; msg.Hook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(WinTimerModule, UnitTest_Execute), WinTimerModuleInstance::Get(), ApCallbackPosNormal); }
-  { Msg_UnitTest_End msg; msg.Hook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(WinTimerModule, UnitTest_End), WinTimerModuleInstance::Get(), ApCallbackPosNormal); }
+  { Msg_UnitTest_Begin msg; msg.Hook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(TimerModule, UnitTest_Begin), TimerModuleInstance::Get(), ApCallbackPosNormal); }
+  { Msg_UnitTest_Execute msg; msg.Hook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(TimerModule, UnitTest_Execute), TimerModuleInstance::Get(), ApCallbackPosNormal); }
+  { Msg_UnitTest_End msg; msg.Hook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(TimerModule, UnitTest_End), TimerModuleInstance::Get(), ApCallbackPosNormal); }
 #endif
 
-  return WinTimerModuleInstance::Get() != 0;
+  return TimerModuleInstance::Get() != 0;
 }
 
-WINTIMER_API int UnLoad(AP_MODULE_CALL* pModuleData)
+TIMER_API int UnLoad(AP_MODULE_CALL* pModuleData)
 {
   AP_UNUSED_ARG(pModuleData);
 
-  { Msg_Timer_ClearAll msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(WinTimerModule, Timer_ClearAll), WinTimerModuleInstance::Get()); }
-  { Msg_Timer_Start msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(WinTimerModule, Timer_Start), WinTimerModuleInstance::Get()); }
-  { Msg_Timer_Cancel msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(WinTimerModule, Timer_Cancel), WinTimerModuleInstance::Get()); }
-  { Msg_OSTimer_Event msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(WinTimerModule, OSTimer_Event), WinTimerModuleInstance::Get()); }
-  { Msg_MainLoop_EventLoopBegin msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(WinTimerModule, MainLoop_EventLoopBegin), WinTimerModuleInstance::Get()); }
-  { Msg_MainLoop_EventLoopEnd msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(WinTimerModule, MainLoop_EventLoopEnd), WinTimerModuleInstance::Get()); }
+  { Msg_Timer_ClearAll msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(TimerModule, Timer_ClearAll), TimerModuleInstance::Get()); }
+  { Msg_Timer_Start msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(TimerModule, Timer_Start), TimerModuleInstance::Get()); }
+  { Msg_Timer_Cancel msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(TimerModule, Timer_Cancel), TimerModuleInstance::Get()); }
+  { Msg_OSTimer_Event msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(TimerModule, OSTimer_Event), TimerModuleInstance::Get()); }
+  { Msg_MainLoop_EventLoopBegin msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(TimerModule, MainLoop_EventLoopBegin), TimerModuleInstance::Get()); }
+  { Msg_MainLoop_EventLoopEnd msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(TimerModule, MainLoop_EventLoopEnd), TimerModuleInstance::Get()); }
 #if defined(AP_TEST)
-  { Msg_UnitTest_Begin msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(WinTimerModule, UnitTest_Begin), WinTimerModuleInstance::Get()); }
-  { Msg_UnitTest_Execute msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(WinTimerModule, UnitTest_Execute), WinTimerModuleInstance::Get()); }
-  { Msg_UnitTest_End msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(WinTimerModule, UnitTest_End), WinTimerModuleInstance::Get()); }
+  { Msg_UnitTest_Begin msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(TimerModule, UnitTest_Begin), TimerModuleInstance::Get()); }
+  { Msg_UnitTest_Execute msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(TimerModule, UnitTest_Execute), TimerModuleInstance::Get()); }
+  { Msg_UnitTest_End msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(TimerModule, UnitTest_End), TimerModuleInstance::Get()); }
 #endif
 
-  WinTimerModuleInstance::Delete();
+  TimerModuleInstance::Delete();
 
   return 1;
 }
