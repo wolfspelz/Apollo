@@ -117,6 +117,8 @@ test.pdb
 test.sqlite3
 thumbs.db
 TrayApp.pdb
+timer.dll
+timer.ilk
 TrayIcon.dll
 TrayIcon.ilk
 TrayIcon.pdb
