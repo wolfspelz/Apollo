@@ -9,6 +9,7 @@
 
 #include "Apollo.h"
 #include "ApTypes.h"
+#include "ApContainer.h"
 #include "MsgSystem.h"
 #include "MsgMainLoop.h"
 #include "MsgConfig.h"
@@ -85,12 +86,19 @@ public:
   void On_Process_GetId(Msg_Process_GetId* pMsg);
   void On_Process_GetInfo(Msg_Process_GetInfo* pMsg);
 
+  void On_OSTimer_Start(Msg_OSTimer_Start* pMsg);
+  void On_OSTimer_Cancel(Msg_OSTimer_Cancel* pMsg);
+
   void On_System_SecTimer(Msg_System_SecTimer* pMsg);
   void On_System_RunLevel(Msg_System_RunLevel* pMsg);
   void On_System_Echo(Msg_System_Echo* pMsg);
   void On_MainLoop_EventLoopBegin(Msg_MainLoop_EventLoopBegin* pMsg);
   void On_MainLoop_EventLoopEnd(Msg_MainLoop_EventLoopEnd* pMsg);
   void On_Config_Loaded(Msg_Config_Loaded* pMsg);
+
+#if defined(WIN32)
+  void On_Win32_WndProcMessage(Msg_Win32_WndProcMessage* pMsg);
+#endif
 
 
 
@@ -135,6 +143,10 @@ public:
   Apollo::ValueList vlArgs_;
   UINT nThreadId_;
   Apollo::TimeValue tvNow_;
+  #if defined(WIN32)
+  int nTimerId_;
+  ApHandleTree<int> osTimers_;
+  #endif
   int n3Timer_;
   int n10Timer_;
   int n60Timer_;

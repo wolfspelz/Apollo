@@ -60,7 +60,7 @@ public:
 class Msg_Win32_WndProcMessage: public ApRequestMessage
 {
 public:
-  Msg_Win32_WndProcMessage() : ApRequestMessage("Msg_Win32_WndProcMessage"), hWnd(NULL), message(0), wParam(0), lParam(0), lResult(0) {}
+  Msg_Win32_WndProcMessage() : ApRequestMessage("Win32_WndProcMessage"), hWnd(NULL), message(0), wParam(0), lParam(0), lResult(0) {}
   ApIN HWND hWnd;
   ApIN UINT message;
   ApIN WPARAM wParam;

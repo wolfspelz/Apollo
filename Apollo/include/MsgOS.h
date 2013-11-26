@@ -9,7 +9,7 @@
 
 #include "ApMessage.h"
 
-// timer -> os
+// module -> os
 class APOLLO_API Msg_OSTimer_Start: public ApRequestMessage
 {
 public:
@@ -20,11 +20,19 @@ public:
   ApIN int nMicroSec;
 };
 
-// timer -> os
+// module -> os
 class APOLLO_API Msg_OSTimer_Cancel: public ApRequestMessage
 {
 public:
   Msg_OSTimer_Cancel() : ApRequestMessage("OSTimer_Cancel") {}
+  ApIN ApHandle hTimer;
+};
+
+// os -> module
+class APOLLO_API Msg_OSTimer_Event: public ApNotificationMessage
+{
+public:
+  Msg_OSTimer_Event() : ApNotificationMessage("OSTimer_Event") {}
   ApIN ApHandle hTimer;
 };
 
