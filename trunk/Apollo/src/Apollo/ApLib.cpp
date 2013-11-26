@@ -29,6 +29,9 @@ ApLib::ApLib()
 //,pszArgv_(0)
 ,nThreadId_(Apollo::GetCurrentThreadId())
 ,tvNow_(Apollo::TimeValue::getTime())
+#if defined(WIN32)
+  ,nTimerId_(123)
+#endif
 ,n3Timer_(0)
 ,n10Timer_(0)
 ,n60Timer_(0)
@@ -889,27 +892,63 @@ AP_MSG_HANDLER_METHOD(ApLib, Process_GetInfo)
 #endif
 }
 
-// -------------------------------------------------------------------
+// --------------------------------
 
+AP_MSG_HANDLER_METHOD(ApLib, OSTimer_Start)
+{
+#if defined(WIN32)
+  int ok = 0;
 
+  int nDelayMS = pMsg->nSec * 1000 + pMsg->nMicroSec / 1000;
 
+  nTimerId_++;
+  apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "Msg_OSTimer_Start id=%d", nTimerId_));
 
+  int nTimer = ::SetTimer(Msg_Win32_GetMainWindow::_(), nTimerId_, nDelayMS, NULL);
+  if (nTimer != 0) {
+    osTimers_.Set(pMsg->hTimer, nTimer);
+    ok = 1;
+  }
 
+  pMsg->apStatus = ok ? ApMessage::Ok : ApMessage::Error;
+#endif
+}
 
+AP_MSG_HANDLER_METHOD(ApLib, OSTimer_Cancel)
+{
+#if defined(WIN32)
+  int ok = 0;
 
+  ApHandleTreeNode<int>* pNode = osTimers_.Find(pMsg->hTimer);
+  if (pNode != 0) {
+    int nTimer = pNode->Value();
+    ::KillTimer(Msg_Win32_GetMainWindow::_(), nTimer);
+    osTimers_.Unset(pMsg->hTimer);
+  }
 
+  pMsg->apStatus = ok ? ApMessage::Ok : ApMessage::Error;
+#endif
+}
 
+#if defined(WIN32)
+AP_MSG_HANDLER_METHOD(ApLib, Win32_WndProcMessage)
+{
+  if (pMsg->message == WM_TIMER) {
 
+    int nTimer = pMsg->wParam;
 
+    for (ApHandleTreeNode<int>* pNode = 0; (pNode = osTimers_.Next(pNode)) != 0; ) {
+      if (nTimer == pNode->Value()) {
+        Msg_OSTimer_Event msg;
+        msg.hTimer = pNode->Key();
+        msg.Send();
+        break;
+      }
+    }
 
-
-
-
-
-
-
-
-
+  } //  if WM_TIMER
+}
+#endif
 
 // -------------------------------------------------------------------
 
@@ -991,6 +1030,11 @@ int ApLib::Init(Apollo::ValueList& vlArgs)
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ApLib, Process_Kill, this, ApCallbackPosLate);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ApLib, Process_GetId, this, ApCallbackPosLate);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ApLib, Process_GetInfo, this, ApCallbackPosLate);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, ApLib, OSTimer_Start, this, ApCallbackPosLate);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, ApLib, OSTimer_Cancel, this, ApCallbackPosLate);
+#if defined(WIN32)
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, ApLib, Win32_WndProcMessage, this, ApCallbackPosNormal);
+#endif
 
   return ok;
 }
@@ -1029,7 +1073,7 @@ int ApLib::Exit()
 
 
 
-
+// Needs refactoring:
 
 String ApLib::getModulesDirectoryName() { return sModulesDirectoryName_; }
 String ApLib::AppBasePathToken() { return sAppBasePathToken_; }

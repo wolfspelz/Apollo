@@ -9,6 +9,7 @@
 #include "ApLog.h"
 #include "ApOS.h"
 #include "MsgLog.h"
+#include "MsgOS.h"
 #include "MsgConfig.h"
 #include "MsgMainLoop.h"
 #include "MsgSystem.h"
@@ -61,7 +62,6 @@ public:
     :hAppInstance_(NULL)
     ,hWnd_(NULL)
     ,nWM_APMSG_(WM_APP + 1)
-    ,nQuitTimer_(-1)
     ,nWaitFinishingModules_(0)
     ,nFinishedModules_(0)
     ,wParam_WM_CLOSE_(0)
@@ -74,23 +74,17 @@ public:
   void On_Win32_GetInstance(Msg_Win32_GetInstance* pMsg);
   void On_Win32_GetMainWindow(Msg_Win32_GetMainWindow* pMsg);
   void On_Win32_WndProcMessage(Msg_Win32_WndProcMessage* pMsg);
+  void On_OSTimer_Event(Msg_OSTimer_Event* pMsg);
   void On_System_ThreadMessage(Msg_System_ThreadMessage* pMsg);
 
   LRESULT WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 protected:
 
-  enum TimerID {
-    NO_TIMER = 0xAFFE,
-    SEC_TIMER,
-    TIMERQUEUE_TIMER,
-    QUIT_TIMER
-  };
-
   HINSTANCE hAppInstance_;
   HWND hWnd_;
   UINT nWM_APMSG_;
-  UINT nQuitTimer_;
+  ApHandle hQuitTimer_;
   int nWaitFinishingModules_;
   int nFinishedModules_;
   WPARAM wParam_WM_CLOSE_;
@@ -183,25 +177,15 @@ LRESULT MainLoopModule::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
     }
     break;
 
+  case WM_TIMER:
+    break;
+
   case WM_PAINT:
     hdc = BeginPaint(hWnd, &ps);
     RECT rt;
     GetClientRect(hWnd, &rt);
     //DrawText(hdc, "Apollo", _tcslen("Apollo"), &rt, DT_CENTER);
     EndPaint(hWnd, &ps);
-    break;
-
-  case WM_TIMER:
-    {
-      switch (wParam) {
-
-      case QUIT_TIMER:
-        ::KillTimer(hWnd, QUIT_TIMER);
-        DefWindowProc(hWnd, WM_CLOSE, wParam_WM_CLOSE_, lParam_WM_CLOSE_);
-        break;
-
-      }
-    }
     break;
 
   case WM_CLOSE:
@@ -224,7 +208,16 @@ LRESULT MainLoopModule::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
         }
       }
 
-      nQuitTimer_ = ::SetTimer(hWnd, QUIT_TIMER, 1000 * nDelay, NULL);
+      {
+        hQuitTimer_ = Apollo::newHandle();
+        Msg_OSTimer_Start msg; 
+        msg.hTimer = hQuitTimer_;
+        msg.nSec = nDelay;
+        if (!msg.Request()) {
+          hQuitTimer_ = ApNoHandle;
+        }
+      }
+
     }
     break;
 
@@ -256,6 +249,9 @@ static LRESULT CALLBACK MainLoopModule_WndProc(HWND hWnd, UINT message, WPARAM w
 
   if (pMainLoopModule != 0) {
     //nResult = pMainLoopModule->WndProc(hWnd, message, wParam, lParam);
+    if (message == WM_TIMER) {
+      int x = 0;
+    }
     Msg_Win32_WndProcMessage msg;
     msg.hWnd = hWnd;
     msg.message = message;
@@ -402,13 +398,30 @@ void MainLoopModule::On_Win32_WndProcMessage(Msg_Win32_WndProcMessage* pMsg)
   pMsg->apStatus = ApMessage::Ok;
 }
 
+void MainLoopModule::On_OSTimer_Event(Msg_OSTimer_Event* pMsg)
+{
+  if (pMsg->hTimer == hQuitTimer_) {
+    DefWindowProc(hWnd_, WM_CLOSE, wParam_WM_CLOSE_, lParam_WM_CLOSE_);
+  }
+}
+
 void MainLoopModule::On_MainLoop_ModuleFinished(Msg_MainLoop_ModuleFinished* pMsg)
 {
   nFinishedModules_++;
 
   if (nFinishedModules_ >= nWaitFinishingModules_) {
-    ::KillTimer(hWnd_, QUIT_TIMER);
-    nQuitTimer_ = ::SetTimer(hWnd_, QUIT_TIMER, 0, NULL);
+    if (ApIsHandle(hQuitTimer_)) {
+      Msg_OSTimer_Cancel msg;
+      msg.hTimer = hQuitTimer_;
+      msg.Request();
+    }
+    {
+      hQuitTimer_ = Apollo::newHandle();
+      Msg_OSTimer_Start msg;
+      msg.hTimer = hQuitTimer_;
+      msg.nSec = 0;
+      msg.Request();
+    }
   }
 }
 
@@ -420,6 +433,7 @@ AP_REFINSTANCE_MSG_HANDLER(MainLoopModule, MainLoop_ModuleFinished)
 AP_REFINSTANCE_MSG_HANDLER(MainLoopModule, Win32_GetInstance)
 AP_REFINSTANCE_MSG_HANDLER(MainLoopModule, Win32_GetMainWindow)
 AP_REFINSTANCE_MSG_HANDLER(MainLoopModule, Win32_WndProcMessage)
+AP_REFINSTANCE_MSG_HANDLER(MainLoopModule, OSTimer_Event)
 AP_REFINSTANCE_MSG_HANDLER(MainLoopModule, System_ThreadMessage)
 
 //----------------------------------------------------------
@@ -436,6 +450,7 @@ WINMAINLOOP_API int Load(AP_MODULE_CALL* pModuleData)
   { Msg_Win32_GetInstance msg; msg.Hook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(MainLoopModule, Win32_GetInstance), MainLoopModuleInstance::Get(), ApCallbackPosNormal); }
   { Msg_Win32_GetMainWindow msg; msg.Hook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(MainLoopModule, Win32_GetMainWindow), MainLoopModuleInstance::Get(), ApCallbackPosNormal); }
   { Msg_Win32_WndProcMessage msg; msg.Hook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(MainLoopModule, Win32_WndProcMessage), MainLoopModuleInstance::Get(), ApCallbackPosLate); }
+  { Msg_OSTimer_Event msg; msg.Hook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(MainLoopModule, OSTimer_Event), MainLoopModuleInstance::Get(), ApCallbackPosNormal); }
   { Msg_System_ThreadMessage msg; msg.Hook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(MainLoopModule, System_ThreadMessage), MainLoopModuleInstance::Get(), ApCallbackPosNormal); }
 
   return MainLoopModuleInstance::Get() != 0;
@@ -451,6 +466,7 @@ WINMAINLOOP_API int UnLoad(AP_MODULE_CALL* pModuleData)
   { Msg_Win32_GetInstance msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(MainLoopModule, Win32_GetInstance), MainLoopModuleInstance::Get()); }
   { Msg_Win32_GetMainWindow msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(MainLoopModule, Win32_GetMainWindow), MainLoopModuleInstance::Get()); }
   { Msg_Win32_WndProcMessage msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(MainLoopModule, Win32_WndProcMessage), MainLoopModuleInstance::Get()); }
+  { Msg_OSTimer_Event msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(MainLoopModule, OSTimer_Event), MainLoopModuleInstance::Get()); }
   { Msg_System_ThreadMessage msg; msg.Unhook(MODULE_NAME, AP_REFINSTANCE_MSG_CALLBACK(MainLoopModule, System_ThreadMessage), MainLoopModuleInstance::Get()); }
 
   MainLoopModuleInstance::Delete();
