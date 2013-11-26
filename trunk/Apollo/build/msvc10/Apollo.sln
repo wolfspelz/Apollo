@@ -126,7 +126,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "md5", "..\..\src\md5\md5.vc
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Inventory", "..\..\src\Inventory\Inventory.vcxproj", "{349D6246-8911-4850-B08C-8C1841439969}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wintimer", "..\..\src\wintimer\wintimer.vcxproj", "{52F0E390-3012-4CA6-A60A-B3C9A5889033}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "timer", "..\..\src\timer\timer.vcxproj", "{52F0E390-3012-4CA6-A60A-B3C9A5889033}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QWebView", "..\..\src\QWebView\QWebView.vcxproj", "{CF72AB4B-0219-49B3-B26A-1E697CCA13AF}"
 	ProjectSection(ProjectDependencies) = postProject

@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8,00"
-	Name="wintimer"
+	Name="timer"
 	ProjectGUID="{538F7EE7-18F8-4346-9C77-6E0335CA9562}"
-	RootNamespace="wintimer"
+  RootNamespace="timer"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -39,7 +39,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalIncludeDirectories=""
-				PreprocessorDefinitions="WINTIMER_EXPORTS"
+        PreprocessorDefinitions="TIMER_EXPORTS"
 				DebugInformationFormat="4"
 			/>
 			<Tool
@@ -105,7 +105,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalIncludeDirectories=""
-				PreprocessorDefinitions="WINTIMER_EXPORTS"
+        PreprocessorDefinitions="TIMER_EXPORTS"
 				DebugInformationFormat="3"
 			/>
 			<Tool
@@ -157,7 +157,7 @@
 			UniqueIdentifier="{E3613B91-F7CF-4b5d-BD15-7E4CA2147831}"
 			>
 			<File
-				RelativePath=".\wintimer.cpp"
+        RelativePath=".\timer.cpp"
 				>
 			</File>
 		</Filter>
@@ -167,7 +167,7 @@
 			UniqueIdentifier="{FA1F6C6A-7309-43b9-A47F-944BE56006F0}"
 			>
 			<File
-				RelativePath=".\wintimer.h"
+        RelativePath=".\timer.h"
 				>
 			</File>
 		</Filter>
