@@ -36,7 +36,7 @@ static AP_MODULE_INFO g_info = {
   "Timer", // szServices
   "Timer Module", // szLongName
   "1", // szVersion
-  "Windows Timer based timer queue and timer event implementation", // szDescription
+  "OS independent timer queue and timer event implementation.", // szDescription
   PROJECT_Author,
   PROJECT_Email,
   PROJECT_Copyright,
