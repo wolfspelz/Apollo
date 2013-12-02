@@ -30,7 +30,7 @@ ApLib::ApLib()
 ,nThreadId_(Apollo::GetCurrentThreadId())
 ,tvNow_(Apollo::TimeValue::getTime())
 #if defined(WIN32)
-  ,nTimerId_(123)
+  ,nFirstTimerId_(123)
 #endif
 ,n3Timer_(0)
 ,n10Timer_(0)
@@ -894,6 +894,23 @@ AP_MSG_HANDLER_METHOD(ApLib, Process_GetInfo)
 
 // --------------------------------
 
+int ApLib::getFreeTimerId()
+{
+  int nId = 0;
+
+  int nCandidate = nFirstTimerId_;
+  do {
+    nId = nCandidate++;
+    for (ApHandleTreeNode<int>* pNode = 0; (pNode = osTimers_.Next(pNode)) != 0; ) {
+      if (pNode != 0 && pNode->Value() == nId) {
+        nId = 0;
+      }
+    }
+  } while (nId == 0);
+
+  return nId;
+}
+
 AP_MSG_HANDLER_METHOD(ApLib, OSTimer_Start)
 {
 #if defined(WIN32)
@@ -901,10 +918,12 @@ AP_MSG_HANDLER_METHOD(ApLib, OSTimer_Start)
 
   int nDelayMS = pMsg->nSec * 1000 + pMsg->nMicroSec / 1000;
 
-  nTimerId_++;
-  apLog_Verbose((LOG_CHANNEL, LOG_CONTEXT, "Msg_OSTimer_Start id=%d", nTimerId_));
+  int nTimerId = getFreeTimerId();
+  if (apLog_IsVeryVerbose) {
+    apLog_VeryVerbose((LOG_CHANNEL, LOG_CONTEXT, "Msg_OSTimer_Start id=%d", nTimerId));
+  }
 
-  int nTimer = ::SetTimer(Msg_Win32_GetMainWindow::_(), nTimerId_, nDelayMS, NULL);
+  int nTimer = ::SetTimer(Msg_Win32_GetMainWindow::_(), nTimerId, nDelayMS, NULL);
   if (nTimer != 0) {
     osTimers_.Set(pMsg->hTimer, nTimer);
     ok = 1;

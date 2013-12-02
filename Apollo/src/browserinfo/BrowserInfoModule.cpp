@@ -51,7 +51,7 @@ void BrowserInfoModule::StartTimer()
   if (nCntTimerUser_ == 1) {
     if (!ApIsHandle(hTimer_)) {
       int nDelayMSec = Apollo::getModuleConfig(MODULE_NAME, "TrackDelay", 314);
-      hTimer_ = Msg_Timer_Start::Interval(0, nDelayMSec * 1000);
+      hTimer_ = Msg_Timer_Start::Interval(0, nDelayMSec * 1000, "BrowserInfoModule::StartTimer");
     }
   }
 }

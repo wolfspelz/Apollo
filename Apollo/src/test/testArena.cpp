@@ -127,7 +127,7 @@ void ActionList::Proceed()
         nSec = nMSec % 1000;
         nMSec = nDelayMSec - nSec * 1000;
       }
-      hTimer_ = Msg_Timer_Start::Timeout(nSec, nMSec * 1000);
+      hTimer_ = Msg_Timer_Start::Timeout(nSec, nMSec * 1000, "testArena::ActionList::Proceed");
     }
   }
 }

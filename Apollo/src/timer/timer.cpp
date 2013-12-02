@@ -261,6 +261,7 @@ void TimerModule::On_Timer_Start(Msg_Timer_Start* pMsg)
 
     TimerListElem* eNew = new TimerListElem(pMsg->hTimer, tvExpires);
     if (eNew != 0) {
+      eNew->setName(pMsg->sName);
 
       if (pMsg->nCount != 1 && (pMsg->nSec != 0 || pMsg->nMicroSec != 0)) {
         eNew->nCount_ = pMsg->nCount;
@@ -333,7 +334,7 @@ static String Test_Timer_QueueAddOne(ListT<Test_Timer_Elem, Elem>& l, int nSec, 
 {
   String err;
 
-  ApHandle hAp = Msg_Timer_Start::Timeout(nSec, nUSec);
+  ApHandle hAp = Msg_Timer_Start::Timeout(nSec, nUSec, "Test_Timer_QueueAddOne");
   if (!ApIsHandle(hAp)) {
     err.appendf("Msg_Timer_Start::Timeout(%d, %d) failed", nSec, nUSec);
   } else {
@@ -409,7 +410,7 @@ String TimerModule::Test_Timer_Basic()
   { Msg_Timer_Event msg; msg.Hook(MODULE_NAME, (ApCallback) Test_Timer_Basic_On_Timer_Event, 0, ApCallbackPosNormal); }
 
   if (err.empty()) {
-    hTest_Timer_Basic_On_Timer_Event = Msg_Timer_Start::Interval(0, 10000);
+    hTest_Timer_Basic_On_Timer_Event = Msg_Timer_Start::Interval(0, 10000, "Test_Timer_Basic");
     if (!ApIsHandle(hTest_Timer_Basic_On_Timer_Event)) {
       err = "Msg_Timer_Start::Intertval() failed";
     }
@@ -450,7 +451,7 @@ String TimerModule::Test_Timer_Interval()
   { Msg_Timer_Event msg; msg.Hook(MODULE_NAME, (ApCallback) Test_Timer_Interval_On_Timer_Event, 0, ApCallbackPosNormal); }
 
   if (err.empty()) {
-    hTest_Timer_Interval_On_Timer_Event = Msg_Timer_Start::Interval(0, 10000);
+    hTest_Timer_Interval_On_Timer_Event = Msg_Timer_Start::Interval(0, 10000, "Test_Timer_Interval");
     if (!ApIsHandle(hTest_Timer_Interval_On_Timer_Event)) {
       err = "Msg_Timer_Start::Interval() failed";
     }
