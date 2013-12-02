@@ -675,7 +675,7 @@ int Item::StartTimer()
 
   tvLastTimer_ = Apollo::TimeValue::getTime();
 
-  hTimer_ = Msg_Timer_Start::Interval(0, nDelayMSec * 1000);
+  hTimer_ = Msg_Timer_Start::Interval(0, nDelayMSec * 1000, "Item::StartTimer");
   if (ApIsHandle(hTimer_)) {
     ok = 1;
   }

@@ -136,7 +136,11 @@ public:
   String ModuleResourcePathToken();
   String UserProfilePathToken();
 
-//protected: Should be protected, but, hey the Apollo namespace is our friend
+protected:
+  int getFreeTimerId();
+
+public:
+  //protected: Should be protected, but, hey the Apollo namespace is our friend
   ApHandle nNextHandle_;
   //int nArgc_;
   //char** pszArgv_;
@@ -144,7 +148,7 @@ public:
   UINT nThreadId_;
   Apollo::TimeValue tvNow_;
   #if defined(WIN32)
-  int nTimerId_;
+  int nFirstTimerId_;
   ApHandleTree<int> osTimers_;
   #endif
   int n3Timer_;

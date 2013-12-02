@@ -12,7 +12,7 @@ class APOLLO_API Msg_Timer_Start: public ApRequestMessage
 {
 public:
   Msg_Timer_Start() : ApRequestMessage("Timer_Start"), nSec(0), nMicroSec(0), nCount(0) {}
-  static ApHandle Interval(int nSec, int nMicroSec)
+  static ApHandle Interval(int nSec, int nMicroSec, const String& sName)
   {
     ApHandle hTimer = Apollo::newHandle();
     Msg_Timer_Start msg;
@@ -20,12 +20,13 @@ public:
     msg.nSec = nSec;
     msg.nMicroSec = nMicroSec;
     msg.nCount = 0; // 0 means infinite
+    msg.sName = sName;
     if (!msg.Request()) {
       hTimer = ApNoHandle;
     }
     return hTimer;
   }
-  static ApHandle Timeout(int nSec, int nMicroSec)
+  static ApHandle Timeout(int nSec, int nMicroSec, const String& sName)
   {
     ApHandle hTimer = Apollo::newHandle();
     Msg_Timer_Start msg;
@@ -33,6 +34,7 @@ public:
     msg.nSec = nSec;
     msg.nMicroSec = nMicroSec;
     msg.nCount = 1; // only once
+    msg.sName = sName;
     if (!msg.Request()) {
       hTimer = ApNoHandle;
     }
@@ -43,6 +45,7 @@ public:
   ApIN int nSec;
   ApIN int nMicroSec;
   ApIN int nCount;
+  ApIN String sName; // optional
 };
 
 // -> timer source
