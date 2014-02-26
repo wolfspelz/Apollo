@@ -408,15 +408,56 @@ AP_MSG_HANDLER_METHOD(ArenaModule, WebView_Event_Closing)
 
 //----------------------------
 
-AP_MSG_HANDLER_METHOD(ArenaModule, Inventory_OnDragItemMove)
-{
-  for (DisplayListNode* pNode = 0; pNode = displays_.Next(pNode); ) {
-    Display* pDisplay = pNode->Value();
-    if (pDisplay != 0) {
-      pDisplay->OnDragItemMove(pMsg->hItem, pMsg->nLeft, pMsg->nTop, pMsg->nWidth, pMsg->nHeight);
-    }
-  }
-}
+//hw DragDropInventoryItem
+//AP_MSG_HANDLER_METHOD(ArenaModule, Inventory_OnDragItemBegin)
+//{
+//  for (DisplayListNode* pNode = 0; pNode = displays_.Next(pNode); ) {
+//    Display* pDisplay = pNode->Value();
+//    if (pDisplay != 0) {
+//      pDisplay->OnDragItemBegin(pMsg->hItem);
+//    }
+//  }
+//}
+//
+//AP_MSG_HANDLER_METHOD(ArenaModule, Inventory_OnDragItemMove)
+//{
+//  for (DisplayListNode* pNode = 0; pNode = displays_.Next(pNode); ) {
+//    Display* pDisplay = pNode->Value();
+//    if (pDisplay != 0) {
+//      pDisplay->OnDragItemMove(pMsg->hItem, pMsg->nLeft, pMsg->nTop, pMsg->nWidth, pMsg->nHeight);
+//    }
+//  }
+//}
+//
+//AP_MSG_HANDLER_METHOD(ArenaModule, Inventory_OnDragItemDrop)
+//{
+//  for (DisplayListNode* pNode = 0; pNode = displays_.Next(pNode); ) {
+//    Display* pDisplay = pNode->Value();
+//    if (pDisplay != 0) {
+//      pDisplay->OnDragItemDrop(pMsg->hItem, pMsg->nLeft, pMsg->nTop);
+//    }
+//  }
+//}
+//
+//AP_MSG_HANDLER_METHOD(ArenaModule, Inventory_OnDragItemCancel)
+//{
+//  for (DisplayListNode* pNode = 0; pNode = displays_.Next(pNode); ) {
+//    Display* pDisplay = pNode->Value();
+//    if (pDisplay != 0) {
+//      pDisplay->OnDragItemCancel(pMsg->hItem);
+//    }
+//  }
+//}
+//
+//AP_MSG_HANDLER_METHOD(ArenaModule, Inventory_OnDragItemEnd)
+//{
+//  for (DisplayListNode* pNode = 0; pNode = displays_.Next(pNode); ) {
+//    Display* pDisplay = pNode->Value();
+//    if (pDisplay != 0) {
+//      pDisplay->OnDragItemEnd(pMsg->hItem);
+//    }
+//  }
+//}
 
 //----------------------------
 
@@ -599,7 +640,12 @@ int ArenaModule::Init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ArenaModule, VpView_ParticipantRemoved, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ArenaModule, WebView_Event_DocumentLoaded, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ArenaModule, WebView_Event_Closing, this, ApCallbackPosNormal);
-  AP_MSG_REGISTRY_ADD(MODULE_NAME, ArenaModule, Inventory_OnDragItemMove, this, ApCallbackPosNormal);
+  //hw DragDropInventoryItem
+  //AP_MSG_REGISTRY_ADD(MODULE_NAME, ArenaModule, Inventory_OnDragItemBegin, this, ApCallbackPosNormal);
+  //AP_MSG_REGISTRY_ADD(MODULE_NAME, ArenaModule, Inventory_OnDragItemMove, this, ApCallbackPosNormal);
+  //AP_MSG_REGISTRY_ADD(MODULE_NAME, ArenaModule, Inventory_OnDragItemDrop, this, ApCallbackPosNormal);
+  //AP_MSG_REGISTRY_ADD(MODULE_NAME, ArenaModule, Inventory_OnDragItemCancel, this, ApCallbackPosNormal);
+  //AP_MSG_REGISTRY_ADD(MODULE_NAME, ArenaModule, Inventory_OnDragItemEnd, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, ArenaModule, Animation_SequenceBegin, this, ApCallbackPosNormal);
   //AP_MSG_REGISTRY_ADD(MODULE_NAME, ArenaModule, Animation_Frame, this, ApCallbackPosNormal);
   //AP_MSG_REGISTRY_ADD(MODULE_NAME, ArenaModule, Animation_SequenceEnd, this, ApCallbackPosNormal);

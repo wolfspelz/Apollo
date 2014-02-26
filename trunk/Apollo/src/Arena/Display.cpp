@@ -292,21 +292,46 @@ void Display::OnAvatarAnimationBegin(const ApHandle& hParticipant, const String&
   }
 }
 
-void Display::OnDragItemMove(const ApHandle& hView, int nLeft, int nTop, int nWidth, int nHeight)
-{
-  int nX = nLeft - nLeft_;
-  int nY = nBottom_ - nTop - nHeight;
-  int nDropAreaHeight = 100;
-
-  bool bInWindow = nX > 0 && nX <= nWidth_ - nWidth && nY > 0 && nY < nHeight_ - nHeight;
-  bool bInDropArea = nX > 0 - nWidth/2 && nX <= nWidth_ - nWidth/2 && nY > 0 - nHeight/2 && nY < nDropAreaHeight - nHeight/2;
-  //apLog_Debug((LOG_CHANNEL, LOG_CONTEXT, "%s %d %d", bInDropArea ? "IN " : "OUT", nX, nY));
-
-  if (bLastInDropArea_ != bInDropArea) {
-    bLastInDropArea_ = bInDropArea;
-    ViewSrpcMessage vsm(this, "HiliteItemDropArea"); vsm.srpc.set("bShow", bInDropArea); vsm.Request();
-  }
-}
+//hw DragDropInventoryItem
+//void Display::OnDragItemBegin(const ApHandle& hView)
+//{
+//  apLog_Debug((LOG_CHANNEL, LOG_CONTEXT, ""));
+//}
+//
+//void Display::OnDragItemMove(const ApHandle& hView, int nLeft, int nTop, int nWidth, int nHeight)
+//{
+//  int nX = nLeft - nLeft_;
+//  int nY = nBottom_ - nTop - nHeight;
+//  int nDropAreaHeight = 100;
+//
+//  bool bInWindow = nX > 0 && nX <= nWidth_ - nWidth && nY > 0 && nY < nHeight_ - nHeight;
+//  bool bInDropArea = nX > 0 - nWidth/2 && nX <= nWidth_ - nWidth/2 && nY > 0 - nHeight/2 && nY < nDropAreaHeight - nHeight/2;
+//  apLog_Debug((LOG_CHANNEL, LOG_CONTEXT, "%s %d %d", bInDropArea ? "IN " : "OUT", nX, nY));
+//
+//  if (bLastInDropArea_ != bInDropArea) {
+//    bLastInDropArea_ = bInDropArea;
+//    ViewSrpcMessage vsm(this, "HiliteItemDropArea"); vsm.srpc.set("bShow", bInDropArea); vsm.Request();
+//
+//    if (bInDropArea) {
+//    } else {
+//    }
+//  }
+//}
+//
+//void Display::OnDragItemDrop(const ApHandle& hView, int nLeft, int nTop)
+//{
+//  apLog_Debug((LOG_CHANNEL, LOG_CONTEXT, " %d,%d", nLeft, nTop));
+//}
+//
+//void Display::OnDragItemCancel(const ApHandle& hView)
+//{
+//  apLog_Debug((LOG_CHANNEL, LOG_CONTEXT, ""));
+//}
+//
+//void Display::OnDragItemEnd(const ApHandle& hView)
+//{
+//  apLog_Debug((LOG_CHANNEL, LOG_CONTEXT, ""));
+//}
 
 void Display::OnModuleCall(Apollo::SrpcMessage& request, Apollo::SrpcMessage& response)
 {

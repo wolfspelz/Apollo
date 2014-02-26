@@ -1,4 +1,3 @@
-
 * { margin:0; padding:0; }
 
 *
@@ -9,12 +8,22 @@
 
 #Wrapper {
   position:absolute;
-  left:4px;
-  top:4px;
-  right:4px;
-  bottom:4px;
+  left:0px;
+  top:0px;
+  right:0px;
+  bottom:0px;
+  border: solid 1px #D0D0D0;
   background-color:#ffffff;
-  padding:4px;
+  padding:0px;
+}
+
+.Items
+{
+  position:absolute;
+  left:0px;
+  top:0px;
+  right:0px;
+  bottom:0px;
 }
 
 .Panel .Name 
@@ -24,12 +33,13 @@
 
 .Item {
   float: left;
-  border: solid 1px #D0D0D0;
+  xborder: solid 1px #D0D0D0;
+  xbackground-color:#ffffff;
   margin: 1px;
-  padding: 2px;
+  xpadding: 2px;
   overflow: hidden;
-  height: 100px;
-  width: 100px;
+  xheight: 100px;
+  xwidth: 100px;
 }
 
 .Item img.Icon {

@@ -101,7 +101,8 @@ void Inventory::Create()
   msg.sContentUrl = "file://" + Apollo::getModuleResourcePath(MODULE_NAME) + "Inventory.html";
   if (!msg.Request()) { throw ApException(LOG_CONTEXT, "%s failed: %s", _sz(msg.Type()), _sz(msg.sComment)); }
 
-  drag_.Init();
+  //hw DragDropInventoryItem
+  //drag_.Init();
 
   hCandidate_ = hDialog;
 }
@@ -118,7 +119,8 @@ void Inventory::Destroy()
     hDialog_ = ApNoHandle;
   }
 
-  drag_.Exit();
+  //hw DragDropInventoryItem
+  //drag_.Exit();
 }
 
 void Inventory::SetVisibility(int bShow)
@@ -179,20 +181,26 @@ void Inventory::OnModuleCall(Apollo::SrpcMessage& request, Apollo::SrpcMessage& 
   } else if (sMethod == "OnPlayModel") {
     PlayModel();
 
-  } else if (sMethod == "OnDragItem") {
-    BeginDragItem(request.getHandle("hItem")
-      ,request.getInt("nLeft")
-      ,request.getInt("nTop")
-      ,request.getInt("nWidth")
-      ,request.getInt("nHeight")
-      ,request.getInt("nMouseX")
-      ,request.getInt("nMouseY")
-      ,request.getInt("nPinX")
-      ,request.getInt("nPinY")
+  } else if (sMethod == "OpenItemInfo") {
+    OpenItemInfo(request.getHandle("hItem")
+      , request.getInt("nMouseX")
+      , request.getInt("nMouseY")
       );
 
-  } else if (sMethod == "OnEndDrag") {
-    EndDragItem();
+  //hw DragDropInventoryItem
+  //} else if (sMethod == "OnDragItem") {
+  //  BeginDragItem(request.getHandle("hItem")
+  //    ,request.getInt("nLeft")
+  //    ,request.getInt("nTop")
+  //    ,request.getInt("nWidth")
+  //    ,request.getInt("nHeight")
+  //    ,request.getInt("nMouseX")
+  //    ,request.getInt("nMouseY")
+  //    ,request.getInt("nPinX")
+  //    ,request.getInt("nPinY")
+  //    );
+  //} else if (sMethod == "OnEndDrag") {
+  //  EndDragItem();
 
   } else {
     throw ApException(LOG_CONTEXT, "Unknown Method=%s", _sz(sMethod));
@@ -471,98 +479,170 @@ void Inventory::PlayModel()
 
 //-------------------------
 
-void Inventory::BeginDragItem(const ApHandle& hItem, int nLeft, int nTop, int nWidth, int nHeight, int nMouseX, int nMouseY, int nPinX, int nPinY)
+ItemInfo* Inventory::FindItemInfoByDialog(const ApHandle& hDialog)
 {
-  drag_.SetItem(hItem);
+  ItemInfo* p = 0;
 
-  String sImage;
-  ItemListNode* pNode = items_.Find(hItem);
+  for (ItemInfoListNode* pNode = 0; (pNode = itemInfos_.Next(pNode)) != 0; ) {
+    ItemInfo* pItemInfo = pNode->Value();
+    if (pItemInfo->GetDialog() == hDialog) {
+      p = pItemInfo;
+    }
+  }
+
+  return p;
+}
+
+int Inventory::HasItemInfo(const ApHandle& hDialog)
+{
+  return (FindItemInfoByDialog(hDialog) != 0);
+}
+
+void Inventory::OpenItemInfo(const ApHandle& hItem, int nX, int nY)
+{
+  ItemInfoListNode* pNode = itemInfos_.Find(hItem);
   if (pNode != 0) {
-    sImage = pNode->Value()->sIcon_;
-  }
-  drag_.SetImage(sImage);
+    ItemInfo* pItemInfo = pNode->Value();
+    pItemInfo->BringToFront();
+  } else {
 
-  // Dialog -> WebView
-  //ApHandle hDialogView = hDialog_;
-  ApHandle hDialogView = Msg_Dialog_GetView::_(hDialog_);
-
-  int nInventoryLeft = 0;
-  int nInventoryTop = 0;
-  {
-    Msg_WebView_GetPosition msg;
-    msg.hView = hDialogView;
-    if (msg.Request()) {
-      nInventoryLeft = msg.nLeft;
-      nInventoryTop = msg.nTop;
-    }
-  }
-
-  int nContentLeft = 0;
-  int nContentTop = 0;
-  // Dialog -> WebView
-  {
-    Msg_Dialog_GetContentRect msg;
-    msg.hDialog = hDialog_;
-    if (msg.Request()) {
-      nContentLeft = msg.nLeft;
-      nContentTop = msg.nTop;
-    }
-  }
-
-  int nAbsLeft = nInventoryLeft + nContentLeft + nMouseX - nPinX;
-  int nAbsTop = nInventoryTop + nContentTop + nMouseY - nPinY;
-
-  drag_.SetPosition(nAbsLeft, nAbsTop, nWidth, nHeight, nPinX, nPinY);
-
-  {
-    Msg_Inventory_OnDragItemBegin msg;
-    msg.hItem = hItem;
-    msg.Send();
-  }
-
-  drag_.Show();
-}
-
-void Inventory::EndDragItem()
-{
-  if (ApIsHandle(drag_.GetView())) {
-    {
-      Msg_Inventory_OnDragItemEnd msg;
-      msg.hItem = drag_.GetItem();
-      msg.Send();
+    ItemInfo* pItemInfo = new ItemInfo(hItem);
+    if (pItemInfo != 0) {
+      pItemInfo->Create(nX, nY, 0, 0);
+      itemInfos_.Set(hItem, pItemInfo);
     }
 
-    drag_.Destroy();
-    drag_.Create();
   }
 }
 
-void Inventory::OnDragItemReady(const ApHandle& hView)
+void Inventory::CloseItemInfo(const ApHandle& hItem)
 {
-  if (drag_.GetView() == hView) {
-    String sResult = Msg_WebView_CallScriptFunction::_(hView, "", "Start");
+  ItemInfoListNode* pNode = itemInfos_.Find(hItem);
+  if (pNode != 0) {
+    ItemInfo* pItemInfo = pNode->Value();
+    pItemInfo->Destroy();
+    itemInfos_.Unset(hItem);
+    delete pItemInfo;
+    pItemInfo = 0;
   }
 }
 
-void Inventory::OnDragItemMove(const ApHandle& hView, int nLeft, int nTop, int nWidth, int nHeight)
+void Inventory::OnItemInfoClosed(const ApHandle& hDialog)
 {
-  if (drag_.GetView() == hView) {
-    Msg_Inventory_OnDragItemMove msg;
-    msg.hItem = drag_.GetItem();
-    msg.nLeft = nLeft;
-    msg.nTop = nTop;
-    msg.nWidth = nWidth;
-    msg.nHeight = nHeight;
-    msg.Send();
+  ItemInfo* pItemInfo = FindItemInfoByDialog(hDialog);
+  if (pItemInfo != 0) {
+    pItemInfo->OnClosed();
+    ApHandle hItem = pItemInfo->GetItem();
+    itemInfos_.Unset(hItem);
+    delete pItemInfo;
+    pItemInfo = 0;
   }
 }
 
-void Inventory::OnDragItemLostFocus(const ApHandle& hView)
-{
-  if (drag_.GetView() == hView) {
-    EndDragItem();
-  }
-}
+//hw DragDropInventoryItem
+//void Inventory::BeginDragItem(const ApHandle& hItem, int nLeft, int nTop, int nWidth, int nHeight, int nMouseX, int nMouseY, int nPinX, int nPinY)
+//{
+//  drag_.SetItem(hItem);
+//
+//  String sImage;
+//  ItemListNode* pNode = items_.Find(hItem);
+//  if (pNode != 0) {
+//    sImage = pNode->Value()->sIcon_;
+//  }
+//  drag_.SetImage(sImage);
+//
+//  // Dialog -> WebView
+//  //ApHandle hDialogView = hDialog_;
+//  ApHandle hDialogView = Msg_Dialog_GetView::_(hDialog_);
+//
+//  int nInventoryLeft = 0;
+//  int nInventoryTop = 0;
+//  {
+//    Msg_WebView_GetPosition msg;
+//    msg.hView = hDialogView;
+//    if (msg.Request()) {
+//      nInventoryLeft = msg.nLeft;
+//      nInventoryTop = msg.nTop;
+//    }
+//  }
+//
+//  int nContentLeft = 0;
+//  int nContentTop = 0;
+//  // Dialog -> WebView
+//  {
+//    Msg_Dialog_GetContentRect msg;
+//    msg.hDialog = hDialog_;
+//    if (msg.Request()) {
+//      nContentLeft = msg.nLeft;
+//      nContentTop = msg.nTop;
+//    }
+//  }
+//
+//  int nAbsLeft = nInventoryLeft + nContentLeft + nMouseX - nPinX;
+//  int nAbsTop = nInventoryTop + nContentTop + nMouseY - nPinY;
+//
+//  drag_.SetPosition(nAbsLeft, nAbsTop, nWidth, nHeight, nPinX, nPinY);
+//
+//  {
+//    Msg_Inventory_OnDragItemBegin msg;
+//    msg.hItem = hItem;
+//    msg.Send();
+//  }
+//
+//  drag_.Show();
+//}
+//
+//void Inventory::EndDragItem()
+//{
+//  if (ApIsHandle(drag_.GetView())) {
+//
+//    if (drag_.GetInDropZone()) {
+//      Msg_Inventory_OnDragItemDrop msg;
+//      msg.hItem = drag_.GetItem();
+//      msg.Send();
+//    } else {
+//      Msg_Inventory_OnDragItemCancel msg;
+//      msg.hItem = drag_.GetItem();
+//      msg.Send();
+//    }
+//
+//    {
+//      Msg_Inventory_OnDragItemEnd msg;
+//      msg.hItem = drag_.GetItem();
+//      msg.Send();
+//    }
+//
+//    drag_.Destroy();
+//    drag_.Create();
+//  }
+//}
+//
+//void Inventory::OnDragItemReady(const ApHandle& hView)
+//{
+//  if (drag_.GetView() == hView) {
+//    String sResult = Msg_WebView_CallScriptFunction::_(hView, "", "Start");
+//  }
+//}
+//
+//void Inventory::OnDragItemMove(const ApHandle& hView, int nLeft, int nTop, int nWidth, int nHeight)
+//{
+//  if (drag_.GetView() == hView) {
+//    Msg_Inventory_OnDragItemMove msg;
+//    msg.hItem = drag_.GetItem();
+//    msg.nLeft = nLeft;
+//    msg.nTop = nTop;
+//    msg.nWidth = nWidth;
+//    msg.nHeight = nHeight;
+//    msg.Send();
+//  }
+//}
+//
+//void Inventory::OnDragItemLostFocus(const ApHandle& hView)
+//{
+//  if (drag_.GetView() == hView) {
+//    EndDragItem();
+//  }
+//}
 
 //---------------------------------------------------
 // Tests

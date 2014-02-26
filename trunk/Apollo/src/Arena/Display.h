@@ -51,7 +51,12 @@ public:
   void OnContextDetailsChanged(Apollo::ValueList& vlKeys);
   void OnLocationDetailsChanged(Apollo::ValueList& vlKeys);
   void OnAvatarAnimationBegin(const ApHandle& hParticipant, const String& sUrl);
-  void OnDragItemMove(const ApHandle& hView, int nLeft, int nTop, int nWidth, int nHeight);
+  //hw DragDropInventoryItem
+  //void OnDragItemBegin(const ApHandle& hView);
+  //void OnDragItemMove(const ApHandle& hView, int nLeft, int nTop, int nWidth, int nHeight);
+  //void OnDragItemDrop(const ApHandle& hView, int nLeft, int nTop);
+  //void OnDragItemCancel(const ApHandle& hView);
+  //void OnDragItemEnd(const ApHandle& hView);
   void OnModuleCall(Apollo::SrpcMessage& request, Apollo::SrpcMessage& response);
   void OnShowChatWindow(int bShow);
   void OnShowDebugTools(int bShow);

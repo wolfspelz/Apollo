@@ -5,71 +5,7 @@
 <script type="text/javascript" src="../WebView/jquery-ui-1.8.13.custom.min.js"></script> 
 <script type="text/javascript" src="../WebView/utils.js"></script>
 <script type="text/javascript" src="../WebView/apollo.js"></script>
-
-<style type="text/css">
-* { margin:0; padding:0; }
-
-*
-{
-  font-family:Verdana, Arial, Sans-Serif;
-  font-size:11px;
-}
-
-#Wrapper {
-  position:absolute;
-  left:0px;
-  top:0px;
-  right:0px;
-  bottom:0px;
-  border: solid 1px #D0D0D0;
-  background-color:#ffffff;
-  padding:0px;
-}
-
-.Items
-{
-  position:absolute;
-  left:0px;
-  top:0px;
-  right:0px;
-  bottom:0px;
-}
-
-.Panel .Name 
-{
-  display:none;
-}
-
-.Item {
-  float: left;
-  xborder: solid 1px #D0D0D0;
-  xbackground-color:#ffffff;
-  margin: 1px;
-  xpadding: 2px;
-  overflow: hidden;
-  xheight: 100px;
-  xwidth: 100px;
-}
-
-.Item img.Icon {
-  margin-right: 4px;
-}
-
-.Panel .Item .Name 
-{
-  display:inline;
-}
-
-.Item .Nickname 
-{
-  font-weight:bold;
-}
-
-.Item .Stacksize {
-  float: right;
-  margin-left: 2px;
-}
-</style>
+<link type="text/css" rel="stylesheet" href="Inventory.css" />
 
 <script type="text/javascript">
 
@@ -136,7 +72,12 @@ function AddItem(hPanel, hItem, sName, sIcon, nSlot, nStacksize) {
       + '</div>'
     );
 
-//  $('#Item_' + hItem.toDomCompatible() + ' .Drag').mousedown(
+  $('#Item_' + hItem.toDomCompatible()).click(
+    function (ev) {
+      OpenItemInfo(hItem, ev.pageX, ev.pageY);
+    });
+
+  //  $('#Item_' + hItem.toDomCompatible() + ' .Drag').mousedown(
 //  //$('#Item_' + hItem.toDomCompatible() + ' .Icon').mousedown(
 //    function (ev) {
 //      api.Log.Debug('OnDragItem');
@@ -164,39 +105,41 @@ function AddItem(hPanel, hItem, sName, sIcon, nSlot, nStacksize) {
     //grid: [108, 108],
     cursor: 'move',
     xcursorAt: { top: 16, left: 16 },
-    containment: '#Panel_' + hPanel.toDomCompatible() + ' .Items',
-    start: function (ev) {
-      var off = $(this).offset();
-      var nMouseX = ev.pageX;
-      var nMouseY = ev.pageY;
-      var nPinX = ev.pageX - off.left;
-      var nPinY = ev.pageY - off.top;
-      api.Log.Debug('draggable.start ' + nPinX + ' ' + nPinY);
-      OnDragItem(hItem, nMouseX, nMouseY, nPinX, nPinY);
-      return false;
-    },
-    drag: function (ev) {
-      var nBorder = 4;
-      var eParent = this.offsetParent;
-      var nLeft = eParent.offsetLeft - nBorder;
-      var nTop = eParent.offsetTop - nBorder;
-      var nRight = nLeft + eParent.offsetWidth + nBorder;
-      var nBottom = nTop + eParent.offsetHeight + nBorder;
-      var nMouseX = ev.pageX;
-      var nMouseY = ev.pageY;
-      var bInside = true;
-      if (nMouseX < nLeft || nMouseX > nRight) { bInside = false; }
-      if (nMouseY < nTop || nMouseY > nBottom) { bInside = false; }
-      api.Log.Debug('draggable.drag ' + nMouseX + ' ' + nMouseY);
-      if (!bInside) {
-        OnDragItem(hItem, nMouseX, nMouseY, nPinX, nPinY);
-        $('#Item_' + hItem.toDomCompatible()).hide();
-        return false;
-      }
-    },
-    stop: function (ev) {
-      api.Log.Debug('draggable.stop ');
-    }
+    containment: '#Panel_' + hPanel.toDomCompatible() + ' .Items'
+//hw DragDropInventoryItem
+//    ,
+//    start: function (ev) {
+//      var off = $(this).offset();
+//      var nMouseX = ev.pageX;
+//      var nMouseY = ev.pageY;
+//      var nPinX = ev.pageX - off.left;
+//      var nPinY = ev.pageY - off.top;
+//      api.Log.Debug('draggable.start ' + nPinX + ' ' + nPinY);
+//      OnDragItem(hItem, nMouseX, nMouseY, nPinX, nPinY);
+//      return false;
+//    },
+//    drag: function (ev) {
+//      var nBorder = 4;
+//      var eParent = this.offsetParent;
+//      var nLeft = eParent.offsetLeft - nBorder;
+//      var nTop = eParent.offsetTop - nBorder;
+//      var nRight = nLeft + eParent.offsetWidth + nBorder;
+//      var nBottom = nTop + eParent.offsetHeight + nBorder;
+//      var nMouseX = ev.pageX;
+//      var nMouseY = ev.pageY;
+//      var bInside = true;
+//      if (nMouseX < nLeft || nMouseX > nRight) { bInside = false; }
+//      if (nMouseY < nTop || nMouseY > nBottom) { bInside = false; }
+//      api.Log.Debug('draggable.drag ' + nMouseX + ' ' + nMouseY);
+//      if (!bInside) {
+//        OnDragItem(hItem, nMouseX, nMouseY, nPinX, nPinY);
+//        $('#Item_' + hItem.toDomCompatible()).hide();
+//        return false;
+//      }
+//    },
+//    stop: function (ev) {
+//      api.Log.Debug('draggable.stop ');
+//    }
   });
 }
 
@@ -206,29 +149,40 @@ function RemoveItem(hPanel, hItem) {
 
 // -----------------------------------------------
 
-function OnDragItem(hItem, nMouseX, nMouseY, nPinX, nPinY) {
-  var eItem = $('#Item_' + hItem.toDomCompatible());
-  var off = eItem.offset();
-  var nLeft = off.left;
-  var nTop = off.top;
-  var nWidth = eItem.width();
-  var nHeight = eItem.height();
-  var nOffsetX = nMouseX - nLeft;
-  var nOffsetY = nMouseY - nTop;
-  api.Log.Debug('offset: ' + off.left + ' ' + off.top);
-  api.Log.Debug('size: ' + nWidth + ' ' + nHeight);
-  api.Log.Debug('mouse: ' + nOffsetX + ' ' + nOffsetY);
+//hw DragDropInventoryItem
+//function OnDragItem(hItem, nMouseX, nMouseY, nPinX, nPinY) {
+//  var eItem = $('#Item_' + hItem.toDomCompatible());
+//  var off = eItem.offset();
+//  var nLeft = off.left;
+//  var nTop = off.top;
+//  var nWidth = eItem.width();
+//  var nHeight = eItem.height();
+//  var nOffsetX = nMouseX - nLeft;
+//  var nOffsetY = nMouseY - nTop;
+//  api.Log.Debug('offset: ' + off.left + ' ' + off.top);
+//  api.Log.Debug('size: ' + nWidth + ' ' + nHeight);
+//  api.Log.Debug('mouse: ' + nOffsetX + ' ' + nOffsetY);
 
-  api.ModuleCall('OnDragItem')
+//  api.ModuleCall('OnDragItem')
+//     .setString('hItem', hItem)
+//     .setInt('nLeft', nLeft)
+//     .setInt('nTop', nTop)
+//     .setInt('nWidth', nWidth)
+//     .setInt('nHeight', nHeight)
+//     .setInt('nMouseX', nMouseX)
+//     .setInt('nMouseY', nMouseY)
+//     .setInt('nPinX', nPinX)
+//     .setInt('nPinY', nPinY)
+//     .send();
+//}
+
+function OpenItemInfo(hItem, nMouseX, nMouseY) {
+  api.Log.Debug('OpenItemInfo: ' + hItem + ' ' + nMouseX + ' ' + nMouseY);
+
+  api.ModuleCall('OpenItemInfo')
      .setString('hItem', hItem)
-     .setInt('nLeft', nLeft)
-     .setInt('nTop', nTop)
-     .setInt('nWidth', nWidth)
-     .setInt('nHeight', nHeight)
      .setInt('nMouseX', nMouseX)
      .setInt('nMouseY', nMouseY)
-     .setInt('nPinX', nPinX)
-     .setInt('nPinY', nPinY)
      .send();
 }
 
