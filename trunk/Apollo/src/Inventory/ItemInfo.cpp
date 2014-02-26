@@ -14,7 +14,7 @@ ItemInfo::~ItemInfo()
   Destroy();
 }
 
-void ItemInfo::Create(int nX, int nY, int nWidth, int nHeight)
+void ItemInfo::Create(const String& sTitle, int nX, int nY, int nWidth, int nHeight)
 {
   ApHandle hDialog = Apollo::newHandle();
 
@@ -28,7 +28,7 @@ void ItemInfo::Create(int nX, int nY, int nWidth, int nHeight)
   msg.nWidth = nWidth;
   msg.nHeight = nHeight;
   msg.bVisible = 1;
-  msg.sCaption = Msg_Translation_Get::_(MODULE_NAME, "", "Item Info");
+  msg.sCaption = sTitle;
   msg.sIconUrl = "file://" + Apollo::getModuleResourcePath(MODULE_NAME) + "ItemIcon16.gif";
   msg.sContentUrl = "file://" + Apollo::getModuleResourcePath(MODULE_NAME) + "ItemInfo.html";
   if (!msg.Request()) { throw ApException(LOG_CONTEXT, "%s failed: %s", _sz(msg.Type()), _sz(msg.sComment)); }

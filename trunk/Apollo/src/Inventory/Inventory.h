@@ -35,10 +35,6 @@ class Inventory
 public:
   Inventory()
     :bVisible_(0)
-    ,nLeft_(100)
-    ,nTop_(100)
-    ,nWidth_(600)
-    ,nHeight_(400)
     ,nState_(NoState)
     ,nOrder_(0)
   {}
@@ -112,6 +108,7 @@ protected:
   ApHandle CreateItemHandle(const String& sItem);
   ApHandle GetItemHandle(const String& sItem);
   String GetItemId(const ApHandle& hItem);
+  Item* FindItem(const ApHandle& hItem);
   void DeleteItemId(const String& sItem);
   void DeleteItemHandle(const ApHandle& hItem);
   void DeleteAllItemHandles();
@@ -120,10 +117,6 @@ protected:
 
 protected:
   int bVisible_;
-  int nLeft_;
-  int nTop_;
-  int nWidth_;
-  int nHeight_;
 
   ApHandleTree<Request*> requests_;
 

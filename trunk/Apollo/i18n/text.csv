@@ -19,3 +19,6 @@
 ;"Setup";;"Avatar for Firefox";;"Setup dialog label before Install-button: Avatar for Firefox [Install]";30;"Avatar for Firefox";;"Avatar für Firefox";;;;;;;;;;;
 ;"Setup";;"Avatar for Internet Explorer";;"Setup dialog label before Install-button: Avatar for Internet Explorer [Install]";30;"Avatar for Internet Explorer";;"Avatar für Internet Explorer";;;;;;;;;;;
 ;"Setup";;"Install";;;20;"Install";;"Installieren";;;;;;;;;;;
+;"Inventory";;"Inventory";;;20;"Your Inventory";;"Deine Gegenstände";;;;;;"在庫品";;;;;
+;"Inventory";;"Item";;;20;"Item";;"Gegenstand";;;;;;;;;;;
+;"Inventory";;"CoffeeMachine";;;20;"Coffee Machine";;"Kaffeemaschine";;;;;;;;;;;
