@@ -1,2 +1,4 @@
 #ässert utf-8
 Inventory=Deine Gegenstände
+Item=Gegenstand
+CoffeeMachine=Kaffeemaschine

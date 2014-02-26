@@ -15,7 +15,7 @@ public:
   {}
   virtual ~ItemInfo();
 
-  void Create(int nX, int nY, int nWidth, int nHeight);
+  void Create(const String& sTitle, int nX, int nY, int nWidth, int nHeight);
   void Destroy();
   void BringToFront();
   void OnClosed();

@@ -1,2 +1,4 @@
 #ässert utf-8
 Inventory=Your Inventory
+Item=Item
+CoffeeMachine=Coffee Machine

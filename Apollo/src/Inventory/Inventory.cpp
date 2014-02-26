@@ -52,6 +52,17 @@ String Inventory::GetItemId(const ApHandle& hItem)
   return "";
 }
 
+Item* Inventory::FindItem(const ApHandle& hItem)
+{
+  Item* pItem = 0;
+  for (ItemListNode* pNode = 0; (pNode = items_.Next(pNode)) != 0; ) {
+    if (pNode->Key() == hItem) {
+      pItem = pNode->Value();
+    }
+  }
+  return pItem;
+}
+
 void Inventory::DeleteItemId(const String& sItem)
 {
   ApHandle hItem = GetItemHandle(sItem);
@@ -506,9 +517,30 @@ void Inventory::OpenItemInfo(const ApHandle& hItem, int nX, int nY)
     pItemInfo->BringToFront();
   } else {
 
+    Msg_Dialog_GetContentRect msgDGCR;
+    msgDGCR.hDialog = hDialog_;
+    msgDGCR.Request();
+
+    Msg_WebView_GetPosition msgWGP;
+    msgWGP.hView = Msg_Dialog_GetView::_(hDialog_);
+    msgWGP.Request();
+
     ItemInfo* pItemInfo = new ItemInfo(hItem);
     if (pItemInfo != 0) {
-      pItemInfo->Create(nX, nY, 0, 0);
+
+      String sTitle;
+      Item* pItem = FindItem(hItem);
+      if (pItem != 0) {
+        sTitle = pItem->sName_;
+      }
+
+      if (sTitle.empty()) {
+        sTitle = Msg_Translation_Get::_(MODULE_NAME, "", "Item");
+      } else {
+        sTitle = Msg_Translation_Get::_(MODULE_NAME, "", sTitle);
+      }
+      
+      pItemInfo->Create(sTitle, msgWGP.nLeft + msgDGCR.nLeft + nX, msgWGP.nTop + msgDGCR.nTop + nY, 0, 0);
       itemInfos_.Set(hItem, pItemInfo);
     }
 

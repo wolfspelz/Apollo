@@ -1,2 +1,4 @@
 #ässert utf-8
 Inventory=在庫品
+Item=Item
+CoffeeMachine=Coffee Machine
