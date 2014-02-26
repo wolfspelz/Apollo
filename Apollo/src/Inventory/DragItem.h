@@ -13,6 +13,7 @@ public:
   DragItem()
     :nPinX_(0)
     ,nPinY_(0)
+    ,bInDropZone_(0)
   {}
   virtual ~DragItem() {}
 
@@ -30,11 +31,15 @@ public:
   void Show();
   void Hide();
 
+  void SetInDropZone(int bInside) { bInDropZone_ = bInside; }
+  int GetInDropZone() { return bInDropZone_; }
+
 protected:
   ApHandle hView_;
   ApHandle hItem_;
   int nPinX_;
   int nPinY_;
+  int bInDropZone_;
 };
 
 #endif // DragItem_H_INCLUDED

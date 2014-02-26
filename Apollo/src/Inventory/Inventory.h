@@ -9,7 +9,10 @@
 
 #include "Request.h"
 #include "Item.h"
-#include "DragItem.h"
+#include "ItemInfo.h"
+
+//hw DragDropInventoryItem
+//#include "DragItem.h"
 
 typedef ApHandleTree<String> ItemHandle2IdList;
 typedef ApHandleTreeNode<String> ItemHandle2IdListNode;
@@ -22,6 +25,10 @@ typedef StringTreeIterator<ApHandle> ItemId2HandleListIterator;
 typedef ApHandlePointerTree<Item*> ItemList;
 typedef ApHandlePointerTreeNode<Item*> ItemListNode;
 typedef ApHandlePointerTreeIterator<Item*> ItemListIterator;
+
+typedef ApHandlePointerTree<ItemInfo*> ItemInfoList;
+typedef ApHandlePointerTreeNode<ItemInfo*> ItemInfoListNode;
+typedef ApHandlePointerTreeIterator<ItemInfo*> ItemInfoListIterator;
 
 class Inventory
 {
@@ -43,13 +50,20 @@ public:
 
   void OnOpened(const ApHandle& hDialog);
   void OnClosed(const ApHandle& hDialog);
-  void OnDragItemReady(const ApHandle& hView);
-  void OnDragItemMove(const ApHandle& hView, int nLeft, int nTop, int nWidth, int nHeight);
-  void OnDragItemLostFocus(const ApHandle& hView);
+  //hw DragDropInventoryItem
+  //void OnDragItemReady(const ApHandle& hView);
+  //void OnDragItemMove(const ApHandle& hView, int nLeft, int nTop, int nWidth, int nHeight);
+  //void OnDragItemLostFocus(const ApHandle& hView);
   void OnModuleCall(Apollo::SrpcMessage& request, Apollo::SrpcMessage& response);
 
   int HasDialog(const ApHandle& hDialog) { return hDialog_ == hDialog || hCandidate_ == hDialog; }
-  int HasDragItem(const ApHandle& hView) { return drag_.GetView() == hView; }
+
+  ItemInfo* FindItemInfoByDialog(const ApHandle& hDialog);
+  int HasItemInfo(const ApHandle& hDialog);
+  void OnItemInfoClosed(const ApHandle& hDialog);
+
+  //hw DragDropInventoryItem
+  //int HasDragItem(const ApHandle& hView) { return drag_.GetView() == hView; }
 
   static String TestItemId2HandleMapper();
   static String Test_CreateItemHandle();
@@ -85,8 +99,12 @@ protected:
   void SendGetItemsPropertiesResquest(const ApHandle& hPanel, const String& sContains);
   void GetItemsPropertiesResponse(const ApHandle& hPanel, Apollo::SrpcMessage& kvIdKeyValues);
 
-  void BeginDragItem(const ApHandle& hItem, int nLeft, int nTop, int nWidth, int nHeight, int nMouseX, int nMouseY, int nPinX, int nPinY);
-  void EndDragItem();
+  void OpenItemInfo(const ApHandle& hItem, int nX, int nY);
+  void CloseItemInfo(const ApHandle& hItem);
+
+  //hw DragDropInventoryItem
+  //void BeginDragItem(const ApHandle& hItem, int nLeft, int nTop, int nWidth, int nHeight, int nMouseX, int nMouseY, int nPinX, int nPinY);
+  //void EndDragItem();
 
 protected:
   // ItemId to Handle mapper
@@ -127,7 +145,10 @@ protected:
   ApHandle hCandidate_;
   ApHandle hDialog_;
 
-  DragItem drag_;
+  ItemInfoList itemInfos_;
+
+  //hw DragDropInventoryItem
+  //DragItem drag_;
 };
 
 #endif // Inventory_H_INCLUDED

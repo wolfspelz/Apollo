@@ -32,7 +32,8 @@ int ApRequestMessage::Request()
 
   if (apStatus == Unknown) {
   #if defined(_DEBUG) 
-    AP_DEBUG_BREAK();
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "No status result for message type=%s", _sz(Type())));
+    //AP_DEBUG_BREAK();
   #endif
     apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "No status result for message type=%s", _sz(Type())));
   }

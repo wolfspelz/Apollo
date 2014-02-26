@@ -83,36 +83,50 @@ AP_MSG_HANDLER_METHOD(InventoryModule, Dialog_OnOpened)
 //}
 AP_MSG_HANDLER_METHOD(InventoryModule, Dialog_OnClosed)
 {
-  if (pInventory_ != 0 && pInventory_->HasDialog(pMsg->hDialog)) {
-    pInventory_->OnClosed(pMsg->hDialog);
+  if (pInventory_ != 0) {
+    if (pInventory_->HasDialog(pMsg->hDialog)) {
+      pInventory_->OnClosed(pMsg->hDialog);
 
-    if (Apollo::getModuleConfig(MODULE_NAME, "DestroyOnHide", 0)) {
-      Msg_Inventory_Destroy msg;
-      msg.Request();
+      if (Apollo::getModuleConfig(MODULE_NAME, "DestroyOnHide", 0)) {
+        Msg_Inventory_Destroy msg;
+        msg.Request();
+      }
+    }
+
+    if (pInventory_->HasItemInfo(pMsg->hDialog)) {
+      pInventory_->OnItemInfoClosed(pMsg->hDialog);
     }
   }
 }
 
 AP_MSG_HANDLER_METHOD(InventoryModule, WebView_Event_DocumentComplete)
 {
-  if (pInventory_ != 0 && pInventory_->HasDragItem(pMsg->hView)) {
-    pInventory_->OnDragItemReady(pMsg->hView);
-  }
+  //hw DragDropInventoryItem
+  //if (pInventory_ != 0 && pInventory_->HasDragItem(pMsg->hView)) {
+  //  pInventory_->OnDragItemReady(pMsg->hView);
+  //}
 }
 
 AP_MSG_HANDLER_METHOD(InventoryModule, WebView_ModuleCall)
 {
-  if (pInventory_ != 0 && (pInventory_->HasDialog(pMsg->hView) || pInventory_->HasDragItem(pMsg->hView))) {
+  if (pInventory_ != 0 && pInventory_->HasDialog(pMsg->hView)) {
     pInventory_->OnModuleCall(pMsg->srpc, pMsg->response);
     pMsg->apStatus = ApMessage::Ok;
   }
+
+  //hw DragDropInventoryItem
+  //if (pInventory_ != 0 && pInventory_->HasDragItem(pMsg->hView)) {
+  //  pInventory_->OnModuleCall(pMsg->srpc, pMsg->response);
+  //  pMsg->apStatus = ApMessage::Ok;
+  //}
 }
 
 AP_MSG_HANDLER_METHOD(InventoryModule, WebView_Event_Position)
 {
-  if (pInventory_ != 0 && pInventory_->HasDragItem(pMsg->hView)) {
-    pInventory_->OnDragItemMove(pMsg->hView, pMsg->nLeft, pMsg->nTop, pMsg->nWidth, pMsg->nHeight);
-  }
+  //hw DragDropInventoryItem
+  //if (pInventory_ != 0 && pInventory_->HasDragItem(pMsg->hView)) {
+  //  pInventory_->OnDragItemMove(pMsg->hView, pMsg->nLeft, pMsg->nTop, pMsg->nWidth, pMsg->nHeight);
+  //}
 }
 
 //AP_MSG_HANDLER_METHOD(InventoryModule, System_RunLevel)

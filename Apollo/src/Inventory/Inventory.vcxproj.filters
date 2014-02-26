@@ -36,6 +36,9 @@
     <ClCompile Include="DragItem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ItemInfo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="dll.h">
@@ -59,6 +62,9 @@
     <ClInclude Include="DragItem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ItemInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\bin\Win32\Debug\modules\Inventory\config.txt" />
@@ -69,6 +75,9 @@
       <Filter>HTML</Filter>
     </None>
     <None Include="..\..\bin\Win32\Debug\modules\Inventory\DragItem.html">
+      <Filter>HTML</Filter>
+    </None>
+    <None Include="..\..\bin\Win32\Debug\modules\Inventory\ItemInfo.html">
       <Filter>HTML</Filter>
     </None>
   </ItemGroup>

@@ -60,7 +60,12 @@ public:
   void On_VpView_ParticipantRemoved(Msg_VpView_ParticipantRemoved* pMsg);
   void On_WebView_Event_DocumentLoaded(Msg_WebView_Event_DocumentLoaded* pMsg);
   void On_WebView_Event_Closing(Msg_WebView_Event_Closing* pMsg);
-  void On_Inventory_OnDragItemMove(Msg_Inventory_OnDragItemMove* pMsg);
+  //hw DragDropInventoryItem
+  //void On_Inventory_OnDragItemBegin(Msg_Inventory_OnDragItemBegin* pMsg);
+  //void On_Inventory_OnDragItemMove(Msg_Inventory_OnDragItemMove* pMsg);
+  //void On_Inventory_OnDragItemDrop(Msg_Inventory_OnDragItemDrop* pMsg);
+  //void On_Inventory_OnDragItemCancel(Msg_Inventory_OnDragItemCancel* pMsg);
+  //void On_Inventory_OnDragItemEnd(Msg_Inventory_OnDragItemEnd* pMsg);
   void On_Animation_SequenceBegin(Msg_Animation_SequenceBegin* pMsg);
   //void On_Animation_Frame(Msg_Animation_Frame* pMsg);
   //void On_Animation_SequenceEnd(Msg_Animation_SequenceEnd* pMsg);

@@ -80,12 +80,14 @@
     <ClCompile Include="Inventory.cpp" />
     <ClCompile Include="InventoryModule.cpp" />
     <ClCompile Include="Item.cpp" />
+    <ClCompile Include="ItemInfo.cpp" />
     <ClCompile Include="Request.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="dll.h" />
     <ClInclude Include="DragItem.h" />
     <ClInclude Include="Item.h" />
+    <ClInclude Include="ItemInfo.h" />
     <ClInclude Include="Local.h" />
     <ClInclude Include="Inventory.h" />
     <ClInclude Include="InventoryModule.h" />
@@ -106,6 +108,7 @@
     <None Include="..\..\bin\Win32\Debug\modules\Inventory\Inventory.css" />
     <None Include="..\..\bin\Win32\Debug\modules\Inventory\Inventory.html" />
     <None Include="..\..\bin\Win32\Debug\modules\Inventory\DragItem.html" />
+    <None Include="..\..\bin\Win32\Debug\modules\Inventory\ItemInfo.html" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
