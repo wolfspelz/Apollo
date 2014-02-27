@@ -155,7 +155,8 @@ void _class_ ## _On_ ## _msgtype_(Msg_ ## _msgtype_* pMsg) \
     self->On_ ## _msgtype_(pMsg); \
   } \
 }\
-void _class_ ## :: ## On_ ## _msgtype_(Msg_## _msgtype_* pMsg)
+void _class_ :: On_ ## _msgtype_(Msg_ ## _msgtype_* pMsg)
+//was: void _class_ ## :: ## On_ ## _msgtype_(Msg_## _msgtype_* pMsg)
 
 #define AP_MSGCLASS_HANDLER_METHOD(_class_, _msgtype_, _msgclass_) \
 void _class_ ## _On_ ## _msgtype_(_msgclass_* pMsg) \
@@ -165,7 +166,8 @@ void _class_ ## _On_ ## _msgtype_(_msgclass_* pMsg) \
     self->On_ ## _msgtype_(pMsg); \
   } \
 }\
-void _class_ ## :: ## On_ ## _msgtype_(_msgclass_* pMsg)
+void _class_ :: On_ ## _msgtype_(_msgclass_* pMsg)
+//was: void _class_ ## :: ## On_ ## _msgtype_(_msgclass_* pMsg)
 
 //----------------------------------------------------------
 
