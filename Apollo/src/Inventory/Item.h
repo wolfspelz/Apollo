@@ -10,18 +10,22 @@
 class Item
 {
 public:
-  Item::Item(const String& sName, const String& sIcon, int nSlot, int nStacksize)
-    :sName_(sName)
-    ,sIcon_(sIcon)
-    ,nSlot_(nSlot)
-    ,nStacksize_(nStacksize)
+  Item()
+    :nSlot_(0)
+    ,nStacksize_(0)
+    ,bIsRezable_(0)
+    ,bRezzed_(0)
   {}
   virtual ~Item() {}
+
+  void AddFieldsForDisplay(Apollo::SrpcMessage& srpc);
 
   String sName_;
   String sIcon_;
   int nSlot_;
   int nStacksize_;
+  int bIsRezable_;
+  int bRezzed_;
 
 protected:
 };

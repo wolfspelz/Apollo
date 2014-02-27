@@ -96,10 +96,6 @@ void Inventory::Create()
 {
   ApHandle hDialog = Apollo::newHandle();
 
-  // Dialog -> WebView
-  //if (!Msg_WebView_Create::_(hDialog, Apollo::getModuleConfig(MODULE_NAME, "Left", 200), Apollo::getModuleConfig(MODULE_NAME, "Top", 200), Apollo::getModuleConfig(MODULE_NAME, "Width", 500), Apollo::getModuleConfig(MODULE_NAME, "Height", 300))) { throw ApException(LOG_CONTEXT, "Msg_WebView_Create"); }
-  //if (!Msg_WebView_SetScriptAccessPolicy::Allow(hDialog)) { throw ApException(LOG_CONTEXT, "Msg_WebView_SetScriptAccessPolicy"); }
-  //if (!Msg_WebView_Load::_(hDialog, "file://" + Apollo::getModuleResourcePath(MODULE_NAME) + "Inventory.html")) { throw ApException(LOG_CONTEXT, "Msg_WebView_Load"); }
   Msg_Dialog_Create msg;
   msg.hDialog = hDialog; 
   msg.nLeft = Apollo::getModuleConfig(MODULE_NAME, "Left", 200);
@@ -121,9 +117,6 @@ void Inventory::Create()
 void Inventory::Destroy()
 {
   if (ApIsHandle(hDialog_)) {
-    // Dialog -> WebView
-    //Msg_WebView_Destroy msg;
-    //msg.hView = hDialog_;
     Msg_Dialog_Destroy msg;
     msg.hDialog = hDialog_;
     if (!msg.Request()) { throw ApException(LOG_CONTEXT, "%s failed: %s", _sz(msg.Type()), _sz(msg.sComment)); }
@@ -137,8 +130,6 @@ void Inventory::Destroy()
 void Inventory::SetVisibility(int bShow)
 {
   if (ApIsHandle(hDialog_)) {
-    // Dialog -> WebView
-    //ApHandle hView = hDialog_;
     ApHandle hView = Msg_Dialog_GetView::_(hDialog_);
     if (ApIsHandle(hView)) {
       Msg_WebView_Visibility::_(hView, bShow);
@@ -161,8 +152,6 @@ void Inventory::OnOpened(const ApHandle& hDialog)
 
     SetVisibility(bVisible_);
 
-    // Dialog -> WebView
-    //Msg_WebView_CallScriptFunction::_(hDialog_, "", "Start");
     Msg_Dialog_ContentCall::_(hDialog_, GetScriptFunctionName(), "Start");
 
     if (nState_ == NoState) {
@@ -188,7 +177,7 @@ void Inventory::OnModuleCall(Apollo::SrpcMessage& request, Apollo::SrpcMessage& 
 {
   String sMethod = request.getString(Srpc::Key::Method);
 
-  if (0){
+  if (0) {
   } else if (sMethod == "OnPlayModel") {
     PlayModel();
 
@@ -378,7 +367,7 @@ void Inventory::SendGetItemsPropertiesResquest(const ApHandle& hPanel, const Str
   msg.srpc.set(Srpc::Key::Method, Gm_ItemProtocol_GetMultiItemProperties);
   msg.srpc.set("sInventory", Apollo::getModuleConfig(MODULE_NAME, "Name", ""));
   msg.srpc.set("vlItems", sContains);
-  msg.srpc.set("vlKeys", Item_PropertyId_Id " " Item_PropertyId_Name " " Item_PropertyId_Nickname " " Item_PropertyId_Icon32Url " " Item_PropertyId_Image100Url " " Item_PropertyId_Stacksize " " Item_PropertyId_Slot);
+  msg.srpc.set("vlKeys", Item_PropertyId_Id " " Item_PropertyId_Name " " Item_PropertyId_Nickname " " Item_PropertyId_Icon32Url " " Item_PropertyId_Image100Url " " Item_PropertyId_Stacksize " " Item_PropertyId_Slot " " Item_PropertyId_IsRezable " " Item_PropertyId_Rezzed);
 
   if (!msg.Request()) {
     DeleteRequest(hRequest);
@@ -404,9 +393,18 @@ void Inventory::GetItemsPropertiesResponse(const ApHandle& hPanel, Apollo::SrpcM
       String sIcon = kvProperties[Item_PropertyId_Icon32Url].getString();
       int nSlot = kvProperties[Item_PropertyId_Slot].getInt();
       int nStacksize = kvProperties[Item_PropertyId_Stacksize].getInt();
+      int bIsRezable = kvProperties[Item_PropertyId_IsRezable].getInt();
+      int bRezzed = kvProperties[Item_PropertyId_Rezzed].getInt();
 
-      Item* pItem = new Item(sName, sIcon, nSlot, nStacksize);
+      Item* pItem = new Item();
       if (pItem != 0) {
+        pItem->sName_ = sName; 
+        pItem->sIcon_ = sIcon; 
+        pItem->nSlot_ = nSlot; 
+        pItem->nStacksize_ = nStacksize;
+        pItem->bIsRezable_ = bIsRezable;
+        pItem->bRezzed_ = bRezzed;
+
         items_.Set(GetOrCreateItemHandle(sId), pItem);
       }
     }
@@ -446,8 +444,6 @@ String Inventory::GetScriptFunctionName()
 void Inventory::PlayModel()
 {
   if (nState_ == StateReady) {
-    // Dialog -> WebView
-    //Msg_WebView_CallScriptFunction::_(hDialog_, "", "PurgePanels");
     Msg_Dialog_ContentCall::_(hDialog_, GetScriptFunctionName(), "PurgePanels");
 
     { // Should be for all panels
@@ -460,8 +456,7 @@ void Inventory::PlayModel()
         srpc.set("sName", sName_);
         srpc.set("nOrder", nOrder_);
         srpc.set("nSlots", nSlots_);
-        // Dialog -> WebView
-        //Msg_WebView_ViewCall::_(hDialog_, GetScriptFunctionName(), srpc);
+
         Msg_Dialog_ContentCall::_(hDialog_, GetScriptFunctionName(), srpc);
       }
   
@@ -474,12 +469,8 @@ void Inventory::PlayModel()
           srpc.set(Srpc::Key::Method, "AddItem");
           srpc.set("hPanel", hPanel);
           srpc.set("hItem", hItem);
-          srpc.set("sName", pItem->sName_);
-          srpc.set("sIcon", pItem->sIcon_);
-          srpc.set("nSlot", pItem->nSlot_);
-          srpc.set("nStacksize", pItem->nStacksize_);
-          // Dialog -> WebView
-          //Msg_WebView_ViewCall::_(hDialog_, GetScriptFunctionName(), srpc);
+          pItem->AddFieldsForDisplay(srpc);
+
           Msg_Dialog_ContentCall::_(hDialog_, GetScriptFunctionName(), srpc);
         }
       }
@@ -525,7 +516,7 @@ void Inventory::OpenItemInfo(const ApHandle& hItem, int nX, int nY)
     msgWGP.hView = Msg_Dialog_GetView::_(hDialog_);
     msgWGP.Request();
 
-    ItemInfo* pItemInfo = new ItemInfo(hItem);
+    ItemInfo* pItemInfo = new ItemInfo(*this, hItem);
     if (pItemInfo != 0) {
 
       String sTitle;
@@ -559,6 +550,14 @@ void Inventory::CloseItemInfo(const ApHandle& hItem)
   }
 }
 
+void Inventory::OnItemInfoOpened(const ApHandle& hDialog)
+{
+  ItemInfo* pItemInfo = FindItemInfoByDialog(hDialog);
+  if (pItemInfo != 0) {
+    pItemInfo->OnOpened();
+  }
+}
+
 void Inventory::OnItemInfoClosed(const ApHandle& hDialog)
 {
   ItemInfo* pItemInfo = FindItemInfoByDialog(hDialog);
@@ -568,6 +567,14 @@ void Inventory::OnItemInfoClosed(const ApHandle& hDialog)
     itemInfos_.Unset(hItem);
     delete pItemInfo;
     pItemInfo = 0;
+  }
+}
+
+void Inventory::OnItemInfoModuleCall(const ApHandle& hDialog, Apollo::SrpcMessage& request, Apollo::SrpcMessage& response)
+{
+  ItemInfo* pItemInfo = FindItemInfoByDialog(hDialog);
+  if (pItemInfo != 0) {
+    pItemInfo->OnModuleCall(request, response);
   }
 }
 

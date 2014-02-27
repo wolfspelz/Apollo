@@ -7,16 +7,38 @@
 <script type="text/javascript" src="../WebView/apollo.js"></script>
 <link type="text/css" rel="stylesheet" href="Inventory.css" />
 
+<style>
+.cItemInfo table {}
+.cItemInfo .cImage {}
+.cItemInfo .cName {}
+.cItemInfo .cStacksizeWrapper {}
+</style>
+
 <script type="text/javascript">
 
-var api = new ApolloApi('ItemInfo');
+function Start() {
+  var api = new ApolloApi('ItemInfo');
+
+  //var s = api.Translate('xx', 'yy');
+  var msg = api.ModuleCall('GetItemDetail').send();
+
+  //api.Log.Debug('Start');
+
+  $('.cName').html(msg.getString('sName'));
+  $('.cIcon').attr('src', msg.getString('sIcon'));
+
+  var nStacksize = msg.getInt('nStacksize');
+  $('.cStacksize').html(nStacksize);
+  //$('.cStacksizeWrapper').css('display', nStacksize > 1 ? '' : 'none');
+
+  $('.cIsRezable').html(msg.getInt('bIsRezable'));
+  $('.cRezzed').html(msg.getInt('bRezzed'));
+}
 
 </script>
 
 </head>
-
 <body>
-ItemInfo
+<div class="cItemInfo"><table><tr><td><img class="cIcon" src="" alt=""/></td><td><span class="cName"></span></td></tr><tr><td>Stacksize</td><td><span class="cStacksize"></span></td></tr><tr><td>IsRezable</td><td><span class="cIsRezable"></span></td></tr><tr><td>Rezzed</td><td><span class="cRezzed"></span></td></tr></table></div>
 </body>
-
 </html>
