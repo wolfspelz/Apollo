@@ -30,6 +30,8 @@
 #define Item_PropertyId_PanelOrder "PanelOrder"
 #define Item_PropertyId_IsPanel "IsPanel"
 #define Item_PropertyId_Contains "Contains"
+#define Item_PropertyId_IsRezable "IsRezable"
+#define Item_PropertyId_Rezzed "Rezzed"
 
 #define Gm_ItemProtocol_GetItemIdsAndValuesByProperty "Item.GetItemIdsAndValuesByProperty"
 #define Gm_ItemProtocol_GetProperties "Item.GetProperties"

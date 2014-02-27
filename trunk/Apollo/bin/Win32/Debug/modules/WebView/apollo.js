@@ -340,7 +340,7 @@ ApolloApi.prototype =
   
   OnMouseDown: function(ev)
   {
-    api.Log.Debug('apollo.js: ' + 'OnMouseDown ' + ev.target.className + ' ' + ev.x + ' ' + ev.y);
+    //api.Log.Debug('apollo.js: ' + 'OnMouseDown ' + ev.target.className + ' ' + ev.x + ' ' + ev.y);
 
     api.bIsMove = false; 
     api.bIsSize = false;
@@ -431,7 +431,7 @@ ApolloApi.prototype =
 
   OnMouseUp: function()
   {
-    api.Log.Debug('apollo.js: ' + 'OnMouseUp');
+    //api.Log.Debug('apollo.js: ' + 'OnMouseUp');
     if (document.getElementById('cApCover')) {
       document.body.removeChild(document.getElementById('cApCover'));
     }

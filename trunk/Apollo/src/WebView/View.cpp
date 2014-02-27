@@ -801,15 +801,23 @@ JSValueRef View::JS_Apollo_sendMessage(JSContextRef ctx, JSObjectRef callableFun
   if (!JSValueIsObjectOfClass(ctx, thisObject, JS_Apollo_class())) return JSValueMakeUndefined(ctx);
 
   View* pView = static_cast<View*>(JSObjectGetPrivate(thisObject));
-  if (pView == 0 || !pView->HasScriptAccess()) return JSValueMakeUndefined(ctx);
+  if (pView == 0) {
+    apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "static_cast<View*>(JSObjectGetPrivate(thisObject)) failed"));
+    return JSValueMakeUndefined(ctx);
+  }
 
-  if (argumentCount < 1) return JSValueMakeUndefined(ctx);
+  if (!pView->HasScriptAccess()) {
+    apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "NoScriptAccess " ApHandleFormat "", ApHandlePrintf(pView->apHandle())));
+    return JSValueMakeUndefined(ctx);
+  }
+
+  if (argumentCount < 1) { return JSValueMakeUndefined(ctx); }
 
   // Convert the result into a string for display.
-  if (!JSValueIsString(ctx, arguments[0])) return JSValueMakeUndefined(ctx);
+  if (!JSValueIsString(ctx, arguments[0])) { return JSValueMakeUndefined(ctx); }
 
   AutoJSStringRef arg0 = JSValueToStringCopy (ctx, arguments[0], exception);
-  if (exception && *exception) return JSValueMakeUndefined(ctx);
+  if (exception && *exception) { return JSValueMakeUndefined(ctx); }
 
   String sText;
   sText.set((PWSTR) JSStringGetCharactersPtr(arg0), JSStringGetLength(arg0));

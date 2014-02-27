@@ -55,32 +55,19 @@ AP_MSG_HANDLER_METHOD(InventoryModule, Inventory_Show)
   pMsg->apStatus = ApMessage::Ok;
 }
 
-// Dialog -> WebView
-//AP_MSG_HANDLER_METHOD(InventoryModule, WebView_Event_DocumentLoaded)
-//{
-//  if (pInventory_ != 0 && pInventory_->HasDialog(pMsg->hView)) {
-//    pInventory_->OnOpened(pMsg->hView);
-//  }
-//}
 AP_MSG_HANDLER_METHOD(InventoryModule, Dialog_OnOpened)
 {
-  if (pInventory_ != 0 && pInventory_->HasDialog(pMsg->hDialog)) {
-    pInventory_->OnOpened(pMsg->hDialog);
+  if (pInventory_ != 0) {
+    if (pInventory_->HasDialog(pMsg->hDialog)) {
+      pInventory_->OnOpened(pMsg->hDialog);
+    }
+
+    if (pInventory_->HasItemInfo(pMsg->hDialog)) {
+      pInventory_->OnItemInfoOpened(pMsg->hDialog);
+    }
   }
 }
 
-// Dialog -> WebView
-//AP_MSG_HANDLER_METHOD(InventoryModule, WebView_Event_Closing)
-//{
-//  if (pInventory_ != 0 && pInventory_->HasDialog(pMsg->hView)) {
-//    pInventory_->OnClosed(pMsg->hView);
-//
-//    if (Apollo::getModuleConfig(MODULE_NAME, "DestroyOnHide", 0)) {
-//      Msg_Inventory_Destroy msg;
-//      msg.Request();
-//    }
-//  }
-//}
 AP_MSG_HANDLER_METHOD(InventoryModule, Dialog_OnClosed)
 {
   if (pInventory_ != 0) {
@@ -109,9 +96,16 @@ AP_MSG_HANDLER_METHOD(InventoryModule, WebView_Event_DocumentComplete)
 
 AP_MSG_HANDLER_METHOD(InventoryModule, WebView_ModuleCall)
 {
-  if (pInventory_ != 0 && pInventory_->HasDialog(pMsg->hView)) {
-    pInventory_->OnModuleCall(pMsg->srpc, pMsg->response);
-    pMsg->apStatus = ApMessage::Ok;
+  if (pInventory_ != 0) {
+    if (pInventory_->HasDialog(pMsg->hView)) {
+      pInventory_->OnModuleCall(pMsg->srpc, pMsg->response);
+      pMsg->apStatus = ApMessage::Ok;
+    }
+
+    if (pInventory_->HasItemInfo(pMsg->hView)) {
+      pInventory_->OnItemInfoModuleCall(pMsg->hView, pMsg->srpc, pMsg->response);
+      pMsg->apStatus = ApMessage::Ok;
+    }
   }
 
   //hw DragDropInventoryItem
@@ -211,9 +205,6 @@ int InventoryModule::Init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, InventoryModule, Inventory_Create, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, InventoryModule, Inventory_Destroy, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, InventoryModule, Inventory_Show, this, ApCallbackPosNormal);
-  // Dialog -> WebView
-  //AP_MSG_REGISTRY_ADD(MODULE_NAME, InventoryModule, WebView_Event_DocumentLoaded, this, ApCallbackPosNormal);
-  //AP_MSG_REGISTRY_ADD(MODULE_NAME, InventoryModule, WebView_Event_Closing, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, InventoryModule, Dialog_OnOpened, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, InventoryModule, Dialog_OnClosed, this, ApCallbackPosNormal);
   //

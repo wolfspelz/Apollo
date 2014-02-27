@@ -56,7 +56,9 @@ public:
 
   ItemInfo* FindItemInfoByDialog(const ApHandle& hDialog);
   int HasItemInfo(const ApHandle& hDialog);
+  void OnItemInfoOpened(const ApHandle& hDialog);
   void OnItemInfoClosed(const ApHandle& hDialog);
+  void OnItemInfoModuleCall(const ApHandle& hDialog, Apollo::SrpcMessage& request, Apollo::SrpcMessage& response);
 
   //hw DragDropInventoryItem
   //int HasDragItem(const ApHandle& hView) { return drag_.GetView() == hView; }
@@ -102,13 +104,14 @@ protected:
   //void BeginDragItem(const ApHandle& hItem, int nLeft, int nTop, int nWidth, int nHeight, int nMouseX, int nMouseY, int nPinX, int nPinY);
   //void EndDragItem();
 
+public: // for ItemInfo
+  Item* FindItem(const ApHandle& hItem);
 protected:
   // ItemId to Handle mapper
   ApHandle GetOrCreateItemHandle(const String& sItem);
   ApHandle CreateItemHandle(const String& sItem);
   ApHandle GetItemHandle(const String& sItem);
   String GetItemId(const ApHandle& hItem);
-  Item* FindItem(const ApHandle& hItem);
   void DeleteItemId(const String& sItem);
   void DeleteItemHandle(const ApHandle& hItem);
   void DeleteAllItemHandles();

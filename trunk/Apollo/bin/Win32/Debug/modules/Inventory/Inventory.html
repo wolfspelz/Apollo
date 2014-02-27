@@ -7,6 +7,64 @@
 <script type="text/javascript" src="../WebView/apollo.js"></script>
 <link type="text/css" rel="stylesheet" href="Inventory.css" />
 
+<style>
+#Wrapper {
+  position:absolute;
+  left:0px;
+  top:0px;
+  right:0px;
+  bottom:0px;
+  border: solid 1px #D0D0D0;
+  background-color:#ffffff;
+  padding:0px;
+}
+
+.Items
+{
+  position:absolute;
+  left:0px;
+  top:0px;
+  right:0px;
+  bottom:0px;
+}
+
+.Panel .Name 
+{
+  display:none;
+}
+
+.Item {
+  float: left;
+  xborder: solid 1px #D0D0D0;
+  xbackground-color:#ffffff;
+  margin: 1px;
+  xpadding: 2px;
+  overflow: hidden;
+  xheight: 100px;
+  xwidth: 100px;
+}
+
+.Item img.Icon {
+  margin-right: 4px;
+}
+
+.Panel .Item .Name 
+{
+  display:inline;
+}
+
+.Item .Nickname 
+{
+  font-weight:bold;
+}
+
+.Item .Stacksize {
+  float: right;
+  margin-left: 2px;
+}
+
+</style>
+
 <script type="text/javascript">
 
 var api = new ApolloApi('Inventory');
@@ -74,7 +132,11 @@ function AddItem(hPanel, hItem, sName, sIcon, nSlot, nStacksize) {
 
   $('#Item_' + hItem.toDomCompatible()).click(
     function (ev) {
-      OpenItemInfo(hItem, ev.pageX, ev.pageY);
+      api.ModuleCall('OpenItemInfo')
+       .setString('hItem', hItem)
+       .setInt('nMouseX', ev.pageX)
+       .setInt('nMouseY', ev.pageY)
+       .send();
     });
 
   //  $('#Item_' + hItem.toDomCompatible() + ' .Drag').mousedown(
@@ -175,16 +237,6 @@ function RemoveItem(hPanel, hItem) {
 //     .setInt('nPinY', nPinY)
 //     .send();
 //}
-
-function OpenItemInfo(hItem, nMouseX, nMouseY) {
-  api.Log.Debug('OpenItemInfo: ' + hItem + ' ' + nMouseX + ' ' + nMouseY);
-
-  api.ModuleCall('OpenItemInfo')
-     .setString('hItem', hItem)
-     .setInt('nMouseX', nMouseX)
-     .setInt('nMouseY', nMouseY)
-     .send();
-}
 
 // -----------------------------------------------
 
