@@ -103,7 +103,7 @@ void Inventory::Create()
   msg.nWidth = Apollo::getModuleConfig(MODULE_NAME, "Width", 500);
   msg.nHeight = Apollo::getModuleConfig(MODULE_NAME, "Height", 300);
   msg.bVisible = 0;
-  msg.sCaption = Msg_Translation_Get::_(MODULE_NAME, "", "Inventory");
+  msg.sCaption = Msg_Translation_Get::_(MODULE_NAME, "", "Your Inventory");
   msg.sIconUrl = "file://" + Apollo::getModuleResourcePath(MODULE_NAME) + "icon.png";
   msg.sContentUrl = "file://" + Apollo::getModuleResourcePath(MODULE_NAME) + "Inventory.html";
   if (!msg.Request()) { throw ApException(LOG_CONTEXT, "%s failed: %s", _sz(msg.Type()), _sz(msg.sComment)); }
@@ -528,7 +528,7 @@ void Inventory::OpenItemInfo(const ApHandle& hItem, int nX, int nY)
       if (sTitle.empty()) {
         sTitle = Msg_Translation_Get::_(MODULE_NAME, "", "Item");
       } else {
-        sTitle = Msg_Translation_Get::_(MODULE_NAME, "", sTitle);
+        sTitle = Msg_Translation_Get::_(MODULE_NAME, "ItemName", sTitle);
       }
       
       pItemInfo->Create(sTitle, msgWGP.nLeft + msgDGCR.nLeft + nX, msgWGP.nTop + msgDGCR.nTop + nY, 0, 0);

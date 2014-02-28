@@ -120,8 +120,10 @@ function RemovePanel(hPanel) {
 }
 
 function AddItem(hPanel, hItem, sName, sIcon, nSlot, nStacksize) {
+  var sId = 'Item_' + hItem.toDomCompatible();
+
   $('#Panel_' + hPanel.toDomCompatible()).append(''
-      + '<div id="Item_' + hItem.toDomCompatible() + '" class="Item">'
+      + '<div id="' + sId + '" class="Item">'
       + '  <img src="' + sIcon + '" class="Icon" />'
 //      + '  <div class="Stacksize">' + nStacksize + '</div>'
 //      + '  <div class="Name">' + sName + '</div>'
@@ -130,7 +132,14 @@ function AddItem(hPanel, hItem, sName, sIcon, nSlot, nStacksize) {
       + '</div>'
     );
 
-  $('#Item_' + hItem.toDomCompatible()).click(
+  $('#' + sId).hover(function () {
+    $(this).stop().animate({ opacity: 0.5 }, 100);
+  },
+  function () {
+    $(this).stop().animate({ opacity: 1.0 }, 100);
+  });
+
+  $('#' + sId).click(
     function (ev) {
       api.ModuleCall('OpenItemInfo')
        .setString('hItem', hItem)
@@ -155,7 +164,7 @@ function AddItem(hPanel, hItem, sName, sIcon, nSlot, nStacksize) {
   var nPinX = 16;
   var nPinY = 16;
 
-  $('#Item_' + hItem.toDomCompatible()).draggable({
+  $('#' + sId).draggable({
     iframeFix: true,
     distance: 4,
     stack: 'div',
