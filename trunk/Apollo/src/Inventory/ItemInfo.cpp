@@ -18,6 +18,9 @@ void ItemInfo::Create(const String& sTitle, int nX, int nY, int nWidth, int nHei
 {
   ApHandle hDialog = Apollo::newHandle();
 
+  int nOffsetX = Apollo::getModuleConfig(MODULE_NAME, "ItemInfo/OffsetX", 0);
+  int nOffsetY = Apollo::getModuleConfig(MODULE_NAME, "ItemInfo/OffsetY", 0);
+
   if (nWidth <= 0) { nWidth = Apollo::getModuleConfig(MODULE_NAME, "ItemInfo/DefaultWidth", 300); }
   if (nHeight <= 0) { nHeight = Apollo::getModuleConfig(MODULE_NAME, "ItemInfo/DefaultHeight", 200); }
 
@@ -25,8 +28,8 @@ void ItemInfo::Create(const String& sTitle, int nX, int nY, int nWidth, int nHei
 
   Msg_Dialog_Create msg;
   msg.hDialog = hDialog; 
-  msg.nLeft = nX;
-  msg.nTop = nY;
+  msg.nLeft = nX + nOffsetX;
+  msg.nTop = nY + nOffsetY;
   msg.nWidth = nWidth;
   msg.nHeight = nHeight;
   msg.bVisible = 1;

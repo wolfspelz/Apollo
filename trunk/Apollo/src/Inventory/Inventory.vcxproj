@@ -105,10 +105,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\bin\Win32\Debug\modules\Inventory\config.txt" />
+    <None Include="..\..\bin\Win32\Debug\modules\Inventory\de.txt" />
     <None Include="..\..\bin\Win32\Debug\modules\Inventory\Inventory.css" />
     <None Include="..\..\bin\Win32\Debug\modules\Inventory\Inventory.html" />
     <None Include="..\..\bin\Win32\Debug\modules\Inventory\DragItem.html" />
     <None Include="..\..\bin\Win32\Debug\modules\Inventory\ItemInfo.html" />
+    <None Include="..\..\bin\Win32\Debug\modules\Inventory\ja.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

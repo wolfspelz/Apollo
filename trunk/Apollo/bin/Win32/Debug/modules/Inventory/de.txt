@@ -1,4 +1,13 @@
 #ässert utf-8
-Inventory=Deine Gegenstände
+Inventory=Inventar
+Your Inventory=Deine Gegenstände
 Item=Gegenstand
-CoffeeMachine=Kaffeemaschine
+ItemName.CoffeeMachine=Kaffeemaschine
+ItemProperty.Name=Kaffeemaschine
+ItemProperty.Stacksize=Anzahl
+ItemProperty.IsRezable=Installierbar
+ItemProperty.Rezzed=Installiert
+ItemPropertyValue.yes=ja
+ItemPropertyValue.no=nein
+ItemPropertyValueUnit.Seconds=Sekunden
+ItemAction.Produce=Herstellen

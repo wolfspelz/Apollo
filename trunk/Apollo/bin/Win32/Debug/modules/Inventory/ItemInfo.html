@@ -19,26 +19,28 @@
 function Start() {
   var api = new ApolloApi('ItemInfo');
 
-  //var s = api.Translate('xx', 'yy');
   var msg = api.ModuleCall('GetItemDetail').send();
 
-  //api.Log.Debug('Start');
+  api.Log.Debug('Start');
+  api.Translate('CoffeeMachine', 'ItemName', 'Inventory');
 
-  $('.cName').html(msg.getString('sName'));
+  $('.cName .cValue').html(api.Translate(msg.getString('sName'), 'ItemName', 'Inventory'));
   $('.cIcon').attr('src', msg.getString('sIcon'));
 
   var nStacksize = msg.getInt('nStacksize');
-  $('.cStacksize').html(nStacksize);
+  $('.cStacksize .cValue').html(nStacksize);
   //$('.cStacksizeWrapper').css('display', nStacksize > 1 ? '' : 'none');
 
-  $('.cIsRezable').html(msg.getInt('bIsRezable'));
-  $('.cRezzed').html(msg.getInt('bRezzed'));
+  $('.cIsRezable .cValue').html(api.Translate(msg.getInt('bIsRezable') == 1 ? 'yes' : 'no', 'ItemPropertyValue', 'Inventory'));
+  $('.cRezzed .cValue').html(api.Translate(msg.getInt('bRezzed') == 1 ? 'yes' : 'no', 'ItemPropertyValue', 'Inventory'));
+
+  $('.cTranslate').each(function () { api.TranslateElement(this, 'ItemProperty', 'Inventory'); });
 }
 
 </script>
 
 </head>
 <body>
-<div class="cItemInfo"><table><tr><td><img class="cIcon" src="" alt=""/></td><td><span class="cName"></span></td></tr><tr><td>Stacksize</td><td><span class="cStacksize"></span></td></tr><tr><td>IsRezable</td><td><span class="cIsRezable"></span></td></tr><tr><td>Rezzed</td><td><span class="cRezzed"></span></td></tr></table></div>
+<span class="cOut"></span><div class="cItemInfo"><table><tr><td><img class="cIcon" src="" alt=""/></td><td class="cName"><span class="cValue"></span></td></tr><tr class="cStacksize"><td class="cLabel cTranslate">Stacksize</td><td><span class="cValue"></span></td></tr><tr class="cIsRezable"><td class="cLabel cTranslate">IsRezable</td><td><span class="cValue"></span></td></tr><tr class="cRezzed"><td class="cLabel cTranslate">Rezzed</td><td><span class="cValue"></span></td></tr></table></div>
 </body>
 </html>

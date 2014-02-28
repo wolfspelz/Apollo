@@ -9,5 +9,7 @@ Language/ja=[[MODULE_RESOURCE_PATH]]/ja.txt
 
 #Name=123@item.osiris
 
+ItemInfo/OffsetX=20
+ItemInfo/OffsetY=20
 ItemInfo/DefaultWidth=300
 ItemInfo/DefaultHeight=200
