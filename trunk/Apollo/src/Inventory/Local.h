@@ -32,6 +32,8 @@
 #define Item_PropertyId_Contains "Contains"
 #define Item_PropertyId_IsRezable "IsRezable"
 #define Item_PropertyId_Rezzed "Rezzed"
+#define Item_PropertyId_RezzedDestination "RezzedDestination"
+#define Item_PropertyId_RezzedJid "RezzedJid"
 
 #define Gm_ItemProtocol_GetItemIdsAndValuesByProperty "Item.GetItemIdsAndValuesByProperty"
 #define Gm_ItemProtocol_GetProperties "Item.GetProperties"

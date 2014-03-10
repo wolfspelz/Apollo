@@ -195,9 +195,11 @@ Function.prototype.bind = function(fn)
 
 function ApEval(sText) { return eval(sText); }
 
+var gApi = null;
 function ApolloApi(sModule)
 {
   this.moduleName = sModule;
+  gApi = this;
 }
 
 ApolloApi.prototype =
@@ -272,11 +274,11 @@ ApolloApi.prototype =
     LevelInfo: 64, 
     LevelVerbose: 128,
 
-    Error: function (sMessage) { this.Send(this.LevelError, this.moduleName, 'JS:', String(sMessage)); },
-    Warning: function (sMessage) { this.Send(this.LevelWarning, this.moduleName, 'JS:', String(sMessage)); },
-    User: function (sMessage) { this.Send(this.LevelUser, this.moduleName, 'JS:', String(sMessage)); },
-    Debug: function (sMessage) { this.Send(this.LevelDebug, this.moduleName, 'JS:', String(sMessage)); },
-    Info: function (sMessage) { this.Send(this.LevelInfo, this.moduleName, 'JS:', String(sMessage)); },
+    Error: function (sMessage) { this.Send(this.LevelError, gApi.moduleName, 'JS:', String(sMessage)); },
+    Warning: function (sMessage) { this.Send(this.LevelWarning, gApi.moduleName, 'JS:', String(sMessage)); },
+    User: function (sMessage) { this.Send(this.LevelUser, gApi.moduleName, 'JS:', String(sMessage)); },
+    Debug: function (sMessage) { this.Send(this.LevelDebug, gApi.moduleName, 'JS:', String(sMessage)); },
+    Info: function (sMessage) { this.Send(this.LevelInfo, gApi.moduleName, 'JS:', String(sMessage)); },
 
     _avoidcommahazzle: 0
   },
