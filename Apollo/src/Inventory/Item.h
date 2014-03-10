@@ -22,10 +22,13 @@ public:
 
   String sName_;
   String sIcon_;
+  String sImage_;
   int nSlot_;
   int nStacksize_;
   int bIsRezable_;
   int bRezzed_;
+  String sRezzedDestination_;
+  String sRezzedJid_;
 
 protected:
 };

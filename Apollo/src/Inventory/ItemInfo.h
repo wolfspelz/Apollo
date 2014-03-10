@@ -23,6 +23,7 @@ public:
   void OnClosed();
   void OnModuleCall(Apollo::SrpcMessage& request, Apollo::SrpcMessage& response);
   void BringToFront();
+  void RezToDestination(const String& sDestination);
 
   ApHandle& GetItem() { return hItem_; }
   ApHandle& GetDialog() { return hDialog_; }

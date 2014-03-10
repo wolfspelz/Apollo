@@ -323,7 +323,7 @@ void Inventory::SendGetPanelItemsRequest(const ApHandle& hPanel)
     throw ApException(LOG_CONTEXT, "Msg_Gm_SendRequest failed");
   }
 
-  nState_ = StateGetPanelDetails;
+  nState_ = StateGetPanelProperties;
 }
 
 void Inventory::GetPanelItemsResponse(const ApHandle& hPanel, Apollo::SrpcMessage& kvProperties)
@@ -367,14 +367,26 @@ void Inventory::SendGetItemsPropertiesResquest(const ApHandle& hPanel, const Str
   msg.srpc.set(Srpc::Key::Method, Gm_ItemProtocol_GetMultiItemProperties);
   msg.srpc.set("sInventory", Apollo::getModuleConfig(MODULE_NAME, "Name", ""));
   msg.srpc.set("vlItems", sContains);
-  msg.srpc.set("vlKeys", Item_PropertyId_Id " " Item_PropertyId_Name " " Item_PropertyId_Nickname " " Item_PropertyId_Icon32Url " " Item_PropertyId_Image100Url " " Item_PropertyId_Stacksize " " Item_PropertyId_Slot " " Item_PropertyId_IsRezable " " Item_PropertyId_Rezzed);
+  msg.srpc.set("vlKeys", 
+    Item_PropertyId_Id " " 
+    Item_PropertyId_Name " " 
+    Item_PropertyId_Nickname " " 
+    Item_PropertyId_Icon32Url " " 
+    Item_PropertyId_Image100Url " " 
+    Item_PropertyId_Slot " " 
+    Item_PropertyId_Stacksize " " 
+    Item_PropertyId_IsRezable " " 
+    Item_PropertyId_Rezzed " "
+    Item_PropertyId_RezzedDestination " "
+    Item_PropertyId_RezzedJid " "
+    );
 
   if (!msg.Request()) {
     DeleteRequest(hRequest);
     throw ApException(LOG_CONTEXT, "Msg_Gm_SendRequest failed");
   }
 
-  nState_ = StateGetItemDetails;
+  nState_ = StateGetItemProperties;
 }
 
 void Inventory::GetItemsPropertiesResponse(const ApHandle& hPanel, Apollo::SrpcMessage& kvIdKeyValues)
@@ -390,20 +402,23 @@ void Inventory::GetItemsPropertiesResponse(const ApHandle& hPanel, Apollo::SrpcM
       if (sName.empty()) {
         sName = kvProperties[Item_PropertyId_Name].getString();
       }
-      String sIcon = kvProperties[Item_PropertyId_Icon32Url].getString();
-      int nSlot = kvProperties[Item_PropertyId_Slot].getInt();
-      int nStacksize = kvProperties[Item_PropertyId_Stacksize].getInt();
-      int bIsRezable = kvProperties[Item_PropertyId_IsRezable].getInt();
-      int bRezzed = kvProperties[Item_PropertyId_Rezzed].getInt();
+
+      String sImage = kvProperties[Item_PropertyId_Image100Url].getString();
+      if (sImage.empty()) {
+        sImage = kvProperties[Item_PropertyId_Icon32Url].getString();
+      }
 
       Item* pItem = new Item();
       if (pItem != 0) {
         pItem->sName_ = sName; 
-        pItem->sIcon_ = sIcon; 
-        pItem->nSlot_ = nSlot; 
-        pItem->nStacksize_ = nStacksize;
-        pItem->bIsRezable_ = bIsRezable;
-        pItem->bRezzed_ = bRezzed;
+        pItem->sIcon_ = kvProperties[Item_PropertyId_Icon32Url].getString(); 
+        pItem->sImage_ = sImage; 
+        pItem->nSlot_ = kvProperties[Item_PropertyId_Slot].getInt(); 
+        pItem->nStacksize_ = kvProperties[Item_PropertyId_Stacksize].getInt();
+        pItem->bIsRezable_ = kvProperties[Item_PropertyId_IsRezable].getInt();
+        pItem->bRezzed_ = kvProperties[Item_PropertyId_Rezzed].getInt();
+        pItem->sRezzedDestination_ = kvProperties[Item_PropertyId_RezzedDestination].getString();
+        pItem->sRezzedJid_ = kvProperties[Item_PropertyId_RezzedJid].getString();
 
         items_.Set(GetOrCreateItemHandle(sId), pItem);
       }
@@ -519,19 +534,12 @@ void Inventory::OpenItemInfo(const ApHandle& hItem, int nX, int nY)
     ItemInfo* pItemInfo = new ItemInfo(*this, hItem);
     if (pItemInfo != 0) {
 
-      String sTitle;
-      Item* pItem = FindItem(hItem);
-      if (pItem != 0) {
-        sTitle = pItem->sName_;
-      }
-
-      if (sTitle.empty()) {
-        sTitle = Msg_Translation_Get::_(MODULE_NAME, "", "Item");
-      } else {
-        sTitle = Msg_Translation_Get::_(MODULE_NAME, "ItemName", sTitle);
-      }
-      
-      pItemInfo->Create(sTitle, msgWGP.nLeft + msgDGCR.nLeft + nX, msgWGP.nTop + msgDGCR.nTop + nY, 0, 0);
+      String sTitle = Msg_Translation_Get::_(MODULE_NAME, "", "Item");
+      int nLeft = msgWGP.nLeft + msgDGCR.nLeft + nX;
+      int nTop = msgWGP.nTop + msgDGCR.nTop + nY;
+      int nWidth = 0; // Create will default 
+      int nHeight = 0; // Create will default
+      pItemInfo->Create(sTitle, nLeft, nTop, nWidth, nHeight);
       itemInfos_.Set(hItem, pItemInfo);
     }
 

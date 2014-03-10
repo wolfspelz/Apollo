@@ -29,9 +29,13 @@
 ;"Inventory";;"ItemName.CoffeeMachine";;;;"Coffee Machine";;"Kaffeemaschine";;;;;;;;;;;
 ;"Inventory";;"ItemProperty.Name";;;;"Name";;"Kaffeemaschine";;;;;;;;;;;
 ;"Inventory";;"ItemProperty.Stacksize";;;;"Stacksize";;"Anzahl";;;;;;;;;;;
+;"Inventory";;"ItemProperty.Slot";;;;"Slot";;"Platz";;;;;;;;;;;
 ;"Inventory";;"ItemProperty.IsRezable";;;;"Installable";;"Installierbar";;;;;;;;;;;
 ;"Inventory";;"ItemProperty.Rezzed";;;;"Installed";;"Installiert";;;;;;;;;;;
+;"Inventory";;"ItemProperty.RezzedDestination";;;;"Location";;"Ort";;;;;;;;;;;
+;"Inventory";;"ItemProperty.RezzedJid";;;;"JID";;"JID";;;;;;;;;;;
 ;"Inventory";;"ItemPropertyValue.yes";;;;"yes";;"ja";;;;;;;;;;;
 ;"Inventory";;"ItemPropertyValue.no";;;;"no";;"nein";;;;;;;;;;;
 ;"Inventory";;"ItemPropertyValueUnit.Seconds";;;;"Seconds";;"Sekunden";;;;;;;;;;;
 ;"Inventory";;"ItemAction.Produce";;;;"Produce";;"Herstellen";;;;;;;;;;;
+;"Inventory";;"ItemDialog.Rez";;;;"Install";;"Installieren";;;;;;;;;;;

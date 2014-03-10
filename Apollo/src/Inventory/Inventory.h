@@ -120,13 +120,13 @@ protected:
 
 protected:
   int bVisible_;
-
+  
   ApHandleTree<Request*> requests_;
 
   enum { NoState = 0
     ,StateGetPanels = 1
-    ,StateGetPanelDetails = 2
-    ,StateGetItemDetails = 3
+    ,StateGetPanelProperties = 2
+    ,StateGetItemProperties = 3
     ,StateReady = 4
   };
 

@@ -73,15 +73,30 @@ void ItemInfo::OnModuleCall(Apollo::SrpcMessage& request, Apollo::SrpcMessage& r
   String sMethod = request.getString(Srpc::Key::Method);
 
   if (0) {
-  } else if (sMethod == "GetItemDetail") {
+  } else if (sMethod == "GetItemProperties") {
     Item* pItem = inventory_.FindItem(hItem_);
     if (pItem != 0) {
       pItem->AddFieldsForDisplay(response);
     }
 
+  } else if (sMethod == "GetRezableDestinations") {
+    Apollo::KeyValueList kvDestinations;
+    kvDestinations.add(ApHandle(0, 1).toString(), "http://www.destination1.com/");
+    kvDestinations.add(ApHandle(0, 2).toString(), "http://www.destination2.com/");
+    response.set("kvDestinations", kvDestinations);
+
+  } else if (sMethod == "RezItemToDestination") {
+    ApHandle hItem = hItem_;
+    String sDestination = request.getString("sDestination");
+    RezToDestination(sDestination);
+
   } else {
     throw ApException(LOG_CONTEXT, "Unknown Method=%s", _sz(sMethod));
   }
+}
+
+void ItemInfo::RezToDestination(const String& sDestination)
+{
 }
 
 void ItemInfo::BringToFront()

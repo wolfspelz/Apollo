@@ -12,4 +12,4 @@ Language/ja=[[MODULE_RESOURCE_PATH]]/ja.txt
 ItemInfo/OffsetX=20
 ItemInfo/OffsetY=20
 ItemInfo/DefaultWidth=300
-ItemInfo/DefaultHeight=200
+ItemInfo/DefaultHeight=300
