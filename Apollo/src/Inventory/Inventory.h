@@ -40,6 +40,8 @@ public:
   {}
   virtual ~Inventory();
 
+  friend class ItemInfo;
+
   void Create();
   void Destroy();
   void Show(int bShow);
@@ -96,6 +98,10 @@ protected:
   friend class GetItemsPropertiesRequest;
   void SendGetItemsPropertiesResquest(const ApHandle& hPanel, const String& sContains);
   void GetItemsPropertiesResponse(const ApHandle& hPanel, Apollo::SrpcMessage& kvIdKeyValues);
+
+  friend class RezToLocationRequest;
+  void SendRezToLocationRequest(const ApHandle& hItem, const String& sLocation, const String& sDestination, int nX);
+  void RezToLocationResponse(const ApHandle& hItem, const String& sLocation, const String& sDestination, Apollo::SrpcMessage& kvIdKeyValues);
 
   void OpenItemInfo(const ApHandle& hItem, int nX, int nY);
   void CloseItemInfo(const ApHandle& hItem);

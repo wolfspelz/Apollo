@@ -562,7 +562,7 @@ AP_MSG_HANDLER_METHOD(GmModule, Gm_SendRequest)
   } else {
 
     Apollo::SrpcMessage srpc;
-    srpc.set(Srpc::Key::Method, GmService_Method_Tranceiver);
+    srpc.set(Srpc::Key::Method, GmService_Method_ItemApi);
     srpc.set("Token", Apollo::getModuleConfig(MODULE_NAME, "Srpc/Token", "8uzxXXZTAmHcni6tK3t-Apollo-3"));
     srpc.set("User", Apollo::getModuleConfig(MODULE_NAME, "User", ""));
     srpc.set("Session", Apollo::getModuleConfig(MODULE_NAME, "Session", "SessionToken"));
@@ -575,7 +575,7 @@ AP_MSG_HANDLER_METHOD(GmModule, Gm_SendRequest)
       }
       ok = pClient->Post(sUrl, srpc);
       if (!ok) {
-        apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "TranceiverClient.Post(%s) failed", _sz(sUrl)));
+        apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "ItemApiClient.Post(%s) failed", _sz(sUrl)));
       }
     }
   }

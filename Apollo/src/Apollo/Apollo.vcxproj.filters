@@ -290,5 +290,17 @@
     <ClInclude Include="..\..\include\MsgOS.h">
       <Filter>Header Files\Include\Msg</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\MsgDialog.h">
+      <Filter>Header Files\Include\Msg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\MsgGm.h">
+      <Filter>Header Files\Include\Msg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\MsgInventory.h">
+      <Filter>Header Files\Include\Msg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\MsgSetup.h">
+      <Filter>Header Files\Include\Msg</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

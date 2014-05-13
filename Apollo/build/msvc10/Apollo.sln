@@ -1,6 +1,9 @@
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Global", "Global", "{61D1C92D-A67F-4DC4-9DAE-0FB41FF33C91}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\i18n\text.csv = ..\..\i18n\text.csv
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Debug", "Debug", "{E83AF4F8-C063-4C9E-A7C6-62B66587D567}"
 	ProjectSection(SolutionItems) = preProject

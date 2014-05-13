@@ -9,6 +9,7 @@
 
 // Forward decl
 class Inventory;
+class Item;
 
 class Request
 {
@@ -50,6 +51,18 @@ public:
   void HandleResponse(Apollo::SrpcMessage& response);
 
   ApHandle hPanel_;
+};
+
+class RezToLocationRequest : public Request
+{
+public:
+  RezToLocationRequest(Inventory* pInventory, const ApHandle& hItem, const String& sLocation, const String& sDestination) : Request(pInventory), hItem_(hItem), sLocation_(sLocation), sDestination_(sDestination) {}
+
+  void HandleResponse(Apollo::SrpcMessage& response);
+
+  ApHandle hItem_;
+  String sLocation_;
+  String sDestination_;
 };
 
 #endif // Request_H_INCLUDED

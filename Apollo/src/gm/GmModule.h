@@ -145,6 +145,6 @@ public:
 #define GmService_Method_Register "Gm.Register"
 #define GmService_Method_Login "Gm.Login"
 #define GmService_Method_SetProperty "Gm.SetProperty"
-#define GmService_Method_Tranceiver "Gm.Tranceiver"
+#define GmService_Method_ItemApi "Gm.ItemApi"
 
 #endif // GmModule_H_INCLUDED
