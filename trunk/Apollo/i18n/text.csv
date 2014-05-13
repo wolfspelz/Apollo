@@ -31,6 +31,7 @@
 ;"Inventory";;"ItemProperty.Stacksize";;;;"Stacksize";;"Anzahl";;;;;;;;;;;
 ;"Inventory";;"ItemProperty.Slot";;;;"Slot";;"Platz";;;;;;;;;;;
 ;"Inventory";;"ItemProperty.IsRezable";;;;"Installable";;"Installierbar";;;;;;;;;;;
+;"Inventory";;"ItemProperty.Rez";;;;"Install";;"Installieren";;;;;;;;;;;
 ;"Inventory";;"ItemProperty.Rezzed";;;;"Installed";;"Installiert";;;;;;;;;;;
 ;"Inventory";;"ItemProperty.RezzedDestination";;;;"Location";;"Ort";;;;;;;;;;;
 ;"Inventory";;"ItemProperty.RezzedJid";;;;"JID";;"JID";;;;;;;;;;;

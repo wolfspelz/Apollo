@@ -38,5 +38,6 @@
 #define Gm_ItemProtocol_GetItemIdsAndValuesByProperty "Item.GetItemIdsAndValuesByProperty"
 #define Gm_ItemProtocol_GetProperties "Item.GetProperties"
 #define Gm_ItemProtocol_GetMultiItemProperties "Item.GetMultiItemProperties"
+#define Gm_ItemProtocol_RezToLocation "Item.RezToLocation"
 
 #endif // Local_H_INCLUDED

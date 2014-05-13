@@ -100,7 +100,11 @@
     <ClCompile Include="XMLProcessor.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\include\MsgDialog.h" />
+    <ClInclude Include="..\..\include\MsgGm.h" />
+    <ClInclude Include="..\..\include\MsgInventory.h" />
     <ClInclude Include="..\..\include\MsgOS.h" />
+    <ClInclude Include="..\..\include\MsgSetup.h" />
     <ClInclude Include="..\..\include\MsgWebSocketServer.h" />
     <ClInclude Include="ApLib.h" />
     <ClInclude Include="..\..\include\ApCompiler.h" />

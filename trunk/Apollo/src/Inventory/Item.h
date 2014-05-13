@@ -15,6 +15,7 @@ public:
     ,nStacksize_(0)
     ,bIsRezable_(0)
     ,bRezzed_(0)
+    ,bRezzing_(0)
   {}
   virtual ~Item() {}
 
@@ -29,6 +30,8 @@ public:
   int bRezzed_;
   String sRezzedDestination_;
   String sRezzedJid_;
+
+  int bRezzing_;
 
 protected:
 };

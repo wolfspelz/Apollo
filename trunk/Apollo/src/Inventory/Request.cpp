@@ -33,3 +33,10 @@ void GetItemsPropertiesRequest::HandleResponse(Apollo::SrpcMessage& response)
   }
 }
 
+void RezToLocationRequest::HandleResponse(Apollo::SrpcMessage& response)
+{
+  if (pInventory_ != 0) {
+    pInventory_->RezToLocationResponse(hItem_, sLocation_, sDestination_, response);
+  }
+}
+

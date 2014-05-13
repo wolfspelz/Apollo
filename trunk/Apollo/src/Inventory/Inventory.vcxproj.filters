@@ -82,5 +82,6 @@
     </None>
     <None Include="..\..\bin\Win32\Debug\modules\Inventory\de.txt" />
     <None Include="..\..\bin\Win32\Debug\modules\Inventory\ja.txt" />
+    <None Include="..\..\bin\Win32\Debug\modules\Inventory\en.txt" />
   </ItemGroup>
 </Project>

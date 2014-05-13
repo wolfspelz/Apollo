@@ -86,7 +86,6 @@ void ItemInfo::OnModuleCall(Apollo::SrpcMessage& request, Apollo::SrpcMessage& r
     response.set("kvDestinations", kvDestinations);
 
   } else if (sMethod == "RezItemToDestination") {
-    ApHandle hItem = hItem_;
     String sDestination = request.getString("sDestination");
     RezToDestination(sDestination);
 
@@ -95,12 +94,16 @@ void ItemInfo::OnModuleCall(Apollo::SrpcMessage& request, Apollo::SrpcMessage& r
   }
 }
 
-void ItemInfo::RezToDestination(const String& sDestination)
-{
-}
-
 void ItemInfo::BringToFront()
 {
   if (ApIsHandle(hDialog_)) {
   }
 }
+
+//-------------------------
+
+void ItemInfo::RezToDestination(const String& sDestination)
+{
+  inventory_.SendRezToLocationRequest(hItem_, "xmpp:room@conference.osiris", sDestination, 200);
+}
+

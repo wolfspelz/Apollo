@@ -430,6 +430,38 @@ void Inventory::GetItemsPropertiesResponse(const ApHandle& hPanel, Apollo::SrpcM
   PlayModel();
 }
 
+void Inventory::SendRezToLocationRequest(const ApHandle& hItem, const String& sLocation, const String& sDestination, int nX)
+{
+  ApHandle hRequest = Apollo::newHandle();
+
+  RezToLocationRequest* pRequest = new RezToLocationRequest(this, hItem, sLocation, sDestination);
+  if (pRequest != 0) {
+    AddRequest(hRequest, pRequest);
+  }
+  
+  Msg_Gm_SendRequest msg;
+  msg.hRequest = hRequest;
+  msg.srpc.set(Srpc::Key::Method, Gm_ItemProtocol_RezToLocation);
+  msg.srpc.set("sInventory", Apollo::getModuleConfig(MODULE_NAME, "Name", ""));
+  msg.srpc.set("nItem", GetItemId(hItem));
+  msg.srpc.set("sLocation", sLocation);
+  msg.srpc.set("sDestination", sDestination);
+  msg.srpc.set("sX", nX);
+
+  if (!msg.Request()) {
+    DeleteRequest(hRequest);
+    throw ApException(LOG_CONTEXT, "Msg_Gm_SendRequest failed");
+  }
+}
+
+void Inventory::RezToLocationResponse(const ApHandle& hItem, const String& sLocation, const String& sDestination, Apollo::SrpcMessage& kvIdKeyValues)
+{
+  Item* pItem = FindItem(hItem);
+  if (pItem != 0) {
+    pItem->bRezzing_ = true;
+  }
+}
+
 //-------------------------
 
 void Inventory::PurgeModel()
