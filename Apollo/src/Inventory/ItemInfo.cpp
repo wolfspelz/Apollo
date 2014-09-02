@@ -79,15 +79,45 @@ void ItemInfo::OnModuleCall(Apollo::SrpcMessage& request, Apollo::SrpcMessage& r
       pItem->AddFieldsForDisplay(response);
     }
 
-  } else if (sMethod == "GetRezableDestinations") {
-    Apollo::KeyValueList kvDestinations;
-    kvDestinations.add(ApHandle(0, 1).toString(), "http://www.destination1.com/");
-    kvDestinations.add(ApHandle(0, 2).toString(), "http://www.destination2.com/");
-    response.set("kvDestinations", kvDestinations);
+  } else if (sMethod == "GetRezableLocations") {
+    Apollo::KeyValueList kvLocations;
 
-  } else if (sMethod == "RezItemToDestination") {
-    String sDestination = request.getString("sDestination");
-    RezToDestination(sDestination);
+    Msg_VpView_GetLocations msgVVGL;
+    if (!msgVVGL.Request()) {
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_VpView_GetLocations failed"));
+    } else {
+      for (Apollo::ValueElem* eLoc = 0; (eLoc = msgVVGL.vlLocations.nextElem(eLoc)) != 0; ) {
+
+        Msg_VpView_GetLocationContexts msgGLC;
+        msgGLC.hLocation = eLoc->getHandle();
+        if (!msgGLC.Request()) {
+          apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_VpView_GetLocationContexts failed for for loc=" ApHandleFormat "", ApHandlePrintf(msgGLC.hLocation)));
+        } else {
+          for (Apollo::ValueElem* eCtxt = 0; (eCtxt = msgGLC.vlContexts.nextElem(eCtxt)) != 0; ) {
+            Msg_VpView_GetContextDetail msgVVGCD;
+            msgVVGCD.hContext = eCtxt->getHandle();
+            msgVVGCD.sKey = Msg_VpView_ContextDetail_DocumentUrl;
+            if (!msgVVGCD.Request()) {
+              apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_VpView_GetContextDetail(Msg_VpView_ContextDetail_DocumentUrl) failed for for loc=" ApHandleFormat " ctxt=" ApHandleFormat "", ApHandlePrintf(msgGLC.hLocation), ApHandlePrintf(msgVVGCD.hContext)));
+            } else {
+              if (msgVVGCD.sValue) {
+                kvLocations.add(msgGLC.hLocation.toString(), msgVVGCD.sValue);
+                break;
+              }
+            }
+          }
+
+        }
+      }
+    }
+
+    //kvLocations.add(ApHandle(1, 23).toString(), "http://www.destination1.com/");
+    //kvLocations.add(ApHandle(4, 56).toString(), "http://www.destination2.com/");
+    response.set("kvLocations", kvLocations);
+
+  } else if (sMethod == "RezItemToLocation") {
+    ApHandle hLocation = request.getHandle("hLocation");
+    inventory_.RezToLocation(hItem_, hLocation);
 
   } else {
     throw ApException(LOG_CONTEXT, "Unknown Method=%s", _sz(sMethod));
@@ -98,12 +128,5 @@ void ItemInfo::BringToFront()
 {
   if (ApIsHandle(hDialog_)) {
   }
-}
-
-//-------------------------
-
-void ItemInfo::RezToDestination(const String& sDestination)
-{
-  inventory_.SendRezToLocationRequest(hItem_, "xmpp:room@conference.osiris", sDestination, 200);
 }
 

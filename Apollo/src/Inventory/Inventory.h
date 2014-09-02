@@ -87,6 +87,8 @@ protected:
   friend class InventoryModule;
   int ConsumeResponse(const ApHandle& hRequest, Apollo::SrpcMessage& response);
 
+  void RezToLocation(const ApHandle& hItem, const ApHandle& hLocation);
+  
   friend class GetPanelsRequest;
   void SendGetPanelsRequest();
   void GetPanelsResponse(Apollo::SrpcMessage& kvIdValues);

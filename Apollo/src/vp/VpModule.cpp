@@ -675,6 +675,25 @@ AP_MSG_HANDLER_METHOD(VpModule, Vp_LeaveLocation)
   pMsg->apStatus = ok ? ApMessage::Ok : ApMessage::Error;
 }
 
+//AP_MSG_HANDLER_METHOD(VpModule, Vp_GetLocationUrl)
+//{
+//  int ok = 0;
+//
+//  Location* pLocation = 0;  
+//  locations_.Get(pMsg->hLocation, pLocation);
+//
+//  if (pLocation == 0) {
+//    apLog_Warning((LOG_CHANNEL, LOG_CONTEXT, "loc=" ApHandleFormat " invalid", ApHandlePrintf(pMsg->hLocation)));
+//  } else {
+//
+//    pMsg->sLocationUrl = pLocation->getUrl();
+//    ok = 1;
+//
+//  }
+//
+//  pMsg->apStatus = ok ? ApMessage::Ok : ApMessage::Error;
+//}
+
 AP_MSG_HANDLER_METHOD(VpModule, Vp_FilterPublicChat)
 {
   int ok = 1;
@@ -1727,6 +1746,8 @@ int VpModule::init()
 
   AP_MSG_REGISTRY_ADD(MODULE_NAME, VpModule, Vp_EnterLocation, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, VpModule, Vp_LeaveLocation, this, ApCallbackPosNormal);
+
+//  AP_MSG_REGISTRY_ADD(MODULE_NAME, VpModule, Vp_GetLocationUrl, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, VpModule, Vp_FilterPublicChat, this, ApCallbackPosNormal);
 
   AP_MSG_REGISTRY_ADD(MODULE_NAME, VpModule, Protocol_Online, this, ApCallbackPosNormal);

@@ -107,6 +107,7 @@ public:
   void On_Vp_EnterLocation(Msg_Vp_EnterLocation* pMsg);
   void On_Vp_LeaveLocation(Msg_Vp_LeaveLocation* pMsg);
 
+//  void On_Vp_GetLocationUrl(Msg_Vp_GetLocationUrl* pMsg);
   void On_Vp_FilterPublicChat(Msg_Vp_FilterPublicChat* pMsg);
 
   void On_Protocol_Online(Msg_Protocol_Online* pMsg);
