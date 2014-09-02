@@ -13,6 +13,7 @@
 #include "MsgGm.h"
 #include "MsgWebView.h"
 #include "MsgDialog.h"
+#include "MsgVpView.h"
 #include "InventoryModule.h"
 
 #define MODULE_NAME "Inventory"

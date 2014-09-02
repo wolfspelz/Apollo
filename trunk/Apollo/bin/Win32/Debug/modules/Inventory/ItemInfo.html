@@ -48,9 +48,9 @@ function Start() {
   UpdateProperty('sRezzedDestination', msgProp.getString('sRezzedDestination'));
   UpdateProperty('sRezzedJid', msgProp.getString('sRezzedJid'));
 
-  var msgDest = api.ModuleCall('GetRezableDestinations').send();
-  var kvDestinations = msgDest.getKeyValueList('kvDestinations');
-  UpdateProperty('kvDestinations', kvDestinations);
+  var msgDest = api.ModuleCall('GetRezableLocations').send();
+  var kvLocations = msgDest.getKeyValueList('kvLocations');
+  UpdateProperty('kvLocations', kvLocations);
 }
 
 function UpdateProperty(sKey, value) {
@@ -88,9 +88,9 @@ function UpdateProperty(sKey, value) {
       $('.cRezzedJid .cValue').html(value != null ? '-' : value);
       break;
 
-    case 'kvDestinations':
+    case 'kvLocations':
       for (var i in value) {
-        $('.cRezToLocation .cList').append('<p> <a href="#" onclick="RezItemToDestination(\'' + value[i] + '\');">' + value[i] + '</a></p>');
+        $('.cRezToLocation .cList').append('<p> <a href="#" onclick="RezItemToLocation(\'' + i + '\');">' + value[i] + '</a></p>');
       }
       break;
 
@@ -98,8 +98,8 @@ function UpdateProperty(sKey, value) {
   }
 }
 
-function RezItemToDestination(sDestination) {
-  api.ModuleCall('RezItemToDestination').setString('sDestination', sDestination).send();
+function RezItemToLocation(hLocation) {
+  api.ModuleCall('RezItemToLocation').setString('hLocation', hLocation).send();
 }
 
 </script>

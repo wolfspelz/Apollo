@@ -109,6 +109,16 @@ public:
   ApIN ApHandle hLocation;
 };
 
+// -> vp
+// Resolve document URL to location URL
+//class Msg_Vp_GetLocationUrl: public ApRequestMessage
+//{
+//public:
+//  Msg_Vp_GetLocationUrl() : ApRequestMessage("Vp_GetLocationUrl") {}
+//  ApIN ApHandle hLocation;
+//  ApOUT String sLocationUrl;
+//};
+
 // vp -> vp
 // Process chat command
 class Msg_Vp_FilterPublicChat: public ApFilterMessage

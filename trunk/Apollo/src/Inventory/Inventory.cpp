@@ -430,6 +430,51 @@ void Inventory::GetItemsPropertiesResponse(const ApHandle& hPanel, Apollo::SrpcM
   PlayModel();
 }
 
+void Inventory::RezToLocation(const ApHandle& hItem, const ApHandle& hLocation)
+{
+  String sLocation;
+  String sDestination;
+
+  {
+    Msg_VpView_GetLocationDetail VVGLDmsg;
+    VVGLDmsg.hLocation = hLocation;
+    VVGLDmsg.sKey = Msg_VpView_LocationDetail_LocationUrl;
+    ApOUT String sValue;
+    ApOUT String sMimeType;
+    if (!VVGLDmsg.Request()) {
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_VpView_GetLocationDetail(Msg_VpView_LocationDetail_LocationUrl) failed for loc=" ApHandleFormat " item=" ApHandleFormat "", ApHandlePrintf(hLocation), ApHandlePrintf(hItem)));
+    } else {
+      sLocation = VVGLDmsg.sValue;
+    }
+  }
+
+  {
+    Msg_VpView_GetLocationContexts msg;
+    msg.hLocation = hLocation;
+    if (!msg.Request()) {
+      apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_VpView_GetLocationContexts failed for for loc=" ApHandleFormat " item=" ApHandleFormat "", ApHandlePrintf(hLocation), ApHandlePrintf(hItem)));
+    } else {
+      for (Apollo::ValueElem* e = 0; (e = msg.vlContexts.nextElem(e)) != 0; ) {
+        Msg_VpView_GetContextDetail msgVVGCD;
+        msgVVGCD.hContext = e->getHandle();
+        msgVVGCD.sKey = Msg_VpView_ContextDetail_DocumentUrl;
+        if (!msgVVGCD.Request()) {
+          apLog_Error((LOG_CHANNEL, LOG_CONTEXT, "Msg_VpView_GetContextDetail(Msg_VpView_ContextDetail_DocumentUrl) failed for for loc=" ApHandleFormat " item=" ApHandleFormat "", ApHandlePrintf(hLocation), ApHandlePrintf(hItem)));
+        } else {
+          if (msgVVGCD.sValue) {
+            sDestination = msgVVGCD.sValue;
+            break;
+          }
+        }
+      }
+    }
+  }
+
+  if (sLocation && sDestination) {
+    SendRezToLocationRequest(hItem, sLocation, sDestination, 300);
+  }
+}
+
 void Inventory::SendRezToLocationRequest(const ApHandle& hItem, const String& sLocation, const String& sDestination, int nX)
 {
   ApHandle hRequest = Apollo::newHandle();
