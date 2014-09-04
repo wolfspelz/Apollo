@@ -82,6 +82,9 @@ JavaScriptCore_debug.pdb
 log.dll
 log.ilk
 log.pdb
+LogWindow.dll
+LogWindow.ilk
+LogWindow.pdb
 navigation.dll
 navigation.ilk
 navigation.pdb

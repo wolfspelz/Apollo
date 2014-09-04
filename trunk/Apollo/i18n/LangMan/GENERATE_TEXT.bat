@@ -1,5 +1,5 @@
 REM For all modules
-FOR %%i IN (Arena,Chat,Setup,Inventory) DO CALL Module.bat %%i 
+FOR %%i IN (LogWindow,Arena,Chat,Setup,Inventory) DO CALL Module.bat %%i 
 
 REM AvatarTray is not a module
 java -jar LangMan.jar -v -p AvatarTray -l en -l de -l ja

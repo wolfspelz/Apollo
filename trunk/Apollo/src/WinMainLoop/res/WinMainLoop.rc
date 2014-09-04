@@ -19,10 +19,8 @@
 // German (Germany) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_DEU)
-#ifdef _WIN32
 LANGUAGE LANG_GERMAN, SUBLANG_GERMAN
 #pragma code_page(1252)
-#endif //_WIN32
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -38,7 +36,7 @@ IDI_MAIN                ICON                    "Main.ico"
 // Menu
 //
 
-IDC_WIN32APP MENU 
+IDC_WIN32APP MENU
 BEGIN
     POPUP "&File"
     BEGIN
@@ -49,6 +47,7 @@ BEGIN
         MENUITEM "Options",                     ID_TOOLS_OPTIONS, GRAYED
         MENUITEM "Test",                        ID_TOOLS_TEST
         MENUITEM "Setup",                       ID_TOOLS_DISPLAY
+        MENUITEM "Log",                         ID_TOOLS_LOG
     END
 END
 
@@ -58,7 +57,7 @@ END
 // Accelerator
 //
 
-IDC_WIN32APP ACCELERATORS 
+IDC_WIN32APP ACCELERATORS
 BEGIN
     "?",            IDM_ABOUT,              ASCII,  ALT
     "/",            IDM_ABOUT,              ASCII,  ALT
@@ -70,7 +69,7 @@ END
 // Dialog
 //
 
-IDD_ABOUTBOX DIALOG  22, 17, 230, 75
+IDD_ABOUTBOX DIALOG 22, 17, 230, 75
 STYLE DS_SETFONT | DS_MODALFRAME | WS_CAPTION | WS_SYSMENU
 CAPTION "About"
 FONT 8, "System"
@@ -116,7 +115,7 @@ END
 // String Table
 //
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_APP_TITLE           "Win32App"
     IDS_HELLO               "Hello World!"

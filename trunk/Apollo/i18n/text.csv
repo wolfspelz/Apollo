@@ -1,6 +1,8 @@
 "#ä";;;;;;;;;;;;;;;;;;;;
 ;"Part";"Changed";"Key";"Reference";"Comment";"Limit";"en";"enDev";"de";"deFormal";"es";"pt";"it";"fr";"ja";"pl";"en-us";"es-us";"zh";"tr"
 "#";;;;;;;;;;;;;;;;;;;;
+;"LogWindow";;"Log Window";;"Log window dialog caption";25;"Log Window";;"Logging";;;;;;;;;;;
+"#";;;;;;;;;;;;;;;;;;;;
 ;"Arena";;"Hello World";;"For testing only";;"Hello World";;"Hallo Welt";;;;;;"ハローワールド";;;;;
 ;"Arena";;"Send";;"Chat input at avatar";10;"Send";;"Senden";;;;;;"送信";;;;;
 ;"Arena";;"Things";;"Virtual items window";10;"My things";;"Meine Sachen";;;;;;"送信";;;;;
