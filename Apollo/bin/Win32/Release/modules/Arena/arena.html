@@ -2,10 +2,10 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-<script src="../WebView/jquery-1.5.1.min.js"></script> 
-<script src="../WebView/jquery-ui-1.8.13.custom.min.js"></script> 
+<script type="text/javascript" src="../WebView/jquery-1.5.1.min.js"></script> 
+<script type="text/javascript" src="../WebView/jquery-ui-1.8.13.custom.min.js"></script> 
 <script type="text/javascript" src="jquery.contextMenu.js"></script>
-<script type="text/javascript" src="utils.js"></script>
+<script type="text/javascript" src="../WebView/utils.js"></script>
 <script type="text/javascript" src="../WebView/apollo.js"></script>
 <script type="text/javascript" src="arena.js"></script>
 <link rel='stylesheet' href='arena.css' type='text/css' media='all' />
@@ -43,6 +43,8 @@ function DispatchMessage(msg)
     case 'SetLocationUrl': return arena.SetLocationUrl(msg.getString('sUrl')); break;
     case 'SetLocationState': return arena.SetLocationState(msg.getString('sState')); break;
 
+    case 'HiliteItemDropArea': return arena.HiliteItemDropArea(msg.getInt('bShow')); break;
+
     default: throw 'Unknown method: ' + sMethod;
   }
 }
@@ -71,12 +73,16 @@ function Start()
 
 function ShowDebug(bShow)
 {
-  if (bShow){
+  //api.Log.Debug('ShowDebug ' + bShow);
+
+  if (bShow) {
+    $('#iItemDropArea').css('right', '800px');
     $('#iContent').css('right', '800px');
     $('#iControl').css('display', '');
     $('#iOut').css('display', '');
     $('#iLogCheck').attr('checked', 'checked');
   } else {
+    $('#iItemDropArea').css('right', '100px');
     $('#iContent').css('right', '100px');
     $('#iControl').css('display', 'none');
     $('#iOut').css('display', 'none');
@@ -115,6 +121,18 @@ body
   -webkit-box-shadow:inset 0 0 1px 1px #0000FF;
 }
 
+#iItemDropArea
+{
+  position:absolute;
+  left:100px;
+  right:100px;
+  bottom:0px;
+  height:100px;
+  background-color:rgba(128,255,128,0.3);
+  x-webkit-box-shadow:inset 0 0 3px 3px #FF0000;
+  visibility:hidden;
+}
+
 #iControl
 {
   position:absolute; right:600px; width:190px; top:0px; bottom:0px;
@@ -140,6 +158,7 @@ body
 <div id="iWrapper">
 
   <div id="iContent" class="cContent"></div>
+  <div id="iItemDropArea" class="cItemDropArea"></div>
 
   <div id="iControl" style="display:none;">
     <input type="button" value="Quit" onclick="api.Message('MainLoop_EndLoop').send();" />

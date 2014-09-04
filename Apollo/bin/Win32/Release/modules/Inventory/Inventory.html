@@ -1,13 +1,72 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
+<title></title>
 <script type="text/javascript" src="../WebView/jquery-1.5.1.min.js"></script>
+<script type="text/javascript" src="../WebView/jquery-ui-1.8.13.custom.min.js"></script> 
+<script type="text/javascript" src="../WebView/utils.js"></script>
 <script type="text/javascript" src="../WebView/apollo.js"></script>
-<link type='text/css' rel='stylesheet' href='Inventory.css' media='all' />
+<link type="text/css" rel="stylesheet" href="Inventory.css" />
+
+<style type="text/css">
+#Wrapper {
+  position:absolute;
+  left:0px;
+  top:0px;
+  right:0px;
+  bottom:0px;
+  border: solid 1px #D0D0D0;
+  background-color:#ffffff;
+  padding:0px;
+}
+
+.Items
+{
+  position:absolute;
+  left:0px;
+  top:0px;
+  right:0px;
+  bottom:0px;
+}
+
+.Panel .Name 
+{
+  display:none;
+}
+
+.Item {
+  float: left;
+  border: solid 1px #D0D0D0;
+  background-color:#ffffff;
+  margin: 1px;
+  padding: 2px;
+  overflow: hidden;
+}
+
+.Item img.Icon {
+  margin-right: 4px;
+}
+
+.Panel .Item .Name 
+{
+  display:inline;
+}
+
+.Item .Nickname 
+{
+  font-weight:bold;
+}
+
+.Item .Stacksize {
+  float: right;
+  margin-left: 2px;
+}
+
+</style>
 
 <script type="text/javascript">
 
-var api = new ApolloApi('Chat');
+var api = new ApolloApi('Inventory');
 
 function ReceiveMessageFromModule(sMsg) {
   //api.Log.Debug('ReceiveMessageFromModule ' + sMsg);
@@ -20,11 +79,11 @@ function ReceiveMessageFromModule(sMsg) {
     var sMethod = msg.getString('Method');
     switch (sMethod) {
       case 'Start': return Start(); break;
-      case 'PurgeGrids': return PurgeGrids(); break;
-      case 'AddGrid': return AddGrid(msg.getString('Grid'), msg.getString('Name'), msg.getInt('Order'), msg.getInt('Slots')); break;
-      case 'RemoveGrid': return RemoveGrid(msg.getString('Grid')); break;
-      case 'AddItem': return AddItem(msg.getString('Grid'), msg.getString('Item'), msg); break;
-      case 'RemoveItem': return RemoveItem(msg.getString('Grid'), msg.getString('Item')); break;
+      case 'PurgePanels': return PurgePanels(); break;
+      case 'AddPanel': return AddPanel(msg.getString('hPanel'), msg.getString('sName'), msg.getInt('nOrder'), msg.getInt('nSlots')); break;
+      case 'RemovePanel': return RemovePanel(msg.getString('hPanel')); break;
+      case 'AddItem': return AddItem(msg.getString('hPanel'), msg.getString('hItem'), msg.getString('sName'), msg.getString('sIcon'), msg.getInt('nSlot'), msg.getInt('nStacksize')); break;
+      case 'RemoveItem': return RemoveItem(msg.getString('hPanel'), msg.getString('hItem')); break;
       default: throw 'Unknown method: ' + sMethod;
     }
 
@@ -39,47 +98,153 @@ function ReceiveMessageFromModule(sMsg) {
 }
 
 function Start() {
-  api = new ApolloApi('Inventory');
-  api.ModuleCall('PlayModel').send();
+  api.ModuleCall('OnPlayModel').send();
 }
 
-function PurgeGrids() {
+function PurgePanels() {
   $('#Wrapper').empty();
 }
 
-function AddGrid(sGridId, sName, nOrder, nSlots) {
+function AddPanel(hPanel, sName, nOrder, nSlots) {
   $('#Wrapper').append(''
-        + '<div id="Grid_' + sGridId + '" class="Grid">'
+        + '<div id="Panel_' + hPanel.toDomCompatible() + '" class="Panel">'
         + '  <div class="Name">' + sName + '</div>'
         + '  <div class="Items"></div>'
         + '</div>'
       );
 }
 
-function RemoveGrid(sGridId) {
-  $('#Grid_' + sGridId).remove();
+function RemovePanel(hPanel) {
+  $('#Panel_' + hPanel.toDomCompatible()).remove();
 }
 
-function AddItem(sGridId, sItemId, props) {
-  var sName = props.getString('Name');
-  var sNickname = props.getString('Nickname');
-  var sIcon = props.getString('Icon32Url');
-  var nSlot = props.getInt('Slot');
-  var nStacksize = props.getInt('Stacksize');
+function AddItem(hPanel, hItem, sName, sIcon, nSlot, nStacksize) {
+  var sId = 'Item_' + hItem.toDomCompatible();
 
-  $('#Grid_' + sGridId).append(''
-        + '<div id="Item_' + sItemId + '" class="Item">'
-        + '  <img src="' + sIcon + '" class="Icon" />'
-        + '  <div class="Stacksize">' + nStacksize + '</div>'
-        + (sNickname != '' ? '  <div class="Nickname">' + sNickname + '</div>' : '')
-        + '  <div class="Name">' + sName + '</div>'
-        + '</div>'
-      );
+  $('#Panel_' + hPanel.toDomCompatible()).append(''
+      + '<div id="' + sId + '" class="Item">'
+      + '  <img src="' + sIcon + '" class="Icon" title="' + sName + '" alt="' + sName + '" />'
+//      + '  <div class="Stacksize">' + nStacksize + '</div>'
+//      + '  <div class="Name">' + sName + '</div>'
+//      + '  <div class="ItemId">' + hItem + '</div>'
+//      + '  <input type="button" class="Drag" value="Drag"/>'
+      + '</div>'
+    );
+
+  $('#' + sId).hover(function () {
+    $(this).stop().animate({ opacity: 0.5 }, 100);
+  },
+  function () {
+    $(this).stop().animate({ opacity: 1.0 }, 100);
+  });
+
+  $('#' + sId).click(
+    function (ev) {
+      api.ModuleCall('OpenItemInfo')
+       .setString('hItem', hItem)
+       .setInt('nMouseX', ev.pageX)
+       .setInt('nMouseY', ev.pageY)
+       .send();
+    });
+
+  //  $('#Item_' + hItem.toDomCompatible() + ' .Drag').mousedown(
+//  //$('#Item_' + hItem.toDomCompatible() + ' .Icon').mousedown(
+//    function (ev) {
+//      api.Log.Debug('OnDragItem');
+//      OnDragItem(hItem, ev.pageX, ev.pageY);
+//    });
+
+  //  $('#Item_' + hItem.toDomCompatible()).mousedown(
+  //    function (ev) {
+  //      //api.Log.Debug('pageX=' + ev.pageX + ' pageY=' + ev.pageY);
+  //      OnDragItem(hItem, ev.pageX, ev.pageY);
+  //    });
+
+  var nPinX = 16;
+  var nPinY = 16;
+
+  $('#' + sId).draggable({
+    iframeFix: true,
+    distance: 4,
+    stack: 'div',
+    opacity: 0.7,
+    scroll: false,
+    //revert: true,
+    //helper: 'clone',
+    //delay: 200,
+    //grid: [108, 108],
+    cursor: 'move',
+    xcursorAt: { top: 16, left: 16 },
+    containment: '#Panel_' + hPanel.toDomCompatible() + ' .Items'
+//hw DragDropInventoryItem
+//    ,
+//    start: function (ev) {
+//      var off = $(this).offset();
+//      var nMouseX = ev.pageX;
+//      var nMouseY = ev.pageY;
+//      var nPinX = ev.pageX - off.left;
+//      var nPinY = ev.pageY - off.top;
+//      api.Log.Debug('draggable.start ' + nPinX + ' ' + nPinY);
+//      OnDragItem(hItem, nMouseX, nMouseY, nPinX, nPinY);
+//      return false;
+//    },
+//    drag: function (ev) {
+//      var nBorder = 4;
+//      var eParent = this.offsetParent;
+//      var nLeft = eParent.offsetLeft - nBorder;
+//      var nTop = eParent.offsetTop - nBorder;
+//      var nRight = nLeft + eParent.offsetWidth + nBorder;
+//      var nBottom = nTop + eParent.offsetHeight + nBorder;
+//      var nMouseX = ev.pageX;
+//      var nMouseY = ev.pageY;
+//      var bInside = true;
+//      if (nMouseX < nLeft || nMouseX > nRight) { bInside = false; }
+//      if (nMouseY < nTop || nMouseY > nBottom) { bInside = false; }
+//      api.Log.Debug('draggable.drag ' + nMouseX + ' ' + nMouseY);
+//      if (!bInside) {
+//        OnDragItem(hItem, nMouseX, nMouseY, nPinX, nPinY);
+//        $('#Item_' + hItem.toDomCompatible()).hide();
+//        return false;
+//      }
+//    },
+//    stop: function (ev) {
+//      api.Log.Debug('draggable.stop ');
+//    }
+  });
 }
 
-function RemoveItem(sGridId, sItemId) {
-  $('#Item_' + sItemId).remove();
+function RemoveItem(hPanel, hItem) {
+  $('#Item_' + hItem.toDomCompatible()).remove();
 }
+
+// -----------------------------------------------
+
+//hw DragDropInventoryItem
+//function OnDragItem(hItem, nMouseX, nMouseY, nPinX, nPinY) {
+//  var eItem = $('#Item_' + hItem.toDomCompatible());
+//  var off = eItem.offset();
+//  var nLeft = off.left;
+//  var nTop = off.top;
+//  var nWidth = eItem.width();
+//  var nHeight = eItem.height();
+//  var nOffsetX = nMouseX - nLeft;
+//  var nOffsetY = nMouseY - nTop;
+//  api.Log.Debug('offset: ' + off.left + ' ' + off.top);
+//  api.Log.Debug('size: ' + nWidth + ' ' + nHeight);
+//  api.Log.Debug('mouse: ' + nOffsetX + ' ' + nOffsetY);
+
+//  api.ModuleCall('OnDragItem')
+//     .setString('hItem', hItem)
+//     .setInt('nLeft', nLeft)
+//     .setInt('nTop', nTop)
+//     .setInt('nWidth', nWidth)
+//     .setInt('nHeight', nHeight)
+//     .setInt('nMouseX', nMouseX)
+//     .setInt('nMouseY', nMouseY)
+//     .setInt('nPinX', nPinX)
+//     .setInt('nPinY', nPinY)
+//     .send();
+//}
 
 // -----------------------------------------------
 

@@ -1,2 +1,18 @@
 #ässert utf-8
-Inventory=在庫品
+Inventory=库存
+Your Inventory=在庫品
+Item=Item
+ItemName.CoffeeMachine=Coffee Machine
+ItemProperty.Name=Name
+ItemProperty.Stacksize=Stacksize
+ItemProperty.Slot=Slot
+ItemProperty.IsRezable=Installable
+ItemProperty.Rez=Install
+ItemProperty.Rezzed=Installed
+ItemProperty.RezzedDestination=Location
+ItemProperty.RezzedJid=JID
+ItemPropertyValue.yes=yes
+ItemPropertyValue.no=no
+ItemPropertyValueUnit.Seconds=Seconds
+ItemAction.Produce=Produce
+ItemDialog.Rez=Install
