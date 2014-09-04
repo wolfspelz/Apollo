@@ -1,5 +1,7 @@
 
 Core/Modules/00100/WinMainLoop/Path=WinMainLoop
+  Core/Modules/00100/QMainLoop/Path=QMainLoop
+Core/Modules/00110/timer/Path=timer
 Core/Modules/00200/SrpcGate/Path=srpcgate
 Core/Modules/00300/log/Path=log
 Core/Modules/00400/Db/Path=db
@@ -20,13 +22,14 @@ Core/Modules/02000/BrowserInfo/Path=browserinfo
 Core/Modules/02100/Navigation/Path=navigation
 Core/Modules/02200/Gm/Path=gm
 Core/Modules/02300/Galileo/Path=Galileo
-Core/Modules/02700/WebView/Path=WebView
-Core/Modules/02800/Arena/Path=Arena
-Core/Modules/02900/Chat/Path=Chat
-Core/Modules/03000/Dialog/Path=Dialog
-Core/Modules/03100/TestDialog/Path=TestDialog
-Core/Modules/03200/Setup/Path=Setup
-Core/Modules/03300/Inventory/Path=Inventory
+Core/Modules/02400/WebView/Path=WebView
+Core/Modules/02500/Dialog/Path=Dialog
+Core/Modules/10100/LogWindow/Path=LogWindow
+Core/Modules/10200/Arena/Path=Arena
+Core/Modules/10300/Chat/Path=Chat
+Core/Modules/10400/TestDialog/Path=TestDialog
+Core/Modules/10500/Setup/Path=Setup
+Core/Modules/10600/Inventory/Path=Inventory
 
 Core/ModulesDirectory=modules
 
