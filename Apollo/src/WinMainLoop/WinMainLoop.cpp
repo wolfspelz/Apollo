@@ -14,6 +14,7 @@
 #include "MsgMainLoop.h"
 #include "MsgSystem.h"
 #include "MsgSetup.h"
+#include "MsgLogWindow.h"
 
 #if defined(WIN32)
 static HINSTANCE g_hDllInstance = NULL;
@@ -170,6 +171,10 @@ LRESULT MainLoopModule::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 
     case ID_TOOLS_DISPLAY:
       { Msg_Setup_Open msg; msg.Request(); }
+      break;
+
+    case ID_TOOLS_LOG:
+      { Msg_LogWindow_Open msg; msg.Request(); }
       break;
 
     default:

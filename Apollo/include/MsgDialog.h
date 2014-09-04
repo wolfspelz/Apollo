@@ -4,8 +4,8 @@
 //
 // ============================================================================
 
-#if !defined(MsgSample_h_INCLUDED)
-#define MsgSample_h_INCLUDED
+#if !defined(MsgDialog_h_INCLUDED)
+#define MsgDialog_h_INCLUDED
 
 #include "ApMessage.h"
 
@@ -148,4 +148,4 @@ public:
   ApIN ApHandle hDialog;
 };
 
-#endif // !defined(MsgSample_h_INCLUDED)
+#endif // !defined(MsgDialog_h_INCLUDED)

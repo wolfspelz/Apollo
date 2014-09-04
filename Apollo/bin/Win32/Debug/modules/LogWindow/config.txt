@@ -1,0 +1,10 @@
+CallScriptSrpcFunctionName=ReceiveMessageFromModule
+
+Left=300
+Top=300
+Width=600
+Height=400
+
+Language/en=[[MODULE_RESOURCE_PATH]]/en.txt
+Language/de=[[MODULE_RESOURCE_PATH]]/de.txt
+Language/ja=[[MODULE_RESOURCE_PATH]]/ja.txt

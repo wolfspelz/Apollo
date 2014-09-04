@@ -1,0 +1,114 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<script type="text/javascript" src="../WebView/apollo.js"></script>
+<script type="text/javascript" src="../WebView/jquery-1.5.1.min.js"></script>
+<title>LogWindow</title>
+
+<style type="text/css">
+    
+* {
+  margin:0; padding:0;
+  font-family:Consolas, Lucida Console, Courier New, Courier, Sans-Serif;
+  font-size:12px;
+}
+
+#Wrapper {
+  position:absolute;
+  left:4px;
+  top:4px;
+  right:4px;
+  bottom:4px
+  }
+
+#Out {
+  width:100%;
+  position:absolute;
+  top:20px;
+  bottom:0px;
+  }
+
+#Clear {
+  padding:1px 1px;
+  }
+
+.cLine {
+  }
+
+.cLevel {
+  color:#c0c0c0;
+  }
+
+.cChannel {
+  color:#c0c0c0;
+  }
+
+.cContext {
+  color:#808080;
+  }
+
+.cMessage {
+  color:#000000;
+  }
+
+</style>
+<script type="text/javascript">
+
+var api = new ApolloApi('LogWindow');
+
+$(document).ready(function () {
+  $('#Clear').click(function (ev) {
+    Clear();
+  });
+});
+
+function ReceiveMessageFromModule(sMsg)
+{
+//  api.Log.Debug('ReceiveMessageFromModule ' + sMsg)
+  var msg = new ApMessage().fromString(sMsg);
+  var resp = null;
+
+  try {
+  
+    var sMethod = msg.getString('Method');
+    switch (sMethod) {
+      case 'Line': Line(msg.getString('sLevel'), msg.getString('sChannel'), msg.getString('sContext'), msg.getString('sMessage')); break;
+      case 'Clear': Clear(); break;
+      default: throw 'Unknown method: ' + sMethod;
+    }
+
+  } catch (ex) {
+    resp = new ApMessage().setInt('Status', 0).setString('Message', String(ex));
+  }
+
+  if (resp != null) {
+    var sResponse = resp.toString();
+    return sResponse;
+  }
+}
+
+function Line(sLevel, sChannel, sContext, sMessage)
+{
+  $('#Out').append('<div class="cLine">'
+  + '<span class="cLevel">' + sLevel + '</span> '
+  + '<span class="cLevel">' + sChannel + '</span> '
+  + '<span class="cContext">' + sContext + '</span> '
+  + '<span class="cMessage">' + sMessage + '</span> '
+  + '</div>');
+}
+
+function Clear(sLevel, sChannel, sContext, sMessage)
+{
+  $('#Out').html('');
+}
+</script>
+
+</head>
+
+<body>
+<div id="Wrapper">
+  <input type="button" id="Clear" name="Clear" value="Clear"/>  <div id="Out"></div>
+</div>
+</body>
+
+</html>
