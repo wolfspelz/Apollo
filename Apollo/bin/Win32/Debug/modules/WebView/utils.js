@@ -110,7 +110,7 @@ var Log = {
     INFO: 6, // few per sec
     IO: 7, // network I/O
     TRACE: 8, // (many) method calls
-    VERBOSE: 9, // 100 per sec
+    VERBOSE: 9 // 100 per sec
   },
   
   Prefix: [
@@ -123,7 +123,7 @@ var Log = {
     'INFO.',
     'IO...',
     'TRACE',
-    '.....',
+    '.....'
   ],
   
   Fatal: function(sText) { Log.instance.Out(Log.Level.FATAL, sText); },
@@ -142,7 +142,7 @@ var Log = {
       Log.instance = new Logger(sDestinationDomId, sGateCheckboxDomId);
     }
     return Log.instance;
-  },
+  }
 }
 
 // ---------------------------------------------------
@@ -276,6 +276,6 @@ var Observable_Tester = {
     if (sMsg !=  'a=b&c=1') {
       return '$.param(msg) returned "' + sMsg + '"';
     }
-  },
+  }
 }
 

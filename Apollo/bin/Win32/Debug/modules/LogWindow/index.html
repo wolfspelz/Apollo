@@ -23,16 +23,15 @@
 
 #Out {
   width:100%;
-  position:absolute;
-  top:20px;
-  bottom:0px;
   }
 
-#Clear {
-  padding:1px 1px;
+#Wrapper input[type=button] {
+  padding:1px 3px;
   }
 
 .cLine {
+  text-indent:-4em;
+  padding-left:4em;
   }
 
 .cLevel {
@@ -56,40 +55,36 @@
 
 var api = new ApolloApi('LogWindow');
 
+var nCount = 0;
+
+var LogLevels = {
+  Fatal: 1,
+  Error: 2,
+  Warning: 3,
+  User: 4,
+  Debug: 5,
+  Info: 6,
+  Verbose: 7
+}
+
 $(document).ready(function () {
+
   $('#Clear').click(function (ev) {
     Clear();
   });
+
+  for (var i in LogLevels) {
+    $('#Level' + i).click(function (ev) {
+      SetMask();
+    });
+  }
+
 });
-
-function ReceiveMessageFromModule(sMsg)
-{
-//  api.Log.Debug('ReceiveMessageFromModule ' + sMsg)
-  var msg = new ApMessage().fromString(sMsg);
-  var resp = null;
-
-  try {
-  
-    var sMethod = msg.getString('Method');
-    switch (sMethod) {
-      case 'Line': Line(msg.getString('sLevel'), msg.getString('sChannel'), msg.getString('sContext'), msg.getString('sMessage')); break;
-      case 'Clear': Clear(); break;
-      default: throw 'Unknown method: ' + sMethod;
-    }
-
-  } catch (ex) {
-    resp = new ApMessage().setInt('Status', 0).setString('Message', String(ex));
-  }
-
-  if (resp != null) {
-    var sResponse = resp.toString();
-    return sResponse;
-  }
-}
 
 function Line(sLevel, sChannel, sContext, sMessage)
 {
-  $('#Out').append('<div class="cLine">'
+  $('#Out').prepend('<div class="cLine">'
+  + '<span class="cCount">' + nCount++ + '</span> '
   + '<span class="cLevel">' + sLevel + '</span> '
   + '<span class="cLevel">' + sChannel + '</span> '
   + '<span class="cContext">' + sContext + '</span> '
@@ -97,9 +92,32 @@ function Line(sLevel, sChannel, sContext, sMessage)
   + '</div>');
 }
 
-function Clear(sLevel, sChannel, sContext, sMessage)
+function Clear()
 {
+  InitMask();
   $('#Out').html('');
+  nCount = 1;
+}
+
+function InitMask() {
+  var nMask = api.Message('Config_GetValue').setString('sPath', 'LogWindow/Mask').send().getInt('sValue');
+  for (var i in LogLevels) {
+    if (nMask & 1 << LogLevels[i]) {
+      $('#Level' + i).attr('checked', 'checked');
+    } else {
+      $('#Level' + i).removeAttr('checked');
+    }
+  }
+}
+
+function SetMask() {
+  var nMask = 0;
+  for (var i in LogLevels) {
+    if ($('#Level' + i).is(':checked')) {
+      nMask += 1 << LogLevels[i];
+    }
+  }
+  var resp = api.Message('LogWindow_SetFilterMask').setInt('nMask', nMask).send();
 }
 </script>
 
@@ -107,7 +125,14 @@ function Clear(sLevel, sChannel, sContext, sMessage)
 
 <body>
 <div id="Wrapper">
-  <input type="button" id="Clear" name="Clear" value="Clear"/>  <div id="Out"></div>
+  <input type="button" id="Clear" name="Clear" value="Clear"/>  <input type="checkbox" id="LevelFatal" /> Fatal
+  <input type="checkbox" id="LevelError" /> Error
+  <input type="checkbox" id="LevelWarning" /> Warning
+  <input type="checkbox" id="LevelUser" /> User
+  <input type="checkbox" id="LevelDebug" /> Debug
+  <input type="checkbox" id="LevelInfo" /> Info
+  <input type="checkbox" id="LevelVerbose" /> Verbose
+  <br />  <div id="Out"></div>
 </div>
 </body>
 

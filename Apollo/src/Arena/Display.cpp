@@ -345,7 +345,7 @@ void Display::OnModuleCall(Apollo::SrpcMessage& request, Apollo::SrpcMessage& re
   } else {
     String sMethod = request.getString(Srpc::Key::Method);
 
-    if (0){
+    if (0) {
     } else if (sMethod == "OnShowDebugTools") {
       OnShowDebugTools(request.getInt("bShow"));
 
@@ -408,7 +408,7 @@ void Display::OnNavigatorCallDisplay(Apollo::SrpcMessage& request, Apollo::SrpcM
 {
   String sMethod = request.getString(Srpc::Key::Method);
 
-  if (0){
+  if (0) {
   } else if (sMethod == "ShowChat") {
     int bShow = request.getInt("bShow");
     OnShowChatWindow(bShow);
