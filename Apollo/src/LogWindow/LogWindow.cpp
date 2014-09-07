@@ -12,6 +12,7 @@
 #include "MsgTranslation.h"
 #include "MsgLog.h"
 #include "MsgWebView.h"
+#include "MsgSystem.h"
 #include "SrpcGateHelper.h"
 #include "SrpcMessage.h"
 
@@ -70,6 +71,7 @@ public:
   void On_LogWindow_SetFilterMask(Msg_LogWindow_SetFilterMask* pMsg);
   void On_Dialog_OnOpened(Msg_Dialog_OnOpened* pMsg);
   void On_Dialog_OnClosed(Msg_Dialog_OnClosed* pMsg);
+  void On_System_RunLevel(Msg_System_RunLevel* pMsg);
   void On_Log_Line(Msg_Log_Line* pMsg);
 
 protected:
@@ -135,6 +137,8 @@ AP_MSG_HANDLER_METHOD(LogWindow, Dialog_OnOpened)
 {
   if (pMsg->hDialog == hView_) {
 
+    Apollo::setModuleConfig(MODULE_NAME, "Open", 1);
+
     Msg_Dialog_CallScriptFunction msg;
     msg.hDialog = hView_;
     msg.sFunction = "Clear";
@@ -149,6 +153,16 @@ AP_MSG_HANDLER_METHOD(LogWindow, Dialog_OnClosed)
   if (pMsg->hDialog == hView_) {
     bReady_ = false;
     hView_ = ApNoHandle;
+    Apollo::setModuleConfig(MODULE_NAME, "Open", 0);
+  }
+}
+
+AP_MSG_HANDLER_METHOD(LogWindow, System_RunLevel)
+{
+  if (pMsg->sLevel == Msg_System_RunLevel_Normal) {
+    if (Apollo::getModuleConfig(MODULE_NAME, "Open", 0)) {
+      Msg_LogWindow_Open msg; msg.Request();
+    }
   }
 }
 
@@ -221,6 +235,7 @@ int LogWindow::Init()
   AP_MSG_REGISTRY_ADD(MODULE_NAME, LogWindow, LogWindow_SetFilterMask, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, LogWindow, Dialog_OnOpened, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, LogWindow, Dialog_OnClosed, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, LogWindow, System_RunLevel, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, LogWindow, Log_Line, this, ApCallbackPosNormal);
 
   srpcGateRegistry_.add("LogWindow_Open", SrpcGate_LogWindow_Open);

@@ -1,3 +1,4 @@
+Open=0
 Mask=254
 
 Left=300
