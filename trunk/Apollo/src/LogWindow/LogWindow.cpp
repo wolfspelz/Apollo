@@ -36,9 +36,9 @@ static AP_MODULE_INFO g_info = {
   ,
   MODULE_NAME, // szName
   "LogWindow", // szServices
-  "LogWindow Module", // szLongName
+  "Log window module", // szLongName
   "1", // szVersion
-  "Show a log window singleton.", // szDescription
+  "Show a (singleton) log window.", // szDescription
   PROJECT_Author,
   PROJECT_Email,
   PROJECT_Copyright,
@@ -59,6 +59,7 @@ public:
   LogWindow()
     :bReady_(false)
     ,bInside_(false)
+    ,nMask_(-1)
   {}
 
   int Init();
@@ -66,15 +67,16 @@ public:
 
   void On_LogWindow_Open(Msg_LogWindow_Open* pMsg);
   void On_LogWindow_Close(Msg_LogWindow_Close* pMsg);
-  void On_LogWindow_Test(Msg_LogWindow_Test* pMsg);
-  void On_Log_Line(Msg_Log_Line* pMsg);
+  void On_LogWindow_SetFilterMask(Msg_LogWindow_SetFilterMask* pMsg);
   void On_Dialog_OnOpened(Msg_Dialog_OnOpened* pMsg);
   void On_Dialog_OnClosed(Msg_Dialog_OnClosed* pMsg);
+  void On_Log_Line(Msg_Log_Line* pMsg);
 
 protected:
   ApHandle hView_;
   bool bReady_;
   bool bInside_;
+  int nMask_;
 
   Apollo::SrpcGateHandlerRegistry srpcGateRegistry_;
   AP_MSG_REGISTRY_DECLARE;
@@ -89,6 +91,8 @@ AP_MSG_HANDLER_METHOD(LogWindow, LogWindow_Open)
   if (ApIsHandle(hView_)) {
     Msg_WebView_MakeFrontWindow::_(hView_);
   } else {
+    nMask_ = Apollo::getModuleConfig(MODULE_NAME, "Mask", -1);
+
     hView_ = Apollo::newHandle();
 
     Msg_Dialog_Create msg;
@@ -120,15 +124,22 @@ AP_MSG_HANDLER_METHOD(LogWindow, LogWindow_Close)
   pMsg->apStatus = ApMessage::Ok;
 }
 
-AP_MSG_HANDLER_METHOD(LogWindow, LogWindow_Test)
+AP_MSG_HANDLER_METHOD(LogWindow, LogWindow_SetFilterMask)
 {
+  nMask_ = pMsg->nMask;
+  Apollo::setModuleConfig(MODULE_NAME, "Mask", nMask_);
   pMsg->apStatus = ApMessage::Ok;
 }
 
 AP_MSG_HANDLER_METHOD(LogWindow, Dialog_OnOpened)
 {
   if (pMsg->hDialog == hView_) {
-    Msg_Dialog_ContentCall::_(hView_, Apollo::getModuleConfig(MODULE_NAME, "CallScriptSrpcFunctionName", "ReceiveMessageFromModule"), "Clear");
+
+    Msg_Dialog_CallScriptFunction msg;
+    msg.hDialog = hView_;
+    msg.sFunction = "Clear";
+    (void) msg.Request();
+    
     bReady_ = true;
   }
 }
@@ -142,36 +153,33 @@ AP_MSG_HANDLER_METHOD(LogWindow, Dialog_OnClosed)
 }
 
 static const char* szLevelNames[apLog_NLogLevels] = {
-   "None....."
-  ,"Fatal...."
-  ,"Error...."
-  ,"Warning.."
-  ,"User....."
+   ""
+  ,"Fatal"
+  ,"Error"
+  ,"Warning"
+  ,"User"
   ,"#########"
-  ,"Info....."
-  ,"Verbose.."
-  ,"Trace...."
-  ,"VVerbose."
-  ,"Alert...."
+  ,"Info"
+  ,"Verbose"
+  ,"Trace"
+  ,"..."
+  ,"Alert"
 };
 
 AP_MSG_HANDLER_METHOD(LogWindow, Log_Line)
 {
-  if (ApIsHandle(hView_) && bReady_ && !bInside_) {
+  if (bReady_ && !bInside_ &&  (nMask_ & pMsg->nMask) != 0) {
     bInside_ = true;
 
-    Msg_Dialog_ContentCall msg;
+    Msg_Dialog_CallScriptFunction msg;
     msg.hDialog = hView_;
-    msg.sFunction = Apollo::getModuleConfig(MODULE_NAME, "CallScriptSrpcFunctionName", "ReceiveMessageFromModule");
-    msg.srpc.set(Srpc::Key::Method, "Line");
-
+    msg.sFunction = "Line";
     int nLevel = apLog_Mask2Level(pMsg->nMask);
-    String sLevel = szLevelNames[nLevel];
-    msg.srpc.set("sLevel", sLevel);
-    msg.srpc.set("sChannel", pMsg->sChannel);
-    msg.srpc.set("sContext", pMsg->sContext);
-    msg.srpc.set("sMessage", pMsg->sMessage);
-
+    String sLevel = nLevel < apLog_NLogLevels ? szLevelNames[nLevel] : "";
+    msg.lArgs.AddLast(sLevel);
+    msg.lArgs.AddLast(pMsg->sChannel);
+    msg.lArgs.AddLast(pMsg->sContext);
+    msg.lArgs.AddLast(pMsg->sMessage);
     (void) msg.Request();
 
     bInside_ = false;
@@ -183,18 +191,22 @@ AP_MSG_HANDLER_METHOD(LogWindow, Log_Line)
 void SrpcGate_LogWindow_Open(ApSRPCMessage* pMsg)
 {
   Msg_LogWindow_Open msg;
+  msg.hLogWindow = pMsg->srpc.getHandle("hLogWindow");
   SRPCGATE_HANDLER_NATIVE_REQUEST(pMsg, msg);
 }
 
 void SrpcGate_LogWindow_Close(ApSRPCMessage* pMsg)
 {
   Msg_LogWindow_Close msg;
+  msg.hLogWindow = pMsg->srpc.getHandle("hLogWindow");
   SRPCGATE_HANDLER_NATIVE_REQUEST(pMsg, msg);
 }
 
-void SrpcGate_LogWindow_Test(ApSRPCMessage* pMsg)
+void SrpcGate_LogWindow_SetFilterMask(ApSRPCMessage* pMsg)
 {
-  Msg_LogWindow_Test msg;
+  Msg_LogWindow_SetFilterMask msg;
+  msg.hLogWindow = pMsg->srpc.getHandle("hLogWindow");
+  msg.nMask = pMsg->srpc.getInt("nMask");
   SRPCGATE_HANDLER_NATIVE_REQUEST(pMsg, msg);
 }
 
@@ -206,14 +218,14 @@ int LogWindow::Init()
 
   AP_MSG_REGISTRY_ADD(MODULE_NAME, LogWindow, LogWindow_Open, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, LogWindow, LogWindow_Close, this, ApCallbackPosNormal);
-  AP_MSG_REGISTRY_ADD(MODULE_NAME, LogWindow, LogWindow_Test, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, LogWindow, LogWindow_SetFilterMask, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, LogWindow, Dialog_OnOpened, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, LogWindow, Dialog_OnClosed, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, LogWindow, Log_Line, this, ApCallbackPosNormal);
 
   srpcGateRegistry_.add("LogWindow_Open", SrpcGate_LogWindow_Open);
   srpcGateRegistry_.add("LogWindow_Close", SrpcGate_LogWindow_Close);
-  srpcGateRegistry_.add("LogWindow_Test", SrpcGate_LogWindow_Test);
+  srpcGateRegistry_.add("LogWindow_SetFilterMask", SrpcGate_LogWindow_SetFilterMask);
 
   return ok;
 }

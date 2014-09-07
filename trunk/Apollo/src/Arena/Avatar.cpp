@@ -527,7 +527,7 @@ void Avatar::OnModuleCall(Apollo::SrpcMessage& request, Apollo::SrpcMessage& res
 {
   String sMethod = request.getString(Srpc::Key::Method);
 
-  if (0){
+  if (0) {
   } else if (sMethod == "OnPublicChatTimedOut" || sMethod == "OnPublicChatClosed") {
     ApHandle hChat = Apollo::string2Handle(request.getString("hChat"));
     if (ApIsHandle(hChat)){

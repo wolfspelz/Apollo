@@ -117,7 +117,7 @@ void ChatWindow::OnModuleCall(Apollo::SrpcMessage& request, Apollo::SrpcMessage&
 {
   String sMethod = request.getString(Srpc::Key::Method);
 
-  if (0){
+  if (0) {
   } else if (sMethod == "SendChat") {
     String sText = request.getString("sText");
     if (sText){

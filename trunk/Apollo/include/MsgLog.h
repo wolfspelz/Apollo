@@ -13,7 +13,7 @@ class Msg_Log_Line: public ApNotificationMessage
 {
 public:
   Msg_Log_Line() : ApNotificationMessage("Log_Line"), nMask(0) {}
-  int nMask;
+  ApIN int nMask;
   ApIN String sChannel;
   ApIN String sContext;
   ApIN String sMessage;

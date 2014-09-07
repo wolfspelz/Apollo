@@ -1,4 +1,4 @@
-CallScriptSrpcFunctionName=ReceiveMessageFromModule
+Mask=254
 
 Left=300
 Top=300
