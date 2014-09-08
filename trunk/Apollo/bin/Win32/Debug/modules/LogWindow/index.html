@@ -21,34 +21,14 @@
   bottom:4px
   }
 
-#Out {
-  width:100%;
-  }
-
-#Wrapper input[type=button] {
-  padding:1px 3px;
-  }
-
-.cLine {
-  text-indent:-4em;
-  padding-left:4em;
-  }
-
-.cLevel {
-  color:#c0c0c0;
-  }
-
-.cChannel {
-  color:#c0c0c0;
-  }
-
-.cContext {
-  color:#808080;
-  }
-
-.cMessage {
-  color:#000000;
-  }
+#Out { padding-top:5px; width:100%; }
+#Wrapper input[type=button] { padding:1px 3px; }
+#Wrapper input[type=checkbox] { vertical-align:text-bottom; }
+.cLine { text-indent:-3em; padding-left:3em; }
+.cLevel { color:#c0c0c0; }
+.cChannel { color:#c0c0c0; }
+.cContext { color:#808080; }
+.cMessage { color:#000000; }
 
 </style>
 <script type="text/javascript">
@@ -125,13 +105,13 @@ function SetMask() {
 
 <body>
 <div id="Wrapper">
-  <input type="button" id="Clear" name="Clear" value="Clear"/>  <input type="checkbox" id="LevelFatal" /> Fatal
-  <input type="checkbox" id="LevelError" /> Error
-  <input type="checkbox" id="LevelWarning" /> Warning
-  <input type="checkbox" id="LevelUser" /> User
-  <input type="checkbox" id="LevelDebug" /> Debug
-  <input type="checkbox" id="LevelInfo" /> Info
-  <input type="checkbox" id="LevelVerbose" /> Verbose
+  <input type="button" id="Clear" name="Clear" value="Clear"/>  <label><label><input type="checkbox" id="LevelFatal" /> Fatal</label>
+  <label><input type="checkbox" id="LevelError" /> Error</label>
+  <label><input type="checkbox" id="LevelWarning" /> Warning</label>
+  <label><input type="checkbox" id="LevelUser" /> User</label>
+  <label><input type="checkbox" id="LevelDebug" /> Debug</label>
+  <label><input type="checkbox" id="LevelInfo" /> Info</label>
+  <label><input type="checkbox" id="LevelVerbose" /> Verbose</label>
   <br />  <div id="Out"></div>
 </div>
 </body>
