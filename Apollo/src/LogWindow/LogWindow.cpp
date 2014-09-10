@@ -9,6 +9,7 @@
 #include "LogWindow.h"
 #include "MsgLogWindow.h"
 #include "MsgDialog.h"
+#include "MsgConfig.h"
 #include "MsgTranslation.h"
 #include "MsgLog.h"
 #include "MsgWebView.h"
@@ -68,7 +69,7 @@ public:
 
   void On_LogWindow_Open(Msg_LogWindow_Open* pMsg);
   void On_LogWindow_Close(Msg_LogWindow_Close* pMsg);
-  void On_LogWindow_SetFilterMask(Msg_LogWindow_SetFilterMask* pMsg);
+  void On_Config_SetValue(Msg_Config_SetValue* pMsg);
   void On_Dialog_OnOpened(Msg_Dialog_OnOpened* pMsg);
   void On_Dialog_OnClosed(Msg_Dialog_OnClosed* pMsg);
   void On_System_RunLevel(Msg_System_RunLevel* pMsg);
@@ -126,11 +127,11 @@ AP_MSG_HANDLER_METHOD(LogWindow, LogWindow_Close)
   pMsg->apStatus = ApMessage::Ok;
 }
 
-AP_MSG_HANDLER_METHOD(LogWindow, LogWindow_SetFilterMask)
+AP_MSG_HANDLER_METHOD(LogWindow, Config_SetValue)
 {
-  nMask_ = pMsg->nMask;
-  Apollo::setModuleConfig(MODULE_NAME, "Mask", nMask_);
-  pMsg->apStatus = ApMessage::Ok;
+  if (pMsg->sPath == MODULE_NAME "/" "Mask") {
+    nMask_ = String::atoi(pMsg->sValue);
+  }
 }
 
 AP_MSG_HANDLER_METHOD(LogWindow, Dialog_OnOpened)
@@ -205,22 +206,12 @@ AP_MSG_HANDLER_METHOD(LogWindow, Log_Line)
 void SrpcGate_LogWindow_Open(ApSRPCMessage* pMsg)
 {
   Msg_LogWindow_Open msg;
-  msg.hLogWindow = pMsg->srpc.getHandle("hLogWindow");
   SRPCGATE_HANDLER_NATIVE_REQUEST(pMsg, msg);
 }
 
 void SrpcGate_LogWindow_Close(ApSRPCMessage* pMsg)
 {
   Msg_LogWindow_Close msg;
-  msg.hLogWindow = pMsg->srpc.getHandle("hLogWindow");
-  SRPCGATE_HANDLER_NATIVE_REQUEST(pMsg, msg);
-}
-
-void SrpcGate_LogWindow_SetFilterMask(ApSRPCMessage* pMsg)
-{
-  Msg_LogWindow_SetFilterMask msg;
-  msg.hLogWindow = pMsg->srpc.getHandle("hLogWindow");
-  msg.nMask = pMsg->srpc.getInt("nMask");
   SRPCGATE_HANDLER_NATIVE_REQUEST(pMsg, msg);
 }
 
@@ -232,7 +223,7 @@ int LogWindow::Init()
 
   AP_MSG_REGISTRY_ADD(MODULE_NAME, LogWindow, LogWindow_Open, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, LogWindow, LogWindow_Close, this, ApCallbackPosNormal);
-  AP_MSG_REGISTRY_ADD(MODULE_NAME, LogWindow, LogWindow_SetFilterMask, this, ApCallbackPosNormal);
+  AP_MSG_REGISTRY_ADD(MODULE_NAME, LogWindow, Config_SetValue, this, ApCallbackPosEarly);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, LogWindow, Dialog_OnOpened, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, LogWindow, Dialog_OnClosed, this, ApCallbackPosNormal);
   AP_MSG_REGISTRY_ADD(MODULE_NAME, LogWindow, System_RunLevel, this, ApCallbackPosNormal);
@@ -240,7 +231,6 @@ int LogWindow::Init()
 
   srpcGateRegistry_.add("LogWindow_Open", SrpcGate_LogWindow_Open);
   srpcGateRegistry_.add("LogWindow_Close", SrpcGate_LogWindow_Close);
-  srpcGateRegistry_.add("LogWindow_SetFilterMask", SrpcGate_LogWindow_SetFilterMask);
 
   return ok;
 }
