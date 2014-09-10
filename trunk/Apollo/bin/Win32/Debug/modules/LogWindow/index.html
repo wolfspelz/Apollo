@@ -97,7 +97,8 @@ function SetMask() {
       nMask += 1 << LogLevels[i];
     }
   }
-  var resp = api.Message('LogWindow_SetFilterMask').setInt('nMask', nMask).send();
+  Line(nMask, '','','');
+  var resp = api.Message('Config_SetValue').setString('sPath', 'LogWindow/Mask').setInt('sValue', nMask).send();
 }
 </script>
 
