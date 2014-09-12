@@ -74,6 +74,7 @@ function UpdateProperty(sKey, value) {
 
     case 'bIsRezable':
       $('.cIsRezable .cValue').html(api.Translate(value ? 'yes' : 'no', 'ItemPropertyValue', 'Inventory'));
+      $('#iRezData').css('display', value ? '' : 'none');
       break;
 
     case 'bRezzed':
@@ -106,5 +107,5 @@ function RezItemToLocation(hLocation) {
 
 </head>
 <body>
-<span class="cOut"></span><div class="cItemInfo"><table class="cHead"><tr>  <td class="cImage"><img src="" alt=""/></td>  <td>    <p class="cProperty cName"><span class="cValue"></span></p>    <p class="cProperty cStacksize"><span class="cLabel cTranslate">Stacksize</span>: <span class="cValue"></span></p>    <p class="cProperty cSlot"><span class="cLabel cTranslate">Slot</span>: <span class="cValue"></span></p>    <p class="cProperty cIsRezable"><span class="cLabel cTranslate">IsRezable</span>: <span class="cValue"></span></p>    <p class="cProperty cRezzed"><span class="cLabel cTranslate">Rezzed</span>: <span class="cValue"></span></p>  </td></tr></table><table class="cMoreData"><tr>  <td>    <p class="cProperty cRezzedDestination"><span class="cLabel cTranslate">RezzedDestination</span>: <span class="cValue"></span></p>    <p class="cProperty cRezzedJid"><span class="cLabel cTranslate">RezzedJid</span>: <span class="cValue"></span></p>    <table class="cRezToLocation"><tr>      <td><span class="cLabel cTranslate">Rez</span>:</td>      <td class="cList"></td>    </tr></table>  </td></tr></table></div></body>
+<span class="cOut"></span><div class="cItemInfo"><table class="cHead"><tr>  <td class="cImage"><img src="" alt=""/></td>  <td>    <p class="cProperty cName"><span class="cValue"></span></p>    <p class="cProperty cStacksize"><span class="cLabel cTranslate">Stacksize</span>: <span class="cValue"></span></p>    <p class="cProperty cSlot"><span class="cLabel cTranslate">Slot</span>: <span class="cValue"></span></p>    <p class="cProperty cIsRezable"><span class="cLabel cTranslate">IsRezable</span>: <span class="cValue"></span></p>  </td></tr></table><table id="iRezData" class="cRezData"><tr>  <td>    <p class="cProperty cRezzed"><span class="cLabel cTranslate">Rezzed</span>: <span class="cValue"></span></p>    <p class="cProperty cRezzedDestination"><span class="cLabel cTranslate">RezzedDestination</span>: <span class="cValue"></span></p>    <p class="cProperty cRezzedJid"><span class="cLabel cTranslate">RezzedJid</span>: <span class="cValue"></span></p>    <table class="cRezToLocation"><tr>      <td><span class="cLabel cTranslate">Rez</span>:</td>      <td class="cList"></td>    </tr></table>  </td></tr></table></div></body>
 </html>
