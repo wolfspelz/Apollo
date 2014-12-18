@@ -65,10 +65,10 @@ function Line(sLevel, sChannel, sContext, sMessage)
 {
   $('#Out').prepend('<div class="cLine">'
   + '<span class="cCount">' + nCount++ + '</span> '
-  + '<span class="cLevel">' + sLevel + '</span> '
-  + '<span class="cLevel">' + sChannel + '</span> '
-  + '<span class="cContext">' + sContext + '</span> '
-  + '<span class="cMessage">' + sMessage + '</span> '
+  + '<span class="cLevel">' + api.HtmlEscape(sLevel) + '</span> '
+  + '<span class="cLevel">' + api.HtmlEscape(sChannel) + '</span> '
+  + '<span class="cContext">' + api.HtmlEscape(sContext) + '</span> '
+  + '<span class="cMessage">' + api.HtmlEscape(sMessage) + '</span> '
   + '</div>');
 }
 
@@ -97,7 +97,6 @@ function SetMask() {
       nMask += 1 << LogLevels[i];
     }
   }
-  Line(nMask, '','','');
   var resp = api.Message('Config_SetValue').setString('sPath', 'LogWindow/Mask').setInt('sValue', nMask).send();
 }
 </script>
