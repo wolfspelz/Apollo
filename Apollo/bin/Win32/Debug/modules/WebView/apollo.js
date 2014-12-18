@@ -271,7 +271,7 @@ ApolloApi.prototype =
     LevelWarning: 8,
     LevelUser: 16,
     LevelDebug: 32,
-    LevelInfo: 64, 
+    LevelInfo: 64,
     LevelVerbose: 128,
 
     Error: function (sMessage) { this.Send(this.LevelError, gApi.moduleName, 'JS:', String(sMessage)); },
@@ -351,13 +351,13 @@ ApolloApi.prototype =
       for (var i = 0; i < aClasses.length; i++) {
         switch (aClasses[i]) {
           case 'cApMove': this.bIsMove = true; break;
-          //          case 'cApSizeLeft': this.bIsSize = true; this.nSizeDirection = 1; break;       
-          //          case 'cApSizeTop': this.bIsSize = true; this.nSizeDirection = 2; break;       
+          //          case 'cApSizeLeft': this.bIsSize = true; this.nSizeDirection = 1; break;         
+          //          case 'cApSizeTop': this.bIsSize = true; this.nSizeDirection = 2; break;         
           case 'cApSizeRight': this.bIsSize = true; this.nSizeDirection = 3; break;
           case 'cApSizeBottom': this.bIsSize = true; this.nSizeDirection = 4; break;
-          //          case 'cApSizeTopLeft': this.bIsSize = true; this.nSizeDirection = 5; break;       
-          //          case 'cApSizeTopRight': this.bIsSize = true; this.nSizeDirection = 6; break;       
-          //          case 'cApSizeBottomLeft': this.bIsSize = true; this.nSizeDirection = 7; break;       
+          //          case 'cApSizeTopLeft': this.bIsSize = true; this.nSizeDirection = 5; break;         
+          //          case 'cApSizeTopRight': this.bIsSize = true; this.nSizeDirection = 6; break;         
+          //          case 'cApSizeBottomLeft': this.bIsSize = true; this.nSizeDirection = 7; break;         
           case 'cApSizeBottomRight': this.bIsSize = true; this.nSizeDirection = 8; break;
         }
       }
@@ -453,6 +453,21 @@ ApolloApi.prototype =
   // ------------------------------------------------
 
   Init: function () {
+  },
+
+  // ---------------------
+  // Utils
+
+  HtmlEscape: function (s) {
+    var t = '';
+    for (var i = 0; i < s.length; i++) {
+      switch (s.charAt(i)) {
+        case '<': t += '&lt;'; break;
+        case '>': t += '&gt;'; break;
+        default: t += s.charAt(i);
+      }
+    }
+    return t;
   },
 
   _avoidcommahazzle: 0
